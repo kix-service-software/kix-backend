@@ -64,8 +64,28 @@ sub Run {
         }
     }
 
-    # return dummy value to make sure the macros will be executed
-    return (1);
+    # do the search
+    my %DefinitionList = $Kernel::OM->Get('Reporting')->ReportDefinitionList(
+        Valid => 1,
+    );
+
+    my @Definitions;
+    DEFINITION:
+    foreach my $ID ( sort keys %{DefinitionList} ) {
+        my %Definition = $Kernel::OM->Get('Reporting')->ReportDefinitionGet(
+            ID => $ID
+        );
+        next DEFINITION if !%Definition;
+        push @Definitions, \%Definition;
+    }
+    @Definitions = $Kernel::OM->Get('Main')->FilterObjectList(
+        Data   => \@Definitions,
+        Filter => $Param{Filter},
+    );
+
+    my @DefinitionIDs = map { $_->{ID} } @Definitions;
+
+    return @DefinitionIDs;
 }
 
 1;

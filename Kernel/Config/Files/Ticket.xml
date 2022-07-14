@@ -275,7 +275,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::ForceOwnerReset</Item>
-                <Item Key="Event">TicketQueueUpdate</Item>
+                <Item Key="Event">Ticket(Owner|Queue)Update</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3360,6 +3360,14 @@ Thanks for your help!
     </ConfigItem>
 
     <!-- ticket placeholder module registrations -->
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###005-Common" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for configuration placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Common</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Placeholder::Module###010-Config" Required="0" Valid="1">
         <Description Translatable="1">Module registration for configuration placeholders.</Description>
         <Setting>

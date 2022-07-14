@@ -46,6 +46,8 @@ $Self->True(
 my $ReportDefinitionID2 = $ReportingObject->ReportDefinitionAdd(
     Name       => $ReportDefinitionName.'-invalid-GenericSQL',
     DataSource => 'GenericSQL',
+    IsPeriodic => 1,
+    MaxReports => 5,
     ValidID    => 2,
     UserID     => 1,
 );
@@ -74,7 +76,7 @@ my %DefinitionList = $ReportingObject->ReportDefinitionList(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    3,
+    4,
     'ReportDefinitionList() - without restrictions',
 );
 
@@ -85,7 +87,7 @@ $Self->Is(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    2,
+    3,
     'ReportDefinitionList() - only valid',
 );
 
@@ -97,12 +99,12 @@ $Self->Is(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    2,
+    3,
     'ReportDefinitionList() - only type "GenericSQL"',
 );
 
 $Self->Is(
-    (sort values %DefinitionList)[1],
+    (sort values %DefinitionList)[2],
     $ReportDefinitionName.'-GenericSQL',
     'ReportDefinitionList() - only type "GenericSQL"',
 );
@@ -122,11 +124,25 @@ $Self->Is(
     'ReportDefinitionGet()',
 );
 
+$Self->Is(
+    $Definition{IsPeriodic},
+    1,
+    'ReportDefinitionGet() - IsPeriodic has correct value',
+);
+
+$Self->Is(
+    $Definition{MaxReports},
+    5,
+    'ReportDefinitionGet() - MaxReports has correct value',
+);
+
 my $Success = $ReportingObject->ReportDefinitionUpdate(
     ID => $ReportDefinitionID2,
     %Definition,
-    ValidID => 1,
-    UserID  => 1,
+    IsPeriodic => undef,
+    MaxReports => 0,
+    ValidID    => 1,
+    UserID     => 1,
 );
 
 $Self->True(
@@ -141,7 +157,7 @@ $Self->True(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    3,
+    4,
     'ReportDefinitionList() - only valid after update',
 );
 
@@ -159,6 +175,18 @@ $Self->Is(
     $Definition{ValidID},
     1,
     'ReportDefinitionGet() - ValidID has correct value',
+);
+
+$Self->Is(
+    $Definition{IsPeriodic},
+    undef,
+    'ReportDefinitionGet() - IsPeriodic has correct value',
+);
+
+$Self->Is(
+    $Definition{MaxReports},
+    0,
+    'ReportDefinitionGet() - MaxReports has correct value',
 );
 
 # update to the same name like definition 1
@@ -190,9 +218,11 @@ $Self->True(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    2,
+    3,
     'ReportDefinitionList() - without restrictions after delete',
 );
+
+
 
 my @ValidationTests = (
     {

@@ -89,15 +89,9 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Definition = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText  => 0,
-        Text      => $Param{Config}->{Definition},
-        Data      => {},
-        UserID    => $Param{UserID},
-        Translate => 0,
-
-        # FIXME: as common action, object id could be not a ticket!
-        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+    my $Definition = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Definition}
     );
 
     # create new instance of helper module

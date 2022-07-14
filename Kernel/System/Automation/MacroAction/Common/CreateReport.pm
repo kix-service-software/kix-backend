@@ -113,24 +113,26 @@ sub Run {
     }
 
     # replace placeholders - atm only for ticket
-    foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
-        $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText  => 0,
-            Text      => $Param{Config}->{Parameters}->{$Parameter},
-            Data      => {},
-            UserID    => $Param{UserID},
-            Translate => 0,
+    if ( IsHashRefWithData($Param{Config}->{Parameters}) ) {
+        foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
+            $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                RichText  => 0,
+                Text      => $Param{Config}->{Parameters}->{$Parameter},
+                Data      => {},
+                UserID    => $Param{UserID},
+                Translate => 0,
 
-            # FIXME: as common action, object id could be not a ticket!
-            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
-        );
+                # FIXME: as common action, object id could be not a ticket!
+                TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+            );
+        }
     }
 
     # create Report
     my $ReportID = $Kernel::OM->Get('Reporting')->ReportCreate(
         DefinitionID => $Param{Config}->{DefinitionID},
         Config       => {
-            Parameters    => $Param{Config}->{Parameters},
+            Parameters    => IsHashRefWithData($Param{Config}->{Parameters}) ? $Param{Config}->{Parameters} : undef,
             OutputFormats => $Param{Config}->{OutputFormats}
         },
         UserID => $Param{UserID}

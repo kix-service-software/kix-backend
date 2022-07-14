@@ -2423,7 +2423,7 @@ sub GetAssignedFAQArticlesForObject {
 # TODO: move to a "common" module (used in other modules too)
 =item _GetCombinedList()
 
-combines to arrays (intersect or union)
+combines two arrays (intersect or union)
 
     my @CombinedList = $Self->_GetCombinedList(
         ListA   => $ListAArrayRef,

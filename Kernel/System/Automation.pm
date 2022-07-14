@@ -338,6 +338,12 @@ sub LogDelete {
     return 1;
 }
 
+sub _GetUnique {
+    my ( $Self, @List ) = @_;
+    my %Known;
+    return grep { !$Known{$_}++ } @List;
+}
+
 1;
 
 =back

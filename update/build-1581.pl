@@ -27,13 +27,44 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
+my $AutomationObject = $Kernel::OM->Get('Automation');
+
+# rename reopen job
+_RenameJobIfNecessary();
+
 # update reopen job
 _UpdateReopenJob();
 
-sub _UpdateReopenJob {
+sub _RenameJobIfNecessary {
     my ( $Self, %Param ) = @_;
 
-    my $AutomationObject = $Kernel::OM->Get('Automation');
+    my $JobID = $AutomationObject->JobLookup(
+        Name => 'Customer Response :: reopen from pending',
+    );
+
+    if ($JobID) {
+        my %Job = $AutomationObject->JobGet(
+            ID => $JobID
+        );
+        $Job{Name} = 'Customer Response - reopen from pending';
+
+        my $Result = $AutomationObject->JobUpdate(
+            %Job,
+            UserID => 1,
+        );
+
+        if (!$Result) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to rename job \"Customer Response :: reopen from pending\" (use \"-\" instead of \"::\")!"
+            );
+        }
+    }
+
+    return 1;
+}
+sub _UpdateReopenJob {
+    my ( $Self, %Param ) = @_;
 
     my $JobID = $AutomationObject->JobLookup(
         Name => 'Customer Response - reopen from pending',

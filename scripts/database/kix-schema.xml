@@ -1374,7 +1374,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="notification_id" Required="true" Type="INTEGER"/>
     <Column Name="subject" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="text" Required="true" Size="4000" Type="VARCHAR"/>
+    <Column Name="text" Required="true" Size="1800000" Type="VARCHAR"/>
     <Column Name="content_type" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="language" Required="true" Size="60" Type="VARCHAR"/>
     <ForeignKey ForeignTable="notification_event">
@@ -1397,7 +1397,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="notification_id" Required="true" Type="INTEGER"/>
     <Column Name="event_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="event_value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="event_value" Required="true" Size="2000" Type="VARCHAR"/>
     <ForeignKey ForeignTable="notification_event">
         <Reference Foreign="id" Local="notification_id"/>
     </ForeignKey>
@@ -1408,7 +1408,7 @@
         <IndexColumn Name="event_key"/>
     </Index>
     <Index Name="notification_event_item_event_value">
-        <IndexColumn Name="event_value"/>
+        <IndexColumn Name="event_value" Size="100"/>
     </Index>
 </Table>
 
@@ -2020,7 +2020,7 @@
 <!-- import run -->
 <Table Name="imexport_template_run">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
-    <Column Name="template_id" Required="true" Type="INTEGER" />
+    <Column Name="template_id" Required="true" Type="BIGINT" />
     <Column Name="state_id" Required="false" Type="SMALLINT" />
     <Column Name="success_count" Required="false" Type="INTEGER" />
     <Column Name="fail_count" Required="false" Type="INTEGER" />
@@ -2144,9 +2144,10 @@
     </ForeignKey>
 </Table>
 <Table Name="configitem_counter">
-    <Column Name="class_id" Required="true" PrimaryKey="true" Type="INTEGER" />
-    <Column Name="counter_type" Required="true" Size="50" Type="VARCHAR" />
-    <Column Name="counter" Required="true" Size="50" Type="VARCHAR" />
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
+    <Column Name="class_id" Required="true" PrimaryKey="false" Type="INTEGER" />
+    <Column Name="counter" Required="true" Size="255" Type="VARCHAR" />
+    <Column Name="value" Required="true" Size="50" Type="VARCHAR" />
     <ForeignKey ForeignTable="general_catalog">
         <Reference Local="class_id" Foreign="id" />
     </ForeignKey>
@@ -2530,6 +2531,7 @@
 <Table Name="macro_action">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="macro_id" Required="true" Type="INTEGER"/>
+    <Column Name="referenced_macro_id" Required="false" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="parameters" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="result_variables" Required="false" Size="10000" Type="VARCHAR"/>
@@ -2541,6 +2543,9 @@
     <Column Name="change_by" Required="true" Type="INTEGER"/>
     <ForeignKey ForeignTable="macro">
         <Reference Local="macro_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="macro">
+        <Reference Local="referenced_macro_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
@@ -2663,6 +2668,8 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="datasource" Required="true" Size="255" Type="VARCHAR"/>
     <Column Name="config" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="is_periodic" Required="false" Type="INTEGER" Default="0"/>
+    <Column Name="max_reports" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

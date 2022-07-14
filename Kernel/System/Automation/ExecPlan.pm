@@ -540,6 +540,17 @@ sub ExecPlanDelete {
         return;
     }
 
+    my $Deletable = $Self->ExecPlanIsDeletable(
+        ID => $Param{ID}
+    );
+    if (!$Deletable) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Could not delete exec plan, it is used/referenced in at least one object.",
+        );
+        return;
+    }
+
     # delete relations with Jobs
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'DELETE FROM job_exec_plan WHERE exec_plan_id = ?',
@@ -573,7 +584,7 @@ sub ExecPlanDelete {
 checks an exec plan if the job can run
 
     my $CanExecute = $AutomationObject->ExecPlanCheck(
-        ID        => 123,       # the ID of the macro action
+        ID        => 123,       # the ID of the exec plan action
         JobID     => 123,       # the ID of the job to be executed
         Time      => '...',     # optional, required for time based execplans
         Event     => '...',     # optional, required for event based execplans
@@ -640,6 +651,71 @@ sub ExecPlanCheck {
     );
 
     return $BackendResult;
+}
+
+=item ExecPlanIsDeletable()
+
+checks if a exec plan is deletable. Return 0 or 1.
+
+    my $Result = $AutomationObject->ExecPlanIsDeletable(
+        ID => 123,        # the ID of the exec plan
+    );
+
+=cut
+
+sub ExecPlanIsDeletable {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check if this exec plan exists
+    my $Name = $Self->ExecPlanLookup(
+        ID => $Param{ID},
+    );
+    return 0 if !$Name;
+
+    my $ReferenceObjects = $Kernel::OM->Get('Config')->Get('Automation::ExecPlanReferenceObject');
+
+    if (IsHashRefWithData($ReferenceObjects)) {
+        for my $Object (keys %{$ReferenceObjects}) {
+            next if (!$Object);
+            if (!$ReferenceObjects->{$Object}) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No module given for object \"$Object\" for exec plan references!"
+                );
+                next;
+            }
+            next if ( !$Kernel::OM->Get('Main')->Require($ReferenceObjects->{$Object}) );
+
+            my $Module = $Kernel::OM->Get($ReferenceObjects->{$Object});
+
+            if ( !$Module->can('AllUsedExecPlanIDList') ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Module \"$ReferenceObjects->{$Object}\" cannot \"AllUsedExecPlanIDList\"!"
+                );
+                next;
+            }
+
+            # get all used exec plan ids
+            my @ExecPlanIDs = $Module->AllUsedExecPlanIDList();
+
+            # not deletable if used/referenced
+            return 0 if (grep { $_ == $Param{ID} } @ExecPlanIDs);
+        }
+    }
+
+    return 1;
 }
 
 sub _LoadExecPlanTypeBackend {

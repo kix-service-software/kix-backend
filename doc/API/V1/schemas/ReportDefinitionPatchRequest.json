@@ -81,6 +81,12 @@
                "description" : "The data source to use.",
                "type" : "string"
             },
+            "IsPeriodic" : {
+               "type" : "integer"
+            },
+            "MaxReports" : {
+               "type" : "integer"
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
