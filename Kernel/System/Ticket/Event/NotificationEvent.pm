@@ -14,6 +14,9 @@ use strict;
 use warnings;
 
 use List::Util qw(first);
+use Time::HiRes qw(time);
+
+use base qw(Kernel::System::AsynchronousExecutor);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -50,6 +53,8 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+my $StartTime = time();
+
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
@@ -83,8 +88,35 @@ sub Run {
 
     return 1 if !$TicketExists;
 
+    my $Result;
+
+    if ( $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+
+        my $Result = $Self->AsyncCall(
+            FunctionName   => '_Run',
+            FunctionParams => \%Param,
+        );
+    }
+    else {
+        $Result = $Self->_Run(
+            %Param
+        );
+    }
+
+printf STDERR "        NotificationEvent->Run: %i ms\n", (time() - $StartTime) * 1000;
+
+    return $Result;
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+
+my $StartTime = time();
     # get notification event object
     my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
+
+    # get objects
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if event is affected
     my @IDs = $NotificationEventObject->NotificationEventCheck(
@@ -110,9 +142,12 @@ sub Run {
         ObjectType => ['Ticket'],
     );
 
+printf STDERR "        NotificationEvent->_Run (Preparation): %i ms\n", (time() - $StartTime) * 1000;
+
     NOTIFICATION:
     for my $ID (@IDs) {
 
+my $StartTime = time();
         my %Notification = $NotificationEventObject->NotificationGet(
             ID => $ID,
         );
@@ -375,6 +410,7 @@ sub Run {
                 );
             }
         }
+printf STDERR "        NotificationEvent->_Run (Notification $ID): %i ms\n", (time() - $StartTime) * 1000;
     }
 
     return 1;
@@ -382,6 +418,8 @@ sub Run {
 
 sub _NotificationFilter {
     my ( $Self, %Param ) = @_;
+
+my $StartTime = time();
 
     # check needed params
     for my $Needed (qw(Data Notification)) {
@@ -419,12 +457,15 @@ sub _NotificationFilter {
         Limit  => 1,
     );
 
+printf STDERR "            NotificationEvent->_NotificationFilter: %i ms\n", (time() - $StartTime) * 1000;
+
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
 }
 
 sub _RecipientsGet {
     my ( $Self, %Param ) = @_;
 
+my $StartTime = time();
     # check needed params
     for my $Needed (qw(Ticket Notification)) {
         return if !$Param{$Needed};
@@ -821,6 +862,8 @@ sub _RecipientsGet {
         push @RecipientUsers, \%User;
     }
 
+printf STDERR "            NotificationEvent->_RecipientsGet: %i ms\n", (time() - $StartTime) * 1000;
+
     return @RecipientUsers;
 }
 
@@ -893,6 +936,8 @@ sub _SendRecipientNotification {
 
     my $TransportObject = $Param{TransportObject};
 
+my $StartTime = time();
+
     # send notification to each recipient
     my $Success = $TransportObject->SendNotification(
         TicketID              => $Param{TicketID},
@@ -903,6 +948,8 @@ sub _SendRecipientNotification {
         Event                 => $Param{Event},
         Attachments           => $Param{Attachments},
     );
+
+printf STDERR "            TransportObject->SendNotification: %i ms\n", (time() - $StartTime) * 1000;
 
     return if !$Success;
 
@@ -953,6 +1000,7 @@ sub _SendRecipientNotification {
 sub _ArticleToUpdate {
     my ( $Self, %Param ) = @_;
 
+my $StartTime = time();
     # check needed params
     for my $Needed (qw(ArticleID Channel UserIDs UserID)) {
         return if !$Param{$Needed};
@@ -988,6 +1036,8 @@ sub _ArticleToUpdate {
         SQL  => 'UPDATE article SET a_to = ? WHERE id = ?',
         Bind => [ \$NewTo, \$Param{ArticleID} ],
     );
+
+printf STDERR "           NotificationEvent->_ArticleToUpdate: %i ms\n", (time() - $StartTime) * 1000;
 
     return 1;
 }

@@ -218,6 +218,7 @@ sub EventHandler {
                 next MODULE if $Param{Transaction} && !$Modules->{$Module}->{Transaction};
             }
 
+my $StartTime = time();
             # load event module
             next MODULE if !$MainObject->Require( $Modules->{$Module}->{Module} );
 
@@ -228,6 +229,10 @@ sub EventHandler {
                 %Param,
                 Config => $Modules->{$Module},
             );
+if ( $Param{Transaction} ) {
+   printf STDERR "    EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (time() - $StartTime) * 1000;
+}
+
         }
     }
 
@@ -263,6 +268,8 @@ sub EventHandlerTransaction {
     # execute events on end of transaction
     if ( $Self->{EventHandlerPipe} ) {
 
+use Time::HiRes qw(time);
+my $StartTime = time();
         for my $Params ( @{ $Self->{EventHandlerPipe} } ) {
             $Self->EventHandler(
                 %Param,
@@ -270,6 +277,7 @@ sub EventHandlerTransaction {
                 Transaction => 1,
             );
         }
+printf STDERR "EventHandlerTransaction: %i ms\n", (time() - $StartTime) * 1000;
 
         # delete event pipe
         $Self->{EventHandlerPipe} = undef;

@@ -1101,18 +1101,16 @@ sub TicketGet {
         );
         return;
     }
-    $Param{Extended} = $Param{Extended} ? 1 : 0;
+    $Param{Extended}      //= 0;
+    $Param{DynamicFields} //= 0;
 
-    # check cache
-    my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
-
-    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::' . $FetchDynamicFields;
+    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::' . $Param{DynamicFields};
 
     my $Cached = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{Cached} if ref $CachedDynamicFields eq 'HASH';
+    return %{$Cached} if ref $Cached eq 'HASH';
 
     my %Ticket;
 
@@ -1133,26 +1131,26 @@ sub TicketGet {
     );
 
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Ticket{TicketID}       = $Row[0];
-        $Ticket{QueueID}        = $Row[1];
-        $Ticket{StateID}        = $Row[2];
-        $Ticket{LockID}         = $Row[3];
-        $Ticket{PriorityID}     = $Row[4];
-        $Ticket{CreateTimeUnix} = $Row[5];
-        $Ticket{TicketNumber}   = $Row[7];
-        $Ticket{OrganisationID} = $Row[8];
-        $Ticket{ContactID}      = $Row[9];
-        $Ticket{OwnerID}        = $Row[10];
-        $Ticket{ResponsibleID}  = $Row[11] || 1;
-        $Ticket{PendingTimeUnix}= $Row[12];
-        $Ticket{Changed}        = $Row[13];
-        $Ticket{Title}          = $Row[14];
-        $Ticket{UnlockTimeout}  = $Row[15];
-        $Ticket{TypeID}         = $Row[16] || 1;
-        $Ticket{ArchiveFlag}    = $Row[17] ? 'y' : 'n';
-        $Ticket{CreateBy}       = $Row[18];
-        $Ticket{ChangeBy}       = $Row[19];
-        $Ticket{AccountedTime}  = $Row[20];
+        $Ticket{TicketID}        = $Row[0];
+        $Ticket{QueueID}         = $Row[1];
+        $Ticket{StateID}         = $Row[2];
+        $Ticket{LockID}          = $Row[3];
+        $Ticket{PriorityID}      = $Row[4];
+        $Ticket{CreateTimeUnix}  = $Row[5];
+        $Ticket{TicketNumber}    = $Row[7];
+        $Ticket{OrganisationID}  = $Row[8];
+        $Ticket{ContactID}       = $Row[9];
+        $Ticket{OwnerID}         = $Row[10];
+        $Ticket{ResponsibleID}   = $Row[11] || 1;
+        $Ticket{PendingTimeUnix} = $Row[12];
+        $Ticket{Changed}         = $Row[13];
+        $Ticket{Title}           = $Row[14];
+        $Ticket{UnlockTimeout}   = $Row[15];
+        $Ticket{TypeID}          = $Row[16] || 1;
+        $Ticket{ArchiveFlag}     = $Row[17] ? 'y' : 'n';
+        $Ticket{CreateBy}        = $Row[18];
+        $Ticket{ChangeBy}        = $Row[19];
+        $Ticket{AccountedTime}   = $Row[20];
     }
 
     # check ticket
@@ -1167,7 +1165,7 @@ sub TicketGet {
     }
 
     # check if need to return DynamicFields
-    if ($FetchDynamicFields) {
+    if ($Param{DynamicFields}) {
 
         # get dynamic field objects
         my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');

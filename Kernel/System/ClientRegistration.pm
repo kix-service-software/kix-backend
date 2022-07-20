@@ -384,7 +384,9 @@ sub NotificationCount {
 
 send notifications to all clients who want to receive notifications
 
-    my $Result = $ClientRegistrationObject->NotificationSend();
+    my $Result = $ClientRegistrationObject->NotificationSend(
+        Async => 0|1,
+    );
 
 =cut
 
@@ -416,14 +418,24 @@ sub NotificationSend {
     return if !@ClientIDs;
 
     # send outstanding notifications to clients
-    $Self->AsyncCall(
-        ObjectName               => $Kernel::OM->GetModuleFor('ClientRegistration'),
-        FunctionName             => 'NotificationSendWorker',
-        FunctionParams           => {
+    if ( !$Param{Async} ) {
+        # we are in sync mode, so send the notifications asynchronously
+        $Self->AsyncCall(
+            ObjectName               => $Kernel::OM->GetModuleFor('ClientRegistration'),
+            FunctionName             => 'NotificationSendWorker',
+            FunctionParams           => {
+                EventList => \@EventList,
+                ClientIDs => \@ClientIDs
+            },
+        );
+    }
+    else {
+        # send synchronously, because we are already running in async mode
+        $Self->NotificationSendWorker(
             EventList => \@EventList,
             ClientIDs => \@ClientIDs
-        },
-    );
+        );
+    }
 
     # delete the cached events we sent
     foreach my $Key ( @Keys ) {

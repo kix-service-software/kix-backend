@@ -18,7 +18,7 @@ use Module::Refresh;
 use Plack::Builder;
 use File::Path qw();
 use Fcntl qw(:flock);
-use Time::HiRes;
+use Time::HiRes qw(time);
 
 # use ../../ as lib location
 use FindBin qw($Bin);
@@ -43,6 +43,8 @@ $Kernel::OM = Kernel::System::ObjectManager->new(
 
 $API::Provider = Kernel::API::Provider->new();
 
+#$API::Provider = Kernel::API::Provider->new();
+
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
 BEGIN {
@@ -66,12 +68,18 @@ my $App = CGI::Emulate::PSGI->handler(
             DB::enable_profile()
         }
 
-        my $StartTime = Time::HiRes::time();
+        my $StartTime = time();
 
-        $API::Provider->Run();
+#        $API::Provider->Run();
 
-        my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-        printf STDERR "Provider took %i ms\n", $TimeDiff;
+        # run the request
+        eval {
+            do "$Bin/$ENV{SCRIPT_NAME}";
+        };
+        if ( $@ && $@ ne "exit called\n" ) {
+            warn $@;
+        }
+        printf STDERR "CGI execution time: %i ms\n", (time() - $StartTime) * 1000;
 
         if ( $ENV{NYTPROF} ) {
             DB::finish_profile();
@@ -124,6 +132,7 @@ builder {
         vary_user_agent => 1;
     enable "Plack::Middleware::AccessLog::Timed",
         format => "%h %l %u %t \"%r\" %>s %b %D";
+    enable "StackTrace", force => 1;
     $App;
 };
 

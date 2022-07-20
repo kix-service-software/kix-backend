@@ -39,8 +39,7 @@ sub new {
     }
 
     # init some more things
-    $Self->{Mapping}      = {};
-    $Self->{CacheOptions} = {};
+    $Self->{Mapping} = {};
 
     return $Self;
 }
@@ -343,112 +342,6 @@ sub Update {
     return 1;
 }
 
-sub Lookup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    for my $Needed (qw(Table PrimaryKey RelevantAttr Item)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    if ( !IsHashRefWithData($Param{Item}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Parameter Item is not a Hash ref!"
-        );
-        return;
-    }
-
-    # check cache
-    my $CacheType = 'MigrationLookup_'.$Param{Table};
-    my $CacheKey  = join('::', values %Param);
-    if ( !$Param{NoCache} ) {
-        my $Cache = $Kernel::OM->Get('Cache')->Get(
-            Type => $CacheType,
-            Key  => $CacheKey,
-            %{$Self->{CacheOptions}->{$Param{Table}} || {}},
-        );
-        return $Cache if $Cache;
-    }
-
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    my $Mapping = $Self->{Mapping}->{$Param{Table}} || $Self->Describe()->{Mapping} || {};
-
-    # prepare select statement
-    my @Bind;
-    my @Where;
-    foreach my $Attr ( @{$Param{RelevantAttr}} ) {
-        my $Value = $Param{Item}->{$Attr};
-        next if !defined $Value;
-
-        # map value if defined
-        $Value = $Mapping->{$Value} if $Mapping->{$Value};
-
-        # should we search case insensitive ?
-        $Value = $Param{IgnoreCase} ? lc($Value) : $Value;
-
-        push @Bind, \$Value;
-        push @Where, $Param{IgnoreCase} ? "lower($Attr) = ?" : "$Attr = ?";
-    }
-    my $SQL = "SELECT $Param{PrimaryKey} FROM $Param{Table} WHERE " . join(' AND ', @Where);
-
-    # lookup ID of existing object
-    return if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Bind,
-    );
-
-    my @Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @Result, $Row[0];
-    }
-
-    return if @Result > 1;
-
-    if ( $Result[0] && ( $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID} ) ) {
-        # check if OID mapping exists and create one if not or replace it
-        my $MappedID = $Self->GetOIDMapping(
-            %Param,
-            ObjectType     => $Param{Table},
-            SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
-        );
-        if ( !$MappedID ) {
-            $Self->CreateOIDMapping(
-                ObjectType     => $Param{Table},
-                ObjectID       => $Result[0],
-                SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
-            );
-        }
-        else {
-            $Self->ReplaceOIDMapping(
-                ObjectType     => $Param{Table},
-                ObjectID       => $Result[0],
-                SourceObjectID => $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID}
-            );
-        }
-    }
-
-    if ( !$Param{NoCache} && $Result[0] ) {
-        # set cache
-        $Kernel::OM->Get('Cache')->Set(
-            Type  => $CacheType,
-            TTL   => undef,
-            Key   => $CacheKey,
-            Value => $Result[0],
-            %{$Self->{CacheOptions}->{$Param{Table}} || {}},
-        );
-    }
-
-    return $Result[0];
-}
-
 sub SetMapping {
     my ( $Self, %Param ) = @_;
 
@@ -512,218 +405,6 @@ sub ParseOptions {
     return 1;
 }
 
-sub GetOIDMapping {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    for my $Needed (qw(ObjectType)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    if ( !$Param{SourceObjectID} && !$Param{ObjectID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need SourceObjectID or ObjectID!"
-        );
-        return;
-    }
-
-    # check whether we have a preloaded mapping
-    my $PreloadedOIDMappings = $Kernel::OM->Get('Cache')->Get(
-        Type           => 'MigrationOIDMapping',
-        Key            => 'PreloadedOIDMappings',
-        CacheInMemory  => 1,
-        CacheInBackend => 0,
-    );
-    if ( IsHashRefWithData($PreloadedOIDMappings) ) {
-        if ( $Param{SourceObjectID} && $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}} ) {
-            return $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}};
-        }
-        elsif ( $Param{ObjectID} && $PreloadedOIDMappings->{$Param{ObjectType}}->{ObjectID}->{$Param{ObjectID}} ) {
-            return $PreloadedOIDMappings->{$Param{ObjectType}}->{ObjectID}->{$Param{ObjectID}};
-        }
-    }
-
-    # check cache
-    my $CacheType = 'MigrationOIDMapping_'.$Param{ObjectType};
-    my $CacheKey  = join('::', values %Param);
-    if ( !$Param{NoCache} ) {
-        my $Cache = $Kernel::OM->Get('Cache')->Get(
-            Type => $CacheType,
-            Key  => $CacheKey,
-            %{$Self->{CacheOptions}->{$Param{ObjectType}} || {}},
-        );
-        return $Cache if $Cache;
-    }
-
-    # get the mapped ID
-    if ( $Param{SourceObjectID} ) {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL  => 'SELECT object_id FROM migration WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
-            Bind => [
-                \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{SourceObjectID},
-            ],
-            Limit => 1,
-        );
-    }
-    else {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL  => 'SELECT source_object_id FROM migration WHERE source = ? AND source_id = ? AND object_type = ? AND object_id = ?',
-            Bind => [
-                \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID},
-            ],
-            Limit => 1,
-        );
-    }
-
-    my $ID;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $ID = $Row[0];
-    }
-
-    if ( !$Param{NoCache} && $ID ) {
-        # set cache
-        $Kernel::OM->Get('Cache')->Set(
-            Type  => $CacheType,
-            TTL   => undef,
-            Key   => $CacheKey,
-            Value => $ID,
-            %{$Self->{CacheOptions}->{$Param{ObjectType}} || {}},
-        );
-    }
-
-    return $ID;
-}
-
-sub CreateOIDMapping {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    for my $Needed (qw(ObjectType ObjectID SourceObjectID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $AdditionalData;
-    if ( IsHashRefWithData($Param{AdditionalData}) ) {
-        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
-            Data => $Param{AdditionalData}
-        );
-    }
-
-    # save the mapping
-    my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id, additional_data) VALUES (?,?,?,?,?,?)',
-        Bind => [
-            \$Self->{Source}, \$Self->{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID}, \$AdditionalData
-        ]
-    );
-    if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to create object id mapping!"
-        );
-        return;
-    }
-
-    return 1;
-}
-
-sub ReplaceOIDMapping {
-    my ( $Self, %Param ) = @_;
-
-    # check needed params
-    for my $Needed (qw(ObjectType ObjectID SourceObjectID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $AdditionalData;
-    if ( IsHashRefWithData($Param{AdditionalData}) ) {
-        $AdditionalData = $Kernel::OM->Get('JSON')->Encode(
-            Data => $Param{AdditionalData}
-        );
-    }
-
-    # save the mapping
-    my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'UPDATE migration SET object_id = ?, additional_data = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
-        Bind => [
-            \$Param{ObjectID}, \$AdditionalData, \$Self->{Source}, \$Self->{SourceID},
-            \$Param{ObjectType}, \$Param{SourceObjectID},
-        ]
-    );
-    if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to update object id mapping!"
-        );
-        return;
-    }
-
-    return 1;
-}
-
-sub PreloadOIDMappings {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !IsArrayRefWithData($Param{ObjectType}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need ObjectType as ArrayRef!",
-        );
-        return;
-    }
-
-    my %PreloadedOIDMappings;
-    foreach my $ObjectType ( @{$Param{ObjectType}} ) {
-        my $Result = $Kernel::OM->Get('DB')->Prepare(
-            SQL  => 'SELECT source_object_id, object_id FROM migration WHERE source = ? AND source_id = ? AND object_type = ?',
-            Bind => [
-                \$Self->{Source}, \$Self->{SourceID}, \$ObjectType,
-            ],
-        );
-        my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-            Columns => [ 'SourceObjectID', 'ObjectID' ],
-        );
-        foreach my $Row ( @{$Data} ) {
-            $PreloadedOIDMappings{$ObjectType}->{SourceObjectID}->{$Row->{SourceObjectID}} = $Row->{ObjectID};
-            $PreloadedOIDMappings{$ObjectType}->{ObjectID}->{$Row->{ObjectID}} = $Row->{SourceObjectID};
-        }
-    }
-
-    if ( %PreloadedOIDMappings ) {
-        # set cache
-        $Kernel::OM->Get('Cache')->Set(
-            Type           => 'MigrationOIDMapping',
-            TTL            => undef,
-            Key            => 'PreloadedOIDMappings',
-            Value          => \%PreloadedOIDMappings,
-            CacheInMemory  => 1,
-            CacheInBackend => 0,
-        );
-    }
-
-    return 1;
-}
-
 sub InitProgress {
     my ( $Self, %Param ) = @_;
 
@@ -771,7 +452,7 @@ sub UpdateProgress {
 
         my $TimeRemaining = ($Progress->{ItemCount} - $Progress->{Current}) / $Progress->{AvgPerMinute} * 60;
         my $RemainingHours = int($TimeRemaining / 3600);
-        my $RemainingMins  = int(($TimeRemaining - $RemainingHours) / 60);
+        my $RemainingMins  = int(($TimeRemaining - $RemainingHours * 3600) / 60);
         $Progress->{TimeRemaining} = sprintf "%i:%02i:%02i", $RemainingHours, $RemainingMins, $TimeRemaining - ($RemainingHours * 3600 + $RemainingMins * 60);
     }
 
@@ -858,21 +539,6 @@ sub SetWorkers {
     my ( $Self, %Param ) = @_;
 
     $Self->{Workers} = $Param{Workers};
-}
-
-sub SetCacheOptions {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !IsArrayRefWithData($Param{ObjectType}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need ObjectType as ArrayRef!",
-        );
-        return;
-    }
-
-    $Self->{CacheOptions} = { map { $_ => { CacheInMemory => $Param{CacheInMemory}, CacheInBackend => $Param{CacheInBackend} } } @{$Param{ObjectType}} };
 }
 
 sub _GetTableColumnNames {
@@ -1022,6 +688,71 @@ sub _UpdateMigrationState {
         Type      => 'Migration',
         Key       => $Self->{MigrationID},
         Value     => $State,
+    );
+}
+
+#
+# convenience wrappers
+# 
+
+sub SetCacheOptions {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->SetCacheOptions(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
+    );
+}
+
+sub Lookup {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->Lookup(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        Mapping  => $Self->{Mapping} || $Self->Describe()->{Mapping},
+        %Param,
+    );
+}
+
+sub GetOIDMapping {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->GetOIDMapping(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
+    );
+}
+
+sub CreateOIDMapping {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->CreateOIDMapping(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
+    );
+}
+
+sub ReplaceOIDMapping {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->ReplaceOIDMapping(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
+    );
+}
+
+sub PreloadOIDMappings {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->PreloadOIDMappings(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
     );
 }
 

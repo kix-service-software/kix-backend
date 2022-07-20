@@ -11,6 +11,8 @@ package Kernel::System::Automation;
 use strict;
 use warnings;
 
+use Time::HiRes qw(time);
+
 use base qw(
     Kernel::System::Automation::ExecPlan
     Kernel::System::Automation::Job
@@ -99,6 +101,7 @@ sub ExecuteJobsForEvent {
 
     # sort by names to enable simple ordering by user
     foreach my $JobID ( sort { $JobList{$a} cmp $JobList{$b} } keys %JobList ) {
+
         my %Job = $Self->JobGet(
             ID => $JobID
         );
@@ -113,6 +116,7 @@ sub ExecuteJobsForEvent {
 
         if ( $CanExecute ) {
 
+my $StartTime = time();
             # execute the job in a new Automation instance
             my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
 
@@ -120,6 +124,7 @@ sub ExecuteJobsForEvent {
                 ID => $JobID,
                 %Param,
             );
+printf STDERR "            Automation->ExecuteJobsForEvent: JobExecute ($Job{Name}): %i ms\n", (time() - $StartTime) * 1000;
         }
     }
 

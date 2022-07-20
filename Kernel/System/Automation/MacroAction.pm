@@ -999,15 +999,16 @@ sub _ReplaceResultVariables {
         }
     }
     else {
-        while ( $Param{Data} =~ /^(.*?)(\$\{(.*?)(?:\|(.*?))?\})(.*?)$/xms ) {
+        while ( $Param{Data} =~ /^(.*?)(\$\{([a-zA-Z0-9_.: ]+)(\|(.*?))?\})(.*?)$/xms ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
             my $Filter     = $4;
             my $Trailing   = $5;
 
-            my $Value = $Self->_ResolveVariableValue(
-                Variable => $Variable
+            my $Value = $Kernel::OM->Get('Main')->ResolveValueByKey(
+                Key  => $Variable,
+                Data => $Self->{MacroResults},
             );
 
             if ( $Filter ) {
@@ -1099,54 +1100,6 @@ sub _ExecuteVariableFilters {
     }
 
     return $Value;
-}
-
-sub _ResolveVariableValue {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Variable)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # return undef if we have no data to work through
-    return if exists $Param{Data} && !$Param{Data};
-
-    my $Data = $Param{Data};
-    if ( !exists $Param{Data} ) {
-        $Data = $Self->{MacroResults};
-    }
-
-    my @Parts = split( /\./, $Param{Variable});
-    my $Attribute = shift @Parts;
-    my $ArrayIndex;
-
-    if ( $Attribute =~ /(.*?):(\d+)/ ) {
-        $Attribute = $1;
-        $ArrayIndex = $2;
-    }
-
-    # get the value of $Attribute
-    $Data = $Data->{$Attribute};
-
-    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
-        $Data = $Data->[$ArrayIndex];
-    }
-
-    if ( @Parts ) {
-        return $Self->_ResolveVariableValue(
-            Variable => join('.', @Parts),
-            Data     => $Data,
-        );
-    }
-
-    return $Data;
 }
 
 1;

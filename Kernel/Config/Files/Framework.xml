@@ -7446,6 +7446,17 @@ You can log in via the following URL:
             </TextArea>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketNotification::SendAsynchronously" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Send all ticket notifications asynchronously through the daemon.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ReferenceData::OwnCountryList" Required="0" Valid="0">
         <Description Translatable="1">This setting allows you to override the built-in country list with your own list of countries. This is particularly handy if you just want to use a small select group of countries.</Description>
         <Group>Framework</Group>

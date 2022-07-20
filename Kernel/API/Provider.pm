@@ -349,6 +349,8 @@ sub Run {
     my $GeneratedResponse = $Self->GenerateResponse(
         Success => 1,
         %{$OperationResult},
+        DoNotSortAttributes => IsHashRefWithData($OperationObject->{OperationConfig}) ?
+            $OperationObject->{OperationConfig}->{DoNotSortAttributes} : 0
     );
 
     if ( !$GeneratedResponse->{Success} ) {
@@ -359,7 +361,7 @@ sub Run {
         );
     }
 
-        printf STDERR "%3i ms Request end\n", TimeDiff($Self->{RequestStartTime});
+    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{Route}, (time() - $Self->{RequestStartTime}) * 1000);
 
     return;
 }

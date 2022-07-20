@@ -16,7 +16,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Installation',
+    'Migration',
 );
 
 sub Configure {
@@ -39,7 +39,7 @@ sub Run {
 
     $Self->Print("<yellow>Listing supported types of the given data source...</yellow>\n");
 
-    my @TypeList = $Kernel::OM->Get('Installation')->MigrationSupportedTypeList(
+    my @TypeList = $Kernel::OM->Get('Migration')->MigrationSupportedTypeList(
         Source => $Self->GetOption('source'),
     );
     if ( !@TypeList ) {

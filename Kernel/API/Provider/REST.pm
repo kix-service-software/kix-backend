@@ -178,7 +178,7 @@ sub ProcessRequest {
             $EncodeObject->EncodeInput( \$Value );
 
             if ( !defined $QueryParams{$Key} ) {
-                $QueryParams{$Key} = $Value || '';
+                $QueryParams{$Key} = $Value // '';
             }
 
             # elements specified multiple times will be added as array reference
@@ -485,6 +485,7 @@ The HTTP code is set accordingly
         Data     => {       # data payload for response, optional
             ...
         },
+        DoNotSortAttributes => 1     # optional, if given, the output is not sorted (default 0)
     );
 
     $Result = HTTP response;
@@ -569,7 +570,7 @@ sub GenerateResponse {
     if ( IsHashRefWithData($Param{Data}) ) {
         $JSONString = $Kernel::OM->Get('JSON')->Encode(
             Data     => $Param{Data},
-            SortKeys => 1
+            SortKeys => $Param{DoNotSortAttributes} ? 0 : 1
         );
 
         if ( !$JSONString ) {

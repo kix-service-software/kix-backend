@@ -15,6 +15,7 @@ use warnings;
 
 use Carp qw(carp confess);
 use Scalar::Util qw(weaken);
+use Time::HiRes qw(time);
 
 use base qw(
     Kernel::System::AsynchronousExecutor
@@ -717,24 +718,32 @@ sub _PerfLogMethodWrapper {
 sub DESTROY {
     my ($Self) = @_;
 
+    my $StartTime = time();
+
     # Make sure $Kernel::OM is still available in the destructor
     local $Kernel::OM = $Self;
 
     # send outstanding notifications to registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
+    my $StartTime = time();
         if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
             $Self->AsyncCall(
-                ObjectName   => $Self->GetModuleFor('ClientRegistration'),
-                FunctionName => 'NotificationSend',
+                ObjectName     => $Self->GetModuleFor('ClientRegistration'),
+                FunctionName   => 'NotificationSend',
+                FunctionParams => {
+                    Async => 1
+                }
             );
         }
         else {
             $Self->Get('ClientRegistration')->NotificationSend();
         }
+printf STDERR "ObjectManager::ClientNotification: %i ms\n", (time() - $StartTime) * 1000;
     }
 
     # discard all objects
     $Self->ObjectsDiscard();
+printf STDERR "ObjectManager::DESTROY: %i ms\n", (time() - $StartTime) * 1000;
 }
 
 
