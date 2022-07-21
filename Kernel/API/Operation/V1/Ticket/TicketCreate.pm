@@ -224,65 +224,10 @@ sub _TicketCreate {
                 Code    => 'Object.UnableToCreate',
                 Message => 'No Contact ID or valid Email provided.',
             );
+        } else {
+            $Ticket->{ContactID} = $Contact{ID};
+            $Ticket->{OrganisationID} = $Contact{PrimaryOrganisationID};
         }
-        $Ticket->{ContactID} = $Contact{ID};
-        $Ticket->{OrganisationID} = $Contact{PrimaryOrganisationID};
-    }
-
-    # use not number value as email for contact search
-    if ($Ticket->{ContactID} !~ /^\d+$/) {
-        $Self->{ParserObject} = Kernel::System::EmailParser->new(
-            Mode => 'Standalone',
-        );
-        my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
-            Email => $Ticket->{ContactID}
-        );
-
-        my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
-            Email => $Ticket->{ContactID}
-        );
-
-        if (!$ContactEmail && !$ContactEmailRealname) {
-            return $Self->_Error(
-                Code    => 'Object.UnableToCreate',
-                Message => 'No Contact ID or valid Email provided.',
-            );
-        }
-
-        my @NameChunks = split(' ', $ContactEmailRealname);
-        my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-            Email  => $ContactEmail,
-            Silent => 1,
-        );
-
-        if (!$ExistingContactID) {
-            $Ticket->{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                Firstname             => (@NameChunks) ? $NameChunks[0] : 'not',
-                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : 'assigned',
-                Email                 => $ContactEmail,
-                PrimaryOrganisationID => ($Ticket->{OrganisationID}) ? $Ticket->{OrganisationID} : undef,
-                ValidID               => 1,
-                UserID                => $Self->{Authorization}->{UserID},
-            );
-        }
-        else {
-            $Ticket->{ContactID} = $ExistingContactID;
-        }
-
-    }
-
-    # get contact information
-    # with information will be used to create the ticket if contact is not defined in the
-    # database, contact ticket information need to be empty strings
-    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $Ticket->{ContactID},
-    );
-
-    my $OrgID = $ContactData{PrimaryOrganisationID} || '';
-
-    # use user defined OrganisationID if defined
-    if ( defined $Ticket->{OrganisationID} && $Ticket->{OrganisationID} ne '' ) {
-        $OrgID = $Ticket->{OrganisationID};
     }
 
     # force owner / responsible if executing user is in customer context
@@ -334,7 +279,7 @@ sub _TicketCreate {
         PriorityID     => $Ticket->{PriorityID} || '',
         Priority       => $Ticket->{Priority} || '',
         OwnerID        => 1,
-        OrganisationID => $OrgID,
+        OrganisationID => $Ticket->{OrganisationID},
         ContactID      => $Ticket->{ContactID},
         UserID         => $Param{UserID},
     );

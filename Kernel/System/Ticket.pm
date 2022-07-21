@@ -493,10 +493,11 @@ sub TicketCreate {
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
 
+    # create organisation if it doesn't exist
     if ($Param{OrganisationID} && $Param{OrganisationID} !~ /^\d+$/) {
-        # create organisation if it doesn't exist
         my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            Number => $Param{OrganisationID}
+            Number => $Param{OrganisationID},
+            Silent => 1
         );
         if (!$OrgID) {
             $Param{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationAdd(
@@ -515,7 +516,8 @@ sub TicketCreate {
         $Param{OrganisationID} = undef;
     }
 
-    if (!$Param{ContactID} || $Param{ContactID} !~ /^\d+$/) {
+    # create contact if necessary
+    if ($Param{ContactID} && $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
             Mode => 'Standalone',
         );
@@ -544,13 +546,23 @@ sub TicketCreate {
                 Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
                 Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
                 Email                 => $ContactEmail,
-                PrimaryOrganisationID => ($Param{OrganisationID}) ? $Param{OrganisationID} : undef,
+                PrimaryOrganisationID => ($Param{OrganisationID} && $Param{OrganisationID} =~ /^\d+$/) ? $Param{OrganisationID} : undef,
                 ValidID               => 1,
                 UserID                => $Param{UserID}
             );
         }
         else {
             $Param{ContactID} = $ExistingContactID;
+        }
+
+        # set contact organisation if not given
+        if ($Param{ContactID} && !$Param{OrganisationID}) {
+            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                ID => $Param{ContactID},
+            );
+            if (IsHashRefWithData(\%ContactData)) {
+                $Param{OrganisationID} = $ContactData{PrimaryOrganisationID} || undef;
+            }
         }
     }
 
