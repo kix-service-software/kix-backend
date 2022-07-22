@@ -128,13 +128,14 @@ sub Run {
 
         # update Job
         my $Success = $Kernel::OM->Get('Automation')->JobUpdate(
-            ID       => $Param{Data}->{JobID},
-            Type     => $Job->{Type} || $JobData{Type},
-            Name     => $Job->{Name} || $JobData{Name},
-            Filter   => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
-            Comment  => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
-            ValidID  => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
-            UserID   => $Self->{Authorization}->{UserID},
+            ID             => $Param{Data}->{JobID},
+            Type           => $Job->{Type} || $JobData{Type},
+            IsAsynchronous => exists $Job->{IsAsynchronous} ? $Job->{IsAsynchronous} : $JobData{IsAsynchronous},
+            Name           => $Job->{Name} || $JobData{Name},
+            Filter         => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
+            Comment        => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
+            ValidID        => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
+            UserID         => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {

@@ -385,7 +385,7 @@ sub NotificationCount {
 send notifications to all clients who want to receive notifications
 
     my $Result = $ClientRegistrationObject->NotificationSend(
-        Async => 0|1,
+        Async => 0|1,       # optional, default 0
     );
 
 =cut

@@ -13,6 +13,8 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
+use base qw(Kernel::System::AsynchronousExecutor);
+
 our @ObjectDependencies = (
     'Cache',
     'ClientRegistration',
@@ -125,7 +127,7 @@ sub JobGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name, type, filter, comments, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
+        SQL   => "SELECT id, name, type, filter, comments, is_async, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -139,12 +141,13 @@ sub JobGet {
             Type              => $Row[2],
             Filter            => $Row[3],
             Comment           => $Row[4],
-            ValidID           => $Row[5],
-            LastExecutionTime => $Row[6],
-            CreateTime        => $Row[7],
-            CreateBy          => $Row[8],
-            ChangeTime        => $Row[9],
-            ChangeBy          => $Row[10],
+            IsAsynchronous    => $Row[5],
+            ValidID           => $Row[6],
+            LastExecutionTime => $Row[7],
+            CreateTime        => $Row[8],
+            CreateBy          => $Row[9],
+            ChangeTime        => $Row[10],
+            ChangeBy          => $Row[11],
         );
 
         if ( $Result{Filter} ) {
@@ -180,14 +183,15 @@ sub JobGet {
 adds a new job
 
     my $ID = $AutomationObject->JobAdd(
-        Name       => 'test',
-        Type       => 'Ticket',
-        Filter     => {                                         # optional
+        Name           => 'test',
+        Type           => 'Ticket',
+        Filter         => {                                         # optional
             Queue => [ 'SomeQueue' ],
         },
-        Comment    => '...',                                    # optional
-        ValidID    => 1,                                        # optional
-        UserID     => 123,
+        Comment        => '...',                                    # optional
+        IsAsynchronous => 1,                                        # optional
+        ValidID        => 1,                                        # optional
+        UserID         => 123,
     );
 
 =cut
@@ -206,9 +210,8 @@ sub JobAdd {
         }
     }
 
-    if ( !defined $Param{ValidID} ) {
-        $Param{ValidID} = 1;
-    }
+    $Param{ValidID}        //= 1;
+    $Param{IsAsynchronous} //= 0;
 
     # check if this is a duplicate after the change
     my $ID = $Self->JobLookup(
@@ -235,10 +238,10 @@ sub JobAdd {
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO job (name, type, filter, comments, valid_id, create_time, create_by, change_time, change_by) '
+        SQL => 'INSERT INTO job (name, type, filter, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
              . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{Type}, \$Filter, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Type}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -275,15 +278,16 @@ sub JobAdd {
 updates a job
 
     my $Success = $AutomationObject->JobUpdate(
-        ID         => 123,
-        Name       => 'test'
-        Type       => 'Ticket',                                 # optional
-        Filter     => {                                         # optional
+        ID             => 123,
+        Name           => 'test'
+        Type           => 'Ticket',                                 # optional
+        Filter         => {                                         # optional
             Queue => [ 'SomeQueue' ],
         },
-        Comment    => '...',                                    # optional
-        ValidID    => 1,                                        # optional
-        UserID     => 123,
+        Comment        => '...',                                    # optional
+        IsAsynchronous => 1,                                        # optional
+        ValidID        => 1,                                        # optional
+        UserID         => 123,
     );
 
 =cut
@@ -325,7 +329,7 @@ sub JobUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Type Name Filter Comment ValidID) ) {
+    for my $Key ( qw(Type Name Filter Comment IsAsynchronous ValidID) ) {
 
         next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
 
@@ -348,9 +352,9 @@ sub JobUpdate {
 
     # update Job in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, comments = ?, is_async = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Type}, \$Param{Name}, \$Filter, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Type}, \$Param{Name}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -978,12 +982,45 @@ executes a job
     my $Success = $AutomationObject->JobExecute(
         ID        => 123,       # the ID of the job
         Data      => {},        # optional, contains the relevant data given by an event or otherwise
+        Async     => 0|1,       # optional, default 0
         UserID    => 1
     );
 
 =cut
 
 sub JobExecute {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Result;
+    if ( $Param{Async} ) {
+        # execute asynchronously
+        $Self->AsyncCall(
+            FunctionName   => '_JobExecute',
+            FunctionParams => \%Param,
+        );
+    }
+    else {
+        # execute synchronously
+        $Result = $Self->_JobExecute(
+            %Param
+        );
+    }
+
+    return $Result;
+}
+
+sub _JobExecute {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff

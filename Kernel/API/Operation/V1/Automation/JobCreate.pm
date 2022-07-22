@@ -125,12 +125,13 @@ sub Run {
 
     # create job
     $JobID = $Kernel::OM->Get('Automation')->JobAdd(
-        Name     => $Job->{Name},
-        Type     => $Job->{Type},
-        Filter   => $Job->{Filter},
-        Comment  => $Job->{Comment} || '',
-        ValidID  => $Job->{ValidID} || 1,
-        UserID   => $Self->{Authorization}->{UserID}
+        Name           => $Job->{Name},
+        Type           => $Job->{Type},
+        IsAsynchronous => $Job->{IsAsynchronous},
+        Filter         => $Job->{Filter},
+        Comment        => $Job->{Comment} || '',
+        ValidID        => $Job->{ValidID} || 1,
+        UserID         => $Self->{Authorization}->{UserID}
     );
 
     if ( !$JobID ) {
