@@ -15985,7 +15985,23 @@ pre code {
             ]
         }
     }
-}</code></pre></div></div><div class="tab-pane" id="reporting_reports_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="reporting_reports_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Report has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ReportPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/ReportPostPatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ReportPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="reporting_reports_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div><div class="tab-pane" id="reporting_reports_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="reporting_reports_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Report has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ReportPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "ReportPostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created report.",
+   "type" : "object",
+   "properties" : {
+      "ReportID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ReportID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ReportID": 1
+}</code></pre></div></div><h2 class="response-title" id="reporting_reports_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "An error object.",
