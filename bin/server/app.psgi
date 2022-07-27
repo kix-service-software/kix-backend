@@ -118,7 +118,7 @@ sub _LockPID {
 
 sub _Autostart {
     my $Result = $Kernel::OM->Get('Autostart')->Run();
-     if ( $Result ) {
+    if ( $Result ) {
         print STDERR "At least one autostart module failed. Please see the KIX log for details.\n";
         exit $Result;
     }
