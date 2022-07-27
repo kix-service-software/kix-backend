@@ -7574,6 +7574,20 @@ You can log in via the following URL:
                 },
                 {
                     "Enabled": 0,
+                    "Module": "Kernel::System::Auth::ValidUser",
+                    "Name": "Valid User Example",
+                    "UsageContext": "Customer",
+                    "Config": {
+                        "RelevantClientIPs": [
+                            "^172\\..*?$"
+                        ],
+                        "RelevantUsers": [
+                            "mamu"
+                        ]
+                    }
+                },
+                {
+                    "Enabled": 0,
                     "Name": "Foreign Database",
                     "Module": "Kernel::System::Auth::DB",
                     "UsageContext": "Customer",
