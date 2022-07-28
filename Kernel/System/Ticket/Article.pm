@@ -2517,7 +2517,6 @@ sub ArticleFlagsOfTicketGet {
                 AND article.ticket_id = ?
                 AND article_flag.create_by = ?',
         Bind  => [ \$Param{TicketID}, \$Param{UserID} ],
-        Limit => 1500,
     );
 
     my %Flag;
