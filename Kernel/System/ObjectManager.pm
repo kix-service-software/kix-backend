@@ -715,18 +715,13 @@ sub _PerfLogMethodWrapper {
     return;
 }
 
-sub DESTROY {
-    my ($Self) = @_;
+sub CleanUp {
+    my ($Self, %Param) = @_;
 
-    my $StartTime = time();
-
-    # Make sure $Kernel::OM is still available in the destructor
-    local $Kernel::OM = $Self;
-
-    # send outstanding notifications to registered clients
+my $StartTime = time();
+    # send all outstanding notifications to the registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-    my $StartTime = time();
-        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
+        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') && !$Param{IsDaemon}) {
             $Self->AsyncCall(
                 ObjectName     => $Self->GetModuleFor('ClientRegistration'),
                 FunctionName   => 'NotificationSend',
@@ -744,6 +739,15 @@ printf STDERR "ObjectManager::ClientNotification: %i ms\n", (time() - $StartTime
     # discard all objects
     $Self->ObjectsDiscard();
 printf STDERR "ObjectManager::DESTROY: %i ms\n", (time() - $StartTime) * 1000;
+}
+
+sub DESTROY {
+    my ($Self) = @_;
+
+    # Make sure $Kernel::OM is still available in the destructor
+    local $Kernel::OM = $Self;
+
+    $Self->CleanUp();
 }
 
 
