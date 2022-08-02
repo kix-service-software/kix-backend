@@ -14,8 +14,11 @@
     </TableAlter>
 
     <TableAlter Name="configitem_counter">
+        <IndexCreate Name="configitem_counter_class_id">
+            <IndexColumn Name="class_id"/>
+        </IndexCreate>
+        <PrimaryDrop />
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
-        <ColumnChange NameOld="class_id" NameNew="class_id" Required="true" PrimaryKey="false" Type="INTEGER" />
         <ColumnChange NameOld="counter" NameNew="value" Required="true" Size="50" Type="VARCHAR" />
         <ColumnChange NameOld="counter_type" NameNew="counter" Required="true" Size="255" Type="VARCHAR"/>
     </TableAlter>
