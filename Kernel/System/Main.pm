@@ -22,6 +22,8 @@ use List::Util qw();
 use Storable;
 use Fcntl qw(:flock);
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Encode',
     'Log',
@@ -1148,6 +1150,339 @@ sub GenerateRandomString {
     return $String;
 }
 
+=item ResolveValueByKey()
+
+resolve a value from a complex data structure
+
+    my $Value = $MainObject->ResolveValueByKey(
+        Data => {} || [],
+        Key  => '...'
+    );
+=cut
+
+sub ResolveValueByKey {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Key)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # return undef if we have no data to work through
+    return if !$Param{Data};
+
+    my $Data = $Param{Data};
+
+    my @Parts = split( /\./, $Param{Key});
+    my $Attribute = shift @Parts;
+    my $ArrayIndex;
+
+    if ( $Attribute =~ /(.*?):(\d+)/ ) {
+        $Attribute = $1;
+        $ArrayIndex = $2;
+    }
+
+    # get the value of $Attribute
+    $Data = exists $Data->{$Attribute} ? $Data->{$Attribute} : return;
+
+    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
+        $Data = $Data->[$ArrayIndex];
+    }
+
+    if ( @Parts ) {
+        return $Self->ResolveValueByKey(
+            Key  => join('.', @Parts),
+            Data => $Data,
+        );
+    }
+
+    return $Data;
+}
+
+sub FilterObjectList {
+    my ($Self, %Param) = @_;
+    my @FilteredResult;
+
+    # without useful data, we've got nothing to do
+    return @FilteredResult if !IsArrayRefWithData($Param{Data});
+
+    my $Filter = $Param{Filter} || {};
+
+    OBJECTITEM:
+    foreach my $ObjectItem ( @{$Param{Data}} ) {
+
+        if ( IsHashRef($ObjectItem) ) {
+            my $Match = 1;
+
+            BOOLOPERATOR:
+            foreach my $BoolOperator ( keys %{ $Filter } ) {
+                my $BoolOperatorMatch = 1;
+
+                FILTERITEM:
+                foreach my $FilterItem ( @{ $Filter->{$BoolOperator} } ) {
+                    my $FilterMatch = 1;
+
+                    if ( !$FilterItem->{AlwaysTrue} ) {
+                        # if filter attributes are not contained in the response, check if it references a sub-structure
+                        if ( !exists( $ObjectItem->{ $FilterItem->{Field} } ) ) {
+
+                            if ( $FilterItem->{Field} =~ /\./ ) {
+
+                                # yes it does, filter sub-structure
+                                my ( $SubObject, $SubField ) = split( /\./, $FilterItem->{Field}, 2 );
+                                my $SubData = IsArrayRefWithData( $ObjectItem->{$SubObject} ) ? $ObjectItem->{$SubObject} : [ $ObjectItem->{$SubObject} ];
+                                my %SubFilter = %{$FilterItem};
+                                $SubFilter{Field} = $SubField;
+
+                                # continue if the sub-structure attribute exists
+                                if ( exists( $ObjectItem->{$SubObject} ) ) {
+
+                                    # execute filter on sub-structure
+                                    my @FilteredData = $Self->FilterObjectList(
+                                        Data   => $SubData,
+                                        Filter => {
+                                            OR => [
+                                                \%SubFilter
+                                            ]
+                                        }
+                                    );
+
+                                    # check filtered SubData
+                                    if ( !IsArrayRefWithData( \@FilteredData ) ) {
+                                        # the filter didn't match the sub-structure
+                                        $FilterMatch = 0;
+                                    }
+                                }
+                                else {
+                                    # the sub-structure attribute doesn't exist, ignore this item
+                                    $FilterMatch = 0;
+                                }
+                            }
+                            else {
+                                # filtered attribute not found, ignore this item
+                                $FilterMatch = 0;
+                            }
+                        }
+                        else {
+                            my $FieldValue  = $ObjectItem->{ $FilterItem->{Field} } || '';
+                            my $FilterValue = $FilterItem->{Value};
+                            my $Type        = $FilterItem->{Type} || 'STRING';
+
+                            # check if the value references a field in our hash and take its value in this case
+                            if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
+                                $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
+                            }
+                            elsif ($FilterValue) {
+                                if ( IsStringWithData($FilterValue) && $FilterItem->{Operator} eq 'LIKE' ) {
+                                    # make non word characters literal to prevent invalid regex (e.g. only opened brackets "[some*test" ==> "\[some*test")
+                                    $FilterValue =~ s/([^\w\s\*\\])/\\$1/g;
+                                    # remove possible unnecessary added backslash
+                                    $FilterValue =~ s/\\\\/\\/g;
+                                }
+                                # replace wildcards with valid RegEx in FilterValue
+                                $FilterValue =~ s/\*/.*?/g;
+                            }
+                            else {
+                                $FilterValue = undef;
+                            }
+
+                            my @FieldValues = ($FieldValue);
+                            if ( IsArrayRef($FieldValue) ) {
+                                if (IsArrayRefWithData($FieldValue)) {
+                                    @FieldValues = @{$FieldValue}
+                                } else {
+                                    @FieldValues = (undef);
+                                }
+                            }
+
+                            # handle multiple FieldValues (array)
+                            FIELDVALUE:
+                            foreach my $FieldValue (@FieldValues) {
+                                $FilterMatch = 1;
+
+                                # prepare date compare
+                                if ( $Type eq 'DATE' ) {
+
+                                    # convert values to unixtime
+                                    my ( $DatePart, $TimePart ) = split( /\s+/, $FieldValue );
+                                    $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                        String => $DatePart . ' 12:00:00',
+                                    );
+                                    my ( $FilterDatePart, $FilterTimePart, $Calculations ) = split( /\s+/, $FilterValue, 3 );
+                                    $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                        String => $FilterDatePart . ' 12:00:00 ' . $Calculations,
+                                    );
+
+                                    # handle this as a numeric compare
+                                    $Type = 'NUMERIC';
+                                }
+
+                                # prepare datetime compare
+                                elsif ( $Type eq 'DATETIME' ) {
+
+                                    # convert values to unixtime
+                                    $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                        String => $FieldValue,
+                                    );
+                                    $FilterValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                                        String => $FilterValue,
+                                    );
+
+                                    # handle this as a numeric compare
+                                    $Type = 'NUMERIC';
+                                }
+
+                                # equal (=)
+                                if ( $FilterItem->{Operator} eq 'EQ' ) {
+                                    if ( !$FilterValue && $FieldValue ) {
+                                        $FilterMatch = 0
+                                    }
+                                    elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) ne ( $FilterValue || '' ) ) {
+                                        $FilterMatch = 0;
+                                    }
+                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) != ( $FilterValue || '' ) ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # not equal (!=)
+                                elsif ( $FilterItem->{Operator} eq 'NE' ) {
+                                    if ( !$FilterValue && !$FieldValue ) {
+                                        $FilterMatch = 0
+                                    }
+                                    elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) eq ( $FilterValue || '' ) ) {
+                                        $FilterMatch = 0;
+                                    }
+                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) == ( $FilterValue || '' ) ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # less than (<)
+                                elsif ( $FilterItem->{Operator} eq 'LT' ) {
+                                    if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # greater than (>)
+                                elsif ( $FilterItem->{Operator} eq 'GT' ) {
+                                    if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # less than or equal (<=)
+                                elsif ( $FilterItem->{Operator} eq 'LTE' ) {
+                                    if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # greater than or equal (>=)
+                                elsif ( $FilterItem->{Operator} eq 'GTE' ) {
+                                    if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # value is contained in an array or values
+                                elsif ( $FilterItem->{Operator} eq 'IN' ) {
+                                    $FilterMatch = 0;
+                                    foreach $FilterValue ( @{$FilterValue} ) {
+                                        if ( $Type eq 'NUMERIC' ) {
+                                            next if $FilterValue != $FieldValue + 0;
+                                        }
+                                        next if $FilterValue ne $FieldValue;
+                                        $FilterMatch = 1;
+                                    }
+                                }
+
+                                # the string contains a part
+                                elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {
+                                    my $FilterValueQuoted = quotemeta $FilterValue;
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/i ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # the string starts with the part
+                                elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
+                                    my $FilterValueQuoted = quotemeta $FilterValue;
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/i ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # the string ends with the part
+                                elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
+                                    my $FilterValueQuoted = quotemeta $FilterValue;
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/i ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                # the string matches the pattern
+                                elsif ( $FilterItem->{Operator} eq 'LIKE' ) {
+                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
+                                        $FilterMatch = 0;
+                                    }
+                                }
+
+                                last FIELDVALUE if $FilterMatch;
+                            }
+                        }
+                    }
+
+                    if ( $FilterItem->{Not} ) {
+
+                        # negate match result
+                        $FilterMatch = !$FilterMatch;
+                    }
+
+                    # abort filters for this bool operator, if we have a non-match
+                    if ( $BoolOperator eq 'AND' && !$FilterMatch ) {
+
+                        # signal the operator that it didn't match
+                        $BoolOperatorMatch = 0;
+                        last FILTERITEM;
+                    }
+                    elsif ( $BoolOperator eq 'OR' && $FilterMatch ) {
+
+                        # we don't need to check more filters in this case
+                        $BoolOperatorMatch = 1;
+                        last FILTERITEM;
+                    }
+                    elsif ( $BoolOperator eq 'OR' && !$FilterMatch ) {
+                        $BoolOperatorMatch = 0;
+                    }
+
+                    last FILTERITEM if $FilterItem->{StopAfterMatch};
+                }
+
+                # abort filters for this object, if we have a non-match in the operator filters
+                if ( !$BoolOperatorMatch ) {
+                    $Match = 0;
+                    last BOOLOPERATOR;
+                }
+            }
+
+            # all filter criteria match, add to result
+            if ($Match) {
+                push @FilteredResult, $ObjectItem;
+            }
+        }
+    }
+
+    return @FilteredResult;
+}
+
 =begin Internal:
 
 =cut
@@ -1223,6 +1558,7 @@ sub _Dump {
 
     return;
 }
+
 
 1;
 

@@ -90,15 +90,9 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Values = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText  => 0,
-        Text      => $Param{Config}->{Values},
-        Data      => {},
-        UserID    => $Param{UserID},
-        Translate => 0,
-
-        # FIXME: as common action, object id could be not a ticket!
-        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+    my $Values = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{Values}
     );
 
     my @ValueList;
@@ -121,6 +115,9 @@ sub Run {
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Value,
             UserID   => $Param{UserID},
+
+            # keep event data if given
+            EventData => $Self->{EventData} || $Param{EventData},
 
             # keep root object id
             RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}

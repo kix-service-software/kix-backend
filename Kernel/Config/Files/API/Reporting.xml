@@ -148,7 +148,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Reporting::ReportCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">ReportPostRequest</Item>
-                <Item Key="ResponseSchema">ReportPostPatchResponse</Item>
+                <Item Key="ResponseSchema">ReportPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -202,6 +202,191 @@ $Self->False(
     'MacroActionDelete() delete non existent macroaction',
 );
 
+# check variable replacement
+my @Tests = (
+    {
+        Name => 'simple',
+        MacroResults => {
+            Test1 => 'test1_value',
+        },
+        Data => {
+            Dummy => '${Test1}',
+        },
+        Expected => {
+            Dummy => 'test1_value',
+        }
+    },
+    {
+        Name => 'array',
+        MacroResults => {
+            Test1 => [
+                1,2,3
+            ]
+        },
+        Data => {
+            Dummy => '${Test1:1}',
+        },
+        Expected => {
+            Dummy => '2',
+        }
+    },
+    {
+        Name => 'hash',
+        MacroResults => {
+            Test1 => {
+                Test2 => 'test2'
+            }
+        },
+        Data => {
+            Dummy => '${Test1.Test2}',
+        },
+        Expected => {
+            Dummy => 'test2',
+        }
+    },
+    {
+        Name => 'array of hashes with arrays of hashes',
+        MacroResults => {
+            Test1 => [
+                {},
+                {
+                    Test2 => [
+                        {
+                            Test3 => 'test3'
+                        }
+                    ]
+                }
+            ]
+        },
+        Data => {
+            Dummy => '${Test1:1.Test2:0.Test3}',
+        },
+        Expected => {
+            Dummy => 'test3',
+        }
+    },
+    {
+        Name => 'array of hashes with arrays of hashes in text',
+        MacroResults => {
+            Test1 => [
+                {},
+                {
+                    Test2 => [
+                        {
+                            Test3 => 'test'
+                        }
+                    ]
+                }
+            ]
+        },
+        Data => {
+            Dummy => 'this is a ${Test1:1.Test2:0.Test3}. a good one',
+        },
+        Expected => {
+            Dummy => 'this is a test. a good one',
+        }
+    },
+    {
+        Name => 'array of hashes with arrays of hashes direct assignment of structure',
+        MacroResults => {
+            Test1 => [
+                {},
+                {
+                    Test2 => [
+                        {
+                            Test3 => 'test'
+                        }
+                    ]
+                }
+            ]
+        },
+        Data => {
+            Dummy => '${Test1:1.Test2}',
+        },
+        Expected => {
+            Dummy => [
+                {
+                    Test3 => 'test'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'nested variables (2 levels)',
+        MacroResults => {
+            Test1 => {
+                Test2 => {
+                    Test3 => 'found!'
+                }
+            },
+            Indexes => {
+                '1st' => 'Test2',
+                '2nd' => 'Test3'
+            }
+        },
+        Data => {
+            Dummy => '${Test1.${Indexes.1st}.${Indexes.2nd}}',
+        },
+        Expected => {
+            Dummy => 'found!'
+        }
+    },
+    {
+        Name => 'nested variables (4 levels)',
+        MacroResults => {
+            Test1 => {
+                Test2 => {
+                    Test3 => 'found!'
+                }
+            },
+            Indexes => {
+                '1st' => 'Test2',
+                '2nd' => 'Test3'
+            },
+            Which => {
+                'the first one' => '1st',
+                Index => {
+                    Should => {
+                        I => {
+                            Use => [
+                                'none',
+                                '2nd',
+                                'the first one',
+                                '3rd'
+                            ]
+                        }
+                    }
+                }
+            },
+        },
+        Data => {
+            Dummy => '${Test1.${Indexes.${Which.${Which.Index.Should.I.Use:2}}}.${Indexes.2nd}}',
+        },
+        Expected => {
+            Dummy => 'found!'
+        }
+    },
+);
+
+my $TestCount = 0;
+foreach my $Test ( @Tests ) {
+    $TestCount++;
+
+    $AutomationObject->{MacroResults} = $Test->{MacroResults};
+
+    my %Data = %{$Test->{Data}};
+
+    $AutomationObject->_ReplaceResultVariables(
+        Data => \%Data,
+    );
+
+    $Self->IsDeeply(
+        \%Data,
+        $Test->{Expected},
+        '_ReplaceResultVariables() Test "'.$Test->{Name}.'"',
+    );
+}
+
 # cleanup is done by RestoreDatabase
 
 1;

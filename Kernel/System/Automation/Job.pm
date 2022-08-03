@@ -479,19 +479,59 @@ sub JobDelete {
         Bind => [ \$Param{ID} ],
     );
 
-    # delete exec plan assignments
-    return if !$DBObject->Do(
-        SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ?',
-        Bind => [ \$Param{ID} ],
+    # remove exec plans
+    my @ExecPlanIDs = $Self->JobExecPlanList(
+        JobID => $Param{ID},
     );
+    if (IsArrayRefWithData(\@ExecPlanIDs)) {
 
-    # delete macro assignments
-    return if !$DBObject->Do(
-        SQL  => 'DELETE FROM job_macro WHERE job_id = ?',
-        Bind => [ \$Param{ID} ],
+        # delete exec plan assignments
+        return if !$DBObject->Do(
+            SQL  => 'DELETE FROM job_exec_plan WHERE job_id = ?',
+            Bind => [ \$Param{ID} ],
+        );
+
+        # delete exec plans if possible
+        for my $ExecPlanID (@ExecPlanIDs) {
+            if (
+                $Self->ExecPlanIsDeletable(
+                    ID => $ExecPlanID
+                )
+            ) {
+                $Self->ExecPlanDelete(
+                    ID => $ExecPlanID,
+                );
+            }
+        }
+    }
+
+    # remove macros
+    my @MacroIDs = $Self->JobMacroList(
+        JobID => $Param{ID},
     );
+    if (IsArrayRefWithData(\@MacroIDs)) {
 
-    # remove from database
+        # delete macro assignments
+        return if !$DBObject->Do(
+            SQL  => 'DELETE FROM job_macro WHERE job_id = ?',
+            Bind => [ \$Param{ID} ],
+        );
+
+        # delete macros if possible
+        for my $MacroID (@MacroIDs) {
+            if (
+                $Self->MacroIsDeletable(
+                    ID => $MacroID
+                )
+            ) {
+                $Self->MacroDelete(
+                    ID => $MacroID,
+                );
+            }
+        }
+    }
+
+    # remove job from database
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM job WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -548,6 +588,30 @@ sub JobMacroList {
     }
 
     return @Result;
+}
+
+=item AllUsedMacroIDList()
+
+returns a list of all Macro ids assigned to Jobs
+
+    my @MacroIDs = $AutomationObject->AllUsedMacroIDList();
+
+=cut
+
+sub AllUsedMacroIDList {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => 'SELECT macro_id FROM job_macro'
+    );
+
+    my @Result;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(@Result, $Row[0]);
+    }
+
+    # remove duplicates
+    return $Self->_GetUnique(@Result);
 }
 
 =item JobMacroAdd()
@@ -712,6 +776,30 @@ sub JobExecPlanList {
     }
 
     return @Result;
+}
+
+=item AllUsedExecPlanIDList()
+
+returns a list of all ExecPlan ids assigned to Jobs
+
+    my @ExecPlanIDs = $AutomationObject->AllUsedExecPlanIDList();
+
+=cut
+
+sub AllUsedExecPlanIDList {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => 'SELECT exec_plan_id FROM job_exec_plan'
+    );
+
+    my @Result;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(@Result, $Row[0]);
+    }
+
+    # remove duplicates
+    return $Self->_GetUnique(@Result);
 }
 
 =item JobExecPlanAdd()
@@ -1021,7 +1109,7 @@ sub JobExecute {
                         my $Result = $Self->MacroExecute(
                             ID        => $MacroID,
                             ObjectID  => $ObjectID,
-                            Event     => $Param{Data},
+                            EventData => $Param{Data},
                             UserID    => $Param{UserID},
                         );
 

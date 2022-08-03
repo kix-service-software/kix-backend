@@ -290,13 +290,39 @@ sub ReportCreate {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
-        Namespace => 'Report',
-        ObjectID  => $ID,
+        Namespace => 'ReportDefinition.Report',
+        ObjectID  => $Param{DefinitionID} . '::' . $ID,
     );
+
+    # cleanup if max reports is configured
+    $Self->_RemoveExcessReports(
+        DefinitionID => $Param{DefinitionID},
+    );
+
+    my @OutputFormats;
+    if ( IsHashRefWithData($Definition{Config}->{OutputFormats}) ) {
+        OUTPUTFORMAT:
+        foreach my $OutputFormat ( @{$Param{Config}->{OutputFormats}} ) {
+            next OUTPUTFORMAT if !$Definition{Config}->{OutputFormats}->{$OutputFormat};
+            push @OutputFormats, $OutputFormat;
+        }
+    }
+    else {
+        # if no explicit config is given in the definition, we just use the requested formats 
+        @OutputFormats = @{$Param{Config}->{OutputFormats}}
+    }
+
+    if ( !@OutputFormats ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No output formats available for report!"
+        );
+        return;
+    }
 
     # create results
     OUTPUTFORMAT:
-    foreach my $OutputFormat ( @{$Param{Config}->{OutputFormats}} ) {
+    foreach my $OutputFormat ( @OutputFormats ) {
         # generate the output for this format
         my $Output = $Self->GenerateOutput(
             Format     => $OutputFormat,
@@ -517,14 +543,25 @@ sub _ValidateReport {
 
     # validate if we have a config for each requested output format
     if ( IsHashRefWithData($Param{Definition}->{Config}->{OutputFormats}) ) {
+        my @AcceptedOutputFormats;
+        OUTPUTFORMAT:
         foreach my $OutputFormat ( @{$Param{Config}->{OutputFormats}} ) {
             if ( !exists $Param{Definition}->{Config}->{OutputFormats}->{$OutputFormat} ) {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Requested output format \"$OutputFormat\" not available for this report!"
+                    Priority => 'notice',
+                    Message  => "Requested output format \"$OutputFormat\" not available for this report! It will be ignored!"
                 );
-                return;
+                next OUTPUTFORMAT;
             }
+            push @AcceptedOutputFormats, $OutputFormat;
+        }
+
+        if ( !@AcceptedOutputFormats ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No output formats are available for this report!"
+            );
+            return;
         }
     }
 
@@ -564,6 +601,40 @@ sub _ValidateReport {
     return 1;
 }
 
+sub _RemoveExcessReports {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(DefinitionID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %Definition = $Self->ReportDefinitionGet(
+        ID => $Param{DefinitionID}
+    );
+
+    return 1 if !$Definition{MaxReports};
+
+    my @Reports = $Self->ReportList(
+        DefinitionID => $Param{DefinitionID}
+    );
+    @Reports = sort {$a <=> $b} @Reports;
+
+    while ( @Reports > $Definition{MaxReports} ) {
+        my $ReportID = shift @Reports;
+        $Self->ReportDelete(
+            ID => $ReportID
+        );
+    }
+
+    return 1;
+}
 
 1;
 

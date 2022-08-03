@@ -134,56 +134,38 @@ sub new {
     return $Self;
 }
 
-=item ConfigItemCount()
+=item ConfigItemCounterGet()
 
-count all records of a config item class
+get a specific counter for a ClassID
 
-    my $Count = $ConfigItemObject->ConfigItemCount(
-        ClassID               => 123,
-        IncludePostproductive => 1     # optional, 0 is default
+    my $Count = $ConfigItemObject->ConfigItemCounterGet(
+        ClassID => 123,
+        Counter => '...'
     );
 
 =cut
 
-sub ConfigItemCount {
+sub ConfigItemCounterGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{ClassID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ClassID!',
-        );
-        return;
+    for my $Needed (qw(ClassID Counter)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
     }
-
-    my $CacheKey = 'ConfigItemCount::'.$Param{ClassID}.'::'.$Param{IncludePostproductive};
-    my $Cache = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return $Cache if $Cache;
-
-    # get state list
-    my @Functionality = ( 'preproductive', 'productive' );
-    push( @Functionality, 'postproductive' ) if ( $Param{IncludePostproductive} );
-    my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class       => 'ITSM::ConfigItem::DeploymentState',
-        Preferences => {
-            Functionality => \@Functionality,
-        },
-    );
-
-    return 0 if !%{$StateList};
-
-    # create state string
-    my $DeplStateString = join q{, }, keys %{$StateList};
 
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
-        SQL => "SELECT COUNT(id) FROM configitem WHERE class_id = ? AND "
-            . "cur_depl_state_id IN ( $DeplStateString )",
-        Bind  => [ \$Param{ClassID} ],
+        SQL   => "SELECT value FROM configitem_counter WHERE class_id = ? AND counter = ?",
+        Bind  => [
+            \$Param{ClassID},
+            \$Param{Counter}
+        ],
         Limit => 1,
     );
 
@@ -193,16 +175,54 @@ sub ConfigItemCount {
         $Count = $Row[0];
     }
 
-    # cache the result
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Count,
+    return 0 + $Count;
+}
+
+=item ConfigItemCounterSet()
+
+set the current counter of a class
+
+    my $True = $ConfigItemObject->ConfigItemCounterSet(
+        ClassID => 123,
+        Counter => 'AutoIncrement',
+        Value   => 12,
     );
 
-    return $Count;
+=cut
+
+sub ConfigItemCounterSet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Argument (qw(ClassID Counter)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # delete old counter
+    $Kernel::OM->Get('DB')->Do(
+        SQL  => "DELETE FROM configitem_counter WHERE counter = ? AND class_id = ?",
+        Bind => [
+            \$Param{Counter}, \$Param{ClassID}
+        ],
+    );
+
+    # set new counter
+    $Kernel::OM->Get('DB')->Do(
+        SQL => 'INSERT INTO configitem_counter (class_id, counter, value) VALUES (?, ?, ?)',
+        Bind => [
+            \$Param{ClassID}, \$Param{Counter}, \$Param{Value}
+        ],
+    );
+
+    return 1;
 }
+
 
 =item ConfigItemResultList()
 
@@ -2983,6 +3003,165 @@ sub GenerateLinkGraph {
 
     return \%Graph;
 }
+
+=item UpdateCounters()
+
+    calculates and updates the class counters
+
+    $ConfigItemObject->UpdateCounters(
+        UserID => 123,
+    );
+
+=cut
+
+sub UpdateCounters {
+    my ( $Self, %Param ) = @_;
+
+    # check for needed stuff
+    for ( qw(UserID) ) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get all classes
+    my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::Class'
+    );
+    if ( !IsHashRefWithData($ClassList) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No configitem classes found!"
+        );
+        return;
+    }
+
+    my @ClassIDs;
+    if ( IsArrayRefWithData($Param{Classes}) ) {
+        my %ClassListReverse = reverse %{$ClassList};
+        CLASS:
+        foreach my $Class ( @{$Param{Classes}} ) {
+            if ( !$ClassListReverse{$Class} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No ClassID for class \"$Class\" found!"
+                );
+                next CLASS;
+            }
+            push @ClassIDs, $ClassListReverse{$Class};
+        }
+    }
+    else {
+        @ClassIDs = sort keys %{$ClassList};
+    }
+
+    # get all deployment states
+    my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::DeploymentState'
+    );
+    if ( !IsHashRefWithData($DeplStateList) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No deployment states found!"
+        );
+        return;
+    }
+
+    # build functionality mapping and full state list
+    my %FunctionalityList;
+    foreach my $DeplStateID ( keys %{$DeplStateList} ) {
+        my $Item = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+            ItemID => $DeplStateID,
+        );
+        $FunctionalityList{$Item->{Functionality}} //= [];
+        push @{$FunctionalityList{$Item->{Functionality}}}, $DeplStateID;
+        $DeplStateList->{$DeplStateID} = $Item;
+    }
+
+    # get all incident states
+    my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::Core::IncidentState'
+    );
+    if ( !IsHashRefWithData($InciStateList) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No incident states found!"
+        );
+        return;
+    }
+    # build full state list
+    foreach my $InciStateID ( keys %{$InciStateList} ) {
+        my $Item = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+            ItemID => $InciStateID,
+        );
+        $InciStateList->{$InciStateID} = $Item;
+    }
+
+    # delete all relevant counters
+    CLASSID:
+    foreach my $ClassID ( sort @ClassIDs ) {
+        my $Success = $Kernel::OM->Get('DB')->Do(
+            SQL => "DELETE FROM configitem_counter WHERE counter <> 'AutoIncrement' AND class_id = $ClassID"
+        );
+        if ( !$Success ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to remove counters for ClassID $ClassID!"
+            );
+            next CLASSID;
+        }
+
+        my %Counters;
+
+        foreach my $Functionality ( sort keys %FunctionalityList ) {
+            my $ConfigItemIDs = $Self->ConfigItemSearch(
+                ClassIDs     => [ $ClassID ],
+                DeplStateIDs => $FunctionalityList{$Functionality},
+            );
+            $Counters{'DeploymentState::Functionality::'.$Functionality} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+        }
+
+        foreach my $DeplStateID ( sort keys %{$DeplStateList} ) {
+            my $ConfigItemIDs = $Self->ConfigItemSearch(
+                ClassIDs     => [ $ClassID ],
+                DeplStateIDs => [ $DeplStateID ],
+            );
+            $Counters{'DeploymentState::'.$DeplStateList->{$DeplStateID}->{Name}} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+        }
+
+        foreach my $InciStateID ( sort keys %{$InciStateList} ) {
+            my $ConfigItemIDs = $Self->ConfigItemSearch(
+                ClassIDs     => [ $ClassID ],
+                InciStateIDs => [ $InciStateID ],
+            );
+            $Counters{'IncidentState::'.$InciStateList->{$InciStateID}->{Name}} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+        }
+
+        foreach my $Counter ( keys %{Counters} ) {
+            # set counter
+            my $Success = $Self->ConfigItemCounterSet(
+                ClassID => $ClassID,
+                Counter => $Counter,
+                Value   => $Counters{$Counter},
+            );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to update counter \"$Counter\" for ClassID $ClassID!"
+                );
+                next CLASSID;
+            }
+
+        }
+    }
+
+    return 1;
+}
+
 
 =begin Internal:
 

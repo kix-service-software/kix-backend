@@ -255,8 +255,10 @@ sub Run {
                 print "  $Self->{DaemonName} task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type}) finished\n";
             }
 
-            # Force transactional events to run by discarding all objects before deleting the task.
-            $Kernel::OM->ObjectsDiscard();
+            # do everything that have to be done afterwards
+            $Kernel::OM->CleanUp(
+                IsDaemon => 1
+            );
 
             $SchedulerDBObject->TaskDelete(
                 TaskID => $TaskID,

@@ -57,6 +57,7 @@ sub _Replace {
     # TODO: keep old placeholder syntax for backward compatibility
     my $OldTag = $Self->{Start} . 'KIX_ARTICLE_DATA_';
 
+    $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
     if ( $Param{ArticleID} ) {
         my %Article = $Self->{TicketObject}->ArticleGet(
             ArticleID => $Param{ArticleID},

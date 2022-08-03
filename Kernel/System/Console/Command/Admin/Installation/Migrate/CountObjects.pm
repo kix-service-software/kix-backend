@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Installation',
+    'Migration',
 );
 
 sub Configure {
@@ -53,7 +53,7 @@ sub Run {
 
     $Self->Print("<yellow>Counting objects...</yellow>\n");
 
-    my %Result = $Kernel::OM->Get('Installation')->CountMigratableObjects(
+    my %Result = $Kernel::OM->Get('Migration')->CountMigratableObjects(
         Source      => $Self->GetOption('source'),
         Options     => $Self->GetOption('options'),
         ObjectType  => $Self->GetOption('type'),

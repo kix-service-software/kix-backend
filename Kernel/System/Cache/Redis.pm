@@ -66,6 +66,7 @@ sub Set {
     }
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+    return if !$PreparedKey;
 
     my $TTL = $Param{TTL} // 0;
     if ( IsHashRefWithData($Self->{Config}->{OverrideTTL}) ) {
@@ -110,6 +111,7 @@ sub Get {
     }
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+    return if !$PreparedKey;
 
     my $Value = $Self->_RedisCall('hget', $Param{Type}, $PreparedKey);
 
@@ -178,6 +180,7 @@ sub Delete {
     }
 
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
+    return if !$PreparedKey;
 
     return $Self->_RedisCall('hdel', $Param{Type}, $PreparedKey);
 }
@@ -278,7 +281,14 @@ sub _PrepareRedisKey {
         return $Param{Key};
     }
 
-    return Digest::MD5::md5_hex($Param{Key});
+    my $Key;
+    eval {
+        $Key = Digest::MD5::md5_hex($Param{Key});
+    };
+    if ( $@ ) {
+        print STDERR "Redis: error in preparing cache key (Key: $Param{Key})\n";
+    }
+    return $Key;
 }
 
 =item _RedisCall()
