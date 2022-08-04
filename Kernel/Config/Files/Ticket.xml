@@ -1000,7 +1000,7 @@
                 <Item>daher</Item>
                 <Item>darum</Item>
                 <Item>das</Item>
-                <Item>da�</Item>
+                <Item>daß</Item>
                 <Item>dass</Item>
                 <Item>dein</Item>
                 <Item>deine</Item>
@@ -1028,7 +1028,7 @@
                 <Item>es</Item>
                 <Item>euer</Item>
                 <Item>eure</Item>
-                <Item>f�r</Item>
+                <Item>für</Item>
                 <Item>hatte</Item>
                 <Item>hatten</Item>
                 <Item>hattest</Item>
@@ -1052,17 +1052,17 @@
                 <Item>jetzt</Item>
                 <Item>kann</Item>
                 <Item>kannst</Item>
-                <Item>k�nnen</Item>
-                <Item>k�nnt</Item>
+                <Item>können</Item>
+                <Item>könnt</Item>
                 <Item>machen</Item>
                 <Item>mein</Item>
                 <Item>meine</Item>
                 <Item>mit</Item>
-                <Item>mu�</Item>
-                <Item>mu�t</Item>
+                <Item>muß</Item>
+                <Item>mußt</Item>
                 <Item>musst</Item>
-                <Item>m�ssen</Item>
-                <Item>m��t</Item>
+                <Item>müssen</Item>
+                <Item>müßt</Item>
                 <Item>nach</Item>
                 <Item>nachdem</Item>
                 <Item>nein</Item>
@@ -1112,7 +1112,7 @@
                 <Item>zu</Item>
                 <Item>zum</Item>
                 <Item>zur</Item>
-                <Item>�ber</Item>
+                <Item>über</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -1281,10 +1281,10 @@
                 <Item>uno</Item>
                 <Item>sobre</Item>
                 <Item>todo</Item>
-                <Item>tambi�n</Item>
+                <Item>tambien</Item>
                 <Item>tras</Item>
                 <Item>otro</Item>
-                <Item>alg�n</Item>
+                <Item>algn</Item>
                 <Item>alguno</Item>
                 <Item>alguna</Item>
                 <Item>algunos</Item>
@@ -1305,7 +1305,7 @@
                 <Item>para</Item>
                 <Item>atras</Item>
                 <Item>porque</Item>
-                <Item>por qu�</Item>
+                <Item>por qué</Item>
                 <Item>estado</Item>
                 <Item>estaba</Item>
                 <Item>ante</Item>
@@ -1491,7 +1491,7 @@
                 <Item>donc</Item>
                 <Item>dos</Item>
                 <Item>droite</Item>
-                <Item>d�but</Item>
+                <Item>début</Item>
                 <Item>elle</Item>
                 <Item>elles</Item>
                 <Item>en</Item>
@@ -1516,7 +1516,7 @@
                 <Item>le</Item>
                 <Item>les</Item>
                 <Item>leur</Item>
-                <Item>l�</Item>
+                <Item>lé</Item>
                 <Item>ma</Item>
                 <Item>maintenant</Item>
                 <Item>mais</Item>
@@ -1525,14 +1525,14 @@
                 <Item>moins</Item>
                 <Item>mon</Item>
                 <Item>mot</Item>
-                <Item>m�me</Item>
+                <Item>même</Item>
                 <Item>ni</Item>
-                <Item>nomm�s</Item>
+                <Item>nommés</Item>
                 <Item>notre</Item>
                 <Item>nous</Item>
                 <Item>nouveaux</Item>
                 <Item>ou</Item>
-                <Item>o�</Item>
+                <Item>oé</Item>
                 <Item>par</Item>
                 <Item>parce</Item>
                 <Item>parole</Item>
@@ -1540,7 +1540,7 @@
                 <Item>personnes</Item>
                 <Item>peut</Item>
                 <Item>peu</Item>
-                <Item>pi�ce</Item>
+                <Item>pièce</Item>
                 <Item>plupart</Item>
                 <Item>pour</Item>
                 <Item>pourquoi</Item>
@@ -1572,7 +1572,7 @@
                 <Item>tous</Item>
                 <Item>tout</Item>
                 <Item>trop</Item>
-                <Item>tr�s</Item>
+                <Item>très</Item>
                 <Item>tu</Item>
                 <Item>valeur</Item>
                 <Item>voie</Item>
@@ -1581,12 +1581,12 @@
                 <Item>votre</Item>
                 <Item>vous</Item>
                 <Item>vu</Item>
-                <Item>�a</Item>
-                <Item>�taient</Item>
-                <Item>�tat</Item>
-                <Item>�tions</Item>
-                <Item>�t�</Item>
-                <Item>�tre</Item>
+                <Item>èa</Item>
+                <Item>étaient</Item>
+                <Item>état</Item>
+                <Item>étions</Item>
+                <Item>été</Item>
+                <Item>être</Item>
             </Array>
         </Setting>
     </ConfigItem>

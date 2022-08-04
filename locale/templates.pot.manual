@@ -297,3 +297,12 @@ msgstr ""
 #: manuel added from SSP src/components/AttachmentUpload.vue:45
 msgid "File(s) added"
 msgstr ""
+
+msgid "FirstResponse"
+msgstr ""
+
+msgid "PendingTime"
+msgstr ""
+
+msgid "customer"
+msgstr ""

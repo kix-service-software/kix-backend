@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
 
+    <TableAlter Name="macro_action">
+        <ColumnAdd Name="referenced_macro_id" Required="false" Type="INTEGER"/>
+        <ForeignKeyCreate ForeignTable="macro">
+            <Reference Local="referenced_macro_id" Foreign="id"/>
+        </ForeignKeyCreate>
+    </TableAlter>
+
     <TableAlter Name="report_definition">
         <ColumnAdd Name="is_periodic" Required="false" Type="INTEGER"/>
         <ColumnAdd Name="max_reports" Required="false" Type="INTEGER"/>
     </TableAlter>
 
     <TableAlter Name="configitem_counter">
+        <IndexCreate Name="configitem_counter_class_id">
+            <IndexColumn Name="class_id"/>
+        </IndexCreate>
+        <PrimaryDrop />
         <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
-        <ColumnChange NameOld="class_id" NameNew="class_id" Required="true" PrimaryKey="false" Type="INTEGER" />
         <ColumnChange NameOld="counter" NameNew="value" Required="true" Size="50" Type="VARCHAR" />
         <ColumnChange NameOld="counter_type" NameNew="counter" Required="true" Size="255" Type="VARCHAR"/>
     </TableAlter>

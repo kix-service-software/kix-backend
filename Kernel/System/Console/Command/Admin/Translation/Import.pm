@@ -133,7 +133,8 @@ sub Run {
             # get all relevant PO files in given directory
             @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
                 Directory => $ImportItem->{Directory},
-                Filter    => $Language ? "$Language.po" : '*.po'
+                Filter    => $Language ? "$Language.po" : '*.po',
+                Recursive => 1,
             );
         }
     }

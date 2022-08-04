@@ -162,9 +162,9 @@ sub ConfigItemCounterGet {
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT value FROM configitem_counter WHERE class_id = ? AND counter = ?",
-        Bind  => [ 
+        Bind  => [
             \$Param{ClassID},
-            \$Param{Counter} 
+            \$Param{Counter}
         ],
         Limit => 1,
     );
@@ -207,16 +207,16 @@ sub ConfigItemCounterSet {
     # delete old counter
     $Kernel::OM->Get('DB')->Do(
         SQL  => "DELETE FROM configitem_counter WHERE counter = ? AND class_id = ?",
-        Bind => [ 
-            \$Param{Counter}, \$Param{ClassID} 
+        Bind => [
+            \$Param{Counter}, \$Param{ClassID}
         ],
     );
 
     # set new counter
     $Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO configitem_counter (class_id, counter, value) VALUES (?, ?, ?)',
-        Bind => [ 
-            \$Param{ClassID}, \$Param{Counter}, \$Param{Value} 
+        Bind => [
+            \$Param{ClassID}, \$Param{Counter}, \$Param{Value}
         ],
     );
 
@@ -3054,7 +3054,7 @@ sub UpdateCounters {
             }
             push @ClassIDs, $ClassListReverse{$Class};
         }
-    } 
+    }
     else {
         @ClassIDs = sort keys %{$ClassList};
     }
@@ -3104,7 +3104,7 @@ sub UpdateCounters {
     # delete all relevant counters
     CLASSID:
     foreach my $ClassID ( sort @ClassIDs ) {
-        my $Success = $Kernel::OM->Get('DB')->Do( 
+        my $Success = $Kernel::OM->Get('DB')->Do(
             SQL => "DELETE FROM configitem_counter WHERE counter <> 'AutoIncrement' AND class_id = $ClassID"
         );
         if ( !$Success ) {
