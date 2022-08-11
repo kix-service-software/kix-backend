@@ -293,6 +293,7 @@ sub Run {
                 {
                     next BUNDLE;
                 }
+
                 # Check if notification should not be send to the customer.
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'
@@ -324,6 +325,7 @@ sub Run {
             # get special recipients specific for each transport
             my @TransportRecipients = $TransportObject->GetTransportRecipients(
                 Notification => \%Notification,
+                TicketID     => $Param{Data}->{TicketID},
             );
 
             next TRANSPORT if !@TransportRecipients;

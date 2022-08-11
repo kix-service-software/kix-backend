@@ -172,7 +172,13 @@ sub new {
     return $Self->{BackendObject} if ref $Self->{BackendObject} ne $GenericModule;
 
     # pass information to backend
-    foreach my $Key ( qw(Authorization RequestURI RequestMethod Operation OperationType OperationConfig OperationRouteMapping ParentMethodOperationMapping AvailableMethods IgnorePermissions SuppressPermissionErrors) ) {
+    foreach my $Key (
+        qw(
+            Authorization RequestURI RequestMethod Operation OperationType
+            OperationConfig OperationRouteMapping ParentMethodOperationMapping
+            AvailableMethods IgnorePermissions SuppressPermissionErrors
+        )
+    ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};
     }
 

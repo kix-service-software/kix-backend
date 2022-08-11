@@ -12,12 +12,14 @@ use strict;
 use warnings;
 
 use File::Basename;
-use Time::HiRes qw(gettimeofday);
 
 use Kernel::Language qw(Translatable);
 use Kernel::System::VariableCheck qw(:all);
 
-use base qw(Kernel::System::AsynchronousExecutor);
+use base qw(
+    Kernel::System::AsynchronousExecutor
+    Kernel::System::Installation::Migration
+);
 
 our @ObjectDependencies = ();
 
@@ -393,319 +395,6 @@ sub Update {
     return 1;
 }
 
-=item MigrationSupportedTypeList()
-
-get the list of supported object types for the given source
-
-    my @Result = $InstallationObject->MigrationSupportedTypeList(
-        Source      => 'KIX17'          # the source
-    );
-
-=cut
-
-sub MigrationSupportedTypeList {
-    my ( $Self, %Param ) = @_;
-
-    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
-
-    # get all object handler modules
-    my $SourceList = $Kernel::OM->Get('Config')->Get('Migration::Sources');
-    if ( !IsHashRefWithData($SourceList) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No registered sources available!',
-        );
-        return;
-    }
-
-    if ( !$SourceList->{$Param{Source}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Source \"$Param{Source}\" not supported!",
-        );
-        return;
-    }
-
-    $Kernel::OM->ObjectParamAdd(
-        $SourceList->{$Param{Source}}->{Module} => {
-            %Param,
-        },
-    );
-
-    my $BackendObject = $Kernel::OM->Get(
-        $SourceList->{$Param{Source}}->{Module}
-    );
-    if ( !$BackendObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to load backend for source \"$Param{Source}\"!",
-        );
-        return;
-    }
-
-    return $BackendObject->ObjectTypeList(
-        %Param,
-    );
-}
-
-=item CountMigratableObjects()
-
-count the number of migratable objects in the given data source
-
-    my %Result = $InstallationObject->CountMigratableObjects(
-        Source      => 'KIX17'          # the type of source to get the data from
-        Options     => '...'            # optional, source specific
-        ObjectType  => 'Ticket,FAQ'     # optional, if not given all supported objects will be migrated
-    );
-
-=cut
-
-sub CountMigratableObjects {
-    my ( $Self, %Param ) = @_;
-
-    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
-
-    # get all object handler modules
-    my $SourceList = $Kernel::OM->Get('Config')->Get('Migration::Sources');
-    if ( !IsHashRefWithData($SourceList) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No registered sources available!',
-        );
-        return;
-    }
-
-    if ( !$SourceList->{$Param{Source}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Source \"$Param{Source}\" not supported!",
-        );
-        return;
-    }
-
-    $Kernel::OM->ObjectParamAdd(
-        $SourceList->{$Param{Source}}->{Module} => {
-            %Param,
-        },
-    );
-
-    my $BackendObject = $Kernel::OM->Get(
-        $SourceList->{$Param{Source}}->{Module}
-    );
-    if ( !$BackendObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to load backend for source \"$Param{Source}\"!",
-        );
-        return;
-    }
-
-    return $BackendObject->Count(
-        %Param,
-    );
-}
-
-=item MigrationStart()
-
-migrate the data from another source
-
-    my $Result = $InstallationObject->MigrationStart(
-        Source      => 'KIX17'          # the type of source to get the data from
-        SourceID    => 'my-system123'   # the ID of the source
-        Options     => '...'            # optional, source specific
-        Filter      => '...'            # optional, source specific
-        ObjectType  => 'Ticket,FAQ'     # optional, if not given all supported objects will be migrated
-        MappingFile => 'mappings.json'  # optional
-        Workers     => 4,               # optional, number of workers to used if something can be parallelly executed
-        Async       => 1,               # optional, start migration as a background process
-    );
-
-=cut
-
-sub MigrationStart {
-    my ( $Self, %Param ) = @_;
-
-    my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
-
-    # get all object handler modules
-    my $SourceList = $Kernel::OM->Get('Config')->Get('Migration::Sources');
-    if ( !IsHashRefWithData($SourceList) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No registered sources available!',
-        );
-        return;
-    }
-
-    if ( !$SourceList->{$Param{Source}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Source \"$Param{Source}\" not supported!",
-        );
-        return;
-    }
-
-    if ( !$Param{SourceID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "SourceID not given!",
-        );
-        return;
-    }
-
-    my $Mapping;
-    if ( $Param{MappingFile} ) {
-        my $Content = $Kernel::OM->Get('Main')->FileRead(
-            Location => $Param{MappingFile}
-        );
-        if ( !$Content ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to open mapping file \"$Param{MappingFile}\"!",
-            );
-            return;
-        }
-        $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data => $$Content
-        );
-    }
-
-    # create MigrationID
-    my $Timestamp = gettimeofday();
-    my $MigrationID = $$.'_'.$Timestamp;
-
-    # clear metadata and init new cache entry
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => 'Migration'
-    );
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => 'Migration',
-        Key   => $MigrationID,
-        Value => {
-            ID     => $MigrationID,
-            Status => 'pending',
-            %Param,
-        }
-    );
-
-    if ( $Param{Async} ) {
-
-        my $TaskID = $Self->AsyncCall(
-            ObjectName     => $Kernel::OM->GetModuleFor('Installation'),
-            FunctionName   => '_MigrationStart',
-            FunctionParams => {
-                %Param,
-                BackendModule => $SourceList->{$Param{Source}}->{Module},
-                MigrationID   => $MigrationID,
-                Mapping       => $Mapping,
-            },
-            MaximumParallelInstances => 1,
-        );
-
-        return $MigrationID;
-    }
-
-    return $Self->_MigrationStart(
-        %Param,
-        BackendModule => $SourceList->{$Param{Source}}->{Module},
-        MigrationID   => $MigrationID,
-        Mapping       => $Mapping,
-    );
-}
-
-sub _MigrationStart {
-    my ($Self, %Param) = @_;
-
-    $Kernel::OM->ObjectParamAdd(
-        $Param{BackendModule} => {
-            %Param,
-        },
-        ClientRegistration => {
-            DisableClientNotifications => 1,
-        },
-    );
-
-    my $BackendObject = $Kernel::OM->Get(
-        $Param{BackendModule}
-    );
-    if ( !$BackendObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to load backend for source \"$Param{Source}\"!",
-        );
-        return;
-    }
-
-    my $Result = $BackendObject->Run(
-        %Param,
-    );
-
-    # clearing cache to use new data
-    $Kernel::OM->Get('Cache')->CleanUp();
-
-    # enable client notifications again
-    $Kernel::OM->Get('ClientRegistration')->{DisableClientNotifications} = 0;
-
-    # send notification to clients
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'CLEAR_CACHE',
-        Namespace => 'Migration',
-    );
-
-    return 1;
-}
-
-sub MigrationList {
-    my ($Self, %Param) = @_;
-    my @Result;
-
-    my @MigrationList = $Kernel::OM->Get('Cache')->GetKeysForType(
-        Type => 'Migration',
-    );
-
-    my $Running;
-    foreach my $MigrationID ( @MigrationList ) {
-        my $MigrationData = $Kernel::OM->Get('Cache')->Get(
-            Type      => 'Migration',
-            Key       => $MigrationID,
-            UseRawKey => 1,
-        );
-
-        push @Result, $MigrationData;
-    }
-
-    return @Result;
-}
-
-sub MigrationStop {
-    my ($Self, %Param) = @_;
-
-    # check needed stuff
-    for (qw(ID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my $Migration = $Kernel::OM->Get('Cache')->Get(
-        Type      => 'Migration',
-        Key       => $Param{ID},
-    );
-    return if !IsHashRefWithData($Migration);
-
-    $Migration->{Status} = $Migration->{Status} !~ /^(pending|finished)$/ ? Kernel::Language::Translatable('aborting') : Kernel::Language::Translatable('aborted');
-
-    return $Kernel::OM->Get('Cache')->Set(
-        Type  => 'Migration',
-        Key   => $Param{ID},
-        Value => $Migration,
-    );
-}
-
 sub _DoUpdate {
     my ($Self, %Param) = @_;
 
@@ -721,6 +410,11 @@ sub _DoUpdate {
 
     # check and execute pre SQL script (to prepare some thing in the DB)
     if ( !$Self->_ExecUpdateSQL(%Param, Type => 'pre') ) {
+        return;
+    }
+
+    # check and execute SQL script (to prepare some thing in the DB)
+    if ( !$Self->_ExecUpdateSQL(%Param) ) {
         return;
     }
 
@@ -751,9 +445,6 @@ sub _ExecUpdateScript {
     if ( $Type ) {
         $Type = '_'.$Type;
     }
-    else {
-        $Type = '';
-    }
 
     my $ScriptFile = $Param{Directory}.'/update/'.$Param{Build}.$Type.'.pl';
 
@@ -781,8 +472,14 @@ sub _ExecUpdateScript {
 sub _ExecUpdateSQL {
     my ($Self, %Param) = @_;
 
-    # check if xml file exists, if it doesn't, exit gracefully
-    my $XMLFile = $Param{Directory}.'/update/'.$Param{Build}.'_'.$Param{Type}.'.xml';
+    my $Type    = $Param{Type} || '';
+    my $OrgType = $Param{Type} || '';
+    if ( $Type ) {
+        $Type = '_'.$Type;
+    }
+
+    # check if xml file exists, if not, exit gracefully
+    my $XMLFile = $Param{Directory}.'/update/'.$Param{Build}.$Type.'.xml';
 
     if ( ! -f "$XMLFile" ) {
         return 1;
@@ -790,7 +487,7 @@ sub _ExecUpdateSQL {
 
     $Kernel::OM->Get('Log')->Log(
         Priority => "info",
-        Message  => "    executing $Param{Type} SQL",
+        Message  => "    executing $OrgType SQL",
     );
 
     my $XML = $Kernel::OM->Get('Main')->FileRead(

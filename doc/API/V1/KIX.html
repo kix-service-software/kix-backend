@@ -14715,6 +14715,14 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "IsPeriodic" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MaxReports" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -14886,6 +14894,8 @@ pre code {
             "CreateTime": "2021-03-01 16:16:32",
             "DataSource": "GenericSQL",
             "ID": 1,
+            "IsPeriodic": 1,
+            "MaxReports": 1,
             "Name": "just a test",
             "Reports": [
                 {
@@ -15023,6 +15033,12 @@ pre code {
             "DataSource" : {
                "description" : "The data source to use.",
                "type" : "string"
+            },
+            "IsPeriodic" : {
+               "type" : "integer"
+            },
+            "MaxReports" : {
+               "type" : "integer"
             },
             "Name" : {
                "type" : "string",
@@ -15259,6 +15275,14 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "IsPeriodic" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MaxReports" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -15429,6 +15453,8 @@ pre code {
         "CreateTime": "2021-03-01 16:16:32",
         "DataSource": "GenericSQL",
         "ID": 1,
+        "IsPeriodic": 1,
+        "MaxReports": 1,
         "Name": "just a test",
         "Reports": [
             {
@@ -15565,6 +15591,12 @@ pre code {
             "DataSource" : {
                "description" : "The data source to use.",
                "type" : "string"
+            },
+            "IsPeriodic" : {
+               "type" : "integer"
+            },
+            "MaxReports" : {
+               "type" : "integer"
             },
             "Name" : {
                "type" : "string",
@@ -15855,6 +15887,8 @@ pre code {
             "CreateTime": "2021-03-01 16:16:37",
             "DefinitionID": 1,
             "ID": 1,
+            "IsPeriodic": 1,
+            "MaxReports": 1,
             "Config": {
                 "OutputFormats": [
                     "CSV"
@@ -15951,7 +15985,23 @@ pre code {
             ]
         }
     }
-}</code></pre></div></div><div class="tab-pane" id="reporting_reports_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="reporting_reports_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Report has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ReportPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>Can not resolve ../../schemas/ReportPostPatchResponse.json</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>Can not resolve ../../examples/ReportPostPatchResponse.json</code></pre></div></div><h2 class="response-title" id="reporting_reports_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div><div class="tab-pane" id="reporting_reports_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="reporting_reports_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Report has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ReportPostResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "ReportPostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created report.",
+   "type" : "object",
+   "properties" : {
+      "ReportID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "ReportID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "ReportID": 1
+}</code></pre></div></div><h2 class="response-title" id="reporting_reports_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "An error object.",
@@ -27278,7 +27328,7 @@ pre code {
                "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
-                  "PostProductiveCount" : {
+                  "PreProductiveCount" : {
                      "type" : "integer",
                      "readOnly" : true
                   },
@@ -27288,7 +27338,7 @@ pre code {
                   }
                },
                "required" : [
-                  "PostProductiveCount",
+                  "PreProductiveCount",
                   "ProductiveCount"
                ]
             },
@@ -27559,7 +27609,7 @@ pre code {
                "description" : "result of include \"ConfigItemStats\"",
                "type" : "object",
                "properties" : {
-                  "PostProductiveCount" : {
+                  "PreProductiveCount" : {
                      "type" : "integer",
                      "readOnly" : true
                   },
@@ -27569,7 +27619,7 @@ pre code {
                   }
                },
                "required" : [
-                  "PostProductiveCount",
+                  "PreProductiveCount",
                   "ProductiveCount"
                ]
             },

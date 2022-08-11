@@ -254,6 +254,20 @@ sub Sort {
     # get dynamic field backend object
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
+    if ( !$Self->{DynamicFields} ) {
+
+        # get all configured dynamic fields
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet();
+        if ( !IsArrayRefWithData($DynamicFieldList) ) {
+            # we don't have any  DFs
+            return {
+                SQLJoin  => [],
+                SQLWhere => [],
+            };
+        }
+        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
+    }
+
     my $DFName = $Param{Attribute};
     $DFName =~ s/DynamicField_//g;
 

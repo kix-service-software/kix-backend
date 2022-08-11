@@ -14,7 +14,7 @@ use warnings;
 use base qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
-    'Installation',
+    'Migration',
 );
 
 sub Configure {
@@ -86,7 +86,7 @@ sub Run {
 
     $Self->Print("<yellow>Migrating data...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('Installation')->MigrationStart(
+    my $Result = $Kernel::OM->Get('Migration')->MigrationStart(
         Source       => $Self->GetOption('source'),
         SourceID     => $Self->GetOption('source-id'),
         Options      => $Self->GetOption('options'),

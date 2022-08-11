@@ -92,6 +92,7 @@ one or more ticket entries in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
     my @ContactList;
 
     if ( $Self->_CanRunParallel(Items => $Param{Data}->{ContactID}) ) {

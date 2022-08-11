@@ -480,10 +480,10 @@ sub SendNotification {
 }
 
 sub GetTransportRecipients {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     for my $Needed (qw(Notification)) {
-        if ( !$Param{$Needed} ) {
+        if (!$Param{$Needed}) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed",
@@ -494,35 +494,51 @@ sub GetTransportRecipients {
     my @Recipients;
 
     # get recipients by RecipientEmail
-    if ( $Param{Notification}->{Data}->{RecipientEmail} ) {
-        if ( $Param{Notification}->{Data}->{RecipientEmail}->[0] ) {
+    if ( IsArrayRefWithData($Param{Notification}->{Data}->{RecipientEmail}) ) {
+        my $RecipientString = $Param{Notification}->{Data}->{RecipientEmail}->[0];
+
+        # check and replace placeholders
+        if ($RecipientString =~ m/(<|&lt;)KIX_.+/) {
+            $RecipientString = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                RichText => 0,
+                Text     => $RecipientString,
+                TicketID => $Param{TicketID},
+                Data     => {},
+                UserID   => $Param{UserID} || 1,
+            );
+        }
+
+        # parse mail addresses
+        my @ParsedMailAddresses = Mail::Address->parse($RecipientString);
+
+        foreach my $MailAddress (@ParsedMailAddresses) {
             my %Recipient;
-            $Recipient{Realname}  = '';
-            $Recipient{Type}      = 'Customer';
-            $Recipient{Email} = $Param{Notification}->{Data}->{RecipientEmail}->[0];
+            $Recipient{Realname} = '';
+            $Recipient{Type}     = 'Customer';
+            $Recipient{Email}    = $MailAddress->address;
 
             # check if we have a specified channel
-            if ( $Param{Notification}->{Data}->{ChannelID} ) {
+            if ($Param{Notification}->{Data}->{ChannelID}) {
                 $Recipient{NotificationChannel} = $Kernel::OM->Get('Channel')->ChannelLookup(
                     ID => $Param{Notification}->{Data}->{ChannelID}->[0]
                 ) || 'email';
             }
 
             # check recipients
-            if ( $Recipient{Email} && $Recipient{Email} =~ /@/ ) {
+            if ($Recipient{Email} && $Recipient{Email} =~ /@/) {
                 push @Recipients, \%Recipient;
             }
         }
     }
 
-# NotificationEventX-capeIT
+    # NotificationEventX-capeIT
     # get object
     my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
     # get dynamic fields
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
         Valid      => 1,
-        ObjectType => ['Ticket'],
+        ObjectType => [ 'Ticket' ],
     );
 
     # get dynamic fields config
@@ -534,10 +550,10 @@ sub GetTransportRecipients {
     # get recipients by RecipientAgentDF
     if (
         $Param{Notification}->{Data}->{RecipientAgentDF}
-        && ref($Param{Notification}->{Data}->{RecipientAgentDF}) eq 'ARRAY'
+            && ref($Param{Notification}->{Data}->{RecipientAgentDF}) eq 'ARRAY'
     ) {
         FIELD:
-        for my $ID ( sort( @{ $Param{Notification}->{Data}->{RecipientAgentDF} } ) ) {
+        for my $ID (sort(@{$Param{Notification}->{Data}->{RecipientAgentDF}})) {
             next FIELD if !$DynamicFieldConfig{$ID};
 
             # generate recipient
@@ -546,17 +562,17 @@ sub GetTransportRecipients {
                 DynamicFieldType => $DynamicFieldConfig{$ID}->{FieldType},
                 Type             => 'Agent',
             );
-            push (@Recipients, \%Recipient);
+            push(@Recipients, \%Recipient);
         }
     }
 
     # get recipients by RecipientCustomerDF
     if (
         $Param{Notification}->{Data}->{RecipientCustomerDF}
-        && ref($Param{Notification}->{Data}->{RecipientCustomerDF}) eq 'ARRAY'
+            && ref($Param{Notification}->{Data}->{RecipientCustomerDF}) eq 'ARRAY'
     ) {
         FIELD:
-        for my $ID ( sort( @{ $Param{Notification}->{Data}->{RecipientCustomerDF} } ) ) {
+        for my $ID (sort(@{$Param{Notification}->{Data}->{RecipientCustomerDF}})) {
             next FIELD if !$DynamicFieldConfig{$ID};
 
             # generate recipient
@@ -565,10 +581,10 @@ sub GetTransportRecipients {
                 DynamicFieldType => $DynamicFieldConfig{$ID}->{FieldType},
                 Type             => 'Customer',
             );
-            push (@Recipients, \%Recipient);
+            push(@Recipients, \%Recipient);
         }
     }
-# EO NotificationEventX-capeIT
+    # EO NotificationEventX-capeIT
 
     return @Recipients;
 }

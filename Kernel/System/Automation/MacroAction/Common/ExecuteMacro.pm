@@ -85,15 +85,9 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     if ( $Param{Config}->{ObjectID} ) {
-        $Param{Config}->{ObjectID} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText  => 0,
-            Text      => $Param{Config}->{ObjectID} || '',
-            Data      => {},
-            UserID    => $Param{UserID},
-            Translate => 0,
-
-            # FIXME: as common action, object id could be not a ticket!
-            TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+        $Param{Config}->{ObjectID} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value => $Param{Config}->{ObjectID} || ''
         );
 
         if ( $Param{Config}->{ObjectID} !~ /^\d+$/ ) {
@@ -113,6 +107,9 @@ sub Run {
         ID       => $Param{Config}->{MacroID},
         ObjectID => $Param{Config}->{ObjectID},
         UserID   => $Param{UserID},
+
+        # keep event data if given
+        EventData => $Self->{EventData} || $Param{EventData},
 
         # keep root object id
         RootObjectID => $Self->{RootObjectID} || $Param{ObjectID},

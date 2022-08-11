@@ -69,11 +69,13 @@ perform ReportDefinitionUpdate Operation. This will return the updated ReportDef
         Data => {
             ReportDefinitionID => 123,
             ReportDefinition  => {
-                Type    => '...',                     # (optional)
-                Name    => 'Item Name',               # (optional)
-                Config  => {}                         # (optional)
-                Comment => 'Comment',                 # (optional)
-                ValidID => 1,                         # (optional)
+                Type    => '...',                     # optional
+                Name    => 'Item Name',               # optional
+                Config  => {}                         # optional
+                IsPeriodic => 0|1,                    # optional
+                MaxReports => ...,                    # optional
+                Comment => 'Comment',                 # optional
+                ValidID => 1,                         # optional
             },
         },
     );
@@ -129,6 +131,8 @@ sub Run {
         DataSource => $ReportDefinition->{DataSource} || $ReportDefinitionData{DataSource},
         Name       => $ReportDefinition->{Name} || $ReportDefinitionData{Name},
         Config     => exists $ReportDefinition->{Config} ? $ReportDefinition->{Config} : $ReportDefinitionData{Config},
+        IsPeriodic => exists $ReportDefinition->{IsPeriodic} ? $ReportDefinition->{IsPeriodic} : $ReportDefinitionData{IsPeriodic},
+        MaxReports => exists $ReportDefinition->{MaxReports} ? $ReportDefinition->{MaxReports} : $ReportDefinitionData{MaxReports},
         Comment    => exists $ReportDefinition->{Comment} ? $ReportDefinition->{Comment} : $ReportDefinitionData{Comment},
         ValidID    => exists $ReportDefinition->{ValidID} ? $ReportDefinition->{ValidID} : $ReportDefinitionData{ValidID},
         UserID     => $Self->{Authorization}->{UserID},

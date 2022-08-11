@@ -2452,7 +2452,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Web</SubGroup>
         <Setting>
-            <String Regex="">font-family:Geneva,Helvetica,Arial,sans-serif; font-size: 12px;</String>
+            <String Regex="">[{"Selector": ".cke_editable", "Value": "font-family:Geneva,Helvetica,Arial,sans-serif; font-size: 12px;"}]</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DisableIFrameOriginRestricted" Required="0" Valid="1">
@@ -7574,6 +7574,20 @@ You can log in via the following URL:
                 },
                 {
                     "Enabled": 0,
+                    "Module": "Kernel::System::Auth::ValidUser",
+                    "Name": "Valid User Example",
+                    "UsageContext": "Customer",
+                    "Config": {
+                        "RelevantClientIPs": [
+                            "^172\\..*?$"
+                        ],
+                        "RelevantUsers": [
+                            "mamu"
+                        ]
+                    }
+                },
+                {
+                    "Enabled": 0,
                     "Name": "Foreign Database",
                     "Module": "Kernel::System::Auth::DB",
                     "UsageContext": "Customer",
@@ -8868,6 +8882,27 @@ You can log in via the following URL:
                 <Item Key="DisplayName" Translatable="1">Conditional</Item>
                 <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Conditional</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroReferenceObject###Job" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a object (module) which uses macros.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanReferenceObject###Job" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a object (module) which uses exec plans.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###100-DateUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::DateUtil</String>
         </Setting>
     </ConfigItem>
 

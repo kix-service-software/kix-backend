@@ -132,9 +132,9 @@ sub Search {
             $ArticleSearchTable = 'article_search';
         }
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN '.$ArticleSearchTable.' art_left ON st.id = art_left.ticket_id' );
+            push( @SQLJoin, 'LEFT OUTER JOIN '.$ArticleSearchTable.' art_left ON st.id = art_left.ticket_id ' );
         } else {
-            push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
+            push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id ' );
         }
         $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
@@ -291,6 +291,20 @@ sub Sort {
         'ArticleCreateTime' => 'art.incoming_time',
     );
 
+    # check if we have to add a join
+    my @SQLJoin;
+    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{AND} ) {
+
+        # use appropriate table for selected search index module
+        my $ArticleSearchTable = 'article';
+        my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
+        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+            $ArticleSearchTable = 'article_search';
+        }
+
+        push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
+    }
+
     return {
         SQLAttrs => [
             $AttributeMapping{$Param{Attribute}}
@@ -298,6 +312,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
+        SQLJoin  => \@SQLJoin
     };
 }
 

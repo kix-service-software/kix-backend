@@ -119,6 +119,10 @@ sub WatcherGet {
 
     return if !@WatcherList;
 
+    if ( !$WatcherList[0]->{WatchUserID} ) {
+        $WatcherList[0]->{WatchUserID} = $WatcherList[0]->{UserID};
+    }
+
     return %{$WatcherList[0]};
 }
 
@@ -377,8 +381,8 @@ sub WatcherDelete {
         );
 
         # check if we have a backend for this object type and execute it
-        if ( $Self->{Backends}->{$Param{Object}} ) {
-            my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherDelete(
+        if ( $Self->{Backends}->{$WatcherData{Object}} ) {
+            my$BackendResult = $Self->{Backends}->{$WatcherData{Object}}->WatcherDelete(
                 %Param,
                 %WatcherData,
             );

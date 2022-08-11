@@ -339,6 +339,8 @@ sub Run {
     my $GeneratedResponse = $Self->GenerateResponse(
         Success => 1,
         %{$OperationResult},
+        DoNotSortAttributes => IsHashRefWithData($OperationObject->{OperationConfig}) ?
+            $OperationObject->{OperationConfig}->{DoNotSortAttributes} : 0
     );
 
     if ( !$GeneratedResponse->{Success} ) {

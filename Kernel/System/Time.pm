@@ -268,14 +268,14 @@ sub TimeStamp2SystemTime {
     }
 
     # match euro time format
-    elsif ( $TimeStamp =~ /(\d{1,2})\.(\d{1,2})\.(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/ ) {
+    elsif ( $TimeStamp =~ /(\d{1,2})\.(\d{1,2})\.(\d{4}),?\s(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/ ) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $3,
             Month  => $2,
             Day    => $1,
             Hour   => $4,
             Minute => $5,
-            Second => $6,
+            Second => $6 || '00',
         );
     }
 
@@ -343,12 +343,18 @@ sub TimeStamp2SystemTime {
         );
     }
 
+    # no valid timestamp
+    else {
+        $SystemTime = undef;
+    }
+
     # return error
     if ( !defined $SystemTime ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Invalid Date '$Param{String}'!",
         );
+        return;
     }
 
     # do calculations if we have to
@@ -1242,6 +1248,113 @@ sub GetVacationDaysOneTime {
     }
 
     return $Result;
+}
+
+=item BOB()
+
+get the begin of businessday based on calender (default is used if omitted)
+
+    $TimeObject->BOB(
+        String   => '2022-04-15 12:00:00',
+        Calendar => '...'                       # optional
+    );
+
+
+=cut
+
+sub BOB {
+    my ( $Self, %Param ) = @_;
+
+    if ( !defined $Param{String} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need String!",
+        );
+        return;
+    }
+
+    # get date parts
+    my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Self->SystemTime2Date(
+        SystemTime => $Self->TimeStamp2SystemTime(
+            String => $Param{String}
+        )
+    );
+    return if (!$Year);
+
+    # get BOB unix
+    my $BOBUnix = $Self->DestinationTime(
+        StartTime => $Self->TimeStamp2SystemTime(
+            String => "$Year-$Month-$Day 00:00:00",
+        ),
+        Time     => 2,   # at least 2 seconds needed, is substracted after next line
+        Calendar => $Param{Calendar}
+    ) - 2;
+
+    # get BOB date time string
+    my $BOB = $Self->SystemTime2TimeStamp(
+        SystemTime => $BOBUnix
+    );
+
+    return $BOB;
+}
+
+=item EOB()
+
+get the end of businessday based on calender (default is used if omitted)
+
+    $TimeObject->EOB(
+        String   => '2022-04-15 12:00:00',
+        Calendar => '...'                       # optional
+    );
+
+
+=cut
+
+sub EOB {
+    my ( $Self, %Param ) = @_;
+
+    if ( !defined $Param{String} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need String!",
+        );
+        return;
+    }
+
+    # get date parts
+    my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Self->SystemTime2Date(
+        SystemTime => $Self->TimeStamp2SystemTime(
+            String => $Param{String}
+        )
+    );
+    return if (!$Year);
+
+    # get working time of relevant day (seconds)
+    my $WorkingTime = $Self->WorkingTime(
+        StartTime => $Self->TimeStamp2SystemTime(
+            String => "$Year-$Month-$Day 00:00:01",
+        ),
+        StopTime => $Self->TimeStamp2SystemTime(
+            String => "$Year-$Month-$Day 23:59:59",
+        ),
+        Calendar => $Param{Calendar}
+    );
+
+    # get BOB unix
+    my $BOBUnix = $Self->DestinationTime(
+        StartTime => $Self->TimeStamp2SystemTime(
+            String => "$Year-$Month-$Day 00:00:00",
+        ),
+        Time     => 2,   # at least 2 seconds needed, is substracted after next line
+        Calendar => $Param{Calendar}
+    ) - 2;
+
+    # get EOB date time string (= BOB + working time for this day)
+    my $EOB = $Self->SystemTime2TimeStamp(
+        SystemTime => $BOBUnix + $WorkingTime
+    );
+
+    return $EOB;
 }
 
 sub _GetTimeWorking {

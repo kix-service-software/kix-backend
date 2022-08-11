@@ -30,6 +30,8 @@
         "CreateTime": "2021-03-01 16:16:32",
         "DataSource": "GenericSQL",
         "ID": 1,
+        "IsPeriodic": 1,
+        "MaxReports": 1,
         "Name": "just a test",
         "Reports": [
             {
