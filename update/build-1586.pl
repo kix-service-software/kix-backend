@@ -263,11 +263,6 @@ sub _CreateChartReports {
                 TypeID => 1
             },
             {
-                Target => '/reporting/reports/*',
-                Value  => 0,
-                TypeID => 1
-            },
-            {
                 Target => '/reporting/reportdefinitions',
                 Value  => 2,
                 TypeID => 1
@@ -278,8 +273,8 @@ sub _CreateChartReports {
                 TypeID => 1
             },
             {
-                Target => '/reporting/reports{Report.DefinitionID IN ['.(join(',', @DefinitionIDs)).']}',
-                Value  => 2,
+                Target => '/reporting/reports{Report.DefinitionID !IN ['.(join(',', @DefinitionIDs)).']}',
+                Value  => 0,
                 TypeID => 2
             }
         );
