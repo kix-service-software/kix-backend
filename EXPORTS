@@ -35,6 +35,7 @@ Console::Command::Admin::Contact::Add                                         = 
 Console::Command::Admin::Contact::List                                        = Kernel::System::Console::Command::Admin::Contact::List
 Console::Command::Admin::Daemon::Reload                                       = Kernel::System::Console::Command::Admin::Daemon::Reload
 Console::Command::Admin::FAQ::Import                                          = Kernel::System::Console::Command::Admin::FAQ::Import
+Console::Command::Admin::ImportExport::CreateMapping                          = Kernel::System::Console::Command::Admin::ImportExport::CreateMapping
 Console::Command::Admin::ImportExport::ListMappings                           = Kernel::System::Console::Command::Admin::ImportExport::ListMappings
 Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition        = Kernel::System::Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition
 Console::Command::Admin::Installation::ListPlugins                            = Kernel::System::Console::Command::Admin::Installation::ListPlugins
