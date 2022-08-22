@@ -1062,7 +1062,7 @@ sub JobExecute {
 
         if ( !$ExecutableMacroCount ) {
             $Self->LogInfo(
-                Message  => "Job \"$Job{Name}\" has assigned macros but non of them is executable. Aborting job execution.",
+                Message  => "Job \"$Job{Name}\" has assigned macros but none of them is executable. Aborting job execution.",
                 UserID   => $Param{UserID},
             );
             $Warning = 1;
