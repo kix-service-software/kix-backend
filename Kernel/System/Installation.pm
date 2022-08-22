@@ -358,28 +358,36 @@ sub Update {
 
         my $Failed = 0;
         my $LastBuild = 0;
-        BUILDNUMBER:
-        foreach my $NumericBuild (sort { $a <=> $b } keys %BuildList) {
-
-            next if $NumericBuild <= $SourceBuild;
-            last if $NumericBuild > $TargetBuild;
-
-            my $Result = $Self->_DoUpdate(
-                Name      => $UpdateItem->{Name},
-                Directory => $UpdateItem->{Directory},
-                Build     => $BuildList{$NumericBuild}
+        TYPE:
+        foreach my $Type ( ('pre', '', 'post') ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => "info",
+                Message  => "executing ".($Type ? $Type.' ' : $Type)."update scripts for $UpdateItem->{Name}...",
             );
+            BUILDNUMBER:
+            foreach my $NumericBuild (sort { $a <=> $b } keys %BuildList) {
 
-            if ( !$Result ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Error while updating $UpdateItem->{Name}. Ignoring further updates for $UpdateItem->{Name}."
+                next if $NumericBuild <= $SourceBuild;
+                last if $NumericBuild > $TargetBuild;
+
+                my $Result = $Self->_DoUpdate(
+                    Name      => $UpdateItem->{Name},
+                    Directory => $UpdateItem->{Directory},
+                    Build     => $BuildList{$NumericBuild},
+                    Type      => $Type,
                 );
-                $Failed = 1;
-                last BUILDNUMBER;
-            }
 
-            $LastBuild = $NumericBuild;
+                if ( !$Result ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Error while updating $UpdateItem->{Name}. Ignoring further updates for $UpdateItem->{Name}."
+                    );
+                    $Failed = 1;
+                    last TYPE;
+                }
+
+                $LastBuild = $NumericBuild;
+            }
         }
 
         if ( !$Failed ) {
@@ -403,34 +411,21 @@ sub _DoUpdate {
         Message  => "updating $Param{Name} to $Param{Build}!"
     );
 
-    # check and exec pre update script (before any SQL)
-    if ( !$Self->_ExecUpdateScript(%Param, Type => 'pre') ) {
-        return;
+    if ( $Param{Type} && $Param{Type} eq 'pre' ) {
+        if ( !$Self->_ExecUpdateScript(%Param, Type => $Param{Type}) ) {
+            return;
+        }
+        if ( !$Self->_ExecUpdateSQL(%Param, Type => $Param{Type}) ) {
+            return;
+        }
     }
-
-    # check and execute pre SQL script (to prepare some thing in the DB)
-    if ( !$Self->_ExecUpdateSQL(%Param, Type => 'pre') ) {
-        return;
-    }
-
-    # check and execute SQL script (to prepare some thing in the DB)
-    if ( !$Self->_ExecUpdateSQL(%Param) ) {
-        return;
-    }
-
-    # check and exec main update script (after preparation)
-    if ( !$Self->_ExecUpdateScript(%Param) ) {
-        return;
-    }
-
-    # check and execute post SQL script (to do some things after main migration)
-    if ( !$Self->_ExecUpdateSQL(%Param, Type => 'post') ) {
-        return;
-    }
-
-    # check and exec post update script (after all SQL)
-    if ( !$Self->_ExecUpdateScript(%Param, Type => 'post') ) {
-        return;
+    else {
+        if ( !$Self->_ExecUpdateSQL(%Param, Type => $Param{Type}) ) {
+            return;
+        }
+        if ( !$Self->_ExecUpdateScript(%Param, Type => $Param{Type}) ) {
+            return;
+        }
     }
 
     return 1;
@@ -451,11 +446,6 @@ sub _ExecUpdateScript {
     if ( ! -f $ScriptFile ) {
         return 1;
     }
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => "info",
-        Message  => "    executing $OrgType update script",
-    );
 
     my $ExitCode = system($ScriptFile);
     if ($ExitCode) {
@@ -484,11 +474,6 @@ sub _ExecUpdateSQL {
     if ( ! -f "$XMLFile" ) {
         return 1;
     }
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => "info",
-        Message  => "    executing $OrgType SQL",
-    );
 
     my $XML = $Kernel::OM->Get('Main')->FileRead(
         Location => $XMLFile,
