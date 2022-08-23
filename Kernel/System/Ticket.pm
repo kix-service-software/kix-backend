@@ -493,29 +493,6 @@ sub TicketCreate {
 
     # check database undef/NULL (set value to undef/NULL to prevent database errors)
 
-    # create organisation if it doesn't exist
-    if ($Param{OrganisationID} && $Param{OrganisationID} !~ /^\d+$/) {
-        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            Number => $Param{OrganisationID},
-            Silent => 1
-        );
-        if (!$OrgID) {
-            $Param{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-                Number => $Param{OrganisationID},
-                Name   => $Param{OrganisationID},
-                UserID => 1,
-            );
-        }
-        else {
-            $Param{OrganisationID} = $OrgID;
-        }
-    }
-
-    if ( !$Param{OrganisationID} ) {
-        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
-        $Param{OrganisationID} = undef;
-    }
-
     # create contact if necessary
     if ($Param{ContactID} && $Param{ContactID} !~ /^\d+$/) {
         $Self->{ParserObject} = Kernel::System::EmailParser->new(
@@ -561,9 +538,32 @@ sub TicketCreate {
                 ID => $Param{ContactID},
             );
             if (IsHashRefWithData(\%ContactData)) {
-                $Param{OrganisationID} = $ContactData{PrimaryOrganisationID} || undef;
+                $Param{OrganisationID} = $ContactData{PrimaryOrganisationID} || $ContactEmail;
             }
         }
+    }
+
+    # create organisation if it doesn't exist
+    if ($Param{OrganisationID} && $Param{OrganisationID} !~ /^\d+$/) {
+        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            Number => $Param{OrganisationID},
+            Silent => 1
+        );
+        if (!$OrgID) {
+            $Param{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+                Number => $Param{OrganisationID},
+                Name   => $Param{OrganisationID},
+                UserID => 1,
+            );
+        }
+        else {
+            $Param{OrganisationID} = $OrgID;
+        }
+    }
+
+    if ( !$Param{OrganisationID} ) {
+        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
+        $Param{OrganisationID} = undef;
     }
 
     # create db record
