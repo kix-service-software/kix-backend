@@ -176,15 +176,11 @@ sub Run {
         if (%OrgList) {
             $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
         }
-    }    
+    }
 
     # if there is still no customer user found, take the senders email address
     if ( !$GetParam{'X-KIX-Contact'} ) {
-        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress};     
-
-        if ( !$GetParam{'X-KIX-Organisation'} ) {
-            $GetParam{'X-KIX-Organisation'} = $GetParam{SenderEmailAddress};
-        }   
+        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress};
     }
 
     # get ticket owner

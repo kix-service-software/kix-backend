@@ -112,7 +112,8 @@ sub Run {
 
         # delete contact
         my $Success = $Kernel::OM->Get('Contact')->ContactDelete(
-            ID  => $ContactID,
+            ID     => $ContactID,
+            UserID => $Self->{Authorization}->{UserID}
         );
 
         if ( !$Success ) {
