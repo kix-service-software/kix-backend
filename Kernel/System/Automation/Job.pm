@@ -95,6 +95,7 @@ This returns something like:
         'Type'              => 'Ticket',
         'Name'              => 'Test',
         'Filter'            => {},
+        'IsAsynchronous'    => 0|1,
         'Comment'           => '...',
         'LastExecutionTime' => '2019-10-21 12:00:00',
         'ValidID'           => '1',
