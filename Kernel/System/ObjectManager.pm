@@ -718,9 +718,9 @@ sub _PerfLogMethodWrapper {
 sub CleanUp {
     my ($Self, %Param) = @_;
 
-my $StartTime = time();
     # send all outstanding notifications to the registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
+my $StartTime = Time::HiRes::time();
         if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') && !$Param{IsDaemon}) {
             $Self->AsyncCall(
                 ObjectName     => $Self->GetModuleFor('ClientRegistration'),
@@ -733,12 +733,13 @@ my $StartTime = time();
         else {
             $Self->Get('ClientRegistration')->NotificationSend();
         }
-printf STDERR "ObjectManager::ClientNotification: %i ms\n", (time() - $StartTime) * 1000;
+printf STDERR "ObjectManager::ClientNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
     }
 
     # discard all objects
+my $StartTime = Time::HiRes::time();
     $Self->ObjectsDiscard();
-printf STDERR "ObjectManager::DESTROY: %i ms\n", (time() - $StartTime) * 1000;
+printf STDERR "ObjectManager::ObjectDiscard: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 }
 
 sub DESTROY {

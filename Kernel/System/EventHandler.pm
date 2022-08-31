@@ -13,6 +13,8 @@ package Kernel::System::EventHandler;
 use strict;
 use warnings;
 
+use Time::HiRes;
+
 use Kernel::System::VariableCheck qw(IsArrayRefWithData);
 
 our $ObjectManagerDisabled = 1;
@@ -218,7 +220,7 @@ sub EventHandler {
                 next MODULE if $Param{Transaction} && !$Modules->{$Module}->{Transaction};
             }
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
             # load event module
             next MODULE if !$MainObject->Require( $Modules->{$Module}->{Module} );
 
@@ -230,7 +232,7 @@ my $StartTime = time();
                 Config => $Modules->{$Module},
             );
 if ( $Param{Transaction} ) {
-   printf STDERR "    EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (time() - $StartTime) * 1000;
+   printf STDERR "   EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (Time::HiRes::time() - $StartTime) * 1000;
 }
 
         }
@@ -268,8 +270,7 @@ sub EventHandlerTransaction {
     # execute events on end of transaction
     if ( $Self->{EventHandlerPipe} ) {
 
-use Time::HiRes qw(time);
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
         for my $Params ( @{ $Self->{EventHandlerPipe} } ) {
             $Self->EventHandler(
                 %Param,
@@ -277,7 +278,7 @@ my $StartTime = time();
                 Transaction => 1,
             );
         }
-printf STDERR "EventHandlerTransaction: %i ms\n", (time() - $StartTime) * 1000;
+printf STDERR "EventHandlerTransaction: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
         # delete event pipe
         $Self->{EventHandlerPipe} = undef;

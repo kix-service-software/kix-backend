@@ -53,7 +53,7 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
 
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
@@ -103,7 +103,7 @@ my $StartTime = time();
         );
     }
 
-printf STDERR "        NotificationEvent->Run: %i ms\n", (time() - $StartTime) * 1000;
+printf STDERR "NotificationEvent::Run: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
     return $Result;
 }
@@ -111,7 +111,7 @@ printf STDERR "        NotificationEvent->Run: %i ms\n", (time() - $StartTime) *
 sub _Run {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
     # get notification event object
     my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
@@ -142,12 +142,15 @@ my $StartTime = time();
         ObjectType => ['Ticket'],
     );
 
-printf STDERR "        NotificationEvent->_Run (Preparation): %i ms\n", (time() - $StartTime) * 1000;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "NotificationEvent::_Run (Preparation): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     NOTIFICATION:
     for my $ID (@IDs) {
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
         my %Notification = $NotificationEventObject->NotificationGet(
             ID => $ID,
         );
@@ -410,7 +413,11 @@ my $StartTime = time();
                 );
             }
         }
-printf STDERR "        NotificationEvent->_Run (Notification $ID): %i ms\n", (time() - $StartTime) * 1000;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "NotificationEvent::_Run (Notification $ID): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+        );
     }
 
     return 1;
@@ -419,7 +426,7 @@ printf STDERR "        NotificationEvent->_Run (Notification $ID): %i ms\n", (ti
 sub _NotificationFilter {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
 
     # check needed params
     for my $Needed (qw(Data Notification)) {
@@ -457,7 +464,10 @@ my $StartTime = time();
         Limit  => 1,
     );
 
-printf STDERR "            NotificationEvent->_NotificationFilter: %i ms\n", (time() - $StartTime) * 1000;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   NotificationEvent::_NotificationFilter: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
 }
@@ -465,7 +475,7 @@ printf STDERR "            NotificationEvent->_NotificationFilter: %i ms\n", (ti
 sub _RecipientsGet {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
     # check needed params
     for my $Needed (qw(Ticket Notification)) {
         return if !$Param{$Needed};
@@ -862,7 +872,10 @@ my $StartTime = time();
         push @RecipientUsers, \%User;
     }
 
-printf STDERR "            NotificationEvent->_RecipientsGet: %i ms\n", (time() - $StartTime) * 1000;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   NotificationEvent::_RecipientsGet: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     return @RecipientUsers;
 }
@@ -936,7 +949,7 @@ sub _SendRecipientNotification {
 
     my $TransportObject = $Param{TransportObject};
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
 
     # send notification to each recipient
     my $Success = $TransportObject->SendNotification(
@@ -949,7 +962,10 @@ my $StartTime = time();
         Attachments           => $Param{Attachments},
     );
 
-printf STDERR "            TransportObject->SendNotification: %i ms\n", (time() - $StartTime) * 1000;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   TransportObject::SendNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     return if !$Success;
 
@@ -1000,7 +1016,7 @@ printf STDERR "            TransportObject->SendNotification: %i ms\n", (time() 
 sub _ArticleToUpdate {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = time();
+my $StartTime = Time::HiRes::time();
     # check needed params
     for my $Needed (qw(ArticleID Channel UserIDs UserID)) {
         return if !$Param{$Needed};
@@ -1037,7 +1053,10 @@ my $StartTime = time();
         Bind => [ \$NewTo, \$Param{ArticleID} ],
     );
 
-printf STDERR "           NotificationEvent->_ArticleToUpdate: %i ms\n", (time() - $StartTime) * 1000;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "    NotificationEvent::_ArticleToUpdate: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     return 1;
 }
