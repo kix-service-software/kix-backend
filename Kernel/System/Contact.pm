@@ -868,7 +868,8 @@ sub ContactUpdate {
     }
 
     $ChangeRequired = 1 if (
-        $Param{PrimaryOrganisationID} && $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID}
+        $Param{PrimaryOrganisationID} &&
+        (!$Contact{PrimaryOrganisationID} || $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID})
     );
 
     $ChangeRequired = 1 if (@DeleteOrgIDs || @InsertOrgIDs);
@@ -905,7 +906,10 @@ sub ContactUpdate {
     }
 
     # update Primary Org ID
-    if ($Param{PrimaryOrganisationID} ne $Contact{PrimaryOrganisationID}) {
+    if (
+        $Param{PrimaryOrganisationID} &&
+        (!$Contact{PrimaryOrganisationID} || $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID})
+    ) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE contact_organisation SET is_primary = 0 WHERE org_id = ? AND contact_id = ?',
             Bind => [ \$Contact{PrimaryOrganisationID}, \$Param{ID} ],
@@ -915,6 +919,7 @@ sub ContactUpdate {
             Bind => [ \$Param{PrimaryOrganisationID}, \$Param{ID} ],
         );
     }
+
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
