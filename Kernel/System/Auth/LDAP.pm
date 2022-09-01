@@ -72,16 +72,9 @@ sub GetOption {
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for (qw(User Pw)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
+    # do nothing if we have no relevant data for us
+    return if !$Param{User} || !$Param{Pw};
+
     $Param{User} = $Self->_ConvertTo( $Param{User}, 'utf-8' );
     $Param{Pw}   = $Self->_ConvertTo( $Param{Pw},   'utf-8' );
 

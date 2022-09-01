@@ -646,10 +646,15 @@ pre code {
    "description" : "An authorization object.",
    "type" : "object",
    "properties" : {
+      "NegotiationToken" : {
+         "type" : "string"
+      },
       "Password" : {
+         "description" : "required if no NegitiationToken is given",
          "type" : "string"
       },
       "UserLogin" : {
+         "description" : "required if no NegitiationToken is given",
          "type" : "string"
       },
       "UserType" : {
@@ -661,9 +666,7 @@ pre code {
       }
    },
    "required" : [
-      "UserLogin",
-      "UserType",
-      "Password"
+      "UserType"
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
