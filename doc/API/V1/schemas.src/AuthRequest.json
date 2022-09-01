@@ -1,26 +1,29 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "AuthRequest.json",
-  "type": "object",
-  "description": "An authorization object.",
-  "properties": {
-    "UserLogin": {
-      "type": "string"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "AuthRequest.json",
+    "type": "object",
+    "description": "An authorization object.",
+    "properties": {
+        "UserLogin": {
+            "type": "string",
+            "description": "required if no NegitiationToken is given"
+        },
+        "UserType": {
+            "type": "string",
+            "enum": [
+                "Agent",
+                "Customer"
+            ]
+        },
+        "Password": {
+            "type": "string",
+            "description": "required if no NegitiationToken is given"
+        },
+        "NegotiationToken": {
+            "type": "string"
+        }
     },
-    "UserType": {
-      "type": "string",
-      "enum": [
-        "Agent",
-        "Customer"
-      ]
-    },
-    "Password": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "UserLogin",
-    "UserType",
-    "Password"
-  ]
+    "required": [
+        "UserType"
+    ]
 }

@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::Config::Dump;
+package Kernel::System::Console::Command::Admin::Config::Disable;
 
 use strict;
 use warnings;
@@ -25,10 +25,11 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Dump configuration settings.');
+    $Self->Description('Change a configuration setting.');
     $Self->AddArgument(
-        Name        => 'name',
-        Description => "Specify which config setting should be dumped. The wildcard '*' can be used.",
+        Name        => 'option',
+        Description => "Specify which config setting should be disabled.",
+        HasValue    => 1,
         Required    => 1,
         ValueRegex  => qr/.*/smx,
     );
@@ -39,31 +40,26 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $Key = $Self->GetArgument('name');
-    chomp $Key;
-    $Key =~ s/\*/.*?/g;
-
-    my @Options = sort keys %{$Kernel::OM->Get('Config')->{Config} || {}};
-
-    foreach my $Option ( @Options ) {
-        next if $Option !~ /^$Key$/;
-
-        my $Value = $Kernel::OM->Get('Config')->Get($Option);
-
-        if ( !defined $Value ) {
-            $Self->PrintError("The config setting $Key could not be found.");
-            return $Self->ExitCodeError();
-        }
-
-        if ( IsHashRef($Value) || IsArrayRef($Value) ) {
-            my $Dump = $Kernel::OM->Get('Main')->Dump($Value);
-            $Dump =~ s/^(.*?) = //g;
-            print "$Option = ".$Dump;
-        }
-        else {
-            print "$Option = $Value\n";
-        }
+    # get option
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
+        Name => $Self->GetArgument('option'),
+    );
+    if ( !IsHashRefWithData(\%OptionData) ) {
+        $Self->PrintError("Option does not exist!");
+        return $Self->ExitCodeError();
     }
+
+    my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
+        %OptionData,
+        ValidID => 2,
+        UserID  => 1
+    );
+    if ( !$Success ) {
+        $Self->PrintError("Unable to disable option!");
+        return $Self->ExitCodeError();
+    }
+    
+    $Self->Print("<green>Done.</green>\n");
 
     return $Self->ExitCodeOk();
 }
