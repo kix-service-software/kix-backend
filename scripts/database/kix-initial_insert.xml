@@ -4713,7 +4713,8 @@ DefaultValue:
 {"AND":[
 {"Field":"SenderTypeID","Value":3,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"}
+{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"CreateTime","Operator":"LT","Type":"DATETIME","Value":"-1m"}
 ]}
     ]]></Data>
         <Data Key="comments" Type="Quote" Translatable="1">Reopens ticket from pending by customer response.</Data>

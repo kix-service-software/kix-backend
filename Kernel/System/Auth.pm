@@ -245,7 +245,7 @@ sub Auth {
                 UserID => $UserID,
             );
 
-            last CONFIG;
+            last AUTHREG;
         }
     }
 
@@ -278,57 +278,65 @@ sub Auth {
     # return if no auth user
     if ( !$User ) {
 
-        # remember failed logins
-        my $UserID = $UserObject->UserLookup(
-            UserLogin => $Param{User},
-            Silent    => 1,
-        );
+        if ( $Param{User} ) {
+            # remember failed logins
+            my $UserID = $UserObject->UserLookup(
+                UserLogin => $Param{User},
+                Silent    => 1,
+            );
 
-        return if !$UserID;
+            return if !$UserID;
 
-        my %UserData = $UserObject->GetUserData(
-            UserID => $UserID,
-            Valid  => 1,
-        );
+            my %UserData = $UserObject->GetUserData(
+                UserID => $UserID,
+                Valid  => 1,
+            );
 
-        my $Count = $UserData{UserLoginFailed} || 0;
-        $Count++;
+            my $Count = $UserData{UserLoginFailed} || 0;
+            $Count++;
 
-        $UserObject->SetPreferences(
-            Key    => 'UserLoginFailed',
-            Value  => $Count,
-            UserID => $UserID,
-        );
+            $UserObject->SetPreferences(
+                Key    => 'UserLoginFailed',
+                Value  => $Count,
+                UserID => $UserID,
+            );
 
-        # set agent to invalid-temporarily if max failed logins reached
-        my $Config = $ConfigObject->Get('PreferencesGroups');
-        my $PasswordMaxLoginFailed;
+            # set agent to invalid-temporarily if max failed logins reached
+            my $Config = $ConfigObject->Get('PreferencesGroups');
+            my $PasswordMaxLoginFailed;
 
-        if ( $Config && $Config->{Password} && $Config->{Password}->{PasswordMaxLoginFailed} ) {
-            $PasswordMaxLoginFailed = $Config->{Password}->{PasswordMaxLoginFailed};
+            if ( $Config && $Config->{Password} && $Config->{Password}->{PasswordMaxLoginFailed} ) {
+                $PasswordMaxLoginFailed = $Config->{Password}->{PasswordMaxLoginFailed};
+            }
+
+            return if !%UserData;
+            return if !$PasswordMaxLoginFailed;
+            return if $Count < $PasswordMaxLoginFailed;
+
+            my $ValidID = $Kernel::OM->Get('Valid')->ValidLookup(
+                Valid => 'invalid-temporarily',
+            );
+
+            my $Update = $UserObject->UserUpdate(
+                %UserData,
+                ValidID      => $ValidID,
+                ChangeUserID => 1,
+            );
+
+            return if !$Update;
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Login failed $Count times. Set $UserData{UserLogin} to "
+                    . "'invalid-temporarily'.",
+            );
         }
-
-        return if !%UserData;
-        return if !$PasswordMaxLoginFailed;
-        return if $Count < $PasswordMaxLoginFailed;
-
-        my $ValidID = $Kernel::OM->Get('Valid')->ValidLookup(
-            Valid => 'invalid-temporarily',
-        );
-
-        my $Update = $UserObject->UserUpdate(
-            %UserData,
-            ValidID      => $ValidID,
-            ChangeUserID => 1,
-        );
-
-        return if !$Update;
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Login failed $Count times. Set $UserData{UserLogin} to "
-                . "'invalid-temporarily'.",
-        );
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Login failed.",
+            );
+        }
 
         return;
     }

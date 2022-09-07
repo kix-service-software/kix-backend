@@ -71,14 +71,8 @@ sub GetOption {
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{User} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need User!"
-        );
-        return;
-    }
+    # do nothing if we have no relevant data for us
+    return if !$Param{User};
 
     # get params
     my $User       = $Param{User}      || '';

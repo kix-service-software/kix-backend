@@ -188,7 +188,7 @@ sub IsNot {
     }
 
     if ( !defined $Test && !defined $ShouldBe ) {
-        $Self->_Print( 0, "$Name (is 'undef')" );
+        $Self->_Print( 0, "$Name (is 'undef') but should not be 'undef'" );
         return;
     }
     elsif ( !defined $Test && defined $ShouldBe ) {
