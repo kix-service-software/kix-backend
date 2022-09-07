@@ -256,9 +256,7 @@ sub Run {
             }
 
             # do everything that have to be done afterwards
-            $Kernel::OM->CleanUp(
-                IsDaemon => 1
-            );
+            $Kernel::OM->CleanUp();
 
             $SchedulerDBObject->TaskDelete(
                 TaskID => $TaskID,

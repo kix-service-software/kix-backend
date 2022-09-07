@@ -721,7 +721,7 @@ sub CleanUp {
     # send all outstanding notifications to the registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
 my $StartTime = Time::HiRes::time();
-        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') && !$Param{IsDaemon}) {
+        if ( !$ENV{IsDaemon} && $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
             $Self->AsyncCall(
                 ObjectName     => $Self->GetModuleFor('ClientRegistration'),
                 FunctionName   => 'NotificationSend',

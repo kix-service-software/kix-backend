@@ -77,6 +77,9 @@ if ( !@ARGV || $Options{Help} ) {
     exit 0;
 }
 
+# tell everyone about the environment we're running in
+$ENV{IsDaemon} = 1;
+
 # to wait until all daemon stops (in seconds)
 my $DaemonStopWait = 30;
 
