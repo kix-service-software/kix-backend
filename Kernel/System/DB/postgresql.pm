@@ -348,6 +348,7 @@ sub TableAlter {
     my $ReferenceName = '';
     my @Reference     = ();
     my $Table         = '';
+    my @Primary       = ();
 
     TAG:
     for my $Tag (@Param) {
@@ -381,11 +382,11 @@ sub TableAlter {
                     $PseudoType = 'bigserial';
                 }
                 push @SQL, $SQLStart . " ADD $Tag->{Name} $PseudoType NOT NULL";
-                next TAG;
-            }
+            } else {
 
-            # normal data type
-            push @SQL, $SQLStart . " ADD $Tag->{Name} $Tag->{Type} NULL";
+                # normal data type
+                push @SQL, $SQLStart . " ADD $Tag->{Name} $Tag->{Type} NULL";
+            }
 
             # investigate the default value
             my $Default = '';
@@ -414,6 +415,11 @@ sub TableAlter {
                 if ($Required) {
                     push @SQL, "ALTER TABLE $Table ALTER $Tag->{Name} SET NOT NULL";
                 }
+            }
+
+            # primary
+            if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /true/i ) {
+                push(@SQL, $SQLStart . " ADD CONSTRAINT $Table\_pkey PRIMARY KEY($Tag->{Name})");
             }
         }
         elsif ( $Tag->{Tag} eq 'ColumnChange' && $Tag->{TagType} eq 'Start' ) {
@@ -506,8 +512,56 @@ sub TableAlter {
         elsif ( $Tag->{Tag} =~ /^(Reference)/ && $Tag->{TagType} eq 'Start' ) {
             push @Reference, $Tag;
         }
+
+        # primary key
+        elsif ( $Tag->{Tag} =~ 'PrimaryCreate' && $Tag->{TagType} ) {
+            my $Method = $Tag->{Tag};
+            if ( $Tag->{TagType} eq 'End' ) {
+                push @SQL, $Self->$Method(
+                    TableName => $Table,
+                    Data      => \@Primary,
+                    SQLStart  => $SQLStart
+                );
+                @Primary = ();
+            }
+        }
+        elsif ( $Tag->{Tag} =~ /^(PrimaryColumn)/ && $Tag->{TagType} eq 'Start' ) {
+            push @Primary, $Tag;
+        }
+        elsif ( $Tag->{Tag} =~ 'PrimaryDrop' && $Tag->{TagType} eq 'Start' ) {
+            push(@SQL, $SQLStart . " DROP CONSTRAINT $Table\_pkey");
+        }
     }
     return @SQL;
+}
+
+sub PrimaryCreate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(TableName SQLStart Data)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $SQL   = "$Param{SQLStart} ADD CONSTRAINT $Param{TableName}_pkey PRIMARY KEY(";
+    my @Array = @{ $Param{Data} };
+    for ( 0 .. $#Array ) {
+        if ( $_ > 0 ) {
+            $SQL .= ', ';
+        }
+        $SQL .= $Array[$_]->{Name};
+    }
+    $SQL .= ')';
+
+    # return SQL
+    return ($SQL);
+
 }
 
 sub IndexCreate {

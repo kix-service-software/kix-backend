@@ -1196,9 +1196,7 @@ sub ExecOperation {
         Authorization            => $Self->{Authorization},
         Level                    => ($Self->{Level} || 0) + 1,
         IgnorePermissions        => $Param{IgnorePermissions},
-        SuppressPermissionErrors => $Param{SuppressPermissionErrors},
-        Limit                    => $Self->{Limit},
-        SearchLimit              => $Self->{SearchLimit}
+        SuppressPermissionErrors => $Param{SuppressPermissionErrors}
     );
 
     # if operation init failed, bail out
@@ -1226,10 +1224,23 @@ sub ExecOperation {
         $AdditionalData{expand} = $Self->{RequestData}->{expand};
     }
 
+    # add inherited data if given (but keep it overwritable if given in Data)
+    my %InheritedData;
+    if (defined $Self->{RequestData}->{limit}) {
+        $InheritedData{limit} = $Self->{RequestData}->{limit};
+    }
+    if (defined $Self->{RequestData}->{searchlimit}) {
+        $InheritedData{searchlimit} = $Self->{RequestData}->{searchlimit};
+    }
+    if (defined $Self->{RequestData}->{sort}) {
+        $InheritedData{sort} = $Self->{RequestData}->{sort};
+    }
+
     my $Result = $OperationObject->Run(
         Data    => {
+            %InheritedData,
             %{$Param{Data} || {}},
-            %AdditionalData,
+            %AdditionalData
         },
         IgnorePermissions   => $Param{IgnorePermissions},
         PermissionCheckOnly => $Param{PermissionCheckOnly},

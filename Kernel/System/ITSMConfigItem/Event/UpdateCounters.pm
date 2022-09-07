@@ -15,6 +15,10 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
+use base qw(
+    Kernel::System::AsynchronousExecutor
+);
+
 our @ObjectDependencies = (
     'ITSMConfigItem',
     'Log',

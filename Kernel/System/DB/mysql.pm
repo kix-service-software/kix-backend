@@ -398,6 +398,7 @@ sub TableAlter {
     my $ReferenceName = '';
     my @Reference     = ();
     my $Table         = '';
+    my @Primary       = ();
     for my $Tag (@Param) {
 
         if ( $Tag->{Tag} eq 'TableAlter' && $Tag->{TagType} eq 'Start' ) {
@@ -422,7 +423,18 @@ sub TableAlter {
             $Tag = $Self->_TypeTranslation($Tag);
 
             # normal data type
-            push @SQL, $SQLStart . " ADD $Tag->{Name} $Tag->{Type} NULL";
+            my $SQLAdd = $SQLStart . " ADD $Tag->{Name} $Tag->{Type}";
+
+            # handle primary and auto increment
+            if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /^true$/i ) {
+                $SQLAdd .= ' NOT NULL PRIMARY KEY';
+            } else {
+                $SQLAdd .= ' NULL';
+            }
+            if ( $Tag->{AutoIncrement} && $Tag->{AutoIncrement} =~ /^true$/i ) {
+                $SQLAdd .= ' AUTO_INCREMENT';
+            }
+            push @SQL, $SQLAdd;
 
             # investigate the default value
             my $Default = '';
@@ -453,7 +465,7 @@ sub TableAlter {
                 if ($Required) {
                     $SQLAlter .= ' NOT NULL';
                 }
-                else {
+                elsif (!$Tag->{PrimaryKey}) {
                     $SQLAlter .= ' NULL';
                 }
 
@@ -489,8 +501,7 @@ sub TableAlter {
             if ( $Required || defined $Tag->{Default} ) {
 
                 # fill up empty rows
-                push @SQL,
-                    "UPDATE $Table SET $Tag->{NameNew} = $Default WHERE $Tag->{NameNew} IS NULL";
+                push @SQL, "UPDATE $Table SET $Tag->{NameNew} = $Default WHERE $Tag->{NameNew} IS NULL";
 
                 my $SQLAlter = "ALTER TABLE $Table CHANGE $Tag->{NameNew} $Tag->{NameNew} $Tag->{Type}";
 
@@ -553,9 +564,57 @@ sub TableAlter {
         elsif ( $Tag->{Tag} =~ /^(Reference)/ && $Tag->{TagType} eq 'Start' ) {
             push @Reference, $Tag;
         }
+
+        # primary key
+        elsif ( $Tag->{Tag} =~ 'PrimaryCreate' ) {
+            my $Method = $Tag->{Tag};
+            if ( $Tag->{TagType} eq 'End' ) {
+                push @SQL, $Self->$Method(
+                    TableName => $Table,
+                    Data      => \@Primary,
+                    SQLStart  => $SQLStart
+                );
+                @Primary = ();
+            }
+        }
+        elsif ( $Tag->{Tag} =~ /^(PrimaryColumn)/ && $Tag->{TagType} eq 'Start' ) {
+            push @Primary, $Tag;
+        }
+        elsif ( $Tag->{Tag} =~ 'PrimaryDrop' && $Tag->{TagType} eq 'Start' ) {
+            push(@SQL, $SQLStart . " DROP PRIMARY KEY");
+        }
     }
 
     return @SQL;
+}
+
+sub PrimaryCreate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(TableName SQLStart Data)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $SQL   = "$Param{SQLStart} ADD CONSTRAINT PK_$Param{TableName} PRIMARY KEY(";
+    my @Array = @{ $Param{Data} };
+    for ( 0 .. $#Array ) {
+        if ( $_ > 0 ) {
+            $SQL .= ', ';
+        }
+        $SQL .= $Array[$_]->{Name};
+    }
+    $SQL .= ')';
+
+    # return SQL
+    return ($SQL);
+
 }
 
 sub IndexCreate {

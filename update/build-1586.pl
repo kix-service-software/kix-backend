@@ -99,7 +99,8 @@ sub _CreateChartReports {
             Config     => {
                 'DataSource' => {
                     'SQL' => {
-                        'any' => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)'
+                        'postgresql' => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)',
+                        'mysql'      => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)'
                     }
                 },
                 "OutputFormats" => {
@@ -209,7 +210,8 @@ sub _CreateChartReports {
             Config     => {
                 'DataSource' => {
                     'SQL' => {
-                        'any' => 'base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSBBTkQgTk9XKCkKICAgICAgICAKV0hFUkUgdGguY3JlYXRlX3RpbWUgSVMgTk9UIE5VTEwKCkdST1VQIEJZIGRheQpPUkRFUiBCWSBkYXk7)'
+                        'postgresql' => 'base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSBBTkQgTk9XKCkKICAgICAgICAKV0hFUkUgdGguY3JlYXRlX3RpbWUgSVMgTk9UIE5VTEwKCkdST1VQIEJZIGRheQpPUkRFUiBCWSBkYXk7)',
+                        'mysql'      => 'base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgKGRhdGUodGguY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCiAgICAgICAgICAgICAgCldIRVJFIHRoLmNyZWF0ZV90aW1lIElTIE5PVCBOVUxMCgpHUk9VUCBCWSBkYXkKT1JERVIgQlkgZGF5Ow==)'
                     }
                 },
                 "OutputFormats" => {
@@ -261,11 +263,6 @@ sub _CreateChartReports {
                 TypeID => 1
             },
             {
-                Target => '/reporting/reports/*',
-                Value  => 0,
-                TypeID => 1
-            },
-            {
                 Target => '/reporting/reportdefinitions',
                 Value  => 2,
                 TypeID => 1
@@ -276,8 +273,8 @@ sub _CreateChartReports {
                 TypeID => 1
             },
             {
-                Target => '/reporting/reports{Report.DefinitionID IN ['.(join(',', @DefinitionIDs)).']}',
-                Value  => 2,
+                Target => '/reporting/reports{Report.DefinitionID !IN ['.(join(',', @DefinitionIDs)).']}',
+                Value  => 0,
                 TypeID => 2
             }
         );

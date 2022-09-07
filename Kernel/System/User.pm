@@ -591,26 +591,15 @@ sub UserUpdate {
 to search users
 
     my %List = $UserObject->UserSearch(
-        Search => '*some*', # also 'hans+huber' possible
-        Valid  => 1, # not required
-    );
-
-    my %List = $UserObject->UserSearch(
-        UserLogin => '*some*',
-        Limit     => 50,
-        Valid     => 1, # not required
-    );
-
-    my %List = $UserObject->UserSearch(
-        UserLoginEquals => 'some',              # exact match
-        Limit           => 50,
-        Valid           => 1, # not required
-    );
-
-    my %List = $UserObject->UserSearch(
-        IsAgent    => 1, # not required
-        IsCustomer => 1, # not required
-        Valid      => 1, # not required
+        Search          => '*some*',                  # optional - also 'hans+huber' possible, searches in login and also in contact attrbutes (e.g. firstname, lastname, ...)
+        UserLogin       => '*some*',                  # optional
+        UserLoginEquals => 'some',                    # optional - exact match
+        IsAgent         => 1,                         # optional
+        IsCustomer      => 1,                         # optional
+        Limit           => 50,                        # optional
+        ValidID         => 2                          # optional - if given "Valid" is ignored
+        Valid           => 1                          # optional - if omitted, 1 is used
+        UserIDs         => [1,2,3]                    # optional
     );
 
 Returns hash of UserID, Login pairs:
@@ -630,23 +619,28 @@ sub UserSearch {
     my $Valid = $Param{Valid} // 1;
 
     # check needed stuff
-    if ( !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals} && !$Param{IsAgent} && !$Param{IsCustomer}) {
+    if (
+        !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals} && !$Param{IsAgent} && !$Param{IsCustomer} && !$Param{ValidID}
+        && !IsArrayRef$Param{UserIDs}
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID - else use UserList!',
         );
         return;
     }
 
     my $CacheKey
         = 'UserSearch::'
-        . ( $Param{Search}    || '' ) . '::'
+        . ( $Param{Search} || '' ) . '::'
         . ( $Param{UserLogin} || '' ) . '::'
         . ( $Param{UserLoginEquals} || '' ) . '::'
-        . ( $Param{IsAgent}     || '' ) . '::'
-        . ( $Param{IsCustomer}     || '' ) . '::'
-        . ( $Param{Valid}     || '' ) . '::'
-        . ( $Param{Limit}     || '' );
+        . ( $Param{IsAgent} || '' ) . '::'
+        . ( $Param{IsCustomer} || '' ) . '::'
+        . ( $Param{Valid} || '' ) . '::'
+        . ( $Param{ValidID} || '' ) . '::'
+        . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
+        . ( $Param{Limit} || '' );
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -662,46 +656,65 @@ sub UserSearch {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
-    my $SQL = "SELECT $Self->{UserTableUserID}, login FROM $Self->{UserTable} WHERE ";
+    my $SQL = "SELECT u.$Self->{UserTableUserID}, u.login FROM $Self->{UserTable} u";
+    my @Where;
     my @Bind;
 
     if ( $Param{Search} ) {
 
+        # search also in contact attributes
+        $SQL .= ' LEFT JOIN contact c ON c.user_id = u.id';
+
+        $Param{Search} =~ s/\*/%/g;
+        $Param{Search} =~ s/%%/%/g;
+
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(login)],
+            Key      => [qw(u.login c.firstname c.lastname c.email c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
             Value    => $Param{Search},
             BindMode => 1,
         );
-        $SQL .= $QueryCondition{SQL} . ' ';
-        push @Bind, @{ $QueryCondition{Values} };
+        push(@Where, $QueryCondition{SQL});
+        push(@Bind, @{ $QueryCondition{Values} });
     }
-    elsif ( $Param{UserLogin} ) {
 
-        $SQL .= " $Self->{Lower}($Self->{UserTableUser}) LIKE ? $LikeEscapeString";
+    if ( $Param{UserLogin} ) {
+        push(@Where, "$Self->{Lower}(u.$Self->{UserTableUser}) LIKE ? $LikeEscapeString");
         $Param{UserLogin} =~ s/\*/%/g;
         $Param{UserLogin} = $DBObject->Quote( $Param{UserLogin}, 'Like' );
         push @Bind, \$Param{UserLogin};
     }
-    elsif ( $Param{UserLoginEquals} ) {
 
-        $SQL .= " $Self->{UserTableUser} = ?";
+    if ( $Param{UserLoginEquals} ) {
+        push(@Where, "u.$Self->{UserTableUser} = ?");
         push @Bind, \$Param{UserLoginEquals};
     }
-    elsif ( $Param{IsAgent} ) {
 
-        $SQL .= " is_agent = ? ";
-        push @Bind, \$Param{IsAgent};
-    }
-    elsif ( $Param{IsAgent} ) {
-
-        $SQL .= " is_customer = ? ";
-        push @Bind, \$Param{IsCustomer};
+    if ( $Param{IsAgent} ) {
+        push(@Where,"u.is_agent = ?");
+        push(@Bind, \$Param{IsAgent});
     }
 
-    # add valid option
-    if ($Valid) {
-        $SQL .= "AND valid_id IN ("
-            . join( ', ', $Kernel::OM->Get('Valid')->ValidIDsGet() ) . ")";
+    if ( $Param{IsCustomer} ) {
+        push(@Where,"u.is_customer = ?");
+        push(@Bind, \$Param{IsCustomer});
+    }
+
+    if ( $Param{ValidID} ) {
+        push(@Where, "u.valid_id = ?");
+        push(@Bind, \$Param{ValidID});
+    } elsif ($Valid) {
+        push(
+            @Where,
+            "u.valid_id IN (" . join( ', ', $Kernel::OM->Get('Valid')->ValidIDsGet() ) . ")"
+        );
+    }
+
+    if ( IsArrayRefWithData($Param{UserIDs}) ) {
+        push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
+    }
+
+    if (@Where) {
+        $SQL .= ' WHERE ' . join(' AND ', @Where);
     }
 
     # get data

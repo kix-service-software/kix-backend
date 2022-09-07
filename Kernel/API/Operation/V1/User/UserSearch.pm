@@ -68,12 +68,11 @@ sub Run {
         }
     );
 
-    # TODO: filter search - currently only UserLogin and Search are possible search parameter
     my %UserSearch;
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|Preferences\..*?)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
                     if (!$UserSearch{$SearchType}) {
                         $UserSearch{$SearchType} = [];
                     }
@@ -85,110 +84,77 @@ sub Run {
 
     # prepare search if given
     if ( IsHashRefWithData( \%UserSearch ) ) {
+        SEARCH_TYPE:
         foreach my $SearchType ( keys %UserSearch ) {
             my %SearchTypeResult;
-            foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
 
-                my %SearchResult;
-                my $Value = $SearchItem->{Value};
-                my %SearchParam;
+            # FIXME: combine OR and AND in one search (in core?)
+            if ($SearchType eq 'OR') {
+                foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
+                    my %SearchResult;
 
-                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
-                    $Value = '*' . $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
-                    $Value = $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
-                    $Value = '*' . $Value;
-                }
-
-                if ( $SearchItem->{Operator} eq 'EQ' && $SearchItem->{Field} eq 'UserLogin' ) {
-                    $SearchParam{UserLoginEquals} = $Value;
-                }
-                elsif ( $SearchItem->{Field} eq 'UserLogin' ) {
-                    $SearchParam{UserLogin} = $Value;
-                }
-                elsif ( $SearchItem->{Field} =~ /^(IsAgent|IsCustomer)$/ ) {
-                    $SearchParam{$SearchItem->{Field}} = $Value;
-                }
-                elsif ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
-                    my @Values = ( $Value );
-                    @Values = @{$SearchItem->{Value}} if $SearchItem->{Operator} eq 'IN';
-
-                    foreach my $Value ( @Values ) {
-                        $Value =~ s/\*/%/g;
-                        # we can use the preferences search result directly because we only need the userid key
-                        my %SearchResultPreferences = $Kernel::OM->Get('User')->SearchPreferences(
-                            Key   => $1,
-                            Value => $Value,
-                            Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+                    # special handling for preference search
+                    if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
+                        %SearchResult = $Self->_GetPreferenceSearchResult(
+                            SearchItem => $SearchItem
                         );
-                        %SearchResult = (
-                            %SearchResult,
-                            %SearchResultPreferences
-                        );
-                    }
-                } else {
-                    $SearchParam{Search} = $Value;
-
-                    # execute contact search to honor contact attributes
-                    my %ContactSearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                        Search => $Value,
-                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
-                        Valid  => 0
-                    );
-
-                    my %ContactLoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                        Login => $Value,
-                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
-                        Valid  => 0
-                    );
-
-                    my %ContactsResult = (
-                        %ContactSearchResult,
-                        %ContactLoginResult
-                    );
-
-                    # add AssignedUserIds to SearchResult
-                    foreach my $Key ( keys %ContactsResult ) {
-                        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                            ID      => $Key,
-                            Silent  => 1
+                    } else {
+                        my %SearchParam = $Self->_GetSearchParam(
+                            SearchItem => $SearchItem
                         );
 
-                        if ( $Contact{AssignedUserID} ) {
-                            %SearchResult = (
-                                %SearchResult,
-                                $Contact{AssignedUserID} => $Contact{Email}
+                        if ( !%SearchResult && %SearchParam ) {
+                            %SearchResult = $Kernel::OM->Get('User')->UserSearch(
+                                %SearchParam,
+                                Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                                Valid => 0
                             );
                         }
                     }
-                }
 
-                if ( !%SearchResult && %SearchParam ) {
-                    # perform User search
-                    %SearchResult = $Kernel::OM->Get('User')->UserSearch(
-                        %SearchParam,
-                        Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
-                        Valid => 0
-                    );
-                }
-
-                # merge results
-                if ( $SearchType eq 'AND' ) {
-                    if ( !%SearchTypeResult ) {
-                        %SearchTypeResult = %SearchResult;
-                    }
-                    else {
-                        # remove all IDs from type result that we don't have in this search
-                        foreach my $Key ( keys %SearchTypeResult ) {
-                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
-                        }
-                    }
-                }
-                elsif ( $SearchType eq 'OR' ) {
+                    # merge results
                     %SearchTypeResult = (
                         %SearchTypeResult,
                         %SearchResult,
+                    );
+                }
+            } else {
+                my %SearchParam;
+                foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
+
+                    # special handling for preference search
+                    if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
+                        my %PrefSearchResult = $Self->_GetPreferenceSearchResult(
+                            SearchItem => $SearchItem,
+                            NoLimit    => 1
+                        );
+
+                        # if nothing found, exit search
+                        if (!IsHashRefWithData(\%PrefSearchResult)) {
+                            $UserList = undef;
+                            last SEARCH_TYPE;
+                        }
+
+                        my @UserIDs = keys %PrefSearchResult;
+                        %SearchParam = (
+                            %SearchParam,
+                            UserIDs => \@UserIDs
+                        );
+                    } else {
+                        %SearchParam = (
+                            %SearchParam,
+                            $Self->_GetSearchParam(
+                                SearchItem => $SearchItem
+                            )
+                        );
+                    }
+                }
+
+                if (%SearchParam) {
+                    %SearchTypeResult = $Kernel::OM->Get('User')->UserSearch(
+                        %SearchParam,
+                        Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                        Valid => 0
                     );
                 }
             }
@@ -209,7 +175,7 @@ sub Run {
         # perform User search without any search params
         $UserList = { $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
-            Limit => $Self->{Limit}->{User} || $Self->{Limit}->{'__COMMON'},
+            Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
             Valid => 0
         ) };
     }
@@ -273,6 +239,73 @@ sub Run {
     return $Self->_Success(
         User => [],
     );
+}
+
+sub _GetSearchParam {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Self->_PrepareSearchValue(%Param);
+    my %SearchParam;
+
+    if ( $Param{SearchItem}->{Operator} eq 'EQ' && $Param{SearchItem}->{Field} eq 'UserLogin' ) {
+        $SearchParam{UserLoginEquals} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'UserLogin' ) {
+        $SearchParam{UserLogin} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} =~ /^(IsAgent|IsCustomer)$/ ) {
+        $SearchParam{$Param{SearchItem}->{Field}} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'ValidID' ) {
+        $SearchParam{ValidID} = $Value;
+    } else {
+        $SearchParam{Search} = $Value;
+    }
+
+    return %SearchParam;
+}
+
+sub _GetPreferenceSearchResult {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Self->_PrepareSearchValue(%Param);
+    my %PrefSearchResult;
+
+    my @Values = ( $Value );
+    @Values = @{$Param{SearchItem}->{Value}} if $Param{SearchItem}->{Operator} eq 'IN';
+
+    foreach my $Value ( @Values ) {
+        $Value =~ s/\*/%/g;
+
+        # we can use the preferences search result directly because we only need the userid key
+        my %SearchResultPreferences = $Kernel::OM->Get('User')->SearchPreferences(
+            Key   => $1,
+            Value => $Value,
+            Limit => !$Param{NoLimit} ? ( $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'} ) : undef,
+        );
+        %PrefSearchResult = (
+            %PrefSearchResult,
+            %SearchResultPreferences
+        );
+    }
+
+    return %PrefSearchResult;
+}
+
+sub _PrepareSearchValue {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{SearchItem}->{Value};
+
+    if ( $Param{SearchItem}->{Operator} eq 'CONTAINS' ) {
+        $Value = '*' . $Value . '*';
+    } elsif ( $Param{SearchItem}->{Operator} eq 'STARTSWITH' ) {
+        $Value = $Value . '*';
+    } elsif ( $Param{SearchItem}->{Operator} eq 'ENDSWITH' ) {
+        $Value = '*' . $Value;
+    }
+
+    return $Value;
 }
 
 1;

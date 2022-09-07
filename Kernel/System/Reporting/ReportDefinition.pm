@@ -381,7 +381,7 @@ sub ReportDefinitionUpdate {
 
     # cleanup if max reports is configured
     $Self->_RemoveExcessReports(
-        DefinitionID => $Param{DefinitionID},
+        DefinitionID => $Param{ID},
     );
 
     return 1;

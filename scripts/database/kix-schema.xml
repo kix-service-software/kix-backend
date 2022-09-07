@@ -2145,9 +2145,12 @@
 </Table>
 <Table Name="configitem_counter">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
-    <Column Name="class_id" Required="true" PrimaryKey="false" Type="INTEGER" />
+    <Column Name="class_id" Required="true" Type="INTEGER" />
     <Column Name="counter" Required="true" Size="255" Type="VARCHAR" />
     <Column Name="value" Required="true" Size="50" Type="VARCHAR" />
+    <Index Name="configitem_counter_class_id">
+        <IndexColumn Name="class_id"/>
+    </Index>
     <ForeignKey ForeignTable="general_catalog">
         <Reference Local="class_id" Foreign="id" />
     </ForeignKey>

@@ -4713,7 +4713,8 @@ DefaultValue:
 {"AND":[
 {"Field":"SenderTypeID","Value":3,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"}
+{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"CreateTime","Operator":"LT","Type":"DATETIME","Value":"-1m"}
 ]}
     ]]></Data>
         <Data Key="comments" Type="Quote" Translatable="1">Reopens ticket from pending by customer response.</Data>
@@ -4963,7 +4964,8 @@ DefaultValue:
 {
   "DataSource": {
     "SQL": {
-      "any": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)"
+        "postgresql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)",
+        "mysql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)"
     }
   },
   "OutputFormats": {
@@ -5118,7 +5120,8 @@ DefaultValue:
 {
   "DataSource": {
     "SQL": {
-      "any": "base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSBBTkQgTk9XKCkKICAgICAgICAKV0hFUkUgdGguY3JlYXRlX3RpbWUgSVMgTk9UIE5VTEwKCkdST1VQIEJZIGRheQpPUkRFUiBCWSBkYXk7)"
+        "postgresql": "base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgdGguY3JlYXRlX3RpbWUgQkVUV0VFTiAoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSBBTkQgTk9XKCkKICAgICAgICAKV0hFUkUgdGguY3JlYXRlX3RpbWUgSVMgTk9UIE5VTEwKCkdST1VQIEJZIGRheQpPUkRFUiBCWSBkYXk7)",
+        "mysql": "base64(U0VMRUNUIAogICAgZGF0ZSh0aC5jcmVhdGVfdGltZSkgYXMgZGF5LAogICAgQ291bnQoKikgYXMgY291bnQKRlJPTSB0aWNrZXQgdAogICAgCiAgICBMRUZUIEpPSU4gdGlja2V0X2hpc3RvcnkgdGggT04gCiAgICAgICAgdGgudGlja2V0X2lkPXQuaWQKICAgICAgICBBTkQgdGguaGlzdG9yeV90eXBlX2lkIElOICgKICAgICAgICAgICAgU0VMRUNUIGlkIEZST00gdGlja2V0X2hpc3RvcnlfdHlwZSB0aHQgV0hFUkUgKHRodC5uYW1lID0gJ1N0YXRlVXBkYXRlJyBPUiB0aHQubmFtZSA9ICdOZXdUaWNrZXQnKQogICAgICAgICkKICAgICAgICBBTkQgdGguc3RhdGVfaWQgSU4gKAogICAgICAgICAgICBTRUxFQ1QgaWQgZnJvbSB0aWNrZXRfc3RhdGUgdHMgV0hFUkUgdHMudHlwZV9pZCBJTiAoCiAgICAgICAgICAgICAgICBTRUxFQ1QgaWQgRlJPTSB0aWNrZXRfc3RhdGVfdHlwZSBXSEVSRSBuYW1lID0gJ2Nsb3NlZCcKICAgICAgICAgICAgKQogICAgICAgICkKICAgICAgICBBTkQgKGRhdGUodGguY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCiAgICAgICAgICAgICAgCldIRVJFIHRoLmNyZWF0ZV90aW1lIElTIE5PVCBOVUxMCgpHUk9VUCBCWSBkYXkKT1JERVIgQlkgZGF5Ow==)"
     }
   },
   "OutputFormats": {
@@ -5498,19 +5501,9 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">4</Data>
-    <Data Key="type_id">1</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
-    <Data Key="value">0</Data>
-    <Data Key="create_by">1</Data>
-    <Data Key="create_time">current_timestamp</Data>
-    <Data Key="change_by">1</Data>
-    <Data Key="change_time">current_timestamp</Data>
-</Insert>
-<Insert Table="role_permission">
-    <Data Key="role_id">4</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
-    <Data Key="value">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -5788,19 +5781,9 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">5</Data>
-    <Data Key="type_id">1</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
-    <Data Key="value">0</Data>
-    <Data Key="create_by">1</Data>
-    <Data Key="create_time">current_timestamp</Data>
-    <Data Key="change_by">1</Data>
-    <Data Key="change_time">current_timestamp</Data>
-</Insert>
-<Insert Table="role_permission">
-    <Data Key="role_id">5</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
-    <Data Key="value">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -6108,19 +6091,9 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">16</Data>
-    <Data Key="type_id">1</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*]]></Data>
-    <Data Key="value">0</Data>
-    <Data Key="create_by">1</Data>
-    <Data Key="create_time">current_timestamp</Data>
-    <Data Key="change_by">1</Data>
-    <Data Key="change_time">current_timestamp</Data>
-</Insert>
-<Insert Table="role_permission">
-    <Data Key="role_id">16</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [3,4,5,6,7,8]}]]]]></Data>
-    <Data Key="value">2</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>

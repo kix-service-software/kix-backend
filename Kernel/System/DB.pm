@@ -1090,6 +1090,11 @@ sub SQLProcessor {
                 push @Table, $Tag;
             }
 
+            # primary drop
+            elsif ( $Tag->{Tag} eq 'PrimaryDrop' ) {
+                push @Table, $Tag;
+            }
+
             # foreign keys
             elsif (
                 $Tag->{Tag} eq 'ForeignKey'

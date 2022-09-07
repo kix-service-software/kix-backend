@@ -178,7 +178,6 @@ sub new {
             Authorization RequestURI RequestMethod Operation OperationType
             OperationConfig OperationRouteMapping ParentMethodOperationMapping
             AvailableMethods IgnorePermissions SuppressPermissionErrors
-            Limit SearchLimit
         )
     ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};

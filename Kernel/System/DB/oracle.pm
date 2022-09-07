@@ -229,16 +229,16 @@ sub TableCreate {
         }
 
         # add primary key
-        my $Constraint = 'PK_' . $TableName;
-        if ( length $Constraint > 30 ) {
-            my $MD5 = $MainObject->MD5sum(
-                String => $Constraint,
-            );
-            $Constraint = substr $Constraint, 0, 28;
-            $Constraint .= substr $MD5, 0,  1;
-            $Constraint .= substr $MD5, 31, 1;
-        }
         if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /true/i ) {
+            my $Constraint = 'PK_' . $TableName;
+            if ( length $Constraint > 30 ) {
+                my $MD5 = $MainObject->MD5sum(
+                    String => $Constraint,
+                );
+                $Constraint = substr $Constraint, 0, 28;
+                $Constraint .= substr $MD5, 0,  1;
+                $Constraint .= substr $MD5, 31, 1;
+            }
             push(
                 @Return2,
                 "ALTER TABLE $TableName ADD CONSTRAINT $Constraint"
@@ -405,6 +405,7 @@ sub TableAlter {
     my $ReferenceName = '';
     my @Reference     = ();
     my $Table         = '';
+    my @Primary       = ();
     for my $Tag (@Param) {
 
         if ( $Tag->{Tag} eq 'TableAlter' && $Tag->{TagType} eq 'Start' ) {
@@ -462,6 +463,20 @@ sub TableAlter {
                 }
 
                 push @SQL, $SQLAlter;
+            }
+
+            # primary
+            if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /true/i ) {
+                my $Constraint = 'PK_' . $TableName;
+                if ( length $Constraint > 30 ) {
+                    my $MD5 = $MainObject->MD5sum(
+                        String => $Constraint,
+                    );
+                    $Constraint = substr $Constraint, 0, 28;
+                    $Constraint .= substr $MD5, 0,  1;
+                    $Constraint .= substr $MD5, 31, 1;
+                }
+                push(@SQL, $SQLStart . " ADD CONSTRAINT $Constraint PRIMARY KEY($Tag->{Name})");
             }
         }
         elsif ( $Tag->{Tag} eq 'ColumnChange' && $Tag->{TagType} eq 'Start' ) {
@@ -586,8 +601,75 @@ sub TableAlter {
         elsif ( $Tag->{Tag} =~ /^(Reference)/ && $Tag->{TagType} eq 'Start' ) {
             push @Reference, $Tag;
         }
+
+        # primary key
+        elsif ( $Tag->{Tag} =~ 'PrimaryCreate' ) {
+            my $Method = $Tag->{Tag};
+            if ( $Tag->{TagType} eq 'End' ) {
+                push @SQL, $Self->$Method(
+                    TableName => $Table,
+                    Data      => \@Primary,
+                    SQLStart  => $SQLStart
+                );
+                @Primary = ();
+            }
+        }
+        elsif ( $Tag->{Tag} =~ /^(PrimaryColumn)/ && $Tag->{TagType} eq 'Start' ) {
+            push @Primary, $Tag;
+        }
+        elsif ( $Tag->{Tag} =~ 'PrimaryDrop' && $Tag->{TagType} eq 'Start' ) {
+            my $Constraint = 'PK_' . $TableName;
+            if ( length $Constraint > 30 ) {
+                my $MD5 = $MainObject->MD5sum(
+                    String => $Constraint,
+                );
+                $Constraint = substr $Constraint, 0, 28;
+                $Constraint .= substr $MD5, 0,  1;
+                $Constraint .= substr $MD5, 31, 1;
+            }
+            push(@SQL, $SQLStart . " DROP CONSTRAINT $Constraint");
+        }
     }
     return @SQL;
+}
+
+sub PrimaryCreate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(TableName SQLStart Data)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Constraint = 'PK_' . $TableName;
+    if ( length $Constraint > 30 ) {
+        my $MD5 = $MainObject->MD5sum(
+            String => $Constraint,
+        );
+        $Constraint = substr $Constraint, 0, 28;
+        $Constraint .= substr $MD5, 0,  1;
+        $Constraint .= substr $MD5, 31, 1;
+    }
+
+    my $SQL   = "$Param{SQLStart} ADD CONSTRAINT $Constraint PRIMARY KEY(";
+    my @Array = @{ $Param{Data} };
+    for ( 0 .. $#Array ) {
+        if ( $_ > 0 ) {
+            $SQL .= ', ';
+        }
+        $SQL .= $Array[$_]->{Name};
+    }
+    $SQL .= ')';
+
+    # return SQL
+    return ($SQL);
+
 }
 
 sub IndexCreate {
