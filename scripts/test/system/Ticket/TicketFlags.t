@@ -32,8 +32,7 @@ my $TicketID = $TicketObject->TicketCreate(
     Lock         => 'unlock',
     Priority     => '3 normal',
     State        => 'open',
-    CustomerNo   => '123465',
-    Contact => 'customer@example.com',
+    ContactID    => 'customer@example.com',
     OwnerID      => 1,
     UserID       => 1,
 );

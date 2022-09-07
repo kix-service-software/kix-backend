@@ -4,10 +4,15 @@
    "description" : "An authorization object.",
    "type" : "object",
    "properties" : {
+      "NegotiationToken" : {
+         "type" : "string"
+      },
       "Password" : {
+         "description" : "required if no NegitiationToken is given",
          "type" : "string"
       },
       "UserLogin" : {
+         "description" : "required if no NegitiationToken is given",
          "type" : "string"
       },
       "UserType" : {
@@ -19,8 +24,6 @@
       }
    },
    "required" : [
-      "UserLogin",
-      "UserType",
-      "Password"
+      "UserType"
    ]
 }
