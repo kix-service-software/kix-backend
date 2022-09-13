@@ -60,6 +60,12 @@ sub _ReplaceParametersInString {
             Parameter => $Parameter->{Name}
         );
         if ( !$ParameterValue ) {
+            # try to use a configured fallback
+            if ( $String =~ /\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/gmx ) {
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/$1/gmx ;
+                next;
+            }
+
             if ( $Param{UseEmpty} ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
                 $String =~ s/\$\{Parameters\.$Parameter->{Name}\}/$ParameterValue/gmx ;

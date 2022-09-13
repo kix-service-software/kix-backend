@@ -1,0 +1,22 @@
+{
+    "Plugin": [
+        {
+            "BuildNumber": "200",
+            "Description": "KIXPro plugin for the KIX Service Management System.",
+            "InitOrder": 0,
+            "PatchNumber": "0",
+            "Product": "KIXPro",
+            "Version": "18"
+        },
+        {
+            "BuildDate": "Thu, 04 Aug 2022 07:15:17 +0200",
+            "BuildNumber": 245,
+            "ClientID": "kix-agent-portal-development-userid",
+            "Description": "KIXPro",
+            "PatchNumber": 0,
+            "Product": "KIXPro",
+            "Requires": "framework(>3985), backend::KIXPro",
+            "Version": "1"
+        }
+    ]
+}
