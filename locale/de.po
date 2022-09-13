@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-9-13 10:27+0000\n"
+"POT-Creation-Date: 2022-9-13 12:08+0000\n"
 "PO-Revision-Date: 2022-09-06 10:18+0000\n"
 "Last-Translator: fkrahl <Frank.Krahl@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -5158,8 +5158,8 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Enables the minimal ticket counter size (if \"Date\" was selected as "
-"TicketNumberGenerator)."
+"Enables the minimal ticket counter size (if \"Date\" or \"DateChecksum\" was "
+"selected as TicketNumberGenerator)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5614,9 +5614,9 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Sets the minimal ticket counter size if \"AutoIncrement\" was selected as "
-"TicketNumberGenerator. Default is 5, this means the counter starts from "
-"10000."
+"Sets the minimal ticket counter size if \"AutoIncrement\", \"Date\" or "
+"\"DateChecksum\" was selected as TicketNumberGenerator. Default is 5, this "
+"means the counter starts from 10000."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
