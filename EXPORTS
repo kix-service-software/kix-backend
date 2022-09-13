@@ -42,6 +42,7 @@ Console::Command::Admin::Daemon::Reload                                       = 
 Console::Command::Admin::FAQ::Import                                          = Kernel::System::Console::Command::Admin::FAQ::Import
 Console::Command::Admin::ImportExport::CreateMapping                          = Kernel::System::Console::Command::Admin::ImportExport::CreateMapping
 Console::Command::Admin::ImportExport::ListMappings                           = Kernel::System::Console::Command::Admin::ImportExport::ListMappings
+Console::Command::Admin::Installation::ExecutePluginAction                    = Kernel::System::Console::Command::Admin::Installation::ExecutePluginAction
 Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition        = Kernel::System::Console::Command::Admin::Installation::GenerateAPIWebServiceDefinition
 Console::Command::Admin::Installation::ListPlugins                            = Kernel::System::Console::Command::Admin::Installation::ListPlugins
 Console::Command::Admin::Installation::Migrate::CountObjects                  = Kernel::System::Console::Command::Admin::Installation::Migrate::CountObjects

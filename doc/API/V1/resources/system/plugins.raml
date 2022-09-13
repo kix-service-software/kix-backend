@@ -1,0 +1,9 @@
+  displayName: "[System] Plugins"
+  description: !include ../../descriptions/resources/system/plugins.md
+  type: { collection-readonly: { typeName: Plugin } }
+  /{product}:
+    type: { item-nodelete: { typeName: Plugin } }
+    uriParameters:
+      product:
+        displayName: Product
+        type: string

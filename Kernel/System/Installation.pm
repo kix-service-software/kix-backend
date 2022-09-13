@@ -158,7 +158,7 @@ sub PluginList {
     }
     closedir(HANDLE);
 
-    # get RELEASE information of each plugin
+    # get more information of each plugin
     DIRECTORY:
     foreach my $Directory ( sort @DirectoryList ) {
         my %Plugin = $Self->_ReadReleaseFile(
@@ -184,6 +184,32 @@ sub PluginList {
                 $Plugin{Exports}->{$Object} = $Module;
             }
             close(HANDLE);
+        }
+
+        # get README
+        # don't do that using the Main object, since we are called by the OM constructor
+        my @ReadmeFiles;
+        my $Dir = $Plugin{Directory}.'/var/setup';
+        if ( -d $Dir ) {
+            opendir(HANDLE, $Dir) || die "Can't open $Dir: $!";
+            while (readdir HANDLE) {
+                next if $_ =~ /^\./;
+                next if !-f $Dir.'/'.$_ || $_ !~ /^README_/g;    # only README files
+                push @ReadmeFiles, $Dir.'/'.$_;
+            }
+            closedir(HANDLE);
+            $Plugin{Readme} //= [];
+            FILE:
+            foreach my $File ( @ReadmeFiles ) {
+                if ( $File =~ /\/README_(.*?).md/g ) {
+                    my $Language = $1;
+                    open(HANDLE, '<', $File) || next FILE;
+                    binmode(HANDLE, ":utf8");
+                    read HANDLE, my $Content, -s HANDLE;
+                    close(HANDLE);
+                    push @{$Plugin{Readme}}, { Language => $Language, Content => $Content };
+                }
+            }
         }
 
         # add to list of plugins
@@ -235,15 +261,182 @@ sub PluginAvailable {
     return $Plugins{$Param{Plugin}};
 }
 
-=item GetPluginExports()
+=item PluginGet()
 
-get the list of plugin exports (object map) in order of initialization
+get the plugin information
 
-    my @PluginExports = $InstallationObject->GetPluginExports()
+    my %Plugin = $InstallationObject->PluginGet(
+        Plugin => 'KIXPro',
+    );
 
 =cut
 
-sub GetPluginExports {
+sub PluginGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed parameters
+    if ( !$Param{Plugin} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Plugin!"
+        );
+    }
+
+    my %PluginList = map { $_->{Product} => $_ } $Self->PluginList();
+
+    return $PluginList{$Param{Plugin}};
+}
+
+=item PluginActionList()
+
+get the registered action for a given plugin
+
+    my @ActionList = $InstallationObject->PluginActionList(
+        Plugin => 'KIXPro',
+    );
+
+=cut
+
+sub PluginActionList {
+    my ( $Self, %Param ) = @_;
+    my @ActionList;
+
+    # check needed parameters
+    if ( !$Param{Plugin} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Plugin!"
+        );
+    }
+
+    my %Plugins = map {$_->{Product} => 1 } $Self->PluginList(Valid => 1);
+
+    return @ActionList if !$Plugins{$Param{Plugin}};
+
+    # get configured actions
+    my $Actions = $Kernel::OM->Get('Config')->Get('Plugin::ActionRegistration::'.$Param{Plugin});
+    if ( IsHashRefWithData($Actions) ) {
+        foreach my $Action ( sort keys %{$Actions} ) {
+            push @ActionList, { Name => $Action, Description => $Actions->{$Action}->{Description} };
+        }
+    }
+
+    return @ActionList;
+}
+
+=item PluginActionExecute()
+
+execute a registered action for a given plugin
+
+    my $Result = $InstallationObject->PluginActionExecute(
+        Plugin => 'KIXPro',
+        Action => '...',
+        UserID => 1
+    );
+
+=cut
+
+sub PluginActionExecute {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    # check needed parameters
+    for (qw(Plugin Action UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Available = $Self->PluginAvailable(
+        Plugin => $Param{Plugin}
+    );
+
+    return if !$Available;
+
+    # get configured actions
+    my $Actions = $Kernel::OM->Get('Config')->Get('Plugin::ActionRegistration::'.$Param{Plugin});
+    if ( IsHashRefWithData($Actions) ) {
+        if ( !IsHashRefWithData($Actions->{$Param{Action}}) || !$Actions->{$Param{Action}}->{Module} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No module registration for plugin action \"$Param{Plugin}::$Param{Action}\" !"
+            );
+        }
+        my $Object = $Kernel::OM->Get($Actions->{$Param{Action}}->{Module});
+        if ( !IsObject($Object, $Actions->{$Param{Action}}->{Module}) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Actions->{$Param{Action}}->{Module}!"
+            );
+            return;
+        }
+
+        my $Method = $Actions->{$Param{Action}}->{Method};
+        if ( !$Object->can($Method) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No such method \"$Actions->{$Param{Action}}->{Module}::$Param{Action}\"!",
+            );
+            return;
+        }
+
+        return $Object->$Method(%Param);
+    }
+
+    return;
+}
+
+=item PluginExtendedDataGet()
+
+get the extended data of a given plugin
+
+    my %ExtendedData = $InstallationObject->PluginExtendedDataGet(
+        Plugin => 'KIXPro',
+    );
+
+=cut
+
+sub PluginExtendedDataGet {
+    my ( $Self, %Param ) = @_;
+    my %ExtendedData;
+
+    # check needed parameters
+    if ( !$Param{Plugin} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Plugin!"
+        );
+    }
+
+    my %Plugins = map {$_->{Product} => 1 } $Self->PluginList(Valid => 1);
+
+    return if !$Plugins{$Param{Plugin}};
+
+    # get plugin specific extended data
+    my $Module = $Kernel::OM->Get('Config')->Get('Plugin::SetupRegistration')->{$Param{Plugin}}->{Module};
+    if ( $Module ) {
+        my $SetupObject = $Kernel::OM->Get($Module);
+        if ( $SetupObject ) {
+            %ExtendedData = $SetupObject->GetExtendedData();
+        }
+    }
+
+    return %ExtendedData;
+}
+
+=item PluginExportsGet()
+
+get the list of plugin exports (object map) in order of initialization
+
+    my @PluginExports = $InstallationObject->PluginExportsGet()
+
+=cut
+
+sub PluginExportsGet {
     my ( $Self, %Param ) = @_;
     my %Exports;
 
