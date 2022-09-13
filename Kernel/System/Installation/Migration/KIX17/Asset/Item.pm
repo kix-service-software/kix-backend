@@ -75,7 +75,7 @@ sub Run {
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
-    return $Self->_RunParallel(
+    my $Result = $Self->_RunParallel(
         sub {
             my ( $Self, %Param ) = @_;
             my $Result;
@@ -148,6 +148,35 @@ sub Run {
         Items => $SourceData,
         %Param,
     );
+
+    my @Keys = $Kernel::OM->Get('Cache')->GetKeysForType(
+        Type => 'ConfigItemMigration',
+    );
+
+    foreach my $Key ( @Keys ) {
+        my $RepeatXMLAttributeMigration = $Kernel::OM->Get('Cache')->Get(
+            Type      => 'ConfigItemMigration',
+            Key       => $Key,
+            UseRawKey => 1,
+        );
+
+        if ( IsArrayRefWithData($RepeatXMLAttributeMigration) ) {
+            foreach my $RepeatItem ( @{$RepeatXMLAttributeMigration} ) {
+                my $Success = $Self->_MapAttributeValue(%{$RepeatItem});
+                if ( $Success ) {
+                    my $ID = $Self->Insert(
+                        Table          => 'xml_storage',
+                        PrimaryKey     => 'id',
+                        Item           => $RepeatItem->{Item},
+                        SourceObjectID => $RepeatItem->{Item}->{xml_type} . '::' . $RepeatItem->{Item}->{xml_key} . '::' . $RepeatItem->{Item}->{xml_content_key},
+                        AutoPrimaryKey => 1,
+                    );
+                }
+            }
+        }
+    }
+
+    return $Result;
 }
 
 sub _MigrateHistory {
@@ -397,15 +426,16 @@ sub _MigrateXMLData {
         # insert row
         if ( !$ID ) {
             # map the original ID in the XML data to the migrated one
-            $Self->_MapAttributeValue(Item => $Item, DefinitionID => $Param{DefinitionID});
-
-            my $ID = $Self->Insert(
-                Table          => 'xml_storage',
-                PrimaryKey     => 'id',
-                Item           => $Item,
-                SourceObjectID => $Item->{xml_type} . '::' . $Item->{xml_key} . '::' . $Item->{xml_content_key},
-                AutoPrimaryKey => 1,
-            );
+            my $Success = $Self->_MapAttributeValue(Item => $Item, DefinitionID => $Param{DefinitionID});
+            if ( $Success ) {
+                $ID = $Self->Insert(
+                    Table          => 'xml_storage',
+                    PrimaryKey     => 'id',
+                    Item           => $Item,
+                    SourceObjectID => $Item->{xml_type} . '::' . $Item->{xml_key} . '::' . $Item->{xml_content_key},
+                    AutoPrimaryKey => 1,
+                );
+            }
         }
 
         if ( $ID ) {
@@ -512,6 +542,30 @@ sub _MapAttributeValue {
         );
         if ( $MappedID ) {
             $Param{Item}->{xml_content_value} = $MappedID,
+        }
+        elsif ( $TypeMapping eq 'configitem' ) {
+            # we are referencing another configitem which isn't migrated yet -> indicate that we didn't succeed
+            my $RepeatXMLAttributeMigration = $Kernel::OM->Get('Cache')->Get(
+                Type => 'ConfigItemMigration',
+                Key  => 'RepeatXMLAttributeMigration'.$$,
+            );
+
+            $RepeatXMLAttributeMigration = [] if !IsArrayRef($RepeatXMLAttributeMigration);
+            push @{$RepeatXMLAttributeMigration}, { Item => $Param{Item}, DefinitionID => $Param{DefinitionID} };
+
+            my $Success = $Kernel::OM->Get('Cache')->Set(
+                Type  => 'ConfigItemMigration',
+                Key   => 'RepeatXMLAttributeMigration'.$$,
+                Value => $RepeatXMLAttributeMigration,
+            );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to store repetition information (PID: $$)!"
+                );
+            }
+
+            return 0;
         }
     }
 

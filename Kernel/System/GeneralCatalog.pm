@@ -845,7 +845,6 @@ sub GeneralCatalogItemDelete {
     );
 
     return 1;
-
 }
 
 1;

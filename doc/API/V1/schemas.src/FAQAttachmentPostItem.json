@@ -6,7 +6,7 @@
     "properties": {
         "Content": {
             "type": "string",
-            "description": "base64 encoded file ontent string"
+            "description": "base64 encoded file content string"
         },
         "ContentType": {
             "type": "string"

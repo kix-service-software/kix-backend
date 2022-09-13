@@ -155,7 +155,7 @@ sub new {
     close(HANDLE);
 
     # init plugins
-    my %PluginExports = $Self->Get('Installation')->GetPluginExports();
+    my %PluginExports = $Self->Get('Installation')->PluginExportsGet();
     %{$Self->{ObjectMap}} = (
         %{$Self->{ObjectMap}},
         %PluginExports,

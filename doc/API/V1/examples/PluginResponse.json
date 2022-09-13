@@ -1,0 +1,10 @@
+{
+    "Plugin": {
+        "BuildNumber": "200",
+        "Description": "KIXPro plugin for the KIX Service Management System.",
+        "InitOrder": 0,
+        "PatchNumber": "0",
+        "Product": "KIXPro",
+        "Version": "18"
+    }
+}
