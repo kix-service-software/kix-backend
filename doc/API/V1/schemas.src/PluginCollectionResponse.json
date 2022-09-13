@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "PluginCollectionResponse.json",
+    "type": "object",
+    "description": "A list of plugins.",
+    "properties": {
+        "Plugin": {
+            "type": "array",
+            "items": {
+                "$ref": "Plugin.json"
+            }
+        }
+    },
+    "required": [
+        "Plugin"
+    ]
+}

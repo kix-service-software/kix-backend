@@ -753,7 +753,7 @@ sub OrganisationDelete {
     # get all dynamic fields this object type
     my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         ObjectType => 'Organisation',
-        Valid      => 0,
+        Valid      => 0
     );
 
     # delete dynamicfield values for this organisation
@@ -769,7 +769,7 @@ sub OrganisationDelete {
             DynamicFieldConfig => $DynamicFieldConfig,
             ObjectID           => $Param{ID},
             UserID             => $Param{UserID},
-            NoPostHandling     => 1,                # we will delete the contact, so no additional handling needed when deleting the DF values
+            NoPostHandling     => 1,                # we will delete the organisation, so no additional handling needed when deleting the DF values
         );
     }
 

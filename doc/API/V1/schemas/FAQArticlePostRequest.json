@@ -134,7 +134,7 @@
          "type" : "object",
          "properties" : {
             "Content" : {
-               "description" : "base64 encoded file ontent string",
+               "description" : "base64 encoded file content string",
                "type" : "string"
             },
             "ContentType" : {

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-7-13 13:36+0000\n"
+"POT-Creation-Date: 2022-9-13 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4619,10 +4619,6 @@ msgid "Workflowmodule which sets the ticket responsible based on ticket type if 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "customer"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "email-internal"
 msgstr ""
 
@@ -4736,6 +4732,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "First Usage Date"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "FirstResponse"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -4875,6 +4875,10 @@ msgid "Parent Location"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "PendingTime"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
 msgstr ""
 
@@ -4988,6 +4992,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "completed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "customer"
 msgstr ""
 
 #. manual entry from templates.pot.manual
