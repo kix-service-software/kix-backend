@@ -944,16 +944,17 @@
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
