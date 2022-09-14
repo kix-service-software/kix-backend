@@ -91,11 +91,16 @@ my $StartTime = Time::HiRes::time();
     my $Result;
 
     if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
-
         my $Result = $Self->AsyncCall(
             FunctionName   => '_Run',
             FunctionParams => \%Param,
         );
+        if ( !$Result ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not schedule asynchronous NotificationEvent execution!",
+            );
+        }
     }
     else {
         $Result = $Self->_Run(
@@ -161,7 +166,10 @@ my $StartTime = Time::HiRes::time();
             Ticket       => \%Ticket,
             Notification => \%Notification,
         );
-
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "   NotificationEvent::_NotificationFilter: Result:=$PassFilter\n",
+        );
         next NOTIFICATION if !$PassFilter;
 
         # add attachments only on ArticleCreate or ArticleSend event
@@ -464,6 +472,15 @@ my $StartTime = Time::HiRes::time();
         Limit  => 1,
     );
 
+    use Data::Dumper;
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   NotificationEvent::_NotificationFilter: Filter=%s\n", Data::Dumper::Dumper($Filter),
+    );
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   NotificationEvent::_NotificationFilter: TicketIDs=%s\n", Data::Dumper::Dumper(\@TicketIDs),
+    );
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
         Message  => sprintf "   NotificationEvent::_NotificationFilter: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
