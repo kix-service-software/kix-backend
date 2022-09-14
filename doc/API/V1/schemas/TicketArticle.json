@@ -193,7 +193,8 @@
       "TicketID",
       "TimeUnits",
       "To",
-      "ToRealname"
+      "ToRealname",
+      "Unseen"
    ],
    "definitions" : {
       "_DynamicFieldValue_json" : {

@@ -593,7 +593,8 @@
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -738,6 +739,10 @@
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -834,6 +839,10 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -850,6 +859,7 @@
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
