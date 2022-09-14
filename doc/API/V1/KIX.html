@@ -4645,16 +4645,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -5825,16 +5826,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -6842,16 +6844,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -6988,7 +6991,8 @@ pre code {
             "Title": "Some title",
             "TypeID": 1,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 0
         },
         {
             "Age": 1316731,
@@ -7013,7 +7017,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 1
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -11049,16 +11054,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -12305,16 +12311,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -13505,16 +13512,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -14250,16 +14258,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -14396,7 +14405,8 @@ pre code {
             "Title": "Some title",
             "TypeID": 1,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 0
         },
         {
             "Age": 1316731,
@@ -14421,7 +14431,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 1
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -17525,16 +17536,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -18943,16 +18955,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -19089,7 +19102,8 @@ pre code {
             "Title": "Some title",
             "TypeID": 1,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 0
         },
         {
             "Age": 1316731,
@@ -19114,7 +19128,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "Watching": 1
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -20077,16 +20092,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -20257,7 +20273,8 @@ pre code {
         "Title": "Some title",
         "TypeID": 1,
         "Unseen": 0,
-        "UntilTime": 0
+        "UntilTime": 0,
+        "Watching": 0
     }
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -44235,16 +44252,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
@@ -45480,16 +45498,17 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
-            "WatcherCount" : {
-               "type" : "integer",
-               "readOnly" : true
-            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
                "items" : {
                   "$ref" : "#/definitions/_Watcher_json"
                },
+               "readOnly" : true
+            },
+            "Watching" : {
+               "description" : " if the current user is watching the ticket, otherwise 0",
+               "type" : "integer",
                "readOnly" : true
             }
          },
