@@ -644,6 +644,10 @@
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
