@@ -1,194 +1,198 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "TicketArticle.json",
-  "type": "object",
-  "description": "The ticket article object.",
-  "properties": {
-    "ArticleID": {
-      "type": "integer",
-      "readOnly": true
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "TicketArticle.json",
+    "type": "object",
+    "description": "The ticket article object.",
+    "properties": {
+        "ArticleID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Attachments": {
+            "type": "array",
+            "description": "added via include \"Attachments\"",
+            "items": {
+                "$ref": "TicketArticleAttachment.json"
+            },
+            "readOnly": true
+        },
+        "Bcc": {
+            "type": "string",
+            "readOnly": true
+        },
+        "BccRealname": {
+            "type": "string",
+            "description": "realnames from \"Bcc\" (if email address has no real name, email address is used)",
+            "readOnly": true
+        },
+        "Body": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Cc": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CcRealname": {
+            "type": "string",
+            "description": "realnames from \"Cc\" (if email address has no real name, email address is used)",
+            "readOnly": true
+        },
+        "ChangeTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ChangedBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ChannelID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Charset": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ContentCharset": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ContentType": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CreateTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CreatedBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CustomerVisible": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "DynamicFields": {
+            "type": "array",
+            "description": "added via include \"DynamicFields\"",
+            "items": {
+                "$ref": "DynamicFieldValue.json"
+            },
+            "readOnly": true
+        },
+        "Flags": {
+            "type": "array",
+            "description": "added via include \"Flags\"",
+            "items": {
+                "$ref": "TicketArticleFlag.json"
+            },
+            "readOnly": true
+        },
+        "From": {
+            "type": "string",
+            "readOnly": true
+        },
+        "FromRealname": {
+            "type": "string",
+            "description": "realnames from \"From\" (if email address has no real name, email address is used)",
+            "readOnly": true
+        },
+        "InReplyTo": {
+            "type": "string",
+            "readOnly": true
+        },
+        "IncommingTime": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "MessageID": {
+            "type": "string",
+            "readOnly": true
+        },
+        "MimeType": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Plain": {
+            "type": "string",
+            "description": "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+            "readOnly": true
+        },
+        "References": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ReplyTo": {
+            "type": "string",
+            "readOnly": true
+        },
+        "SenderType": {
+            "type": "string",
+            "readOnly": true
+        },
+        "SenderTypeID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Subject": {
+            "type": "string",
+            "readOnly": true
+        },
+        "TicketID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "TimeUnits": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "To": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ToRealname": {
+            "type": "string",
+            "description": "realnames from \"To\" (if email address has no real name, email address is used)",
+            "readOnly": true
+        },
+        "Unseen": {
+            "type": "integer",
+            "readOnly": true
+        }
     },
-    "Attachments": {
-      "type": "array",
-      "description": "added via include \"Attachments\"",
-      "items": {
-        "$ref": "TicketArticleAttachment.json"
-      },
-      "readOnly": true
-    },
-    "Bcc": {
-      "type": "string",
-      "readOnly": true
-    },
-    "BccRealname": {
-      "type": "string",
-      "description": "realnames from \"Bcc\" (if email address has no real name, email address is used)",
-      "readOnly": true
-    },
-    "Body": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Cc": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CcRealname": {
-      "type": "string",
-      "description": "realnames from \"Cc\" (if email address has no real name, email address is used)",
-      "readOnly": true
-    },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ChangedBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "ChannelID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Charset" : {
-      "type" : "string",
-      "readOnly": true
-    },
-    "ContentCharset" : {
-      "type" : "string",
-      "readOnly": true
-    },
-    "ContentType" : {
-      "type" : "string",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreatedBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CustomerVisible" : {
-      "type" : "integer",
-      "readOnly": true
-    },
-    "DynamicFields": {
-      "type": "array",
-      "description": "added via include \"DynamicFields\"",
-      "items": {
-        "$ref": "DynamicFieldValue.json"
-      },
-      "readOnly": true
-    },
-    "Flags": {
-      "type": "array",
-      "description": "added via include \"Flags\"",
-      "items": {
-        "$ref": "TicketArticleFlag.json"
-      },
-      "readOnly": true
-    },
-    "From": {
-      "type": "string",
-      "readOnly": true
-    },
-    "FromRealname": {
-      "type": "string",
-      "description": "realnames from \"From\" (if email address has no real name, email address is used)",
-      "readOnly": true
-    },
-    "InReplyTo": {
-      "type": "string",
-      "readOnly": true
-    },
-    "IncommingTime": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "MessageID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "MimeType": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Plain": {
-      "type": "string",
-      "description": "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
-      "readOnly": true
-    },
-    "References": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ReplyTo": {
-      "type": "string",
-      "readOnly": true
-    },
-    "SenderType": {
-      "type": "string",
-      "readOnly": true
-    },
-    "SenderTypeID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Subject": {
-      "type": "string",
-      "readOnly": true
-    },
-    "TicketID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "TimeUnits": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "To": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ToRealname": {
-      "type": "string",
-      "description": "realnames from \"To\" (if email address has no real name, email address is used)",
-      "readOnly": true
-    }
-  },
-  "required": [
-    "ArticleID",
-    "Bcc",
-    "BccRealname",
-    "Body",
-    "Cc",
-    "CcRealname",
-    "ChangeTime",
-    "ChangedBy",
-    "Channel",
-    "ChannelID",
-    "Charset",
-    "ContentCharset",
-    "ContentType",
-    "CreateTime",
-    "CreatedBy",
-    "CustomerVisible",
-    "From",
-    "FromRealname",
-    "InReplyTo",
-    "IncomingTime",
-    "MessageID",
-    "MimeType",
-    "References",
-    "ReplyTo",
-    "SenderType",
-    "SenderTypeID",
-    "Subject",
-    "TicketID",
-    "TimeUnits",
-    "To",
-    "ToRealname"
-  ]
+    "required": [
+        "ArticleID",
+        "Bcc",
+        "BccRealname",
+        "Body",
+        "Cc",
+        "CcRealname",
+        "ChangeTime",
+        "ChangedBy",
+        "Channel",
+        "ChannelID",
+        "Charset",
+        "ContentCharset",
+        "ContentType",
+        "CreateTime",
+        "CreatedBy",
+        "CustomerVisible",
+        "From",
+        "FromRealname",
+        "InReplyTo",
+        "IncomingTime",
+        "MessageID",
+        "MimeType",
+        "References",
+        "ReplyTo",
+        "SenderType",
+        "SenderTypeID",
+        "Subject",
+        "TicketID",
+        "TimeUnits",
+        "To",
+        "ToRealname"
+    ]
 }

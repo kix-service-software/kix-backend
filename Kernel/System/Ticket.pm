@@ -5274,6 +5274,82 @@ sub TicketFlagGet {
     return %{$UserTags};
 }
 
+=item TicketUserFlagExists()
+
+check if the given flag exists for the given user
+
+    my $Exists = $TicketObject->TicketUserFlagExists(
+        TicketID => 123,
+        Flag     => 'Seen',
+        Value    => ...,            # optional
+        UserID   => 123,
+    );
+
+=cut
+
+sub TicketUserFlagExists {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID Flag UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    # check cache
+    my $CacheKey = 'TicketFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Flag} . '::' . ($Param{Value}||'');
+    my $Flags = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    if ( exists $Param{Value} ) {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND ticket_value = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{TicketID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    } 
+    else {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{TicketID}, \$Param{Flag}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+
+    # fetch the result
+    my $Exists = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Exists = $Row[0];
+    }
+
+    # set cache
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Exists,
+    );
+
+    return $Exists;
+}
+
 =item TicketArticleStorageSwitch()
 
 move article storage from one backend to other backend

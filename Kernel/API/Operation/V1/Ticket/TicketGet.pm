@@ -285,11 +285,13 @@ sub _GetTicketData {
     }
 
     # add unseen information
-    my %Flags = $TicketObject->TicketFlagGet(
+    my $Exists = $TicketObject->TicketUserFlagExists(
         TicketID => $TicketID,
+        Flag     => 'Seen',
+        Value    => 1,
         UserID   => $Self->{Authorization}->{UserID},
     );
-    $TicketRaw{Unseen} = (!exists($Flags{Seen}) || !$Flags{Seen}) ? 1 : 0;
+    $TicketRaw{Unseen} = $Exists ? 0 : 1;
 
     my %TicketData;
     my @DynamicFields;

@@ -2464,6 +2464,82 @@ sub ArticleFlagGet {
     return %Flag;
 }
 
+=item ArticleUserFlagExists()
+
+check if the given flag exists for the given user
+
+    my $Exists = $TicketObject->ArticleUserFlagExists(
+        ArticleID => 123,
+        Flag      => 'Seen',
+        Value     => ...,           # optional
+        UserID    => 123,
+    );
+
+=cut
+
+sub ArticleUserFlagExists {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID Flag UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    # check cache
+    my $CacheKey = 'ArticleFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Flag} . '::' . ($Param{Value}||'');
+    my $Flags = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    if ( exists $Param{Value} ) {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND article_value = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+    else {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+
+    # fetch the result
+    my $Exists = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Exists = $Row[0];
+    }
+
+    # set cache
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Exists,
+    );
+
+    return $Exists;
+}
+
 =item ArticleFlagsOfTicketGet()
 
 get all article flags of a ticket
