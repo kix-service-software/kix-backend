@@ -193,6 +193,7 @@
         "TicketID",
         "TimeUnits",
         "To",
-        "ToRealname"
+        "ToRealname",
+        "Unseen"
     ]
 }

@@ -32,7 +32,8 @@
             "TicketID": 49,
             "TimeUnits": 0,
             "To": "agent@myorganisation.com",
-            "ToRealname": "agent@myorganisation.com"
+            "ToRealname": "agent@myorganisation.com",
+            "Unseen": 1
         },
         {
             "ArticleID": 33,
@@ -66,7 +67,8 @@
             "TicketID": 49,
             "TimeUnits": 0,
             "To": "\"Some one\" <someone@somecorp.com>",
-            "ToRealname": "Some one"
+            "ToRealname": "Some one",
+            "Unseen": 0
         }
     ]
 }

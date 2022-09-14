@@ -284,15 +284,6 @@ sub _GetTicketData {
         return;
     }
 
-    # add unseen information
-    my $Exists = $TicketObject->TicketUserFlagExists(
-        TicketID => $TicketID,
-        Flag     => 'Seen',
-        Value    => 1,
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-    $TicketRaw{Unseen} = $Exists ? 0 : 1;
-
     my %TicketData;
     my @DynamicFields;
 
@@ -345,6 +336,27 @@ sub _GetTicketData {
             TicketID => $TicketID,
         );
     }
+
+    # add unseen information
+    my $Exists = $TicketObject->TicketUserFlagExists(
+        TicketID => $TicketID,
+        Flag     => 'Seen',
+        Value    => 1,
+        UserID   => $Self->{Authorization}->{UserID},
+    );
+    $TicketData{Unseen} = $Exists ? 0 : 1;
+
+    # add watcher count
+    $TicketData{WatcherCount} = 0 + $Kernel::OM->Get('Watcher')->WatcherCount(
+        Object   => 'Ticket',
+        ObjectID => $TicketID
+    );
+
+    # add link count
+    $TicketData{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(
+        Object => 'Ticket',
+        Key    => $TicketID
+    );
 
     #FIXME: workaround KIX2018-3308
     $TicketData{ContactID}      = "" . $TicketData{ContactID};

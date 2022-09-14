@@ -174,15 +174,6 @@ sub Run {
             );
         }
 
-        # add unseen information
-        my $Exists = $TicketObject->ArticleUserFlagExists(
-            ArticleID => $ArticleID,
-            Flag      => 'Seen',
-            Value     => 1,
-            UserID    => $Self->{Authorization}->{UserID},
-        );
-        $ArticleRaw{Unseen} = $Exists ? 0 : 1;
-
         my %ArticleData;
         my @DynamicFields;
 
@@ -267,6 +258,15 @@ sub Run {
             ) || '';
             $ArticleData{Plain} = $PlainMessage;
         }
+
+        # add unseen information
+        my $Exists = $TicketObject->ArticleUserFlagExists(
+            ArticleID => $ArticleID,
+            Flag      => 'Seen',
+            Value     => 1,
+            UserID    => $Self->{Authorization}->{UserID},
+        );
+        $ArticleData{Unseen} = $Exists ? 0 : 1;
 
         # add
         push(@ArticleList, \%ArticleData);

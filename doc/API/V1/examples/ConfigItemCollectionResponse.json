@@ -8,8 +8,10 @@
             "ConfigItemID": 61,
             "CreateBy": 1,
             "CreateTime": "2018-07-31 16:07:38",
+            "LinkCount": 0,
             "Name": "notebook1",
             "Number": "1022000001"
+            
         },
         {
             "ChangeBy": 1,
@@ -19,6 +21,7 @@
             "ConfigItemID": 62,
             "CreateBy": 1,
             "CreateTime": "2018-07-31 16:47:48",
+            "LinkCount": 0,
             "Name": "notebook2",
             "Number": "1022000002"
         }
