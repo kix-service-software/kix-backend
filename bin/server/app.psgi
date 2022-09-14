@@ -41,10 +41,6 @@ $Kernel::OM = Kernel::System::ObjectManager->new(
     },
 );
 
-$API::Provider = Kernel::API::Provider->new();
-
-#$API::Provider = Kernel::API::Provider->new();
-
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
 BEGIN {
@@ -70,11 +66,12 @@ my $App = CGI::Emulate::PSGI->handler(
 
         my $StartTime = time();
 
-#        $API::Provider->Run();
-
         # run the request
         eval {
-            do "$Bin/$ENV{SCRIPT_NAME}";
+            my $Provider = Kernel::API::Provider->new();
+            $Provider->Run();
+            $Kernel::OM->CleanUp();
+#            do "$Bin/$ENV{SCRIPT_NAME}";
         };
         if ( $@ && $@ ne "exit called\n" ) {
             warn $@;

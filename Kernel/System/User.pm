@@ -1413,30 +1413,31 @@ sub CheckResourcePermission {
 
     my $StartTime;
 
-    if ( !IsHashRefWithData($Self->{PermissionCheckRoleList}) ) {
+    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckRoleList}) ) {
         # get list of all roles to resolve names
-        $Self->{PermissionCheckRoleList} = { $Kernel::OM->Get('Role')->RoleList( Valid => 1 ) };
+        $Self->{Cache}->{PermissionCheckRoleList} = { $Kernel::OM->Get('Role')->RoleList( Valid => 1 ) };
     }
 
-    if ( !$Self->{PermissionCheckUserRoleList}->{$Param{UserID}} ) {
-        $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} = [];
+    if ( !$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) {
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = [];
     }
 
-    if ( !IsArrayRefWithData($Self->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
+    if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
         # get all roles the user is assigned to
         my @UserRoleList = $Self->RoleList(
             UserID       => $Param{UserID},
             UsageContext => $Param{UsageContext},
             Valid        => 1,
         );
-        $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
+            print STDERR "here!\n";
             my $UserLogin = $Self->UserLookup(
                 UserID => $Param{UserID},
                 Silent => 1,
             );
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}): " . join(', ', map { '"'.($Self->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{PermissionCheckUserRoleList}->{$Param{UserID}}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}): " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}}}));
         }
     }
 
@@ -1445,18 +1446,18 @@ sub CheckResourcePermission {
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for target $Param{Target}");
     }
 
-    if ( !$Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) {
-        $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} = {};
+    if ( !$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) {
+        $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} = {};
     }
 
-    if ( !IsHashRefWithData($Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
+    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
         my %PermissionList = $Self->PermissionList(
             UserID   => $Param{UserID},
             Types    => ['Resource'],
             UserType => $Param{UserType}
         );
         foreach my $Permission ( values %PermissionList ) {
-            $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+            $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
         }
     }
 
@@ -1474,7 +1475,7 @@ sub CheckResourcePermission {
 
         my $TargetPermission;
         ROLEID:
-        foreach my $RoleID ( sort @{ $Self->{PermissionCheckUserRoleList}->{$Param{UserID}} } ) {
+        foreach my $RoleID ( sort @{ $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} } ) {
             my ( $RoleGranted, $RolePermission ) = $Self->_CheckResourcePermissionForRole(
                 %Param,
                 Target   => $Target,
@@ -1484,9 +1485,20 @@ sub CheckResourcePermission {
 
             # use parent permission if no permissions have been found
             if ( !defined $RolePermission && $ParentTarget ) {
-                $RolePermission = $Self->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$Param{RequestedPermission}}->{$RoleID};
-                $Self->{PermissionCache}->{$Param{UserID}}->{$Target}->{$Param{RequestedPermission}}->{$RoleID} = $RolePermission;
-                $Self->_PermissionDebug($Self->{LevelIndent}, "    no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
+                $RolePermission = $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$Param{RequestedPermission}}->{$RoleID};
+                $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Target}->{$Param{RequestedPermission}}->{$RoleID} = $RolePermission;
+                
+                if ( IsArrayRefWithData($RolePermission) ) {
+                    $RolePermission = $RolePermission->[1];
+                }
+
+                if ( $Self->{PermissionDebug} ) {
+                    my $RolePermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+                        Value  => $RolePermission,
+                        Format => 'Short'
+                    );
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "    no permissions found for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission ($RolePermissionShort)");
+                }
             }
 
             # init the value
@@ -1526,7 +1538,7 @@ sub CheckResourcePermission {
                 = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                 Value  => $ResultingPermission,
                 Format => 'Short'
-                );
+            );
 
             $Self->_PermissionDebug($Self->{LevelIndent}, "    resulting permission on target $Target: $ResultingPermissionShort");
         }
@@ -1582,30 +1594,30 @@ sub _CheckResourcePermissionForRole {
         if ( !$Kernel::OM->Get('Config')->Get('SecureMode') && $Param{UserID} == 1 );
 
     if ( $Self->{PermissionDebug} ) {
-        $Self->_PermissionDebug($Self->{LevelIndent}, "    checking $Param{RequestedPermission} permission for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}");
+        $Self->_PermissionDebug($Self->{LevelIndent}, "    checking $Param{RequestedPermission} permission for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}");
     }
 
     my $Granted;
     my $ResultingPermission = 0;
 
-    if ( exists $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
+    if ( exists $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} ) {
 
-        if ( IsArrayRefWithData($Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
-            $Granted = $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'not granted';
-            $ResultingPermission = $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[1];
+        if ( IsArrayRefWithData($Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}) ) {
+            $Granted = $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[0] ? 'granted' : 'not granted';
+            $ResultingPermission = $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}}->[1];
             if ( $Self->{PermissionDebug} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent}, "    using cache for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = $Granted");
+                $Self->_PermissionDebug($Self->{LevelIndent}, "    using cache for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = $Granted");
             }
         }
         elsif ( $Self->{PermissionDebug} ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, "    using cache for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY");
+            $Self->_PermissionDebug($Self->{LevelIndent}, "    using cache for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $Param{RequestedPermission} = denied by explicit DENY");
         }
     }
     else {
         my $Result = 0;
         my %RelevantPermissions;
-        foreach my $ID ( sort keys %{$Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}} ) {
-            my $Permission = $Self->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}->{$ID};
+        foreach my $ID ( sort keys %{$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}} ) {
+            my $Permission = $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}->{$ID};
 
             # prepare target
             my $Target = $Permission->{Target};
@@ -1618,11 +1630,11 @@ sub _CheckResourcePermissionForRole {
             $RelevantPermissions{$ID} = $Permission;
         }
 
-        $Self->_PermissionDebug($Self->{LevelIndent}, "    relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+        $Self->_PermissionDebug($Self->{LevelIndent}, "    relevant permissions for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
 
         # return if no relevant permissions exist
         if ( !IsHashRefWithData( \%RelevantPermissions ) ) {
-            $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ 0, 0 ];
+            $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ 0, 0 ];
             return 0;
         }
 
@@ -1654,12 +1666,12 @@ sub _CheckResourcePermissionForRole {
                 Format => 'Short'
                 );
 
-            $Self->_PermissionDebug($Self->{LevelIndent}, "    resulting permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $ResultingPermissionShort");
+            $Self->_PermissionDebug($Self->{LevelIndent}, "    resulting permissions for role \"$Self->{Cache}->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: $ResultingPermissionShort");
         }
 
         # check if we have a DENY
         if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-            $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
+            $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = 0;
             return 0;
         }
 
@@ -1668,7 +1680,7 @@ sub _CheckResourcePermissionForRole {
                 & Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} } )
             == Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} };
 
-        $Self->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
+        $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Param{Target}}->{$Param{RequestedPermission}}->{$Param{RoleID}} = [ $Granted, $ResultingPermission ];
     }
 
     return ( $Granted, $ResultingPermission );
@@ -2016,7 +2028,7 @@ sub _AssignRolesByContext {
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
+    return if !$Self->{PermissionDebug};
 
     $Indent ||= '';
 
