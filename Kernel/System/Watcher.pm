@@ -253,8 +253,6 @@ sub WatcherCount {
         $Count = $Row[0];
     }
 
-    print STDERR "WatcherCount: $Count\n";
-
     return $Count;
 }
 

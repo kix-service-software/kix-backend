@@ -346,11 +346,13 @@ sub _GetTicketData {
     );
     $TicketData{Unseen} = $Exists ? 0 : 1;
 
-    # add watcher count
-    $TicketData{WatcherCount} = 0 + $Kernel::OM->Get('Watcher')->WatcherCount(
-        Object   => 'Ticket',
-        ObjectID => $TicketID
+    # add watcher info
+    my $WatcherCount = $Kernel::OM->Get('Watcher')->WatcherCount(
+        Object      => 'Ticket',
+        ObjectID    => $TicketID,
+        WatchUserID => $Self->{Authorization}->{UserID},
     );
+    $TicketData{Watching} = $WatcherCount ? 1 : 0;
 
     # add link count
     $TicketData{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(

@@ -86,6 +86,7 @@
         "Title": "Some title",
         "TypeID": 1,
         "Unseen": 0,
-        "UntilTime": 0
+        "UntilTime": 0,
+        "Watching": 0
     }
 }

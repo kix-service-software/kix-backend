@@ -165,8 +165,9 @@
             "type": "integer",
             "readOnly": true
         },
-        "WatcherCount": {
+        "Watching": {
             "type": "integer",
+            "description": "1 if the current user is watching the ticket, otherwise 0",
             "readOnly": true
         },
         "Watchers": {
