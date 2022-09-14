@@ -165,9 +165,9 @@
             "type": "integer",
             "readOnly": true
         },
-        "Watching": {
+        "WatcherID": {
             "type": "integer",
-            "description": "1 if the current user is watching the ticket, otherwise 0",
+            "description": "the ID of the watcher, if the current user is watching this ticket",
             "readOnly": true
         },
         "Watchers": {

@@ -256,6 +256,42 @@ sub WatcherCount {
     return $Count;
 }
 
+=item WatcherLookup()
+
+get the ID of the watcher item
+
+    my $WatcherID = $WatcherObject->WatcherLookup(
+        Object  => 'Ticket'
+        ObjectID    => 123,
+        WatchUserID => 1,
+    );
+
+=cut
+
+sub WatcherLookup {
+    my ( $Self, %Param ) = @_;
+    my @BindObj;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    # get all attributes of an watched ticket
+    return if !$DBObject->Prepare(
+        SQL  => 'SELECT id FROM watcher WHERE object = ? AND object_id = ? AND user_id = ?',
+        Bind => [
+            \$Param{Object}, \$Param{ObjectID}, \$Param{WatchUserID}
+        ],
+    );
+
+    # fetch the result
+    my $WatcherID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $WatcherID = $Row[0];
+    }
+
+    return $WatcherID;
+}
+
 =item WatcherAdd()
 
 subscribe a watcher

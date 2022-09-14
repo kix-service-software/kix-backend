@@ -52,8 +52,7 @@
             "Title": "Some title",
             "TypeID": 1,
             "Unseen": 0,
-            "UntilTime": 0,
-            "Watching": 0
+            "UntilTime": 0
         },
         {
             "Age": 1316731,
@@ -79,7 +78,7 @@
             "TypeID": 2,
             "Unseen": 0,
             "UntilTime": 0,
-            "Watching": 1
+            "WatcherID": 101
           }
     ]
 }
