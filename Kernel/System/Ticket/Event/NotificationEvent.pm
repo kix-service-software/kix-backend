@@ -402,26 +402,6 @@ my $StartTime = Time::HiRes::time();
             }
         }
 
-        if ( %AlreadySent && $Param{Data}->{ArticleID} && $Param{Data}->{Channel} ) {
-
-            # update to field
-            my $UpdateToSuccess = $Self->_ArticleToUpdate(
-                ArticleID   => $Param{Data}->{ArticleID},
-                Channel     => $Param{Data}->{Channel},
-                UserIDs     => \%AlreadySent,
-                UserID      => $Param{UserID},
-            );
-
-            # check for errors
-            if ( !$UpdateToSuccess ) {
-
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Could not update To field for Article: $Param{Data}->{ArticleID}.",
-                );
-            }
-        }
-
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
             Message  => sprintf "NotificationEvent::_Run (Notification $ID): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
@@ -1025,54 +1005,6 @@ my $StartTime = Time::HiRes::time();
     # ticket event
     $TicketObject->EventHandler(
         %EventData,
-    );
-
-    return 1;
-}
-
-sub _ArticleToUpdate {
-    my ( $Self, %Param ) = @_;
-
-my $StartTime = Time::HiRes::time();
-    # check needed params
-    for my $Needed (qw(ArticleID Channel UserIDs UserID)) {
-        return if !$Param{$Needed};
-    }
-
-    # not update for User 1
-    return 1 if $Param{UserID} eq 1;
-
-    # get needed objects
-    my $DBObject   = $Kernel::OM->Get('DB');
-    my $UserObject = $Kernel::OM->Get('User');
-    my $ContactObject = $Kernel::OM->Get('Contact');
-
-    # not update if its not a note article
-    return 1 if $Param{Channel} ne 'note';
-
-    my $NewTo = $Param{To} || '';
-    for my $UserID ( sort keys %{ $Param{UserIDs} } ) {
-        my %ContactData = $ContactObject->ContactGet(
-            UserID => $UserID,
-            Valid  => 1,
-        );
-        if ($NewTo) {
-            $NewTo .= ', ';
-        }
-        $NewTo .= "$ContactData{Firstname} $ContactData{Lastname} <$ContactData{Email}>";
-    }
-
-    # not update if To is the same
-    return 1 if !$NewTo;
-
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE article SET a_to = ? WHERE id = ?',
-        Bind => [ \$NewTo, \$Param{ArticleID} ],
-    );
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "    NotificationEvent::_ArticleToUpdate: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return 1;
