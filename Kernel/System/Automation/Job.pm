@@ -240,7 +240,7 @@ sub JobAdd {
     # insert
     return if !$DBObject->Do(
         SQL => 'INSERT INTO job (name, type, filter, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+             . 'VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name}, \$Param{Type}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
