@@ -999,7 +999,7 @@ sub _ReplaceResultVariables {
         }
     }
     else {
-        while ( $Param{Data} =~ /^(.*?)(\$\{([a-zA-Z0-9_.: ]+)(\|(.*?))?\})(.*?)$/xms ) {
+        while ( $Param{Data} =~ /^(.*?)(\$\{([a-zA-Z0-9_.: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
