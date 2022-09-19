@@ -2373,6 +2373,62 @@ sub _CacheRequest {
     return 1;
 }
 
+=item _ExecPermissionChecks()
+
+check the given permissions
+
+    my $Allowed = $CommonObject->_ExecPermissionChecks(
+        Checks => []
+    );
+
+    $Allowed = 1 if allowed
+
+=cut
+
+sub _ExecPermissionChecks {
+    my ( $Self, %Param ) = @_;
+
+    return 1 if !IsArrayRefWithData($Param{Checks});
+
+    my $UserID = $Self->{Authorization}->{UserID};
+    $Self->{'_ExecPermissionChecksCache'}->{$UserID} //= {};
+
+my $StartTime = Time::HiRes::time();
+
+    my $Allowed = 1;
+    CHECK:
+    foreach my $Check ( @{$Param{Checks}} ) {
+my $StartTimePermissionCheck = Time::HiRes::time();
+        my $Result;
+        if ( exists $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}} ) {
+printf STDERR "_CheckPermissions: executing check(%s) - using cache\n", $Check->{Check};
+            $Result = $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}};
+        }
+        else {
+printf STDERR "_CheckPermissions: executing check(%s)\n", $Check->{Check};
+            $Result = $Self->ExecOperation(
+                OperationType            => $Check->{OperationType},
+                RequestMethod            => $Check->{RequestMethod},
+                SuppressPermissionErrors => 1,
+                PermissionCheckOnly      => 1,
+                IgnoreInclude            => 1,
+                IgnoreExpand             => 1,
+                Data                     => $Check->{Data}
+            );
+            $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}} = $Result;
+        }
+printf STDERR "_CheckPermissions: check(%s): %i ms\n", $Check->{Check}, (Time::HiRes::time() - $StartTimePermissionCheck) * 1000;
+        if ( !$Result->{Success} ) {
+            $Allowed = 0;
+            last CHECK;
+        }
+    }
+
+printf STDERR "_CheckPermissions: total time: %i ms\n",(Time::HiRes::time() - $StartTime) * 1000;
+
+    return $Allowed;
+}
+
 =item _CheckObjectPermission()
 
 check object permissions
@@ -2384,6 +2440,7 @@ check object permissions
     $Return = _Success if granted
 
 =cut
+
 sub _CheckObjectPermission {
     my ( $Self, %Param ) = @_;
 
