@@ -720,7 +720,6 @@ sub CleanUp {
 
     # send all outstanding notifications to the registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-my $StartTime = Time::HiRes::time();
         if ( !$ENV{IsDaemon} && $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
             $Self->AsyncCall(
                 ObjectName     => $Self->GetModuleFor('ClientRegistration'),
@@ -733,13 +732,10 @@ my $StartTime = Time::HiRes::time();
         else {
             $Self->Get('ClientRegistration')->NotificationSend();
         }
-printf STDERR "($$) ObjectManager::ClientNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
     }
 
     # discard all objects
-my $StartTime = Time::HiRes::time();
     $Self->ObjectsDiscard();
-printf STDERR "($$) ObjectManager::ObjectDiscard: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 }
 
 sub DESTROY {

@@ -108,8 +108,6 @@ my $StartTime = Time::HiRes::time();
         );
     }
 
-printf STDERR "($$) NotificationEvent::Run: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
-
     return $Result;
 }
 

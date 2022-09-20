@@ -76,8 +76,7 @@ my $App = CGI::Emulate::PSGI->handler(
         if ( $@ && $@ ne "exit called\n" ) {
             warn $@;
         }
-        printf STDERR "($$) CGI execution time: %i ms\n", (time() - $StartTime) * 1000;
-
+        
         if ( $ENV{NYTPROF} ) {
             DB::finish_profile();
         }
