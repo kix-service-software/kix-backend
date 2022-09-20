@@ -286,7 +286,7 @@ sub _PrepareRedisKey {
         $Key = Digest::MD5::md5_hex($Param{Key});
     };
     if ( $@ ) {
-        print STDERR "Redis: error in preparing cache key (Key: $Param{Key})\n";
+        print STDERR "($$) Redis: error in preparing cache key (Key: $Param{Key})\n";
     }
     return $Key;
 }
@@ -327,16 +327,16 @@ sub _RedisCall {
         $Result = $Self->{RedisObject}->$Command(@Param);
     };
     if ( defined $@ && $@ ) {
-        print STDERR "Redis exception: $@\n";
+        print STDERR "($$) Redis exception: $@\n";
         if ( --$MaxTries > 0 ) {
-            print STDERR "Redis: reconnecting and trying again\n";
+            print STDERR "($$) Redis: reconnecting and trying again\n";
             Time::HiRes::sleep($WaitBetweenTries/1000);
             # force a reconnect on retry
             $Reconnect = 1;
             goto TRYLOOP;
         }
         else {
-            print STDERR "Redis: giving up\n";
+            print STDERR "($$) Redis: giving up\n";
             $Self->{StopReconnect} = 1;
         }
     };

@@ -235,7 +235,7 @@ my $StartTime = Time::HiRes::time();
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             );
-printf STDERR "ArticleGet: call ArticleAttachmentIndexRaw: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) ArticleGet: call ArticleAttachmentIndexRaw: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
             if ( %Attachments ) {
                 $ArticleData{Attachments} = [ sort keys %Attachments ];
@@ -261,7 +261,7 @@ my $StartTime = Time::HiRes::time();
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             ) || '';
-printf STDERR "ArticleGet: call ArticlePlain: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) ArticleGet: call ArticlePlain: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
             $ArticleData{Plain} = $PlainMessage;
         }
 

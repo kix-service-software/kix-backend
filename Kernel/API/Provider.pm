@@ -138,12 +138,12 @@ sub Run {
         $Self->{TransportConfig}->{Config}->{MaxLength} = $LengthFromConfig;
     }
 
-    printf STDERR "%3i ms preparation\n", TimeDiff($Self->{RequestStartTime});
+    printf STDERR "($$) %3i ms preparation\n", TimeDiff($Self->{RequestStartTime});
 
     # read request content
     my $ProcessedRequest = $Self->ProcessRequest();
 
-    printf STDERR "%3i ms ProcessRequest\n", TimeDiff($Self->{RequestStartTime});
+    printf STDERR "($$) %3i ms ProcessRequest\n", TimeDiff($Self->{RequestStartTime});
 
     if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
         use Data::Dumper;
@@ -165,7 +165,7 @@ sub Run {
     my $Authorization;
     my $AuthorizationResult = $Self->CheckAuthorization();
 
-    printf STDERR "%3i ms CheckAuth\n", TimeDiff($Self->{RequestStartTime});
+    printf STDERR "($$) %3i ms CheckAuth\n", TimeDiff($Self->{RequestStartTime});
 
     if (
         $ProcessedRequest->{RequestMethod} ne 'OPTIONS' &&
@@ -314,7 +314,7 @@ sub Run {
         RequestURI                   => $ProcessedRequest->{RequestURI},
         Authorization                => $Authorization,
     );
-    printf STDERR "%3i ms OperationModule->new\n", TimeDiff($Self->{RequestStartTime});
+    printf STDERR "($$) %3i ms OperationModule->new\n", TimeDiff($Self->{RequestStartTime});
 
     # if operation init failed, bail out
     if ( ref $OperationObject ne $OperationModule ) {
@@ -327,7 +327,7 @@ sub Run {
     my $OperationResult = $OperationObject->Run(
         Data => $ProcessedRequest->{Data},
     );
-    printf STDERR "%3i ms OperationModule->Run\n", TimeDiff($Self->{RequestStartTime});
+    printf STDERR "($$) %3i ms OperationModule->Run\n", TimeDiff($Self->{RequestStartTime});
 
     if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
         use Data::Dumper;
@@ -335,7 +335,7 @@ sub Run {
     }
 
     if ( !$OperationResult->{Success} ) {
-        printf STDERR "%3i ms Request end\n", TimeDiff($Self->{RequestStartTime});
+        printf STDERR "($$) %3i ms Request end\n", TimeDiff($Self->{RequestStartTime});
 
         return $Self->_GenerateErrorResponse(
             %{$OperationResult},
@@ -361,7 +361,7 @@ sub Run {
         );
     }
 
-    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{Route}, (time() - $Self->{RequestStartTime}) * 1000);
+    $Self->_Debug('', sprintf "($$) total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{Route}, (time() - $Self->{RequestStartTime}) * 1000);
 
     return;
 }

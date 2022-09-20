@@ -733,13 +733,13 @@ my $StartTime = Time::HiRes::time();
         else {
             $Self->Get('ClientRegistration')->NotificationSend();
         }
-printf STDERR "ObjectManager::ClientNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) ObjectManager::ClientNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
     }
 
     # discard all objects
 my $StartTime = Time::HiRes::time();
     $Self->ObjectsDiscard();
-printf STDERR "ObjectManager::ObjectDiscard: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) ObjectManager::ObjectDiscard: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 }
 
 sub DESTROY {

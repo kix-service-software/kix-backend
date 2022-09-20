@@ -232,7 +232,7 @@ my $StartTime = Time::HiRes::time();
                 Config => $Modules->{$Module},
             );
 if ( $Param{Transaction} ) {
-   printf STDERR "   EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (Time::HiRes::time() - $StartTime) * 1000;
+   printf STDERR "($$)    EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (Time::HiRes::time() - $StartTime) * 1000;
 }
 
         }
@@ -278,7 +278,7 @@ my $StartTime = Time::HiRes::time();
                 Transaction => 1,
             );
         }
-printf STDERR "EventHandlerTransaction: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) EventHandlerTransaction: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
         # delete event pipe
         $Self->{EventHandlerPipe} = undef;

@@ -2401,11 +2401,11 @@ my $StartTime = Time::HiRes::time();
 my $StartTimePermissionCheck = Time::HiRes::time();
         my $Result;
         if ( exists $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}} ) {
-printf STDERR "_CheckPermissions: executing check(%s) - using cache\n", $Check->{Check};
+printf STDERR "($$) _CheckPermissions: executing check(%s) - using cache\n", $Check->{Check};
             $Result = $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}};
         }
         else {
-printf STDERR "_CheckPermissions: executing check(%s)\n", $Check->{Check};
+printf STDERR "($$) _CheckPermissions: executing check(%s)\n", $Check->{Check};
             $Result = $Self->ExecOperation(
                 OperationType            => $Check->{OperationType},
                 RequestMethod            => $Check->{RequestMethod},
@@ -2417,14 +2417,14 @@ printf STDERR "_CheckPermissions: executing check(%s)\n", $Check->{Check};
             );
             $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}} = $Result;
         }
-printf STDERR "_CheckPermissions: check(%s): %i ms\n", $Check->{Check}, (Time::HiRes::time() - $StartTimePermissionCheck) * 1000;
+printf STDERR "($$) _CheckPermissions: check(%s): %i ms\n", $Check->{Check}, (Time::HiRes::time() - $StartTimePermissionCheck) * 1000;
         if ( !$Result->{Success} ) {
             $Allowed = 0;
             last CHECK;
         }
     }
 
-printf STDERR "_CheckPermissions: total time: %i ms\n",(Time::HiRes::time() - $StartTime) * 1000;
+printf STDERR "($$) _CheckPermissions: total time: %i ms\n",(Time::HiRes::time() - $StartTime) * 1000;
 
     return $Allowed;
 }

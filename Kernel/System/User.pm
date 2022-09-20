@@ -1432,7 +1432,6 @@ sub CheckResourcePermission {
         $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
-            print STDERR "here!\n";
             my $UserLogin = $Self->UserLookup(
                 UserID => $Param{UserID},
                 Silent => 1,

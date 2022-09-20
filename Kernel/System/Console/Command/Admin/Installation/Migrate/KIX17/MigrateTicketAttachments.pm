@@ -87,8 +87,6 @@ sub Run {
     while( my @List = splice( @{$ArticleList}, 0, ($ArticleCount / $WorkerCount) ) ) {
         $WorkerList{++$Id} = \@List;
     }
-    use Data::Dumper;
-    print STDERR "ArticleList (rest): ". Data::Dumper::Dumper($ArticleList);
 
     my @PIDs;
     foreach my $WorkerID ( 1..$WorkerCount ) {
