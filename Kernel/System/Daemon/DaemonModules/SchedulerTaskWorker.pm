@@ -96,7 +96,7 @@ sub new {
 
     # Do not change the following values!
     # Modulo in PreRun() can be damaged after a change.
-    $Self->{SleepPost} = 0.25;       # sleep 60 seconds after each loop
+    $Self->{SleepPost} = 0.25;       # sleep 0.25 seconds after each loop
     $Self->{Discard}   = 60 * 60;    # discard every hour
 
     $Self->{DiscardCount} = $Self->{Discard} / $Self->{SleepPost};
@@ -134,20 +134,22 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $StartTime = Time::HiRes::time();
+
     $Self->{CurrentWorkersCount} = scalar keys %{ $Self->{CurrentWorkers} };
 
     my @TaskList = $Self->{SchedulerDBObject}->TaskListUnlocked();
 
     if ( $Self->{Debug} && @TaskList ) {
-        print "  $Self->{DaemonName} unlocked tasks: ".join(',', @TaskList)."\n";
+        $Self->_Debug("unlocked tasks: ".join(',', @TaskList));
     }
 
     TASK:
     for my $TaskID (@TaskList) {
 
         if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} handling TaskID: $TaskID\n";
-            print "  $Self->{DaemonName} current workers: $Self->{CurrentWorkersCount}/$Self->{MaximumWorkers}\n";
+            $Self->_Debug("handling TaskID: $TaskID");
+            $Self->_Debug("current workers: $Self->{CurrentWorkersCount}/$Self->{MaximumWorkers}");
         }
 
         last TASK if $Self->{CurrentWorkersCount} >= $Self->{MaximumWorkers};
@@ -242,7 +244,7 @@ sub Run {
             }
 
             if ( $Self->{Debug} ) {
-                print "  $Self->{DaemonName} running task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type})\n";
+                $Self->_Debug("running task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type})");
             }
 
             $TaskHandlerObject->Run(
@@ -251,16 +253,16 @@ sub Run {
                 Data     => $Task{Data},
             );
 
-            if ( $Self->{Debug} ) {
-                print "  $Self->{DaemonName} task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type}) finished\n";
-            }
-
             # do everything that have to be done afterwards
             $Kernel::OM->CleanUp();
 
             $SchedulerDBObject->TaskDelete(
                 TaskID => $TaskID,
             );
+
+            if ( $Self->{Debug} ) {
+                $Self->_Debug(sprintf "task \"$Task{Name}\" (TaskID: $TaskID, Type: $Task{Type}) finished in %i ms", (Time::HiRes::time() - $StartTime) * 1000);
+            }
 
             exit 0;
         }
@@ -310,7 +312,7 @@ sub PostRun {
         # Update locks (only for this node).
         if (@LockedTaskIDs) {
             if ( $Self->{Debug} ) {
-                print "  $Self->{DaemonName} updating locks for task ids: ".join(',', @LockedTaskIDs)."\n";
+                $Self->_Debug("updating locks for task ids: ".join(',', @LockedTaskIDs));
             }
             $Self->{SchedulerDBObject}->TaskLockUpdate(
                 TaskIDs => \@LockedTaskIDs,
@@ -318,7 +320,7 @@ sub PostRun {
         }
 
         if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} unlocking expired tasks\n";
+            $Self->_Debug("unlocking expired tasks");
         }
 
         # Unlock expired tasks (for all nodes).
@@ -328,7 +330,7 @@ sub PostRun {
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
         if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} cleaning up tasks\n";
+            $Self->_Debug("cleaning up tasks");
         }
         $Self->{SchedulerDBObject}->TaskCleanup();
     }

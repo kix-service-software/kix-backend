@@ -43,6 +43,8 @@ if ( $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
     exit 1;
 }
 
+my $Command = shift @ARGV;
+
 my %Options;
 GetOptions(
     'debug=s'      => \$Options{Debug},
@@ -50,6 +52,11 @@ GetOptions(
     'no-daemonize' => \$Options{NoDaemon},
     'help'         => \$Options{Help},
 );
+
+if ( !$Command || $Options{Help} ) {
+    PrintUsage();
+    exit 0;
+}
 
 # get required objects
 my $ConfigObject = $Kernel::OM->Get('Config');
@@ -70,11 +77,6 @@ if ( !-d $LogDir ) {
         print STDERR "Failed to create path: $LogDir";
         exit 1;
     }
-}
-
-if ( !@ARGV || $Options{Help} ) {
-    PrintUsage();
-    exit 0;
 }
 
 # tell everyone about the environment we're running in
@@ -110,8 +112,6 @@ if ( $Options{Debug} ) {
     }
 }
 
-my $Command = $ARGV[0];
-
 # check for action
 if ( lc $Command eq 'start' ) {
     exit 1 if !Start();
@@ -140,7 +140,6 @@ sub PrintUsage {
     $UsageText .= "\nNote:\n";
     $UsageText
         .= " In debug mode if a daemon module is specified the debug mode will be activated only for that daemon.\n";
-    $UsageText .= " Debug information is stored in the daemon log files localed under: $LogDir\n";
     $UsageText .= "\n kix.Daemon.pl start --debug=all|SchedulerTaskWorker,SchedulerCronTaskManager,...\n\n";
     $UsageText
         .= "\n A forced start cleans up everything a previous daemon crash or stop might have left before starting the daemon.\n";
@@ -231,7 +230,7 @@ sub Stop {
         Key   => $$
     );
 
-    print STDOUT "Daemon stopped\n";
+    print "Daemon stopped\n";
 
     return 1;
 }
@@ -257,7 +256,7 @@ sub Status {
                 my $RunningPID = kill 0, $RegisteredPID;
 
                 if ($RunningPID) {
-                    print STDOUT "Daemon running\n";
+                    print "Daemon running\n";
                     return 1;
                 }
             }
@@ -271,7 +270,7 @@ sub Status {
 
     _PIDUnlock();
 
-    print STDOUT "Daemon not running\n";
+    print "Daemon not running\n";
     return;
 }
 
@@ -313,10 +312,7 @@ sub _Run {
     local $SIG{TERM} = sub { $DaemonChecker = 0; $DaemonStopWait = 5; };
     local $SIG{CHLD} = "IGNORE";
 
-    print STDOUT "Daemon started\n";
-    if ($Debug) {
-        print STDOUT "\nDebug information is stored in the daemon log files localed under: $LogDir\n\n";
-    }
+    print "Daemon started\n";
 
     while ($DaemonChecker) {
         my $Cache = $CacheObject->Get(
@@ -326,7 +322,7 @@ sub _Run {
 
         # check for reload (either triggert externally or we've los our registration in cache)
         if ( !IsHashRefWithData($Cache) || (IsHashRefWithData($Cache) && $Cache->{Reload}) ) {
-            print STDOUT "Reload triggered\n";
+            print "Reload triggered\n";
             $ReloadRequired = 1;
             last;
         }
@@ -340,6 +336,7 @@ sub _Run {
             my $RunningPID = kill 0, $DaemonModules{$Module}->{PID};
 
             if ( $DaemonModules{$Module}->{PID} && !$RunningPID ) {
+                print "Module $Module not running (PID $DaemonModules{$Module}->{PID})\n";
                 $DaemonModules{$Module}->{PID} = 0;
             }
 
@@ -358,7 +355,7 @@ sub _Run {
             else {
 
                 if ($Debug) {
-                    print STDOUT "Registered Daemon $Module with PID $ChildPID\n";
+                    _Debug("Registered Daemon $Module with PID $ChildPID");
                 }
 
                 $DaemonModules{$Module}->{PID} = $ChildPID;
@@ -377,12 +374,12 @@ sub _Run {
     _LogFilesCleanup();
 
     # unregister the process - tell the system we are no longer active
-    print STDOUT "Removing daemon registration...";
+    print "Removing daemon registration...";
     $CacheObject->Delete(
         Type  => 'Daemon',
         Key   => $$
     );
-    print STDOUT "OK\n";
+    print "OK\n";
 
     return 1;
 }
@@ -415,7 +412,6 @@ sub _RunModule {
     my $DaemonObject;
     LOOP:
     while ($ChildRun) {
-
         # create daemon object if not exists
         eval {
             if (
@@ -451,7 +447,7 @@ sub _RunModule {
 sub _StopChildren {
     my (%Param) = @_;
 
-    print STDOUT "Stopping child processes...\n";
+    print "Stopping child processes...\n";
 
     # send all daemon processes a stop signal
     MODULE:
@@ -461,7 +457,7 @@ sub _StopChildren {
         next MODULE if !$DaemonModules{$Module}->{PID};
 
         if ($Debug) {
-            print STDOUT "Send stop signal to $Module with PID $DaemonModules{$Module}->{PID}\n";
+            print "Sending stop signal to $Module with PID $DaemonModules{$Module}->{PID}\n";
         }
 
         kill 2, $DaemonModules{$Module}->{PID};
@@ -489,7 +485,7 @@ sub _StopChildren {
             else {
 
                 $ProcessesStillRunning = 1;
-                print STDOUT "Waiting to stop $DaemonModules{$Module}->{Name} with PID $DaemonModules{$Module}->{PID}\n";
+                print "Waiting to stop $DaemonModules{$Module}->{Name} with PID $DaemonModules{$Module}->{PID}\n";
             }
         }
 
@@ -505,12 +501,12 @@ sub _StopChildren {
         next MODULE if !$Module;
         next MODULE if !$DaemonModules{$Module}->{PID};
 
-        print STDOUT "Killing $Module with PID $DaemonModules{$Module}->{PID}\n";
+        print "Killing $Module with PID $DaemonModules{$Module}->{PID}\n";
 
         kill 9, $DaemonModules{$Module};
     }
 
-    print STDOUT "OK\n";
+    print "OK\n";
 
     return 1;
 }
@@ -661,7 +657,7 @@ sub _LogFilesSet {
 sub _LogFilesCleanup {
     my %Param = @_;
 
-    print STDOUT "Cleaning up empty logfiles...";
+    print "Cleaning up empty logfiles...";
 
     my @LogFiles = glob "$LogDir/*.log";
 
@@ -685,7 +681,7 @@ sub _LogFilesCleanup {
         }
     }
 
-    print STDOUT "OK\n";
+    print "OK\n";
 
     return 1;
 }
@@ -707,6 +703,14 @@ sub _ReadPID {
         close $FH;
     }
     return $PID;
+}
+
+sub _Debug {
+    my ( $Message ) = @_;
+
+    return if !$Debug;
+
+    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", "Daemon", "$Message";
 }
 
 exit 0;

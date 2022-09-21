@@ -2337,10 +2337,10 @@ sub _GetCacheKey {
         $RequestData{$What} = join( ',', sort @Parts );
     }
 
-    # add UserKey (UserID + UserType) to CacheKey if not explicitly disabled
+    # add RoleIDs to CacheKey if not explicitly disabled
     my $UserKey = '';
     if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
-        $UserKey = $Self->{Authorization}->{UserID} . '::' . $Self->{Authorization}->{UserType};
+        $UserKey = $Self->{Authorization}->{UserRoleIDsAsString};
     }
 
     my $CacheKey = $UserKey . '::' . $Self->{WebserviceID} . '::' . $Self->{OperationType} . '::' . $Kernel::OM->Get('Main')->Dump(

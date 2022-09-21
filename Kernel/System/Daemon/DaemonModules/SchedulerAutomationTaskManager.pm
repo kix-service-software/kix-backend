@@ -124,7 +124,7 @@ sub PostRun {
     # }
 
     if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} unlocking expired automation tasks\n";
+        $Self->_Debug("unlocking expired automation tasks");
     }
 
     # Unlock long locked tasks.
@@ -135,7 +135,7 @@ sub PostRun {
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
         if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} cleaning up automation tasks\n";
+            $Self->_Debug("cleaning up automation tasks");
         }
         $Self->{SchedulerDBObject}->AutomationTaskCleanup();
     }

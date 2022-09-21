@@ -125,10 +125,16 @@ sub Summary {
     return ();
 }
 
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", $Self->{DaemonName}, "$Message";
+}
+
 1;
-
-
-
 
 
 =back

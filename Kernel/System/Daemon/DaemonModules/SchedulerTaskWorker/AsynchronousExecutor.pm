@@ -13,6 +13,8 @@ package Kernel::System::Daemon::DaemonModules::SchedulerTaskWorker::Asynchronous
 use strict;
 use warnings;
 
+use Time::HiRes;
+
 use base qw(Kernel::System::Daemon::DaemonModules::BaseTaskWorker);
 
 our @ObjectDependencies = (
@@ -76,6 +78,8 @@ Returns:
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $StartTime = Time::HiRes::time();
+
     # Check task params.
     my $CheckResult = $Self->_CheckTaskParams(
         %Param,
@@ -116,7 +120,7 @@ sub Run {
     my $ErrorMessage;
 
     if ( $Self->{Debug} ) {
-        print "    $Self->{WorkerName} executes task: $Param{TaskName}\n";
+        $Self->_Debug("executes task: $Param{TaskName}");
     }
 
     # Run given function on the object with the specified parameters in Data->{Params}
@@ -147,7 +151,7 @@ sub Run {
     };
 
     if ( $Self->{Debug} ) {
-        print "    $Self->{WorkerName} execution finished\n";
+        $Self->_Debug(sprintf "execution finished in %i ms", (Time::HiRes::time() - $StartTime) * 1000);
     }
 
     # Check if there are errors.

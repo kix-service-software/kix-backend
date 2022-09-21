@@ -573,6 +573,16 @@
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerClientNotificationWorker" Required="1" Valid="1">
+        <Description Translatable="1">The daemon registration for the scheduler client notification worker.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Daemon::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Daemon::DaemonModules::SchedulerClientNotificationWorker</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerAutomationTaskManager" Required="1" Valid="1">
         <Description Translatable="1">The daemon registration for the scheduler automation task manager.</Description>
         <Group>Framework</Group>

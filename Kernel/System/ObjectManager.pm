@@ -719,20 +719,7 @@ sub CleanUp {
     my ($Self, %Param) = @_;
 
     # send all outstanding notifications to the registered clients
-    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-        if ( !$ENV{IsDaemon} && $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') ) {
-            $Self->AsyncCall(
-                ObjectName     => $Self->GetModuleFor('ClientRegistration'),
-                FunctionName   => 'NotificationSend',
-                FunctionParams => {
-                    Async => 1
-                }
-            );
-        }
-        else {
-            $Self->Get('ClientRegistration')->NotificationSend();
-        }
-    }
+    $Self->Get('ClientRegistration')->NotificationSend();
 
     # discard all objects
     $Self->ObjectsDiscard();

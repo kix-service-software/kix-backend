@@ -147,11 +147,16 @@ sub _CheckTaskParams {
 
     return 1;
 }
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", $Self->{WorkerName}, "$Message";
+}
+
 1;
-
-
-
-
 
 =back
 

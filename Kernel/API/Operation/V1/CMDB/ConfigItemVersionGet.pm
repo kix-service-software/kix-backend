@@ -148,6 +148,8 @@ sub Run {
                     VersionID  => $VersionID,
                     XMLDataGet => 1,
                 );
+use Data::Dumper;
+            print STDERR "Data ($VersionID): ".Data::Dumper::Dumper($VersionData);
 
                 $Version->{Data} = $Self->ConvertDataToExternal(
                     Definition => $VersionData->{XMLDefinition},
