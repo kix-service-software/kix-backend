@@ -120,7 +120,7 @@ sub Run {
     my $ErrorMessage;
 
     if ( $Self->{Debug} ) {
-        $Self->_Debug("executes task: $Param{TaskName}");
+        $Self->_Debug("executing task: $Param{TaskName}");
     }
 
     # Run given function on the object with the specified parameters in Data->{Params}
