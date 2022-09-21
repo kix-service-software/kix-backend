@@ -172,14 +172,6 @@ sub Run {
     }
     else {
         $Authorization = $AuthorizationResult->{Data}->{Authorization};
-        if ( IsHashRefWithData($Authorization) ) {
-            # add RoleIDs of user (used for API caching)
-            my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
-                UserID => $Authorization->{UserID},
-                Valid  => 1,
-            );
-            $Authorization->{UserRoleIDsAsString} = join(',', @RoleIDs);
-        }
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
