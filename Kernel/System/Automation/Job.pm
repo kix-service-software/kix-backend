@@ -582,6 +582,14 @@ sub JobMacroList {
         }
     }
 
+    # check cache
+    my $CacheKey = 'JobMacroList::' . $Param{JobID};
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT macro_id FROM job_macro WHERE job_id = ?',
         Bind => [ \$Param{JobID} ],
@@ -591,6 +599,14 @@ sub JobMacroList {
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
 
     return @Result;
 }
@@ -606,6 +622,14 @@ returns a list of all Macro ids assigned to Jobs
 sub AllUsedMacroIDList {
     my ( $Self, %Param ) = @_;
 
+    # check cache
+    my $CacheKey = 'AllUsedMacroIDList';
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT macro_id FROM job_macro'
     );
@@ -616,7 +640,17 @@ sub AllUsedMacroIDList {
     }
 
     # remove duplicates
-    return $Self->_GetUnique(@Result);
+    @Result = $Self->_GetUnique(@Result);
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
+
+    return @Result;
 }
 
 =item JobMacroAdd()
@@ -770,6 +804,14 @@ sub JobExecPlanList {
         }
     }
 
+    # check cache
+    my $CacheKey = 'JobExecPlanList::' . $Param{JobID};
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT exec_plan_id FROM job_exec_plan WHERE job_id = ?',
         Bind => [ \$Param{JobID} ],
@@ -779,6 +821,14 @@ sub JobExecPlanList {
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
     }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
 
     return @Result;
 }
@@ -794,6 +844,14 @@ returns a list of all ExecPlan ids assigned to Jobs
 sub AllUsedExecPlanIDList {
     my ( $Self, %Param ) = @_;
 
+    # check cache
+    my $CacheKey = 'JobExecPlanList::' . $Param{JobID};
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT exec_plan_id FROM job_exec_plan'
     );
@@ -804,7 +862,17 @@ sub AllUsedExecPlanIDList {
     }
 
     # remove duplicates
-    return $Self->_GetUnique(@Result);
+    @Result = $Self->_GetUnique(@Result);
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
+    );
+
+    return @Result;
 }
 
 =item JobExecPlanAdd()
