@@ -28,9 +28,10 @@ $Kernel::OM->ObjectParamAdd(
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $NameRandom  = $Helper->GetRandomID();
-my %MacroActionIDByMacroActionType = (
+my %MacroActions = (
     'test-macroaction-' . $NameRandom . '-1' => {
         Type => 'TitleSet',
+        NewType => 'StateSet',
         Parameters => {
             Title => 'test',
         }
@@ -63,73 +64,69 @@ $Self->True(
 );
 
 # try to add macroactions
-for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
+for my $Name ( sort keys %MacroActions ) {
     my $MacroActionID = $AutomationObject->MacroActionAdd(
         MacroID => $MacroID,
-        Type    => $MacroActionIDByMacroActionType{$MacroActionType}->{Type},
-        Parameters => $MacroActionIDByMacroActionType{$MacroActionType}->{Parameters},
+        Type    => $MacroActions{$Name}->{Type},
+        Parameters => $MacroActions{$Name}->{Parameters},
         ValidID => 1,
         UserID  => 1,
     );
 
     $Self->True(
         $MacroActionID,
-        'MacroActionAdd() for new macro action ' . $MacroActionType,
+        'MacroActionAdd() for new macro action ' . $Name,
     );
 
     if ($MacroActionID) {
-        $MacroActionIDByMacroActionType{$MacroActionType}->{ID} = $MacroActionID;
+        $MacroActions{$Name}->{ID} = $MacroActionID;
     }
-}
-
-# try to fetch data of existing MacroActions
-for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
-    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType}->{ID};
-    my %MacroAction = $AutomationObject->MacroActionGet( ID => $MacroActionID );
+    my %MacroAction = $AutomationObject->MacroActionGet( 
+        ID => $MacroActionID 
+    );
 
     $Self->Is(
         $MacroAction{Type},
-        $MacroActionType,
-        'MacroActionGet() for macro action ' . $MacroActionType,
+        $MacroActions{$Name}->{Type},
+        'MacroActionGet() for macro action ' . $Name,
     );
 }
 
 # list MacroActions
-my %MacroActions = $AutomationObject->MacroActionList(
+my %MacroActionList = $AutomationObject->MacroActionList(
     MacroID => $MacroID
 );
-for my $MacroActionType ( sort keys %MacroActionIDByMacroActionType ) {
-    my $MacroActionID = $MacroActionIDByMacroActionType{$MacroActionType}->{ID};
+for my $Name ( sort keys %MacroActions ) {
+    my $MacroActionID = $MacroActions{$Name}->{ID};
 
     $Self->True(
-        exists $MacroActions{$MacroActionID} && $MacroActions{$MacroActionID} eq $MacroActionType,
-        'MacroActionList() contains macro action ' . $MacroActionType . ' with ID ' . $MacroActionID,
+        exists $MacroActionList{$MacroActionID} && $MacroActionList{$MacroActionID} eq $MacroActions{$Name}->{Type},
+        'MacroActionList() contains macro action ' . $Name . ' with ID ' . $MacroActionID,
     );
 }
 
 # change type of a single MacroAction
-my $MacroActionTypeToChange = 'test-macroaction-' . $NameRandom . '-1';
-my $ChangedMacroActionType  = $MacroActionTypeToChange . '-changed';
-my $MacroActionIDToChange   = $MacroActionIDByMacroActionType{$MacroActionTypeToChange}->{ID};
+my $NameToChange = 'test-macroaction-' . $NameRandom . '-1';
+my $IDToChange   = $MacroActions{$NameToChange}->{ID};
 
 my $MacroActionUpdateResult = $AutomationObject->MacroActionUpdate(
-    ID      => $MacroActionIDToChange,
-    Type    => '',
+    ID      => $IDToChange,
+    Type    => $MacroActions{$NameToChange}->{NewType},
     ValidID => 1,
     UserID  => 1,
 );
 
 $Self->True(
     $MacroActionUpdateResult,
-    'MacroActionUpdate() for changing type of macro action ' . $MacroActionTypeToChange . ' to ' . $ChangedMacroActionType,
+    'MacroActionUpdate() for changing type of macro action ' . $NameToChange . ' to ' . $MacroActions{$NameToChange}->{NewType},
 );
 
 # update parameters of a single MacroAction
 $MacroActionUpdateResult = $AutomationObject->MacroActionUpdate(
-    ID      => $MacroActionIDToChange,
-    Type    => $ChangedMacroActionType,
+    ID      => $IDToChange,
+    Type    => $MacroActions{$NameToChange}->{NewType},
     Parameters => {
-        Test => 123
+        State => 'new'
     },
     ValidID => 1,
     UserID  => 1,
@@ -140,49 +137,16 @@ $Self->True(
     'MacroActionUpdate() for changing parameters of macro action.',
 );
 
-my %MacroAction = $AutomationObject->MacroActionGet( ID => $MacroActionIDToChange );
+my %MacroAction = $AutomationObject->MacroActionGet( ID => $IDToChange );
 
 $Self->True(
     $MacroAction{Parameters},
     'MacroActionGet() for macro action with parameters.',
 );
 
-$MacroActionIDByMacroActionType{$ChangedMacroActionType} = $MacroActionIDToChange;
-delete $MacroActionIDByMacroActionType{$MacroActionTypeToChange};
-
-# try to add macro action with previous type
-my $MacroActionID1 = $AutomationObject->MacroActionAdd(
-    MacroID => $MacroID,
-    Type    => $MacroActionTypeToChange,
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$Self->True(
-    $MacroActionID1,
-    'MacroActionAdd() for new macro action ' . $MacroActionTypeToChange,
-);
-
-if ($MacroActionID1) {
-    $MacroActionIDByMacroActionType{$MacroActionTypeToChange} = $MacroActionID1;
-}
-
-my $MacroActionType2 = $ChangedMacroActionType . 'update';
-my $MacroActionID2   = $AutomationObject->MacroActionAdd(
-    MacroID => $MacroID,
-    Type    => $MacroActionType2,
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$Self->True(
-    $MacroActionID2,
-    'MacroActionAdd() add the second test macro action ' . $MacroActionType2,
-);
-
 # delete an existing macroaction
 my $MacroActionDelete = $AutomationObject->MacroActionDelete(
-    ID      => $MacroActionIDToChange,
+    ID      => $IDToChange,
     UserID  => 1,
 );
 
@@ -214,6 +178,18 @@ my @Tests = (
         },
         Expected => {
             Dummy => 'test1_value',
+        }
+    },
+    {
+        Name => 'simple as part of a string',
+        MacroResults => {
+            Test1 => 'test1_value',
+        },
+        Data => {
+            Dummy => '${Test1}/dummy',
+        },
+        Expected => {
+            Dummy => 'test1_value/dummy',
         }
     },
     {
