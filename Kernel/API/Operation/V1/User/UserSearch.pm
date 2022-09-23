@@ -68,6 +68,14 @@ sub Run {
         }
     );
 
+    # extend limit to broaden the result list for permission filter (requiredPermissions)
+    my $SearchLimit = $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'};
+    # remember search limitation for end result
+    my $OrgSearchLimit = $SearchLimit;
+    if ($Param{Data}->{requiredPermission} && $SearchLimit && $SearchLimit < 100) {
+        $SearchLimit = 100;
+    }
+
     my %UserSearch;
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
@@ -96,7 +104,8 @@ sub Run {
                     # special handling for preference search
                     if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
                         %SearchResult = $Self->_GetPreferenceSearchResult(
-                            SearchItem => $SearchItem
+                            SearchItem  => $SearchItem,
+                            SearchLimit => $SearchLimit
                         );
                     } else {
                         my %SearchParam = $Self->_GetSearchParam(
@@ -106,7 +115,7 @@ sub Run {
                         if ( !%SearchResult && %SearchParam ) {
                             %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                                 %SearchParam,
-                                Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                                Limit => $SearchLimit,
                                 Valid => 0
                             );
                         }
@@ -153,7 +162,7 @@ sub Run {
                 if (%SearchParam) {
                     %SearchTypeResult = $Kernel::OM->Get('User')->UserSearch(
                         %SearchParam,
-                        Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                        Limit => $SearchLimit,
                         Valid => 0
                     );
                 }
@@ -175,7 +184,7 @@ sub Run {
         # perform User search without any search params
         $UserList = { $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
-            Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+            Limit => $SearchLimit,
             Valid => 0
         ) };
     }
@@ -183,7 +192,7 @@ sub Run {
     if (IsHashRefWithData($UserList)) {
 
         # check requested permissions (AND combined)
-        my @GetUserIDs = sort keys %{$UserList};
+        my @GetUserIDs = keys %{$UserList};
         if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
             my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
 
@@ -209,6 +218,11 @@ sub Run {
                 # set allowed ids for next permission
                 @GetUserIDs = @AllowedUserIDs;
             }
+        }
+
+        # limit results if necessary (0 = no limit)
+        if ($OrgSearchLimit && scalar(@GetUserIDs) > $OrgSearchLimit) {
+            splice(@GetUserIDs, $OrgSearchLimit);
         }
 
         # get already prepared user data from UserGet operation
@@ -281,7 +295,7 @@ sub _GetPreferenceSearchResult {
         my %SearchResultPreferences = $Kernel::OM->Get('User')->SearchPreferences(
             Key   => $1,
             Value => $Value,
-            Limit => !$Param{NoLimit} ? ( $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'} ) : undef,
+            Limit => !$Param{NoLimit} ? $Param{SearchLimit} : undef
         );
         %PrefSearchResult = (
             %PrefSearchResult,
