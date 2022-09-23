@@ -668,7 +668,7 @@ sub UserSearch {
         $Param{Search} =~ s/%%/%/g;
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(u.login c.firstname c.lastname c.email c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
+            Key      => [qw(u.login c.firstname c.lastname c.email)], # ignore rest for now: c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
             Value    => $Param{Search},
             BindMode => 1,
         );
