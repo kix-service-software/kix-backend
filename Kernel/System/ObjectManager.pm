@@ -719,7 +719,9 @@ sub CleanUp {
     my ($Self, %Param) = @_;
 
     # send all outstanding notifications to the registered clients
-    $Self->Get('ClientRegistration')->NotificationSend();
+    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
+        $Self->Get('ClientRegistration')->NotificationSend();
+    }
 
     # discard all objects
     $Self->ObjectsDiscard();
