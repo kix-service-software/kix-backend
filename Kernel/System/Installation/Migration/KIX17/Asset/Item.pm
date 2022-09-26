@@ -176,6 +176,17 @@ sub Run {
         }
     }
 
+    my $Success = $Kernel::OM->Get('ITSMConfigItem')->UpdateCounters(
+        UserID => 1,
+    );
+
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to update counters\"!"
+        );
+    }
+
     return $Result;
 }
 
