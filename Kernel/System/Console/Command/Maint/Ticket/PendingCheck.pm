@@ -180,6 +180,8 @@ sub Run {
             OnlyCalendars => [ sort keys %RelevantCalendars ],
         );
         
+        my $NotificationCount = 0;
+
         TICKETID:
         for my $Ticket ( @{$TicketList || []} ) {
 
@@ -194,7 +196,11 @@ sub Run {
                 },
                 UserID => 1,
             );
+
+            $NotificationCount++;
         }
+
+        $Self->Print(" Triggered $NotificationCount reminder notification(s).\n");
     }
 
     $Self->Print("<green>Done.</green>\n");
