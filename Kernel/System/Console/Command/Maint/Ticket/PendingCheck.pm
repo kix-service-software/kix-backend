@@ -58,7 +58,12 @@ sub Run {
                         Field    => 'StateIDs',
                         Operator => 'IN',
                         Value    => \@PendingAutoStateIDs,
-                    }
+                    },
+                    {
+                        Field    => 'PendingTime',
+                        Operator => 'LT',
+                        Value    => '+0s',
+                    },
                 ]
             },
             UserID   => 1,
@@ -75,8 +80,6 @@ sub Run {
                 UserID        => 1,
                 DynamicFields => 0,
             );
-
-            next TICKETID if $Ticket{UntilTime} >= 1;
 
             # KIX4OTRS-capeIT
             if ( $States{ $Ticket{Type} . ':::' . $Ticket{State} } || $States{ $Ticket{State} } ) {
@@ -127,64 +130,71 @@ sub Run {
         $Self->Print(" No pending auto StateIDs found!\n");
     }
 
-    # do ticket reminder notification jobs
-    @TicketIDs = $TicketObject->TicketSearch(
-        Result    => 'ARRAY',
-        Search => {
-            AND => [
-                {
-                    Field    => 'StateType',
-                    Operator => 'EQ',
-                    Value    => 'pending reminder',
-                }
-            ]
-        },
-        UserID    => 1,
-    );
+    # determine relevant calendars
+    my %RelevantCalendars;
+    my $ConfigObject = $Kernel::OM->Get('Config');
+    my $TimeObject = $Kernel::OM->Get('Time');
 
-    TICKETID:
-    for my $TicketID (@TicketIDs) {
+    my $MaxCalendarCount = $ConfigObject->Get('MaximumCalendarNumber') || 100;
 
-        # get ticket data
-        my %Ticket = $TicketObject->TicketGet(
-            TicketID      => $TicketID,
-            UserID        => 1,
-            DynamicFields => 0,
-        );
+    CALENDAR:
+    foreach my $Calendar ('', 1..$MaxCalendarCount) {
+        my $CalendarConfig = 'TimeWorkingHours' . ($Calendar ? '::Calendar'.$Calendar : '');
 
-        next TICKETID if $Ticket{UntilTime} >= 1 || !$Ticket{PendingTime} || $Ticket{StateType} !~ m/^pending/i ;
+        next CALENDAR if !$ConfigObject->Get($CalendarConfig);
 
-        # get used calendar
-        my $Calendar = $TicketObject->TicketCalendarGet(
-            %Ticket,
-        );
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
-
-        # check if it is during business hours, then send reminder
-        my $CountedTime = $TimeObject->WorkingTime(
+        # check if NOW is within the calendars business hours
+        my $IsBusinessHour = $TimeObject->WorkingTime(
             StartTime => $TimeObject->SystemTime() - ( 10 * 60 ),
             StopTime  => $TimeObject->SystemTime(),
             Calendar  => $Calendar,
         );
+        next CALENDAR if !$IsBusinessHour;
+        $RelevantCalendars{$Calendar} = $IsBusinessHour;
+    }
 
-        # error handling
-        if ( !$CountedTime ) {
-            next TICKETID;
-        }
-
-        # trigger notification event
-        $TicketObject->EventHandler(
-            Event => 'NotificationPendingReminder',
-            Data  => {
-                TicketID              => $Ticket{TicketID},
-                CustomerMessageParams => {
-                    TicketNumber => $Ticket{TicketNumber},
-                },
+    if ( %RelevantCalendars ) {
+        # look for pending reminder tickets with PendingTime in the past
+        my %Tickets = $TicketObject->TicketSearch(
+            Result    => 'HASH',
+            Search => {
+                AND => [
+                    {
+                        Field    => 'StateType',
+                        Operator => 'EQ',
+                        Value    => 'pending reminder',
+                    },
+                    {
+                        Field    => 'PendingTime',
+                        Operator => 'LT',
+                        Value    => '+0s',
+                    },
+                ]
             },
-            UserID => 1,
+            UserID    => 1,
         );
+
+        # get calendars of tickets
+        my $TicketList = $TicketObject->TicketCalendarGet(
+            TicketIDs     => [ sort keys %Tickets ],
+            OnlyCalendars => [ sort keys %RelevantCalendars ],
+        );
+        
+        TICKETID:
+        for my $Ticket ( @{$TicketList || []} ) {
+
+            # trigger notification event
+            $TicketObject->EventHandler(
+                Event => 'NotificationPendingReminder',
+                Data  => {
+                    TicketID              => $Ticket->{TicketID},
+                    CustomerMessageParams => {
+                        TicketNumber => $Tickets{$Ticket->{TicketID}},
+                    },
+                },
+                UserID => 1,
+            );
+        }
     }
 
     $Self->Print("<green>Done.</green>\n");

@@ -146,17 +146,6 @@ sub Search {
 
     push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
 
-    if ( $Param{Search}->{Field} =~ /^Pending/ ) {
-        # in case of pending time search, restrict states to pending states
-        my @List = $Kernel::OM->Get('State')->StateGetStatesByType(
-            StateType => [ 'pending reminder', 'pending auto' ],
-            Result    => 'ID',
-        );
-        if (@List) {
-            push( @SQLWhere, 'st.ticket_state_id IN ('.(join(', ', sort @List)). ')' );
-        }
-    }
-
     return {
         SQLWhere => \@SQLWhere,
     };
