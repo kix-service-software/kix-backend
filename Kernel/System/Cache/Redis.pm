@@ -37,17 +37,9 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    $Kernel::OM->ObjectParamAdd(
-        'Config' => {
-            NoCache => 1
-        },
-    );
-
+    
     # get the config
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('Cache::Module::Redis');
-
-    $Kernel::OM->ObjectsDiscard( Objects => ['Config'] );
+    $Self->{Config} = $Kernel::OM->CreateOnce('Config', {NoCache => 1})->Get('Cache::Module::Redis');
 
     return $Self;
 }
@@ -190,7 +182,8 @@ sub CleanUp {
 
     if ( $Param{Type} ) {
         # delete type
-        return $Self->_RedisCall('del', $Param{Type});
+        my $KeyCount = $Self->_RedisCall('del', $Param{Type});
+        return defined $KeyCount ? 1 : 0;
     }
     else {
         if ( $Param{KeepTypes} ) {

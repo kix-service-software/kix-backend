@@ -1480,7 +1480,9 @@ sub CheckResourcePermission {
             if ( !defined $RolePermission && $ParentTarget ) {
                 $RolePermission = $Self->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$RoleID};
                 $Self->{PermissionCache}->{$Param{UserID}}->{$Target}->{$RoleID} = $RolePermission;
-                $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
+                if ( $Self->{PermissionDebug} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
+                }
             }
 
             # init the value
@@ -1609,7 +1611,9 @@ sub _CheckResourcePermissionForRole {
         $RelevantPermissions{$ID} = $Permission;
     }
 
-    $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+    if ( $Self->{PermissionDebug} ) {
+        $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+    }
 
     # return if no relevant permissions exist
     if ( !IsHashRefWithData( \%RelevantPermissions ) ) {

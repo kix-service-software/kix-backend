@@ -291,6 +291,7 @@ sub Run {
                     && !$AgentSendNotification
                     )
                 {
+                    print STDERR "skipping notification!\n";
                     next BUNDLE;
                 }
 
@@ -801,6 +802,8 @@ sub _RecipientsGet {
         push @RecipientUsers, \%User;
     }
 
+use Data::Dumper;
+print STDERR "RecipientUsers: ".Data::Dumper::Dumper(\@RecipientUsers);
     return @RecipientUsers;
 }
 
