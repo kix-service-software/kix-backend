@@ -468,6 +468,10 @@ sub PrepareData {
                 }
             }
         }
+        else {
+            my $Limit = $Kernel::OM->Get('Config')->Get('API::Request::DefaultLimit') || 0;
+            $Self->{$LimitType}->{__COMMON} = $Limit;
+        }
     }
 
     # prepare offset
@@ -981,12 +985,6 @@ sub _Success {
             );
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
-        }
-
-        if (!IsHashRefWithData( $Self->{Limit})) {
-            my $Limit = $Kernel::OM->Get('Config')->Get('API::Request::DefaultLimit');
-            # API::Request::DefaultLimit == 0 means it's disabled
-            $Self->{Limit}->{__COMMON} = $Limit if ($Limit);
         }
 
         # honor a limiter, if we have one
