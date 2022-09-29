@@ -91,9 +91,11 @@ my $StartTime = Time::HiRes::time();
     my $Result;
 
     if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+        my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
         my $Result = $Self->AsyncCall(
-            FunctionName   => '_Run',
-            FunctionParams => \%Param,
+            FunctionName             => '_Run',
+            FunctionParams           => \%Param,
+            MaximumParallelInstances => $MaximumParallelInstances
         );
         if ( !$Result ) {
             $Kernel::OM->Get('Log')->Log(

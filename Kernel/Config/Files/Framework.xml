@@ -7467,6 +7467,14 @@ You can log in via the following URL:
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketNotification::SendAsynchronously::MaximumParallelInstances" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Define the maximum number of parallel workers to handle ticket notifications. Default: 0 (unlimited)</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">0</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ReferenceData::OwnCountryList" Required="0" Valid="0">
         <Description Translatable="1">This setting allows you to override the built-in country list with your own list of countries. This is particularly handy if you just want to use a small select group of countries.</Description>
         <Group>Framework</Group>
