@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-7-13 13:36+0000\n"
-"PO-Revision-Date: 2022-07-27 10:32+0000\n"
-"Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
+"POT-Creation-Date: 2022-9-13 12:08+0000\n"
+"PO-Revision-Date: 2022-09-06 10:18+0000\n"
+"Last-Translator: fkrahl <Frank.Krahl@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.10.1\n"
+"X-Generator: Weblate 4.14\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -2013,7 +2013,7 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
-msgstr "Anzahl offener Tickets der letzten 7 Tage"
+msgstr "Anzahl erstellter Tickets der letzten 7 Tage"
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
@@ -5158,8 +5158,8 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Enables the minimal ticket counter size (if \"Date\" was selected as "
-"TicketNumberGenerator)."
+"Enables the minimal ticket counter size (if \"Date\" or \"DateChecksum\" was "
+"selected as TicketNumberGenerator)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5614,9 +5614,9 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Sets the minimal ticket counter size if \"AutoIncrement\" was selected as "
-"TicketNumberGenerator. Default is 5, this means the counter starts from "
-"10000."
+"Sets the minimal ticket counter size if \"AutoIncrement\", \"Date\" or "
+"\"DateChecksum\" was selected as TicketNumberGenerator. Default is 5, this "
+"means the counter starts from 10000."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5836,10 +5836,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "customer"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "email-internal"
 msgstr "Email (intern)"
 
@@ -5961,6 +5957,10 @@ msgstr "Datei(en) hinzugefügt"
 #. manual entry from templates.pot.manual
 msgid "First Usage Date"
 msgstr "Inbetriebnahme"
+
+#. manual entry from templates.pot.manual
+msgid "FirstResponse"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
@@ -6101,6 +6101,10 @@ msgid "Parent Location"
 msgstr "Übergeordneter Standort"
 
 #. manual entry from templates.pot.manual
+msgid "PendingTime"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
 msgstr ""
 "Bitte geben Sie eine gültige IPv4 Adresse im Format 123.123.123.123 ein."
@@ -6222,6 +6226,10 @@ msgstr "Abgebrochen"
 #. manual entry from templates.pot.manual
 msgid "completed"
 msgstr "Abgeschlossen"
+
+#. manual entry from templates.pot.manual
+msgid "customer"
+msgstr "Kunde"
 
 #. manual entry from templates.pot.manual
 msgid "downloaded"

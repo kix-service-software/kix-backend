@@ -128,10 +128,11 @@ sub Run {
 
     # check if UserLogin already exists
     if ( IsStringWithData( $User->{UserLogin} ) ) {
-        my %UserList = $Kernel::OM->Get('User')->UserSearch(
-            Search => $User->{UserLogin},
+        my $Exists = $Kernel::OM->Get('User')->UserLoginExistsCheck(
+            UserLogin => $User->{UserLogin},
+            UserID    => $UserData{UserID}
         );
-        if ( %UserList && ( scalar( keys %UserList ) > 1 || !$UserList{ $UserData{UserID} } ) ) {
+        if ( $Exists ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update user. Another user with same login already exists.',

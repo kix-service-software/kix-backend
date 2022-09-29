@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "PluginResponse.json",
+  "type": "object",
+  "description": "A response for a plugin GET request.",
+  "properties": {
+    "Plugin": {
+      "$ref": "Plugin.json"
+    }
+  },
+  "required": [
+    "Plugin"
+  ]
+}

@@ -211,6 +211,9 @@ sub ReportDefinitionAdd {
         $Param{ValidID} = 1;
     }
 
+    $Param{MaxReports} //= 0;
+    $Param{IsPeriodic} //= 0;
+
     # check if this is a duplicate after the change
     my $ID = $Self->ReportDefinitionLookup(
         Name => $Param{Name},
@@ -307,6 +310,9 @@ sub ReportDefinitionUpdate {
             return;
         }
     }
+
+    $Param{MaxReports} //= 0;
+    $Param{IsPeriodic} //= 0;
 
     # get current data
     my %Data = $Self->ReportDefinitionGet(
