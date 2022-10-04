@@ -1406,6 +1406,13 @@ sub _TicketCacheClear {
     );
     return if !@Keys;
 
+    my @Values = $CacheObject->GetMulti(
+        Type          => "TicketCache".$Param{TicketID},
+        Keys          => \@Keys,
+        UseRawKey     => 1,
+        NoStatsUpdate => 1,
+    );
+
     # delete metadata
     $CacheObject->CleanUp(
         Type          => "TicketCache".$Param{TicketID},
@@ -1422,13 +1429,6 @@ sub _TicketCacheClear {
         Type => "TicketIndex",
     );
     
-    my @Values = $CacheObject->GetMulti(
-        Type          => "TicketCache".$Param{TicketID},
-        Keys          => \@Keys,
-        UseRawKey     => 1,
-        NoStatsUpdate => 1,
-    );
-
     foreach my $Value ( @Values ) {
         next if !$Value;
         my ( $Type, $Key ) = split(/::/, $Value, 2);
