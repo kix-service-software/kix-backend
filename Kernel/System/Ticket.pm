@@ -1406,6 +1406,22 @@ sub _TicketCacheClear {
     );
     return if !@Keys;
 
+    # delete metadata
+    $CacheObject->CleanUp(
+        Type          => "TicketCache".$Param{TicketID},
+        NoStatsUpdate => 1,
+    );
+
+    # cleanup search cache
+    $CacheObject->CleanUp(
+        Type => "TicketSearch",
+    );
+
+    # cleanup index cache
+    $CacheObject->CleanUp(
+        Type => "TicketIndex",
+    );
+    
     my @Values = $CacheObject->GetMulti(
         Type          => "TicketCache".$Param{TicketID},
         Keys          => \@Keys,
@@ -1425,22 +1441,6 @@ sub _TicketCacheClear {
             Key  => $Key
         );
     }
-
-    # delete metadata
-    $CacheObject->CleanUp(
-        Type          => "TicketCache".$Param{TicketID},
-        NoStatsUpdate => 1,
-    );
-
-    # cleanup search cache
-    $CacheObject->CleanUp(
-        Type => "TicketSearch",
-    );
-
-    # cleanup index cache
-    $CacheObject->CleanUp(
-        Type => "TicketIndex",
-    );
 
     return 1;
 }
