@@ -813,7 +813,7 @@ sub CreateArticle {
         SenderType     => 'system',
         TicketID       => $Param{TicketID},
         HistoryType    => $Param{Recipient}->{Type} eq 'Agent' ? 'SendAgentNotification' : 'SendCustomerNotification',
-        HistoryComment => $Param{Recipient}->{Type} eq 'Agent' ? "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{Login}\%\%Email" : "\%\%$Param{Recipient}->{Email}",
+        HistoryComment => $Param{Recipient}->{Type} eq 'Agent' ? "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%Email" : "\%\%$Param{Recipient}->{Email}",
         From           => "$Param{Address}->{RealName} <$Param{Address}->{Email}>",
         To             => $Param{Recipient}->{Email},
         Subject        => $Param{Notification}->{Subject},
