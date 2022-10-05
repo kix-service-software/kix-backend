@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-9-13 12:08+0000\n"
-"PO-Revision-Date: 2022-10-04 13:18+0000\n"
+"PO-Revision-Date: 2022-10-05 16:18+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -416,7 +416,7 @@ msgstr "pro Nutzer"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Periodic Reports"
-msgstr ""
+msgstr "Periodische Berichte"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Permission type that corresponds with a API resource."
@@ -2748,6 +2748,7 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the auth modules and their order of execution."
 msgstr ""
+"Definiert die Authentifizierungsbackends und deren Anwendungsreihenfolge."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
