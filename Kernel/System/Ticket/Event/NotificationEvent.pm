@@ -66,10 +66,10 @@ my $StartTime = Time::HiRes::time();
         }
     }
 
-    if ( !$Param{Data}->{TicketID} ) {
+    if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need TicketID in Data!',
+            Message  => 'Need TicketID or TicketList in Data!',
         );
         return;
     }
@@ -80,13 +80,15 @@ my $StartTime = Time::HiRes::time();
     # return if no notification is active
     return 1 if $TicketObject->{SendNoNotification};
 
-    # return if no ticket exists (e. g. it got deleted)
-    my $TicketExists = $TicketObject->TicketNumberLookup(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Param{UserID},
-    );
+    if ( $Param{Data}->{TicketID} ) {
+        # return if no ticket exists (e. g. it got deleted)
+        my $TicketNumber = $TicketObject->TicketNumberLookup(
+            TicketID => $Param{Data}->{TicketID},
+            UserID   => $Param{UserID},
+        );
 
-    return 1 if !$TicketExists;
+        return 1 if !$TicketNumber;
+    }
 
     my $Result;
 
@@ -117,6 +119,30 @@ sub _Run {
     my ( $Self, %Param ) = @_;
 
 my $StartTime = Time::HiRes::time();
+
+    my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( { %Param } );
+
+    TICKET:
+    foreach my $Ticket ( @TicketList ) {
+        $Self->_HandleTicket(
+            Event  => $Param{Event}, 
+            Data   => $Ticket,
+            UserID => $Param{UserID},
+        );
+    }
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "NotificationEvent::_Run (%i tickets): %i ms\n", (scalar @TicketList), (Time::HiRes::time() - $StartTime) * 1000,
+    );
+
+    return 1;
+}
+
+sub _HandleTicket {
+    my ( $Self, %Param ) = @_;
+
+my $StartTime = Time::HiRes::time();
     # get notification event object
     my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
@@ -124,9 +150,16 @@ my $StartTime = Time::HiRes::time();
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # check if event is affected
-    my @IDs = $NotificationEventObject->NotificationEventCheck(
-        Event => $Param{Event},
-    );
+    my @IDs;
+    if ( IsArrayRef($Self->{Cache}->{NotificationIDs}->{$Param{Event}}) ) {
+        @IDs = @{$Self->{Cache}->{NotificationIDs}->{$Param{Event}}};
+    }
+    else {
+        @IDs = $NotificationEventObject->NotificationEventCheck(
+            Event => $Param{Event},
+        );
+        $Self->{Cache}->{NotificationIDs}->{$Param{Event}} = \@IDs;
+    }
 
     # return if no notification for event exists
     return 1 if !@IDs;
@@ -138,18 +171,9 @@ my $StartTime = Time::HiRes::time();
         DynamicFields => 1,
     );
 
-    # get dynamic field objects
-    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
-
-    # get dynamic fields
-    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-        Valid      => 1,
-        ObjectType => ['Ticket'],
-    );
-
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => sprintf "NotificationEvent::_Run (Preparation): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+        Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (Preparation): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     NOTIFICATION:
@@ -168,7 +192,7 @@ my $StartTime = Time::HiRes::time();
         );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => sprintf "   NotificationEvent::_NotificationFilter: Result:=$PassFilter\n",
+            Message  => sprintf "   NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (_NotificationFilter \"$Notification{Name}\"): Result:=$PassFilter\n",
         );
         next NOTIFICATION if !$PassFilter;
 
@@ -231,9 +255,6 @@ my $StartTime = Time::HiRes::time();
         );
 
         my @NotificationBundle;
-
-        # get template generator object;
-        my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
         # parse all notification tags for each user
         for my $Recipient (@RecipientUsers) {
@@ -371,18 +392,9 @@ my $StartTime = Time::HiRes::time();
             RECIPIENT:
             for my $Recipient (@TransportRecipients) {
 
-                # replace all notification tags for each special recipient
-                my %ReplacedNotification = $TemplateGeneratorObject->NotificationEvent(
-                    TicketID              => $Param{Data}->{TicketID},
-                    Recipient             => $Recipient,
-                    Notification          => \%Notification,
-                    CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
-                    UserID                => $Param{UserID},
-                );
-
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
-                    Notification          => \%ReplacedNotification,
+                    Notification          => \%Notification,
                     CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
                     Recipient             => $Recipient,
                     Event                 => $Param{Event},
@@ -396,17 +408,20 @@ my $StartTime = Time::HiRes::time();
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => sprintf "NotificationEvent::_Run (Notification $ID): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+            Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (Notification \"$Notification{Name}\"): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
         );
     }
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
 
     return 1;
 }
 
 sub _NotificationFilter {
     my ( $Self, %Param ) = @_;
-
-my $StartTime = Time::HiRes::time();
 
     # check needed params
     for my $Needed (qw(Data Notification)) {
@@ -442,20 +457,6 @@ my $StartTime = Time::HiRes::time();
         Result => 'ARRAY',
         Search => $Filter,
         Limit  => 1,
-    );
-
-    use Data::Dumper;
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   NotificationEvent::_NotificationFilter: Filter=%s\n", Data::Dumper::Dumper($Filter),
-    );
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   NotificationEvent::_NotificationFilter: TicketIDs=%s\n", Data::Dumper::Dumper(\@TicketIDs),
-    );
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   NotificationEvent::_NotificationFilter: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
@@ -496,39 +497,6 @@ my $StartTime = Time::HiRes::time();
         my $QueueObject        = $Kernel::OM->Get('Queue');
         my $ContactObject = $Kernel::OM->Get('Contact');
 
-        # KIX4OTRS-capeIT
-        my @LinkedAgents = ();
-        my @LinkedCustomers = ();
-        my %SelectedRecipientTypes = map {$_ => 1} grep { $_ =~ /^LinkedPerson/ } @{ $Notification{Data}->{Recipients} };
-        if ( %SelectedRecipientTypes ) {
-
-            # get linked persons
-            my @LinkedRecipients = $Kernel::OM->Get('WebRequest')->GetArray( Param => 'LinkedPersonToInform' );
-
-            my @RecipientType = ();
-            for my $LinkedRecipient ( @LinkedRecipients ) {
-                my @RecipientParts = split(/:::/,$LinkedRecipient);
-                if ( $RecipientParts[0] eq 'Agent' && $SelectedRecipientTypes{LinkedPersonAgent} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedAgents ) {
-                    push @LinkedAgents, $RecipientParts[1];
-                }
-                elsif ( $RecipientParts[0] eq 'Customer' && $SelectedRecipientTypes{LinkedPersonCustomer} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedCustomers ) {
-                    push @LinkedCustomers, $RecipientParts[1];
-                }
-                elsif ( $RecipientParts[0] eq '3rdParty' && $SelectedRecipientTypes{LinkedPerson3rdPerson} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedCustomers ) {
-                    push @LinkedCustomers, $RecipientParts[1];
-                    $RecipientParts[0] = 'Customer';
-                }
-                else {
-                    # not possible to add recipient
-                    next;
-                }
-                next if grep { $_ eq $RecipientParts[0] } @RecipientType;
-                push @RecipientType, $RecipientParts[0];
-                push @{ $Notification{Data}->{Recipients} }, $RecipientParts[0].'LinkedPerson';
-            }
-        }
-        # EO KIX4OTRS-capeIT
-
         RECIPIENT:
         for my $Recipient ( @{ $Notification{Data}->{Recipients} } ) {
 
@@ -564,17 +532,32 @@ my $StartTime = Time::HiRes::time();
 
                     # check each valid user if he has READ permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('User')->UserList(
-                        Valid => 1,
-                        Short => 1,
-                    );
-                    foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                            UserID              => $UserID,
-                            Target              => '/tickets/' . $Ticket{TicketID},
-                            UsageContext        => 'Agent',
-                            RequestedPermission => 'READ'
+                    my %UserList;
+                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
+                        %UserList = %{$Self->{Cache}->{UserList}};
+                    }
+                    else {
+                        %UserList = $Kernel::OM->Get('User')->UserList(
+                            Valid => 1,
+                            Short => 1,
                         );
+                        $Self->{Cache}->{UserList} = \%UserList;
+                    }
+                    my $Resource = '/tickets/' . $Ticket{TicketID};
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my $Granted;
+                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} ) {
+                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ};
+                        }
+                        else {
+                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                                UserID              => $UserID,
+                                Target              => $Resource,
+                                UsageContext        => 'Agent',
+                                RequestedPermission => 'READ'
+                            );
+                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} = $Granted;
+                        }
                         if ( $Granted ) {
                             push @UserIDs, $UserID;
                         }
@@ -586,10 +569,36 @@ my $StartTime = Time::HiRes::time();
 
                     # check each valid user if he has UPDATE permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('User')->UserList(
-                        Valid => 1,
-                        Short => 1,
-                    );
+                    my %UserList;
+                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
+                        %UserList = %{$Self->{Cache}->{UserList}};
+                    }
+                    else {
+                        %UserList = $Kernel::OM->Get('User')->UserList(
+                            Valid => 1,
+                            Short => 1,
+                        );
+                        $Self->{Cache}->{UserList} = \%UserList;
+                    }
+                    my $Resource = '/tickets/' . $Ticket{TicketID};
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my $Granted;
+                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} ) {
+                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE};
+                        }
+                        else {
+                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                                UserID              => $UserID,
+                                Target              => $Resource,
+                                UsageContext        => 'Agent',
+                                RequestedPermission => 'UPDATE'
+                            );
+                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} = $Granted;
+                        }
+                        if ( $Granted ) {
+                            push @UserIDs, $UserID;
+                        }
+                    }
                     foreach my $UserID ( sort keys %UserList ) {
                         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
@@ -606,43 +615,30 @@ my $StartTime = Time::HiRes::time();
                 }
                 elsif ( $Recipient eq 'AgentMyQueues' ) {
 
-                    # get subscribed users
-                    my %MyQueuesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByQueueID(
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
                     );
-
-                    my @UserIDs = sort keys %MyQueuesUserIDs;
-
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyServices' ) {
 
-                    # get subscribed users
-                    my %MyServicesUserIDs;
-                    if ( $Ticket{ServiceID} ) {
-                        %MyServicesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByServiceID(
-                            ServiceID => $Ticket{ServiceID},
-                        );
-                    }
-
-                    my @UserIDs = sort keys %MyServicesUserIDs;
-
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByServiceID(
+                        ServiceID => $Ticket{ServiceID}
+                    );
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyQueuesMyServices' ) {
 
                     # get subscribed users
-                    my %MyQueuesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByQueueID(
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
                     );
+                    my %MyQueuesUserIDs = map { $_ => 1 } @UserIDs;
 
-                    # get subscribed users
-                    my %MyServicesUserIDs;
-                    if ( $Ticket{ServiceID} ) {
-                        %MyServicesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByServiceID(
-                            ServiceID => $Ticket{ServiceID},
-                        );
-                    }
+                    @UserIDs = $Self->_GetSubscribedUserIDsByServiceID(
+                        ServiceID => $Ticket{ServiceID}
+                    );
+                    my %MyServicesUserIDs = map { $_ => 1 } @UserIDs;
 
                     # combine both subscribed users list (this will also remove duplicates)
                     my %SubscribedUserIDs = ( %MyQueuesUserIDs, %MyServicesUserIDs );
@@ -653,15 +649,10 @@ my $StartTime = Time::HiRes::time();
                         }
                     }
 
-                    my @UserIDs = sort keys %SubscribedUserIDs;
+                    @UserIDs = sort keys %SubscribedUserIDs;
 
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
-                # KIX4OTRS-capeIT
-                elsif ( $Recipient eq 'AgentLinkedPerson' ) {
-                    push @{ $Notification{Data}->{RecipientAgents} }, @LinkedAgents;
-                }
-                # EO KIX4OTRS-capeIT
             }
 
             elsif ( $Recipient eq 'Customer' ) {
@@ -810,6 +801,36 @@ my $StartTime = Time::HiRes::time();
         );
         next RECIPIENT if !%User;
 
+        # check if the notification needs to be sent just one time per day
+        if (
+            IsArrayRefWithData($Notification{Data}->{OncePerDay})
+            && $Notification{Data}->{OncePerDay}->[0]
+            && $User{UserLogin}
+        ) {
+
+            # get time object
+            my $TimeObject = $Kernel::OM->Get('Time');
+
+            # get current date
+            my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay ) = $TimeObject->SystemTime2Date(
+                SystemTime => $TimeObject->SystemTime()
+            );
+
+            # get ticket history
+            my @HistoryLines = $TicketObject->HistoryGet(
+                TicketID      => $Param{Data}->{TicketID},
+                HistoryType   => 'SendAgentNotification',
+                Name          => "\%\%$Notification{Name}\%\%$User{UserLogin}\%\%Email",      # we use a fixed Email here
+                MinCreateTime => "$CurrYear-$CurrMonth-$CurrDay 00:00:00",
+                SortReverse   => 1,
+                UserID        => $Param{UserID},
+                Limit         => 1,
+            );
+
+            # do not send the notification if it has been sent already today
+            return if @HistoryLines;
+        }
+
         # skip user that triggers the event (it should not be notified) but only if it is not
         #   a pre-calculated recipient
         if (
@@ -843,13 +864,20 @@ my $StartTime = Time::HiRes::time();
             next RECIPIENT if $TimeStart < $Time && $TimeEnd > $Time;
         }
 
-        # skip users with out READ permissions
-        my ($Granted) = $UserObject->CheckResourcePermission(
-            UserID              => $User{UserID},
-            Target              => '/tickets/' . $Ticket{TicketID},
-            UsageContext        => 'Agent',
-            RequestedPermission => 'READ'
-        );
+        my $Granted;
+        my $Resource = '/tickets/' . $Ticket{TicketID};
+        if ( exists $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ} ) {
+            $Granted = $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ};
+        }
+        else {
+            # skip users with out READ permissions
+            $Granted = $UserObject->CheckResourcePermission(
+                UserID              => $User{UserID},
+                Target              => $Resource,
+                UsageContext        => 'Agent',
+                RequestedPermission => 'READ'
+            );
+        }
         next RECIPIENT if !$Granted;
 
         # skip PostMasterUserID
@@ -884,36 +912,6 @@ sub _SendRecipientNotification {
 
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    # check if the notification needs to be sent just one time per day
-    if (
-        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay})
-        && $Param{Notification}->{Data}->{OncePerDay}->[0]
-        && $Param{Recipient}->{UserLogin}
-    ) {
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
-
-        # get current date
-        my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay ) = $TimeObject->SystemTime2Date(
-            SystemTime => $TimeObject->SystemTime()
-        );
-
-        # get ticket history
-        my @HistoryLines = $TicketObject->HistoryGet(
-            TicketID      => $Param{TicketID},
-            HistoryType   => 'SendAgentNotification',
-            Name          => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
-            MinCreateTime => "$CurrYear-$CurrMonth-$CurrDay 00:00:00",
-            SortReverse   => 1,
-            UserID        => $Param{UserID},
-            Limit         => 1,
-        );
-
-        # do not send the notification if it has been sent already today
-        return if @HistoryLines;
-    }
 
     my $TransportObject = $Param{TransportObject};
 
@@ -992,6 +990,48 @@ $StartTime = Time::HiRes::time();
     );
 
     return 1;
+}
+
+sub _GetSubscribedUserIDsByQueueID {
+    my ( $Self, %Param ) = @_;
+
+    my @UserIDs;
+    if ( IsArrayRef($Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}}) ) {
+        @UserIDs = @{$Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}}};
+    }
+    else {
+        # get subscribed users
+        my %MyQueuesUserIDs = map { $_ => 1 } $Kernel::OM->Get('Ticket')->GetSubscribedUserIDsByQueueID(
+            QueueID => $Param{QueueID}
+        );
+
+        @UserIDs = sort keys %MyQueuesUserIDs;
+        $Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}} = \@UserIDs;
+    }
+
+    return @UserIDs;
+}
+
+sub _GetSubscribedUserIDsByServiceID {
+    my ( $Self, %Param ) = @_;
+
+    my @UserIDs;
+    if ( $Param{ServiceID} ) {
+        if ( IsArrayRef($Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}}) ) {
+            @UserIDs = @{$Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}}};
+        }
+        else {
+            # get subscribed users
+            my %MyServicesUserIDs = map { $_ => 1 } $Kernel::OM->Get('Ticket')->GetSubscribedUserIDsByServiceID(
+                ServiceID => $Param{ServiceID},
+            );
+
+            @UserIDs = sort keys %MyServicesUserIDs;
+            $Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}} = \@UserIDs;
+        }
+    }
+
+    return @UserIDs;
 }
 
 1;

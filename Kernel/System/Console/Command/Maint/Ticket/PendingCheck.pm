@@ -182,23 +182,25 @@ sub Run {
         
         my $NotificationCount = 0;
 
-        TICKETID:
-        for my $Ticket ( @{$TicketList || []} ) {
-
-            # trigger notification event
-            $TicketObject->EventHandler(
-                Event => 'NotificationPendingReminder',
-                Data  => {
-                    TicketID              => $Ticket->{TicketID},
-                    CustomerMessageParams => {
-                        TicketNumber => $Tickets{$Ticket->{TicketID}},
-                    },
+        my @PreparedTicketList;
+        foreach my $Ticket ( @{$TicketList || []} ) {
+            push @PreparedTicketList, {
+                TicketID              => $Ticket->{TicketID},
+                CustomerMessageParams => {
+                    TicketNumber => $Tickets{$Ticket->{TicketID}},
                 },
-                UserID => 1,
-            );
-
+            };
             $NotificationCount++;
         }
+
+        # trigger notification event
+        $TicketObject->EventHandler(
+            Event => 'NotificationPendingReminder',
+            Data  => {
+                TicketList => \@PreparedTicketList
+            },
+            UserID => 1,
+        );
 
         $Self->Print(" Triggered $NotificationCount reminder notification(s).\n");
     }
