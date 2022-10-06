@@ -90,25 +90,25 @@ my $StartTime = Time::HiRes::time();
 
     my $Result;
 
-    if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
-        my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
-        my $Result = $Self->AsyncCall(
-            FunctionName             => '_Run',
-            FunctionParams           => \%Param,
-            MaximumParallelInstances => $MaximumParallelInstances
-        );
-        if ( !$Result ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Could not schedule asynchronous NotificationEvent execution!",
-            );
-        }
-    }
-    else {
+    # if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+    #     my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
+    #     my $Result = $Self->AsyncCall(
+    #         FunctionName             => '_Run',
+    #         FunctionParams           => \%Param,
+    #         MaximumParallelInstances => $MaximumParallelInstances
+    #     );
+    #     if ( !$Result ) {
+    #         $Kernel::OM->Get('Log')->Log(
+    #             Priority => 'error',
+    #             Message  => "Could not schedule asynchronous NotificationEvent execution!",
+    #         );
+    #     }
+    # }
+    # else {
         $Result = $Self->_Run(
             %Param
         );
-    }
+    # }
 
     return $Result;
 }
@@ -900,48 +900,27 @@ sub _SendRecipientNotification {
         && $Param{Recipient}->{UserLogin}
     ) {
 
-        # get ticket history
-        my @HistoryLines = $TicketObject->HistoryGet(
-            TicketID => $Param{TicketID},
-            UserID   => $Param{UserID},
+        # get time object
+        my $TimeObject = $Kernel::OM->Get('Time');
+
+        # get current date
+        my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay ) = $TimeObject->SystemTime2Date(
+            SystemTime => $TimeObject->SystemTime()
         );
 
-        # get last notification sent ticket history entry for this transport and this user
-        my $LastNotificationHistory = first {
-            $_->{HistoryType} eq 'SendAgentNotification'
-                && $_->{Name} eq
-                "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}"
-        }
-        reverse @HistoryLines;
+        # get ticket history
+        my @HistoryLines = $TicketObject->HistoryGet(
+            TicketID      => $Param{TicketID},
+            HistoryType   => 'SendAgentNotification',
+            Name          => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
+            MinCreateTime => "$CurrYear-$CurrMonth-$CurrDay 00:00:00",
+            SortReverse   => 1,
+            UserID        => $Param{UserID},
+            Limit         => 1,
+        );
 
-        if ( $LastNotificationHistory && $LastNotificationHistory->{CreateTime} ) {
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            # get last notification date
-            my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-                SystemTime => $TimeObject->TimeStamp2SystemTime(
-                    String => $LastNotificationHistory->{CreateTime},
-                    )
-            );
-
-            # get current date
-            my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay )
-                = $TimeObject->SystemTime2Date(
-                SystemTime => $TimeObject->SystemTime(),
-                );
-
-            # do not send the notification if it has been sent already today
-            if (
-                $CurrYear == $Year
-                && $CurrMonth == $Month
-                && $CurrDay == $Day
-                )
-            {
-                return;
-            }
-        }
+        # do not send the notification if it has been sent already today
+        return if @HistoryLines;
     }
 
     my $TransportObject = $Param{TransportObject};
@@ -961,7 +940,7 @@ my $StartTime = Time::HiRes::time();
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => sprintf "   TransportObject::SendNotification: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+        Message  => sprintf "   TransportObject::SendNotification: %i ms (Success: $Success)\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return if !$Success;

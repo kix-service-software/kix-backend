@@ -3266,7 +3266,7 @@ sub _Debug {
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s: %s\n", $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
+    printf STDERR "%f (%5i) %-15s %s%s: %s\n", Time::HiRes::time(), $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 sub _PermissionDebug {
@@ -3276,7 +3276,7 @@ sub _PermissionDebug {
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
+    printf STDERR "%f (%5i) %-15s %s%s\n", Time::HiRes::time(), $$, "[Permission]", $Indent, $Message;
 }
 
 =item _CheckCustomerAssignedObject()

@@ -131,7 +131,7 @@ sub _Debug {
 
     return if !$Self->{Debug};
 
-    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", $Self->{DaemonName}, "$Message";
+    printf "%f (%5i) [%s] [%s] %s\n", Time::HiRes::time(), $$, "DEBUG", $Self->{DaemonName}, "$Message";
 }
 
 1;

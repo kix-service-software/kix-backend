@@ -153,7 +153,7 @@ sub _Debug {
 
     return if !$Self->{Debug};
 
-    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", $Self->{WorkerName}, "$Message";
+    printf "%f (%5i) [%s] [%s] %s\n", Time::HiRes::time(), $$, "DEBUG", $Self->{WorkerName}, "$Message";
 }
 
 1;

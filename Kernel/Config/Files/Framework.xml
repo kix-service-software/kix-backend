@@ -8129,7 +8129,33 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LanguageDebug" Required="1" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="DB::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable DB debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="DB::Debug::Methods" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable DB debugging for specific DB methods. Depends on DB::Debug as the "main switch".</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Connect">1</Item>
+                <Item Key="Do">1</Item>
+                <Item Key="Prepare">1</Item>
+                <Item Key="FetchAllArrayRef">1</Item>
+                <Item Key="FetchrowArray">1</Item>
+                <Item Key="Ping">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Language::Debug" Required="1" Valid="1">
         <Description Translatable="1">Debugs the translation set. If this is set to "Yes" all strings (text) without translations are written to STDERR. This can be helpful when you are creating a new translation file. Otherwise, this option should remain set to "No".</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>

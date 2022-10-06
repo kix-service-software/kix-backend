@@ -4770,8 +4770,13 @@ get ticket history as array with hashes
 OwnerID, PriorityID, StateID, HistoryTypeID and TypeID)
 
     my @HistoryLines = $TicketObject->HistoryGet(
-        TicketID  => 123,
-        UserID    => 123,
+        TicketID      => 123,
+        HistoryType   => '...',           # optional
+        Name          => '...',           # optional
+        MinCreateTime => '...',           # optional
+        SortReverse   => 1,               # optional
+        Limit         => 1,               # optional
+        UserID        => 123,
     );
 
 =cut
@@ -4795,13 +4800,38 @@ sub HistoryGet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT sh.name, sh.article_id, sh.create_time, sh.create_by, ht.name, '
+    my @BindArray = (
+        \$Param{TicketID}
+    );
+    my $SQL = 'SELECT sh.name, sh.article_id, sh.create_time, sh.create_by, ht.name, '
             . ' sh.queue_id, sh.owner_id, sh.priority_id, sh.state_id, sh.history_type_id, sh.type_id, sh.id '
             . ' FROM ticket_history sh, ticket_history_type ht WHERE '
-            . ' sh.ticket_id = ? AND ht.id = sh.history_type_id'
-            . ' ORDER BY sh.create_time, sh.id',
-        Bind => [ \$Param{TicketID} ],
+            . ' sh.ticket_id = ? AND ht.id = sh.history_type_id';
+
+    if ( $Param{HistoryType} ) {
+        $SQL .= ' AND ht.name = ?';
+        push @BindArray, \$Param{HistoryType};
+    }
+
+    if ( $Param{Name} ) {
+        $SQL .= ' AND sh.name = ?';
+        push @BindArray, \$Param{Name};
+    }
+
+    if ( $Param{MinCreateTime} ) {
+        $SQL .= ' AND sh.create_time >= ?';
+        push @BindArray, \$Param{MinCreateTime};
+    }
+
+    $SQL .= ' ORDER BY sh.create_time, sh.id';
+    if ( $Param{SortReverse} ) {
+        $SQL .= ' DESC'
+    }
+
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => \@BindArray,
+        Limit => $Param{Limit}
     );
 
     while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -6961,7 +6991,7 @@ sub TicketCalendarGet {
                 push @Calendars, "'" . $DBObject->Quote( $Calendar ) . "'";
             }
 
-            $SQL .= ' AND q.calendar_name IN ('.(join(',', @Calendars)).')';
+            $SQL .= ' AND (q.calendar_name IS null OR q.calendar_name IN (null, '.(join(',', @Calendars)).'))';
         }
 
         # db query

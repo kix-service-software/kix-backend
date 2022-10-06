@@ -710,7 +710,7 @@ sub _Debug {
 
     return if !$Debug;
 
-    printf "(%5i) [%s] [%s] %s\n", $$, "DEBUG", "Daemon", "$Message";
+    printf "%f (%5i) [%s] [%s] %s\n", Time::HiRes::time(), $$, "DEBUG", "Daemon", "$Message";
 }
 
 exit 0;
