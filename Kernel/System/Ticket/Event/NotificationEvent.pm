@@ -238,21 +238,13 @@ my $StartTime = Time::HiRes::time();
         # parse all notification tags for each user
         for my $Recipient (@RecipientUsers) {
 
-            my %ReplacedNotification = $TemplateGeneratorObject->NotificationEvent(
-                TicketID              => $Param{Data}->{TicketID},
-                Recipient             => $Recipient,
-                Notification          => \%Notification,
-                CustomerMessageParams => $Param{Data}->{CustomerMessageParams},
-                UserID                => $Param{UserID},
-            );
-
             my $UserNotificationTransport = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Recipient->{Preferences}->{NotificationTransport},
             );
 
             push @NotificationBundle, {
                 Recipient                      => $Recipient,
-                Notification                   => \%ReplacedNotification,
+                Notification                   => \%Notification,
                 RecipientNotificationTransport => $UserNotificationTransport,
             };
         }
@@ -926,12 +918,25 @@ sub _SendRecipientNotification {
     my $TransportObject = $Param{TransportObject};
 
 my $StartTime = Time::HiRes::time();
+    my %ReplacedNotification = $Kernel::OM->Get('TemplateGenerator')->NotificationEvent(
+        TicketID              => $Param{TicketID},
+        Recipient             => $Param{Recipient},
+        Notification          => $Param{Notification},
+        CustomerMessageParams => $Param{CustomerMessageParams},
+        UserID                => $Param{UserID},
+    );
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "   TransportObject::_SendRecipientNotification (TemplateGenerator): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
+    );
+
+$StartTime = Time::HiRes::time();
 
     # send notification to each recipient
     my $Success = $TransportObject->SendNotification(
         TicketID              => $Param{TicketID},
         UserID                => $Param{UserID},
-        Notification          => $Param{Notification},
+        Notification          => \%ReplacedNotification,
         CustomerMessageParams => $Param{CustomerMessageParams},
         Recipient             => $Param{Recipient},
         Event                 => $Param{Event},
@@ -940,7 +945,7 @@ my $StartTime = Time::HiRes::time();
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => sprintf "   TransportObject::SendNotification: %i ms (Success: $Success)\n", (Time::HiRes::time() - $StartTime) * 1000,
+        Message  => sprintf "   TransportObject::_SendRecipientNotification (Transport-SendNotification): %i ms (Success: $Success)\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return if !$Success;
