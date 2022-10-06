@@ -492,7 +492,7 @@ sub Do {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -515,16 +515,6 @@ sub Do {
     {
         '$Timestamp'
     }xmsg;
-
-    # debug
-    if ( $Self->{Debug} > 0 ) {
-        $Self->{DoCounter}++;
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message  => "DB.pm->Do ($Self->{DoCounter}) SQL: '$Param{SQL}'",
-        );
-    }
 
     if ( !$Param{SkipConnectCheck} ) {
         return if !$Self->Connect();
@@ -720,7 +710,7 @@ sub Prepare {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
