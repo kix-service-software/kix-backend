@@ -132,16 +132,16 @@ my $StartTime = Time::HiRes::time();
 
     TICKET:
     foreach my $Ticket ( @TicketList ) {
-my $StartTimeTicket = Time::HiRes::time();
+        my $StartTimeTicket = Time::HiRes::time();
         $Self->_HandleTicket(
             Event  => $Param{Event}, 
             Data   => $Ticket,
             UserID => $Param{UserID},
         );
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "NotificationEvent::_HandleTicket %i/%i (TicketID: %i): %i ms\n", ++$Counter, (scalar @TicketList), $Ticket->{TicketID}, (Time::HiRes::time() - $StartTimeTicket) * 1000,
-    );
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "NotificationEvent::_HandleTicket %i/%i (TicketID: %i): %i ms\n", ++$Counter, (scalar @TicketList), $Ticket->{TicketID}, (Time::HiRes::time() - $StartTimeTicket) * 1000,
+        );
     }
 
     $Kernel::OM->Get('Log')->Log(
@@ -170,6 +170,8 @@ sub _HandleTicket {
 
     NOTIFICATION:
     for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
+
+        my $InformedRecipientCount = 0;
 
         my %Notification = $NotificationEventObject->NotificationGet(
             ID => $ID,
@@ -362,6 +364,8 @@ sub _HandleTicket {
                     UserID                => $Param{UserID},
                 );
 
+                $InformedRecipientCount++;
+
                 # remember to have sent
                 if ( $Bundle->{Recipient}->{UserID} ) {
                     $AlreadySent{ $Bundle->{Recipient}->{UserID} } = 1;
@@ -390,8 +394,15 @@ sub _HandleTicket {
                     TransportObject       => $TransportObject,
                     UserID                => $Param{UserID},
                 );
+
+                $InformedRecipientCount++;
             }
         }
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, $Notification{Name},
+        );
     }
 
     return 1;
