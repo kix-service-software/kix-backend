@@ -186,6 +186,9 @@ sub Send {
         );
     }
 
+    # correct charset if necessary (KIX2018-8418)
+    $Param{Charset} =~ s/utf8/utf-8/i;
+
     # get sign options for inline
     if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Inline' ) {
 
