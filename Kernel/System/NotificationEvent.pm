@@ -774,6 +774,61 @@ sub NotificationEventCheck {
     return @IDs;
 }
 
+=item NotificationEventList()
+
+returns a hash with the NotificationIDs to events mapping
+
+    my %EventToIDsMapping = $NotificationEventObject->NotificationEventList();
+
+=cut
+
+sub NotificationEventList {
+    my ( $Self, %Param ) = @_;
+
+    my $CacheKey = 'NotificationEventList';
+    my $Cached = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    return %{$Cached} if ( ref $Cached eq 'HASH' );
+
+    # get needed objects
+    my $DBObject    = $Kernel::OM->Get('DB');
+    my $ValidObject = $Kernel::OM->Get('Valid');
+
+    my @ValidIDs = $ValidObject->ValidIDsGet();
+    my $ValidIDString = join ', ', @ValidIDs;
+
+    $DBObject->Prepare(
+        SQL => "
+            SELECT nei.event_value, nei.notification_id
+            FROM notification_event ne, notification_event_item nei
+            WHERE ne.id = nei.notification_id
+                AND ne.valid_id IN ( $ValidIDString )
+                AND nei.event_key = 'Events'",
+    );
+
+    my $Data = $DBObject->FetchAllArrayRef(
+        Columns => [ 'Event', 'NotificationID' ]
+    );
+
+    my %Result;
+    foreach my $Row ( @{$Data || []} ) {
+        $Result{$Row->{Event}} //= [];
+        push @{$Result{$Row->{Event}}}, $Row->{NotificationID};
+    }
+
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \%Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return %Result;
+}
+
 =item NotificationImport()
 
 import an Notification YAML file/content

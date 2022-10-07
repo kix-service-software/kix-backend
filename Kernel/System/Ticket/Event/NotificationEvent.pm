@@ -47,6 +47,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    # get notification event object
+    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
+
+    # check if event is affected
+    $Self->{NotificationEventMapping} = { $NotificationEventObject->NotificationEventList() };
+
     return $Self;
 }
 
@@ -65,6 +71,8 @@ my $StartTime = Time::HiRes::time();
             return;
         }
     }
+
+    return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
     if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
         $Kernel::OM->Get('Log')->Log(
@@ -149,26 +157,11 @@ my $StartTime = Time::HiRes::time();
     # get objects
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    # check if event is affected
-    my @IDs;
-    if ( IsArrayRef($Self->{Cache}->{NotificationIDs}->{$Param{Event}}) ) {
-        @IDs = @{$Self->{Cache}->{NotificationIDs}->{$Param{Event}}};
-    }
-    else {
-        @IDs = $NotificationEventObject->NotificationEventCheck(
-            Event => $Param{Event},
-        );
-        $Self->{Cache}->{NotificationIDs}->{$Param{Event}} = \@IDs;
-    }
-
-    # return if no notification for event exists
-    return 1 if !@IDs;
-
     # get ticket attribute matches
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Param{Data}->{TicketID},
         UserID        => $Param{UserID},
-        DynamicFields => 1,
+        DynamicFields => 0,
     );
 
     $Kernel::OM->Get('Log')->Log(
@@ -177,7 +170,7 @@ my $StartTime = Time::HiRes::time();
     );
 
     NOTIFICATION:
-    for my $ID (@IDs) {
+    for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
 
 my $StartTime = Time::HiRes::time();
         my %Notification = $NotificationEventObject->NotificationGet(
@@ -943,7 +936,7 @@ $StartTime = Time::HiRes::time();
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => sprintf "   TransportObject::_SendRecipientNotification (Transport-SendNotification): %i ms (Success: $Success)\n", (Time::HiRes::time() - $StartTime) * 1000,
+        Message  => sprintf "   TransportObject::_SendRecipientNotification (Transport-SendNotification): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return if !$Success;
