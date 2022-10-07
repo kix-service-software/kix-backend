@@ -59,8 +59,6 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = Time::HiRes::time();
-
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
@@ -130,13 +128,20 @@ my $StartTime = Time::HiRes::time();
 
     my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( { %Param } );
 
+    my $Counter = 0;
+
     TICKET:
     foreach my $Ticket ( @TicketList ) {
+my $StartTimeTicket = Time::HiRes::time();
         $Self->_HandleTicket(
             Event  => $Param{Event}, 
             Data   => $Ticket,
             UserID => $Param{UserID},
         );
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "NotificationEvent::_HandleTicket %i/%i (TicketID: %i): %i ms\n", ++$Counter, (scalar @TicketList), $Ticket->{TicketID}, (Time::HiRes::time() - $StartTimeTicket) * 1000,
+    );
     }
 
     $Kernel::OM->Get('Log')->Log(
@@ -150,7 +155,6 @@ my $StartTime = Time::HiRes::time();
 sub _HandleTicket {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = Time::HiRes::time();
     # get notification event object
     my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
@@ -164,15 +168,9 @@ my $StartTime = Time::HiRes::time();
         DynamicFields => 0,
     );
 
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (Preparation): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
-    );
-
     NOTIFICATION:
     for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
 
-my $StartTime = Time::HiRes::time();
         my %Notification = $NotificationEventObject->NotificationGet(
             ID => $ID,
         );
@@ -398,17 +396,7 @@ my $StartTime = Time::HiRes::time();
                 );
             }
         }
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (Notification \"$Notification{Name}\"): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
-        );
     }
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
-    );
 
     return 1;
 }
@@ -458,7 +446,6 @@ sub _NotificationFilter {
 sub _RecipientsGet {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = Time::HiRes::time();
     # check needed params
     for my $Needed (qw(Ticket Notification)) {
         return if !$Param{$Needed};
@@ -882,11 +869,6 @@ my $StartTime = Time::HiRes::time();
         push @RecipientUsers, \%User;
     }
 
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   NotificationEvent::_RecipientsGet: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
-    );
-
     return @RecipientUsers;
 }
 
@@ -908,7 +890,6 @@ sub _SendRecipientNotification {
 
     my $TransportObject = $Param{TransportObject};
 
-my $StartTime = Time::HiRes::time();
     my %ReplacedNotification = $Kernel::OM->Get('TemplateGenerator')->NotificationEvent(
         TicketID              => $Param{TicketID},
         Recipient             => $Param{Recipient},
@@ -916,12 +897,6 @@ my $StartTime = Time::HiRes::time();
         CustomerMessageParams => $Param{CustomerMessageParams},
         UserID                => $Param{UserID},
     );
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   TransportObject::_SendRecipientNotification (TemplateGenerator): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
-    );
-
-$StartTime = Time::HiRes::time();
 
     # send notification to each recipient
     my $Success = $TransportObject->SendNotification(
@@ -932,11 +907,6 @@ $StartTime = Time::HiRes::time();
         Recipient             => $Param{Recipient},
         Event                 => $Param{Event},
         Attachments           => $Param{Attachments},
-    );
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
-        Message  => sprintf "   TransportObject::_SendRecipientNotification (Transport-SendNotification): %i ms\n", (Time::HiRes::time() - $StartTime) * 1000,
     );
 
     return if !$Success;
