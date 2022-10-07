@@ -181,10 +181,6 @@ sub _HandleTicket {
             Ticket       => \%Ticket,
             Notification => \%Notification,
         );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => sprintf "   NotificationEvent::_HandleTicket (TicketID: $Param{Data}->{TicketID}) (_NotificationFilter \"$Notification{Name}\"): Result:=$PassFilter\n",
-        );
         next NOTIFICATION if !$PassFilter;
 
         # add attachments only on ArticleCreate or ArticleSend event
