@@ -16,6 +16,7 @@ use warnings;
 use File::Path;
 use utf8;
 use Encode ();
+use Time::HiRes;
 
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
@@ -1401,6 +1402,14 @@ sub _TicketCacheClear {
         return 1;
     }
 
+    # set sempahore
+    my $Value = $Param{TicketID}.Time::HiRes::time();
+    $CacheObject->SetSemaphore(
+        ID      => "TicketCache".$Param{TicketID},
+        Value   => $Value,
+        Timeout => 1000
+    );
+
     my @Keys = $CacheObject->GetKeysForType(
         Type => "TicketCache".$Param{TicketID},
     );
@@ -1417,6 +1426,12 @@ sub _TicketCacheClear {
     $CacheObject->CleanUp(
         Type          => "TicketCache".$Param{TicketID},
         NoStatsUpdate => 1,
+    );
+
+    # clear semaphore
+    $CacheObject->ClearSemaphore(
+        ID    => "TicketCache".$Param{TicketID},
+        Value => $Value,
     );
 
     # cleanup search cache

@@ -233,6 +233,45 @@ sub GetKeysForType {
     return @Result;
 }
 
+sub SetSemaphore {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(ID Timeout Value)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+
+    return $Self->_RedisCall('set', $PreparedKey, $Param{Value}, 'nx', 'px', $Param{Timeout});
+}
+
+sub ClearSemaphore {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(ID Value)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+
+    my $Value = $Self->_RedisCall('get', $PreparedKey);
+    return if ( $Value != $Param{Value} );
+    
+    return $Self->_RedisCall('del', $PreparedKey);
+}
+
 =item _InitRedis()
 
 initialize connection to Redis
