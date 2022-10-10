@@ -1760,6 +1760,9 @@ sub SetPreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
+    # set preferences
+    my $Result = $PreferencesObject->SetPreferences(%Param);
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
@@ -1767,8 +1770,7 @@ sub SetPreferences {
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
     );
 
-    # set preferences
-    return $PreferencesObject->SetPreferences(%Param);
+    return $Result;
 }
 
 =item GetUserLanguage()
@@ -1828,7 +1830,7 @@ delete a user preference
 =cut
 
 sub DeletePreferences {
-    my $Self = shift;
+    my ( $Self, %Param ) = @_;
 
     # get user preferences config
     my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
@@ -1837,7 +1839,16 @@ sub DeletePreferences {
     # get generator preferences module
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
-    return $PreferencesObject->DeletePreferences(@_);
+    my $Result = $PreferencesObject->DeletePreferences(%Param);
+
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'User.UserPreference',
+        ObjectID  => $Param{UserID} . '::' . $Param{Key},
+    );
+
+    return $Result;
 }
 
 =item SearchPreferences()

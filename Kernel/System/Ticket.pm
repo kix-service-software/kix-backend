@@ -2060,8 +2060,8 @@ sub TicketQueueSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Queue',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{QueueID}.'::'.$Param{QueueID},
     );
 
     return 1;
@@ -2301,8 +2301,8 @@ sub TicketTypeSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Type',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{TypeID}.'::'.$Param{TypeID},
     );
 
     return 1;
@@ -2346,6 +2346,13 @@ sub TicketCustomerSet {
         );
         return;
     }
+
+    my %Ticket = $Self->TicketGet(
+        TicketID      => $Param{TicketID},
+        UserID        => $Param{UserID}
+        DynamicFields => 0,
+    )
+    return 1 if %Ticket;
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -2397,6 +2404,13 @@ sub TicketCustomerSet {
             },
             UserID => $Param{UserID},
         );
+
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Organisation',
+            ObjectID  => $Param{TicketID}.'::'.$Ticket{OrganisationID}.'::'.$Param{OrganisationID},
+        );
     }
     if ( defined $Param{ContactID} ) {
         $Self->EventHandler(
@@ -2406,14 +2420,14 @@ sub TicketCustomerSet {
             },
             UserID => $Param{UserID},
         );
-    }
 
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Contact',
+            ObjectID  => $Param{TicketID}.'::'.$Ticket{ContactID}.'::'.$Param{ContactID},
+        );
+    }
 
     # if no change
     if ( !$Param{History} ) {
@@ -2743,7 +2757,7 @@ sub TicketPendingTimeSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
+        Namespace => 'Ticket.PendingTime',
         ObjectID  => $Param{TicketID},
     );
 
@@ -2945,8 +2959,8 @@ sub TicketLockSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Lock',
+        ObjectID  => $Param{TicketID}.'::'.(lc $Param{Lock}).'::'.$Param{OwnerID},
     );
 
     return 1;
@@ -3252,8 +3266,8 @@ sub TicketStateSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.State',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{StateID}.'::'.$State{ID},
     );
 
     # KIX4OTRS-capeIT
@@ -3610,8 +3624,8 @@ sub TicketOwnerSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Owner',
+        ObjectID  => $Param{TicketID}.'::'.$OwnerID.'::'.$Param{NewUserID},
     );
 
     return 1;
@@ -3836,8 +3850,8 @@ sub TicketResponsibleSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Responsible',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{ResponsibleID}.'::'.$Param{NewUserID},
     );
 
     return 1;
@@ -4117,8 +4131,8 @@ sub TicketPrioritySet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Priority',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{PriorityID}.'::'.$Param{PriorityID},
     );
 
     return 1;
