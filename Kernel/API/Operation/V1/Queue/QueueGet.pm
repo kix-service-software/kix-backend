@@ -160,7 +160,7 @@ sub Run {
             my @DirectSubQueues;
             CHILDQUEUE:
             foreach my $ChildName ( sort keys %QueueDataListByName ) {
-                next CHILDQUEUE if $ChildName !~ /^$QueueData{Fullname}::\w+$/;
+                next CHILDQUEUE if $ChildName !~ /^\Q$QueueData{Fullname}\E::\w+$/;
                 push @DirectSubQueues, $QueueDataListByName{$ChildName}->{QueueID};
             }
 
