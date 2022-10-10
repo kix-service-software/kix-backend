@@ -2349,7 +2349,7 @@ sub TicketCustomerSet {
 
     my %Ticket = $Self->TicketGet(
         TicketID      => $Param{TicketID},
-        UserID        => $Param{UserID}
+        UserID        => $Param{UserID},
         DynamicFields => 0,
     );
     return 1 if %Ticket;
