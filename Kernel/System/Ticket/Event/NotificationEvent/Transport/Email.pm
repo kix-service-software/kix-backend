@@ -74,8 +74,6 @@ sub new {
 sub SendNotification {
     my ( $Self, %Param ) = @_;
 
-use Data::Dumper;
-print STDERR "SendNotification: ".Data::Dumper::Dumper(\%Param);
     # check needed stuff
     for my $Needed (qw(TicketID UserID Notification Recipient)) {
         if ( !$Param{$Needed} ) {
