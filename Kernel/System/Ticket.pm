@@ -2352,7 +2352,7 @@ sub TicketCustomerSet {
         UserID        => $Param{UserID},
         DynamicFields => 0,
     );
-    return 1 if %Ticket;
+    return 1 if !%Ticket;
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
