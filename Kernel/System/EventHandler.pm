@@ -284,6 +284,10 @@ sub EventHandlerTransaction {
     # execute events on end of transaction
     if ( $Self->{EventHandlerPipe} ) {
 
+        if ( $Debug ) {
+            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction: handling %i piped events", (scalar @{$Self->{EventHandlerPipe}}));
+        }
+
         my $StartTime;
         if ( $Debug ) {
             $StartTime = Time::HiRes::time();
@@ -296,7 +300,7 @@ sub EventHandlerTransaction {
             );
         }
         if ( $Debug ) {
-            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction: %i ms", (Time::HiRes::time() - $StartTime) * 1000);
+            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction took %i ms", (Time::HiRes::time() - $StartTime) * 1000);
         }
 
         # delete event pipe
