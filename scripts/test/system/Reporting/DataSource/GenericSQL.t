@@ -329,6 +329,28 @@ my @DataTests = (
         }
     },
     {
+        Test   => 'simple row SELECT with WHERE variable and fallback',
+        Config => {
+            DataSource => {
+                SQL => {
+                    any => "SELECT id, name FROM valid WHERE name LIKE '\${Parameters.NameVar?inv}%' ORDER BY id LIMIT 1"
+                },
+            },
+            Parameters => [
+                {
+                    Name => 'NameVar',
+                    DataType => 'STRING'
+                }
+            ]
+        },
+        Expect => {
+            Columns => ['id', 'name'],
+            Data => [
+                { id => 2, name => 'invalid' }
+            ],
+        }
+    },
+    {
         Test   => 'simple row SELECT with WHERE variable as array',
         Config => {
             DataSource => {
@@ -374,6 +396,28 @@ my @DataTests = (
             Columns => ['id', 'name'],
             Data => [
                 { id => 1, name => 'valid' },
+                { id => 2, name => 'invalid' }
+            ],
+        }
+    },
+    {
+        Test   => 'simple row SELECT with a part in a fallback',
+        Config => {
+            DataSource => {
+                SQL => {
+                    any => "SELECT id, name FROM valid \${Parameters.NameVar?WHERE name LIKE 'inv%'} ORDER BY id LIMIT 1"
+                },
+            },
+            Parameters => [
+                {
+                    Name => 'NameVar',
+                    DataType => 'STRING'
+                }
+            ]
+        },
+        Expect => {
+            Columns => ['id', 'name'],
+            Data => [
                 { id => 2, name => 'invalid' }
             ],
         }

@@ -373,7 +373,7 @@ sub QueueLookup {
     }
 
     # check if data exists
-    if ( !$ReturnData ) {
+    if ( !$ReturnData && !$Param{Silent}) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no $Key for $Value!",

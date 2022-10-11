@@ -16,6 +16,7 @@ use warnings;
 use File::Path;
 use utf8;
 use Encode ();
+use Time::HiRes;
 
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
@@ -1401,6 +1402,14 @@ sub _TicketCacheClear {
         return 1;
     }
 
+    # set sempahore
+    my $Value = $Param{TicketID}.Time::HiRes::time();
+    $CacheObject->SetSemaphore(
+        ID      => "TicketCache".$Param{TicketID},
+        Value   => $Value,
+        Timeout => 1000
+    );
+
     my @Keys = $CacheObject->GetKeysForType(
         Type => "TicketCache".$Param{TicketID},
     );
@@ -1413,6 +1422,28 @@ sub _TicketCacheClear {
         NoStatsUpdate => 1,
     );
 
+    # delete metadata
+    $CacheObject->CleanUp(
+        Type          => "TicketCache".$Param{TicketID},
+        NoStatsUpdate => 1,
+    );
+
+    # clear semaphore
+    $CacheObject->ClearSemaphore(
+        ID    => "TicketCache".$Param{TicketID},
+        Value => $Value,
+    );
+
+    # cleanup search cache
+    $CacheObject->CleanUp(
+        Type => "TicketSearch",
+    );
+
+    # cleanup index cache
+    $CacheObject->CleanUp(
+        Type => "TicketIndex",
+    );
+    
     foreach my $Value ( @Values ) {
         next if !$Value;
         my ( $Type, $Key ) = split(/::/, $Value, 2);
@@ -1425,22 +1456,6 @@ sub _TicketCacheClear {
             Key  => $Key
         );
     }
-
-    # delete metadata
-    $CacheObject->CleanUp(
-        Type          => "TicketCache".$Param{TicketID},
-        NoStatsUpdate => 1,
-    );
-
-    # cleanup search cache
-    $CacheObject->CleanUp(
-        Type => "TicketSearch",
-    );
-
-    # cleanup index cache
-    $CacheObject->CleanUp(
-        Type => "TicketIndex",
-    );
 
     return 1;
 }

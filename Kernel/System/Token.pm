@@ -307,7 +307,7 @@ sub RemoveToken {
 
     # log event
     $Kernel::OM->Get('Log')->Log(
-        Priority => 'notice',
+        Priority => 'debug',
         Message  => "Removed token $Param{Token}."
     );
 

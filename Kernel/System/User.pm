@@ -668,7 +668,7 @@ sub UserSearch {
         $Param{Search} =~ s/%%/%/g;
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(u.login c.firstname c.lastname c.email c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
+            Key      => [qw(u.login c.firstname c.lastname c.email)], # ignore rest for now: c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
             Value    => $Param{Search},
             BindMode => 1,
         );
@@ -1480,7 +1480,9 @@ sub CheckResourcePermission {
             if ( !defined $RolePermission && $ParentTarget ) {
                 $RolePermission = $Self->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$RoleID};
                 $Self->{PermissionCache}->{$Param{UserID}}->{$Target}->{$RoleID} = $RolePermission;
-                $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
+                if ( $Self->{PermissionDebug} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "no permissions found for role \"$Self->{PermissionCheckRoleList}->{$RoleID}\" on target $Target, using parent permission");
+                }
             }
 
             # init the value
@@ -1609,7 +1611,9 @@ sub _CheckResourcePermissionForRole {
         $RelevantPermissions{$ID} = $Permission;
     }
 
-    $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+    if ( $Self->{PermissionDebug} ) {
+        $Self->_PermissionDebug($Self->{LevelIndent}, "relevant permissions for role \"$Self->{PermissionCheckRoleList}->{$Param{RoleID}}\" on target $Param{Target}: " . Dumper( \%RelevantPermissions ) );
+    }
 
     # return if no relevant permissions exist
     if ( !IsHashRefWithData( \%RelevantPermissions ) ) {

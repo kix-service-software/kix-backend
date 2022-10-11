@@ -135,6 +135,9 @@
 /system/objecticons/:ObjectIconID                                                          | DELETE           | V1::ObjectIcon::ObjectIconDelete                 |
 /system/objecticons/:ObjectIconID                                                          | GET              | V1::ObjectIcon::ObjectIconGet                    |
 /system/objecticons/:ObjectIconID                                                          | PATCH            | V1::ObjectIcon::ObjectIconUpdate                 |
+/system/plugins                                                                            | GET              | V1::Plugin::PluginSearch                             |
+/system/plugins/:Product                                                                   | GET              | V1::Plugin::PluginGet                                |
+/system/plugins/:Product                                                                   | PATCH            | V1::Plugin::PluginUpdate                             |
 /system/roles                                                                              | GET              | V1::Role::RoleSearch                             |
 /system/roles                                                                              | POST             | V1::Role::RoleCreate                             |
 /system/roles/:RoleID                                                                      | DELETE           | V1::Role::RoleDelete                             |
