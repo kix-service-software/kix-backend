@@ -121,6 +121,8 @@ sub EventHandlerInit {
     $Self->{EventHandlerInit} = \%Param;
     $Kernel::OM->ObjectRegisterEventHandler( EventHandler => $Self );
 
+    $Self->{EventHandlerDebug} = $Kernel::OM->Get('Config')->Get('EventHandler::Debug') || 0;
+
     return 1;
 }
 
@@ -174,9 +176,15 @@ sub EventHandler {
     # return if there is no one
     return 1 if !$Modules;
 
+    my $Debug = $Kernel::OM->Get('Config')->Get('EventHandler::Debug');
+
     # remember events only on normal mode
     if ( !$Self->{EventHandlerTransaction} ) {
         push @{ $Self->{EventHandlerPipe} }, \%Param;
+
+        if ( $Debug ) {
+            $Self->_EventHandlerDebug(sprintf "event \"%s\" triggered - pipe contains %i events", $Param{Event}, (scalar @{$Self->{EventHandlerPipe}}));
+        }
     }
 
     # get main object
@@ -220,7 +228,11 @@ sub EventHandler {
                 next MODULE if $Param{Transaction} && !$Modules->{$Module}->{Transaction};
             }
 
-my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Debug ) {
+                $StartTime = Time::HiRes::time();
+            }
+
             # load event module
             next MODULE if !$MainObject->Require( $Modules->{$Module}->{Module} );
 
@@ -231,10 +243,10 @@ my $StartTime = Time::HiRes::time();
                 %Param,
                 Config => $Modules->{$Module},
             );
-if ( $Param{Transaction} ) {
-   printf STDERR "($$)    EventHandler %s on %s: %i ms\n", $Modules->{$Module}->{Module}, $Param{Event}, (Time::HiRes::time() - $StartTime) * 1000;
-}
 
+            if ( $Debug ) {
+                $Self->_EventHandlerDebug(sprintf "%sevent \"%s\": execution of handler \"%s\" took %i ms", ($Param{Transaction} ? '(Transaction) ' : ''), $Param{Event}, $Modules->{$Module}->{Module}, (Time::HiRes::time() - $StartTime) * 1000);
+            }
         }
     }
 
@@ -264,13 +276,18 @@ Kernel::System::EventHandler, like this:
 sub EventHandlerTransaction {
     my ( $Self, %Param ) = @_;
 
+    my $Debug = $Kernel::OM->Get('Config')->Get('EventHandler::Debug');
+
     # remember, we are in destroy mode, do not execute new events
     $Self->{EventHandlerTransaction} = 1;
 
     # execute events on end of transaction
     if ( $Self->{EventHandlerPipe} ) {
 
-my $StartTime = Time::HiRes::time();
+        my $StartTime;
+        if ( $Debug ) {
+            $StartTime = Time::HiRes::time();
+        }
         for my $Params ( @{ $Self->{EventHandlerPipe} } ) {
             $Self->EventHandler(
                 %Param,
@@ -278,7 +295,9 @@ my $StartTime = Time::HiRes::time();
                 Transaction => 1,
             );
         }
-printf STDERR "($$) EventHandlerTransaction: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
+        if ( $Debug ) {
+            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction: %i ms", (Time::HiRes::time() - $StartTime) * 1000);
+        }
 
         # delete event pipe
         $Self->{EventHandlerPipe} = undef;
@@ -303,11 +322,15 @@ sub EventHandlerHasQueuedTransactions {
     return IsArrayRefWithData( $Self->{EventHandlerPipe} );
 }
 
+sub _EventHandlerDebug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Kernel::OM->Get('Config')->Get('EventHandler::Debug');
+
+    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[EventHandler]", "$Message";
+}
+
 1;
-
-
-
-
 
 =back
 

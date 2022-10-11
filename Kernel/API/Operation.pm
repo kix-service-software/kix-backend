@@ -425,17 +425,17 @@ sub _CheckPermission {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
+    return if !$Kernel::OM->Get('Config')->Get('API::Debug');
 
     $Indent ||= '';
 
-    printf STDERR "%f, Time::HiRes::time()(%5i) %-15s %s%s: %s\n", Time::HiRes::time(), $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
+    printf STDERR "%f (%5i) %-15s %s%s: %s\n", Time::HiRes::time(), $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
+    return if !$Kernel::OM->Get('Config')->Get('Permission::Debug');
 
     $Indent ||= '';
 

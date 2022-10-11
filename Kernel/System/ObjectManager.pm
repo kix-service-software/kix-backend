@@ -730,6 +730,9 @@ sub CleanUp {
 sub DESTROY {
     my ($Self) = @_;
 
+    my $Debug = $Self->Get('Config')->Get('EventHandler::Debug');
+    print STDERR "OM: Debug: $Debug\n";
+
     # Make sure $Kernel::OM is still available in the destructor
     local $Kernel::OM = $Self;
 

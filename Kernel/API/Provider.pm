@@ -351,7 +351,7 @@ sub Run {
         );
     }
 
-    $Self->_Debug('', sprintf "($$) total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{Route}, (time() - $Self->{RequestStartTime}) * 1000);
+    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, (time() - $Self->{RequestStartTime}) * 1000);
 
     return;
 }

@@ -60,6 +60,8 @@ sub new {
     $Self->{CacheType} = 'Automation';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Automation::Debug') || 0;
+
     return $Self;
 }
 
@@ -116,7 +118,10 @@ sub ExecuteJobsForEvent {
 
         if ( $CanExecute ) {
 
-my $StartTime = time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
             # execute the job in a new Automation instance
             my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
 
@@ -124,7 +129,9 @@ my $StartTime = time();
                 ID => $JobID,
                 %Param,
             );
-printf STDERR "($$)             Automation->ExecuteJobsForEvent: JobExecute ($Job{Name}): %i ms\n", (time() - $StartTime) * 1000;
+            if ( $Self->{Debug} ) {
+                $Self->_Debug(sprintf "ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $StartTime) * 1000);
+            }
         }
     }
 
@@ -347,6 +354,14 @@ sub _GetUnique {
     my ( $Self, @List ) = @_;
     my %Known;
     return grep { !$Known{$_}++ } @List;
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[Automation]", "$Message";
 }
 
 1;
