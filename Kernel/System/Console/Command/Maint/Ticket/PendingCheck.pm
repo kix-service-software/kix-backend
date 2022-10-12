@@ -130,80 +130,49 @@ sub Run {
         $Self->Print(" No pending auto StateIDs found!\n");
     }
 
-    # determine relevant calendars
-    my %RelevantCalendars;
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    my $MaxCalendarCount = $ConfigObject->Get('MaximumCalendarNumber') || 100;
-
-    CALENDAR:
-    foreach my $Calendar ('', 1..$MaxCalendarCount) {
-        my $CalendarConfig = 'TimeWorkingHours' . ($Calendar ? '::Calendar'.$Calendar : '');
-
-        next CALENDAR if !$ConfigObject->Get($CalendarConfig);
-
-        # check if NOW is within the calendars business hours
-        my $IsBusinessHour = $TimeObject->WorkingTime(
-            StartTime => $TimeObject->SystemTime() - ( 10 * 60 ),
-            StopTime  => $TimeObject->SystemTime(),
-            Calendar  => $Calendar,
-        );
-        next CALENDAR if !$IsBusinessHour;
-        $RelevantCalendars{$Calendar} = $IsBusinessHour;
-    }
-
-    if ( %RelevantCalendars ) {
-        # look for pending reminder tickets with PendingTime in the past
-        my %Tickets = $TicketObject->TicketSearch(
-            Result    => 'HASH',
-            Search => {
-                AND => [
-                    {
-                        Field    => 'StateType',
-                        Operator => 'EQ',
-                        Value    => 'pending reminder',
-                    },
-                    {
-                        Field    => 'PendingTime',
-                        Operator => 'LT',
-                        Value    => '+0s',
-                    },
-                ]
-            },
-            UserID    => 1,
-        );
-
-        # get calendars of tickets
-        my $TicketList = $TicketObject->TicketCalendarGet(
-            TicketIDs     => [ sort keys %Tickets ],
-            OnlyCalendars => [ sort keys %RelevantCalendars ],
-        );
-        
-        my $NotificationCount = 0;
-
-        my @PreparedTicketList;
-        foreach my $Ticket ( @{$TicketList || []} ) {
-            push @PreparedTicketList, {
-                TicketID              => $Ticket->{TicketID},
-                CustomerMessageParams => {
-                    TicketNumber => $Tickets{$Ticket->{TicketID}},
+    # look for pending reminder tickets with PendingTime in the past
+    my %Tickets = $TicketObject->TicketSearch(
+        Result    => 'HASH',
+        Search => {
+            AND => [
+                {
+                    Field    => 'StateType',
+                    Operator => 'EQ',
+                    Value    => 'pending reminder',
                 },
-            };
-            $NotificationCount++;
-        }
+                {
+                    Field    => 'PendingTime',
+                    Operator => 'LT',
+                    Value    => '+0s',
+                },
+            ]
+        },
+        UserID => 1,
+    );
+        
+    my $NotificationCount = 0;
 
-        # trigger notification event
-        $TicketObject->EventHandler(
-            Event => 'NotificationPendingReminder',
-            Data  => {
-                TicketList => \@PreparedTicketList
+    my @PreparedTicketList;
+    foreach my $TicketID ( sort %Tickets ) {
+        push @PreparedTicketList, {
+            TicketID              => $TicketID,
+            CustomerMessageParams => {
+                TicketNumber => $Tickets{TicketID},
             },
-            UserID => 1,
-        );
-
-        $Self->Print(" Triggered $NotificationCount reminder notification(s).\n");
+        };
+        $NotificationCount++;
     }
+
+    # trigger notification event
+    $TicketObject->EventHandler(
+        Event => 'NotificationPendingReminder',
+        Data  => {
+            TicketList => \@PreparedTicketList
+        },
+        UserID => 1,
+    );
+
+    $Self->Print("Triggered $NotificationCount reminder notification(s).\n");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
