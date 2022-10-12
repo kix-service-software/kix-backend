@@ -716,9 +716,16 @@ sub ConfigSettingChange {
 
     die "Need 'Key'" if !defined $Key;
 
-    # Also set at runtime in the ConfigObject. This will be destroyed at the end of the unit test.
+    # set in SysConfig
+    $Kernel::OM->Get('SysConfig')->ValueSet(
+        Key    => $Key,
+        Value  => $Valid ? $Value : undef,
+        UserID => 1,
+    );
+
+    # set in Config
     $Kernel::OM->Get('Config')->Set(
-        Key   => $Key,
+        Key   => $Param{Key},
         Value => $Valid ? $Value : undef,
     );
 

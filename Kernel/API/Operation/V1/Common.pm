@@ -986,10 +986,16 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", $TimeDiff));
         }
 
-        if (!IsHashRefWithData( $Self->{Limit})) {
-            my $Limit = $Kernel::OM->Get('Config')->Get('API::Request::DefaultLimit');
+        # set default limits if necessary
+        if ( !IsHashRefWithData( $Self->{Limit} ) ) {
             # API::Request::DefaultLimit == 0 means it's disabled
-            $Self->{Limit}->{__COMMON} = $Limit if ($Limit);
+            my $Limit = $Kernel::OM->Get('Config')->Get('API::Request::DefaultLimit') || undef;
+            $Self->{Limit}->{__COMMON} = $Limit;
+        }
+        if ( !IsHashRefWithData( $Self->{SearchLimit} ) ) {
+            # API::Request::DefaultLimit == 0 means it's disabled
+            my $Limit = $Kernel::OM->Get('Config')->Get('API::Request::DefaultLimit') || undef;
+            $Self->{SearchLimit}->{__COMMON} = $Self->{Limit}->{__COMMON} || $Limit;
         }
 
         # honor a limiter, if we have one
