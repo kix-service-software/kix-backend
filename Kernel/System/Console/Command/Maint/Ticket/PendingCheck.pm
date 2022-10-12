@@ -126,9 +126,10 @@ sub Run {
         }
     }
     else {
-
         $Self->Print(" No pending auto StateIDs found!\n");
     }
+
+    my %CronTaskSummary = map { $_->{Name} => $_ } @{( $Kernel::OM->Get('Daemon::SchedulerDB')->CronTaskSummary() )[0]->{Data}} ;
 
     # look for pending reminder tickets with PendingTime in the past
     my %Tickets = $TicketObject->TicketSearch(
@@ -141,19 +142,19 @@ sub Run {
                     Value    => 'pending reminder',
                 },
                 {
-                    Field    => 'PendingTime',
-                    Operator => 'LT',
-                    Value    => '+0s',
+                    Field    => 'PendingReminderRequired',
+                    Operator => 'EQ',
+                    Value    => '1',
                 },
             ]
         },
         UserID => 1,
     );
-        
+
     my $NotificationCount = 0;
 
     my @PreparedTicketList;
-    foreach my $TicketID ( sort %Tickets ) {
+    foreach my $TicketID ( sort keys %Tickets ) {
         push @PreparedTicketList, {
             TicketID              => $TicketID,
             CustomerMessageParams => {
@@ -163,14 +164,16 @@ sub Run {
         $NotificationCount++;
     }
 
-    # trigger notification event
-    $TicketObject->EventHandler(
-        Event => 'NotificationPendingReminder',
-        Data  => {
-            TicketList => \@PreparedTicketList
-        },
-        UserID => 1,
-    );
+    if ( @PreparedTicketList ) {
+        # trigger notification event
+        $TicketObject->EventHandler(
+            Event => 'NotificationPendingReminder',
+            Data  => {
+                TicketList => \@PreparedTicketList
+            },
+            UserID => 1,
+        );
+    }
 
     $Self->Print("Triggered $NotificationCount reminder notification(s).\n");
 

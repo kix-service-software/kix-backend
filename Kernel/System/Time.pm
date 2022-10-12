@@ -215,6 +215,12 @@ if no timestamp is used in the calculation, the current system time will be used
         String => '+1w',
     );
 
+if no date part is given, the current day will be used
+    my $SystemTime = $TimeObject->TimeStamp2SystemTime(
+        String => '22:45:00',
+    );
+
+
 =cut
 
 sub TimeStamp2SystemTime {
@@ -236,7 +242,9 @@ sub TimeStamp2SystemTime {
 
     if ( $Parts[0] !~ /^[+-]\d+[YMwdhms]?/ ) {
         # we have a real timestamp
-        $TimeStamp = (shift @Parts) . ' ' . (shift @Parts);
+        $TimeStamp = (shift @Parts);
+        $TimeStamp .= (' ' . shift @Parts) if $Parts[0];
+        
     }
     else {
         # we have to use NOW as TimeStamp
@@ -329,10 +337,8 @@ sub TimeStamp2SystemTime {
             Second => $8,
         ) + $DiffTime + $Self->{TimeSecDiff};
     }
-    elsif (    # match yyyy-mm-ddThh:mm:ssZ
-        $TimeStamp =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})Z$/
-        )
-    {
+    # match yyyy-mm-ddThh:mm:ssZ
+    elsif ($TimeStamp =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})Z$/) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $1,
             Month  => $2,
@@ -340,6 +346,20 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6,
+        );
+    }
+    # match hh:mm:ss (time TODAY)
+    elsif ($TimeStamp =~ /(\d{1,2}):(\d{1,2}):(\d{1,2})/) {
+        my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $Self->SystemTime2Date(
+            SystemTime => $Self->SystemTime()
+        );
+        $SystemTime = $Self->Date2SystemTime(
+            Year   => $Year,
+            Month  => $Month,
+            Day    => $Day,
+            Hour   => $1,
+            Minute => $2,
+            Second => $3,
         );
     }
 
@@ -375,7 +395,7 @@ sub TimeStamp2SystemTime {
             eval "\$Diffs{\$Unit} = $Diffs{$Unit} $Operator $Diff";
         }
 
-        # add one year to the current timestamp
+        # add the relatives to the current timestamp
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $Self->SystemTime2Date(
             SystemTime => $SystemTime
         );
