@@ -635,6 +635,7 @@ sub Sync {
             my $Result = $RoleObject->RoleUserDelete(
                 UserID => $UserID,
                 RoleID => $RoleID,
+                IgnoreContextRoles => 1,
             );
             if ( !$Result ) {
                 $Kernel::OM->Get('Log')->Log(
