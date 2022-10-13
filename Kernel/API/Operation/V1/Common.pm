@@ -199,9 +199,20 @@ sub RunOperation {
     # check cache if CacheType is set for this operation
     if ( $Kernel::OM->Get('Config')->Get('API::Cache') && $Self->{OperationConfig}->{CacheType} ) {
 
-        my $CacheResult = $Self->_CacheGet();
+        # add own cache dependencies, if available
+        if ( $Self->{OperationConfig}->{CacheTypeDependency} ) {
+            $Self->AddCacheDependency( Type => $Self->{OperationConfig}->{CacheTypeDependency} );
+        }
+
+        my $CacheKey = $Self->_GetCacheKey();
+
+        my $CacheResult = $Kernel::OM->Get('Cache')->Get(
+            Type => $Self->{OperationConfig}->{CacheType},
+            Key  => $CacheKey,
+        );
 
         if ( IsHashRefWithData($CacheResult) ) {
+            $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
                 %{$CacheResult}
@@ -751,8 +762,7 @@ sub IncludeSubResourceIfProperty {
 add a new cache dependency to inform the system about foreign depending objects included in the response
 
     $CommonObject->AddCacheDependency(
-        Type => '...',
-        Raw  => 1,          # optional, don't alter the given type
+        Type => '...'
     );
 
 =cut
@@ -779,24 +789,15 @@ sub AddCacheDependency {
         }
     }
 
-    my $UserRef = '';
-    if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
-        $UserRef = $Self->{Authorization}->{UserID} . '_' . $Self->{Authorization}->{UserType}.'_';
-    }
-
     foreach my $Type ( split( /,/, $Param{Type} ) ) {
 
         # ignore the same type as dependency
         next if $Type eq $Self->{OperationConfig}->{CacheType};
 
-        if ( $Type =~ /^API_/ && !$Param{Raw} ) {
-            $Type = 'API_'.$UserRef.$Type;
-        }
-
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"API_$UserRef$Self->{OperationConfig}->{CacheType}\": $Type" );
+        $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
         $Self->{CacheDependencies}->{$Type} = 1;
     }
 }
@@ -1248,7 +1249,7 @@ sub ExecOperation {
         $Self->AddCacheDependency( Type => $OperationObject->{OperationConfig}->{CacheType} );
         if ( IsHashRefWithData( $OperationObject->GetCacheDependencies() ) ) {
             foreach my $CacheDep ( keys %{ $OperationObject->GetCacheDependencies() } ) {
-                $Self->AddCacheDependency( Type => $CacheDep, Raw => 1 );
+                $Self->AddCacheDependency( Type => $CacheDep );
             }
         }
         if ( $Kernel::OM->Get('Config')->Get('API::Debug') ) {
@@ -2334,7 +2335,13 @@ sub _GetCacheKey {
         $RequestData{$What} = join( ',', sort @Parts );
     }
 
-    my $CacheKey = $Self->{WebserviceID} . '::' . $Self->{OperationType} . '::' . $Kernel::OM->Get('Main')->Dump(
+    # add UserKey (UserID + UserType) to CacheKey if not explicitly disabled
+    my $UserKey = '';
+    if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
+        $UserKey = $Self->{Authorization}->{UserID} . '::' . $Self->{Authorization}->{UserType};
+    }
+
+    my $CacheKey = $UserKey . '::' . $Self->{WebserviceID} . '::' . $Self->{OperationType} . '::' . $Kernel::OM->Get('Main')->Dump(
         \%RequestData,
         'ascii+noindent'
     );
@@ -2342,50 +2349,17 @@ sub _GetCacheKey {
     return $CacheKey;
 }
 
-sub _CacheGet {
-    my ( $Self, %Param ) = @_;
-
-    # add own cache dependencies, if available
-    if ( $Self->{OperationConfig}->{CacheTypeDependency} ) {
-        $Self->AddCacheDependency( Type => $Self->{OperationConfig}->{CacheTypeDependency} );
-    }
-
-    my $CacheKey = $Self->_GetCacheKey();
-
-    my $UserRef = '';
-    if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
-        $UserRef = $Self->{Authorization}->{UserID} . '_' . $Self->{Authorization}->{UserType}.'_';
-    }
-
-    my $CacheResult = $Kernel::OM->Get('Cache')->Get(
-        Type => 'API_'.$UserRef.$Self->{OperationConfig}->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    if ( $CacheResult ) {
-        $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
-    }
-
-    return $CacheResult;
-}
-
 sub _CacheRequest {
     my ( $Self, %Param ) = @_;
 
     if ( $Param{Data} ) {
         my $CacheKey = $Self->_GetCacheKey();
-        my @CacheDependencies = ( 'Role' );    # every api cache depends on the roles
+        my @CacheDependencies;
         if ( IsHashRefWithData( $Self->{CacheDependencies} ) ) {
-            @CacheDependencies = ( @CacheDependencies, keys %{ $Self->{CacheDependencies} });
+            @CacheDependencies = keys %{ $Self->{CacheDependencies} };
         }
-
-        my $UserRef = '';
-        if ( !$Self->{OperationConfig}->{DisableUserBasedCaching} ) {
-            $UserRef = $Self->{Authorization}->{UserID} . '_' . $Self->{Authorization}->{UserType}.'_';
-        }
-
         $Kernel::OM->Get('Cache')->Set(
-            Type     => 'API_'.$UserRef.$Self->{OperationConfig}->{CacheType},
+            Type     => $Self->{OperationConfig}->{CacheType},
             Depends  => \@CacheDependencies,
             Category => 'API',
             Key      => $CacheKey,

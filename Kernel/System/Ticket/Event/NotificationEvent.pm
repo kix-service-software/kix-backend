@@ -126,12 +126,14 @@ sub _Run {
 
 my $StartTime = Time::HiRes::time();
 
-    my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( { %Param } );
+    my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( $Param{Data} );
 
     my $Counter = 0;
 
     TICKET:
     foreach my $Ticket ( @TicketList ) {
+        next TICKET if !$Ticket->{TicketID};
+
         my $StartTimeTicket = Time::HiRes::time();
         $Self->_HandleTicket(
             Event  => $Param{Event}, 

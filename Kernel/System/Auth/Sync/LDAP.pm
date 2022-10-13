@@ -591,7 +591,7 @@ sub Sync {
     # compare role permissions from ldap with current user role permissions and update if necessary
     if ( %RolesFromLDAP ) {
 
-        my %UserRoles = $UserObject->RoleList(
+        my %UserRoles = map { $_ => 1 } $UserObject->RoleList(
             UserID => $UserID,
         );
 
