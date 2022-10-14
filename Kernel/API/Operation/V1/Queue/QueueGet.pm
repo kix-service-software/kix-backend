@@ -206,7 +206,8 @@ sub Run {
                 if ( !IsHashRef($Self->{QueueTicketStats}) ) {
 use Time::HiRes;
 my $StartTime = Time::HiRes::time();
-                    $Self->{QueueTicketStats} = { $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats() || () };
+                    my %QueueStats = $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats();
+                    $Self->{QueueTicketStats} = \%QueueStats;
 print STDERR "TicketIndexGetQueueStats: ".((Time::HiRes::time() - $StartTime) * 1000) . " ms\n";
                 }
                 $QueueData{TicketStats} = $Self->{QueueTicketStats}->{$QueueID} || { TotalCount => 0, LockCount => 0 };
