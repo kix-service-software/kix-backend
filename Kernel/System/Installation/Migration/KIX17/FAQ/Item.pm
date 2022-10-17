@@ -317,13 +317,13 @@ sub _MigrateAttachments {
     my %FAQItem = %{$Param{Item}};
     my %InlineAttachments;
     foreach my $Field ( qw(f_field1 f_field2 f_field3 f_field4 f_field5 f_field6) ) {
-        if ( $FAQItem{$Field} && $FAQItem{$Field} =~ /src="(.*?Action=AgentFAQZoom;Subaction=DownloadAttachment;.*?;FileID=(\d+))"/ ) {
+        while ( $FAQItem{$Field} && $FAQItem{$Field} =~ /src="\/(.*?Action=AgentFAQZoom;Subaction=DownloadAttachment;.*?;FileID=(\d+))"/g ) {
             my $CID = $InlineAttachments{$2};
             if ( !$CID ) {
                 $CID = 'pasted.' . time() . '.' . int(rand(1000000)) . '@' . $FQDN;
                 $InlineAttachments{$2} = $CID;
             }
-            $FAQItem{$Field} =~ s/\Q$1\E/cid:$CID/gmi;
+            $FAQItem{$Field} =~ s/\/\Q$1\E/cid:$CID/gmi;
         }
     }
 

@@ -283,6 +283,11 @@ sub Run {
     }
 
     #
+    # store user authorization info in object manager for usage in kernel packages
+    #
+    $Kernel::OM->{Authorization} = $Authorization;
+
+    #
     # Execute actual operation.
     #
     my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');

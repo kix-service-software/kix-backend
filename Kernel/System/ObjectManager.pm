@@ -220,6 +220,18 @@ sub GetObjectDefinitionList {
     return @Result;
 }
 
+=item CreateOnce()
+
+Retrieves a new object of the given package, with the given params. Does NOT overide an existing Singleton.
+
+    my $ConfigObject = $Kernel::OM->CreateOnce('Config', <{Params}>);
+
+=cut
+
+sub CreateOnce {
+    return $_[0]->_ObjectBuild( Package => $_[1], Params => $_[2] // {} );
+}
+
 =item Get()
 
 Retrieves a singleton object, and if it not yet exists, implicitly creates one for you.
@@ -321,9 +333,9 @@ sub _ObjectBuild {
     use strict 'refs';
     $Self->{ObjectDependencies}->{$Package} = $Dependencies;
 
-    my $NewObject = $Package->new(
-        %{ $Self->{Param}->{$Param{Package}} // {} }
-    );
+    my %Params = %{ $Self->{Param}->{$Param{Package}} || $Param{Params} || {} };
+
+    my $NewObject = $Package->new(%Params);
 
     if ( !defined $NewObject ) {
         if ( $CurrentObject && $CurrentObject ne $Package ) {

@@ -30,6 +30,7 @@
 
 <!-- acl_sync - sync states for acls -->
 <Table Name="acl_sync">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="acl_id" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="sync_state" Required="true" Size="30" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
@@ -295,6 +296,7 @@
 
 <!-- queue preferences -->
 <Table Name="queue_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="queue_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Size="250" Type="VARCHAR"/>
@@ -728,6 +730,7 @@
 
 <!-- ticket_loop_protection -->
 <Table Name="ticket_loop_protection">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="sent_to" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="sent_date" Required="true" Size="150" Type="VARCHAR"/>
     <Index Name="ticket_loop_protection_sent_to">
@@ -1320,6 +1323,7 @@
     </Index>
 </Table>
 <Table Name="search_profile_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="search_profile_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_type" Required="true" Size="30" Type="VARCHAR"/>
     <Column Name="preferences_key" Required="true" Size="200" Type="VARCHAR"/>
@@ -1329,6 +1333,7 @@
     </ForeignKey>
 </Table>
 <Table Name="search_profile_category">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="search_profile_id"  Required="true"  Type="INTEGER"/>
     <Column Name="category" Required="true"  Type="VARCHAR" Size="100"/>
     <ForeignKey ForeignTable="search_profile">

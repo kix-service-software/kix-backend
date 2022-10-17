@@ -417,7 +417,10 @@ sub PluginExtendedDataGet {
     return if !$Plugins{$Param{Plugin}};
 
     # get plugin specific extended data
-    my $Module = $Kernel::OM->Get('Config')->Get('Plugin::SetupRegistration')->{$Param{Plugin}}->{Module};
+    my $SetupRegistration = $Kernel::OM->Get('Config')->Get('Plugin::SetupRegistration');
+    return %ExtendedData if !IsHashRefWithData($SetupRegistration);
+
+    my $Module = $SetupRegistration->{$Param{Plugin}}->{Module};
     if ( $Module ) {
         my $SetupObject = $Kernel::OM->Get($Module);
         if ( $SetupObject ) {

@@ -168,6 +168,9 @@ sub ArticleCreate {
         }
     }
 
+    # correct charset if necessary (KIX2018-8418)
+    $Param{Charset} =~ s/utf8/utf-8/i;
+
     # check ContentType vs. Charset & MimeType
     if ( !$Param{ContentType} ) {
         for (qw(Charset MimeType)) {
@@ -182,18 +185,12 @@ sub ArticleCreate {
         $Param{ContentType} = "$Param{MimeType}; charset=$Param{Charset}";
     }
     else {
-        for (qw(ContentType)) {
-            if ( !$Param{$_} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-                return;
-            }
-        }
-        my $Charset = 'utf-8';
         if ( $Param{ContentType} =~ /charset=/i ) {
-            $Charset = $Param{ContentType};
+
+            # correct charset if necessary (KIX2018-8418)
+            $Param{ContentType} =~ s/utf8/utf-8/i;
+
+            my $Charset = $Param{ContentType};
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
             $Charset =~ s/"|'//g;
             $Charset =~ s/(.+?);.*/$1/g;
@@ -201,14 +198,14 @@ sub ArticleCreate {
             # only change if we extracted a charset
             $Param{Charset} = $Charset || $Param{Charset};
         }
-        my $MimeType = '';
-        if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
-            $MimeType = $1;
-            $MimeType =~ s/"|'//g;
-        }
 
-        # only change if we extracted a mime type
-        $Param{MimeType} = $MimeType || $Param{MimeType};
+        if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
+            my $MimeType = $1;
+            $MimeType =~ s/"|'//g;
+
+            # only change if we extracted a mime type
+            $Param{MimeType} = $MimeType || $Param{MimeType};
+        }
     }
 
     # fallback for Charset
