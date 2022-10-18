@@ -52,25 +52,34 @@ sub _Replace {
     $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{
         my $Replace = '';
         my $Key = $1;
-        my %ConfigDefinition = $SysConfigObject->OptionGet(
-            Name => $Key,
+
+        my $Exists = $SysConfigObject->Exists(
+            Name => $Key
         );
-        if ($Kernel::OM->{Authorization}->{UserType} && $ConfigDefinition{AccessLevel} &&
-            (
-                ($Kernel::OM->{Authorization}->{UserType} eq 'Agent' && $ConfigDefinition{AccessLevel} eq 'internal')
-                    || $ConfigDefinition{AccessLevel} eq 'external'
-                    || $ConfigDefinition{AccessLevel} eq 'public'
-            )
-        ) {
-            $Replace = $Self->_GetReplaceValue(
-                Key             => $Key,
-                ReplaceNotFound => $Param{ReplaceNotFound}
+
+        if ($Exists) {
+            my %ConfigDefinition = $SysConfigObject->OptionGet(
+                Name => $Key,
             );
-        }
-        else {
-            $Replace = $Param{UserID} == 1 ?
-                $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound})
-                : $Param{ReplaceNotFound};
+            if ($Kernel::OM->{Authorization}->{UserType} && $ConfigDefinition{AccessLevel} &&
+                (
+                    ($Kernel::OM->{Authorization}->{UserType} eq 'Agent' && $ConfigDefinition{AccessLevel} eq 'internal')
+                        || $ConfigDefinition{AccessLevel} eq 'external'
+                        || $ConfigDefinition{AccessLevel} eq 'public'
+                )
+            ) {
+                $Replace = $Self->_GetReplaceValue(
+                    Key             => $Key,
+                    ReplaceNotFound => $Param{ReplaceNotFound}
+                );
+            }
+            else {
+                $Replace = $Param{UserID} == 1 ?
+                    $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound})
+                    : $Param{ReplaceNotFound};
+            }
+        } {
+            $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound});
         }
         $Replace;
     }egx;
