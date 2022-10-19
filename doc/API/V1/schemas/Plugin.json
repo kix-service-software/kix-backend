@@ -1,0 +1,96 @@
+{
+   "$id" : "Plugin.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The plugin object.",
+   "type" : "object",
+   "properties" : {
+      "BuildDate" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "BuildNumber" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Client" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Description" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "ExtendedData" : {
+         "type" : "object",
+         "readOnly" : true
+      },
+      "InitOrder" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
+      "PatchNumber" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Product" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Readme" : {
+         "type" : "array",
+         "items" : {
+            "properties" : {
+               "Content" : {
+                  "type" : "string",
+                  "readOnly" : true
+               },
+               "Language" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "required" : [
+               "Language",
+               "Content"
+            ]
+         },
+         "readOnly" : true
+      },
+      "Requires" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Triggers" : {
+         "type" : "array",
+         "items" : {
+            "properties" : {
+               "Description" : {
+                  "type" : "string",
+                  "readOnly" : true
+               },
+               "Name" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "required" : [
+               "Name",
+               "Description"
+            ]
+         },
+         "readOnly" : true
+      },
+      "Version" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "BuildNumber",
+      "Description",
+      "InitOrder",
+      "PatchNumber",
+      "Product",
+      "Version"
+   ]
+}

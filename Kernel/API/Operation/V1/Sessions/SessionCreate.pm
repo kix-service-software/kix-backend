@@ -51,7 +51,7 @@ sub ParameterDefinition {
 
     return {
         'UserLogin' => {
-            Required => 1
+            RequiredIfNot => ['NegotiateToken']
         },
         'UserType' => {
             Required => 1,
@@ -61,7 +61,7 @@ sub ParameterDefinition {
             ]
         },
         'Password' => {
-            Required => 1
+            RequiredIfNot => ['NegotiateToken']
         }
     }
 }
@@ -100,9 +100,10 @@ sub Run {
     if ( defined $Param{Data}->{UserType} ) {
         # check submitted data
         $User = $Kernel::OM->Get('Auth')->Auth(
-            User         => $Param{Data}->{UserLogin} || '',
-            UsageContext => $Param{Data}->{UserType},
-            Pw           => $PostPw,
+            User           => $Param{Data}->{UserLogin} || '',
+            UsageContext   => $Param{Data}->{UserType},
+            Pw             => $PostPw,
+            NegotiateToken => $Param{Data}->{NegotiateToken},
         );
         if ( $User ) {
             $UserID = $Kernel::OM->Get('User')->UserLookup(

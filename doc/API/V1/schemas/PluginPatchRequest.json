@@ -1,0 +1,24 @@
+{
+   "$id" : "PluginPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The plugin request object for update.",
+   "type" : "object",
+   "properties" : {
+      "Plugin" : {
+         "type" : "object",
+         "properties" : {
+            "ExecActivateConfig" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 the plugins config activation routines will be triggered.",
+               "type" : "integer"
+            },
+            "ExecReset" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 the plugins reset routines will be triggered.",
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "Plugin"
+   ]
+}

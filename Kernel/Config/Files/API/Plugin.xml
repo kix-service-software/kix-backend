@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Plugin::PluginGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">PluginGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Plugin::PluginGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ObjectID">PluginID</Item>
+                <Item Key="ResponseSchema">PluginResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Plugin::PluginSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">PluginSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Plugin::PluginSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">PluginCollectionResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Plugin::PluginUpdate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">PluginUpdate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Plugin::PluginUpdate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">PluginPatchRequest</Item>
+                <Item Key="ResponseSchema">PluginPatchResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

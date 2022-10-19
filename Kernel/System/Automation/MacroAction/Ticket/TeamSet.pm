@@ -96,8 +96,19 @@ sub Run {
 
     # set the new team
     my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
-        Queue => $Team
+        Queue => $Team,
+        Silent => 1
     );
+
+    if (!$QueueID && $Team =~ m/^\d+$/) {
+        my $QueueName = $Kernel::OM->Get('Queue')->QueueLookup(
+            QueueID => $Team,
+            Silent => 1
+        );
+        if ($QueueName) {
+            $QueueID = $Team;
+        }
+    }
 
     if ( !$QueueID ) {
         $Kernel::OM->Get('Automation')->LogError(

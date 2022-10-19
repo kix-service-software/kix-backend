@@ -243,7 +243,7 @@ sub SearchSQLGet {
 
         # calculate relative times
         my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            TimeStamp => $SearchTerm
+            String => $SearchTerm
         );
         $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $SystemTime

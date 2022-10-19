@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::Config::CleanUp;
+package Kernel::System::Console::Command::Admin::Config::CleanUp;
 
 use strict;
 use warnings;

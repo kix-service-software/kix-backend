@@ -16,6 +16,7 @@ use warnings;
 use File::Path;
 use utf8;
 use Encode ();
+use Time::HiRes;
 
 use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
@@ -491,79 +492,144 @@ sub TicketCreate {
         $Param{Title} = substr( $Param{Title}, 0, 255 );
     }
 
-    # check database undef/NULL (set value to undef/NULL to prevent database errors)
+    # check given organisation id
+    my $ExistingOrganisationID;
 
-    # create organisation if it doesn't exist
-    if ($Param{OrganisationID} && $Param{OrganisationID} !~ /^\d+$/) {
-        my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            Number => $Param{OrganisationID},
-            Silent => 1
-        );
-        if (!$OrgID) {
-            $Param{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-                Number => $Param{OrganisationID},
-                Name   => $Param{OrganisationID},
-                UserID => 1,
+    # FIXME: remove ContactID check with KIX2018-6884
+    if ( $Param{OrganisationID} && $Param{ContactID} ) {
+        if ($Param{OrganisationID} =~ /^\d+$/) {
+            my $FoundOrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                ID     => $Param{OrganisationID},
+                Silent => 1
             );
+            if ($FoundOrgNumber) {
+                $ExistingOrganisationID = $Param{OrganisationID}
+            }
         }
-        else {
-            $Param{OrganisationID} = $OrgID;
+        if (!$ExistingOrganisationID) {
+            my $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                Number => $Param{OrganisationID},
+                Silent => 1
+            );
+            if ($FoundOrgID) {
+                $ExistingOrganisationID = $FoundOrgID
+            }
         }
-    }
-
-    if ( !$Param{OrganisationID} ) {
-        # make sure it's undef and no empty string, so that the result is a NULL value in the DB
-        $Param{OrganisationID} = undef;
     }
 
     # create contact if necessary
-    if ($Param{ContactID} && $Param{ContactID} !~ /^\d+$/) {
-        $Self->{ParserObject} = Kernel::System::EmailParser->new(
-            Mode => 'Standalone',
-        );
-        my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
-            Email => $Param{ContactID},
-        );
-        my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
-            Email => $Param{ContactID},
-        );
-
-        if (!$ContactEmail && !$ContactEmailRealname) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => 'No Contact ID or valid Email provided.',
+    if ($Param{ContactID} ) {
+        if ($Param{ContactID} !~ /^\d+$/) {
+            $Self->{ParserObject} = Kernel::System::EmailParser->new(
+                Mode => 'Standalone',
             );
-        }
-
-        my @NameChunks = split(' ', $ContactEmailRealname);
-        my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-            Email  => $ContactEmail,
-            Silent => 1,
-        );
-
-        if (!$ExistingContactID) {
-            $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
-                Email                 => $ContactEmail,
-                PrimaryOrganisationID => ($Param{OrganisationID} && $Param{OrganisationID} =~ /^\d+$/) ? $Param{OrganisationID} : undef,
-                ValidID               => 1,
-                UserID                => $Param{UserID}
+            my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
+                Email => $Param{ContactID},
             );
-        }
-        else {
-            $Param{ContactID} = $ExistingContactID;
-        }
+            my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
+                Email => $Param{ContactID},
+            );
 
-        # set contact organisation if not given
-        if ($Param{ContactID} && !$Param{OrganisationID}) {
+            if (!$ContactEmail && !$ContactEmailRealname) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message => 'No Contact ID or valid Email provided.',
+                );
+            }
+
+            my @NameChunks = split(' ', $ContactEmailRealname);
+            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                Email  => $ContactEmail,
+                Silent => 1,
+            );
+
+            if (!$ExistingContactID) {
+                $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
+                    Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                    Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                    Email                 => $ContactEmail,
+                    PrimaryOrganisationID => $ExistingOrganisationID,
+                    ValidID               => 1,
+                    UserID                => $Param{UserID}
+                );
+            } else {
+                $Param{ContactID} = $ExistingContactID;
+            }
+
+            # set organisation if not given
+            # FIXME: remove this with KIX2018-6884
+            if ($Param{ContactID} && !$Param{OrganisationID}) {
+                my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                    ID => $Param{ContactID},
+                );
+                if (IsHashRefWithData(\%ContactData)) {
+                    if ($ContactData{PrimaryOrganisationID}) {
+                        $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
+                    } else {
+                        $Param{OrganisationID} = $ContactEmail;
+                    }
+                }
+            }
+        } else {
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $Param{ContactID},
             );
             if (IsHashRefWithData(\%ContactData)) {
-                $Param{OrganisationID} = $ContactData{PrimaryOrganisationID} || undef;
+
+                # set organisation if not given at all (also no unknown)
+                # FIXME: remove this with KIX2018-6884
+                if ($ContactData{PrimaryOrganisationID} && !$Param{OrganisationID}) {
+                    $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
+                }
+            } else {
+                $Param{ContactID} = undef;
             }
         }
+    }
+
+    # make sure it's undef and no empty string, so that the result is a NULL value in the DB
+    if ( !$Param{ContactID} ) {
+        $Param{ContactID} = undef;
+
+        # FIXME: if no contact, than no organisation (maybe remove this with KIX2018-6884)
+        $ExistingOrganisationID = undef;
+        $Param{OrganisationID}  = undef;
+    }
+
+    # create organisation if it doesn't exist
+    if ( !$ExistingOrganisationID && $Param{OrganisationID} ) {
+        $ExistingOrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+            Number => $Param{OrganisationID},
+            Name   => $Param{OrganisationID},
+            UserID => $Param{UserID}
+        );
+    }
+
+    # update contact if necessary (add given or new organisation)
+    if ($ExistingOrganisationID && $Param{ContactID}) {
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+            ID => $Param{ContactID},
+        );
+        if (IsHashRefWithData(\%ContactData)) {
+            if (!$ContactData{PrimaryOrganisationID}) {
+                $ContactData{PrimaryOrganisationID} = $ExistingOrganisationID;
+                $Kernel::OM->Get('Contact')->ContactUpdate(
+                    %ContactData,
+                    UserID => $Param{UserID}
+                );
+            } elsif (!grep {$_ == $ExistingOrganisationID} @{ $ContactData{OrganisationIDs} }) {
+                push( @{ $ContactData{OrganisationIDs} }, $ExistingOrganisationID );
+                $Kernel::OM->Get('Contact')->ContactUpdate(
+                    %ContactData,
+                    UserID => $Param{UserID}
+                );
+            }
+        }
+    }
+
+    # make sure it's undef and no empty string, so that the result is a NULL value in the DB
+    if ( !$ExistingOrganisationID ) {
+        $ExistingOrganisationID = undef;
     }
 
     # create db record
@@ -582,7 +648,7 @@ sub TicketCreate {
             \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
             \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
             \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
-            \$Param{ContactID}, \$Param{OrganisationID},
+            \$Param{ContactID}, \$ExistingOrganisationID,
         ],
     );
 
@@ -1336,6 +1402,14 @@ sub _TicketCacheClear {
         return 1;
     }
 
+    # set sempahore
+    my $Value = $Param{TicketID}.Time::HiRes::time();
+    $CacheObject->SetSemaphore(
+        ID      => "TicketCache".$Param{TicketID},
+        Value   => $Value,
+        Timeout => 1000
+    );
+
     my @Keys = $CacheObject->GetKeysForType(
         Type => "TicketCache".$Param{TicketID},
     );
@@ -1348,6 +1422,28 @@ sub _TicketCacheClear {
         NoStatsUpdate => 1,
     );
 
+    # delete metadata
+    $CacheObject->CleanUp(
+        Type          => "TicketCache".$Param{TicketID},
+        NoStatsUpdate => 1,
+    );
+
+    # clear semaphore
+    $CacheObject->ClearSemaphore(
+        ID    => "TicketCache".$Param{TicketID},
+        Value => $Value,
+    );
+
+    # cleanup search cache
+    $CacheObject->CleanUp(
+        Type => "TicketSearch",
+    );
+
+    # cleanup index cache
+    $CacheObject->CleanUp(
+        Type => "TicketIndex",
+    );
+    
     foreach my $Value ( @Values ) {
         next if !$Value;
         my ( $Type, $Key ) = split(/::/, $Value, 2);
@@ -1360,22 +1456,6 @@ sub _TicketCacheClear {
             Key  => $Key
         );
     }
-
-    # delete metadata
-    $CacheObject->CleanUp(
-        Type          => "TicketCache".$Param{TicketID},
-        NoStatsUpdate => 1,
-    );
-
-    # cleanup search cache
-    $CacheObject->CleanUp(
-        Type => "TicketSearch",
-    );
-
-    # cleanup index cache
-    $CacheObject->CleanUp(
-        Type => "TicketIndex",
-    );
 
     return 1;
 }
