@@ -79,7 +79,8 @@ sub Run {
             UserID   => $Param{UserID},
 
             # FIXME: add instance if job was triggerd by event (ExecuteJobsForEvent)
-            AutomationInstance => $Param{AutomationInstance}
+            AutomationInstance => $Param{AutomationInstance},
+            AdditionalData     => $Param{AdditionalData}
         );
         # we don't need error handling here since MacroActionExecute did that already and we don't have to abort here
     }
