@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-10-20 09:35+0000\n"
+"POT-Creation-Date: 2022-10-20 13:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2163,6 +2163,10 @@ msgid "Define Tool (Nagios) acknowledge type."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Define the maximum number of parallel workers to handle ticket notifications. Default: 0 (unlimited)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defined which cache types should be ignored when doing a complete cache cleanup, i.e. change of permissions. Key = Cache Type, Value = 1 to activate."
 msgstr ""
 
@@ -2604,6 +2608,22 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField object registration."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable Automation debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable DB debugging for specific DB methods. Depends on DB::Debug as the \"main switch\"."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable DB debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable Event Handler debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3175,7 +3195,7 @@ msgid "Selects the cache backend to use."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Send all client notifications asynchronously through the daemon."
+msgid "Send all ticket notifications asynchronously through the daemon."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3388,6 +3408,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler automation task manager."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "The daemon registration for the scheduler client notification worker."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
