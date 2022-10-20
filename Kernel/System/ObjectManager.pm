@@ -15,6 +15,7 @@ use warnings;
 
 use Carp qw(carp confess);
 use Scalar::Util qw(weaken);
+use Time::HiRes qw(time);
 
 use base qw(
     Kernel::System::AsynchronousExecutor
@@ -731,15 +732,7 @@ sub CleanUp {
 
     # send all outstanding notifications to the registered clients
     if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-        if ( $Self->Get('Config')->Get('ClientNotification::SendAsynchronously') && !$Param{IsDaemon}) {
-            $Self->AsyncCall(
-                ObjectName   => $Self->GetModuleFor('ClientRegistration'),
-                FunctionName => 'NotificationSend',
-            );
-        }
-        else {
-            $Self->Get('ClientRegistration')->NotificationSend();
-        }
+        $Self->Get('ClientRegistration')->NotificationSend();
     }
 
     # discard all objects

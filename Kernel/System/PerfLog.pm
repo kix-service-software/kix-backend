@@ -17,6 +17,14 @@ our @ObjectDependencies = ();
 use vars qw(@ISA $VERSION);
 $VERSION = qw($Revision: 1.12 $) [1];
 
+use Exporter qw(import);
+our %EXPORT_TAGS = (    ## no critic
+    all => [
+        'TimeDiff',
+    ],
+);
+Exporter::export_ok_tags('all');
+
 sub new {
     my ( $Type, %Param ) = @_;
 
@@ -159,6 +167,12 @@ sub Output {
 
     # cleanup
     $Self->Init();
+}
+
+sub TimeDiff {
+    my ($StartTime) = @_;
+
+    return (Time::HiRes::time() - $StartTime) * 1000;
 }
 
 1;

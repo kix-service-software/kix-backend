@@ -1,98 +1,115 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "ConfigItem.json",
-  "type": "object",
-  "description": "The config item object.",
-  "properties": {
-    "ChangeBy": {
-      "type": "integer",
-      "readOnly": true
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ConfigItem.json",
+    "type": "object",
+    "description": "The config item object.",
+    "properties": {
+        "ChangeBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ChangeTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Class": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ClassID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ConfigItemID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CreateBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CreateTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CurDeplStateID": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "CurInciStateID": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "CurrentVersion": {
+            "type": "object",
+            "description": "added via include \"CurrentVersion\"",
+            "readOnly": true,
+            "$ref": "ConfigItemVersion.json"
+        },
+        "LastVersionID": {
+            "anyOf": [
+                {
+                    "type": "integer"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "readOnly": true
+        },
+        "Name": {
+            "type": "string",
+            "readOnly": true
+        },
+        "History": {
+            "type": "array",
+            "description": "added via include \"History\"",
+            "item": {
+                "$ref": "ConfigItemHistory.json"
+            }
+        },
+        "Images": {
+            "type": "array",
+            "description": "added via include \"Images\"",
+            "item": {
+                "$ref": "ConfigItemImage.json"
+            }
+        },
+        "LinkCount": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Versions": {
+            "type": "array",
+            "description": "added via include \"Versions\"",
+            "item": {
+                "$ref": "ConfigItemVersion.json"
+            }
+        }
     },
-    "ChangeTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Class": {
-      "type": "string",
-      "readOnly": true
-    },    
-    "ClassID": {
-      "type": "integer",
-      "readOnly": true
-    },    
-    "ConfigItemID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CreateBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CreateTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CurDeplStateID": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },    
-    "CurInciStateID": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },    
-    "CurrentVersion": {
-      "type": "object",
-      "description": "added via include \"CurrentVersion\"",
-      "readOnly": true,
-      "$ref": "ConfigItemVersion.json"
-    },    
-    "LastVersionID": {
-      "anyOf": [
-        {"type": "integer"},
-        {"type": "null"}
-      ],
-      "readOnly": true
-    },
-    "Name" : {
-        "type" : "string",
-        "readOnly" : true
-     },
-    "History": {
-      "type": "array",
-      "description": "added via include \"History\"",
-      "item": {
-        "$ref": "ConfigItemHistory.json"
-      }
-    },
-    "Images": {
-      "type": "array",
-      "description": "added via include \"Images\"",
-      "item": {
-        "$ref": "ConfigItemImage.json"
-      }
-    },
-    "Versions": {
-      "type": "array",
-      "description": "added via include \"Versions\"",
-      "item": {
-        "$ref": "ConfigItemVersion.json"
-      }
-    }
-  },
-  "required": [
-    "ChangeBy",
-    "ChangeTime",
-    "Class",
-    "ClassID",
-    "CreateBy",
-    "CreateTime",
-    "ConfigItemID",
-    "Name"
-  ]
+    "required": [
+        "ChangeBy",
+        "ChangeTime",
+        "Class",
+        "ClassID",
+        "CreateBy",
+        "CreateTime",
+        "ConfigItemID",
+        "LinkCount",
+        "Name"
+    ]
 }

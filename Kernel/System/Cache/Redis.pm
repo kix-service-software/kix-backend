@@ -40,6 +40,7 @@ sub new {
     
     # get the config
     $Self->{Config} = $Kernel::OM->CreateOnce('Config', {NoCache => 1})->Get('Cache::Module::Redis');
+    $Self->{CachePrefix} = 'KIXBackend::';
 
     return $Self;
 }
@@ -81,11 +82,11 @@ sub Set {
     }
 
     if ( $TTL > 0 ) {
-        $Self->_RedisCall('hset', $Param{Type}, $PreparedKey, $Value);
-        $Self->_RedisCall('expire', $Param{Type}, $TTL);
+        $Self->_RedisCall('hset', $Self->{CachePrefix}.$Param{Type}, $PreparedKey, $Value);
+        $Self->_RedisCall('expire', $Self->{CachePrefix}.$Param{Type}, $TTL);
     }
     else {
-        $Self->_RedisCall('hset', $Param{Type}, $PreparedKey, $Value);
+        $Self->_RedisCall('hset', $Self->{CachePrefix}.$Param{Type}, $PreparedKey, $Value);
     }
 
     return 1;
@@ -105,7 +106,7 @@ sub Get {
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
     return if !$PreparedKey;
 
-    my $Value = $Self->_RedisCall('hget', $Param{Type}, $PreparedKey);
+    my $Value = $Self->_RedisCall('hget', $Self->{CachePrefix}.$Param{Type}, $PreparedKey);
 
     return $Value if !$Value || index($Value, '__b64') != 0;
 
@@ -137,7 +138,7 @@ sub GetMulti {
 
     my @PreparedKeys = map { $Param{UseRawKey} ? $_ : $Self->_PrepareRedisKey($_) } @{$Param{Keys}};
 
-    my @Values = @{$Self->_RedisCall('hmget', $Param{Type}, @PreparedKeys) || []};
+    my @Values = @{$Self->_RedisCall('hmget', $Self->{CachePrefix}.$Param{Type}, @PreparedKeys) || []};
 
     return @Values if !@Values;
 
@@ -174,7 +175,7 @@ sub Delete {
     my $PreparedKey = $Param{UseRawKey} ? $Param{Key} : $Self->_PrepareRedisKey(%Param);
     return if !$PreparedKey;
 
-    return $Self->_RedisCall('hdel', $Param{Type}, $PreparedKey);
+    return $Self->_RedisCall('hdel', $Self->{CachePrefix}.$Param{Type}, $PreparedKey);
 }
 
 sub CleanUp {
@@ -182,7 +183,7 @@ sub CleanUp {
 
     if ( $Param{Type} ) {
         # delete type
-        my $KeyCount = $Self->_RedisCall('del', $Param{Type});
+        my $KeyCount = $Self->_RedisCall('del', $Self->{CachePrefix}.$Param{Type});
         return defined $KeyCount ? 1 : 0;
     }
     else {
@@ -219,7 +220,7 @@ sub GetKeysForType {
     my $Cursor = 0;
     do {
         if ( $Param{Type} ne '*' ) {
-            ($Cursor, $Keys) = @{$Self->_RedisCall('hscan', $Param{Type}, $Cursor) || []};
+            ($Cursor, $Keys) = @{$Self->_RedisCall('hscan', $Self->{CachePrefix}.$Param{Type}, $Cursor) || []};
             # remove the values in this case
             my $Index=0;
             $Keys = [ grep { $Index++ % 2 == 0 } @{$Keys} ];
@@ -315,10 +316,10 @@ sub _PrepareRedisKey {
 
     my $Key;
     eval {
-        $Key = Digest::MD5::md5_hex($Param{Key});
+        $Key = Digest::MD5::md5_hex($Self->{CachePrefix}.$Param{Key});
     };
     if ( $@ ) {
-        print STDERR "Redis: error in preparing cache key (Key: $Param{Key})\n";
+        print STDERR "($$) Redis: error in preparing cache key (Key: $Param{Key})\n";
     }
     return $Key;
 }
@@ -359,16 +360,16 @@ sub _RedisCall {
         $Result = $Self->{RedisObject}->$Command(@Param);
     };
     if ( defined $@ && $@ ) {
-        print STDERR "Redis exception: $@\n";
+        print STDERR "($$) Redis exception: $@\n";
         if ( --$MaxTries > 0 ) {
-            print STDERR "Redis: reconnecting and trying again\n";
+            print STDERR "($$) Redis: reconnecting and trying again\n";
             Time::HiRes::sleep($WaitBetweenTries/1000);
             # force a reconnect on retry
             $Reconnect = 1;
             goto TRYLOOP;
         }
         else {
-            print STDERR "Redis: giving up\n";
+            print STDERR "($$) Redis: giving up\n";
             $Self->{StopReconnect} = 1;
         }
     };

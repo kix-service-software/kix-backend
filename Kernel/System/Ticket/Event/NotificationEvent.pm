@@ -14,6 +14,9 @@ use strict;
 use warnings;
 
 use List::Util qw(first);
+use Time::HiRes qw(time);
+
+use base qw(Kernel::System::AsynchronousExecutor);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -44,6 +47,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    # get notification event object
+    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
+
+    # check if event is affected
+    $Self->{NotificationEventMapping} = { $NotificationEventObject->NotificationEventList() };
+
     return $Self;
 }
 
@@ -61,10 +70,12 @@ sub Run {
         }
     }
 
-    if ( !$Param{Data}->{TicketID} ) {
+    return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
+
+    if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need TicketID in Data!',
+            Message  => 'Need TicketID or TicketList in Data!',
         );
         return;
     }
@@ -75,43 +86,94 @@ sub Run {
     # return if no notification is active
     return 1 if $TicketObject->{SendNoNotification};
 
-    # return if no ticket exists (e. g. it got deleted)
-    my $TicketExists = $TicketObject->TicketNumberLookup(
-        TicketID => $Param{Data}->{TicketID},
-        UserID   => $Param{UserID},
+    if ( $Param{Data}->{TicketID} ) {
+        # return if no ticket exists (e. g. it got deleted)
+        my $TicketNumber = $TicketObject->TicketNumberLookup(
+            TicketID => $Param{Data}->{TicketID},
+            UserID   => $Param{UserID},
+        );
+
+        return 1 if !$TicketNumber;
+    }
+
+    my $Result;
+
+    if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+        my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
+        my $Result = $Self->AsyncCall(
+            FunctionName             => '_Run',
+            FunctionParams           => \%Param,
+            MaximumParallelInstances => $MaximumParallelInstances
+        );
+        if ( !$Result ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not schedule asynchronous NotificationEvent execution!",
+            );
+        }
+    }
+    else {
+        $Result = $Self->_Run(
+            %Param
+        );
+    }
+
+    return $Result;
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+
+my $StartTime = Time::HiRes::time();
+
+    my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( $Param{Data} );
+
+    my $Counter = 0;
+
+    TICKET:
+    foreach my $Ticket ( @TicketList ) {
+        next TICKET if !$Ticket->{TicketID};
+
+        my $StartTimeTicket = Time::HiRes::time();
+        $Self->_HandleTicket(
+            Event  => $Param{Event}, 
+            Data   => $Ticket,
+            UserID => $Param{UserID},
+        );
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "NotificationEvent::_HandleTicket %i/%i (TicketID: %i): %i ms\n", ++$Counter, (scalar @TicketList), $Ticket->{TicketID}, (Time::HiRes::time() - $StartTimeTicket) * 1000,
+        );
+    }
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => sprintf "NotificationEvent::_Run (%i tickets): %i ms\n", (scalar @TicketList), (Time::HiRes::time() - $StartTime) * 1000,
     );
 
-    return 1 if !$TicketExists;
+    return 1;
+}
+
+sub _HandleTicket {
+    my ( $Self, %Param ) = @_;
 
     # get notification event object
     my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
-    # check if event is affected
-    my @IDs = $NotificationEventObject->NotificationEventCheck(
-        Event => $Param{Event},
-    );
-
-    # return if no notification for event exists
-    return 1 if !@IDs;
+    # get objects
+    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get ticket attribute matches
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Param{Data}->{TicketID},
         UserID        => $Param{UserID},
-        DynamicFields => 1,
-    );
-
-    # get dynamic field objects
-    my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
-
-    # get dynamic fields
-    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-        Valid      => 1,
-        ObjectType => ['Ticket'],
+        DynamicFields => 0,
     );
 
     NOTIFICATION:
-    for my $ID (@IDs) {
+    for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
+
+        my $InformedRecipientCount = 0;
 
         my %Notification = $NotificationEventObject->NotificationGet(
             ID => $ID,
@@ -123,7 +185,6 @@ sub Run {
             Ticket       => \%Ticket,
             Notification => \%Notification,
         );
-
         next NOTIFICATION if !$PassFilter;
 
         # add attachments only on ArticleCreate or ArticleSend event
@@ -186,19 +247,8 @@ sub Run {
 
         my @NotificationBundle;
 
-        # get template generator object;
-        my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
-
         # parse all notification tags for each user
         for my $Recipient (@RecipientUsers) {
-
-            my %ReplacedNotification = $TemplateGeneratorObject->NotificationEvent(
-                TicketID              => $Param{Data}->{TicketID},
-                Recipient             => $Recipient,
-                Notification          => \%Notification,
-                CustomerMessageParams => $Param{Data}->{CustomerMessageParams},
-                UserID                => $Param{UserID},
-            );
 
             my $UserNotificationTransport = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Recipient->{Preferences}->{NotificationTransport},
@@ -206,7 +256,7 @@ sub Run {
 
             push @NotificationBundle, {
                 Recipient                      => $Recipient,
-                Notification                   => \%ReplacedNotification,
+                Notification                   => \%Notification,
                 RecipientNotificationTransport => $UserNotificationTransport,
             };
         }
@@ -316,6 +366,8 @@ sub Run {
                     UserID                => $Param{UserID},
                 );
 
+                $InformedRecipientCount++;
+
                 # remember to have sent
                 if ( $Bundle->{Recipient}->{UserID} ) {
                     $AlreadySent{ $Bundle->{Recipient}->{UserID} } = 1;
@@ -333,18 +385,9 @@ sub Run {
             RECIPIENT:
             for my $Recipient (@TransportRecipients) {
 
-                # replace all notification tags for each special recipient
-                my %ReplacedNotification = $TemplateGeneratorObject->NotificationEvent(
-                    TicketID              => $Param{Data}->{TicketID},
-                    Recipient             => $Recipient,
-                    Notification          => \%Notification,
-                    CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
-                    UserID                => $Param{UserID},
-                );
-
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
-                    Notification          => \%ReplacedNotification,
+                    Notification          => \%Notification,
                     CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
                     Recipient             => $Recipient,
                     Event                 => $Param{Event},
@@ -353,8 +396,15 @@ sub Run {
                     TransportObject       => $TransportObject,
                     UserID                => $Param{UserID},
                 );
+
+                $InformedRecipientCount++;
             }
         }
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, $Notification{Name},
+        );
     }
 
     return 1;
@@ -436,39 +486,6 @@ sub _RecipientsGet {
         my $QueueObject        = $Kernel::OM->Get('Queue');
         my $ContactObject = $Kernel::OM->Get('Contact');
 
-        # KIX4OTRS-capeIT
-        my @LinkedAgents = ();
-        my @LinkedCustomers = ();
-        my %SelectedRecipientTypes = map {$_ => 1} grep { $_ =~ /^LinkedPerson/ } @{ $Notification{Data}->{Recipients} };
-        if ( %SelectedRecipientTypes ) {
-
-            # get linked persons
-            my @LinkedRecipients = $Kernel::OM->Get('WebRequest')->GetArray( Param => 'LinkedPersonToInform' );
-
-            my @RecipientType = ();
-            for my $LinkedRecipient ( @LinkedRecipients ) {
-                my @RecipientParts = split(/:::/,$LinkedRecipient);
-                if ( $RecipientParts[0] eq 'Agent' && $SelectedRecipientTypes{LinkedPersonAgent} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedAgents ) {
-                    push @LinkedAgents, $RecipientParts[1];
-                }
-                elsif ( $RecipientParts[0] eq 'Customer' && $SelectedRecipientTypes{LinkedPersonCustomer} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedCustomers ) {
-                    push @LinkedCustomers, $RecipientParts[1];
-                }
-                elsif ( $RecipientParts[0] eq '3rdParty' && $SelectedRecipientTypes{LinkedPerson3rdPerson} && $RecipientParts[1] && !grep { $_ eq $RecipientParts[1] } @LinkedCustomers ) {
-                    push @LinkedCustomers, $RecipientParts[1];
-                    $RecipientParts[0] = 'Customer';
-                }
-                else {
-                    # not possible to add recipient
-                    next;
-                }
-                next if grep { $_ eq $RecipientParts[0] } @RecipientType;
-                push @RecipientType, $RecipientParts[0];
-                push @{ $Notification{Data}->{Recipients} }, $RecipientParts[0].'LinkedPerson';
-            }
-        }
-        # EO KIX4OTRS-capeIT
-
         RECIPIENT:
         for my $Recipient ( @{ $Notification{Data}->{Recipients} } ) {
 
@@ -504,17 +521,32 @@ sub _RecipientsGet {
 
                     # check each valid user if he has READ permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('User')->UserList(
-                        Valid => 1,
-                        Short => 1,
-                    );
-                    foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                            UserID              => $UserID,
-                            Target              => '/tickets/' . $Ticket{TicketID},
-                            UsageContext        => 'Agent',
-                            RequestedPermission => 'READ'
+                    my %UserList;
+                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
+                        %UserList = %{$Self->{Cache}->{UserList}};
+                    }
+                    else {
+                        %UserList = $Kernel::OM->Get('User')->UserList(
+                            Valid => 1,
+                            Short => 1,
                         );
+                        $Self->{Cache}->{UserList} = \%UserList;
+                    }
+                    my $Resource = '/tickets/' . $Ticket{TicketID};
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my $Granted;
+                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} ) {
+                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ};
+                        }
+                        else {
+                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                                UserID              => $UserID,
+                                Target              => $Resource,
+                                UsageContext        => 'Agent',
+                                RequestedPermission => 'READ'
+                            );
+                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} = $Granted;
+                        }
                         if ( $Granted ) {
                             push @UserIDs, $UserID;
                         }
@@ -526,10 +558,36 @@ sub _RecipientsGet {
 
                     # check each valid user if he has UPDATE permission on /tickets
                     my @UserIDs;
-                    my %UserList = $Kernel::OM->Get('User')->UserList(
-                        Valid => 1,
-                        Short => 1,
-                    );
+                    my %UserList;
+                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
+                        %UserList = %{$Self->{Cache}->{UserList}};
+                    }
+                    else {
+                        %UserList = $Kernel::OM->Get('User')->UserList(
+                            Valid => 1,
+                            Short => 1,
+                        );
+                        $Self->{Cache}->{UserList} = \%UserList;
+                    }
+                    my $Resource = '/tickets/' . $Ticket{TicketID};
+                    foreach my $UserID ( sort keys %UserList ) {
+                        my $Granted;
+                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} ) {
+                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE};
+                        }
+                        else {
+                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                                UserID              => $UserID,
+                                Target              => $Resource,
+                                UsageContext        => 'Agent',
+                                RequestedPermission => 'UPDATE'
+                            );
+                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} = $Granted;
+                        }
+                        if ( $Granted ) {
+                            push @UserIDs, $UserID;
+                        }
+                    }
                     foreach my $UserID ( sort keys %UserList ) {
                         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
                             UserID              => $UserID,
@@ -546,43 +604,30 @@ sub _RecipientsGet {
                 }
                 elsif ( $Recipient eq 'AgentMyQueues' ) {
 
-                    # get subscribed users
-                    my %MyQueuesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByQueueID(
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
                     );
-
-                    my @UserIDs = sort keys %MyQueuesUserIDs;
-
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyServices' ) {
 
-                    # get subscribed users
-                    my %MyServicesUserIDs;
-                    if ( $Ticket{ServiceID} ) {
-                        %MyServicesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByServiceID(
-                            ServiceID => $Ticket{ServiceID},
-                        );
-                    }
-
-                    my @UserIDs = sort keys %MyServicesUserIDs;
-
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByServiceID(
+                        ServiceID => $Ticket{ServiceID}
+                    );
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyQueuesMyServices' ) {
 
                     # get subscribed users
-                    my %MyQueuesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByQueueID(
+                    my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
                     );
+                    my %MyQueuesUserIDs = map { $_ => 1 } @UserIDs;
 
-                    # get subscribed users
-                    my %MyServicesUserIDs;
-                    if ( $Ticket{ServiceID} ) {
-                        %MyServicesUserIDs = map { $_ => 1 } $TicketObject->GetSubscribedUserIDsByServiceID(
-                            ServiceID => $Ticket{ServiceID},
-                        );
-                    }
+                    @UserIDs = $Self->_GetSubscribedUserIDsByServiceID(
+                        ServiceID => $Ticket{ServiceID}
+                    );
+                    my %MyServicesUserIDs = map { $_ => 1 } @UserIDs;
 
                     # combine both subscribed users list (this will also remove duplicates)
                     my %SubscribedUserIDs = ( %MyQueuesUserIDs, %MyServicesUserIDs );
@@ -593,15 +638,10 @@ sub _RecipientsGet {
                         }
                     }
 
-                    my @UserIDs = sort keys %SubscribedUserIDs;
+                    @UserIDs = sort keys %SubscribedUserIDs;
 
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
-                # KIX4OTRS-capeIT
-                elsif ( $Recipient eq 'AgentLinkedPerson' ) {
-                    push @{ $Notification{Data}->{RecipientAgents} }, @LinkedAgents;
-                }
-                # EO KIX4OTRS-capeIT
             }
 
             elsif ( $Recipient eq 'Customer' ) {
@@ -750,6 +790,36 @@ sub _RecipientsGet {
         );
         next RECIPIENT if !%User;
 
+        # check if the notification needs to be sent just one time per day
+        if (
+            IsArrayRefWithData($Notification{Data}->{OncePerDay})
+            && $Notification{Data}->{OncePerDay}->[0]
+            && $User{UserLogin}
+        ) {
+
+            # get time object
+            my $TimeObject = $Kernel::OM->Get('Time');
+
+            # get current date
+            my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay ) = $TimeObject->SystemTime2Date(
+                SystemTime => $TimeObject->SystemTime()
+            );
+
+            # get ticket history
+            my @HistoryLines = $TicketObject->HistoryGet(
+                TicketID      => $Param{Data}->{TicketID},
+                HistoryType   => 'SendAgentNotification',
+                Name          => "\%\%$Notification{Name}\%\%$User{UserLogin}\%\%Email",      # we use a fixed Email here
+                MinCreateTime => "$CurrYear-$CurrMonth-$CurrDay 00:00:00",
+                SortReverse   => 1,
+                UserID        => $Param{UserID},
+                Limit         => 1,
+            );
+
+            # do not send the notification if it has been sent already today
+            return if @HistoryLines;
+        }
+
         # skip user that triggers the event (it should not be notified) but only if it is not
         #   a pre-calculated recipient
         if (
@@ -783,13 +853,20 @@ sub _RecipientsGet {
             next RECIPIENT if $TimeStart < $Time && $TimeEnd > $Time;
         }
 
-        # skip users with out READ permissions
-        my ($Granted) = $UserObject->CheckResourcePermission(
-            UserID              => $User{UserID},
-            Target              => '/tickets/' . $Ticket{TicketID},
-            UsageContext        => 'Agent',
-            RequestedPermission => 'READ'
-        );
+        my $Granted;
+        my $Resource = '/tickets/' . $Ticket{TicketID};
+        if ( exists $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ} ) {
+            $Granted = $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ};
+        }
+        else {
+            # skip users with out READ permissions
+            $Granted = $UserObject->CheckResourcePermission(
+                UserID              => $User{UserID},
+                Target              => $Resource,
+                UsageContext        => 'Agent',
+                RequestedPermission => 'READ'
+            );
+        }
         next RECIPIENT if !$Granted;
 
         # skip PostMasterUserID
@@ -820,64 +897,21 @@ sub _SendRecipientNotification {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    # check if the notification needs to be sent just one time per day
-    if (
-        IsArrayRefWithData($Param{Notification}->{Data}->{OncePerDay})
-        && $Param{Notification}->{Data}->{OncePerDay}->[0]
-        && $Param{Recipient}->{UserLogin}
-    ) {
-
-        # get ticket history
-        my @HistoryLines = $TicketObject->HistoryGet(
-            TicketID => $Param{TicketID},
-            UserID   => $Param{UserID},
-        );
-
-        # get last notification sent ticket history entry for this transport and this user
-        my $LastNotificationHistory = first {
-            $_->{HistoryType} eq 'SendAgentNotification'
-                && $_->{Name} eq
-                "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}"
-        }
-        reverse @HistoryLines;
-
-        if ( $LastNotificationHistory && $LastNotificationHistory->{CreateTime} ) {
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            # get last notification date
-            my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-                SystemTime => $TimeObject->TimeStamp2SystemTime(
-                    String => $LastNotificationHistory->{CreateTime},
-                    )
-            );
-
-            # get current date
-            my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay )
-                = $TimeObject->SystemTime2Date(
-                SystemTime => $TimeObject->SystemTime(),
-                );
-
-            # do not send the notification if it has been sent already today
-            if (
-                $CurrYear == $Year
-                && $CurrMonth == $Month
-                && $CurrDay == $Day
-                )
-            {
-                return;
-            }
-        }
-    }
-
     my $TransportObject = $Param{TransportObject};
+
+    my %ReplacedNotification = $Kernel::OM->Get('TemplateGenerator')->NotificationEvent(
+        TicketID              => $Param{TicketID},
+        Recipient             => $Param{Recipient},
+        Notification          => $Param{Notification},
+        CustomerMessageParams => $Param{CustomerMessageParams},
+        UserID                => $Param{UserID},
+    );
 
     # send notification to each recipient
     my $Success = $TransportObject->SendNotification(
         TicketID              => $Param{TicketID},
         UserID                => $Param{UserID},
-        Notification          => $Param{Notification},
+        Notification          => \%ReplacedNotification,
         CustomerMessageParams => $Param{CustomerMessageParams},
         Recipient             => $Param{Recipient},
         Event                 => $Param{Event},
@@ -928,6 +962,48 @@ sub _SendRecipientNotification {
     );
 
     return 1;
+}
+
+sub _GetSubscribedUserIDsByQueueID {
+    my ( $Self, %Param ) = @_;
+
+    my @UserIDs;
+    if ( IsArrayRef($Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}}) ) {
+        @UserIDs = @{$Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}}};
+    }
+    else {
+        # get subscribed users
+        my %MyQueuesUserIDs = map { $_ => 1 } $Kernel::OM->Get('Ticket')->GetSubscribedUserIDsByQueueID(
+            QueueID => $Param{QueueID}
+        );
+
+        @UserIDs = sort keys %MyQueuesUserIDs;
+        $Self->{Cache}->{SubscribedUserIDsByQueueID}->{$Param{QueueID}} = \@UserIDs;
+    }
+
+    return @UserIDs;
+}
+
+sub _GetSubscribedUserIDsByServiceID {
+    my ( $Self, %Param ) = @_;
+
+    my @UserIDs;
+    if ( $Param{ServiceID} ) {
+        if ( IsArrayRef($Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}}) ) {
+            @UserIDs = @{$Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}}};
+        }
+        else {
+            # get subscribed users
+            my %MyServicesUserIDs = map { $_ => 1 } $Kernel::OM->Get('Ticket')->GetSubscribedUserIDsByServiceID(
+                ServiceID => $Param{ServiceID},
+            );
+
+            @UserIDs = sort keys %MyServicesUserIDs;
+            $Self->{Cache}->{SubscribedUserIDsByServiceID}->{$Param{ServiceID}} = \@UserIDs;
+        }
+    }
+
+    return @UserIDs;
 }
 
 1;

@@ -9,5 +9,8 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <TableAlter Name="job">
+        <ColumnAdd Name="is_async" Required="false" Type="INTEGER" Default="0"/>
+    </TableAlter>
 
 </database>

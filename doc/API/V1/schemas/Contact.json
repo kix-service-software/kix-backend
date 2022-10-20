@@ -539,6 +539,10 @@
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -572,7 +576,8 @@
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -717,6 +722,10 @@
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -813,6 +822,11 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -829,6 +843,7 @@
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",

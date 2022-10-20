@@ -13,7 +13,7 @@ use warnings;
 
 use CGI;
 use LWP::UserAgent;
-use Time::HiRes qw(gettimeofday);
+use Time::HiRes;
 
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
@@ -342,7 +342,7 @@ sub NotifyClients {
 
     return if $Self->{DisableClientNotifications};
 
-    my $Timestamp = gettimeofday();
+    my $Timestamp = Time::HiRes::time();
 
     # get RequestID
     my $cgi = CGI->new;
@@ -384,7 +384,9 @@ sub NotificationCount {
 
 send notifications to all clients who want to receive notifications
 
-    my $Result = $ClientRegistrationObject->NotificationSend();
+    my $Result = $ClientRegistrationObject->NotificationSend(
+        Async => 0|1,       # optional, default 0
+    );
 
 =cut
 
@@ -415,14 +417,15 @@ sub NotificationSend {
     );
     return if !@ClientIDs;
 
-    # send outstanding notifications to clients
-    $Self->AsyncCall(
-        ObjectName               => $Kernel::OM->GetModuleFor('ClientRegistration'),
-        FunctionName             => 'NotificationSendWorker',
-        FunctionParams           => {
+    # inform the daemon worker of the work to be done
+    $Kernel::OM->Get('Cache')->Set(
+        Type          => 'ClientNotificationToSend',
+        Key           => $$.Time::HiRes::time(),
+        Value         => {
             EventList => \@EventList,
             ClientIDs => \@ClientIDs
         },
+        NoStatsUpdate => 1,
     );
 
     # delete the cached events we sent

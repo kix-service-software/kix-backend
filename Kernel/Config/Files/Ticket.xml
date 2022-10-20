@@ -641,6 +641,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###PendingReminder" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::TicketSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::PendingReminder</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Priority" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>

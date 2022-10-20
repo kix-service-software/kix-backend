@@ -57,6 +57,7 @@ sub new {
     # Get objects in constructor to save performance.
     $Self->{CacheObject}        = $Kernel::OM->Get('Cache');
     $Self->{AutomationObject}   = $Kernel::OM->Get('Automation');
+    $Self->{TimeObject}         = $Kernel::OM->Get('Time');
     $Self->{DBObject}           = $Kernel::OM->Get('DB');
     $Self->{SchedulerDBObject}  = $Kernel::OM->Get('Daemon::SchedulerDB');
 
@@ -80,9 +81,6 @@ sub new {
 
     # Do not change the following values!
     $Self->{SleepPost} = 5;          # sleep 5 seconds after each loop
-    $Self->{Discard}   = 60 * 60;    # discard every hour
-
-    $Self->{DiscardCount} = $Self->{Discard} / $Self->{SleepPost};
 
     $Self->{Debug}      = $Param{Debug};
     $Self->{DaemonName} = 'Daemon: SchedulerAutomationTaskManager';
@@ -104,10 +102,51 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    return if !$Self->{SchedulerDBObject}->AutomationTaskToExecute(
-        NodeID => $Self->{NodeID},
-        PID    => $$,
+    # get a list of valid automation jobs
+    my %JobList = $Self->{AutomationObject}->JobList(
+        Valid => 1
     );
+    return 1 if !%JobList;
+
+    # get the list of scheduled jobs
+    my %TaskList = map { $_->{Name} => $_->{TaskID} } $Self->{SchedulerDBObject}->TaskList(
+        Type => 'AsynchronousExecutor'
+    );
+
+    my $CurrentTimestamp = $Self->{TimeObject}->CurrentTimestamp();
+
+    JOBNAME:
+    for my $JobID ( sort keys %JobList ) {
+        # skip job if it has already been scheduled
+        next JOBNAME if $TaskList{'Job-'.$JobList{$JobID}};
+
+        # check if job can be executed now
+        my $CanExecute = $Self->{AutomationObject}->JobIsExecutable(
+            ID     => $JobID,
+            Time   => $CurrentTimestamp,
+            UserID => 1,
+        );
+        next JOBNAME if !$CanExecute;
+
+        if ( $Self->{Debug} ) {
+            $Self->_Debug("scheduling job \"$JobList{$JobID}\" for execution");
+        }
+
+        # execute recurrent tasks
+        $Self->{SchedulerDBObject}->TaskAdd(
+            Name                     => 'Job-'.$JobList{$JobID},
+            Type                     => 'AsynchronousExecutor',
+            MaximumParallelInstances => 1,
+            Data                     => {
+                Object   => 'Automation',
+                Function => 'JobExecute',
+                Params   => {
+                    ID     => $JobID,
+                    UserID => 1,
+                },
+            },
+        );
+    }
 
     return 1;
 }
@@ -117,37 +156,7 @@ sub PostRun {
 
     sleep $Self->{SleepPost};
 
-    $Self->{DiscardCount}--;
-
-    # if ( $Self->{Debug} ) {
-    #     print "  $Self->{DaemonName} Discard Count: $Self->{DiscardCount}\n";
-    # }
-
-    if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} unlocking expired automation tasks\n";
-    }
-
-    # Unlock long locked tasks.
-    $Self->{SchedulerDBObject}->RecurrentTaskUnlockExpired(
-        Type => 'Automation',
-    );
-
-    # Remove obsolete tasks before destroy.
-    if ( $Self->{DiscardCount} == 0 ) {
-        if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} cleaning up automation tasks\n";
-        }
-        $Self->{SchedulerDBObject}->AutomationTaskCleanup();
-    }
-
-    return if $Self->{DiscardCount} <= 0;
     return 1;
-}
-
-sub Summary {
-    my ( $Self, %Param ) = @_;
-
-    return $Self->{SchedulerDBObject}->AutomationTaskSummary();
 }
 
 sub DESTROY {

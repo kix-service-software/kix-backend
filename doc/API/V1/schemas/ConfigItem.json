@@ -82,6 +82,10 @@
          ],
          "readOnly" : true
       },
+      "LinkCount" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
       "Name" : {
          "type" : "string",
          "readOnly" : true
@@ -102,6 +106,7 @@
       "CreateBy",
       "CreateTime",
       "ConfigItemID",
+      "LinkCount",
       "Name"
    ],
    "definitions" : {

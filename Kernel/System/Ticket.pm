@@ -856,6 +856,14 @@ sub TicketIDLookup {
         return;
     }
 
+    my $CacheKey = 'Cache::TicketIDLookup::' . $Param{TicketNumber};
+
+    my $Cached = $Self->_TicketCacheGet(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cached if ref $Cached;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -869,6 +877,17 @@ sub TicketIDLookup {
     my $ID;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
+    }
+
+    if ( $ID ) {
+        # cache user result
+        $Self->_TicketCacheSet(
+            TicketID => $ID,
+            Type     => $Self->{CacheType},
+            TTL      => $Self->{CacheTTL},
+            Key      => $CacheKey,
+            Value    => $ID,
+        );
     }
 
     return $ID;
@@ -897,6 +916,14 @@ sub TicketNumberLookup {
         return;
     }
 
+    my $CacheKey = 'Cache::TicketNumberLookup::' . $Param{TicketID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cached if ref $Cached;
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -910,6 +937,17 @@ sub TicketNumberLookup {
     my $Number;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Number = $Row[0];
+    }
+
+    if ( $Number ) {
+        # cache user result
+        $Self->_TicketCacheSet(
+            TicketID => $Param{TicketID},
+            Type     => $Self->{CacheType},
+            TTL      => $Self->{CacheTTL},
+            Key      => $CacheKey,
+            Value    => $Number,
+        );
     }
 
     return $Number;
@@ -1863,16 +1901,41 @@ sub TicketQueueID {
         return;
     }
 
-    # get ticket data
-    my %Ticket = $Self->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 0,
-        UserID        => 1,
+    my $CacheKey = 'Cache::TicketQueueID' . $Param{TicketID};
+
+    my $Cached = $Self->_TicketCacheGet(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cached if ref $Cached;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    # db query
+    return if !$DBObject->Prepare(
+        SQL   => 'SELECT queue_id FROM ticket WHERE id = ?',
+        Bind  => [ \$Param{TicketID} ],
+        Limit => 1,
     );
 
-    return if !%Ticket;
+    my $QueueID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $QueueID = $Row[0];
+    }
 
-    return $Ticket{QueueID};
+    if ( $QueueID ) {
+        # cache user result
+        $Self->_TicketCacheSet(
+            TicketID => $Param{TicketID},
+            Type     => $Self->{CacheType},
+            TTL      => $Self->{CacheTTL},
+            Key      => $CacheKey,
+            Value    => $QueueID,
+        );
+    }
+
+    return $QueueID;
 }
 
 =item TicketQueueSet()
@@ -2012,8 +2075,8 @@ sub TicketQueueSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Queue',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{QueueID}.'::'.$Param{QueueID},
     );
 
     return 1;
@@ -2253,8 +2316,8 @@ sub TicketTypeSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Type',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{TypeID}.'::'.$Param{TypeID},
     );
 
     return 1;
@@ -2298,6 +2361,13 @@ sub TicketCustomerSet {
         );
         return;
     }
+
+    my %Ticket = $Self->TicketGet(
+        TicketID      => $Param{TicketID},
+        UserID        => $Param{UserID},
+        DynamicFields => 0,
+    );
+    return 1 if !%Ticket;
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -2349,6 +2419,13 @@ sub TicketCustomerSet {
             },
             UserID => $Param{UserID},
         );
+
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Organisation',
+            ObjectID  => $Param{TicketID}.'::'.$Ticket{OrganisationID}.'::'.$Param{OrganisationID},
+        );
     }
     if ( defined $Param{ContactID} ) {
         $Self->EventHandler(
@@ -2358,14 +2435,14 @@ sub TicketCustomerSet {
             },
             UserID => $Param{UserID},
         );
-    }
 
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
+        # push client callback event
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket.Contact',
+            ObjectID  => $Param{TicketID}.'::'.$Ticket{ContactID}.'::'.$Param{ContactID},
+        );
+    }
 
     # if no change
     if ( !$Param{History} ) {
@@ -2695,7 +2772,7 @@ sub TicketPendingTimeSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
+        Namespace => 'Ticket.PendingTime',
         ObjectID  => $Param{TicketID},
     );
 
@@ -2897,8 +2974,8 @@ sub TicketLockSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Lock',
+        ObjectID  => $Param{TicketID}.'::'.(lc $Param{Lock}).'::'.$Param{UserID},
     );
 
     return 1;
@@ -3204,8 +3281,8 @@ sub TicketStateSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.State',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{StateID}.'::'.$State{ID},
     );
 
     # KIX4OTRS-capeIT
@@ -3562,8 +3639,8 @@ sub TicketOwnerSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Owner',
+        ObjectID  => $Param{TicketID}.'::'.$OwnerID.'::'.$Param{NewUserID},
     );
 
     return 1;
@@ -3788,8 +3865,8 @@ sub TicketResponsibleSet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Responsible',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{ResponsibleID}.'::'.$Param{NewUserID},
     );
 
     return 1;
@@ -4069,8 +4146,8 @@ sub TicketPrioritySet {
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
+        Namespace => 'Ticket.Priority',
+        ObjectID  => $Param{TicketID}.'::'.$Ticket{PriorityID}.'::'.$Param{PriorityID},
     );
 
     return 1;
@@ -4722,8 +4799,13 @@ get ticket history as array with hashes
 OwnerID, PriorityID, StateID, HistoryTypeID and TypeID)
 
     my @HistoryLines = $TicketObject->HistoryGet(
-        TicketID  => 123,
-        UserID    => 123,
+        TicketID      => 123,
+        HistoryType   => '...',           # optional
+        Name          => '...',           # optional
+        MinCreateTime => '...',           # optional
+        SortReverse   => 1,               # optional
+        Limit         => 1,               # optional
+        UserID        => 123,
     );
 
 =cut
@@ -4747,13 +4829,38 @@ sub HistoryGet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT sh.name, sh.article_id, sh.create_time, sh.create_by, ht.name, '
+    my @BindArray = (
+        \$Param{TicketID}
+    );
+    my $SQL = 'SELECT sh.name, sh.article_id, sh.create_time, sh.create_by, ht.name, '
             . ' sh.queue_id, sh.owner_id, sh.priority_id, sh.state_id, sh.history_type_id, sh.type_id, sh.id '
             . ' FROM ticket_history sh, ticket_history_type ht WHERE '
-            . ' sh.ticket_id = ? AND ht.id = sh.history_type_id'
-            . ' ORDER BY sh.create_time, sh.id',
-        Bind => [ \$Param{TicketID} ],
+            . ' sh.ticket_id = ? AND ht.id = sh.history_type_id';
+
+    if ( $Param{HistoryType} ) {
+        $SQL .= ' AND ht.name = ?';
+        push @BindArray, \$Param{HistoryType};
+    }
+
+    if ( $Param{Name} ) {
+        $SQL .= ' AND sh.name = ?';
+        push @BindArray, \$Param{Name};
+    }
+
+    if ( $Param{MinCreateTime} ) {
+        $SQL .= ' AND sh.create_time >= ?';
+        push @BindArray, \$Param{MinCreateTime};
+    }
+
+    $SQL .= ' ORDER BY sh.create_time, sh.id';
+    if ( $Param{SortReverse} ) {
+        $SQL .= ' DESC'
+    }
+
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => \@BindArray,
+        Limit => $Param{Limit}
     );
 
     while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -5287,6 +5394,82 @@ sub TicketFlagGet {
     my $UserTags = $Flags->{ $Param{UserID} } || {};
 
     return %{$UserTags};
+}
+
+=item TicketUserFlagExists()
+
+check if the given flag exists for the given user
+
+    my $Exists = $TicketObject->TicketUserFlagExists(
+        TicketID => 123,
+        Flag     => 'Seen',
+        Value    => ...,            # optional
+        UserID   => 123,
+    );
+
+=cut
+
+sub TicketUserFlagExists {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID Flag UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    # check cache
+    my $CacheKey = 'TicketFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Flag} . '::' . ($Param{Value}||'');
+    my $Flags = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    if ( exists $Param{Value} ) {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND ticket_value = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{TicketID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    } 
+    else {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{TicketID}, \$Param{Flag}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+
+    # fetch the result
+    my $Exists = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Exists = $Row[0];
+    }
+
+    # set cache
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Exists,
+    );
+
+    return $Exists;
 }
 
 =item TicketArticleStorageSwitch()
@@ -6799,47 +6982,75 @@ sub _CalcStringDistance {
 get the relevant calendar for the ticket
 
     my $Calendar = $TicketObject->TicketCalendarGet(
-        TicketID => 123
+        TicketID  => 123     # or
+        TicketIDs => []      # or
+        Ticket    => {}
     );
 
-returns calendar number or empty string for default calendar
+returns calendar number or empty string for default calendar (in case of "TicketIDs" it returns a HashRef of TicketIDs with Calendar)
 
 =cut
 
 sub TicketCalendarGet {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{TicketID} ) {
+    my $Result;
+    
+    if ( IsHashRefWithData($Param{Ticket}) ) {
+        # get queue specific calendar
+        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
+            ID => $Param{Ticket}->{QueueID},
+        );
+        $Result = $QueueData{Calendar} || '';
+    }
+    elsif ( IsArrayRefWithData($Param{TicketIDs}) ) {
+        # get database object
+        my $DBObject = $Kernel::OM->Get('DB');
+
+        my @TicketIDs = @{$Param{TicketIDs}};
+        foreach my $TicketID ( @TicketIDs ) {
+            $TicketID = $DBObject->Quote( $TicketID, 'Integer' );
+        }
+
+        my $SQL = 'SELECT t.id, q.calendar_name FROM ticket t, queue q WHERE t.queue_id = q.id AND t.id IN ('.(join(',', @TicketIDs)).')';
+
+        if ( IsArrayRefWithData($Param{OnlyCalendars}) ) {
+            my @Calendars;
+            foreach my $Calendar ( @{$Param{OnlyCalendars}} ) {
+                push @Calendars, "'" . $DBObject->Quote( $Calendar ) . "'";
+            }
+
+            $SQL .= ' AND (q.calendar_name IS null OR q.calendar_name IN (null, '.(join(',', @Calendars)).'))';
+        }
+
+        # db query
+        return if !$DBObject->Prepare(
+            SQL => $SQL,
+        );
+
+        $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
+            Columns => [ 'TicketID', 'Calendar' ]
+        );
+    }
+    elsif ( $Param{TicketID} ) {
+        my $QueueID = $Self->TicketQueueGet(
+            TicketID => $Param{TicketID}
+        );
+        # get queue specific calendar
+        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
+            ID => $QueueID,
+        );
+        $Result = $QueueData{Calendar} || '';
+    }
+    else {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need TicketID!'
+            Message  => 'Need TicketID or TicketIDs or Ticket!'
         );
         return;
     }
 
-    my %Ticket = $Self->TicketGet(
-        TicketID => $Param{TicketID}
-    );
-
-    if (!%Ticket) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such TicketID ($Param{TicketID})!",
-        );
-        return;
-    }
-
-    # get queue specific calendar
-    my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-        ID => $Ticket{QueueID},
-    );
-
-    # if queue has a defined calendar, return it
-    return $QueueData{Calendar} if $QueueData{Calendar};
-
-    # use default calendar
-    return '';
+    return $Result;
 }
 
 =item GetAssignedTicketsForObject()
