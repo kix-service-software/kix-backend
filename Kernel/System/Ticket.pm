@@ -2975,7 +2975,7 @@ sub TicketLockSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Lock',
-        ObjectID  => $Param{TicketID}.'::'.(lc $Param{Lock}).'::'.$Param{OwnerID},
+        ObjectID  => $Param{TicketID}.'::'.(lc $Param{Lock}).'::'.$Param{UserID},
     );
 
     return 1;
