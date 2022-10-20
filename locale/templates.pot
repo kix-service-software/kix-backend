@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-10-17 06:47+0000\n"
+"POT-Creation-Date: 2022-10-20 09:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1132,6 +1132,18 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "To"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "(Required) ID of the article which should be deleted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "ArticleID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "Deletes an article of a ticket. Inlcuding dynamic fields, attachments, flags and accounted time."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
@@ -3839,6 +3851,10 @@ msgid "Archive state changed: \"%s\""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Article ID %s - %s deleted."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Automatically sets the owner of a ticket as the responsible for it (if ticket responsible feature is enabled). This will only work by manually actions of the logged in user. It does not work for automated actions e.g. Automation, Postmaster and API."
 msgstr ""
 
@@ -4060,6 +4076,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines, which tickets of which ticket state types should not be listed in linked ticket lists."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Delete Article"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
