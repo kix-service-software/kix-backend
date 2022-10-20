@@ -2427,6 +2427,7 @@
     <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="is_async" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="last_exec_time" Required="false" Type="DATE"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

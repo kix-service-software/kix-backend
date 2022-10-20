@@ -68,8 +68,8 @@ sub new {
 
     my $ConfigObject = $Kernel::OM->Get('Config');
         
-    $Self->{ProductVersion} = $ConfigObject->Get('Product') . ' ';
-    $Self->{ProductVersion} .= $ConfigObject->Get('Version');
+    $Self->{ProductVersion} = ($ConfigObject->Get('Product') || 'KIX') . ' ';
+    $Self->{ProductVersion} .= ($ConfigObject->Get('Version') || 18);
 
     # get system id
     my $SystemID = $ConfigObject->Get('SystemID');

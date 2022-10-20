@@ -707,6 +707,78 @@ sub GetKeysForType {
     );
 }
 
+=item SetSemaphore()
+
+create a semaphore
+
+    my $Success = $CacheObject->SetSemaphore(
+        ID      => '...',
+        Value   => '...',
+        Timeout => 123,
+    );
+
+=cut
+
+sub SetSemaphore {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(ID Timeout Value)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    return 1 if !$Self->{CacheObject}->can('SetSemaphore');
+
+    my $Success;
+    do {
+        $Success = $Self->{CacheObject}->SetSemaphore(
+            %Param
+        );
+        if ( !$Success ) {
+            Time::HiRes::sleep 0.01;
+        }
+    }
+    while ( !$Success );
+
+    return 1;
+}
+
+=item ClearSemaphore()
+
+clear a semaphore
+
+    my $Success = $CacheObject->ClearSemaphore(
+        ID    => '...',
+        Value => '...'
+    );
+
+=cut
+
+sub ClearSemaphore {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(ID Value)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    return 1 if !$Self->{CacheObject}->can('SetSemaphore');
+
+    return $Self->{CacheObject}->ClearSemaphore(
+        %Param
+    );
+}
+
 =item _HandleDependingCacheTypes()
 
 deletes relevant keys of depending cache types
@@ -832,7 +904,7 @@ sub _Debug {
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Cache]", $Indent, $Message;
+    printf STDERR "%f (%5i) %-15s %s%s\n", Time::HiRes::time(), $$, "[Cache]", $Indent, $Message;
 }
 
 1;

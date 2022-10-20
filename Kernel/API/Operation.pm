@@ -16,6 +16,7 @@ use Storable;
 
 use Kernel::API::Validator;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
@@ -256,8 +257,7 @@ sub Run {
     # start the backend
     my $Result = $Self->{BackendObject}->RunOperation(%Param);
 
-    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-    $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", $TimeDiff));
+    $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", TimeDiff($StartTime)));
 
     return $Result;
 }
@@ -322,6 +322,10 @@ sub _CheckPermission {
 
     my $StartTime = Time::HiRes::time();
 
+    $Self->_PermissionDebug($Self->{LevelIndent}, "permission check (Resource)");
+    my $OldLevelIndent = $Self->{LevelIndent};
+    $Self->{LevelIndent} .= '    ';
+
     my $RequestedPermission = Kernel::API::Operation::REQUEST_METHOD_PERMISSION_MAPPING->{$Self->{RequestMethod}};
 
     # check if token allows access, first check denials
@@ -350,6 +354,7 @@ sub _CheckPermission {
     # return false if access is explicitly denied by token
     if ( !$Access ) {
         $Self->_PermissionDebug($Self->{LevelIndent}, "RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
+        $Self->{LevelIndent} = $OldLevelIndent;
         return;
     }
 
@@ -363,6 +368,7 @@ sub _CheckPermission {
     my $PermissionDebug = $Kernel::OM->Get('Config')->Get('Permission::Debug');
 
     foreach my $Resource ( @Resources ) {
+        $Kernel::OM->Get('User')->{LevelIndent} = $Self->{LevelIndent};
         ($Granted, $AllowedPermission) = $Kernel::OM->Get('User')->CheckResourcePermission(
                 UserID              => $Param{Authorization}->{UserID},
                 UsageContext        => $Param{Authorization}->{UserType},
@@ -376,7 +382,7 @@ sub _CheckPermission {
                 Format => 'Short'
             );
 
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: %i, allowed permission: %s (0x%04x)", $ResourceBase.$Resource, ($Granted || 0), $AllowedPermissionShort, ($AllowedPermission||0)));
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: %i, allowed permission: %s", $ResourceBase.$Resource, ($Granted || 0), $AllowedPermissionShort));
         }
 
         if ( $Granted ) {
@@ -384,7 +390,6 @@ sub _CheckPermission {
             push(@GrantedResources, $Resource);
         }
     }
-
 
     # create a new RequestURI with granted resources if some of the item resources are denied
     if ( scalar(@Resources) > 1 && scalar(@GrantedResources) > 0 && scalar(@GrantedResources) < scalar(@Resources) ) {
@@ -408,8 +413,8 @@ sub _CheckPermission {
         }
     }
 
-    my $TimeDiff = (Time::HiRes::time() - $StartTime) * 1000;
-    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", $TimeDiff));
+    $Self->{LevelIndent} = $OldLevelIndent;
+    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
 
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
@@ -420,21 +425,21 @@ sub _CheckPermission {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
+    return if !$Kernel::OM->Get('Config')->Get('API::Debug');
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s: %s\n", $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
+    printf STDERR "%f (%5i) %-15s %s%s: %s\n", Time::HiRes::time(), $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
 }
 
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
+    return if !$Kernel::OM->Get('Config')->Get('Permission::Debug');
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
+    printf STDERR "%f (%5i) %-15s %s%s\n", Time::HiRes::time(), $$, "[Permission]", $Indent, $Message;
 }
 
 1;

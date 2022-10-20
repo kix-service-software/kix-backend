@@ -1316,6 +1316,73 @@ sub LinkListWithData {
     return $LinkList;
 }
 
+=item LinkCount()
+
+get the number of links for a given object (used for API)
+
+    my $Count = $LinkObject->LinkCount(
+        Object => '...',
+        Key    => '...',
+    );
+
+=cut
+
+sub LinkCount {
+    my ( $Self, %Param ) = @_;
+    my @BindVars;
+    my @SQLWhere;
+
+    # check needed stuff
+    for my $Argument (qw(Object Key)) {
+        if ( !$Param{$Argument} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Argument!",
+            );
+            return;
+        }
+    }
+
+    # check cache
+    my $CacheKey = 'LinkCount::'.$Param{Object}.'::'.$Param{Key};
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SQL = 'SELECT count(*) FROM link_relation lr, link_object lo 
+        WHERE (lr.source_object_id = lo.id AND lo.name = ? AND lr.source_key = ?) 
+           OR (lr.target_object_id = lo.id AND lo.name = ? AND lr.target_key = ?)';
+
+    # get links where the given object is the source
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => [
+            \$Param{Object}, \$Param{Key}, \$Param{Object}, \$Param{Key}
+        ],
+    );
+
+    # fetch results
+    my $Count = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Count = $Row[0]
+    }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Count,
+    );
+
+    return $Count;
+}
+
 =item LinkSearch()
 
 get all valid link IDs (used for API)

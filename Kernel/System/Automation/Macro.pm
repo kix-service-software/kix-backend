@@ -604,9 +604,10 @@ sub MacroExecute {
         push @{$Self->{ParentMacroID}}, $Self->{MacroID};
     } else {
         $Self->{MacroResults} = {
-            RootObjectID => $Param{RootObjectID} || $Param{ObjectID},
-            ObjectID     => $Param{ObjectID},
-            EventData    => $Param{EventData} || {}
+            RootObjectID   => $Param{RootObjectID} || $Param{ObjectID},
+            ObjectID       => $Param{ObjectID},
+            EventData      => $Param{EventData} || {},
+            AdditionalData => $Param{AdditionalData} || {}
         };
     }
 
@@ -689,7 +690,8 @@ sub MacroExecute {
         UserID    => $Param{UserID},
 
         # FIXME: add instance if job was triggerd by event with new instance (ExecuteJobsForEvent)
-        AutomationInstance => $Self
+        AutomationInstance => $Self,
+        AdditionalData     => $Param{AdditionalData} || {}
     );
 
     # remove result variable cache

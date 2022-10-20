@@ -15,6 +15,7 @@ use warnings;
 
 use IPC::Open3;
 use Symbol;
+use Time::HiRes;
 
 use base qw(Kernel::System::Daemon::DaemonModules::BaseTaskWorker);
 
@@ -87,6 +88,8 @@ Returns:
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $StartTime = Time::HiRes::time();
+
     # Check task params.
     my $CheckResult = $Self->_CheckTaskParams(
         %Param,
@@ -125,7 +128,7 @@ sub Run {
     my $Result;
 
     if ( $Self->{Debug} ) {
-        print "    $Self->{WorkerName} Executes task: $Param{TaskName}\n";
+        $Self->_Debug("executes task: $Param{TaskName}");
     }
 
     eval {
@@ -196,6 +199,10 @@ sub Run {
         LastWorkerStatus      => $Success,
         LastWorkerRunningTime => $EndSystemTime - $StartSystemTime,
     );
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "execution finished in %i ms", (Time::HiRes::time() - $StartTime) * 1000);
+    }
 
     return $Success;
 }

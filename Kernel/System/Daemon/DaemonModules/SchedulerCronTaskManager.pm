@@ -123,7 +123,7 @@ sub PostRun {
     # }
 
     if ( $Self->{Debug} ) {
-        print "  $Self->{DaemonName} unlocking expired cron tasks\n";
+        $Self->_Debug("unlocking expired cron tasks");
     }
 
     # Unlock long locked tasks.
@@ -134,7 +134,7 @@ sub PostRun {
     # Remove obsolete tasks before destroy.
     if ( $Self->{DiscardCount} == 0 ) {
         if ( $Self->{Debug} ) {
-            print "  $Self->{DaemonName} cleaning up cron tasks\n";
+            $Self->_Debug("cleaning up cron tasks");
         }
         $Self->{SchedulerDBObject}->CronTaskCleanup();
     }

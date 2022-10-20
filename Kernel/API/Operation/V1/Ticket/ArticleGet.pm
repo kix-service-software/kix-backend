@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use MIME::Base64;
+use Time::HiRes;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -227,11 +228,14 @@ sub Run {
 
         # add attachments array included
         if ( $Param{Data}->{include}->{Attachments} || $Param{Data}->{include}->{'Article.Attachments'} ) {
+my $StartTime = Time::HiRes::time();
+
             # get attachment index from backend
             my %Attachments = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndexRaw(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             );
+printf STDERR "($$) ArticleGet: call ArticleAttachmentIndexRaw: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
             if ( %Attachments ) {
                 $ArticleData{Attachments} = [ sort keys %Attachments ];
@@ -252,12 +256,23 @@ sub Run {
         }
 
         if ( $Param{Data}->{include}->{Plain} ) {
+my $StartTime = Time::HiRes::time();
             my $PlainMessage = $TicketObject->ArticlePlain(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             ) || '';
+printf STDERR "($$) ArticleGet: call ArticlePlain: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
             $ArticleData{Plain} = $PlainMessage;
         }
+
+        # add unseen information
+        my $Exists = $TicketObject->ArticleUserFlagExists(
+            ArticleID => $ArticleID,
+            Flag      => 'Seen',
+            Value     => 1,
+            UserID    => $Self->{Authorization}->{UserID},
+        );
+        $ArticleData{Unseen} = $Exists ? 0 : 1;
 
         # add
         push(@ArticleList, \%ArticleData);

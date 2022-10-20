@@ -133,6 +133,12 @@ sub Run {
             );
         }
 
+        # add link count
+        $FAQArticle{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(
+            Object => 'FAQArticle',
+            Key    => $FAQArticle{ID}
+        );
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }

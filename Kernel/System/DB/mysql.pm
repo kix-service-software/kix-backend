@@ -422,21 +422,7 @@ sub TableAlter {
             # Type translation
             $Tag = $Self->_TypeTranslation($Tag);
 
-            # normal data type
-            my $SQLAdd = $SQLStart . " ADD $Tag->{Name} $Tag->{Type}";
-
-            # handle primary and auto increment
-            if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /^true$/i ) {
-                $SQLAdd .= ' NOT NULL PRIMARY KEY';
-            } else {
-                $SQLAdd .= ' NULL';
-            }
-            if ( $Tag->{AutoIncrement} && $Tag->{AutoIncrement} =~ /^true$/i ) {
-                $SQLAdd .= ' AUTO_INCREMENT';
-            }
-            push @SQL, $SQLAdd;
-
-            # investigate the default value
+            # determine default value
             my $Default = '';
             if ( $Tag->{Type} =~ /int/i ) {
                 $Default = defined $Tag->{Default} ? $Tag->{Default} : 0;
@@ -445,32 +431,26 @@ sub TableAlter {
                 $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "''";
             }
 
-            # investigate the require
+            # determine if required
             my $Required = ( $Tag->{Required} && lc $Tag->{Required} eq 'true' ) ? 1 : 0;
+            $Required = $Required || $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /^true$/i;
 
-            # handle default and require
-            if ( $Required || defined $Tag->{Default} ) {
+            # normal data type
+            my $SQLAdd = $SQLStart . " ADD $Tag->{Name} $Tag->{Type}";
 
-                # fill up empty rows
-                push @SQL, "UPDATE $Table SET $Tag->{Name} = $Default WHERE $Tag->{Name} IS NULL";
+            # add require
+            $SQLAdd .= $Required ? ' NOT NULL' : ' NULL';
 
-                my $SQLAlter = "ALTER TABLE $Table CHANGE $Tag->{Name} $Tag->{Name} $Tag->{Type}";
+            # handle primary
+            $SQLAdd .= ' PRIMARY KEY' if ( $Tag->{PrimaryKey} && $Tag->{PrimaryKey} =~ /^true$/i );
 
-                # add default
-                if ( defined $Tag->{Default} ) {
-                    $SQLAlter .= " DEFAULT $Default";
-                }
+            # handle auto increment
+            $SQLAdd .= ' AUTO_INCREMENT' if ( $Tag->{AutoIncrement} && $Tag->{AutoIncrement} =~ /^true$/i );
 
-                # add require
-                if ($Required) {
-                    $SQLAlter .= ' NOT NULL';
-                }
-                elsif (!$Tag->{PrimaryKey}) {
-                    $SQLAlter .= ' NULL';
-                }
+            # handle default
+            $SQLAdd .= " DEFAULT $Default" if ( defined $Tag->{Default} );
 
-                push @SQL, $SQLAlter;
-            }
+            push @SQL, $SQLAdd;
         }
         elsif ( $Tag->{Tag} eq 'ColumnChange' && $Tag->{TagType} eq 'Start' ) {
 

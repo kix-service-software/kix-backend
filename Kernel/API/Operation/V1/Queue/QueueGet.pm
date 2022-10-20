@@ -128,49 +128,49 @@ sub Run {
 
     my @QueueList;
 
+    # get data of all relevant queues (due to performance)
+    my $QueueDataRef = $Kernel::OM->Get('Queue')->QueueListGet(
+        IDs => $Param{Data}->{QueueID},
+    );
+    my %QueueDataListByID = map { $_->{QueueID} => $_ } @{$QueueDataRef || []};
+    my %QueueDataListByName = map { $_->{Name} => $_ } @{$QueueDataRef || []};
+
     # start loop
     foreach my $QueueID ( @{$Param{Data}->{QueueID}} ) {
 
-        # get the Queue data
-        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $QueueID,
-        );
-
-        my @ParentQueueParts = split(/::/, $QueueData{Name});
-
-        if ( !IsHashRefWithData( \%QueueData ) ) {
+        if ( !IsHashRefWithData( $QueueDataListByID{$QueueID} ) ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
-        # include SubQueues if requested
-        if ( $Param{Data}->{include}->{SubQueues} ) {
-            my %SubQueueList = $Kernel::OM->Get('Queue')->GetAllSubQueues(
-                QueueID => $QueueID,
-            );
 
-            # filter direct children
-            my @DirectSubQueues;
-            foreach my $SubQueueID ( sort keys %SubQueueList ) {
-                my @QueueParts = split(/::/, $SubQueueList{$SubQueueID});
-                next if scalar(@QueueParts) > scalar(@ParentQueueParts)+1;
-                push(@DirectSubQueues, $SubQueueID)
-            }
+        my %QueueData = %{$QueueDataListByID{$QueueID}};
 
-            $QueueData{SubQueues} = \@DirectSubQueues;
-        }
+        my @QueueParts = split(/::/, $QueueData{Name});
 
         # save full queue name
         $QueueData{Fullname} = $QueueData{Name};
 
         # remove hierarchy from name (use last element of name split)
-        $QueueData{Name} = pop @ParentQueueParts;
+        $QueueData{Name} = pop @QueueParts;
+
+        # include SubQueues if requested
+        if ( $Param{Data}->{include}->{SubQueues} ) {
+
+            my @DirectSubQueues;
+            CHILDQUEUE:
+            foreach my $ChildName ( sort keys %QueueDataListByName ) {
+                next CHILDQUEUE if $ChildName !~ /^\Q$QueueData{Fullname}\E::\w+$/;
+                push @DirectSubQueues, $QueueDataListByName{$ChildName}->{QueueID};
+            }
+
+            $QueueData{SubQueues} = \@DirectSubQueues;
+        }
 
         # add "pseudo" ParentID
-        if ( scalar(@ParentQueueParts) > 0 ) {
-            $QueueData{ParentID} = 0 + $Kernel::OM->Get('Queue')->QueueLookup(
-                Queue => join('::', @ParentQueueParts),
-            );
+        my $ParentName = join('::', @QueueParts);
+        if ( $ParentName ) {
+            $QueueData{ParentID} = 0 + $QueueDataListByName{$ParentName};
         }
         else {
             $QueueData{ParentID} = undef;
@@ -203,8 +203,12 @@ sub Run {
 
             if ( $Param{Data}->{'TicketStats.StateType'} =~ /^(Open|Viewable)$/ ) {
                 # get Stats from TicketIndex
-                if ( !IsHashRefWithData($Self->{QueueTicketStats}) ) {
-                    $Self->{QueueTicketStats} = { $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats() };
+                if ( !IsHashRef($Self->{QueueTicketStats}) ) {
+use Time::HiRes;
+my $StartTime = Time::HiRes::time();
+                    my %QueueStats = $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats();
+                    $Self->{QueueTicketStats} = \%QueueStats;
+print STDERR "TicketIndexGetQueueStats: ".((Time::HiRes::time() - $StartTime) * 1000) . " ms\n";
                 }
                 $QueueData{TicketStats} = $Self->{QueueTicketStats}->{$QueueID} || { TotalCount => 0, LockCount => 0 };
             }

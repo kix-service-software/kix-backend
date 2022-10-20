@@ -61,7 +61,7 @@ sub Run {
     }
 
     my $Value = $Self->GetArgument('value');
-    if ( !$Value && !$Self->GetOption('default') ) {
+    if ( !defined $Value && !$Self->GetOption('default') ) {
         $Self->PrintError("No value given!");
         return $Self->ExitCodeError();
     }

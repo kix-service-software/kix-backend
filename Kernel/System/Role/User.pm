@@ -69,7 +69,9 @@ sub RoleUserAdd {
     );
 
     # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
@@ -189,7 +191,9 @@ sub RoleUserDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(

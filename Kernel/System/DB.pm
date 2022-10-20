@@ -15,6 +15,7 @@ use warnings;
 
 use DBI;
 use List::Util();
+use Time::HiRes qw(time);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -73,11 +74,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # 0=off; 1=updates; 2=+selects; 3=+Connects;
-    $Self->{Debug} = $Param{Debug} || 0;
-
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
+
+    # 0=off; 1=updates; 2=+selects; 3=+Connects;
+    $Self->{Debug} = $Param{Debug} || $ConfigObject->Get('DB::Debug');
+    $Self->{DebugMethods} = $ConfigObject->Get('DB::Debug::Methods');
 
     # get config data
     $Self->{DSN}  = $Param{DatabaseDSN}  || $ConfigObject->Get('DatabaseDSN');
@@ -189,14 +191,9 @@ sub Connect {
         delete $Self->{dbh};
     }
 
-    # debug
-    if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message =>
-                "DB.pm->Connect: DSN: $Self->{DSN}, User: $Self->{USER}, Pw: $Self->{PW}, DB Type: $Self->{'DB::Type'};",
-        );
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Connect} ) {
+        $StartTime = Time::HiRes::time();
     }
 
     # db connect
@@ -217,13 +214,10 @@ sub Connect {
     }
 
     if ( $Self->{Backend}->{'DB::Connect'} ) {
-# capeIT
-#        $Self->Do( SQL => $Self->{Backend}->{'DB::Connect'} );
         $Self->Do(
             SQL              => $Self->{Backend}->{'DB::Connect'},
             SkipConnectCheck => 1,
         );
-# EO capeIT
     }
 
     # set utf-8 on for PostgreSQL
@@ -233,6 +227,10 @@ sub Connect {
 
     if ( $Self->{SlaveDBObject} ) {
         $Self->{SlaveDBObject}->Connect();
+    }
+
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Connect} ) {
+        $Self->_Debug(sprintf("Connect [DSN: $Self->{DSN}, User: $Self->{USER}, Pw: $Self->{PW}, DB Type: $Self->{'DB::Type'}] took %i ms", (Time::HiRes::time() - $StartTime) * 1000));
     }
 
     return $Self->{dbh};
@@ -248,15 +246,6 @@ to disconnect from a database
 
 sub Disconnect {
     my $Self = shift;
-
-    # debug
-    if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message  => 'DB.pm->Disconnect',
-        );
-    }
 
     # do disconnect
     if ( $Self->{dbh} ) {
@@ -481,6 +470,11 @@ sub Do {
         return;
     }
 
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Do} ) {
+        $StartTime = Time::HiRes::time();
+    }
+
     if ( $Self->{Backend}->{'DB::PreProcessSQL'} ) {
         $Self->{Backend}->PreProcessSQL( \$Param{SQL} );
     }
@@ -498,7 +492,7 @@ sub Do {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -522,23 +516,9 @@ sub Do {
         '$Timestamp'
     }xmsg;
 
-    # debug
-    if ( $Self->{Debug} > 0 ) {
-        $Self->{DoCounter}++;
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message  => "DB.pm->Do ($Self->{DoCounter}) SQL: '$Param{SQL}'",
-        );
-    }
-
-# capeIT
     if ( !$Param{SkipConnectCheck} ) {
-# EO capeIT
-    return if !$Self->Connect();
-# capeIT
+        return if !$Self->Connect();
     }
-# EO capeIT
 
     # send sql to database
     if ( !$Self->{dbh}->do( $Param{SQL}, undef, @Array ) ) {
@@ -548,6 +528,10 @@ sub Do {
             Message  => "$DBI::errstr, SQL: '$Param{SQL}'",
         );
         return;
+    }
+
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Do} ) {
+        $Self->_Debug(sprintf("Do [SQL: %s] took %i ms", $Param{SQL}, (Time::HiRes::time() - $StartTime) * 1000));
     }
 
     return 1;
@@ -664,6 +648,11 @@ sub Prepare {
         return;
     }
 
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Prepare} ) {
+        $StartTime = Time::HiRes::time();
+    }
+
     $Self->{_PreparedOnSlaveDB} = 0;
 
     # Route SELECT statements to the DB slave if requested and a slave is configured.
@@ -705,22 +694,6 @@ sub Prepare {
         }
     }
 
-    # debug
-    if ( $Self->{Debug} > 1 ) {
-        $Self->{PrepareCounter}++;
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message  => "DB.pm->Prepare ($Self->{PrepareCounter}/" . time() . ") SQL: '$SQL'",
-        );
-    }
-
-    # slow log feature
-    my $LogTime;
-    if ( $Self->{SlowLog} ) {
-        $LogTime = time();
-    }
-
     if ( $Self->{Backend}->{'DB::PreProcessSQL'} ) {
         $Self->{Backend}->PreProcessSQL( \$SQL );
     }
@@ -737,7 +710,7 @@ sub Prepare {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug} > 1) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
                 );
                 return;
             }
@@ -768,16 +741,8 @@ sub Prepare {
         return;
     }
 
-    # slow log feature
-    if ( $Self->{SlowLog} ) {
-        my $LogTimeTaken = time() - $LogTime;
-        if ( $LogTimeTaken > 4 ) {
-            $Kernel::OM->Get('Log')->Log(
-                Caller   => 1,
-                Priority => 'error',
-                Message  => "Slow ($LogTimeTaken s) SQL: '$SQL'",
-            );
-        }
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Prepare} ) {
+        $Self->_Debug(sprintf("Prepare [SQL: %s] took %i ms", $SQL, (Time::HiRes::time() - $StartTime) * 1000));
     }
 
     return 1;
@@ -800,6 +765,11 @@ to process the results of a SELECT statement
 
 sub FetchrowArray {
     my $Self = shift;
+
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{FetchrowArray} ) {
+        $StartTime = Time::HiRes::time();
+    }
 
     if ( $Self->{_PreparedOnSlaveDB} ) {
         return $Self->{SlaveDBObject}->FetchrowArray();
@@ -851,6 +821,10 @@ sub FetchrowArray {
         $Counter++;
     }
 
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{FetchrowArray} ) {
+        $Self->_Debug(sprintf("FetchrowArray took %i ms", (Time::HiRes::time() - $StartTime) * 1000));
+    }
+
     return @Row;
 }
 
@@ -879,6 +853,11 @@ sub FetchAllArrayRef {
             Message  => 'Need Columns!',
         );
         return;
+    }
+
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{FetchAllArrayRef} ) {
+        $StartTime = Time::HiRes::time();
     }
 
     if ( $Self->{_PreparedOnSlaveDB} ) {
@@ -915,6 +894,10 @@ sub FetchAllArrayRef {
             }
         }
         push(@Result, \%RowData);
+    }
+
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{FetchAllArrayRef} ) {
+        $Self->_Debug(sprintf("FetchAllArrayRef [Columns: %s] took %i ms",  join(',', @{$Param{Columns}}), (Time::HiRes::time() - $StartTime) * 1000));
     }
 
     return \@Result;
@@ -1833,13 +1816,9 @@ checks if the database is reachable
 sub Ping {
     my ( $Self, %Param ) = @_;
 
-    # debug
-    if ( $Self->{Debug} > 2 ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'debug',
-            Message  => 'DB.pm->Ping',
-        );
+    my $StartTime;
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Ping} ) {
+        $StartTime = Time::HiRes::time();
     }
 
     if ( !defined $Param{AutoConnect} || $Param{AutoConnect} ) {
@@ -1849,7 +1828,13 @@ sub Ping {
         return if !$Self->{dbh};
     }
 
-    return $Self->{dbh}->ping();
+    my $Result = $Self->{dbh}->ping();
+
+    if ( $Self->{Debug} && $Self->{DebugMethods}->{Ping} ) {
+        $Self->_Debug(sprintf("Ping took %i ms", (Time::HiRes::time() - $StartTime) * 1000));
+    }
+
+    return $Result;
 }
 
 =begin Internal:
@@ -1947,6 +1932,15 @@ sub DESTROY {
 
     return 1;
 }
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[DB]", $Message;
+}
+
 
 1;
 

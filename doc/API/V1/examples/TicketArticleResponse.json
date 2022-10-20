@@ -30,6 +30,7 @@
         "TicketID": 49,
         "TimeUnits": 0,
         "To": "\"Some one\" <someone@somecorp.com>",
-        "ToRealname": "Some one"
+        "ToRealname": "Some one",
+        "Unseen": 0
     }
 }

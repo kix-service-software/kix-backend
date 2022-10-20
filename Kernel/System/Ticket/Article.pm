@@ -168,6 +168,9 @@ sub ArticleCreate {
         }
     }
 
+    # correct charset if necessary (KIX2018-8418)
+    $Param{Charset} =~ s/utf8/utf-8/i;
+
     # check ContentType vs. Charset & MimeType
     if ( !$Param{ContentType} ) {
         for (qw(Charset MimeType)) {
@@ -182,18 +185,12 @@ sub ArticleCreate {
         $Param{ContentType} = "$Param{MimeType}; charset=$Param{Charset}";
     }
     else {
-        for (qw(ContentType)) {
-            if ( !$Param{$_} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-                return;
-            }
-        }
-        my $Charset = 'utf-8';
         if ( $Param{ContentType} =~ /charset=/i ) {
-            $Charset = $Param{ContentType};
+
+            # correct charset if necessary (KIX2018-8418)
+            $Param{ContentType} =~ s/utf8/utf-8/i;
+
+            my $Charset = $Param{ContentType};
             $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
             $Charset =~ s/"|'//g;
             $Charset =~ s/(.+?);.*/$1/g;
@@ -201,14 +198,14 @@ sub ArticleCreate {
             # only change if we extracted a charset
             $Param{Charset} = $Charset || $Param{Charset};
         }
-        my $MimeType = '';
-        if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
-            $MimeType = $1;
-            $MimeType =~ s/"|'//g;
-        }
 
-        # only change if we extracted a mime type
-        $Param{MimeType} = $MimeType || $Param{MimeType};
+        if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
+            my $MimeType = $1;
+            $MimeType =~ s/"|'//g;
+
+            # only change if we extracted a mime type
+            $Param{MimeType} = $MimeType || $Param{MimeType};
+        }
     }
 
     # fallback for Charset
@@ -2076,17 +2073,26 @@ sub ArticleUpdate {
         );
     }
 
+    # prepare IncomingTime if given
+    if ( $Param{Key} eq 'IncomingTime') {
+        my $IncomingSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Param{Value},
+        );
+        $Param{Value} = $IncomingSystemTime if $IncomingSystemTime;
+    }
+
     # map
     my %Map = (
-        Body          => 'a_body',
-        Subject       => 'a_subject',
-        From          => 'a_from',
-        ReplyTo       => 'a_reply_to',
-        To            => 'a_to',
-        Cc            => 'a_cc',
-        Bcc           => 'a_bcc',
+        Body            => 'a_body',
+        Subject         => 'a_subject',
+        From            => 'a_from',
+        ReplyTo         => 'a_reply_to',
+        To              => 'a_to',
+        Cc              => 'a_cc',
+        Bcc             => 'a_bcc',
         CustomerVisible => 'customer_visible',
-        SenderTypeID  => 'article_sender_type_id',
+        SenderTypeID    => 'article_sender_type_id',
+        IncomingTime    => 'incoming_time',
     );
 
     # db update
@@ -2112,7 +2118,7 @@ sub ArticleUpdate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
-        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+        ObjectID  => $Param{TicketID}.q{::}.$Param{ArticleID},
     );
 
     return 1;
@@ -2464,6 +2470,82 @@ sub ArticleFlagGet {
     return %Flag;
 }
 
+=item ArticleUserFlagExists()
+
+check if the given flag exists for the given user
+
+    my $Exists = $TicketObject->ArticleUserFlagExists(
+        ArticleID => 123,
+        Flag      => 'Seen',
+        Value     => ...,           # optional
+        UserID    => 123,
+    );
+
+=cut
+
+sub ArticleUserFlagExists {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ArticleID Flag UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    # check cache
+    my $CacheKey = 'ArticleFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Flag} . '::' . ($Param{Value}||'');
+    my $Flags = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    if ( exists $Param{Value} ) {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND article_value = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+    else {
+        return if !$DBObject->Prepare(
+            SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND create_by = ?',
+            Bind  => [ 
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{UserID} 
+            ],
+            Limit => 1,
+        );
+    }
+
+    # fetch the result
+    my $Exists = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Exists = $Row[0];
+    }
+
+    # set cache
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Exists,
+    );
+
+    return $Exists;
+}
+
 =item ArticleFlagsOfTicketGet()
 
 get all article flags of a ticket
@@ -2517,7 +2599,6 @@ sub ArticleFlagsOfTicketGet {
                 AND article.ticket_id = ?
                 AND article_flag.create_by = ?',
         Bind  => [ \$Param{TicketID}, \$Param{UserID} ],
-        Limit => 1500,
     );
 
     my %Flag;
