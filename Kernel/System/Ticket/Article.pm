@@ -2073,17 +2073,26 @@ sub ArticleUpdate {
         );
     }
 
+    # prepare IncomingTime if given
+    if ( $Param{Key} eq 'IncomingTime') {
+        my $IncomingSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Param{Value},
+        );
+        $Param{Value} = $IncomingSystemTime if $IncomingSystemTime;
+    }
+
     # map
     my %Map = (
-        Body          => 'a_body',
-        Subject       => 'a_subject',
-        From          => 'a_from',
-        ReplyTo       => 'a_reply_to',
-        To            => 'a_to',
-        Cc            => 'a_cc',
-        Bcc           => 'a_bcc',
+        Body            => 'a_body',
+        Subject         => 'a_subject',
+        From            => 'a_from',
+        ReplyTo         => 'a_reply_to',
+        To              => 'a_to',
+        Cc              => 'a_cc',
+        Bcc             => 'a_bcc',
         CustomerVisible => 'customer_visible',
-        SenderTypeID  => 'article_sender_type_id',
+        SenderTypeID    => 'article_sender_type_id',
+        IncomingTime    => 'incoming_time',
     );
 
     # db update
@@ -2109,7 +2118,7 @@ sub ArticleUpdate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
-        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+        ObjectID  => $Param{TicketID}.q{::}.$Param{ArticleID},
     );
 
     return 1;

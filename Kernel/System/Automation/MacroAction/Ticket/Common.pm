@@ -65,7 +65,8 @@ sub _ReplaceValuePlaceholder {
 
     # add ticket id, to be sure
     $Param{EventData} ||= IsHashRefWithData($Self->{EventData}) ? $Self->{EventData} : {};
-    $Param{EventData}->{TicketID} = $Self->{RootObjectID} || $Param{TicketID};
+    $Param{EventData}->{TicketID}  = $Self->{RootObjectID} || $Param{TicketID};
+    $Param{EventData}->{ArticleID} = $Param{AdditionalData}->{ArticleID} ? $Param{AdditionalData}->{ArticleID}->[0] : q{};
 
     return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
 }
