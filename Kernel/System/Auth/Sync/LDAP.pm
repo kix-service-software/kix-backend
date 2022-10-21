@@ -570,7 +570,7 @@ sub Sync {
         my $Result = $UserObject->UserUpdate(
             %User,
             %UserContextFromLDAP,
-            ValidID      => ($UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent}) ? 1 : 0,
+            ValidID      => ($UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent}) ? 1 : 2,
             ChangeUserID => 1,
         );
 
@@ -589,24 +589,29 @@ sub Sync {
     }
 
     # compare role permissions from ldap with current user role permissions and update if necessary
-    if ( %RolesFromLDAP ) {
-
-        my %UserRoles = map { $_ => 1 } $UserObject->RoleList(
-            UserID => $UserID,
-        );
+    if (%RolesFromLDAP) {
 
         ROLEID:
         foreach my $RoleID ( sort keys %RolesFromLDAP ) {
             next ROLEID if !$RolesFromLDAP{$RoleID};
-
-            # ignore if already assigned
-            next ROLEID if $UserRoles{$RoleID};
 
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
                 Message  => "User: \"$Param{User}\" assigning role \"$SystemRoles{$RoleID}\"!",
             );
 
+            # clean up role
+            my $CleanUpResult = $RoleObject->RoleUserDelete(
+                UserID  => $UserID,
+                RoleID        => $RoleID,
+                IgnoreContextRoles        => 1,
+            );
+            if ( !$CleanUpResult ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to clean up role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
+                );
+            }
             # assign role
             my $Result = $RoleObject->RoleUserAdd(
                 AssignUserID  => $UserID,
@@ -617,30 +622,6 @@ sub Sync {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to assign role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
-                );
-            }
-        }
-
-        USER_ROLEID:
-        foreach my $RoleID ( sort keys %UserRoles ) {
-            # ignore if assigned by sync
-            next USER_ROLEID if $RolesFromLDAP{$RoleID};
-
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "User: \"$Param{User}\" revoking role \"$SystemRoles{$RoleID}\"!",
-            );
-
-            # assign role
-            my $Result = $RoleObject->RoleUserDelete(
-                UserID => $UserID,
-                RoleID => $RoleID,
-                IgnoreContextRoles => 1,
-            );
-            if ( !$Result ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to revoke role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
                 );
             }
         }
