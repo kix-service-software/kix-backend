@@ -228,14 +228,12 @@ sub Run {
 
         # add attachments array included
         if ( $Param{Data}->{include}->{Attachments} || $Param{Data}->{include}->{'Article.Attachments'} ) {
-my $StartTime = Time::HiRes::time();
 
             # get attachment index from backend
             my %Attachments = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndexRaw(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             );
-printf STDERR "($$) ArticleGet: call ArticleAttachmentIndexRaw: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
 
             if ( %Attachments ) {
                 $ArticleData{Attachments} = [ sort keys %Attachments ];
@@ -256,12 +254,10 @@ printf STDERR "($$) ArticleGet: call ArticleAttachmentIndexRaw: %i ms\n", (Time:
         }
 
         if ( $Param{Data}->{include}->{Plain} ) {
-my $StartTime = Time::HiRes::time();
             my $PlainMessage = $TicketObject->ArticlePlain(
                 ArticleID => $ArticleID,
                 UserID    => $Self->{Authorization}->{UserID},
             ) || '';
-printf STDERR "($$) ArticleGet: call ArticlePlain: %i ms\n", (Time::HiRes::time() - $StartTime) * 1000;
             $ArticleData{Plain} = $PlainMessage;
         }
 
