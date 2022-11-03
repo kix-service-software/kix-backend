@@ -131,7 +131,8 @@ sub Run {
     # get data of all relevant queues (due to performance)
     my $QueueDataRef = $Kernel::OM->Get('Queue')->QueueListGet(
         IDs => $Param{Data}->{QueueID},
-    );
+    );    
+
     my %QueueDataListByID = map { $_->{QueueID} => $_ } @{$QueueDataRef || []};
     my %QueueDataListByName = map { $_->{Name} => $_ } @{$QueueDataRef || []};
 
@@ -168,9 +169,19 @@ sub Run {
         }
 
         # add "pseudo" ParentID
-        my $ParentName = join('::', @QueueParts);
+        my $ParentName = join('::', @QueueParts);        
+
         if ( $ParentName ) {
-            $QueueData{ParentID} = 0 + $QueueDataListByName{$ParentName};
+            if ( !$QueueDataListByName{$ParentName} ) {
+                my $ParentQueueID = $Kernel::OM->Get('Queue')->QueueLookup(
+                    Queue => $ParentName
+                );
+
+                $QueueData{ParentID} = 0 + $ParentQueueID;
+
+            } else {
+                $QueueData{ParentID} = 0 + $QueueDataListByName{$ParentName}->{QueueID};
+            }
         }
         else {
             $QueueData{ParentID} = undef;
