@@ -183,7 +183,9 @@ sub CleanUp {
 
     if ( $Param{Type} ) {
         # delete type
-        my $KeyCount = $Self->_RedisCall('del', $Self->{CachePrefix}.$Param{Type});
+        my $Type = $Param{Type};
+        $Type = $Self->{CachePrefix}.$Type if $Type !~ /^$Self->{CachePrefix}/;
+        my $KeyCount = $Self->_RedisCall('del', $Type);
         return defined $KeyCount ? 1 : 0;
     }
     else {
