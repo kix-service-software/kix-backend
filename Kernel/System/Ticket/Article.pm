@@ -2513,8 +2513,8 @@ sub ArticleUserFlagExists {
     if ( exists $Param{Value} ) {
         return if !$DBObject->Prepare(
             SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND article_value = ? AND create_by = ?',
-            Bind  => [ 
-                \$Param{ArticleID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            Bind  => [
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID}
             ],
             Limit => 1,
         );
@@ -2522,8 +2522,8 @@ sub ArticleUserFlagExists {
     else {
         return if !$DBObject->Prepare(
             SQL   => 'SELECT id FROM article_flag WHERE article_id = ? AND article_key = ? AND create_by = ?',
-            Bind  => [ 
-                \$Param{ArticleID}, \$Param{Flag}, \$Param{UserID} 
+            Bind  => [
+                \$Param{ArticleID}, \$Param{Flag}, \$Param{UserID}
             ],
             Limit => 1,
         );
@@ -2711,6 +2711,7 @@ delete an article, its plain message, and all attachments
     my $Success = $TicketObject->ArticleDelete(
         ArticleID => 123,
         UserID    => 123,
+        NoHistory => 1         # optional, if given, no history entry will added
     );
 
 =item ArticleDeletePlain()
