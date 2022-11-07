@@ -796,7 +796,8 @@ sub TicketDelete {
     for my $ArticleID (@Articles) {
         return if !$Self->ArticleDelete(
             ArticleID => $ArticleID,
-            %Param,
+            NoHistory => 1,
+            %Param
         );
     }
 
@@ -1481,7 +1482,7 @@ sub _TicketCacheClear {
     $CacheObject->CleanUp(
         Type => "TicketIndex",
     );
-    
+
     foreach my $Value ( @Values ) {
         next if !$Value;
         my ( $Type, $Key ) = split(/::/, $Value, 2);
@@ -5439,17 +5440,17 @@ sub TicketUserFlagExists {
     if ( exists $Param{Value} ) {
         return if !$DBObject->Prepare(
             SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND ticket_value = ? AND create_by = ?',
-            Bind  => [ 
-                \$Param{TicketID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID} 
+            Bind  => [
+                \$Param{TicketID}, \$Param{Flag}, \$Param{Value}, \$Param{UserID}
             ],
             Limit => 1,
         );
-    } 
+    }
     else {
         return if !$DBObject->Prepare(
             SQL   => 'SELECT id FROM ticket_flag WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
-            Bind  => [ 
-                \$Param{TicketID}, \$Param{Flag}, \$Param{UserID} 
+            Bind  => [
+                \$Param{TicketID}, \$Param{Flag}, \$Param{UserID}
             ],
             Limit => 1,
         );
@@ -6995,7 +6996,7 @@ sub TicketCalendarGet {
     my ( $Self, %Param ) = @_;
 
     my $Result;
-    
+
     if ( IsHashRefWithData($Param{Ticket}) ) {
         # get queue specific calendar
         my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(

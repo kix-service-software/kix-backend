@@ -133,6 +133,17 @@ sub ArticleDelete {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    if ( !$Param{NoHistory} ) {
+        $Self->HistoryAdd(
+            Name         => "\%\%$Article{ArticleID}\%\%$Article{Subject}",
+            HistoryType  => 'ArticleDelete',
+            TicketID     => $Article{TicketID},
+            CreateUserID => $Param{UserID}
+        );
+    }
+
+    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
