@@ -125,13 +125,6 @@ sub Run {
         return;
     }
 
-    $Kernel::OM->Get('Ticket')->HistoryAdd(
-        Name         => "\%\%$Article{ArticleID}\%\%$Article{Subject}",
-        HistoryType  => 'ArticleDelete',
-        TicketID     => $Param{TicketID},
-        CreateUserID => $Param{UserID}
-    );
-
     return 1;
 }
 

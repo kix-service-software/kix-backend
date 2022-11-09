@@ -193,40 +193,12 @@ sub _ArticleUpdate {
         UserID    => $Param{UserID}
     );
 
-    if (
-        $Article->{Body}
-        && !$Article->{Attachments}
-    ) {
-        my %OldAttachments = $TicketObject->ArticleAttachmentIndex(
-            ArticleID                  => $Param{ArticleID},
-            UserID                     => $Param{UserID},
-            Article                    => \%OldArticle,
-            StripPlainBodyAsAttachment => 3,
-        );
-
-        if ( %OldAttachments ) {
-            for my $FileID ( sort keys %OldAttachments ) {
-                my %Attachment = $TicketObject->ArticleAttachment(
-                    FileID    => $FileID,
-                    ArticleID => $Param{ArticleID},
-                    UserID    => $Param{UserID}
-                );
-
-                $Attachment{Content} = MIME::Base64::encode_base64($Attachment{Content});
-
-                push ( @{$Article->{Attachments}}, \%Attachment );
-            }
-        }
-    }
-
     if ( !$Article->{Body} ) {
-        if ( defined $Article->{Attachments} ) {
-            $Article->{Body}     = $OldArticle{Body};
-            $Article->{HTMLBody} = $Self->_GetBodyRichtext(
-                Article => $Article,
-                UserID  => $Param{UserID}
-            );
-        }
+        $Article->{Body}     = $OldArticle{Body};
+        $Article->{HTMLBody} = $Self->_GetBodyRichtext(
+            Article => $Article,
+            UserID  => $Param{UserID}
+        );
     } else {
 
         # replace placeholders
@@ -294,7 +266,6 @@ sub _ArticleUpdate {
         }
     }
 
-
     # update normal attributes
     foreach my $Attribute (
         qw(
@@ -315,8 +286,8 @@ sub _ArticleUpdate {
 
         if ( !$Success ) {
             return $Self->_Error(
-                Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article attribute $Attribute",
+                Code    => 'Object.UnableToUpdate',
+                Message => "Unable to update article attribute $Attribute",
             );
         }
     }
@@ -341,6 +312,19 @@ sub _ArticleUpdate {
 
         # write attachments
         for my $Attachment (@{$Article->{Attachments}}) {
+
+            if ($Attachment->{Filename} !~ m/^(?:file-[12]|pasted[-]\d+[-]\d+[.].*)$/smx) {
+                $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
+            }
+            elsif (
+                $Attachment->{ContentType} eq "text/html; charset=\"$Article->{Charset}\""
+                && $Attachment->{Filename} eq 'file-2'
+            ) {
+                $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
+                    DocumentRef    => \$Attachment->{Content},
+                    AttachmentsRef => $Article->{Attachments},
+                );
+            }
 
             # write existing file to backend
             $UpdateSuccessful = $TicketObject->ArticleWriteAttachment(
