@@ -204,11 +204,8 @@ sub Run {
             if ( $Param{Data}->{'TicketStats.StateType'} =~ /^(Open|Viewable)$/ ) {
                 # get Stats from TicketIndex
                 if ( !IsHashRef($Self->{QueueTicketStats}) ) {
-use Time::HiRes;
-my $StartTime = Time::HiRes::time();
                     my %QueueStats = $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats();
                     $Self->{QueueTicketStats} = \%QueueStats;
-print STDERR "TicketIndexGetQueueStats: ".((Time::HiRes::time() - $StartTime) * 1000) . " ms\n";
                 }
                 $QueueData{TicketStats} = $Self->{QueueTicketStats}->{$QueueID} || { TotalCount => 0, LockCount => 0 };
             }
