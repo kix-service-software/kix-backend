@@ -17,6 +17,7 @@
         "InciState": "Operational",
         "InciStateID": 1,
         "InciStateType": "operational",
+        "IsLastVersion": 1,
         "Name": "rbo test ci 2",
         "Number": "1022000022",
         "VersionID": 562

@@ -79,6 +79,11 @@
          "type" : "string",
          "readOnly" : true
       },
+      "IsLastVersion" : {
+         "description" : " if this version is last version, else value is 0",
+         "type" : "integer",
+         "readOnly" : true
+      },
       "Name" : {
          "type" : "string",
          "readOnly" : true
@@ -110,6 +115,7 @@
       "InciState",
       "InciStateID",
       "InciStateType",
+      "IsLastVersion",
       "Name",
       "VersionID"
    ],

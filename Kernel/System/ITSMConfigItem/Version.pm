@@ -838,34 +838,45 @@ sub VersionAdd {
     my $ReturnVersionID = scalar @{$VersionList} ? $VersionList->[-1] : 0;
     return $ReturnVersionID if !( $Events && keys %{$Events} );
 
+    # don't add new version if just incident state has changed => only update config item
+    my $VersionID;
+    my $CreateTime;
+    my $AddVersion = 1;
+    if ($Events && (keys %{$Events}) == 1 && $Events->{IncidentStateUpdate}) {
+        $AddVersion = 0;
+        $VersionID = $ReturnVersionID;
+    }
+
     # KIX4OTRS-capeIT
     my $Result = 0;
 
-    # trigger Pre-VersionCreate event
-    $Result = $Self->PreEventHandler(
-        Event => 'VersionCreate',
-        Data  => {
-            ConfigItemID => $Param{ConfigItemID},
-            Name         => $Param{Name},
-            DefinitionID => $Param{DefinitionID},
-            DeplStateID  => $Param{DeplStateID},
-            InciStateID  => $Param{InciStateID},
-            XMLData      => $Param{XMLData},
-            SkipPreEvent => $Param{SkipPreEvent},
-            Comment      => '',
-        },
-        UserID => $Param{UserID},
-    );
-    if ( ( ref($Result) eq 'HASH' ) && ( $Result->{Error} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Pre-VersionCreate refused version update.",
+    # trigger Pre-VersionCreate event - if necessary
+    if ($AddVersion) {
+        $Result = $Self->PreEventHandler(
+            Event => 'VersionCreate',
+            Data  => {
+                ConfigItemID => $Param{ConfigItemID},
+                Name         => $Param{Name},
+                DefinitionID => $Param{DefinitionID},
+                DeplStateID  => $Param{DeplStateID},
+                InciStateID  => $Param{InciStateID},
+                XMLData      => $Param{XMLData},
+                SkipPreEvent => $Param{SkipPreEvent},
+                Comment      => '',
+            },
+            UserID => $Param{UserID},
         );
-        return $Result;
-    }
-    elsif ( ref($Result) eq 'HASH' ) {
-        for my $ResultKey ( keys %{$Result} ) {
-            $Param{$ResultKey} = $Result->{$ResultKey};
+        if ( ( ref($Result) eq 'HASH' ) && ( $Result->{Error} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Pre-VersionCreate refused version update.",
+            );
+            return $Result;
+        }
+        elsif ( ref($Result) eq 'HASH' ) {
+            for my $ResultKey ( keys %{$Result} ) {
+                $Param{$ResultKey} = $Result->{$ResultKey};
+            }
         }
     }
 
@@ -1018,60 +1029,61 @@ sub VersionAdd {
 
     # EO KIX4OTRS-capeIT
 
-    # insert new version
-    my $Success = $Kernel::OM->Get('DB')->Do(
-        SQL => 'INSERT INTO configitem_version '
-            . '(configitem_id, name, definition_id, '
-            . 'depl_state_id, inci_state_id, create_time, create_by) VALUES '
-            . '(?, ?, ?, ?, ?, current_timestamp, ?)',
-        Bind => [
-            \$Param{ConfigItemID},
-            \$Param{Name},
-            \$Param{DefinitionID},
-            \$Param{DeplStateID},
-            \$Param{InciStateID},
-            \$Param{UserID},
-        ],
-    );
-
-    return if !$Success;
-
-    # get id of new version
-    $Kernel::OM->Get('DB')->Prepare(
-        SQL => 'SELECT id, create_time FROM configitem_version WHERE '
-            . 'configitem_id = ? ORDER BY id DESC',
-        Bind  => [ \$Param{ConfigItemID} ],
-        Limit => 1,
-    );
-
-    # fetch the result
-    my $VersionID;
-    my $CreateTime;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $VersionID  = $Row[0];
-        $CreateTime = $Row[1];
-    }
-
-    # check version id
-    if ( !$VersionID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't get the new version id!",
+    # insert new version - if necessary
+    if ($AddVersion) {
+        my $Success = $Kernel::OM->Get('DB')->Do(
+            SQL => 'INSERT INTO configitem_version '
+                . '(configitem_id, name, definition_id, '
+                . 'depl_state_id, inci_state_id, create_time, create_by) VALUES '
+                . '(?, ?, ?, ?, ?, current_timestamp, ?)',
+            Bind => [
+                \$Param{ConfigItemID},
+                \$Param{Name},
+                \$Param{DefinitionID},
+                \$Param{DeplStateID},
+                \$Param{InciStateID},
+                \$Param{UserID},
+            ],
         );
-        return;
-    }
 
-    # add xml data
-    if ( $Param{XMLData} && ref $Param{XMLData} eq 'ARRAY' ) {
-        $Self->_XMLVersionAdd(
-            ClassID      => $ConfigItemInfo->{ClassID},
-            ConfigItemID => $Param{ConfigItemID},
-            VersionID    => $VersionID,
-            XMLData      => $Param{XMLData},
+        return if !$Success;
+
+        # get id of new version
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL => 'SELECT id, create_time FROM configitem_version WHERE '
+                . 'configitem_id = ? ORDER BY id DESC',
+            Bind  => [ \$Param{ConfigItemID} ],
+            Limit => 1,
         );
+
+        # fetch the result
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $VersionID  = $Row[0];
+            $CreateTime = $Row[1];
+        }
+
+        # check version id
+        if ( !$VersionID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't get the new version id!",
+            );
+            return;
+        }
+
+        # add xml data
+        if ( $Param{XMLData} && ref $Param{XMLData} eq 'ARRAY' ) {
+            $Self->_XMLVersionAdd(
+                ClassID      => $ConfigItemInfo->{ClassID},
+                ConfigItemID => $Param{ConfigItemID},
+                VersionID    => $VersionID,
+                XMLData      => $Param{XMLData},
+            );
+        }
     }
 
     # update name, last_version_id, cur_depl_state_id, cur_inci_state_id, change_time and change_by
+    $CreateTime ||= $Kernel::OM->Get('Time')->CurrentTimestamp();
     $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE configitem SET name = ?, last_version_id = ?, '
             . 'cur_depl_state_id = ?, cur_inci_state_id = ?, '
@@ -1093,15 +1105,17 @@ sub VersionAdd {
         Type => $Self->{CacheType},
     );
 
-    # trigger VersionCreate event
-    $Self->EventHandler(
-        Event => 'VersionCreate',
-        Data  => {
-            ConfigItemID => $Param{ConfigItemID},
-            Comment      => $VersionID,
-        },
-        UserID => $Param{UserID},
-    );
+    if ($AddVersion) {
+        # trigger VersionCreate event
+        $Self->EventHandler(
+            Event => 'VersionCreate',
+            Data  => {
+                ConfigItemID => $Param{ConfigItemID},
+                Comment      => $VersionID,
+            },
+            UserID => $Param{UserID},
+        );
+    }
 
     # compare current and old values
     if ( $Events->{ValueUpdate} ) {
@@ -1162,15 +1176,23 @@ sub VersionAdd {
 
     # recalculate the current incident state of all linked config items
     $Self->RecalculateCurrentIncidentState(
-        ConfigItemID => $Param{ConfigItemID},
+        ConfigItemID => $Param{ConfigItemID}
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'CREATE',
-        Namespace => 'CMDB.ConfigItem.Version',
-        ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
-    );
+    if ($AddVersion) {
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'CREATE',
+            Namespace => 'CMDB.ConfigItem.Version',
+            ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
+        );
+    } else {
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event      => 'UPDATE',
+            Namespace  => 'CMDB.ConfigItem',
+            ObjectID   => $Param{ConfigItemID},
+        );
+    }
 
     return $VersionID;
 }
@@ -1652,16 +1674,16 @@ sub _GetEvents {
     }
 
     # if depl_state is updated
-    my $LastDeplStateID = $Param{ConfigItemInfo}->{DeplStateID} || '';
-    my $CurDeplStateID  = $Param{Param}->{DeplStateID}          || '';
+    my $LastDeplStateID = $Param{ConfigItemInfo}->{CurDeplStateID} || '';
+    my $CurDeplStateID  = $Param{Param}->{DeplStateID}             || '';
 
     if ( $LastDeplStateID ne $CurDeplStateID ) {
         $Events->{DeploymentStateUpdate} = $CurDeplStateID . '%%' . $LastDeplStateID;
     }
 
-    # if incistate is updated
-    my $LastInciStateID = $Param{ConfigItemInfo}->{InciStateID} || '';
-    my $CurInciStateID  = $Param{Param}->{InciStateID}          || '';
+    # if inci_state is updated
+    my $LastInciStateID = $Param{ConfigItemInfo}->{CurInciStateID} || '';
+    my $CurInciStateID  = $Param{Param}->{InciStateID}             || '';
 
     if ( $LastInciStateID ne $CurInciStateID ) {
         $Events->{IncidentStateUpdate} = $CurInciStateID . '%%' . $LastInciStateID;
