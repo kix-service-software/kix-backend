@@ -2728,4 +2728,20 @@
     </ForeignKey>
 </Table>
 
+<Table Name="html_to_pdf">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="object" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="description" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="definition" Required="false" Type="LONGBLOB"/>
+    <Column Name="created" Required="true" Type="DATE"/>
+    <Column Name="created_by" Required="true" Type="INTEGER"/>
+    <Column Name="changed" Required="true" Type="DATE"/>
+    <Column Name="changed_by" Required="true" Type="INTEGER"/>
+    <Index Name="html_to_pdf_name">
+        <IndexColumn Name="name"/>
+    </Index>
+</Table>
+
 </database>
