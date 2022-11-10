@@ -180,6 +180,9 @@ sub Run {
             # add ConfigItemID to version hash
             $Version->{ConfigItemID} = $Param{Data}->{ConfigItemID};
 
+            # add last version identifier
+            $Version->{IsLastVersion} = ($ConfigItem->{LastVersionID} == $VersionID) ? 1 : 0;
+
             push(@VersionList, $Version);
         }
 

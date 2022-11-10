@@ -18,6 +18,7 @@
             "InciState": "Operational",
             "InciStateID": 1,
             "InciStateType": "operational",
+            "IsLastVersion": 0,
             "Name": "test ci",
             "Number": "1022000022",
             "VersionID": 561
@@ -40,6 +41,7 @@
             "InciState": "Operational",
             "InciStateID": 1,
             "InciStateType": "operational",
+            "IsLastVersion": 1,
             "Name": "test ci 2",
             "Number": "1022000022",
             "VersionID": 562
