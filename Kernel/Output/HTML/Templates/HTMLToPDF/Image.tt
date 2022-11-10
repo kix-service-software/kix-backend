@@ -1,0 +1,30 @@
+# --
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+
+[% RenderBlockStart("CSS") %]
+<style  type="text/css">
+    .[% Data.ID %] {
+[% IF Data.Style.Height %]
+        height: [% Data.Style.Height | html %];
+[% END %]
+[% IF Data.Style.Width %]
+        width: [% Data.Style.Width | html %];
+[% END %]
+[% IF Data.Style.Float %]
+        float: [% Data.Style.Float | html %];
+[% END %]
+    }
+    .[% Data.ID %] > img {
+        width: 100%;
+    }
+</style>
+[% RenderBlockEnd("CSS") %]
+[% RenderBlockStart("HTML") %]
+<img src="[% Data.Value %]" />
+[% RenderBlockEnd("HTML") %]
