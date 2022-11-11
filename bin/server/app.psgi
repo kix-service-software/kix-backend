@@ -18,6 +18,7 @@ use Module::Refresh;
 use Plack::Builder;
 use File::Path qw();
 use Fcntl qw(:flock);
+use Time::HiRes qw(time);
 
 # use ../../ as lib location
 use FindBin qw($Bin);
@@ -25,8 +26,12 @@ use lib "$Bin/../..";
 use lib "$Bin/../../Kernel/cpan-lib";
 use lib "$Bin/../../plugins";
 
+use Kernel::API::Provider;
+use Kernel::System::ObjectManager;
+
 $ENV{KIX_HOME} = "$Bin/../.." if !$ENV{KIX_HOME};
 
+use Kernel::Config;
 use Kernel::API::Provider;
 use Kernel::System::ObjectManager;
 
@@ -35,8 +40,6 @@ $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'API',
     },
 );
-
-use Kernel::Config;
 
 # Workaround: some parts of KIX use exit to interrupt the control flow.
 #   This would kill the Plack server, so just use die instead.
@@ -56,25 +59,24 @@ my $App = CGI::Emulate::PSGI->handler(
         # Populate SCRIPT_NAME as KIX needs it in some places.
         $ENV{SCRIPT_NAME} = 'api';
 
-        eval {
-            # Reload files in @INC that have changed since the last request.
-            Module::Refresh->refresh();
-        };
-        warn $@ if $@;
-
         if ( $ENV{NYTPROF} ) {
             print STDERR "!!!PROFILING ENABLED!!! ($ENV{NYTPROF})\n";
             DB::enable_profile()
         }
 
+        my $StartTime = time();
+
         # run the request
         eval {
-            do "$Bin/$ENV{SCRIPT_NAME}";
+            my $Provider = Kernel::API::Provider->new();
+            $Provider->Run();
+            $Kernel::OM->CleanUp();
+#            do "$Bin/$ENV{SCRIPT_NAME}";
         };
         if ( $@ && $@ ne "exit called\n" ) {
             warn $@;
         }
-
+        
         if ( $ENV{NYTPROF} ) {
             DB::finish_profile();
         }
@@ -126,6 +128,7 @@ builder {
         vary_user_agent => 1;
     enable "Plack::Middleware::AccessLog::Timed",
         format => "%h %l %u %t \"%r\" %>s %b %D";
+    enable "StackTrace", force => 1;
     $App;
 };
 

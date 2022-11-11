@@ -37,6 +37,7 @@
                     ]
                 }
             ],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -61,6 +62,7 @@
             "CreateBy": 1,
             "Created": "2020-04-09 08:28:19",
             "DynamicFields": [],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -75,7 +77,8 @@
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "WatcherID": 101
           }
     ]
 }

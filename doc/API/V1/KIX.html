@@ -1596,6 +1596,10 @@ pre code {
                ],
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -1616,6 +1620,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "ConfigItemID",
+            "LinkCount",
             "Name"
          ]
       }
@@ -1631,8 +1636,10 @@ pre code {
             "ConfigItemID": 61,
             "CreateBy": 1,
             "CreateTime": "2018-07-31 16:07:38",
+            "LinkCount": 0,
             "Name": "notebook1",
             "Number": "1022000001"
+            
         },
         {
             "ChangeBy": 1,
@@ -1642,6 +1649,7 @@ pre code {
             "ConfigItemID": 62,
             "CreateBy": 1,
             "CreateTime": "2018-07-31 16:47:48",
+            "LinkCount": 0,
             "Name": "notebook2",
             "Number": "1022000002"
         }
@@ -2230,6 +2238,10 @@ pre code {
                ],
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -2250,6 +2262,7 @@ pre code {
             "CreateBy",
             "CreateTime",
             "ConfigItemID",
+            "LinkCount",
             "Name"
          ]
       }
@@ -2268,6 +2281,7 @@ pre code {
         "Name": "notebook1",
         "CreateBy": 1,
         "LastVersionID": null,
+        "LinkCount": 0,
         "CreateTime": "2018-07-31 16:07:38"
     }
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -4348,6 +4362,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -4381,7 +4399,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -4526,6 +4545,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -4622,6 +4645,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -4638,6 +4666,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -5514,6 +5543,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -5547,7 +5580,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -5692,6 +5726,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -5788,6 +5826,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -5804,6 +5847,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -6517,6 +6561,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -6550,7 +6598,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -6695,6 +6744,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -6791,6 +6844,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -6807,6 +6865,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -6917,6 +6976,7 @@ pre code {
                     ]
                 }
             ],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -6941,6 +7001,7 @@ pre code {
             "CreateBy": 1,
             "Created": "2020-04-09 08:28:19",
             "DynamicFields": [],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -6955,7 +7016,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "WatcherID": 101
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="contacts__contactid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -7164,6 +7226,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -7207,6 +7273,7 @@ pre code {
             "ID",
             "Keywords",
             "Language",
+            "LinkCount",
             "Name",
             "Number",
             "Title",
@@ -7391,6 +7458,7 @@ pre code {
             "ID": 1,
             "Keywords": [],
             "Language": "de",
+            "LinkCount": 0,
             "Name": "1563537571-45.0767307683304",
             "Number": "17001",
             "Title": "Allgemeine Hinweise zum Arbeiten mit KIX 18",
@@ -7432,6 +7500,7 @@ pre code {
             "ID": 2,
             "Keywords": [],
             "Language": "en",
+            "LinkCount": 1,
             "Name": "1563537503-86.2410868161835",
             "Number": "17002",
             "Title": "General information on how to work with KIX 18",
@@ -7902,6 +7971,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -7945,6 +8018,7 @@ pre code {
             "ID",
             "Keywords",
             "Language",
+            "LinkCount",
             "Name",
             "Number",
             "Title",
@@ -8145,6 +8219,7 @@ pre code {
         "ID": 2,
         "Keywords": [],
         "Language": "en",
+        "LinkCount": 0,
         "Name": "1563537503-86.2410868161835",
         "Number": "17002",
         "Title": "General information on how to work with KIX 18",
@@ -10695,6 +10770,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -10728,7 +10807,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -10873,6 +10953,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -10969,6 +11053,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -10985,6 +11074,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -11937,6 +12027,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -11970,7 +12064,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -12115,6 +12210,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -12211,6 +12310,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -12227,6 +12331,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -13123,6 +13228,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -13156,7 +13265,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -13301,6 +13411,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -13397,6 +13511,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -13413,6 +13532,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -13854,6 +13974,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -13887,7 +14011,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -14032,6 +14157,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -14128,6 +14257,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -14144,6 +14278,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -14254,6 +14389,7 @@ pre code {
                     ]
                 }
             ],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -14278,6 +14414,7 @@ pre code {
             "CreateBy": 1,
             "Created": "2020-04-09 08:28:19",
             "DynamicFields": [],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -14292,7 +14429,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "WatcherID": 101
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="organisations__organisationid__tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -17113,6 +17251,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -17146,7 +17288,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -17291,6 +17434,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -17387,6 +17534,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -17403,6 +17555,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -18517,6 +18670,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -18550,7 +18707,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -18695,6 +18853,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -18791,6 +18953,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -18807,6 +18974,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -18917,6 +19085,7 @@ pre code {
                     ]
                 }
             ],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -18941,6 +19110,7 @@ pre code {
             "CreateBy": 1,
             "Created": "2020-04-09 08:28:19",
             "DynamicFields": [],
+            "LinkCount": 0,
             "LockID": 1,
             "OrganisationID": "1",
             "OwnerID": 1,
@@ -18955,7 +19125,8 @@ pre code {
             "Title": "another title",
             "TypeID": 2,
             "Unseen": 0,
-            "UntilTime": 0
+            "UntilTime": 0,
+            "WatcherID": 101
           }
     ]
 }</code></pre></div></div><h2 class="response-title" id="tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -19635,6 +19806,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -19668,7 +19843,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -19813,6 +19989,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -19909,6 +20089,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -19925,6 +20110,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -20069,6 +20255,7 @@ pre code {
                 ]
             }
         ],
+        "LinkCount": 0,
         "LockID": 1,
         "OrganisationID": "1",
         "OwnerID": 1,
@@ -20668,6 +20855,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -20701,7 +20892,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       }
    }
@@ -20740,7 +20932,8 @@ pre code {
             "TicketID": 49,
             "TimeUnits": 0,
             "To": "agent@myorganisation.com",
-            "ToRealname": "agent@myorganisation.com"
+            "ToRealname": "agent@myorganisation.com",
+            "Unseen": 1
         },
         {
             "ArticleID": 33,
@@ -20774,7 +20967,8 @@ pre code {
             "TicketID": 49,
             "TimeUnits": 0,
             "To": "\"Some one\" &lt;someone@somecorp.com&gt;",
-            "ToRealname": "Some one"
+            "ToRealname": "Some one",
+            "Unseen": 0
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -21377,6 +21571,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -21410,7 +21608,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       }
    }
@@ -21447,7 +21646,8 @@ pre code {
         "TicketID": 49,
         "TimeUnits": 0,
         "To": "\"Some one\" &lt;someone@somecorp.com&gt;",
-        "ToRealname": "Some one"
+        "ToRealname": "Some one",
+        "Unseen": 0
     }
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles__articleid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -33484,6 +33684,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -33527,6 +33731,7 @@ pre code {
             "ID",
             "Keywords",
             "Language",
+            "LinkCount",
             "Name",
             "Number",
             "Title",
@@ -34116,6 +34321,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -34159,6 +34368,7 @@ pre code {
             "ID",
             "Keywords",
             "Language",
+            "LinkCount",
             "Name",
             "Number",
             "Title",
@@ -43755,6 +43965,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -43788,7 +44002,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -43933,6 +44148,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -44029,6 +44248,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -44045,6 +44269,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",
@@ -44986,6 +45211,10 @@ pre code {
                "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
                "type" : "string",
                "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
@@ -45019,7 +45248,8 @@ pre code {
             "TicketID",
             "TimeUnits",
             "To",
-            "ToRealname"
+            "ToRealname",
+            "Unseen"
          ]
       },
       "_TicketHistory_json" : {
@@ -45164,6 +45394,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "LinkCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Lock" : {
                "type" : "string",
                "readOnly" : true
@@ -45260,6 +45494,11 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Watchers" : {
                "description" : "added via include \"Watchers\"",
                "type" : "array",
@@ -45276,6 +45515,7 @@ pre code {
             "ContactID",
             "CreateBy",
             "Created",
+            "LinkCount",
             "LockID",
             "OrganisationID",
             "OwnerID",

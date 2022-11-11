@@ -143,9 +143,10 @@ sub Run {
     if ( $Macro->{Exec} && IsArrayRefWithData($Macro->{Exec}->{ObjectIDs})) {
         for ( @{ $Macro->{Exec}->{ObjectIDs} } ) {
             my $Result = $Kernel::OM->Get('Automation')->MacroExecute(
-                ID          => $Param{Data}->{MacroID},
-                ObjectID    => $_,
-                UserID      => $Self->{Authorization}->{UserID}
+                ID             => $Param{Data}->{MacroID},
+                ObjectID       => $_,
+                UserID         => $Self->{Authorization}->{UserID},
+                AdditionalData => $Macro->{Exec}->{AdditionalData}
             );
 
             if ( !$Result ) {

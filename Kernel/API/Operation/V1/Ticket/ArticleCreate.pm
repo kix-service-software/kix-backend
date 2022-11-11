@@ -105,6 +105,7 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 Cc                              => 'some Cc string',           # optional
                 Bcc                             => 'some Bcc string',          # optional
                 InReplyTo                       => 'some InReplyTo string',    # optional
+                References                      => '<somemessageid-1@example.com> <somemessageid-2@example.com>',
                 HistoryType                     => 'some history type',        # optional
                 HistoryComment                  => 'Some  history comment',    # optional
                 TimeUnit                        => 123,                        # optional
@@ -328,7 +329,8 @@ sub _ArticleCreate {
         },
         Attachment     => $Article->{Attachments},
         TimeUnit       => $Article->{TimeUnit},
-        InReplyTo      => $Article->{InReplyTo} || ''
+        InReplyTo      => $Article->{InReplyTo} || '',
+        References     => $Article->{References} || ''
     );
 
     if ( !$ArticleID ) {

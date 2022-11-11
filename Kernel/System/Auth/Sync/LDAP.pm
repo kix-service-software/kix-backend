@@ -570,7 +570,7 @@ sub Sync {
         my $Result = $UserObject->UserUpdate(
             %User,
             %UserContextFromLDAP,
-            ValidID      => ($UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent}) ? 1 : 0,
+            ValidID      => ($UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent}) ? 1 : 2,
             ChangeUserID => 1,
         );
 
@@ -591,18 +591,6 @@ sub Sync {
     # compare role permissions from ldap with current user role permissions and update if necessary
     if (%RolesFromLDAP) {
 
-        # cleanup all user roles
-        my $Success = $RoleObject->RoleUserDelete(
-            UserID             => $UserID,
-            IgnoreContextRoles => 1,
-        );
-        if ( !$Success ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to cleanup role assignments of user \"$Param{User}\" (UserID: $UserID)!",
-            );
-        }
-
         ROLEID:
         foreach my $RoleID ( sort keys %RolesFromLDAP ) {
             next ROLEID if !$RolesFromLDAP{$RoleID};
@@ -612,6 +600,18 @@ sub Sync {
                 Message  => "User: \"$Param{User}\" assigning role \"$SystemRoles{$RoleID}\"!",
             );
 
+            # clean up role
+            my $CleanUpResult = $RoleObject->RoleUserDelete(
+                UserID  => $UserID,
+                RoleID        => $RoleID,
+                IgnoreContextRoles        => 1,
+            );
+            if ( !$CleanUpResult ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to clean up role \"$SystemRoles{$RoleID}\" to user \"$Param{User}\" (UserID: $UserID)!",
+                );
+            }
             # assign role
             my $Result = $RoleObject->RoleUserAdd(
                 AssignUserID  => $UserID,

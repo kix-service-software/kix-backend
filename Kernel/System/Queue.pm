@@ -13,6 +13,8 @@ package Kernel::System::Queue;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::Queue::FollowUp
     Kernel::System::EventHandler
@@ -634,6 +636,71 @@ sub QueueGet {
     );
 
     return %Data;
+}
+
+=item QueueListGet()
+
+get queue attributes of multiple queues
+
+    my $QueueDataArrayRef = $QueueObject->QueueListGet(
+        IDs => [...],
+    );
+
+=cut
+
+sub QueueListGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !IsArrayRefWithData($Param{IDs}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need IDs array!'
+        );
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'QueueListGet::' . join('::', @{$Param{IDs}});
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    # sql
+    my @BindRefList = map { \$_ } @{$Param{IDs}};
+    my $SQL = 'SELECT q.id, q.name, q.unlock_timeout, '
+        . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
+        . 'q.follow_up_id, q.follow_up_lock, '
+        . 'q.default_sign_key, q.calendar_name, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
+        . 'system_address sa WHERE q.system_address_id = sa.id AND q.id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')';
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => \@BindRefList,
+    );
+
+    # fetch the result
+    my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
+        Columns => [ 
+            'QueueID', 'Name', 'UnlockTimeout', 'SystemAddressID', 'Signature', 'Comment', 'ValidID', 
+            'FollowUpID', 'FollowUpLock', 'DefaultSignKey', 'Calendar', 'CreateBy', 'CreateTime', 'ChangeBy', 'ChangeTime'
+        ],
+    );
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result,
+    );
+
+    return $Result;
 }
 
 =item QueueUpdate()

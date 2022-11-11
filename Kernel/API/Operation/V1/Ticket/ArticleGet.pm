@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use MIME::Base64;
+use Time::HiRes;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -227,6 +228,7 @@ sub Run {
 
         # add attachments array included
         if ( $Param{Data}->{include}->{Attachments} || $Param{Data}->{include}->{'Article.Attachments'} ) {
+
             # get attachment index from backend
             my %Attachments = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndexRaw(
                 ArticleID => $ArticleID,
@@ -258,6 +260,15 @@ sub Run {
             ) || '';
             $ArticleData{Plain} = $PlainMessage;
         }
+
+        # add unseen information
+        my $Exists = $TicketObject->ArticleUserFlagExists(
+            ArticleID => $ArticleID,
+            Flag      => 'Seen',
+            Value     => 1,
+            UserID    => $Self->{Authorization}->{UserID},
+        );
+        $ArticleData{Unseen} = $Exists ? 0 : 1;
 
         # add
         push(@ArticleList, \%ArticleData);

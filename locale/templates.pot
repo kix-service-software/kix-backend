@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-9-13 12:08+0000\n"
+"POT-Creation-Date: 2022-10-20 13:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1134,6 +1134,18 @@ msgstr ""
 msgid "To"
 msgstr ""
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "(Required) ID of the article which should be deleted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "ArticleID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
+msgid "Deletes an article of a ticket. Inlcuding dynamic fields, attachments, flags and accounted time."
+msgstr ""
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ContactSet.pm
 msgid "Sets the contact (and its primary organisation as organisation) of a ticket."
 msgstr ""
@@ -2151,6 +2163,10 @@ msgid "Define Tool (Nagios) acknowledge type."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Define the maximum number of parallel workers to handle ticket notifications. Default: 0 (unlimited)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defined which cache types should be ignored when doing a complete cache cleanup, i.e. change of permissions. Key = Cache Type, Value = 1 to activate."
 msgstr ""
 
@@ -2592,6 +2608,22 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField object registration."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable Automation debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable DB debugging for specific DB methods. Depends on DB::Debug as the \"main switch\"."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable DB debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable Event Handler debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3163,7 +3195,7 @@ msgid "Selects the cache backend to use."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Send all client notifications asynchronously through the daemon."
+msgid "Send all ticket notifications asynchronously through the daemon."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3376,6 +3408,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler automation task manager."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "The daemon registration for the scheduler client notification worker."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3839,6 +3875,10 @@ msgid "Archive state changed: \"%s\""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Article ID %s - %s deleted."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Automatically sets the owner of a ticket as the responsible for it (if ticket responsible feature is enabled). This will only work by manually actions of the logged in user. It does not work for automated actions e.g. Automation, Postmaster and API."
 msgstr ""
 
@@ -4060,6 +4100,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines, which tickets of which ticket state types should not be listed in linked ticket lists."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Delete Article"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

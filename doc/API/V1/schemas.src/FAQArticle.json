@@ -1,154 +1,159 @@
 {
-   "$schema": "http://json-schema.org/draft-07/schema",
-   "$id": "FAQArticle.json",
-   "type": "object",
-   "description": "The FAQ article object.",
-   "properties": {
-      "Approved": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "Attachments": {
-         "type": "array",
-         "description": "added via include \"Attachments\"",
-         "readOnly": true,
-         "items": {
-           "$ref": "FAQAttachment.json"
-         }
-      },
-      "CategoryID": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "Changed": {
-         "type": "string",
-         "readOnly": true
-      },
-      "ChangedBy": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "ContentType": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Created": {
-         "type": "string",
-         "readOnly": true
-      },
-      "CreatedBy": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "CustomerVisible": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "DynamicFields": {
-        "type": "array",
-        "description": "added via include \"DynamicFields\"",
-        "items": {
-          "$ref": "DynamicFieldValue.json"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "FAQArticle.json",
+    "type": "object",
+    "description": "The FAQ article object.",
+    "properties": {
+        "Approved": {
+            "type": "integer",
+            "readOnly": true
         },
-        "readOnly": true
-      },
-      "Field1": {
-         "type": "string",
-         "readOnly": true,
-         "description": "symptom"
-      },
-      "Field2": {
-         "type": "string",
-         "readOnly": true,
-         "description": "problem"
-      },
-      "Field3": {
-         "type": "string",
-         "readOnly": true,
-         "description": "solution"
-      },
-      "Field4": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Field5": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Field6": {
-         "type": "string",
-         "readOnly": true,
-         "description": "comment"
-      },
-      "History": {
-         "type": "array",
-         "description": "added via include \"History\"",
-         "readOnly": true,
-         "items": {
-           "$ref": "FAQHistory.json"
-         }
-      },
-      "ID": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "Keywords": {
-         "type": "array",
-         "readOnly": true,
-         "item": {
-            "type": "string"
-         }
-      },
-      "Language": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Name": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Number": {
-         "type": "string",
-         "readOnly": true
-      },
-      "Title": {
-         "type": "string",
-         "readOnly": true
-      },
-      "ValidID": {
-         "type": "integer",
-         "readOnly": true
-      },
-      "Votes": {
-         "type": "array",
-         "description": "added via include \"Votes\"",
-         "readOnly": true,
-         "items": {
-           "$ref": "FAQVote.json"
-         }
-      }
-   },
-   "required" : [
-      "Approved",
-      "CategoryID",
-      "Changed",
-      "ChangedBy",
-      "ContentType",
-      "Created",
-      "CreatedBy",
-      "CustomerVisible",
-      "Field1",
-      "Field2",
-      "Field3",
-      "Field4",
-      "Field5",
-      "Field6",
-      "ID",
-      "Keywords",
-      "Language",
-      "Name",
-      "Number",
-      "Title",
-      "ValidID"
-   ]
+        "Attachments": {
+            "type": "array",
+            "description": "added via include \"Attachments\"",
+            "readOnly": true,
+            "items": {
+                "$ref": "FAQAttachment.json"
+            }
+        },
+        "CategoryID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Changed": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ChangedBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ContentType": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Created": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CreatedBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CustomerVisible": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "DynamicFields": {
+            "type": "array",
+            "description": "added via include \"DynamicFields\"",
+            "items": {
+                "$ref": "DynamicFieldValue.json"
+            },
+            "readOnly": true
+        },
+        "Field1": {
+            "type": "string",
+            "readOnly": true,
+            "description": "symptom"
+        },
+        "Field2": {
+            "type": "string",
+            "readOnly": true,
+            "description": "problem"
+        },
+        "Field3": {
+            "type": "string",
+            "readOnly": true,
+            "description": "solution"
+        },
+        "Field4": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Field5": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Field6": {
+            "type": "string",
+            "readOnly": true,
+            "description": "comment"
+        },
+        "History": {
+            "type": "array",
+            "description": "added via include \"History\"",
+            "readOnly": true,
+            "items": {
+                "$ref": "FAQHistory.json"
+            }
+        },
+        "ID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Keywords": {
+            "type": "array",
+            "readOnly": true,
+            "item": {
+                "type": "string"
+            }
+        },
+        "Language": {
+            "type": "string",
+            "readOnly": true
+        },
+        "LinkCount": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Name": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Number": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Title": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ValidID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Votes": {
+            "type": "array",
+            "description": "added via include \"Votes\"",
+            "readOnly": true,
+            "items": {
+                "$ref": "FAQVote.json"
+            }
+        }
+    },
+    "required": [
+        "Approved",
+        "CategoryID",
+        "Changed",
+        "ChangedBy",
+        "ContentType",
+        "Created",
+        "CreatedBy",
+        "CustomerVisible",
+        "Field1",
+        "Field2",
+        "Field3",
+        "Field4",
+        "Field5",
+        "Field6",
+        "ID",
+        "Keywords",
+        "Language",
+        "LinkCount",
+        "Name",
+        "Number",
+        "Title",
+        "ValidID"
+    ]
 }

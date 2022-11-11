@@ -12,7 +12,7 @@
                 <Item Key="ResponseSchema">TicketResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangeBy; Unseen; UntilTime]</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LinkCount; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangeBy; Unseen; UntilTime; WatcherID]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
             </Hash>
         </Setting>
