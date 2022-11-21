@@ -37,7 +37,7 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-    
+
     # get the config
     $Self->{Config} = $Kernel::OM->CreateOnce('Config', {NoCache => 1})->Get('Cache::Module::Redis');
     $Self->{CachePrefix} = 'KIXBackend::';
@@ -247,7 +247,10 @@ sub SetSemaphore {
         }
     }
 
-    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Self->_PrepareRedisKey(
+        %Param,
+        Key => $Param{Key} // $Param{ID}
+    );
 
     return $Self->_RedisCall('set', $PreparedKey, $Param{Value}, 'nx', 'px', $Param{Timeout});
 }
@@ -265,11 +268,14 @@ sub ClearSemaphore {
         }
     }
 
-    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Self->_PrepareRedisKey(
+        %Param,
+        Key => $Param{Key} // $Param{ID}
+    );
 
     my $Value = $Self->_RedisCall('get', $PreparedKey);
     return if ( $Value != $Param{Value} );
-    
+
     return $Self->_RedisCall('del', $PreparedKey);
 }
 
