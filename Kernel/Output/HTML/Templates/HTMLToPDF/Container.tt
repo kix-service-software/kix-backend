@@ -1,0 +1,119 @@
+# --
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style type="text/css">
+            body {
+                color: black;
+                font-size: 9pt;
+                margin: 0;
+                border: 0;
+            }
+
+            a {
+                color: #787878;
+            }
+
+            a:hover {
+                color          : #002244;
+                text-decoration: none;
+            }
+
+            .Proportional {
+                font-family: Sans-serif;
+                font-style : normal;
+                font-weight: normal;
+            }
+            .ProportionalBold {
+                font-family: Sans-serif;
+                font-style : normal;
+                font-weight: bold;
+            }
+            .ProportionalItalic {
+                font-family: Sans-serif;
+                font-style : italic;
+                font-weight: normal;
+            }
+            .ProportionalBoldItalic {
+                font-family: Sans-serif;
+                font-style : italic;
+                font-weight: bold;
+            }
+            .Monospaced {
+                font-family: Monospace;
+                font-style : normal;
+                font-weight: normal;
+            }
+            .MonospacedBold {
+                font-family: Monospace;
+                font-style : normal;
+                font-weight: bold;
+            }
+            .MonospacedItalic {
+                font-family: Monospace;
+                font-style : italic;
+                font-weight: normal;
+            }
+            .MonospacedBoldItalic {
+                font-family: Monospace;
+                font-style : italic;
+                font-weight: bold;
+            }
+            .Blocks {
+                display: block;
+                overflow: auto;
+            }
+            .Header {
+                background-color: #55ff22;
+            }
+            .Footer {
+                background-color: #ff5522;
+            }
+        </style>
+        [% Data.CSS %]
+        <script>
+            function loadFunc() {
+[% IF Data.HasPage %]
+                var vars = {};
+                var query_strings_from_url = document.location.search.substring(1).split('&');
+                for (var query_string in query_strings_from_url) {
+                    if (query_strings_from_url.hasOwnProperty(query_string)) {
+                        var temp_var = query_strings_from_url[query_string].split('=', 2);
+                        vars[temp_var[0]] = decodeURI(temp_var[1]);
+                    }
+                }
+                var css_selector_classes = ['page', 'frompage', 'topage', 'webpage', 'section', 'subsection', 'date', 'isodate', 'time', 'title', 'doctitle', 'sitepage', 'sitepages'];
+                for (var css_class in css_selector_classes) {
+                    if (css_selector_classes.hasOwnProperty(css_class)) {
+                        var element = document.getElementsByClassName(css_selector_classes[css_class]);
+                        for (var j = 0; j < element.length; ++j) {
+                            element[j].textContent = vars[css_selector_classes[css_class]];
+                        }
+                    }
+                }
+[% END %]
+                // var elements = document.querySelectorAll("p > img");
+                // if ( elements.length ) {
+                //     var bwidth = 660;
+                //     for (var j = 0; j < elements.length; ++j) {
+                //         var ewidth = elements[j].naturalWidth;
+                //         if ( bwidth < ewidth ) {
+                //             elements[j].style.width = bwidth + 'px';
+                //         }
+                //     }
+                // }
+            }
+        </script>
+    </head>
+    <body onload="loadFunc()">
+        [% Data.Value %]
+    </body>
+</html>

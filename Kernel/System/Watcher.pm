@@ -130,7 +130,7 @@ sub WatcherGet {
 
 to get a list of subscribed users or objects a user is watching
 
-    my @UserList = $WatcherObject->WatcherList(
+    my @WatcherList = $WatcherObject->WatcherList(
         Object  => 'Ticket'
         ObjectID    => 123,
         WatchUserID => 1,
@@ -138,7 +138,7 @@ to get a list of subscribed users or objects a user is watching
 
 get list of users to notify
 
-    my @UserList = $WatcherObject->WatcherList(
+    my @WatcherList = $WatcherObject->WatcherList(
         Object => 'Ticket'
         ObjectID   => 123,
         Notify     => 1,
@@ -205,6 +205,91 @@ sub WatcherList {
     }
 
     return @{$Data || []};
+}
+
+=item WatcherCount()
+
+get the number of subscribed users or objects a user is watching
+
+    my $Count = $WatcherObject->WatcherCount(
+        Object  => 'Ticket'         # optional
+        ObjectID    => 123,         # optional
+        WatchUserID => 1,           # optional, to check if this user is a watcher
+    );
+
+=cut
+
+sub WatcherCount {
+    my ( $Self, %Param ) = @_;
+    my @BindObj;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SQL = 'SELECT count(*) FROM watcher WHERE 1=1';
+
+    if ( $Param{Object} ) {
+        $SQL .= ' AND object = ?';
+        push(@BindObj, \$Param{Object});
+    }
+    if ( $Param{ObjectID} ) {
+        $SQL .= ' AND object_id = ?';
+        push(@BindObj, \$Param{ObjectID});
+    }
+    if ( $Param{WatchUserID} ) {
+        $SQL .= ' AND user_id = ?';
+        push(@BindObj, \$Param{WatchUserID});
+    }
+
+    # get all attributes of an watched ticket
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@BindObj,
+    );
+
+    # fetch the result
+    my $Count = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Count = $Row[0];
+    }
+
+    return $Count;
+}
+
+=item WatcherLookup()
+
+get the ID of the watcher item
+
+    my $WatcherID = $WatcherObject->WatcherLookup(
+        Object  => 'Ticket'
+        ObjectID    => 123,
+        WatchUserID => 1,
+    );
+
+=cut
+
+sub WatcherLookup {
+    my ( $Self, %Param ) = @_;
+    my @BindObj;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    # get all attributes of an watched ticket
+    return if !$DBObject->Prepare(
+        SQL  => 'SELECT id FROM watcher WHERE object = ? AND object_id = ? AND user_id = ?',
+        Bind => [
+            \$Param{Object}, \$Param{ObjectID}, \$Param{WatchUserID}
+        ],
+    );
+
+    # fetch the result
+    my $WatcherID;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $WatcherID = $Row[0];
+    }
+
+    return $WatcherID;
 }
 
 =item WatcherAdd()

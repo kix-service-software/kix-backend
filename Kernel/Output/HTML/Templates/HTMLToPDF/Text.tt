@@ -1,0 +1,52 @@
+# --
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+
+[% RenderBlockStart("CSS") %]
+<style  type="text/css">
+    .[% Data.ID %] {
+[% IF Data.Break %]
+        margin-top: 0.6rem;
+[% IF Data.Style.Color %]
+        border-bottom: 1px solid [% Data.Style.Color | html %];
+[% ELSE %]
+        border-bottom: 1px solid #000;
+[% END %]
+[% END %]
+        padding: 0.5rem 0;
+    }
+    .[% Data.ID %] > .Text {
+[% IF Data.Style.Height %]
+        height: [% Data.Style.Height | html %];
+[% END %]
+[% IF Data.Style.Width %]
+        width: [% Data.Style.Width | html %];
+[% END %]
+[% IF Data.Style.Float %]
+        float: [% Data.Style.Float | html %];
+[% END %]
+[% IF Data.Style.Size %]
+        font-size: [% Data.Style.Size | html %];
+[% END %]
+[% IF Data.Style.Color %]
+        color: [% Data.Style.Color | html %];
+[% END %]
+[% IF Data.Style.BGColor %]
+        background-color: [% Data.Style.BGColor | html %];
+[% END %]
+        margin: 0.1rem 0;
+    }
+</style>
+[% RenderBlockEnd("CSS") %]
+[% RenderBlockStart("HTML") %]
+[% IF Data.IsLink %]
+<a class="Text [% Data.Class | html %]" href="[% Data.Value %]"></a>
+[% ELSE %]
+<p class="Text [% Data.Class | html %]">[% Data.Value %]</p>
+[% END %]
+[% RenderBlockEnd("HTML") %]

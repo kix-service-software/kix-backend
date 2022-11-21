@@ -14,7 +14,8 @@ use warnings;
 use URI::Escape;
 use Time::HiRes qw(time);
 
-use Kernel::System::VariableCheck (qw(IsHashRefWithData IsInteger));
+use Kernel::System::VariableCheck qw(IsHashRefWithData IsInteger);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 our @ObjectDependencies = (
     'Config',
@@ -78,7 +79,7 @@ web service.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->{RequestStartTime} = time();
+    $Self->{RequestStartTime} = Time::HiRes::time();
 
     #
     # First, we need to locate the desired webservice and load its configuration data.
@@ -116,8 +117,8 @@ sub Run {
         return;    # bail out, this will generate 500 Error
     }
 
-    # Check if web service has valid state.
-    if ( $Kernel::OM->Get('Valid')->ValidLookup( ValidID => $Webservice->{ValidID} ) ne 'valid' ) {
+    # Check if web service has valid state (we are explicitely using the numeric ID here to prevent additional executing time)
+    if ( $Webservice->{ValidID} != 1 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
@@ -282,6 +283,11 @@ sub Run {
     }
 
     #
+    # store user authorization info in object manager for usage in kernel packages
+    #
+    $Kernel::OM->{Authorization} = $Authorization;
+
+    #
     # Execute actual operation.
     #
     my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
@@ -326,7 +332,6 @@ sub Run {
     }
 
     if ( !$OperationResult->{Success} ) {
-
         return $Self->_GenerateErrorResponse(
             %{$OperationResult},
         );
@@ -350,6 +355,8 @@ sub Run {
             Data    => $GeneratedResponse->{ErrorMessage},
         );
     }
+
+    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, (time() - $Self->{RequestStartTime}) * 1000);
 
     return;
 }

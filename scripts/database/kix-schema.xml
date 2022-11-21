@@ -2427,6 +2427,7 @@
     <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="is_async" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="last_exec_time" Required="false" Type="DATE"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
@@ -2725,6 +2726,22 @@
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
     </ForeignKey>
+</Table>
+
+<Table Name="html_to_pdf">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="name" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="object" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="description" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+    <Column Name="definition" Required="false" Type="LONGBLOB"/>
+    <Column Name="created" Required="true" Type="DATE"/>
+    <Column Name="created_by" Required="true" Type="INTEGER"/>
+    <Column Name="changed" Required="true" Type="DATE"/>
+    <Column Name="changed_by" Required="true" Type="INTEGER"/>
+    <Index Name="html_to_pdf_name">
+        <IndexColumn Name="name"/>
+    </Index>
 </Table>
 
 </database>

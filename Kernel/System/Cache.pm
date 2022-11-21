@@ -904,7 +904,7 @@ sub _Debug {
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s %s%s\n", $$, "[Cache]", $Indent, $Message;
+    printf STDERR "%f (%5i) %-15s %s%s\n", Time::HiRes::time(), $$, "[Cache]", $Indent, $Message;
 }
 
 1;

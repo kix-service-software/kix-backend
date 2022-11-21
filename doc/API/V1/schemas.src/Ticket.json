@@ -1,196 +1,206 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "Ticket.json",
-  "type": "object",
-  "description": "The ticket object.",
-  "properties": {
-    "AccountedTime": {
-      "type": "integer",
-      "description": "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
-      "readOnly": true
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "Ticket.json",
+    "type": "object",
+    "description": "The ticket object.",
+    "properties": {
+        "AccountedTime": {
+            "type": "integer",
+            "description": "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+            "readOnly": true
+        },
+        "Age": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "ArchiveFlag": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Articles": {
+            "type": "array",
+            "description": "added via include \"Articles\"",
+            "items": {
+                "$ref": "TicketArticle.json"
+            },
+            "readOnly": true
+        },
+        "ChangeBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Changed": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ContactID": {
+            "type": "string",
+            "readOnly": true
+        },
+        "CreateBy": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "CreateTimeUnix": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Created": {
+            "type": "string",
+            "readOnly": true
+        },
+        "DynamicFields": {
+            "type": "array",
+            "description": "added via include \"DynamicFields\"",
+            "items": {
+                "$ref": "DynamicFieldValue.json"
+            },
+            "readOnly": true
+        },
+        "History": {
+            "type": "array",
+            "description": "added via include \"History\"",
+            "readOnly": true,
+            "items": {
+                "$ref": "TicketHistory.json"
+            }
+        },
+        "LinkCount": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Lock": {
+            "type": "string",
+            "readOnly": true
+        },
+        "LockID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "OrganisationID": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Owner": {
+            "type": "string",
+            "readOnly": true
+        },
+        "OwnerID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "PendingTime": {
+            "type": "string",
+            "readOnly": true
+        },
+        "PendingTimeUnix": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Priority": {
+            "type": "string",
+            "readOnly": true
+        },
+        "PriorityID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Queue": {
+            "type": "string",
+            "readOnly": true
+        },
+        "QueueID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Responsible": {
+            "type": "string",
+            "readOnly": true
+        },
+        "ResponsibleID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "State": {
+            "type": "string",
+            "readOnly": true
+        },
+        "StateID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "StateType": {
+            "type": "string",
+            "readOnly": true
+        },
+        "TicketID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "TicketNumber": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Title": {
+            "type": "string",
+            "readOnly": true
+        },
+        "Type": {
+            "type": "string",
+            "readOnly": true
+        },
+        "TypeID": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "UnlockTimeout": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "Unseen": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "UntilTime": {
+            "type": "integer",
+            "readOnly": true
+        },
+        "WatcherID": {
+            "type": "integer",
+            "description": "the ID of the watcher, if the current user is watching this ticket",
+            "readOnly": true
+        },
+        "Watchers": {
+            "type": "array",
+            "description": "added via include \"Watchers\"",
+            "items": {
+                "$ref": "Watcher.json"
+            },
+            "readOnly": true
+        }
     },
-    "Age": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "ArchiveFlag": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Articles": {
-      "type": "array",
-      "description": "added via include \"Articles\"",
-      "items": {
-        "$ref": "TicketArticle.json"
-      },
-      "readOnly": true
-    },
-    "ChangeBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Changed": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ContactID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "CreateBy": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "CreateTimeUnix": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Created": {
-      "type": "string",
-      "readOnly": true
-    },
-    "DynamicFields": {
-      "type": "array",
-      "description": "added via include \"DynamicFields\"",
-      "items": {
-        "$ref": "DynamicFieldValue.json"
-      },
-      "readOnly": true
-    },
-    "History": {
-       "type": "array",
-       "description": "added via include \"History\"",
-       "readOnly": true,
-       "items": {
-         "$ref": "TicketHistory.json"
-       }
-    },
-    "Lock": {
-      "type": "string",
-      "readOnly": true
-    },
-    "LockID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "OrganisationID": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Owner": {
-      "type": "string",
-      "readOnly": true
-    },
-    "OwnerID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "PendingTime": {
-      "type": "string",
-      "readOnly": true
-    },
-    "PendingTimeUnix": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Priority": {
-      "type": "string",
-      "readOnly": true
-    },
-    "PriorityID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Queue": {
-      "type": "string",
-      "readOnly": true
-    },
-    "QueueID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Responsible": {
-      "type": "string",
-      "readOnly": true
-    },
-    "ResponsibleID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "State": {
-      "type": "string",
-      "readOnly": true
-    },
-    "StateID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "StateType": {
-      "type": "string",
-      "readOnly": true
-    },
-    "TicketID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "TicketNumber": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Title": {
-      "type": "string",
-      "readOnly": true
-    },
-    "Type": {
-      "type": "string",
-      "readOnly": true
-    },
-    "TypeID": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "UnlockTimeout": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Unseen": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "UntilTime": {
-      "type": "integer",
-      "readOnly": true
-    },
-    "Watchers": {
-      "type": "array",
-      "description": "added via include \"Watchers\"",
-      "items": {
-        "$ref": "Watcher.json"
-      },
-      "readOnly": true
-    }
-  },
-  "required": [
-    "Age",
-    "ChangeBy",
-    "Changed",
-    "ContactID",
-    "CreateBy",
-    "Created",
-    "LockID",
-    "OrganisationID",
-    "OwnerID",
-    "PendingTime",
-    "PendingTimeUnix",
-    "PriorityID",
-    "QueueID",
-    "ResponsibleID",
-    "StateID",
-    "TicketID",
-    "TicketNumber",
-    "Title",
-    "TypeID",
-    "Unseen",
-    "UntilTime"
-  ]
+    "required": [
+        "Age",
+        "ChangeBy",
+        "Changed",
+        "ContactID",
+        "CreateBy",
+        "Created",
+        "LinkCount",
+        "LockID",
+        "OrganisationID",
+        "OwnerID",
+        "PendingTime",
+        "PendingTimeUnix",
+        "PriorityID",
+        "QueueID",
+        "ResponsibleID",
+        "StateID",
+        "TicketID",
+        "TicketNumber",
+        "Title",
+        "TypeID",
+        "Unseen",
+        "UntilTime"
+    ]
 }

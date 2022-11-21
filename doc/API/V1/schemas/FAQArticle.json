@@ -103,6 +103,10 @@
          "type" : "string",
          "readOnly" : true
       },
+      "LinkCount" : {
+         "type" : "integer",
+         "readOnly" : true
+      },
       "Name" : {
          "type" : "string",
          "readOnly" : true
@@ -146,6 +150,7 @@
       "ID",
       "Keywords",
       "Language",
+      "LinkCount",
       "Name",
       "Number",
       "Title",

@@ -641,6 +641,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###PendingReminder" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::TicketSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::PendingReminder</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Priority" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
         <Group>Ticket</Group>
@@ -1811,6 +1821,7 @@
                 <Item Key="TypeUpdate" Translatable="1">Updated Type to %s (ID=%s).</Item>
                 <Item Key="Unlock" Translatable="1">Unlocked ticket.</Item>
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
+                <Item Key="ArticleDelete" Translatable="1">Article ID %s - %s deleted.</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3205,6 +3216,16 @@ Thanks for your help!
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Create Article</Item>
                 <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ArticleCreate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ArticleDelete" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Delete Article</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ArticleDelete</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -33,11 +33,70 @@ Kernel::System::Placeholder::Config
 =cut
 
 sub _Replace {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     # check needed stuff
     for (qw(Text UserID)) {
-        if ( !defined $Param{$_} ) {
+        if (!defined $Param{$_}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Tag = $Self->{Start} . 'KIX_CONFIG_';
+    my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+
+    $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{
+        my $Replace = '';
+        my $Key = $1;
+
+        my $Exists = $SysConfigObject->Exists(
+            Name => $Key
+        );
+
+        if ($Exists) {
+            my %ConfigDefinition = $SysConfigObject->OptionGet(
+                Name => $Key,
+            );
+            if ($Kernel::OM->{Authorization}->{UserType} && $ConfigDefinition{AccessLevel} &&
+                (
+                    ($Kernel::OM->{Authorization}->{UserType} eq 'Agent' && $ConfigDefinition{AccessLevel} eq 'internal')
+                        || $ConfigDefinition{AccessLevel} eq 'external'
+                        || $ConfigDefinition{AccessLevel} eq 'public'
+                )
+            ) {
+                $Replace = $Self->_GetReplaceValue(
+                    Key             => $Key,
+                    ReplaceNotFound => $Param{ReplaceNotFound}
+                );
+            }
+            else {
+                $Replace = $Param{UserID} == 1 ?
+                    $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound})
+                    : $Param{ReplaceNotFound};
+            }
+        } {
+            $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound});
+        }
+        $Replace;
+    }egx;
+
+    # cleanup
+    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+
+    return $Param{Text};
+}
+
+sub _GetReplaceValue {
+
+    my ($Self, %Param) = @_;
+
+    # check needed stuff
+    for (qw(Key ReplaceNotFound)) {
+        if (!defined $Param{$_}) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -48,42 +107,27 @@ sub _Replace {
 
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    my $Tag = $Self->{Start} . 'KIX_CONFIG_';
-    $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{
-        my $Replace = '';
-        my $Key     = $1;
-        # Mask secret config options.
-        if ($Key =~ m{(Password|Pw)\d*$}smxi) {
-            $Replace = 'xxx';
-        }
-        else {
-            # special handling for FQDN
-            if ($Key =~ m/FQDN_?(.*)/ ) {
-                my $FQDNConfig = $ConfigObject->Get('FQDN') // '';
-                if ( IsHashRefWithData($FQDNConfig) ) {
-                    if ( $Key eq 'FQDN' ) {
-                        $Replace = $FQDNConfig->{Frontend} || '';
-                    } elsif ($1) {
-                        $Replace = $FQDNConfig->{$1} || '';
-                    }
-                }
-            } else {
-                $Replace = $ConfigObject->Get($Key) // '';
-                # TODO: handle ref values
-                # if ( IsHashRefWithData($Replace) || IsArrayRefWithData($Replace) ) {
-                #     $Replace = $Kernel::OM->Get('JSON')->Encode(
-                #         Data => $Replace
-                #     );
-                # }
+    if ($Param{Key} =~ m/FQDN_?(.*)/) {
+        my $FQDNConfig = $ConfigObject->Get('FQDN') // $Param{ReplaceNotFound};
+        if (IsHashRefWithData($FQDNConfig)) {
+            if ($Param{Key} eq 'FQDN') {
+                return $FQDNConfig->{Frontend} || $Param{ReplaceNotFound};
+            }
+            elsif ($1) {
+                return $FQDNConfig->{$1} || $Param{ReplaceNotFound};
             }
         }
-        $Replace;
-    }egx;
+    }
+    else {
+        return $ConfigObject->Get($Param{Key}) // $Param{ReplaceNotFound};
+        # TODO: handle ref values
+        # if ( IsHashRefWithData($Replace) || IsArrayRefWithData($Replace) ) {
+        #     $Replace = $Kernel::OM->Get('JSON')->Encode(
+        #         Data => $Replace
+        #     );
+        # }
+    }
 
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
-
-    return $Param{Text};
 }
 
 1;

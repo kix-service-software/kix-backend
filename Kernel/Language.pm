@@ -76,7 +76,7 @@ sub new {
     my $MainObject   = $Kernel::OM->Get('Main');
 
     # check if LanguageDebug is configured
-    if ( $ConfigObject->Get('LanguageDebug') ) {
+    if ( $ConfigObject->Get('Language::Debug') ) {
         $Self->{LanguageDebug} = 1;
     }
 

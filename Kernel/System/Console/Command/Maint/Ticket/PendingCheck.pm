@@ -58,7 +58,12 @@ sub Run {
                         Field    => 'StateIDs',
                         Operator => 'IN',
                         Value    => \@PendingAutoStateIDs,
-                    }
+                    },
+                    {
+                        Field    => 'PendingTime',
+                        Operator => 'LT',
+                        Value    => '+0s',
+                    },
                 ]
             },
             UserID   => 1,
@@ -75,8 +80,6 @@ sub Run {
                 UserID        => 1,
                 DynamicFields => 0,
             );
-
-            next TICKETID if $Ticket{UntilTime} >= 1;
 
             # KIX4OTRS-capeIT
             if ( $States{ $Ticket{Type} . ':::' . $Ticket{State} } || $States{ $Ticket{State} } ) {
@@ -123,69 +126,56 @@ sub Run {
         }
     }
     else {
-
         $Self->Print(" No pending auto StateIDs found!\n");
     }
 
-    # do ticket reminder notification jobs
-    @TicketIDs = $TicketObject->TicketSearch(
-        Result    => 'ARRAY',
+    my %CronTaskSummary = map { $_->{Name} => $_ } @{( $Kernel::OM->Get('Daemon::SchedulerDB')->CronTaskSummary() )[0]->{Data}} ;
+
+    # look for pending reminder tickets with PendingTime in the past
+    my %Tickets = $TicketObject->TicketSearch(
+        Result    => 'HASH',
         Search => {
             AND => [
                 {
                     Field    => 'StateType',
                     Operator => 'EQ',
                     Value    => 'pending reminder',
-                }
+                },
+                {
+                    Field    => 'PendingReminderRequired',
+                    Operator => 'EQ',
+                    Value    => '1',
+                },
             ]
         },
-        UserID    => 1,
+        UserID => 1,
     );
 
-    TICKETID:
-    for my $TicketID (@TicketIDs) {
+    my $NotificationCount = 0;
 
-        # get ticket data
-        my %Ticket = $TicketObject->TicketGet(
-            TicketID      => $TicketID,
-            UserID        => 1,
-            DynamicFields => 0,
-        );
+    my @PreparedTicketList;
+    foreach my $TicketID ( sort keys %Tickets ) {
+        push @PreparedTicketList, {
+            TicketID              => $TicketID,
+            CustomerMessageParams => {
+                TicketNumber => $Tickets{TicketID},
+            },
+        };
+        $NotificationCount++;
+    }
 
-        next TICKETID if $Ticket{UntilTime} >= 1 || !$Ticket{PendingTime} || $Ticket{StateType} !~ m/^pending/i ;
-
-        # get used calendar
-        my $Calendar = $TicketObject->TicketCalendarGet(
-            %Ticket,
-        );
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
-
-        # check if it is during business hours, then send reminder
-        my $CountedTime = $TimeObject->WorkingTime(
-            StartTime => $TimeObject->SystemTime() - ( 10 * 60 ),
-            StopTime  => $TimeObject->SystemTime(),
-            Calendar  => $Calendar,
-        );
-
-        # error handling
-        if ( !$CountedTime ) {
-            next TICKETID;
-        }
-
+    if ( @PreparedTicketList ) {
         # trigger notification event
         $TicketObject->EventHandler(
             Event => 'NotificationPendingReminder',
             Data  => {
-                TicketID              => $Ticket{TicketID},
-                CustomerMessageParams => {
-                    TicketNumber => $Ticket{TicketNumber},
-                },
+                TicketList => \@PreparedTicketList
             },
             UserID => 1,
         );
     }
+
+    $Self->Print("Triggered $NotificationCount reminder notification(s).\n");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

@@ -298,6 +298,11 @@ sub _GetBodyRichtext {
         }
     }
 
+    # fallback, if no html body given
+    if ( !$BodyRichtext ) {
+        $BodyRichtext = $Param{Article}->{Body};
+    }
+
     return $BodyRichtext;
 }
 

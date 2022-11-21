@@ -11,6 +11,8 @@ package Kernel::System::Automation;
 use strict;
 use warnings;
 
+use Time::HiRes qw(time);
+
 use base qw(
     Kernel::System::Automation::ExecPlan
     Kernel::System::Automation::Job
@@ -58,6 +60,8 @@ sub new {
     $Self->{CacheType} = 'Automation';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Automation::Debug') || 0;
+
     return $Self;
 }
 
@@ -99,6 +103,7 @@ sub ExecuteJobsForEvent {
 
     # sort by names to enable simple ordering by user
     foreach my $JobID ( sort { $JobList{$a} cmp $JobList{$b} } keys %JobList ) {
+
         my %Job = $Self->JobGet(
             ID => $JobID
         );
@@ -113,6 +118,10 @@ sub ExecuteJobsForEvent {
 
         if ( $CanExecute ) {
 
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
             # execute the job in a new Automation instance
             my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
 
@@ -120,6 +129,9 @@ sub ExecuteJobsForEvent {
                 ID => $JobID,
                 %Param,
             );
+            if ( $Self->{Debug} ) {
+                $Self->_Debug(sprintf "ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $StartTime) * 1000);
+            }
         }
     }
 
@@ -342,6 +354,14 @@ sub _GetUnique {
     my ( $Self, @List ) = @_;
     my %Known;
     return grep { !$Known{$_}++ } @List;
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[Automation]", "$Message";
 }
 
 1;

@@ -116,6 +116,12 @@ sub Run {
             }
         }
 
+        # add link count
+        $ConfigItem->{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(
+            Object => 'ConfigItem',
+            Key    => $ConfigItemID
+        );
+
         push(@ConfigItemList, $ConfigItem);
     }
 

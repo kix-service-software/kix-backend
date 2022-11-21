@@ -934,6 +934,12 @@ $ENV{TZ} = 'UTC';
         TimeStamp  => '1970-01-01 00:00:00 +188',
         Result     => '1970-01-01 00:03:08',
     },
+    {
+        Name       => '+0s',
+        TimeStamp  => '+0s',
+        FixedTimeSet => '2022-01-01 01:11:22',
+        Result     => '2022-01-01 01:11:22',
+    },
 );
 
 for my $Test (@Tests) {

@@ -112,13 +112,6 @@ sub SetPreferences {
         );
     }
 
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'User',
-        ObjectID  => $Param{UserID},
-    );
-
     return 1;
 }
 
@@ -220,13 +213,6 @@ sub DeletePreferences {
             Type => 'UserLanguage',
         );
     }
-
-    # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'User',
-        ObjectID  => $Param{UserID},
-    );
 
     return 1;
 }

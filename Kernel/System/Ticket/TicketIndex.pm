@@ -258,12 +258,14 @@ sub TicketIndexGetQueueStats {
         SQL => 'SELECT queue_id, '
              . '(SELECT COUNT(*) FROM ticket_index WHERE queue_id = ti.queue_id), '
              . '(SELECT COUNT(*) FROM ticket_index WHERE queue_id = ti.queue_id AND lock_id = 2) '
-             . 'FROM ticket_index ti',
+             . 'FROM ticket_index ti GROUP BY queue_id',
     );
 
-    my %Data = map { $_->{QueueID} => { TotalCount => $_->{TotalCount}, LockCount => $_->{LockCount}} } @{$DBObject->FetchAllArrayRef(
+    my $Result = $DBObject->FetchAllArrayRef(
         Columns => ['QueueID', 'TotalCount', 'LockCount']
-    )};
+    );
+
+    my %Data = map { $_->{QueueID} => { TotalCount => $_->{TotalCount}, LockCount => $_->{LockCount} } } @{$Result || []};
 
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'TicketIndex',

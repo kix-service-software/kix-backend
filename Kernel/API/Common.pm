@@ -102,7 +102,7 @@ sub _Debug {
 
     $Indent ||= '';
 
-    printf STDERR "(%5i) %-15s%s %s\n", $$, "[API]", $Indent, "$Message";
+    printf STDERR "%f (%5i) %-15s%s %s\n", Time::HiRes::time(), $$, "[API]", $Indent, "$Message";
 }
 
 1;

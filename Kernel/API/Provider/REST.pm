@@ -17,6 +17,7 @@ use Time::HiRes qw(time);
 
 use Kernel::Config;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 our $ObjectManagerDisabled = 1;
 
@@ -675,7 +676,7 @@ sub _Output {
             $Kernel::OM->Get('Time')->CurrentTimestamp(),
             'Method', $Self->{RequestMethod},
             'Resource', $ENV{REQUEST_URI},
-            'Duration', (time() - $Self->{RequestStartTime}) * 1000,
+            'Duration', TimeDiff($Self->{RequestStartTime}),
             'HTTPStatus', $HTTPCode.' '.$StatusMessage,
             'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code},
             'Message', IsHashRefWithData($Content) ? $Content->{Message} : $Param{Content}->{Message};

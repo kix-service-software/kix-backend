@@ -91,10 +91,7 @@ sub _Replace {
     # replace current agent placeholders
     $Tag = $Self->{Start} . 'KIX_CURRENT_';
 
-    if (
-        $Param{UserID}
-        && ( !$Param{Frontend} || ( $Param{Frontend} && $Param{Frontend} ne 'Customer' ) )
-    ) {
+    if ($Param{UserID}) {
         $Param{Text} = $Self->_ReplaceUserPlaceholder(
             %Param,
             Tags      => [ $Tag ],

@@ -125,10 +125,16 @@ sub Summary {
     return ();
 }
 
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    printf "%f (%5i) [%s] [%s] %s\n", Time::HiRes::time(), $$, "DEBUG", $Self->{DaemonName}, "$Message";
+}
+
 1;
-
-
-
 
 
 =back
