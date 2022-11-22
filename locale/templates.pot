@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-11-18 07:27+0000\n"
+"POT-Creation-Date: 2022-11-22 07:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -820,10 +820,6 @@ msgstr ""
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "No matches found."
-msgstr ""
-
-#. Perl Module: Kernel/Output/PDF/Statistics.pm
-msgid "Page"
 msgstr ""
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
@@ -3634,6 +3630,14 @@ msgstr ""
 msgid "notice"
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
+msgid "Module registration for configuration print."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
+msgid "Settings for 'wkhtmltopdf'"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Both"
 msgstr ""
@@ -4668,6 +4672,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "note-report"
+msgstr ""
+
+#. Template: Page
+msgid "Page"
+msgstr ""
+
+#. Template: Page
+msgid "of"
 msgstr ""
 
 #. Update: update/build-807_pre.xml
