@@ -1,0 +1,82 @@
+# --
+# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+
+[% RenderBlockStart("CSS") %]
+<style  type="text/css">
+    .[% Data.ID %] {
+[% IF Data.Style.Height %]
+        height: [% Data.Style.Height | html %];
+[% END %]
+[% IF Data.Style.Width %]
+        width: [% Data.Style.Width | html %];
+[% END %]
+[% IF Data.Style.Float %]
+        float: [% Data.Style.Float | html %];
+[% END %]
+        padding: 0.5rem 0;
+    }
+    .[% Data.ID %] > table {
+        clear: both;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    .[% Data.ID %] > table > thead > tr > th {
+        padding: 0 0.2rem 0 0;
+[% IF Data.Style.Size %]
+        font-size: [% Data.Style.Size | html %];
+[% END %]
+        vertical-align: bottom;
+        white-space: nowrap;
+        position: relative;
+        text-align: left;
+    }
+    .[% Data.ID %] > table > tbody > tr > td {
+        vertical-align: middle;
+        padding: 0.2rem 0;
+[% IF Data.Style.Size %]
+        line-height: [% Data.Style.Size | html %];
+        font-size: [% Data.Style.Size | html %];
+[% END %]
+    }
+    .page-break {
+        page-break-before:always !important;
+        page-break-inside:avoid !important;
+        break-before:always !important;
+        break-inside:avoid !important;
+        overflow: hidden;
+        display:block !important;
+        margin: 4px 0;
+    }
+</style>
+[% RenderBlockEnd("CSS") %]
+[% RenderBlockStart("HTML") %]
+<table>
+[% RenderBlockStart("HeadBlock") %]
+    <thead>
+        <tr>
+            <div class="page-break"></div>
+[% RenderBlockStart("HeadCol") %]
+            <th>[% Data.Value %]</th>
+[% RenderBlockEnd("HeadCol") %]
+        </tr>
+    </thead>
+[% RenderBlockEnd("HeadBlock") %]
+    <tbody>
+[% RenderBlockStart("BodyRow") %]
+        <tr>
+            <div class="page-break"></div>
+[% RenderBlockStart("BodyCol") %]
+            <td class="[% Data.Class %]" >[% Data.Value %]</td>
+[% RenderBlockEnd("BodyCol") %]
+        </tr>
+[% RenderBlockEnd("BodyRow") %]
+    </tbody>
+</table>
+[% RenderBlockEnd("HTML") %]

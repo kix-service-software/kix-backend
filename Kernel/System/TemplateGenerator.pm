@@ -607,7 +607,6 @@ sub ReplacePlaceHolder {
     }
 
     $Param{Translate} //= 1;
-    $Param{ReplaceNotFound} //= '-';
 
     if ( $Param{Translate} && (!defined $Param{Language} || !$Param{Language}) ) {
         $Param{Language}
@@ -640,6 +639,8 @@ sub _Replace {
             return;
         }
     }
+
+    $Param{ReplaceNotFound} //= '-';
 
     # check for mailto links
     # since the subject and body of those mailto links are

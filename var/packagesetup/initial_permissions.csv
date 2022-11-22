@@ -147,6 +147,7 @@
 "Customer Reader";"Resource";"/contacts";;"x";;;
 "Customer Manager";"Resource";"/organisations";"x";"x";"x";"x";
 "Customer Manager";"Resource";"/contacts";"x";"x";"x";"x";
+"Customer Manager";"Resource";"/system/objecticons";"x";"x";"x";;
 "System Admin";"Resource";"/system";"x";"x";"x";"x";
 "System Admin";"Resource";"/auth";"x";;;;
 "System Admin";"Resource";"/session";"x";"x";"x";"x";

@@ -37,7 +37,7 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-    
+
     # get the config
     $Self->{Config} = $Kernel::OM->CreateOnce('Config', {NoCache => 1})->Get('Cache::Module::Redis');
     $Self->{CachePrefix} = 'KIXBackend::';
@@ -183,7 +183,9 @@ sub CleanUp {
 
     if ( $Param{Type} ) {
         # delete type
-        my $KeyCount = $Self->_RedisCall('del', $Self->{CachePrefix}.$Param{Type});
+        my $Type = $Param{Type};
+        $Type = $Self->{CachePrefix}.$Type if $Type !~ /^$Self->{CachePrefix}/;
+        my $KeyCount = $Self->_RedisCall('del', $Type);
         return defined $KeyCount ? 1 : 0;
     }
     else {
@@ -194,6 +196,10 @@ sub CleanUp {
             my @Types = $Self->GetKeysForType(Type => '*');
 
             for my $Type ( @Types ) {
+
+                # remove prefix (KeepTypeLookup are without it and CleanUp for specific type adds it anew)
+                $Type =~ s/^$Self->{CachePrefix}(.+)/$1/;
+
                 next if $KeepTypeLookup{$Type};
                 $Self->CleanUp( Type => $Type );
             }
@@ -269,7 +275,7 @@ sub ClearSemaphore {
 
     my $Value = $Self->_RedisCall('get', $PreparedKey);
     return if ( $Value != $Param{Value} );
-    
+
     return $Self->_RedisCall('del', $PreparedKey);
 }
 

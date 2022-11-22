@@ -5157,6 +5157,29 @@ DefaultValue:
     <Data Key="value_text" Type="Quote">service provider</Data>
 </Insert>
 
+<Insert Table="html_to_pdf">
+    <Data Key="name" Type="Quote">Ticket</Data>
+    <Data Key="object" Type="Quote">Ticket</Data>
+    <Data Key="description" Type="Quote"></Data>
+    <Data Key="valid_id">1</Data>
+    <Data Key="definition" Type="Quote"><![CDATA[{"Expands":["DynamicField","Article","LinkObject"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"8","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}},{"ID":"PageTitle","Type":"Text","Value":"<KIX_CONFIG_Ticket::Hook><KIX_TICKET_TicketNumber>","Style":{"Size":"0.9rem","Float":"right"}}],"Content":[{"ID":"Title","Type":"Text","Value":"<KIX_TICKET_Title>","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"Blocks":[{"ID":"InfoTableLeft","Type":"Table","Include":"DynamicField","Columns":["<Font_Bold>Key","Value"],"Allow":{"State":"KEY","Queue":"KEY","Lock":"KEY","CustomerID":"KEY","Owner":"KEY","Responsoble":"KEY","Type":"KEY","Priority":"KEY"},"Translate":true,"Style":{"Width":"48%","Float":"left"}},{"ID":"InfoTableRight","Type":"Table","Include":"DynamicField","Columns":["<Font_Bold>Key","Value"],"Allow":{"Age":"KEY","Created":"KEY","CreatedBy":"KEY","CustomerID":"KEY","AccountedTime":"KEY","PendingTime":"KEY"},"Translate":true,"Style":{"Width":"50%","Float":"right"}}]},{"Data":"LinkObject","Blocks":[{"ID":"LinkedHeader","Type":"Text","Value":"<Font_Bold>Linked Objects","Translate":true,"Break":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"LinkedTable","Type":"Table","Columns":["<Font_Bold>Key","Value"],"Translate":true,"Join":"<br>"}]},{"Type":"List","Object":"Article","Expand":"DynamicField","Data":"Article","Blocks":[{"ID":"ArticleHeader","Type":"Text","Value":["<Font_Bold>Article","#<Count>"],"Join":" ","Break":true,"Translate":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"ArticleMeta","Type":"Table","Columns":["<Font_Bold>Key","Value"],"Allow":{"From":"KEY","Subject":"KEY","CreateTime":"KEY","Channel":"KEY"},"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"<KIX_ARTICLE_BodyRichtext>"}]}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":false,"Translate":true,"Style":{"Float":"right"}}]}]]></Data>
+    <Data Key="created_by">1</Data>
+    <Data Key="created">current_timestamp</Data>
+    <Data Key="changed_by">1</Data>
+    <Data Key="changed">current_timestamp</Data>
+</Insert>
+<Insert Table="html_to_pdf">
+    <Data Key="name" Type="Quote">Article</Data>
+    <Data Key="object" Type="Quote">Article</Data>
+    <Data Key="description" Type="Quote"></Data>
+    <Data Key="valid_id">1</Data>
+    <Data Key="definition" Type="Quote"><![CDATA[{"Expands":["DynamicField"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"10","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}}],"Content":[{"ID":"Subject","Type":"Text","Value":"<KIX_ARTICLE_Subject>","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"ID":"ArticleMeta","Type":"Table","Columns":["<Font_Bold>Key","Value"],"Value":["From","Subject","CreateTime","Channel"],"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"<KIX_ARTICLE_BodyRichtext>"}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":0,"Translate":true,"Style":{"Float":"right"}}]}]]></Data>
+    <Data Key="created_by">1</Data>
+    <Data Key="created">current_timestamp</Data>
+    <Data Key="changed_by">1</Data>
+    <Data Key="changed">current_timestamp</Data>
+</Insert>
+
 <!-- \### DYNAMIC PERMISSION INSERT - DO NOT REMOVE THIS LINE!!! \### -->
 <Insert Table="role_permission">
     <Data Key="role_id">3</Data>
@@ -6633,6 +6656,16 @@ DefaultValue:
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
     <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">12</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
+    <Data Key="value">7</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
