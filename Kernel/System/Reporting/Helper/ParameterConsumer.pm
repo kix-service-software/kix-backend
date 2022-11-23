@@ -69,7 +69,7 @@ sub _ReplaceParametersInString {
 
             if ( $Param{UseEmpty} ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
-                $String =~ s/\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/$ParameterValue/gmx ;
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx ;
             }
             next;
         }
@@ -77,7 +77,7 @@ sub _ReplaceParametersInString {
         if ( IsArrayRefWithData($ParameterValue) ) {
             $ParameterValue = uc($Parameter->{DataType}) eq 'STRING' ? join(',', (map { "'".$_."'"} @{$ParameterValue})) : join(',', @{$ParameterValue});
         }        
-        $String =~ s/\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/$ParameterValue/gmx;        
+        $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx;        
     }
 
     return $String;
