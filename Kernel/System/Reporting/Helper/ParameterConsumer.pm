@@ -69,7 +69,7 @@ sub _ReplaceParametersInString {
 
             if ( $Param{UseEmpty} ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
-                $String =~ s/\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/$ParameterValue/gmx ;
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx ;
             }
             next;
         }
