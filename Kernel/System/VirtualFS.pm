@@ -261,7 +261,21 @@ sub Write {
 
     # store file
     my $BackendKey = $Self->{Backend}->{ $Self->{BackendDefault} }->Write(%Param);
-    return if !$BackendKey;
+    if ( !$BackendKey ) {
+        # cleanup data if file could not be stored in backend
+
+        $DBObject->Do(
+            SQL => 'DELETE FROM virtual_fs_preferences WHERE virtual_fs_id=?',
+            Bind => [ \$FileID ],
+        );
+
+        $DBObject->Do(
+            SQL => 'DELETE FROM virtual_fs WHERE id=?',
+            Bind => [ \$FileID ],
+        );
+        
+        return;
+    }
 
     # update backend key
     return if !$DBObject->Do(
