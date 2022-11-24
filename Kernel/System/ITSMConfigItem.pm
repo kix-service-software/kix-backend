@@ -3158,6 +3158,12 @@ sub UpdateCounters {
                 next CLASSID;
             }
 
+            # push client callback event
+            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+                Event      => 'UPDATE',
+                Namespace  => 'CMDB.Class.Counters',
+                ObjectID   => $ClassID,
+            );
         }
     }
 
