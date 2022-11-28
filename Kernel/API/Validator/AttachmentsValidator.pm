@@ -75,7 +75,7 @@ sub Validate {
         $Found = 1;
 
         my $Attachment = $Param{Data}->{$Param{Attribute}};
-        foreach my $Needed ( qw(ContentType Filename) ) {
+        foreach my $Needed ( qw(Filename) ) {
             if ( !$Attachment->{$Needed} ) {
                 $Found = 0;
                 last;

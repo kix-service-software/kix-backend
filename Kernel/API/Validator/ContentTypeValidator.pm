@@ -97,7 +97,7 @@ sub Validate {
             $MimeType = $1;
             $MimeType =~ s/["']//g;
         }
-        elsif ( $ContentType eq 'text' ) {
+        elsif ( $ContentType eq 'text' || !$ContentType ) {
             return $Self->_Success();
         }
         my $Result = Kernel::API::Validator::MimeTypeValidator::Validate(

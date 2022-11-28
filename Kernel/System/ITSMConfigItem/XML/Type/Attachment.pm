@@ -338,11 +338,13 @@ sub ValidateValue {
 
     my $Value = $Param{Value};
 
-    my $Valid = $Value->{Filename} && $Value->{ContentType} && $Value->{Content};
+    my $Valid = $Value->{Filename} && $Value->{Content};
 
     if (!$Valid) {
         return 'not a valid attachment'
     }
+
+    $Value->{ContentType} //= $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Attachment::ContentType::Fallback');
 
     my $ConfigObject = $Kernel::OM->Get('Config');
 

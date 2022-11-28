@@ -9,6 +9,7 @@
          "type" : "string"
       },
       "ContentType" : {
+         "description" : "if not given, fallback to SysConfig FAQ::Attachment::ContentType::Fallback",
          "type" : "string"
       },
       "CustomerVisible" : {
@@ -24,7 +25,6 @@
    },
    "required" : [
       "Content",
-      "ContentType",
       "Filename"
    ]
 }

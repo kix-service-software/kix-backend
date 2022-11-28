@@ -9,7 +9,8 @@
       "description": "base63 encoded file content"
     },
     "ContentType": {
-      "type": "string"
+      "type": "string",
+      "description": "if not given, fallback to SysConfig Ticket::Article::Attachment::ContentType::Fallback"
     },
     "Filename": {
       "type": "string"
@@ -17,7 +18,6 @@
   },
   "required" : [
      "Content",
-     "ContentType",
      "Filename"
   ]
 }

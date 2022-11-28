@@ -115,6 +115,7 @@
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig Ticket::Article::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "Filename" : {
@@ -123,7 +124,6 @@
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       },
