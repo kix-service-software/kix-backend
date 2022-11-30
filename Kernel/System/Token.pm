@@ -454,6 +454,76 @@ sub CleanUp {
     return 1;
 }
 
+=item CountUniqueUsers()
+
+count unique users per user context
+
+    my %CountHashRef = $TokensObject->CountUniqueUsers(
+        StartTime => '...',
+        EndTime   => '...',
+        Since     => '15m',
+    );
+
+=cut
+
+sub CountUniqueUsers {
+    my ( $Self, %Param ) = @_;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SQL = 'SELECT token FROM token WHERE 1=1';
+
+    my @BindArr;
+    if ( $Param{StartTime} ) {
+        $SQL .= ' AND last_request_time >= ?';
+        push @BindArr, \$Param{StartTime};
+    }
+    if ( $Param{EndTime} ) {
+        $SQL .= ' AND last_request_time <= ?';
+        push @BindArr, \$Param{EndTime};
+    }
+    if ( $Param{Since} ) {
+        my $TargetTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                String => '-' . $Param{Since},
+            )
+        );
+
+        $SQL .= ' AND last_request_time >= ?';
+        push @BindArr, \$TargetTime;
+    }
+
+    # get all session ids from the database
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@BindArr,
+    );
+
+    # fetch the result
+    my @Tokens;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push @Tokens, $Row[0];
+    }
+
+    my %UniqueUsers;
+    TOKEN:
+    foreach my $Token ( @Tokens ) {
+        my $Payload = $Self->ExtractToken(
+            Token => $Token,
+        );
+        next TOKEN if !IsHashRefWithData($Payload);
+
+        $UniqueUsers{$Payload->{UserType}}->{Count} //= 0;
+        if ( !$UniqueUsers{$Payload->{UserType}}->{UserIDs}->{$Payload->{UserID}} ) {
+            $UniqueUsers{$Payload->{UserType}}->{UserIDs}->{$Payload->{UserID}} = 1;
+            $UniqueUsers{$Payload->{UserType}}->{Count}++;
+        }
+    }
+
+    return %UniqueUsers;
+}
+
 1;
 
 
