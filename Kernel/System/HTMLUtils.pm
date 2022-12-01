@@ -575,7 +575,10 @@ sub ToAscii {
 
 convert an ascii string to a html string
 
-    my $HTMLString = $HTMLUtilsObject->ToHTML( String => $String );
+    my $HTMLString = $HTMLUtilsObject->ToHTML(
+         String => $String
+         AlsoUmlauts => 1|0     # option - default 0
+    );
 
 =cut
 
@@ -602,6 +605,15 @@ sub ToHTML {
     $Param{String} =~ s/"/&quot;/g;
     $Param{String} =~ s/(\n|\r)/<br\/>\n/g;
     $Param{String} =~ s/  /&nbsp;&nbsp;/g;
+
+    if ($Param{AlsoUmlauts}) {
+        $Param{String} =~ s/ü/&uuml;/g;
+        $Param{String} =~ s/ä/&auml;/g;
+        $Param{String} =~ s/ö/&ouml;/g;
+        $Param{String} =~ s/ß/&szlig;/g;
+        $Param{String} =~ s/§/&sect;/g;
+        $Param{String} =~ s/€/&euro;/g;
+    }
 
     return $Param{String};
 }
