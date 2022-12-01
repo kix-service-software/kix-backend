@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Log',
     'Time',
     'Valid',
+    'HTMLUtils'
 );
 
 =head1 NAME
@@ -47,7 +48,8 @@ search in FAQ articles
         # is searching in Number, Title, Keyword and Field1-6
         What      => '*some text*',                                   # (optional)
 
-        Keyword   => '*webserver*',                                   # (optional)
+        Field1      => '*some text*',                                 # (optional) - also other fields (e.g. Field2) possible
+        Keyword     => '*webserver*',                                 # (optional)
         Visibility  => [ 'internal', 'external', 'public' ],          # (optional)
         Languages   => [ 'en', 'de, 'fr' ],                           # (optional)
         CategoryIDs => [ 7, 8, 9 ],                                   # (optional)
@@ -137,10 +139,6 @@ search in FAQ articles
 
         Limit     => 150,
 
-        Interface => {              # (default internal)
-            StateID => 3,
-            Name    => 'public',    # public | external | internal
-        },
         UserID    => 1,
     );
 
@@ -170,11 +168,6 @@ sub FAQSearch {
         );
 
         return;
-    }
-
-    # set default interface
-    if ( !$Param{Interface} || !$Param{Interface}->{Name} ) {
-        $Param{Interface}->{Name} = 'internal';
     }
 
     # verify that all passed array parameters contain an array reference
@@ -333,64 +326,58 @@ sub FAQSearch {
     if ( $Param{What} && $Param{What} ne '*' ) {
 
         # define the search fields for full-text search
-        my @SearchFields = ( 'i.f_number', 'i.f_subject', 'i.f_keywords' );
+        my @PrimarySearchFields = ( 'i.f_number', 'i.f_subject', 'i.f_keywords' );
 
-        # used from the agent interface (internal)
-        if ( $Param{Interface}->{Name} eq 'internal' ) {
-
-            for my $Number ( 1 .. 6 ) {
-
-                # get the state of the field (internal, external, public)
-                my $FieldState = $ConfigObject->Get( 'FAQ::Item::Field' . $Number )->{Show};
-
-                # add all internal, external and public fields
-                if (
-                    $FieldState eq 'internal'
-                    || $FieldState eq 'external'
-                    || $FieldState eq 'public'
-                    )
-                {
-                    push @SearchFields, 'i.f_field' . $Number;
-                }
-            }
-        }
-
-        # used from the customer interface (external)
-        elsif ( $Param{Interface}->{Name} eq 'external' ) {
-
-            for my $Number ( 1 .. 6 ) {
-
-                # get the state of the field (internal, external, public)
-                my $FieldState = $ConfigObject->Get( 'FAQ::Item::Field' . $Number )->{Show};
-
-                # add all external and public fields
-                if ( $FieldState eq 'external' || $FieldState eq 'public' ) {
-                    push @SearchFields, 'i.f_field' . $Number;
-                }
-            }
-        }
-
-        # used from the public interface (public)
-        else {
-            for my $Number ( 1 .. 6 ) {
-
-                # get the state of the field (internal, external, public)
-                my $FieldState = $ConfigObject->Get( 'FAQ::Item::Field' . $Number )->{Show};
-
-                # add all public fields
-                if ( $FieldState eq 'public' ) {
-                    push @SearchFields, 'i.f_field' . $Number;
-                }
-            }
+        my @SecondarySearchFields;
+        for my $Number ( 1 .. 6 ) {
+            push @SecondarySearchFields, 'i.f_field' . $Number;
         }
 
         # add the SQL for the full-text search
-        $Ext .= $DBObject->QueryCondition(
-            Key          => \@SearchFields,
+        $Ext .= '( ' . $DBObject->QueryCondition(
+            Key          => [@PrimarySearchFields, @SecondarySearchFields],
             Value        => $Param{What},
             SearchPrefix => '*',
             SearchSuffix => '*',
         );
+
+        # also search as html value, because fields content are html
+        my $HTMLValue = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+            String      => $Param{What},
+            AlsoUmlauts => 1
+        );
+        $Ext .= ' OR ' . $DBObject->QueryCondition(
+            Key          => \@SecondarySearchFields,
+            Value        => $HTMLValue,
+            SearchPrefix => '*',
+            SearchSuffix => '*',
+        ) . ' )';
+    }
+
+    # search for fields
+    for my $Number ( 1 .. 6 ) {
+        if ( $Param{'Field' . $Number} ) {
+
+            # also search as html value, because fields content are html
+            my $HTMLValue = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+                String      => $Param{'Field' . $Number},
+                AlsoUmlauts => 1
+            );
+
+            $Param{'Field' . $Number} =~ s/\*/%/g;
+            $Param{'Field' . $Number} =~ s/%%/%/g;
+            $Param{'Field' . $Number} = $DBObject->Quote( $Param{'Field' . $Number}, 'Like' );
+            $HTMLValue =~ s/\*/%/g;
+            $HTMLValue =~ s/%%/%/g;
+            $HTMLValue = $DBObject->Quote( $HTMLValue, 'Like' );
+            if ($Ext) {
+                $Ext .= ' AND';
+            }
+
+            # use given and html value (as OR)
+            $Ext .= " ( LOWER(i.f_field" . $Number . ") LIKE LOWER('" . $Param{'Field' . $Number} . "') $Self->{LikeEscapeString} OR";
+            $Ext .= " LOWER(i.f_field" . $Number . ") LIKE LOWER('" . $HTMLValue . "') $Self->{LikeEscapeString} )";
+        }
     }
 
     # search for the number
@@ -406,7 +393,6 @@ sub FAQSearch {
 
     # search for the title
     if ( $Param{Title} ) {
-        $Param{Title} = "\%$Param{Title}\%";
         $Param{Title} =~ s/\*/%/g;
         $Param{Title} =~ s/%%/%/g;
         $Param{Title} = $DBObject->Quote( $Param{Title}, 'Like' );
