@@ -324,11 +324,20 @@ sub GetAllSubQueues {
 
 get id or name for queue
 
-    my $Queue = $QueueObject->QueueLookup( QueueID => $QueueID );
+    my $Queue = $QueueObject->QueueLookup(
+        QueueID => $QueueID,
+        Silent  => 0|1              # optional - do not log if not found (defautl 0)
+    );
 
-    my $QueueID = $QueueObject->QueueLookup( Queue => $Queue );
+    my $QueueID = $QueueObject->QueueLookup(
+        Queue => $Queue,
+        Silent => 0|1               # optional - do not log if not found (defautl 0)
+    );
 
-    my $QueueID = $QueueObject->QueueLookup( SystemAddressID => $SystemAddressID );
+    my $QueueID = $QueueObject->QueueLookup(
+        SystemAddressID => $SystemAddressID,
+        Silent          => 0|1      # optional - do not log if not found (defautl 0)
+    );
 
 =cut
 
@@ -376,10 +385,12 @@ sub QueueLookup {
 
     # check if data exists
     if ( !$ReturnData && !$Param{Silent}) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Found no $Key for $Value!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Found no $Key for $Value!",
+            );
+        }
         return;
     }
 
@@ -686,8 +697,8 @@ sub QueueListGet {
 
     # fetch the result
     my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-        Columns => [ 
-            'QueueID', 'Name', 'UnlockTimeout', 'SystemAddressID', 'Signature', 'Comment', 'ValidID', 
+        Columns => [
+            'QueueID', 'Name', 'UnlockTimeout', 'SystemAddressID', 'Signature', 'Comment', 'ValidID',
             'FollowUpID', 'FollowUpLock', 'DefaultSignKey', 'Calendar', 'CreateBy', 'CreateTime', 'ChangeBy', 'ChangeTime'
         ],
     );
