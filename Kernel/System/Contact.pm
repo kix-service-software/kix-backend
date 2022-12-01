@@ -857,12 +857,12 @@ sub ContactUpdate {
     my @DeleteOrgIDs;
     my @InsertOrgIDs;
     for my $OrgID (@{$Param{OrganisationIDs}}) {
-        if (!grep ( /$OrgID/, @{$Contact{OrganisationIDs}})) {
+        if (!grep ( /^$OrgID$/, @{$Contact{OrganisationIDs}})) {
             push(@InsertOrgIDs, $OrgID);
         }
     }
     for my $OrgID (@{$Contact{OrganisationIDs}}) {
-        if (!grep ( /$OrgID/, @{$Param{OrganisationIDs}})) {
+        if (!grep ( /^$OrgID$/, @{$Param{OrganisationIDs}})) {
             push(@DeleteOrgIDs, $OrgID);
         }
     }
