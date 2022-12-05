@@ -305,6 +305,16 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="permission_type">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Basic</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Permission type that uses basic core object dependencies (i.e. Queue->Ticket).</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- ticket_state_type -->
     <Insert Table="ticket_state_type">

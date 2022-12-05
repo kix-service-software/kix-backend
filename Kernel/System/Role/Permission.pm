@@ -32,6 +32,14 @@ use constant PERMISSION => {
     DENY   => 0xF000,
 };
 
+# define basic permissions
+use constant BASIC_PERMISSION => {
+    NONE  => PERMISSION->{NONE},
+    READ  => PERMISSION->{READ},
+    WRITE => PERMISSION->{CREATE} + PERMISSION->{UPDATE} + PERMISSION->{DELETE},
+    FULL  => PERMISSION_CRUD,
+};
+
 # just for convenience
 use constant PERMISSION_CRUD => 0x000F;
 
@@ -844,6 +852,13 @@ sub ValidatePermission {
         }
     } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Property' ) {
         # check if the target contains a filter expression and the pattern matches the required format
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
+            return;
+        }
+    }
+    } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Basic' ) {
+        # TODO!!!!!
+        # check if the target contains one of the supported object types and the value corresponds to and object id
         if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
