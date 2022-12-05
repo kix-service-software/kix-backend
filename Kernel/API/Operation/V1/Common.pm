@@ -929,9 +929,39 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
         }
 
+        # cache request without offset and limit if CacheType is set for this operation
+        if ( $Kernel::OM->Get('Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
+            $Self->_CacheRequest(
+                Data => \%Param,
+            );
+        }
+
         if ( !$Self->{PermissionCheckOnly} ) {
+
+            # honor an offset, if we have one
+            if ( IsHashRefWithData( $Self->{Offset} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyOffset(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
+            }
+
+            # honor a limiter, if we have one
+            if ( IsHashRefWithData( $Self->{Limit} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyLimit(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
+            }
+
             # honor a generic include, if we have one
-            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
+            if ( IsHashRefWithData( $Self->{Include} ) ) {
                 my $StartTime = Time::HiRes::time();
 
                 $Self->_ApplyInclude(
@@ -942,7 +972,7 @@ sub _Success {
             }
 
             # honor an expander, if we have one
-            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
+            if ( IsHashRefWithData( $Self->{Expand} ) ) {
                 my $StartTime = Time::HiRes::time();
 
                 $Self->_ApplyExpand(
@@ -955,7 +985,7 @@ sub _Success {
         }
 
         # honor a permission field selector, if we have one - make sure nothing gets out what should not get out
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
+        if ( IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
@@ -967,35 +997,6 @@ sub _Success {
             );
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", TimeDiff($StartTime)));
-        }
-
-        # cache request without offset and limit if CacheType is set for this operation
-        if ( $Kernel::OM->Get('Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
-            $Self->_CacheRequest(
-                Data => \%Param,
-            );
-        }
-
-        # honor an offset, if we have one
-        if ( IsHashRefWithData( $Self->{Offset} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyOffset(
-                Data => \%Param,
-            );
-
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
-        }
-
-        # honor a limiter, if we have one
-        if ( IsHashRefWithData( $Self->{Limit} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyLimit(
-                Data => \%Param,
-            );
-
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
         }
     }
 
