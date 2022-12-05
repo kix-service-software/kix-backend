@@ -718,7 +718,7 @@ sub ConfigSettingChange {
 
     # set in SysConfig
     $Kernel::OM->Get('SysConfig')->ValueSet(
-        Key    => $Key,
+        Name   => $Key,
         Value  => $Valid ? $Value : undef,
         UserID => 1,
     );
