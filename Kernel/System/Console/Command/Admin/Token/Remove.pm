@@ -34,6 +34,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'expired',
+        Description => "Remove all tokens which ValidUntilTime or IdleTime are expired",
+        Required    => 0,
+        HasValue    => 0,
+    );
 
     return;
 }
@@ -45,17 +51,19 @@ sub Run {
 
     my $All = $Self->GetOption('all') || 0;
     my $Token = $Self->GetOption('token') || '';
+    my $Expired = $Self->GetOption('expired') || 0;
 
-    if ( !$All && !$Token ) {
-        $Self->PrintError("Please specify token to remove or declare all tokens to be removed by using the --all parameter.");
+    if ( !$All && !$Token && !$Expired ) {
+        $Self->PrintError("Please specify token to remove or declare all/expired tokens to be removed.");
         return $Self->ExitCodeError();
     }
 
     if ($All) {
-        my $Result = $Kernel::OM->Get('Token')->CleanUp();
-    }
-    elsif ($Token) {
-        my $Result = $Kernel::OM->Get('Token')->RemoveToken(
+        $Kernel::OM->Get('Token')->CleanUp();
+    } elsif ($Expired) {
+        $Kernel::OM->Get('Token')->CleanUpExpired();
+    } elsif ($Token) {
+        $Kernel::OM->Get('Token')->RemoveToken(
             Token => $Token,
         );
     }
