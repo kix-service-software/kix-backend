@@ -105,6 +105,7 @@ sub Run {
     if ( $Queue->{ParentID} ) {
         my $ParentQueueName = $Kernel::OM->Get('Queue')->QueueLookup(
             QueueID => $Queue->{ParentID},
+            Silent  => 1
         );
         if ( !$ParentQueueName ) {
             return $Self->_Error(
