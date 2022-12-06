@@ -307,6 +307,12 @@ sub _FileDelete {
     return 1;
 }
 
+sub PossibleExpandsGet {
+    my ($Self, %Param) = @_;
+
+    return  $Self->{"Backend$Param{Object}"}->GetPossibleExpands();
+}
+
 sub DefinitionGet {
     my ($Self, %Param) = @_;
 
