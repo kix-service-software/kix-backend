@@ -508,8 +508,9 @@ sub ArticleCreate {
         for my $Attachment ( @{ $Param{Attachment} } ) {
             $Self->ArticleWriteAttachment(
                 %{$Attachment},
-                ArticleID => $ArticleID,
-                UserID    => $Param{UserID},
+                ContentType => $Attachment->{ContentType} || $Kernel::OM->Get('Config')->Get('Ticket::Article::Attachment::ContentType::Fallback'),
+                ArticleID   => $ArticleID,
+                UserID      => $Param{UserID},
             );
         }
     }

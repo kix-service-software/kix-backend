@@ -9,7 +9,8 @@
             "description": "base64 encoded file content string"
         },
         "ContentType": {
-            "type": "string"
+            "type": "string",
+            "description": "if not given, fallback to SysConfig FAQ::Attachment::ContentType::Fallback"
         },
         "CustomerVisible": {
             "type": "integer"
@@ -24,7 +25,6 @@
     },
     "required": [
         "Content",
-        "ContentType",
         "Filename"
     ]
 }

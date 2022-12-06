@@ -1347,7 +1347,7 @@ sub FilterObjectList {
                                     elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) ne ( $FilterValue || '' ) ) {
                                         $FilterMatch = 0;
                                     }
-                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) != ( $FilterValue || '' ) ) {
+                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) != ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
@@ -1360,35 +1360,35 @@ sub FilterObjectList {
                                     elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) eq ( $FilterValue || '' ) ) {
                                         $FilterMatch = 0;
                                     }
-                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || '' ) == ( $FilterValue || '' ) ) {
+                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) == ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
 
                                 # less than (<)
                                 elsif ( $FilterItem->{Operator} eq 'LT' ) {
-                                    if ( $Type eq 'NUMERIC' && $FieldValue >= $FilterValue ) {
+                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) >= ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
 
                                 # greater than (>)
                                 elsif ( $FilterItem->{Operator} eq 'GT' ) {
-                                    if ( $Type eq 'NUMERIC' && $FieldValue <= $FilterValue ) {
+                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) <= ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
 
                                 # less than or equal (<=)
                                 elsif ( $FilterItem->{Operator} eq 'LTE' ) {
-                                    if ( $Type eq 'NUMERIC' && $FieldValue > $FilterValue ) {
+                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) > ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
 
                                 # greater than or equal (>=)
                                 elsif ( $FilterItem->{Operator} eq 'GTE' ) {
-                                    if ( $Type eq 'NUMERIC' && $FieldValue < $FilterValue ) {
+                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) < ( $FilterValue || 0 ) ) {
                                         $FilterMatch = 0;
                                     }
                                 }
@@ -1398,7 +1398,7 @@ sub FilterObjectList {
                                     $FilterMatch = 0;
                                     foreach $FilterValue ( @{$FilterValue} ) {
                                         if ( $Type eq 'NUMERIC' ) {
-                                            next if $FilterValue != $FieldValue + 0;
+                                            next if ( $FilterValue || 0 ) != ( $FieldValue || 0 );
                                         }
                                         next if $FilterValue ne $FieldValue;
                                         $FilterMatch = 1;

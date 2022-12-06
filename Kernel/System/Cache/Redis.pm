@@ -253,7 +253,10 @@ sub SetSemaphore {
         }
     }
 
-    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Self->_PrepareRedisKey(
+        %Param,
+        Key => $Param{Key} // $Param{ID}
+    );
 
     return $Self->_RedisCall('set', $PreparedKey, $Param{Value}, 'nx', 'px', $Param{Timeout});
 }
@@ -271,7 +274,10 @@ sub ClearSemaphore {
         }
     }
 
-    my $PreparedKey = $Self->_PrepareRedisKey(%Param);
+    my $PreparedKey = $Self->_PrepareRedisKey(
+        %Param,
+        Key => $Param{Key} // $Param{ID}
+    );
 
     my $Value = $Self->_RedisCall('get', $PreparedKey);
     return if ( $Value != $Param{Value} );

@@ -58,7 +58,8 @@ sub _ReplaceParametersInString {
     foreach my $Parameter ( $Self->_GetParameterDefinitionList() ) {
         my $ParameterValue = $Self->_GetParameterValue(
             Parameter => $Parameter->{Name}
-        );
+        );        
+
         if ( !$ParameterValue ) {
             # try to use a configured fallback
             if ( $String =~ /\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/gmx ) {
@@ -68,15 +69,15 @@ sub _ReplaceParametersInString {
 
             if ( $Param{UseEmpty} ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
-                $String =~ s/\$\{Parameters\.$Parameter->{Name}\}/$ParameterValue/gmx ;
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx ;
             }
             next;
         }
 
         if ( IsArrayRefWithData($ParameterValue) ) {
             $ParameterValue = uc($Parameter->{DataType}) eq 'STRING' ? join(',', (map { "'".$_."'"} @{$ParameterValue})) : join(',', @{$ParameterValue});
-        }
-        $String =~ s/\$\{Parameters\.$Parameter->{Name}\}/$ParameterValue/gmx;
+        }        
+        $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx;        
     }
 
     return $String;

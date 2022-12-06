@@ -106,83 +106,85 @@ sub Run {
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
     return $Self->_RunParallel(
-        sub {
-            my ( $Self, %Param ) = @_;
-            my $Result;
-
-            my $Item = $Param{Item};
-
-            my $SourceObjectID = $Item->{'type_id::raw'}.'::'.$Item->{'source_object_id::raw'}.'::'.$Item->{source_key}.'::'.$Item->{'target_object_id::raw'}.'::'.$Item->{target_key};
-
-            # check if this object is already mapped
-            my $MappedID = $Self->GetOIDMapping(
-                ObjectType     => 'link_relation',
-                SourceObjectID => $SourceObjectID
-            );
-            if ( $MappedID ) {
-                return 'Ignored';
-            }
-
-            # check if this item already exists (i.e. some initial data)
-            my $ID = $Self->Lookup(
-                Table        => 'link_relation',
-                PrimaryKey   => 'id',
-                Item         => $Item,
-                RelevantAttr => [
-                    'type_id',
-                    'source_object_id',
-                    'source_key',
-                    'target_object_id',
-                    'target_key',
-                ]
-            );
-
-            # insert row
-            if ( !$ID ) {
-                # map source object
-                $Item->{source_key} = $Self->_MapObjectKey(
-                    ObjectID => $Item->{source_object_id},
-                    Key      => $Item->{source_key},
-                );
-                if ( !$Item->{source_key} ) {
-                    return 'Ignored';
-                }
-
-                # map target object
-                $Item->{target_key} = $Self->_MapObjectKey(
-                    ObjectID => $Item->{target_object_id},
-                    Key      => $Item->{target_key},
-                );
-                if ( !$Item->{target_key} ) {
-                    return 'Ignored'
-                }
-
-                # map the type
-                $Item->{type_id} = $Self->_MapLinkType(
-                    Item => $Item
-                );
-
-                $ID = $Self->Insert(
-                    Table          => 'link_relation',
-                    PrimaryKey     => 'id',
-                    Item           => $Item,
-                    AutoPrimaryKey => 1,
-                    SourceObjectID => $SourceObjectID,
-                );
-            }
-
-            if ( $ID ) {
-                $Result = 'OK';
-            }
-            else {
-                $Result = 'Error';
-            }
-
-            return $Result;
-        },
+        $Self->{WorkerSubRef} || \&_Run,
         Items => $SourceData,
         %Param,
     );
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $Item = $Param{Item};
+
+    my $SourceObjectID = $Item->{'type_id::raw'}.'::'.$Item->{'source_object_id::raw'}.'::'.$Item->{source_key}.'::'.$Item->{'target_object_id::raw'}.'::'.$Item->{target_key};
+
+    # check if this object is already mapped
+    my $MappedID = $Self->GetOIDMapping(
+        ObjectType     => 'link_relation',
+        SourceObjectID => $SourceObjectID
+    );
+    if ( $MappedID ) {
+        return 'Ignored';
+    }
+
+    # check if this item already exists (i.e. some initial data)
+    my $ID = $Self->Lookup(
+        Table        => 'link_relation',
+        PrimaryKey   => 'id',
+        Item         => $Item,
+        RelevantAttr => [
+            'type_id',
+            'source_object_id',
+            'source_key',
+            'target_object_id',
+            'target_key',
+        ]
+    );
+
+    # insert row
+    if ( !$ID ) {
+        # map source object
+        $Item->{source_key} = $Self->_MapObjectKey(
+            ObjectID => $Item->{source_object_id},
+            Key      => $Item->{source_key},
+        );
+        if ( !$Item->{source_key} ) {
+            return 'Ignored';
+        }
+
+        # map target object
+        $Item->{target_key} = $Self->_MapObjectKey(
+            ObjectID => $Item->{target_object_id},
+            Key      => $Item->{target_key},
+        );
+        if ( !$Item->{target_key} ) {
+            return 'Ignored'
+        }
+
+        # map the type
+        $Item->{type_id} = $Self->_MapLinkType(
+            Item => $Item
+        );
+
+        $ID = $Self->Insert(
+            Table          => 'link_relation',
+            PrimaryKey     => 'id',
+            Item           => $Item,
+            AutoPrimaryKey => 1,
+            SourceObjectID => $SourceObjectID,
+        );
+    }
+
+    if ( $ID ) {
+        $Result = 'OK';
+    }
+    else {
+        $Result = 'Error';
+    }
+
+    return $Result;
 }
 
 sub _MapObjectKey {

@@ -313,4 +313,12 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="FAQ::Attachment::ContentType::Fallback" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Specifies the ContentType fallback for FAQ attachments.</Description>
+        <Group>FAQ</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">application/octet-stream</String>
+        </Setting>
+    </ConfigItem>
 </kix_config>

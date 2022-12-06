@@ -422,7 +422,12 @@ sub NotificationEvent {
     # get system default language
     my $DefaultLanguage = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
 
-    my $Languages = [ $Param{Recipient}->{UserLanguage}, $DefaultLanguage, 'en' ];
+    my $UserLanguage = $Param{Recipient}->{UserLanguage};
+    if ( IsHashRefWithData($Param{Recipient}->{Preferences}) && $Param{Recipient}->{Preferences}->{UserLanguage} ) {
+        $UserLanguage = $Param{Recipient}->{Preferences}->{UserLanguage};
+    }
+
+    my $Languages = [ $UserLanguage, $DefaultLanguage, 'en' ];
 
     my $Language;
     LANGUAGE:

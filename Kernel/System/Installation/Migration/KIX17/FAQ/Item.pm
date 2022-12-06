@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use POSIX;
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -66,108 +67,110 @@ sub Run {
     my $StateTypeData = $Self->GetSourceData(Type => 'faq_state_type', NoProgress => 1);
 
     # map language
-    my %Languages = map { $_->{id} => $_->{name} } @{$LangData};
+    $Self->{Languages} = { map { $_->{id} => $_->{name} } @{$LangData} };
 
-    my %DefaultUsedLanguages = map { $_ => 1 } keys %{$Kernel::OM->Get('Config')->Get('DefaultUsedLanguages')};
+    $Self->{DefaultUsedLanguages} = { map { $_ => 1 } keys %{$Kernel::OM->Get('Config')->Get('DefaultUsedLanguages')} };
 
     # map state to statetype
-    my %StateTypes = map { $_->{id} => $_->{name} } @{$StateTypeData};
-    my %States = map { $_->{id} => $StateTypes{$_->{type_id}} } @{$StateData};
+    $Self->{StateTypes} =  { map { $_->{id} => $_->{name} } @{$StateTypeData} };
+    $Self->{States} = { map { $_->{id} => $Self->{StateTypes}->{$_->{type_id}} } @{$StateData} };
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
     return $Self->_RunParallel(
-        sub {
-            my ( $Self, %Param ) = @_;
-            my $Result;
-
-            my $Item = $Param{Item};
-
-            # prepare language
-            $Item->{language} = $Languages{$Item->{f_language_id}};
-
-            # prepare visibility
-            $Item->{visibility} = $States{$Item->{state_id}};
-            $Item->{visibility} = 'external' if $Item->{visibility} eq 'public';
-
-            # check if this object is already mapped
-            my $MappedID = $Self->GetOIDMapping(
-                ObjectType     => 'faq_item',
-                SourceObjectID => $Item->{id}
-            );
-            if ( $MappedID ) {
-                return 'Ignored';
-            }
-
-            # check if this item already exists (i.e. some initial data)
-            my $ID = $Self->Lookup(
-                Table        => 'faq_item',
-                PrimaryKey   => 'id',
-                Item         => $Item,
-                RelevantAttr => [
-                    'f_name'
-                ]
-            );
-
-            if ( !$ID ) {
-                # insert row
-                $ID = $Self->Insert(
-                    Table          => 'faq_item',
-                    PrimaryKey     => 'id',
-                    Item           => $Item,
-                    AutoPrimaryKey => 1,
-                );
-            }
-
-            if ( $ID ) {
-                $Self->_MigrateVoting(
-                    ItemID       => $ID,
-                    SourceItemID => $Item->{id},
-                );
-                $Self->_MigrateHistory(
-                    ItemID       => $ID,
-                    SourceItemID => $Item->{id},
-                );
-                $Self->_MigrateAttachments(
-                    ItemID       => $ID,
-                    Item         => $Item,
-                    SourceItemID => $Item->{id},
-                );
-
-                # check if the given language exists
-                if ( !$DefaultUsedLanguages{$Item->{language}} ) {
-                    # add language to SysConfig
-                    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
-                        Name => 'DefaultUsedLanguages',
-                    );
-
-                    $OptionData{Default}->{$Item->{language}} = $Item->{language};
-
-                    # update option
-                    my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
-                        %OptionData,
-                        UserID  => 1
-                    );
-
-                    if ( !$Success ) {
-                        $Kernel::OM->Get('Log')->Log(
-                            Priority => 'error',
-                            Message  => "Could not update SysConfig option \"DefaultUsedLanguages\" for FAQ item $ID"
-                        );
-                    }
-                }
-
-                $Result = 'OK';
-            }
-            else {
-                $Result = 'Error';
-            }
-
-            return $Result;
-        },
+        $Self->{WorkerSubRef} || \&_Run,
         Items => $SourceData,
         %Param,
     );
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $Item = $Param{Item};
+
+    # prepare language
+    $Item->{language} = $Self->{Languages}->{$Item->{f_language_id}};
+
+    # prepare visibility
+    $Item->{visibility} = $Self->{States}->{$Item->{state_id}};
+    $Item->{visibility} = 'external' if $Item->{visibility} eq 'public';
+
+    # check if this object is already mapped
+    my $MappedID = $Self->GetOIDMapping(
+        ObjectType     => 'faq_item',
+        SourceObjectID => $Item->{id}
+    );
+    if ( $MappedID ) {
+        return 'Ignored';
+    }
+
+    # check if this item already exists (i.e. some initial data)
+    my $ID = $Self->Lookup(
+        Table        => 'faq_item',
+        PrimaryKey   => 'id',
+        Item         => $Item,
+        RelevantAttr => [
+            'f_name'
+        ]
+    );
+
+    if ( !$ID ) {
+        # insert row
+        $ID = $Self->Insert(
+            Table          => 'faq_item',
+            PrimaryKey     => 'id',
+            Item           => $Item,
+            AutoPrimaryKey => 1,
+        );
+    }
+
+    if ( $ID ) {
+        $Self->_MigrateVoting(
+            ItemID       => $ID,
+            SourceItemID => $Item->{id},
+        );
+        $Self->_MigrateHistory(
+            ItemID       => $ID,
+            SourceItemID => $Item->{id},
+        );
+        $Self->_MigrateAttachments(
+            ItemID       => $ID,
+            Item         => $Item,
+            SourceItemID => $Item->{id},
+        );
+
+        # check if the given language exists
+        if ( !$Self->{DefaultUsedLanguages}->{$Item->{language}} ) {
+            # add language to SysConfig
+            my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
+                Name => 'DefaultUsedLanguages',
+            );
+
+            $OptionData{Default}->{$Item->{language}} = $Item->{language};
+
+            # update option
+            my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
+                %OptionData,
+                UserID  => 1
+            );
+
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Could not update SysConfig option \"DefaultUsedLanguages\" for FAQ item $ID"
+                );
+            }
+        }
+
+        $Result = 'OK';
+    }
+    else {
+        $Result = 'Error';
+    }
+
+    return $Result;
 }
 
 sub _MigrateVoting {
@@ -345,7 +348,10 @@ sub _MigrateAttachments {
     foreach my $Item ( @{$SourceData} ) {
         $Item->{disposition}  = 'inline' if $Item->{inlineattachment};
         $Item->{content_id}   = $InlineAttachments{$Item->{id}} ? "<$InlineAttachments{$Item->{id}}>" : '';
-        $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
+        $Item->{content}      = MIME::Base64::decode_base64($Item->{content});
+        if ( $Item->{content_type} =~ /\s+;/ ) {
+            $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
+        }
         delete $Item->{inlineattachment};
 
         # insert row

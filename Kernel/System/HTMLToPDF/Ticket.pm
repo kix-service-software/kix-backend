@@ -33,6 +33,16 @@ sub GetParams {
     };
 }
 
+sub GetPossibleExpands {
+    my ( $Self, %Param) = @_;
+
+    return [
+        'DynamicField',
+        'Article',
+        'LinkObject'
+    ];
+}
+
 sub CheckParams {
     my ( $Self, %Param) = @_;
 

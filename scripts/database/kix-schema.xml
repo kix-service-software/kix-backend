@@ -1304,7 +1304,7 @@
     <Column Name="filter_id" Required="true" Type="INTEGER"/>
     <Column Name="type" Required="true" Size="20" Type="VARCHAR"/>
     <Column Name="filter_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="filter_value" Required="true" Size="200" Type="VARCHAR"/>
+    <Column Name="filter_value" Required="true" Size="1800000" Type="VARCHAR"/>
     <Column Name="negate" Required="false" Type="SMALLINT"/>
     <ForeignKey ForeignTable="mail_filter">
         <Reference Local="filter_id" Foreign="id"/>

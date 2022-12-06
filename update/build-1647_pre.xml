@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    <TableAlter Name="mail_filter_properties">
+        <ColumnChange NameOld="filter_value" NameNew="filter_value" Required="true" Size="1800000" Type="VARCHAR"/>
+    </TableAlter>
+</database>

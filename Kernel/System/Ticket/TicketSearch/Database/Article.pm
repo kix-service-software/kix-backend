@@ -11,6 +11,8 @@ package Kernel::System::Ticket::TicketSearch::Database::Article;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
@@ -188,8 +190,10 @@ sub Search {
 
         # prepare Value if needed
         my $Value = $Param{Search}->{Value};
-        if ( $OperatorMap{$Param{Search}->{Operator}} eq 'IN' ) {
+        if ( $Param{Search}->{Operator} eq 'IN' ) {
             $Value = '('.(join(',', @{$Value})).')';
+        } elsif ( $Param{Search}->{Operator} eq 'EQ' && IsArrayRefWithData($Value) ) {
+            $Value = $Value->[0];
         }
 
         if ( $Param{BoolOperator} eq 'OR') {

@@ -2011,18 +2011,20 @@ sub RecalculateCurrentIncidentState {
         # get new incident state type (can only be 'operational' or 'warning')
         my $InciStateType = $NewConfigItemIncidentState{$ConfigItemID}->{Type};
 
-        # get last version
-        my $LastVersion;
+        # get new incident state
+        my $NewIncidentState;
         if ( $Param{Simulate} && $Param{Simulate}->{$ConfigItemID} ) {
-            $LastVersion->{InciStateType} = $Self->{IncidentState2TypeMapping}->{$Param{Simulate}->{$ConfigItemID}};
-            $LastVersion->{InciStateID}   = $Self->{IncidentStateListReverse}->{$Param{Simulate}->{$ConfigItemID}};
+            $NewIncidentState->{InciStateType} = $Self->{IncidentState2TypeMapping}->{$Param{Simulate}->{$ConfigItemID}};
+            $NewIncidentState->{InciStateID}   = $Self->{IncidentStateListReverse}->{$Param{Simulate}->{$ConfigItemID}};
         }
         else {
-            # read the last actual version without cache
-            $LastVersion = $Self->VersionGet(
+            # get current value without cache
+            my $ConfigItem = $Self->ConfigItemGet(
                 ConfigItemID => $ConfigItemID,
-                XMLDataGet   => 0,
+                Cache        => 0
             );
+            $NewIncidentState->{InciStateType} = $ConfigItem->{CurInciStateType};
+            $NewIncidentState->{InciStateID}   = $ConfigItem->{CurInciStateID};
         }
 
         my $CurInciStateID;
@@ -2030,15 +2032,15 @@ sub RecalculateCurrentIncidentState {
 
             # check the current incident state type is in 'incident'
             # then we do not want to change it to warning
-            next CONFIGITEMID if $LastVersion->{InciStateType} eq 'incident';
+            next CONFIGITEMID if $NewIncidentState->{InciStateType} eq 'incident';
 
             $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{warning};
         }
         elsif ( $InciStateType eq 'operational' ) {
-            $CurInciStateID = $LastVersion->{InciStateID};
+            $CurInciStateID = $NewIncidentState->{InciStateID};
         }
         elsif ( $InciStateType eq 'incident' ) {
-            $CurInciStateID = $LastVersion->{InciStateID};
+            $CurInciStateID = $NewIncidentState->{InciStateID};
         }
 
         $NewConfigItemIncidentState{$ConfigItemID}->{State} = $Self->{IncidentStateList}->{$CurInciStateID};
@@ -3156,6 +3158,12 @@ sub UpdateCounters {
                 next CLASSID;
             }
 
+            # push client callback event
+            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+                Event      => 'UPDATE',
+                Namespace  => 'CMDB.Class.Counters',
+                ObjectID   => $ClassID,
+            );
         }
     }
 
