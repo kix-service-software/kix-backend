@@ -1088,12 +1088,7 @@ sub QueueDelete {
     return 1;
 }
 
-
 1;
-
-
-
-
 
 =back
 

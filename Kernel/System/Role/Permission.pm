@@ -22,6 +22,9 @@ our @ObjectDependencies = (
     'Valid',
 );
 
+# just for convenience
+use constant PERMISSION_CRUD => 0x000F;
+
 # define permission bit values
 use constant PERMISSION => {
     NONE   => 0x0000,
@@ -29,19 +32,9 @@ use constant PERMISSION => {
     READ   => 0x0002,
     UPDATE => 0x0004,
     DELETE => 0x0008,
+    WRITE  => 0x000D,       # combined permission used for base permissions (CREATE+UPDATE+DELETE)
     DENY   => 0xF000,
 };
-
-# define basic permissions
-use constant BASIC_PERMISSION => {
-    NONE  => PERMISSION->{NONE},
-    READ  => PERMISSION->{READ},
-    WRITE => PERMISSION->{CREATE} + PERMISSION->{UPDATE} + PERMISSION->{DELETE},
-    FULL  => PERMISSION_CRUD,
-};
-
-# just for convenience
-use constant PERMISSION_CRUD => 0x000F;
 
 =head1 NAME
 
@@ -562,7 +555,7 @@ sub PermissionUpdate {
     if ( !$ValidationResult ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "The permission target doesn't match the possible ones for type Object.",
+            Message  => "The permission target doesn't match the possible ones for given type.",
         );
         return;
     }
@@ -855,11 +848,10 @@ sub ValidatePermission {
         if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
-    }
-    } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Basic' ) {
-        # TODO!!!!!
-        # check if the target contains one of the supported object types and the value corresponds to and object id
-        if ( $Param{Target} !~ /^.*?\{(\w+)\.\[(.*?)\](\s*IF\s+(.*?)\s*)?\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
+    } elsif ( $PermissionTypeList{$Param{TypeID}} =~ /^Base::(.*?)$/ ) {
+        # check if the target contains one of the supported object types and the value corresponds to an object id
+        my $TargetObject = $Kernel::OM->Get($1);
+        if ( !$TargetObject || !$TargetObject->can('BasePermissionValidate') || !$TargetObject->BasePermissionValidate(%Param)) {
             return;
         }
     }
