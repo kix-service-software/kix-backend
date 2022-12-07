@@ -529,6 +529,14 @@ sub ArticleWriteAttachment {
         Permission => 660,
     );
 
+    # update article data
+    if ($Param{CountAsUpdate}) {
+        $Kernel::OM->Get('DB')->Do(
+            SQL => "UPDATE article SET change_time = current_timestamp, change_by = ? WHERE id = ?",
+            Bind => [ \$Param{UserID}, \$Param{ArticleID} ],
+        );
+    }
+
     return if !$SuccessContent;
 
     # delete cache
