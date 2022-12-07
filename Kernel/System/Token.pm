@@ -269,7 +269,7 @@ sub CreateToken {
 
     # store token in whitelist
     $Kernel::OM->Get('DB')->Do(
-        SQL  => "INSERT INTO token (token) values (?)",
+        SQL  => "INSERT INTO token (token, last_request_time) values (?, current_timestamp)",
         Bind => [
             \$Token,
         ],
@@ -424,9 +424,11 @@ sub GetAllTokens {
 
 =item CleanUp()
 
-cleanup all tokens in system
+cleanup all "normal" tokens in system
 
-    $TokensObject->CleanUp();
+    $TokensObject->CleanUp(
+        TokenType => 'SomeType'   # optional, 'normal' is used if empty
+    );
 
 =cut
 
@@ -434,20 +436,60 @@ sub CleanUp {
     my ( $Self, %Param ) = @_;
 
     my %TokenList = %{$Self->GetAllTokens()};
+    $Param{TokenType} ||= 'Nomal';
 
     foreach my $Token ( keys %TokenList ) {
         my $Payload = $Self->ExtractToken(
             Token => $Token,
         );
-        if ( !IsHashRefWithData($Payload) ) {
-            return;
-        }
+        return if ( !IsHashRefWithData($Payload) );
 
-        # only remove normal tokens
-        if ( $Payload->{TokenType} eq 'Normal' ) {
+        # only remove tokens of relevant type
+        if ( $Payload->{TokenType} eq $Param{TokenType} ) {
             $Self->RemoveToken(
                 Token => $Token,
             );
+        }
+    }
+
+    return 1;
+}
+
+=item CleanUpExpired()
+
+cleanup all expired tokens in system
+
+    $TokensObject->CleanUpExpired();
+
+=cut
+
+sub CleanUpExpired {
+    my ( $Self, %Param ) = @_;
+
+    my $TimeNow = $Kernel::OM->Get('Time')->SystemTime();
+
+    if ( $TimeNow ) {
+        my $TokenMaxIdleTime = $Kernel::OM->Get('Config')->Get('TokenMaxIdleTime');
+
+        my %TokenList = %{$Self->GetAllTokens()};
+        foreach my $Token ( keys %TokenList ) {
+            my $Payload = $Self->ExtractToken( Token => $Token );
+
+            return if ( !IsHashRefWithData($Payload) );
+
+            # check valid until time
+            if ( $Payload->{ValidUntilTimeUnix} && $TimeNow > $Payload->{ValidUntilTimeUnix} ) {
+                $Self->RemoveToken( Token => $Token );
+                next;
+            }
+
+            # check idle time
+            if (
+                !$Payload->{IgnoreMaxIdleTime} && $TokenMaxIdleTime && $Payload->{LastRequestTimeUnix} &&
+                ( $TimeNow - $TokenMaxIdleTime ) >= $Payload->{LastRequestTimeUnix}
+            ) {
+                $Self->RemoveToken( Token => $Token );
+            }
         }
     }
 

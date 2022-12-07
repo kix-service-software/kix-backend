@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use POSIX;
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -347,7 +348,10 @@ sub _MigrateAttachments {
     foreach my $Item ( @{$SourceData} ) {
         $Item->{disposition}  = 'inline' if $Item->{inlineattachment};
         $Item->{content_id}   = $InlineAttachments{$Item->{id}} ? "<$InlineAttachments{$Item->{id}}>" : '';
-        $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
+        $Item->{content}      = MIME::Base64::decode_base64($Item->{content});
+        if ( $Item->{content_type} =~ /\s+;/ ) {
+            $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
+        }
         delete $Item->{inlineattachment};
 
         # insert row

@@ -87,6 +87,13 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddOption(
+        Name        => 'expands',
+        Description => '(optional) "Expands": Expands the basic data with additional data. For more information please use "--help".',
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
 
     my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
@@ -201,6 +208,7 @@ sub Run {
     my $Filter    = $Self->GetOption('filter')    || q{};
     my $Allow     = $Self->GetOption('allow')     || q{};
     my $Ignore    = $Self->GetOption('ignore')    || q{};
+    my $Expands   = $Self->GetOption('expands')   || q{};
 
     if ( !$Object ) {
         $Self->Print("<red>No object is given!</red>\n");
@@ -246,7 +254,8 @@ sub Run {
         UserID   => $UserID,
         Filters  => $Filter,
         Allows   => $Allow,
-        Ignores  => $Ignore
+        Ignores  => $Ignore,
+        Expands  => $Expands
     );
 
     if ( %Result ) {

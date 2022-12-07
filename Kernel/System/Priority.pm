@@ -373,10 +373,12 @@ returns the id or the name of a priority
 
     my $PriorityID = $PriorityObject->PriorityLookup(
         Priority => '3 normal',
+        Silent   => 0|1      # optional - do not log if not found (defautl 0)
     );
 
     my $Priority = $PriorityObject->PriorityLookup(
         PriorityID => 1,
+        Silent     => 0|1      # optional - do not log if not found (defautl 0)
     );
 
 =cut
@@ -415,10 +417,12 @@ sub PriorityLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No $Key for $Value found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No $Key for $Value found!",
+            );
+        }
         return;
     }
 
