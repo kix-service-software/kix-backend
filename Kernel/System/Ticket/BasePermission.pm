@@ -40,8 +40,6 @@ validate a given base permission.
 sub BasePermissionValidate {
     my ( $Self, %Param ) = @_;
 
-use Data::Dumper;
-print STDERR "BasePermissionValidate: ".Data::Dumper::Dumper(\%Param);
     # check needed stuff
     foreach my $Key ( qw(Target) ) {
         if ( !$Param{$Key} ) {
@@ -84,7 +82,7 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     my @Values = (
-        Kernel::System::Role::Permission::PERMISSION->{WRITE}
+        Kernel::System::Role::Permission::PERMISSION_CRUD
     );
     if ( $Param{Permission} eq 'READ' ) {
         push @Values, Kernel::System::Role::Permission::PERMISSION->{READ};

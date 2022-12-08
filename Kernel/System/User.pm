@@ -1264,8 +1264,6 @@ print STDERR "PermissionList: ".Data::Dumper::Dumper(\%Param);
     # filter specific permission types
     if ( IsArrayRefWithData( $Param{Types} ) ) {
         my %PermissionTypeList = reverse $Kernel::OM->Get('Role')->PermissionTypeList();
-        use Data::Dumper;
-        print STDERR "PermissionTypeList: ".Data::Dumper::Dumper(\%PermissionTypeList);
         my @PermissionTypeIDs;
         foreach my $Type ( @{$Param{Types}} ) {
             if ( !$PermissionTypeList{$Type} ) {
@@ -1295,8 +1293,6 @@ print STDERR "PermissionList: ".Data::Dumper::Dumper(\%Param);
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-print STDERR "SQL: $SQL\n";
-print STDERR "Bind: ".Data::Dumper::Dumper(\@Bind);
     return if !$DBObject->Prepare(
         SQL  => $SQL,
         Bind => \@Bind
