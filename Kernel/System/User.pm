@@ -1222,9 +1222,6 @@ sub PermissionList {
     # set default value
     my $Valid = $Param{Valid} ? 1 : 0;
 
-use Data::Dumper;
-print STDERR "PermissionList: ".Data::Dumper::Dumper(\%Param);
-
     # check cache
     my $CacheKey
         = 'PermissionList::'

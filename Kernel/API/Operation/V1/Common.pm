@@ -146,6 +146,20 @@ sub RunOperation {
         }
 
         # check if we have permission for this object
+        if ( $Self->can('GetBasePermissionObjectIDs') ) {
+            my $StartTime = Time::HiRes::time();
+            my $Result =  $Self->_CheckBasePermission(
+                %Param,
+                Data => $Param{Data},
+            );
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+
+        # check if we have permission for this object
         my $StartTime = Time::HiRes::time();
         my $Result =  $Self->_CheckObjectPermission(
             %Param,
@@ -868,6 +882,20 @@ sub _Success {
 
     # handle Search parameter if we have to
     if ( !$Param{IsOptionsResponse} ) {
+        if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{BasePermissionFilter} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_Debug($Self->{LevelIndent}, "applying base permission");
+
+            $Self->_ApplyFilter(
+                Data               => \%Param,
+                Filter             => $Self->{BasePermissionFilter},
+                IsPermissionFilter => 1,
+            );
+
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+        }
+
         # at first honor permissions
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{RelevantObjectPermissions} ) ) {
             my $StartTime = Time::HiRes::time();
@@ -1182,6 +1210,7 @@ sub ExecOperation {
     }
 
     my $OperationObject = $OperationModule->new(
+        CallingOperationType     => $Self->{OperationType},
         Operation                => (split(/::/, $Param{OperationType}))[-1],
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},
@@ -2420,6 +2449,73 @@ sub _ExecPermissionChecks {
     return $Allowed;
 }
 
+=item _CheckBasePermission()
+
+check base permissions
+
+    my $Return = $CommonObject->_CheckBasePermission(
+        Data         => {},
+        Permission   => ...,
+        UsageContext => 'Agent'|'Customer',
+        UserID       => 1
+    );
+
+    $Return = _Success if granted
+
+=cut
+
+sub _CheckBasePermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Data)) {
+        if ( !defined $Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+
+    my %Result = $Self->GetBasePermissionObjectIDs(
+        %Param,
+        UserID       => $Self->{Authorization}->{UserID},
+        UsageContext => $Self->{Authorization}->{UserType},
+        Permission   => $PermissionName,
+    );
+    if ( !%Result ) {
+        # return 403, because we don't have permission
+        return $Self->_Error(
+            Code => 'Forbidden',
+        );
+    }
+    if ( !IsArrayRefWithData($Result{ObjectIDs}) ) {
+        # we don't have any relevant base permissions
+        return $Self->_Success();
+    }
+
+    # add corresponding permission filter 
+    my %Filter = $Self->_CreateFilterForObject(
+        Filter   => {},
+        Object   => $Result{Object},
+        Field    => $Result{Attribute},
+        Operator => 'IN',
+        Value    => $Result{ObjectIDs},
+    );
+    if ( !%Filter ) {
+        # we can't generate the filter, so this is a false
+        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+        return;
+    }
+
+    $Self->{BasePermissionFilter} = \%Filter;
+
+    return $Self->_Success();
+}
+
 =item _CheckObjectPermission()
 
 check object permissions
@@ -2444,7 +2540,7 @@ sub _CheckObjectPermission {
     # get list of permission types
     my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
 
-    # get all Object and Property permissions for this user
+    # get all Object permissions for this user
     my %Permissions = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},

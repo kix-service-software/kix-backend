@@ -32,7 +32,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'type',
-        Description => 'The type of the new permission (Resource, Object, Property).',
+        Description => 'The type of the new permission (Base::Ticket, Resource, Object, Property).',
         Required    => 1,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,

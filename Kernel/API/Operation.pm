@@ -86,6 +86,8 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{CallingOperationType} = $Param{CallingOperationType};
+
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
 

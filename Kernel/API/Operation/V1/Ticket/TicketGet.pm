@@ -369,6 +369,19 @@ sub _GetTicketData {
     return \%TicketData;
 }
 
+sub GetBasePermissionObjectIDs {
+    my ( $Self, %Param ) = @_;
+
+    # we don't have to do the checks if we have been called by TicketSearch
+    return if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
+
+    my @QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+        %Param,
+    );
+    
+    return (Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => \@QueueIDs);
+}
+
 1;
 
 =back
