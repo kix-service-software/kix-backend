@@ -402,6 +402,14 @@ sub ArticleWriteAttachment {
         ],
     );
 
+    # update article data
+    if ($Param{CountAsUpdate}) {
+        $Kernel::OM->Get('DB')->Do(
+            SQL => "UPDATE article SET change_time = current_timestamp, change_by = ? WHERE id = ?",
+            Bind => [ \$Param{UserID}, \$Param{ArticleID} ],
+        );
+    }
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
