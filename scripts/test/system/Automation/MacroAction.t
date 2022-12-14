@@ -81,8 +81,8 @@ for my $Name ( sort keys %MacroActions ) {
     if ($MacroActionID) {
         $MacroActions{$Name}->{ID} = $MacroActionID;
     }
-    my %MacroAction = $AutomationObject->MacroActionGet( 
-        ID => $MacroActionID 
+    my %MacroAction = $AutomationObject->MacroActionGet(
+        ID => $MacroActionID
     );
 
     $Self->Is(
@@ -342,7 +342,24 @@ my @Tests = (
             Dummy => 'found!'
         }
     },
+    {
+        Name => 'nested variable in filter',
+        MacroResults => {
+            Variable1 => '2022-10-01 12:22:33',
+            Variable2 => 3,
+            Variable3 => 'TimeStamp'
+        },
+        Data => {
+            Result => '${Variable1|DateUtil.Calc(+${Variable2}M)|DateUtil.UnixTime|DateUtil.${Variable3}}',
+        },
+        Expected => {
+            Result => '2023-01-01 12:22:33'
+        }
+    },
 );
+
+# load additional filter
+$AutomationObject->_GetVariableFilter();
 
 my $TestCount = 0;
 foreach my $Test ( @Tests ) {
