@@ -20,6 +20,7 @@ my $CacheObject        = $Kernel::OM->Get('Cache');
 my $ContactObject      = $Kernel::OM->Get('Contact');
 my $OrganisationObject = $Kernel::OM->Get('Organisation');
 my $DBObject           = $Kernel::OM->Get('DB');
+my $UserObject         = $Kernel::OM->Get('User');
 
 # get helper object
 $Kernel::OM->ObjectParamAdd(
@@ -71,7 +72,20 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     # create non existing customer user login
     my $ContactRandom = 'unittest-' . $Key . $Helper->GetRandomID();
 
+    # add assigned user
+    my $UserID = $UserObject->UserAdd(
+        UserLogin    => $ContactRandom,
+        ValidID      => 1,
+        ChangeUserID => 1,
+        IsAgent      => 1
+    );
+    $Self->True(
+        $UserID,
+        "assigned UserAdd() - $UserID",
+    );
+
     my $ContactID = $ContactObject->ContactAdd(
+        AssignedUserID        => $UserID,
         Firstname             => 'Firstname Test' . $Key,
         Lastname              => 'Lastname Test' . $Key,
         PrimaryOrganisationID => $OrganisationID,
@@ -112,6 +126,11 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         $OrganisationID,
         "ContactGet() - PrimaryOrganisationID",
     );
+    $Self->Is(
+        $Contact{AssignedUserID},
+        $UserID,
+        "ContactGet() - AssignedUserID",
+    );
 
     $Self->Is(
         scalar( @{ $Contact{OrganisationIDs} } ),
@@ -126,6 +145,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
     my $Update = $ContactObject->ContactUpdate(
         ID                    => $ContactID,
+        AssignedUserID        => $UserID,
         Firstname             => 'Firstname Test Update' . $Key,
         Lastname              => 'Lastname Test Update' . $Key,
         Email                 => 'test@example.org' . $Key,
@@ -157,13 +177,18 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
     $Self->Is(
         $Contact{Email},
-        $ContactRandom . '-Update@example.com',
+        'test@example.org' . $Key,
         "ContactGet() - Email",
     );
     $Self->Is(
         $Contact{PrimaryOrganisationID},
         $OrganisationIDForUpdate,
         "ContactGet() - OrganisationID",
+    );
+    $Self->Is(
+        $Contact{AssignedUserID},
+        $UserID,
+        "ContactGet() - AssignedUserID",
     );
     $Self->Is(
         $Contact{ValidID},
@@ -201,8 +226,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
             $List{$ContactID},
             "ContactSearch() - ContactID - $ContactID (SearchCaseSensitive = 1)",
         );
-    }
-    else {
+    } else {
         $Self->True(
             $List{$ContactID},
             "ContactSearch() - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
@@ -210,7 +234,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     }
 
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => $ContactRandom . '-Update@example.com',
+        PostMasterSearch => 'test@example.org' . $Key,
         ValidID          => 1,
     );
     $Self->True(
@@ -218,7 +242,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         "ContactSearch() - PostMasterSearch - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => lc( $ContactRandom . '-Update@example.com' ),
+        PostMasterSearch => lc( 'test@example.org' . $Key ),
         ValidID          => 1,
     );
     $Self->True(
@@ -226,7 +250,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         "ContactSearch() - PostMasterSearch lc() - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => uc( $ContactRandom . '-Update@example.com' ),
+        PostMasterSearch => uc( 'test@example.org' . $Key ),
         ValidID          => 1,
     );
     $Self->True(
@@ -269,7 +293,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     %List = $ContactObject->ContactSearch(
-        Search  => "$ContactRandom+firstname",
+        Search  => 'Firstname Test Update' . $Key,
         ValidID => 1,
     );
     $Self->True(
@@ -278,7 +302,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     %List = $ContactObject->ContactSearch(
-        Search  => "$ContactRandom+firstname_with_not_match",
+        Search  => 'Firstname Test Update' . $Key . 'not_match',
         ValidID => 1,
     );
     $Self->True(
@@ -535,6 +559,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     #update customer user
     $Update = $ContactObject->ContactUpdate(
         ID                    => $ContactID,
+        AssignedUserID        => $UserID,
         Firstname             => 'Firstname Update' . $ContactID,
         Lastname              => 'Lastname Update' . $ContactID,
         Email                 => $ContactID . 'new@example.com',
