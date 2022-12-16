@@ -107,14 +107,4 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="public" Name="ContactSearch::UseWildcardPrefix" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Enable wildcard praefix for contact fulltext search.</Description>
-        <Group>API</Group>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
 </kix_config>
