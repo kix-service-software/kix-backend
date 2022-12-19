@@ -615,7 +615,7 @@ sub _SetDynamicFields {
                 push(@ExistingValuesForGivenDF, ($ReplacedValue));
             }
 
-            @ExistingValuesForGivenDF = _GetUnique(@ExistingValuesForGivenDF);
+            @ExistingValuesForGivenDF = $Kernel::OM->Get('Main')->GetUnique(@ExistingValuesForGivenDF);
 
             $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
         }
@@ -631,10 +631,6 @@ sub _SetDynamicFields {
     }
 }
 
-sub _GetUnique {
-    my %seen;
-    return grep {!$seen{$_}++} @_;
-}
 
 1;
 

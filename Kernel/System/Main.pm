@@ -1484,6 +1484,23 @@ sub FilterObjectList {
     return @FilteredResult;
 }
 
+
+
+=item GetUnique()
+
+returns an array with unique values
+keeps original order of kept elements
+
+    my @UniqueValuesArray = $MainObject->GetUnique(@NonUniqueValuesArray);
+
+=cut
+
+sub GetUnique {
+    my ( $Self, @Array ) = @_;
+    my %Known;
+    return grep { !$Known{$_}++ } @Array;
+}
+
 =begin Internal:
 
 =cut
