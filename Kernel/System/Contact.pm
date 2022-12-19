@@ -245,12 +245,14 @@ sub ContactAdd {
         $ContactID = $Row[0];
     }
 
-    if ($ContactID) {
-        if ($Param{OrganisationIDs}) {
-            for my $orgID (@{$Param{OrganisationIDs}}) {
+    if ( $ContactID ) {
+        if ( $Param{OrganisationIDs} ) {
+            # remove duplicates
+            my @OrgIDs = $Kernel::OM->Get('Main')->GetUnique(@{$Param{OrganisationIDs}});
+            for my $orgID ( @OrgIDs ) {
                 return if !$Kernel::OM->Get('DB')->Do(
                     SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
-                    Bind => [ \$ContactID, \$orgID, \($orgID eq $Param{PrimaryOrganisationID} ? 1 : 0) ],
+                    Bind => [\$ContactID, \$orgID, \( $orgID eq $Param{PrimaryOrganisationID} ? 1 : 0 )],
                 );
             }
         }
@@ -897,7 +899,8 @@ sub ContactUpdate {
             Bind => [ \$Param{ID} ],
         );
     }
-
+    # remove duplicates
+    @InsertOrgIDs = $Kernel::OM->Get('Main')->GetUnique(@InsertOrgIDs);
     for my $orgID (@InsertOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'INSERT INTO contact_organisation (contact_id, org_id) VALUES (?,?)',
