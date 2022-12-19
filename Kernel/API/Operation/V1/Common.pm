@@ -964,8 +964,8 @@ sub _Success {
             );
         }
 
-        if ( !$Self->{PermissionCheckOnly} ) {
-
+        # apply offset and limit only for collections
+        if ( !$Self->{PermissionCheckOnly} && $Self->{OperationRouteMapping}->{$Self->{OperationType}} !~ /\/:\w+$/ ) {
             # honor an offset, if we have one
             if ( IsHashRefWithData( $Self->{Offset} ) ) {
                 my $StartTime = Time::HiRes::time();
@@ -987,6 +987,9 @@ sub _Success {
 
                 $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
             }
+        }
+
+        if ( !$Self->{PermissionCheckOnly} ) {
 
             # honor a generic include, if we have one
             if ( IsHashRefWithData( $Self->{Include} ) ) {
