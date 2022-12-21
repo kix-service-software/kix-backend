@@ -433,7 +433,7 @@ sub _CheckAttachment {
     my $Attachment = $Param{Attachment};
 
     # check attachment item internally
-    for my $Needed (qw(ContentType Filename Content)) {
+    for my $Needed (qw(Filename Content)) {
         if ( !$Attachment->{$Needed} ) {
             return $Self->_Error(
                 Code    => 'BadRequest',

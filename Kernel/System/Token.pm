@@ -269,7 +269,7 @@ sub CreateToken {
 
     # store token in whitelist
     $Kernel::OM->Get('DB')->Do(
-        SQL  => "INSERT INTO token (token) values (?)",
+        SQL  => "INSERT INTO token (token, last_request_time) values (?, current_timestamp)",
         Bind => [
             \$Token,
         ],
@@ -424,9 +424,11 @@ sub GetAllTokens {
 
 =item CleanUp()
 
-cleanup all tokens in system
+cleanup all "normal" tokens in system
 
-    $TokensObject->CleanUp();
+    $TokensObject->CleanUp(
+        TokenType => 'SomeType'   # optional, 'normal' is used if empty
+    );
 
 =cut
 
@@ -434,17 +436,16 @@ sub CleanUp {
     my ( $Self, %Param ) = @_;
 
     my %TokenList = %{$Self->GetAllTokens()};
+    $Param{TokenType} ||= 'Nomal';
 
     foreach my $Token ( keys %TokenList ) {
         my $Payload = $Self->ExtractToken(
             Token => $Token,
         );
-        if ( !IsHashRefWithData($Payload) ) {
-            return;
-        }
+        return if ( !IsHashRefWithData($Payload) );
 
-        # only remove normal tokens
-        if ( $Payload->{TokenType} eq 'Normal' ) {
+        # only remove tokens of relevant type
+        if ( $Payload->{TokenType} eq $Param{TokenType} ) {
             $Self->RemoveToken(
                 Token => $Token,
             );
@@ -452,6 +453,117 @@ sub CleanUp {
     }
 
     return 1;
+}
+
+=item CleanUpExpired()
+
+cleanup all expired tokens in system
+
+    $TokensObject->CleanUpExpired();
+
+=cut
+
+sub CleanUpExpired {
+    my ( $Self, %Param ) = @_;
+
+    my $TimeNow = $Kernel::OM->Get('Time')->SystemTime();
+
+    if ( $TimeNow ) {
+        my $TokenMaxIdleTime = $Kernel::OM->Get('Config')->Get('TokenMaxIdleTime');
+
+        my %TokenList = %{$Self->GetAllTokens()};
+        foreach my $Token ( keys %TokenList ) {
+            my $Payload = $Self->ExtractToken( Token => $Token );
+
+            return if ( !IsHashRefWithData($Payload) );
+
+            # check valid until time
+            if ( $Payload->{ValidUntilTimeUnix} && $TimeNow > $Payload->{ValidUntilTimeUnix} ) {
+                $Self->RemoveToken( Token => $Token );
+                next;
+            }
+
+            # check idle time
+            if (
+                !$Payload->{IgnoreMaxIdleTime} && $TokenMaxIdleTime && $Payload->{LastRequestTimeUnix} &&
+                ( $TimeNow - $TokenMaxIdleTime ) >= $Payload->{LastRequestTimeUnix}
+            ) {
+                $Self->RemoveToken( Token => $Token );
+            }
+        }
+    }
+
+    return 1;
+}
+
+=item CountUniqueUsers()
+
+count unique users per user context
+
+    my %CountHashRef = $TokensObject->CountUniqueUsers(
+        StartTime => '...',
+        EndTime   => '...',
+        Since     => '15m',
+    );
+
+=cut
+
+sub CountUniqueUsers {
+    my ( $Self, %Param ) = @_;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SQL = 'SELECT token FROM token WHERE 1=1';
+
+    my @BindArr;
+    if ( $Param{StartTime} ) {
+        $SQL .= ' AND last_request_time >= ?';
+        push @BindArr, \$Param{StartTime};
+    }
+    if ( $Param{EndTime} ) {
+        $SQL .= ' AND last_request_time <= ?';
+        push @BindArr, \$Param{EndTime};
+    }
+    if ( $Param{Since} ) {
+        my $TargetTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                String => '-' . $Param{Since},
+            )
+        );
+
+        $SQL .= ' AND last_request_time >= ?';
+        push @BindArr, \$TargetTime;
+    }
+
+    # get all session ids from the database
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@BindArr,
+    );
+
+    # fetch the result
+    my @Tokens;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        push @Tokens, $Row[0];
+    }
+
+    my %UniqueUsers;
+    TOKEN:
+    foreach my $Token ( @Tokens ) {
+        my $Payload = $Self->ExtractToken(
+            Token => $Token,
+        );
+        next TOKEN if !IsHashRefWithData($Payload);
+
+        $UniqueUsers{$Payload->{UserType}}->{Count} //= 0;
+        if ( !$UniqueUsers{$Payload->{UserType}}->{UserIDs}->{$Payload->{UserID}} ) {
+            $UniqueUsers{$Payload->{UserType}}->{UserIDs}->{$Payload->{UserID}} = 1;
+            $UniqueUsers{$Payload->{UserType}}->{Count}++;
+        }
+    }
+
+    return %UniqueUsers;
 }
 
 1;

@@ -73,22 +73,33 @@ sub Run {
 
     my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
     my @ValidIDs = %ValidList && keys %ValidList ? keys %ValidList : [ 1, 2, 3 ];
-    my $ArticleIDs;
+    my @ArticleIDs;
 
-    # prepare search (dynamic fields are possible)
-    my %FAQDFSearch;
+    # prepare search
+    my %FAQSearch;
     if ( IsHashRefWithData( $Self->{Search}->{FAQArticle} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{FAQArticle} } ) {
             my @FilteredList;
             foreach my $SearchItem ( @{ $Self->{Search}->{FAQArticle}->{$SearchType} } ) {
 
-                # removed them from search-param (is used as filter, see below)
-                if ($SearchItem->{Field} =~ m/DynamicField_/) {
-                    if (!$FAQDFSearch{$SearchType}) {
-                        $FAQDFSearch{$SearchType} = [];
+                if (
+                    $SearchItem->{Field} =~ m/DynamicField_/ ||
+                    ( $SearchItem->{Field} eq 'Language' && $SearchItem->{Operator} eq 'IN' ) ||
+                    ( $SearchItem->{Field} eq 'CustomerVisible' && $SearchItem->{Operator} eq 'EQ' ) ||
+                    ( $SearchItem->{Field} eq 'ValidID' && $SearchItem->{Operator} eq 'IN' ) ||
+                    (
+                        $SearchItem->{Field} =~ m/(Fulltext|Number|Title|Keywords|Field)/ &&
+                        $SearchItem->{Operator} =~ m/(CONTAINS|STARTSWITH|ENDSWITH|LIKE)/
+                    )
+                ) {
+                    if (!$FAQSearch{$SearchType}) {
+                        $FAQSearch{$SearchType} = [];
                     }
-                    push(@{$FAQDFSearch{$SearchType}}, $SearchItem);
-                } else {
+                    push(@{$FAQSearch{$SearchType}}, $SearchItem);
+                }
+
+                # keep "not" searchable properties they are used as filter, see below (HandleSearchInAPI)
+                else {
                     push(@FilteredList, $SearchItem);
                 }
             }
@@ -96,14 +107,33 @@ sub Run {
         }
     }
 
-    # do search if given (only with dfs and valid)
-    if ( IsHashRefWithData( \%FAQDFSearch ) ) {
-        foreach my $SearchType ( keys %FAQDFSearch ) {
+    # do search if given
+    if ( IsHashRefWithData( \%FAQSearch ) ) {
+        # do first OR to prevent replacement of prior AND search with empty result
+        my %SearchParams;
+        SEARCHTYPE:
+        foreach my $SearchType ( qw(OR AND) ) {
+            next SEARCHTYPE if ( !IsArrayRefWithData($FAQSearch{$SearchType}) );
             my @SearchTypeResult;
-            foreach my $SearchItem ( @{ $FAQDFSearch{$SearchType} } ) {
+            foreach my $SearchItem ( @{ $FAQSearch{$SearchType} } ) {
 
                 my $Value = $SearchItem->{Value};
                 my $Operator = 'Like';
+
+                # FIXME: adjust "core names" to api known properties on core search rework
+                if ( $SearchItem->{Field} eq 'Fulltext' ) {
+                    $SearchItem->{Field} = 'What';
+                } elsif ( $SearchItem->{Field} eq 'Keywords' ) {
+                    $SearchItem->{Field} = 'Keyword';
+                } elsif ( $SearchItem->{Field} eq 'Language' ) {
+                    $SearchItem->{Field} = 'Languages';
+                } elsif ( $SearchItem->{Field} eq 'CustomerVisible' ) {
+                    $SearchItem->{Field} = 'Visibility';
+                    $SearchItem->{Operator} = 'IN';
+                    $Value = $Value ? ['external', 'public'] : ['internal'];
+                } elsif ( $SearchItem->{Field} eq 'ValidID' ) {
+                    $SearchItem->{Field} = 'ValidIDs';
+                }
 
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
                     $Value = '*' . $Value . '*';
@@ -126,67 +156,74 @@ sub Run {
                     $Operator = 'GreaterThanEquals';
                 }
 
-                # perform faq search
-                my @SearchResult = $Kernel::OM->Get('FAQ')->FAQSearch(
-                    UserID   => $Self->{Authorization}->{UserID},
-                    Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
-                    ValidIDs => \@ValidIDs,
-                    $SearchItem->{Field} => {
-                        $Operator => $Value
-                    },
+                $SearchParams{ $SearchItem->{Field} } = $SearchItem->{Field} =~ m/DynamicField_/ ?
+                    { $Operator => $Value } :
+                    $Value;
 
-                    # use ids of customer if given
-                    ArticleIDs => $CustomerFAQIDList
-                );
+                if ( $SearchType eq 'OR' ) {
+                    # perform faq search
+                    my @SearchResult = $Kernel::OM->Get('FAQ')->FAQSearch(
+                        UserID   => $Self->{Authorization}->{UserID},
+                        Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
+                        ValidIDs => \@ValidIDs, # add all ids because by default just "valid" is used - can be overwritten in %Search
+                        %SearchParams,
 
-                # merge results
-                if ( $SearchType eq 'AND' ) {
-                    if ( !@SearchTypeResult ) {
-                        @SearchTypeResult = @SearchResult;
-                    } else {
+                        # use ids of customer if given
+                        ArticleIDs => $CustomerFAQIDList
+                    );
 
-                        # remove all IDs from type result that we don't have in this search
-                        @SearchTypeResult = $Self->_GetCombinedList(
-                            ListA => \@SearchTypeResult,
-                            ListB => \@SearchResult
-                        );
-                    }
-                } elsif ( $SearchType eq 'OR' ) {
+                    # merge results
                     @SearchTypeResult = $Self->_GetCombinedList(
                         ListA => \@SearchTypeResult,
                         ListB => \@SearchResult,
                         Union => 1
                     );
+
+                    # reset
+                    %SearchParams = ();
                 }
             }
+            if ( $SearchType eq 'AND' ) {
 
-            if ( !defined $ArticleIDs ) {
-                $ArticleIDs = \@SearchTypeResult;
+                # perform faq search
+                @SearchTypeResult = $Kernel::OM->Get('FAQ')->FAQSearch(
+                    UserID   => $Self->{Authorization}->{UserID},
+                    Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
+                    ValidIDs => \@ValidIDs, # add all ids because by default just "valid" is used - can be overwritten in %Search
+                    %SearchParams,
+
+                    # use ids of customer if given
+                    ArticleIDs => $CustomerFAQIDList
+                );
+            }
+
+            if ( !@ArticleIDs ) {
+                @ArticleIDs = @SearchTypeResult;
             } else {
 
-                # combine both results by AND
+                # combine both results (OR and AND)
                 # remove all IDs from type result that we don't have in this search
-                $ArticleIDs = $Self->_GetCombinedList(
+                @ArticleIDs = $Self->_GetCombinedList(
                     ListA => \@SearchTypeResult,
-                    ListB => $ArticleIDs
+                    ListB => \@ArticleIDs
                 );
             }
         }
     } else {
 
         # perform FAQArticle search (at the moment without any filters - we do filtering in the API)
-        $ArticleIDs = [ $Kernel::OM->Get('FAQ')->FAQSearch(
+        @ArticleIDs = $Kernel::OM->Get('FAQ')->FAQSearch(
             UserID   => $Self->{Authorization}->{UserID},
-            Limit   => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
-            ValidIDs => \@ValidIDs,
+            Limit    => $Self->{SearchLimit}->{FAQArticle} || $Self->{SearchLimit}->{'__COMMON'},
+            ValidIDs => \@ValidIDs, # add all ids because by default just "valid" is used
 
             # use ids of customer if given
             ArticleIDs => $CustomerFAQIDList
-        ) ];
+        );
     }
 
     # get already prepared FAQ data from FAQArticleGet operation
-    if (IsArrayRefWithData($ArticleIDs) ) {
+    if (IsArrayRefWithData(\@ArticleIDs) ) {
 
         # we don't do any core search filtering, inform the API to do it for us, based on the given search
         $Self->HandleSearchInAPI();
@@ -195,7 +232,7 @@ sub Run {
             OperationType            => 'V1::FAQ::FAQArticleGet',
             SuppressPermissionErrors => 1,
             Data                     => {
-                FAQArticleID                => join( ',', sort @{$ArticleIDs} ),
+                FAQArticleID                => join( ',', sort @ArticleIDs ),
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
                 RelevantOrganisationID      => $Param{Data}->{RelevantOrganisationID}
             }
@@ -231,7 +268,7 @@ sub _GetCombinedList {
         $Union{$E}++ && $Isect{$E}++
     }
 
-    return $Param{Union} ? [ keys %Union ] : [ keys %Isect ];
+    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 1;

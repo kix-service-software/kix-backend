@@ -32,6 +32,13 @@ sub GetParams {
     };
 }
 
+sub GetPossibleExpands {
+    my ( $Self, %Param) = @_;
+
+    return [
+        'DynamicField'
+    ];
+}
 
 sub CheckParams {
     my ( $Self, %Param) = @_;

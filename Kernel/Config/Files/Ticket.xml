@@ -192,7 +192,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::NumberGenerator::MinCounterSize" Required="1" Valid="1">
-        <Description Translatable="1">Sets the minimal ticket counter size if "AutoIncrement", "Date" or "DateChecksum" was selected as TicketNumberGenerator. Default is 5, this means the counter starts from 10000.</Description>
+        <Description Translatable="1">Sets the minimal ticket counter size if "AutoIncrement", "Date" or "DateChecksum" was selected as TicketNumberGenerator. Default is 5, this means the counter starts from 00001.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
@@ -204,7 +204,7 @@
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
-            <Option SelectedID="0">
+            <Option SelectedID="1">
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
@@ -244,6 +244,14 @@
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/article</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::Article::Attachment::ContentType::Fallback" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Specifies the ContentType fallback for article attachments.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="">application/octet-stream</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###100-ArchiveRestore" Required="0" Valid="1">

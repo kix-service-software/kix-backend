@@ -26,6 +26,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $Payload = {
     UserID     => 123,
     UserType   => 'Agent',
+    TokenType  => 'TestToken'
 };
 
 # create valid token
@@ -39,15 +40,14 @@ $Self->True(
 );
 
 # get all tokens
-my $TokenList = $TokenObject->GetAllTokens();
-
+my $TokenList = _getAllRelevantTokensNumber();
 $Self->True(
-    scalar(keys %{$TokenList}) == 1,
-    'GetAllTokens() returns 1 tokens',
+    $TokenList == 1,
+    'GetAllTokens() returns 1 token',
 );
 
 # create invalid token
-$Kernel::OM->Get('Config')->Set(Key => 'TokenMaxTime', Value => -100);
+$Helper->ConfigSettingChange(Key => 'TokenMaxTime', Value => -100);
 my $InvalidToken = $TokenObject->CreateToken(
     Payload => $Payload
 );
@@ -58,10 +58,9 @@ $Self->True(
 );
 
 # get all tokens
-$TokenList = $TokenObject->GetAllTokens();
-
+$TokenList = _getAllRelevantTokensNumber();
 $Self->True(
-    scalar(keys %{$TokenList}) == 2,
+    $TokenList == 2,
     'GetAllTokens() returns 2 tokens',
 );
 
@@ -112,10 +111,9 @@ $Self->Is(
 );
 
 # check tokenlist again
-$TokenList = $TokenObject->GetAllTokens();
-
+$TokenList = _getAllRelevantTokensNumber();
 $Self->True(
-    scalar(keys %{$TokenList}) == 1,
+    $TokenList == 1,
     'GetAllTokens() now returns 1 token',
 );
 
@@ -128,10 +126,9 @@ $Self->True(
 );
 
 # check tokenlist again
-$TokenList = $TokenObject->GetAllTokens();
-
+$TokenList = _getAllRelevantTokensNumber();
 $Self->True(
-    scalar(keys %{$TokenList}) == 0,
+    $TokenList == 0,
     'GetAllTokens() now returns 0 token',
 );
 
@@ -143,7 +140,7 @@ foreach (1..10) {
 }
 
 # cleanup all tokens
-$Result = $TokenObject->CleanUp();
+$Result = $TokenObject->CleanUp( TokenType  => 'TestToken' );
 
 $Self->True(
     $Result,
@@ -151,18 +148,100 @@ $Self->True(
 );
 
 # check tokenlist again
-$TokenList = $TokenObject->GetAllTokens();
-
+$TokenList = _getAllRelevantTokensNumber();
 $Self->True(
-    scalar(keys %{$TokenList}) == 0,
+    $TokenList == 0,
     'GetAllTokens() returns empty list',
 );
+
+# check expired token deletion
+# -----------------------------------------------
+my @Payloads = (
+    {
+        UserID     => 123,
+        UserType   => 'Agent',
+        TokenType  => 'TestToken',
+        ValidUntil => '2022-01-01 12:00:00' # date in past
+    },
+    {
+        UserID     => 1234,
+        UserType   => 'Agent',
+        TokenType  => 'TestToken',
+        ValidUntil => '9999-01-01 12:00:00' # date in future
+    },
+    {
+        UserID     => 12345,
+        UserType   => 'Agent',
+        TokenType  => 'TestToken',
+        ValidUntil => '9999-01-01 12:00:00', # date in future,
+        IgnoreMaxIdleTime => 1               # ignore idle time
+    }
+);
+
+# create tokens
+for my $Payload (@Payloads) {
+    $TokenObject->CreateToken(
+        Payload => $Payload
+    );
+}
+
+# get all new created tokens
+$TokenList = _getAllRelevantTokensNumber();
+$Self->True(
+    $TokenList == 3,
+    'GetAllTokens() returns 3 tokens',
+);
+
+# make sure idle check time is in future (100 seconds) - should not be reached now
+$Helper->ConfigSettingChange(Key => 'TokenMaxIdleTime', Value => 100);
+
+# cleanup all expired token
+$Result = $TokenObject->CleanUpExpired();
+$Self->True(
+    $Result,
+    'CleanUpExpired()',
+);
+
+# check tokenlist again - only the two not expired (ValidUntil)
+$TokenList = _getAllRelevantTokensNumber();
+$Self->True(
+    $TokenList == 2,
+    'GetAllTokens() after CleanUpExpired returns 2 token',
+);
+
+# change idle check time (100 seconnds in past) => should be reached now
+$Helper->ConfigSettingChange(Key => 'TokenMaxIdleTime', Value => -100);
+
+# cleanup all expired token again
+$Result = $TokenObject->CleanUpExpired();
+$Self->True(
+    $Result,
+    'CleanUpExpired()',
+);
+
+# check tokenlist again - only the not one with ignore idle should remain
+$TokenList = _getAllRelevantTokensNumber();
+$Self->True(
+    $TokenList == 1,
+    'GetAllTokens() after CleanUpExpired (idle) returns 1 token',
+);
+
+# final cleanup - remove all test tokesn
+$TokenObject->CleanUp( TokenType  => 'TestToken' );
 
 # cleanup is done by RestoreDatabase.
 
 1;
 
-
+sub _getAllRelevantTokensNumber {
+    my $TokenList = $TokenObject->GetAllTokens();
+    my $RelevantTokenNumber = 0;
+    for my $Token (keys %{$TokenList}) {
+        my $ExtractedToken = $TokenObject->ExtractToken( Token => $Token );
+        $RelevantTokenNumber++ if ($ExtractedToken && $ExtractedToken->{TokenType} eq 'TestToken');
+    }
+    return $RelevantTokenNumber;
+}
 
 =back
 

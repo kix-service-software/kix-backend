@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::Console::Command::Admin::Token::Remove;
+package Kernel::System::Console::Command::Admin::Token::UniqueUsers;
 
 use strict;
 use warnings;
@@ -20,25 +20,28 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Remove token.');
+    $Self->Description('Count unique users.');
+
     $Self->AddOption(
-        Name        => 'token',
-        Description => "The token to remove.",
+        Name        => 'from',
+        Description => "The start time of the count.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'all',
-        Description => "Remove all tokens (except AccessTokens)",
+        Name        => 'to',
+        Description => "The end time of the count.",
         Required    => 0,
-        HasValue    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'expired',
-        Description => "Remove all tokens which ValidUntilTime or IdleTime are expired",
+        Name        => 'since',
+        Description => "The time span into the past.",
         Required    => 0,
-        HasValue    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
     );
 
     return;
@@ -47,26 +50,21 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Removing token(s)...</yellow>\n");
+    $Self->Print("<yellow>counting unique users...</yellow>\n");
 
-    my $All = $Self->GetOption('all') || 0;
-    my $Token = $Self->GetOption('token') || '';
-    my $Expired = $Self->GetOption('expired') || 0;
+    my %UniqueUsers = $Kernel::OM->Get('Token')->CountUniqueUsers(
+        StartTime => $Self->GetOption('from'),
+        EndTime   => $Self->GetOption('to'),
+        Since     => $Self->GetOption('since'),
+    );
 
-    if ( !$All && !$Token && !$Expired ) {
-        $Self->PrintError("Please specify token to remove or declare all/expired tokens to be removed.");
-        return $Self->ExitCodeError();
+    $Self->Print("Context     Count\n");
+    $Self->Print("---------- ------\n");
+
+    foreach my $Context ( sort keys %UniqueUsers ) {
+        $Self->Print(sprintf("%-10s %6i\n", $Context, $UniqueUsers{$Context}->{Count}));
     }
 
-    if ($All) {
-        $Kernel::OM->Get('Token')->CleanUp();
-    } elsif ($Expired) {
-        $Kernel::OM->Get('Token')->CleanUpExpired();
-    } elsif ($Token) {
-        $Kernel::OM->Get('Token')->RemoveToken(
-            Token => $Token,
-        );
-    }
 
     $Self->Print("<green>Done.</green>\n");
 

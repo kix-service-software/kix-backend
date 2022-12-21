@@ -419,9 +419,15 @@ sub TypeList {
 
 get id or name for a ticket type
 
-    my $Type = $TypeObject->TypeLookup( TypeID => $TypeID );
+    my $Type = $TypeObject->TypeLookup(
+        TypeID => $TypeID,
+        Silent => 0|1      # optional - do not log if not found (defautl 0)
+    );
 
-    my $TypeID = $TypeObject->TypeLookup( Type => $Type );
+    my $TypeID = $TypeObject->TypeLookup(
+        Type => $Type,
+        Silent => 0|1      # optional - do not log if not found (defautl 0)
+    );
 
 =cut
 
@@ -459,10 +465,12 @@ sub TypeLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No $Key for $Value found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No $Key for $Value found!",
+            );
+        }
         return;
     }
 

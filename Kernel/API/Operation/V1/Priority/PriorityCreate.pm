@@ -99,6 +99,7 @@ sub Run {
     # check if Priority exists
     my $Exists = $Kernel::OM->Get('Priority')->PriorityLookup(
         Priority => $Priority->{Name},
+        Silent   => 1
     );
 
     if ( $Exists ) {
