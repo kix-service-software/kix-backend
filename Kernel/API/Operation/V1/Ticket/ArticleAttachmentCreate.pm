@@ -159,6 +159,7 @@ sub Run {
         Content     => MIME::Base64::decode_base64( $Attachment->{Content} ),
         ArticleID   => $Param{Data}->{ArticleID},
         UserID      => $Self->{Authorization}->{UserID},
+        CountAsUpdate => 1
     );
 
     if ( !$AttachmentID ) {
