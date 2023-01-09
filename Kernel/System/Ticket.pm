@@ -621,6 +621,7 @@ sub TicketCreate {
                 );
             } elsif (!grep {$_ == $ExistingOrganisationID} @{ $ContactData{OrganisationIDs} }) {
                 push( @{ $ContactData{OrganisationIDs} }, $ExistingOrganisationID );
+
                 $Kernel::OM->Get('Contact')->ContactUpdate(
                     %ContactData,
                     UserID => $Param{UserID}

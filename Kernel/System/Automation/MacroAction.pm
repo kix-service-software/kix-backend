@@ -796,7 +796,7 @@ sub GetAllSubMacros {
     }
 
     # remove duplicates
-    @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+    @SubMacroIDs = $Kernel::OM->Get('Main')->GetUnique(@SubMacroIDs);
 
     # set cache
     $Kernel::OM->Get('Cache')->Set(
@@ -856,7 +856,7 @@ sub GetAllSubMacrosOf {
         }
 
         # remove duplicates
-        @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+        @SubMacroIDs = $Kernel::OM->Get('Main')->GetUnique(@SubMacroIDs);
 
         # go deeper if requested
         if ($Param{Recursive} && IsArrayRefWithData(\@SubMacroIDs)) {
@@ -871,7 +871,7 @@ sub GetAllSubMacrosOf {
     }
 
     # remove duplicates
-    @SubMacroIDs = $Self->_GetUnique(@SubMacroIDs);
+    @SubMacroIDs = $Kernel::OM->Get('Main')->GetUnique(@SubMacroIDs);
 
     return @SubMacroIDs;
 }
@@ -999,7 +999,8 @@ sub _ReplaceResultVariables {
         }
     }
     else {
-        while ( $Param{Data} =~ /^(.*?)(\$\{([a-zA-Z0-9_.: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
+        # let leading be greedy - start with innermost variable
+        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;

@@ -245,12 +245,14 @@ sub ContactAdd {
         $ContactID = $Row[0];
     }
 
-    if ($ContactID) {
-        if ($Param{OrganisationIDs}) {
-            for my $orgID (@{$Param{OrganisationIDs}}) {
+    if ( $ContactID ) {
+        if ( $Param{OrganisationIDs} ) {
+            # remove duplicates
+            my @OrgIDs = $Kernel::OM->Get('Main')->GetUnique(@{$Param{OrganisationIDs}});
+            for my $orgID ( @OrgIDs ) {
                 return if !$Kernel::OM->Get('DB')->Do(
                     SQL  => 'INSERT INTO contact_organisation (contact_id, org_id, is_primary) VALUES (?,?,?)',
-                    Bind => [ \$ContactID, \$orgID, \($orgID eq $Param{PrimaryOrganisationID} ? 1 : 0) ],
+                    Bind => [\$ContactID, \$orgID, \( $orgID eq $Param{PrimaryOrganisationID} ? 1 : 0 )],
                 );
             }
         }
@@ -897,7 +899,8 @@ sub ContactUpdate {
             Bind => [ \$Param{ID} ],
         );
     }
-
+    # remove duplicates
+    @InsertOrgIDs = $Kernel::OM->Get('Main')->GetUnique(@InsertOrgIDs);
     for my $orgID (@InsertOrgIDs) {
         return if !$Kernel::OM->Get('DB')->Do(
             SQL  => 'INSERT INTO contact_organisation (contact_id, org_id) VALUES (?,?)',
@@ -967,62 +970,104 @@ to search contacts
     my %List = $ContactObject->ContactSearch(
         Search => '*some*', # also 'hans+huber' possible
         Valid  => 1,        # (optional) default 1
-        Limit  => 100,      # (optional) overrides limit of the config
+        Limit  => 100       # (optional)
     );
 
     # email search
     my %List = $ContactObject->ContactSearch(
         PostMasterSearch => '*email@example.com*',
         Valid            => 1,                      # (optional) default 1
-        Limit            => 100,      # (optional) overrides limit of the config
+        Limit            => 100                     # (optional)
+    );
+
+    # title search
+    my %List = $ContactObject->ContactSearch(
+        Title     => '*Sir*',
+        Valid     => 1,                      # (optional) default 1
+        Limit     => 100                     # (optional)
+    );
+
+    # firstname search
+    my %List = $ContactObject->ContactSearch(
+        Firstname => '*John*',
+        Valid     => 1,                      # (optional) default 1
+        Limit     => 100                     # (optional)
+    );
+
+    # lastname search
+    my %List = $ContactObject->ContactSearch(
+        Lastname  => '*Doe*',
+        Valid     => 1,                      # (optional) default 1
+        Limit     => 100                     # (optional)
+    );
+
+    # address data search (City Country Fax Mobil Phone Street Zip)
+    my %List = $ContactObject->ContactSearch(
+        City      => '*City*',               # or other attribute from above
+        Valid     => 1,                      # (optional) default 1
+        Limit     => 100                     # (optional)
+    );
+
+    # valid search
+    my %List = $ContactObject->ContactSearch(
+        ValidID   => [1,2],                  # if ValidId given, param Valid is ignored
+        Limit     => 100                     # (optional)
     );
 
     # email search (exact match)
     my %List = $ContactObject->ContactSearch(
         EmailEquals => 'email@example.com',
         Valid       => 1,                      # (optional) default 1
+        Limit       => 100                     # (optional)
     );
 
     # email list search (exact match)
     my %List = $ContactObject->ContactSearch(
         EmailIn => ['email1@example.com', 'email2@example.com']
         Valid   => 1,                      # (optional) default 1
+        Limit   => 100                     # (optional)
     );
 
     # search by OrganisationID
     my %List = $ContactObject->ContactSearch(
         OrganisationID => 123
         Valid          => 1,                    # (optional) default 1
+        Limit          => 100                   # (optional)
     );
 
     # search by multiple OrganisationIDs
     my %List = $ContactObject->ContactSearch(
         OrganisationIDs =>  [ 123, 456, 789 ]
         Valid           => 1,                    # (optional) default 1
+        Limit           => 100                   # (optional)
     );
 
     #search by UserID
     my %List = $ContactObject->ContactSearch(
         UserID         => 123,
         Valid          => 1,                    # (optional) default 1
+        Limit          => 100                   # (optional)
     );
 
     #search by AssignedUserID
     my %List = $ContactObject->ContactSearch(
         AssignedUserID => 123,
         Valid          => 1,                    # (optional) default 1
+        Limit          => 100                   # (optional)
     );
 
     #search by UserLogin
     my %List = $ContactObject->ContactSearch(
-        Login         => '*some_user_login*',
+        Login          => '*some_user_login*',
         Valid          => 1,                    # (optional) default 1
+        Limit          => 100                   # (optional)
     );
 
     #search by UserLogin (exact match)
     my %List = $ContactObject->ContactSearch(
         LoginEquals    => 'some_user_login,
         Valid          => 1,                    # (optional) default 1
+        Limit          => 100                   # (optional)
     );
 
 =cut
@@ -1048,6 +1093,9 @@ sub ContactSearch {
             OrganisationIDs OrganisationID AssignedUserID UserID
             Search PostMasterSearch Limit Login LoginEquals
             EmailEquals EmailIn DynamicField
+            Title Firstname Lastname
+            City Country Fax Mobil Phone Street Zip
+            ValidID
         )
     ) {
         my $CacheStrg = $Param{$Key};
@@ -1076,38 +1124,59 @@ sub ContactSearch {
     my @Bind;
     my $Join = q{};
 
-    if ($Valid) {
+    if ( IsArrayRefWithData($Param{ValidID}) ) {
+        $Where .= "c.valid_id IN ( ${\(join ', ', @{$Param{ValidID}})} )";
+    } elsif ($Valid) {
         $Where .= "c.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
     }
 
     # where
     if ( $Param{Search} ) {
+        $Join = 'LEFT JOIN users u ON c.user_id = u.id';
 
-        my @Parts = split /\+/, $Param{Search}, 6;
+        my $AddWildcards = 1 if ($Param{Search} =~ m/^\*.+\*$/);
+        my @OrCombinedGroups = split( /\|/, $Param{Search});
 
-        # allow phone numbers with + (e.g. +49123456789*, also single leading * should be ingored)
-        if ($Param{Search} =~ m/^\*?\+/) {
-            $Parts[1] =  "+$Parts[1]";
-            shift(@Parts);
+        if ( defined $Where ) {
+            $Where .= " AND ";
         }
 
-        for my $Part (@Parts) {
-            $Part =~ s/\*/%/g;
-            $Part =~ s/%%/%/g;
+        my @ORParts;
+        for my $OrCombined (@OrCombinedGroups) {
+            my @Parts = split(/\+/, $OrCombined, 6);
 
-            if ( defined $Where ) {
-                $Where .= " AND ";
+            # allow phone numbers with + (e.g. +49123456789*, also single leading * should be ingored)
+            if ($Param{Search} =~ m/^\*?\+/) {
+                $Parts[1] =  "+$Parts[1]";
+                shift(@Parts);
             }
 
-            my @WhereParts;
-            for my $Field ( qw(firstname lastname email title phone fax mobile street zip city country) ) {
-                push(@WhereParts, "$Self->{Lower}(c.$Field) LIKE $Self->{Lower}(?)");
+            my @ANDParts;
+
+            for my $Part (@Parts) {
+                if ($AddWildcards) {
+                    $Part = "*$Part*";
+                }
+                $Part =~ s/\*/%/g;
+                $Part =~ s/%%/%/g;
+
+                my @WhereParts;
+                for my $Field ( qw(firstname lastname email title phone fax mobile street zip city country) ) {
+                    push(@WhereParts, "$Self->{Lower}(c.$Field) LIKE $Self->{Lower}(?)");
+                    push(@Bind, \$Part);
+                }
+
+                push(@WhereParts, "$Self->{Lower}(u.login) LIKE $Self->{Lower}(?)");
                 push(@Bind, \$Part);
+
+                if (@WhereParts) {
+                    push(@ANDParts, '(' . join( ' OR ', @WhereParts ) . ')');
+                }
             }
-            if (@WhereParts) {
-                $Where .= '(' . join( ' OR ', @WhereParts ) . ')';
-            }
+
+            push(@ORParts, '(' . join( ' AND ', @ANDParts ) . ')');
         }
+        $Where .= '(' . join( ' OR ', @ORParts ) . ')';
     }
     elsif ( $Param{PostMasterSearch} ) {
 
@@ -1218,6 +1287,34 @@ sub ContactSearch {
 
         $Join  .= join( q{ }, @{$SQLReturn->{SQLJoin}});
         $Where .= join( ' AND ', @{$SQLReturn->{SQLWhere}});
+    }
+
+    my %AttributMapping = (
+        Title     => 'c.title',
+        Firstname => 'c.firstname',
+        Lastname  => 'c.lastname',
+        City      => 'c.city',
+        Country   => 'c.country',
+        Fax       => 'c.fax',
+        Mobil     => 'c.mobile',
+        Phone     => 'c.phone',
+        Street    => 'c.street',
+        Zip       => 'c.zip'
+    );
+
+    for my $Attribute ( qw(Title Firstname Lastname City Country Fax Mobil Phone Street Zip) ) {
+        if ($Param{$Attribute}) {
+            if ( defined $Where ) {
+                $Where .= " AND ";
+            }
+
+            my $AttributeValue = $Param{$Attribute};
+            $AttributeValue =~ s/\*/%/g;
+            $AttributeValue =~ s/%%/%/g;
+
+            $Where .= "$Self->{Lower}($AttributMapping{$Attribute}) LIKE $Self->{Lower}(?)";
+            push(@Bind, \$AttributeValue);
+        }
     }
 
     my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join ";

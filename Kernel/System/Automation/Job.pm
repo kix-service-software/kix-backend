@@ -640,7 +640,7 @@ sub AllUsedMacroIDList {
     }
 
     # remove duplicates
-    @Result = $Self->_GetUnique(@Result);
+    @Result = $Kernel::OM->Get('Main')->GetUnique(@Result);
 
     # set cache
     $Kernel::OM->Get('Cache')->Set(
@@ -862,7 +862,7 @@ sub AllUsedExecPlanIDList {
     }
 
     # remove duplicates
-    @Result = $Self->_GetUnique(@Result);
+    @Result = $Kernel::OM->Get('Main')->GetUnique(@Result);
 
     # set cache
     $Kernel::OM->Get('Cache')->Set(
