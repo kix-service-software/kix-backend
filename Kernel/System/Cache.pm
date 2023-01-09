@@ -70,6 +70,8 @@ sub new {
 
     $Self->{IgnoreTypes} = {};
 
+    $Self->{StatsEnabled} = $Param{StatsEnabled} // 0;
+
     return $Self;
 }
 
@@ -220,7 +222,7 @@ sub Set {
     }
 
     # update stats
-    if ( !$Param{NoStatsUpdate} ) {
+    if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
         $Self->_UpdateCacheStats(
             Operation => 'Set',
             %Param,
@@ -285,7 +287,7 @@ sub Get {
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
-            if ( !$Param{NoStatsUpdate} ) {
+            if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
                 $Self->_UpdateCacheStats(
                     Operation => 'Get',
                     Result    => 'HIT',
@@ -297,7 +299,7 @@ sub Get {
     }
 
     if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
-        if ( !$Param{NoStatsUpdate} ) {
+        if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
             $Self->_UpdateCacheStats(
                 Operation => 'Get',
                 Result    => 'MISS',
@@ -312,7 +314,7 @@ sub Get {
 
     # set in-memory cache
     if ( defined $Value ) {
-        if ( !$Param{NoStatsUpdate} ) {
+        if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
             $Self->_UpdateCacheStats(
                 Operation => 'Get',
                 Result    => 'HIT',
@@ -324,7 +326,7 @@ sub Get {
         }
     }
     else {
-        if ( !$Param{NoStatsUpdate} ) {
+        if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
             $Self->_UpdateCacheStats(
                 Operation => 'Get',
                 Result    => 'MISS',
@@ -367,7 +369,7 @@ sub GetMulti {
         my @Results;
         foreach my $Key ( @{$Param{Keys}} ) {
             if ( exists $Self->{Cache}->{ $Param{Type} }->{$Key} ) {
-                if ( !$Param{NoStatsUpdate} ) {
+                if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
                     $Self->_UpdateCacheStats(
                         Operation => 'Get',
                         Result    => 'HIT',
@@ -382,7 +384,7 @@ sub GetMulti {
 
     if ( !$Self->{CacheInBackend} || !( $Param{CacheInBackend} // 1 ) ) {
         foreach my $Key ( @{$Param{Keys}} ) {
-            next if $Param{NoStatsUpdate};
+            next if $Param{NoStatsUpdate} || !$Self->{StatsEnabled};
 
             $Self->_UpdateCacheStats(
                 Operation => 'Get',
@@ -401,7 +403,7 @@ sub GetMulti {
     if ( @Values ) {
         my $Index = 0;
         foreach my $Key ( @{$Param{Keys}} ) {
-            if ( !$Param{NoStatsUpdate} ) {
+            if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
                 $Self->_UpdateCacheStats(
                     Operation => 'Get',
                     Result    => 'HIT',
@@ -416,7 +418,7 @@ sub GetMulti {
     }
     else {
         foreach my $Key ( @{$Param{Keys}} ) {
-            next if $Param{NoStatsUpdate};
+            next if $Param{NoStatsUpdate} || $Self->{StatsEnabled};
 
             $Self->_UpdateCacheStats(
                 Operation => 'Get',
@@ -477,7 +479,7 @@ sub Delete {
         Indent => $Param{Indent}.'    '
     );
 
-    if ( !$Param{NoStatsUpdate} ) {
+    if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
         $Self->_UpdateCacheStats(
             Operation => 'Delete',
             %Param,
@@ -544,7 +546,7 @@ sub CleanUp {
             Indent => $Param{Indent}.'    '
         );
 
-        if ( !$Param{NoStatsUpdate} ) {
+        if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
             $Self->_UpdateCacheStats(
                 Operation => 'CleanUp',
                 %Param,
@@ -566,7 +568,7 @@ sub CleanUp {
                 Indent => $Param{Indent}.'    '
             );
 
-            if ( !$Param{NoStatsUpdate} ) {
+            if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
                 $Self->_UpdateCacheStats(
                     Operation => 'CleanUp',
                     Type      => $Type
@@ -604,7 +606,7 @@ sub CleanUp {
             $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
         }
 
-        if ( !$Param{NoStatsUpdate} ) {
+        if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
             $Self->_UpdateCacheStats(
                 Operation => 'CleanUp',
                 %Param,
@@ -843,7 +845,7 @@ sub _UpdateCacheStats {
     my ( $Self, %Param ) = @_;
 
     # do nothing if cache stats are not enabled
-    return if !$Kernel::OM->Get('Config')->Get('Cache::Stats');
+    return if !$Self->{StatsEnabled};
 
     # read stats
     my $CacheStats = $Self->{CacheObject}->Get(

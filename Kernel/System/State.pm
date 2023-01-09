@@ -561,10 +561,12 @@ returns the id or the name of a state
 
     my $StateID = $StateObject->StateLookup(
         State => 'closed',
+        Silent => 0|1      # optional - do not log if not found (defautl 0)
     );
 
     my $State = $StateObject->StateLookup(
         StateID => 2,
+        Silent  => 0|1      # optional - do not log if not found (defautl 0)
     );
 
 =cut
@@ -604,10 +606,12 @@ sub StateLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No $Key for $Value found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No $Key for $Value found!",
+            );
+        }
         return;
     }
 

@@ -76,75 +76,7 @@ sub Run {
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
     my $Result = $Self->_RunParallel(
-        sub {
-            my ( $Self, %Param ) = @_;
-            my $Result;
-
-            my $Item = $Param{Item};
-
-            # check if this object is already mapped
-            my $MappedID = $Self->GetOIDMapping(
-                ObjectType     => 'configitem',
-                SourceObjectID => $Item->{id},
-            );
-            if ( $MappedID ) {
-                return 'Ignored';
-            }
-
-            # check if this item already exists (i.e. some initial data)
-            my $ID = $Self->Lookup(
-                Table        => 'configitem',
-                PrimaryKey   => 'id',
-                Item         => $Item,
-                RelevantAttr => [
-                    'configitem_number',
-                    'class_id',
-                ],
-            );
-
-            # insert row
-            if ( !$ID ) {
-                # remove reference to last version to prevent ring dependency
-                delete $Item->{last_version_id};
-
-                $ID = $Self->Insert(
-                    Table          => 'configitem',
-                    PrimaryKey     => 'id',
-                    Item           => $Item,
-                    AutoPrimaryKey => 1,
-                );
-            }
-
-            if ( $ID ) {
-                $Result = 'OK';
-
-                my $SourceClassID = $Self->GetOIDMapping(
-                    ObjectType => 'general_catalog',
-                    ObjectID   => $Item->{class_id}
-                );
-
-                $Self->_MigrateHistory(
-                    AssetID       => $ID,
-                    SourceAssetID => $Item->{id},
-                );
-                $Self->_MigrateVersions(
-                    AssetID       => $ID,
-                    ClassID       => $Item->{class_id},
-                    SourceAssetID => $Item->{id},
-                    SourceClassID => $SourceClassID,
-                );
-
-                # update corresponding CIs
-                return $Result if !$Kernel::OM->Get('DB')->Do(
-                    SQL   => 'UPDATE configitem ci SET last_version_id = (SELECT MAX(id) FROM configitem_version WHERE configitem_id = ci.id), name = (SELECT name FROM configitem_version WHERE configitem_id = ci.id ORDER BY id DESC LIMIT 1) WHERE id = ' . $ID,
-                );
-            }
-            else {
-                $Result = 'Error';
-            }
-
-            return $Result;
-        },
+        $Self->{WorkerSubRef} || \&_Run,
         Items => $SourceData,
         %Param,
     );
@@ -185,6 +117,76 @@ sub Run {
             Priority => 'error',
             Message  => "Unable to update counters\"!"
         );
+    }
+
+    return $Result;
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $Item = $Param{Item};
+
+    # check if this object is already mapped
+    my $MappedID = $Self->GetOIDMapping(
+        ObjectType     => 'configitem',
+        SourceObjectID => $Item->{id},
+    );
+    if ( $MappedID ) {
+        return 'Ignored';
+    }
+
+    # check if this item already exists (i.e. some initial data)
+    my $ID = $Self->Lookup(
+        Table        => 'configitem',
+        PrimaryKey   => 'id',
+        Item         => $Item,
+        RelevantAttr => [
+            'configitem_number',
+            'class_id',
+        ],
+    );
+
+    # insert row
+    if ( !$ID ) {
+        # remove reference to last version to prevent ring dependency
+        delete $Item->{last_version_id};
+
+        $ID = $Self->Insert(
+            Table          => 'configitem',
+            PrimaryKey     => 'id',
+            Item           => $Item,
+            AutoPrimaryKey => 1,
+        );
+    }
+
+    if ( $ID ) {
+        $Result = 'OK';
+
+        my $SourceClassID = $Self->GetOIDMapping(
+            ObjectType => 'general_catalog',
+            ObjectID   => $Item->{class_id}
+        );
+
+        $Self->_MigrateHistory(
+            AssetID       => $ID,
+            SourceAssetID => $Item->{id},
+        );
+        $Self->_MigrateVersions(
+            AssetID       => $ID,
+            ClassID       => $Item->{class_id},
+            SourceAssetID => $Item->{id},
+            SourceClassID => $SourceClassID,
+        );
+
+        # update corresponding CIs
+        return $Result if !$Kernel::OM->Get('DB')->Do(
+            SQL   => 'UPDATE configitem ci SET last_version_id = (SELECT MAX(id) FROM configitem_version WHERE configitem_id = ci.id), name = (SELECT name FROM configitem_version WHERE configitem_id = ci.id ORDER BY id DESC LIMIT 1) WHERE id = ' . $ID,
+        );
+    }
+    else {
+        $Result = 'Error';
     }
 
     return $Result;

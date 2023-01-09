@@ -1477,6 +1477,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "IsLastVersion" : {
+               "description" : " if this version is last version, else value is 0",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -1508,6 +1513,7 @@ pre code {
             "InciState",
             "InciStateID",
             "InciStateType",
+            "IsLastVersion",
             "Name",
             "VersionID"
          ]
@@ -2119,6 +2125,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "IsLastVersion" : {
+               "description" : " if this version is last version, else value is 0",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -2150,6 +2161,7 @@ pre code {
             "InciState",
             "InciStateID",
             "InciStateType",
+            "IsLastVersion",
             "Name",
             "VersionID"
          ]
@@ -3253,6 +3265,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "IsLastVersion" : {
+               "description" : " if this version is last version, else value is 0",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -3284,6 +3301,7 @@ pre code {
             "InciState",
             "InciStateID",
             "InciStateType",
+            "IsLastVersion",
             "Name",
             "VersionID"
          ]
@@ -3310,6 +3328,7 @@ pre code {
             "InciState": "Operational",
             "InciStateID": 1,
             "InciStateType": "operational",
+            "IsLastVersion": 0,
             "Name": "test ci",
             "Number": "1022000022",
             "VersionID": 561
@@ -3332,6 +3351,7 @@ pre code {
             "InciState": "Operational",
             "InciStateID": 1,
             "InciStateType": "operational",
+            "IsLastVersion": 1,
             "Name": "test ci 2",
             "Number": "1022000022",
             "VersionID": 562
@@ -3634,6 +3654,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "IsLastVersion" : {
+               "description" : " if this version is last version, else value is 0",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Name" : {
                "type" : "string",
                "readOnly" : true
@@ -3665,6 +3690,7 @@ pre code {
             "InciState",
             "InciStateID",
             "InciStateType",
+            "IsLastVersion",
             "Name",
             "VersionID"
          ]
@@ -3690,6 +3716,7 @@ pre code {
         "InciState": "Operational",
         "InciStateID": 1,
         "InciStateType": "operational",
+        "IsLastVersion": 1,
         "Name": "rbo test ci 2",
         "Number": "1022000022",
         "VersionID": 562
@@ -7670,6 +7697,7 @@ pre code {
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig FAQ::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "CustomerVisible" : {
@@ -7685,7 +7713,6 @@ pre code {
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       }
@@ -8678,6 +8705,7 @@ pre code {
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig FAQ::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "CustomerVisible" : {
@@ -8693,7 +8721,6 @@ pre code {
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       }
@@ -19269,6 +19296,7 @@ pre code {
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig Ticket::Article::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "Filename" : {
@@ -19277,7 +19305,6 @@ pre code {
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       },
@@ -21059,6 +21086,7 @@ pre code {
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig Ticket::Article::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "Filename" : {
@@ -21067,7 +21095,6 @@ pre code {
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       },
@@ -22045,6 +22072,7 @@ pre code {
                "type" : "string"
             },
             "ContentType" : {
+               "description" : "if not given, fallback to SysConfig Ticket::Article::Attachment::ContentType::Fallback",
                "type" : "string"
             },
             "Filename" : {
@@ -22053,7 +22081,6 @@ pre code {
          },
          "required" : [
             "Content",
-            "ContentType",
             "Filename"
          ]
       }

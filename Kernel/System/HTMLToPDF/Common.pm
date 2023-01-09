@@ -44,6 +44,12 @@ sub new {
     return $Self;
 }
 
+sub GetPossibleExpands {
+    my ( $Self, %Param) = @_;
+
+    return [];
+}
+
 sub _GetDynamicFields {
     my ( $Self, %Param ) = @_;
 

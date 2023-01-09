@@ -294,6 +294,11 @@ sub Run {
             foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber PatchNumber) ) {
                 $Requesting{SystemInfo}->{$Key} = $Kernel::OM->Get('Config')->Get($Key);
             }
+
+            use DateTime::TimeZone;
+            my $TimeZoneObject = DateTime::TimeZone->new( name => 'local' );
+            $Requesting{SystemInfo}->{TimeZone} = $TimeZoneObject->name();
+            $Requesting{SystemInfo}->{TimeZoneOffset} = $TimeZoneObject->offset_for_datetime(DateTime->now);
         }
         if ( $ClientRegistration->{Requesting}->{DBSchema} ) {
             $Requesting{DBSchema} = $Kernel::OM->Get('DB')->GetSchemaInformation();

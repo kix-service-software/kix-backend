@@ -83,6 +83,7 @@ Console::Command::Admin::Token::Create                                        = 
 Console::Command::Admin::Token::Inspect                                       = Kernel::System::Console::Command::Admin::Token::Inspect
 Console::Command::Admin::Token::List                                          = Kernel::System::Console::Command::Admin::Token::List
 Console::Command::Admin::Token::Remove                                        = Kernel::System::Console::Command::Admin::Token::Remove
+Console::Command::Admin::Token::UniqueUsers                                   = Kernel::System::Console::Command::Admin::Token::UniqueUsers
 Console::Command::Admin::Translation::Cleanup                                 = Kernel::System::Console::Command::Admin::Translation::Cleanup
 Console::Command::Admin::Translation::Import                                  = Kernel::System::Console::Command::Admin::Translation::Import
 Console::Command::Admin::Translation::List                                    = Kernel::System::Console::Command::Admin::Translation::List

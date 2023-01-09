@@ -125,7 +125,7 @@ Retrieves messages from an email server using fetchmail backend.
 
         # Administrative Options:
         Postmaster  => 'SomeName',                  # Optional, specify recipient of last resort
-        NoBouce     => 1,                           # Optional, redirect bounces from user to postmaster.
+        NoBounce    => 1,                           # Optional, redirect bounces from user to postmaster.
     );
 
 Returns:
@@ -199,7 +199,7 @@ sub Fetch {
         NoRewrite => '--norewrite',
 
         # Administrative Options:
-        NoBouce => '--nobounce',
+        NoBounce => '--nobounce',
     );
 
     my %HasValueParamLookup = (

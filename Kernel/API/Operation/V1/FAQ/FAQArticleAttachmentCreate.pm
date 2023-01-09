@@ -63,9 +63,6 @@ sub ParameterDefinition {
         'Attachment::Filename' => {
             Required => 1
         },
-        'Attachment::ContentType' => {
-            Required => 1
-        },
         'Attachment::Content' => {
             Required => 1
         },
@@ -81,7 +78,7 @@ perform FAQArticleAttachmentCreate Operation. This will return the created FAQAt
             FAQArticleID  => 123,
             Attachment  => {
                 Content     => $Content,                    # required, base64 encoded
-                ContentType => 'text/xml',                  # required
+                ContentType => 'text/xml',                  # optional
                 Filename    => 'somename.xml',              # required
                 Inline      => 1,                           # (0|1, default 0)
             },
@@ -111,7 +108,7 @@ sub Run {
     my $AttachmentID = $Kernel::OM->Get('FAQ')->AttachmentAdd(
         ItemID      => $Param{Data}->{FAQArticleID},
         Content     => MIME::Base64::decode_base64($Attachment->{Content}),
-        ContentType => $Attachment->{ContentType},
+        ContentType => $Attachment->{ContentType} || $Kernel::OM->Get('Config')->Get('FAQ::Attachment::ContentType::Fallback'),
         Filename    => $Attachment->{Filename},
         Inline      => $Attachment->{Inline} || 0,
         UserID      => $Self->{Authorization}->{UserID},

@@ -68,10 +68,11 @@ sub new {
 sub Convert {
     my ($Self, %Param) = @_;
 
-    my $LogObject    = $Kernel::OM->Get('Log');
-    my $MainObject   = $Kernel::OM->Get('Main');
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $JSONObject   = $Kernel::OM->Get('JSON');
+    my $LogObject               = $Kernel::OM->Get('Log');
+    my $MainObject              = $Kernel::OM->Get('Main');
+    my $ConfigObject            = $Kernel::OM->Get('Config');
+    my $JSONObject              = $Kernel::OM->Get('JSON');
+    my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
     my %Data = $Self->DefinitionGet(
         %Param
@@ -83,6 +84,12 @@ sub Convert {
             Message  => 'No definition exists!'
         );
         return;
+    }
+
+    if ( $Param{IdentifierType} ) {
+        my $ObjectParams = $Self->{"Backend$Data{Object}"}->GetParams();
+
+        $Param{$ObjectParams->{$Param{IdentifierType}}} = $Param{IdentifierIDorNumber};
     }
 
     my $Result = $Self->_CheckParams(
@@ -136,6 +143,19 @@ sub Convert {
             Name   => $Data{Object}
         );
     }
+    else {
+        my %Replaced = $Self->_ReplacePlaceholders(
+            String => $Filename,
+            UserID => $Param{UserID},
+        );
+        $Filename = $TemplateGeneratorObject->ReplacePlaceHolder(
+            %Param,
+            Text     => $Replaced{Text},
+            RichText => 1,
+            UserID   => $Param{UserID},
+            Data     => {}
+        )
+    }
 
     for my $Key ( qw(Filters Allows Ignores) ) {
         next if !$Param{$Key};
@@ -144,6 +164,10 @@ sub Convert {
         );
 
         $Data{Definition}->{$Key} = $Tmp;
+    }
+
+    if ( $Param{Expands} ) {
+        $Data{Definition}->{Expands} = $Param{Expands};
     }
 
     my %FileDatas;
@@ -281,6 +305,12 @@ sub _FileDelete {
     }
 
     return 1;
+}
+
+sub PossibleExpandsGet {
+    my ($Self, %Param) = @_;
+
+    return  $Self->{"Backend$Param{Object}"}->GetPossibleExpands();
 }
 
 sub DefinitionGet {
@@ -445,6 +475,8 @@ sub DefinitionDataList {
     my $DBObject    = $Kernel::OM->Get('DB');
     my $ValidObject = $Kernel::OM->Get('Valid');
 
+    my $Result = $Param{Result} || 'HASH';
+
     # set valid option
     my $Valid = $Param{Valid};
     if ( !defined $Valid || $Valid ) {
@@ -472,6 +504,10 @@ END
     my @IDList;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         push(@IDList, $Row[0]);
+    }
+
+    if ( $Result eq 'ARRAY' ) {
+        return @IDList;
     }
 
     my %List;
@@ -549,19 +585,22 @@ sub _GeneratHTML {
     for my $Block ( @{$Param{Block}} ) {
         $HasPage = 1 if $Block->{Type} && $Block->{Type} eq 'Page';
         my $Content = q{};
-
+        my $BlockData;
         if ( $Block->{Data} ) {
             next if ( !$Datas->{Expands}->{$Block->{Data}} );
-            $Datas = $Datas->{Expands}->{$Block->{Data}};
+            $BlockData = $Datas->{Expands}->{$Block->{Data}};
         }
         elsif (
             $Block->{Include}
             && $Datas->{Expands}->{$Block->{Include}}
         ) {
-            %{$Datas} = (
+            %{$BlockData} = (
                 %{$Self->{$Object . 'Data'}},
                 %{$Self->{$Object . 'Data'}->{Expands}->{$Block->{Include}}}
             );
+        }
+        else {
+            $BlockData = $Datas;
         }
 
         if ( $Block->{Blocks} ) {
@@ -577,16 +616,16 @@ sub _GeneratHTML {
 
                 my $Count = 0;
                 ID:
-                for my $ID ( @{$Datas} ) {
+                for my $ID ( @{$BlockData} ) {
                     $Count++;
 
                     my %ListKeys;
-                    for my $Key ( qw{IDKey} ) {
-                        if ( $Self->{"Backend$Block->{Object}"}->{$Key} ) {
-                            $ListKeys{$Self->{"Backend$Block->{Object}"}->{$Key}} = $ID || q{};
-                            $ListKeys{$Key} = $Self->{"Backend$Block->{Object}"}->{$Key};
-                        }
+
+                    if( $Self->{"Backend$Block->{Object}"}->{IDKey} ) {
+                        $ListKeys{$Self->{"Backend$Block->{Object}"}->{IDKey}} = $ID || q{};
+                        $ListKeys{IDKey} = $Self->{"Backend$Block->{Object}"}->{IDKey};
                     }
+
                     my %HTML = $Self->_GeneratHTML(
                         %ListKeys,
                         UserID     => $Param{UserID},
@@ -609,6 +648,8 @@ sub _GeneratHTML {
             else {
                 my %HTML = $Self->_GeneratHTML(
                     %Param,
+                    Object  => $Block->{Object} || $Object,
+                    Data    => $Block->{Data} || q{},
                     Block   => $Block->{Blocks},
                     Result  => 'Content',
                     Filters => $Param{Filters},
@@ -624,7 +665,7 @@ sub _GeneratHTML {
             my $Function = "_Render$Block->{Type}";
             my %HTML = $Self->$Function(
                 %Keys,
-                Data    => $Datas,
+                Data    => $BlockData,
                 Block   => $Block,
                 UserID  => $Param{UserID},
                 Count   => $Param{Count},
@@ -1330,6 +1371,40 @@ sub _ReplacePlaceholders {
         else {
             $Result{Text} =~ s/<Count>//gsxm;
         }
+    }
+    # replace filename time
+    if ( $Result{Text} =~ m{<TIME_}smx ) {
+        my @Time = $TimeObject->SystemTime2Date(
+            SystemTime => $TimeObject->SystemTime()
+        );
+
+        if ( $Result{Text} =~ m{<TIME_YYMMDD_hhmm}smx ) {
+            my $TimeStamp = $Time[5]
+                . $Time[4]
+                . $Time[3]
+                . q{_}
+                . $Time[2]
+                .$Time[1];
+            $Result{Text} =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
+        }
+
+        if ( $Result{Text} =~ m{<TIME_YYMMDD}smx ) {
+            my $TimeStamp = $Time[5]
+                . $Time[4]
+                . $Time[3];
+            $Result{Text} =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
+        }
+
+        if ( $Result{Text} =~ m{<TIME_YYMMDDhhmm}smx ) {
+            my $TimeStamp = $Time[5]
+                . $Time[4]
+                . $Time[3]
+                . $Time[2]
+                .$Time[1];
+            $Result{Text} =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
+        }
+
+        $Result{Text} =~ s/<TIME_.*>//gsxm;
     }
 
     return %Result;

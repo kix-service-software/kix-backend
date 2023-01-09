@@ -98,7 +98,8 @@ sub Run {
 
     # check if ticketState exists
     my $Exists = $Kernel::OM->Get('State')->StateLookup(
-        State => $TicketState->{Name},
+        State  => $TicketState->{Name},
+        Silent => 1
     );
 
     if ( $Exists ) {

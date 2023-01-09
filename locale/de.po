@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-20 13:43+0000\n"
+"POT-Creation-Date: 2022-12-6 07:16+0000\n"
 "PO-Revision-Date: 2022-10-05 16:18+0000\n"
 "Last-Translator: tto <Torsten.Thau@cape-it.de>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -903,10 +903,6 @@ msgstr "Minute(n)"
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "No matches found."
 msgstr "Keine Treffer gefunden."
-
-#. Perl Module: Kernel/Output/PDF/Statistics.pm
-msgid "Page"
-msgstr "Seite"
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "Time Zone"
@@ -2285,6 +2281,10 @@ msgid "Solution"
 msgstr "Lösung"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
+msgid "Specifies the ContentType fallback for FAQ attachments."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Symptom"
 msgstr "Symptom"
 
@@ -3210,6 +3210,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Delete expired tokens."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4534,6 +4538,14 @@ msgstr ""
 msgid "notice"
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
+msgid "Module registration for configuration print."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
+msgid "Settings for 'wkhtmltopdf'"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Both"
 msgstr ""
@@ -4693,6 +4705,10 @@ msgid ""
 "MAKE CHANGES TO THIS SYSCONFIG OPTION YOU NEED TO RUN THE CONSOLE COMMAND "
 "Admin::ITSM::IncidentState::Recalculate SO THAT ALL INCIDENT STATES WILL BE "
 "RECALCULATED BASED ON THE NEW SETTINGS!"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Specifies the ContentType fallback for ConfigItem attachments."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -5696,6 +5712,10 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Specifies the ContentType fallback for article attachments."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Specifies the directory to store the data in, if \"FS\" was selected for "
 "TicketStorageModule."
@@ -5893,6 +5913,14 @@ msgstr "Email (intern)"
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "note-report"
 msgstr "Notiz (Bericht)"
+
+#. Template: Page
+msgid "Page"
+msgstr "Seite"
+
+#. Template: Page
+msgid "of"
+msgstr ""
 
 #. Update: update/build-807_pre.xml
 msgid "Permission type for the relationship of queues and tickets."

@@ -63,9 +63,6 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },
-        'Attachment::ContentType' => {
-            Required => 1
-        },
         'Attachment::Filename' => {
             Required => 1
         },
@@ -85,7 +82,7 @@ perform ArticleAttachmentCreate Operation. This will return the created Attachme
             Article    => 123,                                         # required
             Attachment => {                                            # required
                 Content     => 'content'                               # required, base64 encoded
-                ContentType => 'some content type'                     # required
+                ContentType => 'some content type'                     # optional, fallback
                 Filename    => 'some fine name'                        # required
             },
         },
@@ -158,9 +155,11 @@ sub Run {
     # create the new attachment
     my $AttachmentID = $TicketObject->ArticleWriteAttachment(
         %{$Attachment},
-        Content    => MIME::Base64::decode_base64( $Attachment->{Content} ),
-        ArticleID  => $Param{Data}->{ArticleID},
-        UserID     => $Self->{Authorization}->{UserID},
+        ContentType => $Attachment->{ContentType} || $Kernel::OM->Get('Config')->Get('Ticket::Article::Attachment::ContentType::Fallback'),
+        Content     => MIME::Base64::decode_base64( $Attachment->{Content} ),
+        ArticleID   => $Param{Data}->{ArticleID},
+        UserID      => $Self->{Authorization}->{UserID},
+        CountAsUpdate => 1
     );
 
     if ( !$AttachmentID ) {

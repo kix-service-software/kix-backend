@@ -88,103 +88,7 @@ sub Run {
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
     my $Result = $Self->_RunParallel(
-        sub {
-            my ( $Self, %Param ) = @_;
-            my $Result;
-
-            my $Item = $Param{Item};
-
-            # check if this object is already mapped
-            my $MappedID = $Self->GetOIDMapping(
-                ObjectType     => 'ticket',
-                SourceObjectID => $Item->{id},
-                NoCache        => 1,        # don't cache this mass data
-            );
-            if ( $MappedID ) {
-                return 'Ignored';
-            }
-
-            # get the ticket data
-            $Item = $Self->GetSourceData(Type => 'ticket', Where => "id = $Item->{id}", NoProgress => 1);
-            return if !IsArrayRefWithData($Item);
-            $Item = $Item->[0];
-            return if !IsHashRefWithData($Item);
-
-            # check if this item already exists (i.e. some initial data)
-            my $ID = $Self->Lookup(
-                Table        => 'ticket',
-                PrimaryKey   => 'id',
-                Item         => $Item,
-                RelevantAttr => [
-                    'tn',
-                    'title'
-                ],
-                NoCache => 1,        # don't cache this mass data
-            );
-
-            # insert row
-            if ( !$ID ) {
-                # check if this TN already exists - rare case but possible
-                my $Exists = $Self->Lookup(
-                    Table        => 'ticket',
-                    PrimaryKey   => 'id',
-                    Item         => $Item,
-                    RelevantAttr => [
-                        'tn',
-                    ],
-                    NoCache => 1,        # don't cache this mass data
-                );
-                if ( $Exists ) {
-                    $Item->{tn} = 'Migration-'.$Item->{tn};
-                }
-
-                # assign the new organisation
-                $Item->{organisation_id} = $Self->_AssignOrganisation(
-                    Ticket => $Item
-                );
-
-                # assign the new contact
-                $Item->{contact_id} = $Self->_AssignContact(
-                    Ticket => $Item
-                );
-
-                $Item-> {type_id} = 1 if ! defined $Item-> {type_id};   # type fallback to Unclassified
-
-                # separate insert method to support extensions in KIXPro, e.g. for SLA references
-                $ID = $Self->_InsertTicket(
-                    Ticket => $Item,
-                );
-            }
-
-            if ( $ID ) {
-                $Self->_MigrateTicketFlags(
-                    TicketID       => $ID,
-                    SourceTicketID => $Item->{id},
-                );
-
-                $Self->_MigrateArticles(
-                    TicketID       => $ID,
-                    SourceTicketID => $Item->{id},
-                );
-
-                $Self->_MigrateHistory(
-                    TicketID       => $ID,
-                    SourceTicketID => $Item->{id},
-                );
-
-                $Self->_MigrateTimeUnits(
-                    TicketID       => $ID,
-                    SourceTicketID => $Item->{id},
-                );
-
-                $Result = 'OK';
-            }
-            else {
-                $Result = 'Error';
-            }
-
-            return $Result;
-        },
+        $Self->{WorkerSubRef} || \&_Run,
         Items => $SourceData,
         %Param,
     );
@@ -204,6 +108,104 @@ sub Run {
         FunctionParams           => {},
         MaximumParallelInstances => 1,
     );
+
+    return $Result;
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+    my $Result;
+
+    my $Item = $Param{Item};
+
+    # check if this object is already mapped
+    my $MappedID = $Self->GetOIDMapping(
+        ObjectType     => 'ticket',
+        SourceObjectID => $Item->{id},
+        NoCache        => 1,        # don't cache this mass data
+    );
+    if ( $MappedID ) {
+        return 'Ignored';
+    }
+
+    # get the ticket data
+    $Item = $Self->GetSourceData(Type => 'ticket', Where => "id = $Item->{id}", NoProgress => 1);
+    return if !IsArrayRefWithData($Item);
+    $Item = $Item->[0];
+    return if !IsHashRefWithData($Item);
+
+    # check if this item already exists (i.e. some initial data)
+    my $ID = $Self->Lookup(
+        Table        => 'ticket',
+        PrimaryKey   => 'id',
+        Item         => $Item,
+        RelevantAttr => [
+            'tn',
+            'title'
+        ],
+        NoCache => 1,        # don't cache this mass data
+    );
+
+    # insert row
+    if ( !$ID ) {
+        # check if this TN already exists - rare case but possible
+        my $Exists = $Self->Lookup(
+            Table        => 'ticket',
+            PrimaryKey   => 'id',
+            Item         => $Item,
+            RelevantAttr => [
+                'tn',
+            ],
+            NoCache => 1,        # don't cache this mass data
+        );
+        if ( $Exists ) {
+            $Item->{tn} = 'Migration-'.$Item->{tn};
+        }
+
+        # assign the new organisation
+        $Item->{organisation_id} = $Self->_AssignOrganisation(
+            Ticket => $Item
+        );
+
+        # assign the new contact
+        $Item->{contact_id} = $Self->_AssignContact(
+            Ticket => $Item
+        );
+
+        $Item-> {type_id} = 1 if ! defined $Item-> {type_id};   # type fallback to Unclassified
+
+        # separate insert method to support extensions in KIXPro, e.g. for SLA references
+        $ID = $Self->_InsertTicket(
+            Ticket => $Item,
+        );
+    }
+
+    if ( $ID ) {
+        $Self->_MigrateTicketFlags(
+            TicketID       => $ID,
+            SourceTicketID => $Item->{id},
+        );
+
+        $Self->_MigrateArticles(
+            TicketID       => $ID,
+            SourceTicketID => $Item->{id},
+        );
+
+        $Self->_MigrateHistory(
+            TicketID       => $ID,
+            SourceTicketID => $Item->{id},
+        );
+
+        $Self->_MigrateTimeUnits(
+            TicketID       => $ID,
+            SourceTicketID => $Item->{id},
+        );
+
+        $Result = 'OK';
+    }
+    else {
+        $Result = 'Error';
+    }
 
     return $Result;
 }
@@ -751,30 +753,15 @@ sub _MigrateHistory {
         );
         next if $MappedID;
 
-        # check if this item already exists (i.e. some initial data)
-        my $ID = $Self->Lookup(
-            Table        => 'ticket_history',
-            PrimaryKey   => 'id',
-            Item         => $Item,
-            RelevantAttr => [
-                'ticket_id',
-                'article_id',
-                'create_by',
-                'create_time'
-            ]
-        );
-
         # insert row
-        if ( !$ID ) {
-            $Item-> {type_id} = 1 if ! defined $Item-> {type_id};   # type fallback to Unclassified
+        $Item-> {type_id} = 1 if ! defined $Item-> {type_id};   # type fallback to Unclassified
 
-            $ID = $Self->Insert(
-                Table          => 'ticket_history',
-                PrimaryKey     => 'id',
-                Item           => $Item,
-                AutoPrimaryKey => 1,
-            );
-        }
+        my $ID = $Self->Insert(
+            Table          => 'ticket_history',
+            PrimaryKey     => 'id',
+            Item           => $Item,
+            AutoPrimaryKey => 1,
+        );
 
         if ( $ID ) {
             $Result{OK}++;
