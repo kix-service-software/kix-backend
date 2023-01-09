@@ -246,7 +246,13 @@ sub TicketSearch {
         %Param
     );
     $SQLDef{SQLFrom}  .= ' '.$PermissionSQL{From} if $PermissionSQL{From};
-    $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where} if $PermissionSQL{Where};
+    if ( $PermissionSQL{Where} ) {
+        $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where};
+    }
+    else {
+        $SQLDef{SQLWhere} .= ' 1=1 ';
+    }
+
 
     # filter
     if ( IsHashRefWithData($Param{Search}) ) {
@@ -263,6 +269,9 @@ sub TicketSearch {
             $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
         }
     }
+
+use Data::Dumper;
+print STDERR "SQLDef: ".Data::Dumper::Dumper(\%SQLDef);
 
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
@@ -316,6 +325,7 @@ sub TicketSearch {
         return;
     }
 
+print STDERR "SQL: $SQL\n";
     # database query
     my %Tickets;
     my @TicketIDs;
