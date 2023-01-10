@@ -877,6 +877,7 @@ helper function to return a successful result.
 
 sub _Success {
     my ( $Self, %Param ) = @_;
+    my %Headers;
 
     # ignore cached values if we have a cached response (see end of Init method)
 
@@ -964,6 +965,17 @@ sub _Success {
             );
         }
 
+        # add header
+        my $TotalCount;
+        OBJECT:
+        foreach my $Object ( sort keys %Param ) {
+            next OBJECT if !IsArrayRef($Param{$Object});
+            my $Count = scalar @{$Param{$Object}};
+            $Headers{'X-Total-Count-'.$Object} = $Count;
+            $TotalCount += $Count;
+        }
+        $Headers{'X-Total-Count'} = $TotalCount if defined $TotalCount;
+
         # apply offset and limit only for collections
         if ( !$Self->{PermissionCheckOnly} && $Self->{OperationRouteMapping}->{$Self->{OperationType}} !~ /\/:\w+$/ ) {
             # honor an offset, if we have one
@@ -1044,6 +1056,9 @@ sub _Success {
         Code    => $Code,
         Message => $Message,
     };
+    if ( IsHashRefWithData( \%Headers )) {
+        $Result->{Additional}->{AddHeader} = \%Headers
+    }
     if ( IsHashRefWithData( \%Param ) ) {
         $Result->{Data} = {
             %Param
