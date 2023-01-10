@@ -2765,6 +2765,7 @@ write an article attachment to storage
         Disposition        => 'attachment',                         # or 'inline'
         ArticleID          => 123,
         UserID             => 123,
+        CountAsUpdate      => 1|0                                   # optional, default 0 - use 1 if e.g. new attachment should count as article update (change time/by update)
     );
 
 =item ArticleAttachment()

@@ -51,11 +51,16 @@ sub Run {
     my %JobList = $PostMasterFilter->FilterList(
         Valid => 1
     );
+    my %JobDefs = ();
+    for my $CurrID ( sort keys %JobList ) {
+        my %JobConfig = $PostMasterFilter->FilterGet( ID => $CurrID );
+        $JobDefs{ $JobConfig{Name} } = \%JobConfig;
+    }
 
-    for ( sort keys %JobList ) {
+    for my $CurrKey ( sort keys %JobDefs ) {
 
         # get config options
-        my %Config = $PostMasterFilter->FilterGet( ID => $_ );
+        my %Config = %{$JobDefs{$CurrKey}};
 
         my %Match;
         my %Set;

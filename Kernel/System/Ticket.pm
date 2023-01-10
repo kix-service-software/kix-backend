@@ -7000,6 +7000,10 @@ sub TicketCalendarGet {
 
     my $Result;
 
+    if ( $Param{TicketID} ) {
+        $Param{TicketIDs} = [ $Param{TicketID} ];
+    }
+
     if ( IsHashRefWithData($Param{Ticket}) ) {
         # get queue specific calendar
         my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
@@ -7035,16 +7039,6 @@ sub TicketCalendarGet {
         $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
             Columns => [ 'TicketID', 'Calendar' ]
         );
-    }
-    elsif ( $Param{TicketID} ) {
-        my $QueueID = $Self->TicketQueueGet(
-            TicketID => $Param{TicketID}
-        );
-        # get queue specific calendar
-        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $QueueID,
-        );
-        $Result = $QueueData{Calendar} || '';
     }
     else {
         $Kernel::OM->Get('Log')->Log(
