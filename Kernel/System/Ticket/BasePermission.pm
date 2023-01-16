@@ -101,7 +101,22 @@ sub BasePermissionRelevantObjectIDList {
 
     PERMISSION:
     foreach my $Permission ( values %PermissionList ) {
-        push @QueueIDs, $Permission->{Target};
+        if ( $Permission->{Target} !~ /\*/ ) {
+            push @QueueIDs, $Permission->{Target};
+        }
+        else {
+            if ( !IsHashRef($Self->{QueueListReverse}) ) {
+                $Self->{QueueListReverse} = { reverse $Kernel::OM->Get('Queue')->QueueList(Valid => 0) };
+            }
+            my $Pattern = $Permission->{Target};
+            $Pattern =~ s/\*/.*/g;
+
+            QUEUE:
+            foreach my $Queue ( sort keys %{$Self->{QueueListReverse}} ) {
+                next QUEUE if $Queue !~ /^$Pattern$/;
+                push @QueueIDs, $Self->{QueueListReverse}->{$Queue};
+            }
+        }
     }
 
     return @QueueIDs;
