@@ -216,7 +216,7 @@ sub TicketSearch {
     }
 
     # check required params
-    if ( !$Param{UserID} && !$Param{UserType} ) {
+    if ( !$Param{UserID} || !$Param{UserType} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID and UserType params for permission check!',
@@ -408,7 +408,7 @@ sub _CreatePermissionSQL {
     my ( $Self, %Param ) = @_;
     my %Result;
 
-    if ( !$Param{UserID} && !$Param{UserType} ) {
+    if ( !$Param{UserID} || !$Param{UserType} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for permission check!',
