@@ -270,9 +270,6 @@ sub TicketSearch {
         }
     }
 
-use Data::Dumper;
-print STDERR "SQLDef: ".Data::Dumper::Dumper(\%SQLDef);
-
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
         my %Result = $Self->_CreateOrderBySQL(
@@ -325,7 +322,6 @@ print STDERR "SQLDef: ".Data::Dumper::Dumper(\%SQLDef);
         return;
     }
 
-print STDERR "SQL: $SQL\n";
     # database query
     my %Tickets;
     my @TicketIDs;
