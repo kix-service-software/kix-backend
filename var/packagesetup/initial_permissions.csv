@@ -43,6 +43,8 @@
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Reader";"Resource";"/system/htmltopdf";;"x";;;
+"Ticket Reader";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent";"Resource";"/system/ticket";;"x";;;
@@ -71,6 +73,8 @@
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Agent";"Resource";"/system/htmltopdf";;"x";;;
+"Ticket Agent";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket";;"x";;;
@@ -102,6 +106,8 @@
 "Ticket Agent (w/o teams)";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Agent (w/o teams)";"Resource";"/system/htmltopdf";;"x";;;
+"Ticket Agent (w/o teams)";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/1";;"x";;;
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/2";;"x";;;
 "Ticket Agent (Servicedesk)";"Object";"/tickets/*{Ticket.QueueID IN [1,2]}";"x";"x";"x";"x";
