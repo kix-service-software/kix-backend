@@ -2317,6 +2317,7 @@
                 <Item>X-KIX-FollowUp-Priority</Item>
                 <Item>X-KIX-FollowUp-Queue</Item>
                 <Item>X-KIX-FollowUp-Lock</Item>
+                <Item>X-KIX-FollowUp-KeepState</Item>
                 <Item>X-KIX-FollowUp-State</Item>
                 <Item>X-KIX-FollowUp-State-PendingTime</Item>
                 <Item>X-KIX-FollowUp-Type</Item>
