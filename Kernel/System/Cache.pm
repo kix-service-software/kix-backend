@@ -525,6 +525,7 @@ be executed both in memory and in the backend to avoid inconsistent cache states
 
 sub CleanUp {
     my ( $Self, %Param ) = @_;
+    my $NotifyClients = 0;
 
     $Param{Indent} = $Param{Indent} || '';
 
@@ -612,13 +613,25 @@ sub CleanUp {
                 %Param,
             );
         }
+
+        $NotifyClients = 1;
     }
 
     # clear loop prevention for this type
     $Self->{CleanupTypesSeen}->{$Param{Type}} = 0 if $Param{Type};
 
     # cleanup persistent cache
-    return $Self->{CacheObject}->CleanUp(%Param);
+    my $Result = $Self->{CacheObject}->CleanUp(%Param);
+
+    if ( $Result && $NotifyClients ) {
+        # send notification to clients
+        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            Event     => 'CLEAR_CACHE',
+            Namespace => 'Migration',
+        );
+    }
+
+    return $Result;
 }
 
 =item GetCacheStats()
