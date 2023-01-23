@@ -1098,17 +1098,26 @@ sub ContactSearch {
             ValidID
         )
     ) {
-        my $CacheStrg = $Param{$Key};
-
+        my $CacheStrg;
         if (
             $Key eq 'DynamicField'
-            && $Param{$Key}->{Value}
-            && IsArrayRefWithData($Param{$Key}->{Value})
+            && ref( $Param{ $Key } ) eq 'HASH'
         ) {
-            $CacheStrg = join( q{,} , @{$Param{$Key}->{Value}});
+            $CacheStrg = ( $Param{ $Key }->{Field} // '' )
+                        . q{;}
+                        . ( $Param{ $Key }->{Operator} // '' )
+                        . q{;};
+            if ( defined( $Param{ $Key }->{Value} ) ) {
+                $CacheStrg .= $Kernel::OM->Get('JSON')->Encode(
+                    Data => $Param{ $Key }->{Value},
+                );
+            }
         }
         elsif ( IsArrayRefWithData($Param{$Key}) ) {
             $CacheStrg = join( q{,} , @{$Param{$Key}});
+        }
+        else {
+            $CacheStrg = $Param{$Key};
         }
         $CacheKey .= q{::} . ($CacheStrg  || q{});
     }
@@ -1279,6 +1288,10 @@ sub ContactSearch {
         $Param{DynamicField}
         && IsHashRefWithData($Param{DynamicField})
     ) {
+        if (defined $Where) {
+            $Where .= " AND ";
+        }
+
         my $SQLReturn = $Self->_SearchInDynamicField(
             Search       => $Param{DynamicField},
             BoolOperator => 'AND',
