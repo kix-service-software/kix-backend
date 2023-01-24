@@ -209,8 +209,8 @@ sub Run {
         $Self->{Handler}->{$Type}->InitProgress(Type => $Type, ItemCount => $ItemCount);
     }
 
+    TYPE:
     foreach my $Type ( @Types ) {
-
         my $MigrationState = $Self->_GetMigrationState();
 
         # abort if we don't have a state
@@ -222,15 +222,14 @@ sub Run {
         $MigrationState->{State}->{Progress}->{$Type}->{StartTime} = $StartTime;
         $Self->_UpdateMigrationState($MigrationState);
 
-        $Self->{Handler}->{$Type}->SetWorkers(Workers => $Param{Workers} || 1);
+        if ( $MigrationState->{State}->{Progress}->{$Type}->{ItemCount} > 0 ) {
+            $Self->{Handler}->{$Type}->SetWorkers(Workers => $Param{Workers} || 1);
 
-        my $Result = $Self->{Handler}->{$Type}->Run(
-            Type => $Type,
-        );
-
-        if ( $Result ) {
-            $Self->{Handler}->{$Type}->StopProgress($Type);
+            my $Result = $Self->{Handler}->{$Type}->Run(
+                Type => $Type,
+            );
         }
+        $Self->{Handler}->{$Type}->StopProgress($Type);
     }
 
     # get the prepared meta data and update it
