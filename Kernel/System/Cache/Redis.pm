@@ -208,6 +208,8 @@ sub CleanUp {
             return $Self->_RedisCall('flushall');
         }
     }
+
+    return 1;
 }
 
 sub GetKeysForType {
