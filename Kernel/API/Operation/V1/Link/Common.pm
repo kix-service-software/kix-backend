@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 use MIME::Base64();
-use Mail::Address;
 
 use Kernel::System::VariableCheck qw(:all);
 

@@ -396,48 +396,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AutoCreateLinkedPerson###Blacklist" Required="1" Valid="1">
-        <Description Translatable="1">Defines which persons should not be added on AutoCreateLinkedPerson.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###Agent" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "agent".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">Agent</Item>
-                <Item Key="TargetName">Agent</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###Customer" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "customer".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">Customer</Item>
-                <Item Key="TargetName">Customer</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###3rdParty" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "3rd party".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">3rd party</Item>
-                <Item Key="TargetName">3rd party</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FAQWorkflow::Basic" Required="1" Valid="1">
         <Description Translatable="1">Basic settings for FAQ edit workflow.</Description>
         <Group>Framework</Group>
