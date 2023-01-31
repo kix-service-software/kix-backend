@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-1-30 14:18+0000\n"
+"POT-Creation-Date: 2023-1-31 12:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2571,10 +2571,6 @@ msgid "Defines which email address to use if not defined - strongly depends on b
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines which persons should not be added on AutoCreateLinkedPerson."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines which state will unlock the ticket."
 msgstr ""
 
@@ -3515,18 +3511,6 @@ msgid "This setting defines the link type 'RelevantTo'. If the source name and t
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"3rd party\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"agent\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"customer\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Time Based"
 msgstr ""
 
@@ -3971,10 +3955,6 @@ msgid "Create link between ticket and config item on DynamicFieldUpdate (This ev
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Create new linked person on create new Article or Update Owner."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Customizable stop words for fulltext index. These words will be removed from the search index."
 msgstr ""
 
@@ -4335,10 +4315,6 @@ msgid "Module registration for user attribute placeholders such as owner, respon
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to check if arrived emails should be marked as email-internal (because of original forwarded internal email). ArticleType and SenderType define the values for the arrived email/article."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to fetch contacts SMIME certificates of incoming messages."
 msgstr ""
 
@@ -4668,10 +4644,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Workflowmodule which sets the ticket responsible based on ticket type if not given."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "email-internal"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
