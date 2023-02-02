@@ -27,9 +27,10 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
-# correct states in inital reports (e.g. "pending_reminder" => "pending reminder")
 _UpdateReports();
+_MigrateCheckboxDFValues();
 
+# correct states in inital reports (e.g. "pending_reminder" => "pending reminder")
 sub _UpdateReports {
     my ( $Self, %Param ) = @_;
 
@@ -99,6 +100,30 @@ sub _UpdateReports {
                 }
             }
         }
+    }
+
+    return 1;
+}
+
+sub _MigrateCheckboxDFValues {
+    my ( $Self, %Param ) = @_;
+
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $Success = $DBObject->Do(
+        SQL => "UPDATE dynamic_field_value SET value_text = value_int, value_int = NULL WHERE field_id IN (SELECT id FROM dynamic_field WHERE field_type = 'Multiselect') AND value_text is NULL AND value_int IS NOT NULL"
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to update values of migrated \"Checkbox\" dynamic fields!"
+        );
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => "Update values of migrated \"Checkbox\" dynamic fields."
+        );
     }
 
     return 1;
