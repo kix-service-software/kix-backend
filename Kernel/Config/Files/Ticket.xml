@@ -1863,22 +1863,6 @@
             <String Regex="^[1-9][0-9]*$">99</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AutomaticMergeSubject" Required="1" Valid="1">
-        <Description Translatable="1">When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the subject of this note (this subject cannot be changed by the agent).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Ticket::ViewMerge</SubGroup>
-        <Setting>
-            <String Regex="">Ticket Merged</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::Frontend::AutomaticMergeText" Required="1" Valid="1">
-        <Description Translatable="1">When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the body of this note (this text cannot be changed by the agent).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Ticket::ViewMerge</SubGroup>
-        <Setting>
-            <TextArea Translatable="1">Merged Ticket &lt;KIX_TICKET&gt; to &lt;KIX_MERGE_TO_TICKET&gt;.</TextArea>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::ViewableSenderTypes" Required="1" Valid="1">
         <Description Translatable="1">Defines the default viewable sender types of a ticket (default: customer).</Description>
         <Group>Ticket</Group>
@@ -2317,6 +2301,7 @@
                 <Item>X-KIX-FollowUp-Priority</Item>
                 <Item>X-KIX-FollowUp-Queue</Item>
                 <Item>X-KIX-FollowUp-Lock</Item>
+                <Item>X-KIX-FollowUp-KeepState</Item>
                 <Item>X-KIX-FollowUp-State</Item>
                 <Item>X-KIX-FollowUp-State-PendingTime</Item>
                 <Item>X-KIX-FollowUp-Type</Item>
@@ -2505,18 +2490,6 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::MatchDBSource</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PostFilterModule###000-FollowUpChannelCheck" Required="0" Valid="1">
-        <Description Translatable="1">Module to check if arrived emails should be marked as email-internal (because of original forwarded internal email). ArticleType and SenderType define the values for the arrived email/article.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::FollowUpChannelCheck</Item>
-                <Item Key="ArticleType" Translatable="1">email-internal</Item>
-                <Item Key="SenderType" Translatable="1">customer</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3003,17 +2976,6 @@ Thanks for your help!
                 <Item Key="Name"></Item>
                 <Item Key="Value"></Item>
                 <Item Key="Event"></Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###AutoCreateLinkedPerson" Required="0" Valid="0">
-        <Description Translatable="1">Create new linked person on create new Article or Update Owner.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::AutoCreateLinkedPerson</Item>
-                <Item Key="Event">(ArticleCreate|TicketOwnerUpdate|TicketResponsibleUpdate|TicketMerge|TicketCustomerUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

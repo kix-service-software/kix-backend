@@ -288,6 +288,7 @@ sub Run {
         if ( !$ID ) {
 
             # migrate field type if needed
+            my $FieldTypeSrc = $Item->{field_type};
             $Item->{field_type} = $Migration->{Type} ? $Migration->{Type} : $Item->{field_type};
 
             # migrate object type if needed
@@ -323,6 +324,7 @@ sub Run {
                 PrimaryKey     => 'id',
                 Item           => $Item,
                 AutoPrimaryKey => 1,
+                AdditionalData => { FieldTypeSource => $FieldTypeSrc }
             );
         }
 

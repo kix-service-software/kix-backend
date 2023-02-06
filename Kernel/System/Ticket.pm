@@ -391,14 +391,14 @@ sub TicketCreate {
         my $DefaultTicketState = $Kernel::OM->Get('Config')->Get('Ticket::State::Default');
 
         # check if default ticket state exists
-        my %AllTicketStates = reverse $StateObject->StateList();
+        my %AllTicketStates = reverse $StateObject->StateList( UserID => 1);
 
         if ( $AllTicketStates{$DefaultTicketState} ) {
             $Param{State} = $DefaultTicketState;
         }
         else {
             $Param{StateID} = 1;
-        }
+        }        
     }
 
     # StateID/State lookup!

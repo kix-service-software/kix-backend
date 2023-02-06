@@ -23,6 +23,13 @@ our @ObjectDependencies = (
     'Main',
 );
 
+$SIG{'PIPE'} = sub {
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'notice',
+        Message  => "Received SIGPIPE but ignoring it."
+    );
+};
+
 sub new {
     my ( $Type, %Param ) = @_;
 

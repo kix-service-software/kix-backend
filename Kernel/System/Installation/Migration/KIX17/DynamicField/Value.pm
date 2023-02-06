@@ -84,6 +84,7 @@ sub Run {
     my $DynamicFieldData = $Self->GetSourceData(Type => 'dynamic_field', NoProgress => 1);
 
     # map DF types
+    $Self->{DynamicFieldTypesSrc} = { map { $_->{id} => $_->{field_type} } @{$DynamicFieldData} };
     $Self->{DynamicFieldObjectTypes} = { map { $_->{id} => $_->{object_type} } @{$DynamicFieldData} };
     $Self->{DynamicFields} = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         Valid => 0
@@ -160,6 +161,8 @@ sub _Run {
         }
         $Item->{object_id} = $ReferencedID;
 
+        my $FieldIDSrc = $Item->{field_id};
+
         # map the field_id
         $Item->{field_id} = $Self->GetOIDMapping(
             ObjectType     => 'dynamic_field',
@@ -167,7 +170,7 @@ sub _Run {
         );
 
         # special handling for value if needed
-        if ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'Checkbox' ) {
+        if ( $Self->{DynamicFieldTypesSrc}->{$FieldIDSrc} eq 'Checkbox' ) {
             $Item->{value_text} = $Item->{value_int};
             $Item->{value_int} = undef;
         }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -17,9 +17,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Config',
-    # KIX4OTRS-capeIT
     'Contact',
-    # EO KIX4OTRS-capeIT
     'DynamicField',
     'DynamicField::Backend',
     'Log',
@@ -67,8 +65,8 @@ sub Run {
         DynamicFields => 0,
     );
 
-    my $Comment          = $Param{Comment}          || '';
-    my $Lock             = $Param{Lock}             || '';
+    my $Comment = $Param{Comment} || q{};
+    my $Lock    = $Param{Lock}    || q{};
 
     # Check if owner of ticket is still valid
     my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
@@ -90,7 +88,7 @@ sub Run {
     }
 
     # 2) check user, just lock it if user is valid and ticket was closed
-    elsif ( $UserInfo{ValidID} eq 1 ) {
+    elsif ( $UserInfo{ValidID} eq '1' ) {
 
         # set lock (if ticket should be locked on follow up)
         if ( $Lock && $Ticket{StateType} =~ /^close/i ) {
@@ -125,103 +123,97 @@ sub Run {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    # set state
-    # KIX4OTRS-capeIT
-    my $State = $ConfigObject->Get('PostmasterFollowUpState') || 'open';
-    if (
-        $Ticket{StateType} =~ /^close/
-        && $ConfigObject->Get('PostmasterFollowUpStateClosed')
-        )
-    {
-        $State = $ConfigObject->Get('PostmasterFollowUpStateClosed');
-    }
+    # neither state- nor pending-time update if KeepState set..
+    if ( !$GetParam{'X-KIX-FollowUp-KeepState'} ) {
+        # set state
+        my $State = $ConfigObject->Get('PostmasterFollowUpState') || 'open';
 
-    my $NextStateRef = $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpState');
+        if (
+            $Ticket{StateType} =~ /^close/
+            && $ConfigObject->Get('PostmasterFollowUpStateClosed')
+        ) {
+            $State = $ConfigObject->Get('PostmasterFollowUpStateClosed');
+        }
 
-    if (
-        $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
-        || $NextStateRef->{ $Ticket{State} }
-        )
-    {
-        $State = $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
+        my $NextStateRef = $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpState');
+
+        if (
+            $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
             || $NextStateRef->{ $Ticket{State} }
-            || $NextStateRef->{''};
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    if ( $GetParam{'X-KIX-FollowUp-State'} ) {
-        $State = $GetParam{'X-KIX-FollowUp-State'};
-    }
-
-    # KIX4OTRS-capeIT
-    # if ( $Ticket{StateType} !~ /^new/ || $GetParam{'X-KIX-FollowUp-State'} ) {
-    if ($State) {
-
-        # EO KIX4OTRS-capeIT
-        $TicketObject->TicketStateSet(
-
-            # KIX4OTRS-capeIT
-            # State => $GetParam{'X-KIX-FollowUp-State'} || $State,
-            State => $State,
-
-            # EO KIX4OTRS-capeIT
-            TicketID => $Param{TicketID},
-            UserID   => $Param{InmailUserID},
-        );
-        if ( $Self->{Debug} > 0 ) {
-            print "State: $State\n";
-        }
-    }
-
-    # set pending time
-    if ( $GetParam{'X-KIX-FollowUp-State-PendingTime'} ) {
-
-  # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
-  # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
-  # Only one unit can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
-  # "+12d" (12 days). Note that settings like "+1d 12h" are not possible. You can specify "+36h" instead.
-
-        my $TargetTimeStamp = $GetParam{'X-KIX-FollowUp-State-PendingTime'};
-
-        my ( $Sign, $Number, $Unit ) = $TargetTimeStamp =~ m{^\s*([+-]?)\s*(\d+)\s*([smhd]?)\s*$}smx;
-
-        if ($Number) {
-            $Sign ||= '+';
-            $Unit ||= 's';
-
-            my $Seconds = $Sign eq '-' ? ( $Number * -1 ) : $Number;
-
-            my %UnitMultiplier = (
-                s => 1,
-                m => 60,
-                h => 60 * 60,
-                d => 60 * 60 * 24,
-            );
-
-            $Seconds = $Seconds * $UnitMultiplier{$Unit};
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            $TargetTimeStamp = $TimeObject->SystemTime2TimeStamp(
-                SystemTime => $TimeObject->SystemTime() + $Seconds,
-            );
+        ) {
+            $State = $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
+                || $NextStateRef->{ $Ticket{State} }
+                || $NextStateRef->{q{}};
         }
 
-        my $Updated = $TicketObject->TicketPendingTimeSet(
-            String   => $TargetTimeStamp,
-            TicketID => $Param{TicketID},
-            UserID   => $Param{InmailUserID},
-        );
+        if ( $GetParam{'X-KIX-FollowUp-State'} ) {
+            $State = $GetParam{'X-KIX-FollowUp-State'};
+        }
 
-        # debug
-        if ($Updated) {
+        if ($State) {
+            $TicketObject->TicketStateSet(
+                State    => $State,
+                TicketID => $Param{TicketID},
+                UserID   => $Param{InmailUserID},
+            );
             if ( $Self->{Debug} > 0 ) {
-                print "State-PendingTime: ".$GetParam{'X-KIX-FollowUp-State-PendingTime'}."\n";
+                print "State: $State\n";
+            }
+        }
+
+        # set pending time
+        if ( $GetParam{'X-KIX-FollowUp-State-PendingTime'} ) {
+
+            # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
+            # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
+            # Only one unit can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
+            # "+12d" (12 days). Note that settings like "+1d 12h" are not possible. You can specify "+36h" instead.
+
+            my $TargetTimeStamp = $GetParam{'X-KIX-FollowUp-State-PendingTime'};
+
+            my ( $Sign, $Number, $Unit ) = $TargetTimeStamp =~ m{^\s*([+-]?)\s*(\d+)\s*([smhd]?)\s*$}smx;
+
+            if ($Number) {
+                $Sign ||= q{+};
+                $Unit ||= 's';
+
+                my $Seconds = $Sign eq q{-} ? ( $Number * -1 ) : $Number;
+
+                my %UnitMultiplier = (
+                    s => 1,
+                    m => 60,
+                    h => 60 * 60,
+                    d => 60 * 60 * 24,
+                );
+
+                $Seconds = $Seconds * $UnitMultiplier{$Unit};
+
+                # get time object
+                my $TimeObject = $Kernel::OM->Get('Time');
+
+                $TargetTimeStamp = $TimeObject->SystemTime2TimeStamp(
+                    SystemTime => $TimeObject->SystemTime() + $Seconds,
+                );
+            }
+
+            my $Updated = $TicketObject->TicketPendingTimeSet(
+                String   => $TargetTimeStamp,
+                TicketID => $Param{TicketID},
+                UserID   => $Param{InmailUserID},
+            );
+
+            # debug
+            if ($Updated) {
+                if ( $Self->{Debug} > 0 ) {
+                    print "State-PendingTime: ".$GetParam{'X-KIX-FollowUp-State-PendingTime'}."\n";
+                }
             }
         }
     }
+    else {
+        delete $GetParam{'X-KIX-FollowUp-State-PendingTime'};
+    }
+
 
     # set priority
     if ( $GetParam{'X-KIX-FollowUp-Priority'} ) {
@@ -335,11 +327,10 @@ sub Run {
     my %DynamicFieldListReversed = reverse %{$DynamicFieldList};
 
     # set ticket free text
-    my %Values =
-        (
+    my %Values = (
         'X-KIX-FollowUp-TicketKey'   => 'TicketFreeKey',
         'X-KIX-FollowUp-TicketValue' => 'TicketFreeText',
-        );
+    );
     for my $Item ( sort keys %Values ) {
         for my $Count ( 1 .. 16 ) {
             my $Key = $Item . $Count;
@@ -347,8 +338,7 @@ sub Run {
                 defined $GetParam{$Key}
                 && length $GetParam{$Key}
                 && $DynamicFieldListReversed{ $Values{$Item} . $Count }
-                )
-            {
+            ) {
                 # get dynamic field config
                 my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
                     ID => $DynamicFieldListReversed{ $Values{$Item} . $Count },
@@ -406,7 +396,7 @@ sub Run {
         }
     }
 
-    # KIX4OTRS-capeIT - apply stricter methods to set article-type and -sender.
+    # apply stricter methods to set article-type and -sender.
     my @SplitFrom = grep {/.+@.+/} split( /[<>,"\s\/\\()\[\]\{\}]/, $GetParam{From} );
 
     # check if email-from is a valid agent...
@@ -430,8 +420,7 @@ sub Run {
     }
 
     # check if from is known customer AND has the same customerID as in Ticket
-    if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom') )
-    {
+    if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom') ) {
         $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
         for my $FromAddress (@SplitFrom) {
             my $ContactObject = $Kernel::OM->Get('Contact');
@@ -447,8 +436,7 @@ sub Run {
                     if (
                         $ContactData{UserCustomerID} && $Ticket{CustomerID}
                         && $Ticket{CustomerID} eq $ContactData{UserCustomerID}
-                        )
-                    {
+                    ) {
                         $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
                         $GetParam{CustomerVisible} = 1;
                         last;
@@ -465,7 +453,6 @@ sub Run {
             last if ( $GetParam{'X-KIX-FollowUp-Channel'} eq 'email' );
         }
     }
-    # EO KIX4OTRS-capeIT
 
     # check channel
     if ( $GetParam{'X-KIX-FollowUp-Channel'} ) {
@@ -592,11 +579,10 @@ sub Run {
     %DynamicFieldListReversed = reverse %{$DynamicFieldList};
 
     # set free article text
-    %Values =
-        (
+    %Values = (
         'X-KIX-FollowUp-ArticleKey'   => 'ArticleFreeKey',
         'X-KIX-FollowUp-ArticleValue' => 'ArticleFreeText',
-        );
+    );
     for my $Item ( sort keys %Values ) {
         for my $Count ( 1 .. 16 ) {
             my $Key = $Item . $Count;
@@ -604,8 +590,7 @@ sub Run {
                 defined $GetParam{$Key}
                 && length $GetParam{$Key}
                 && $DynamicFieldListReversed{ $Values{$Item} . $Count }
-                )
-            {
+            ) {
                 # get dynamic field config
                 my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
                     ID => $DynamicFieldListReversed{ $Values{$Item} . $Count },

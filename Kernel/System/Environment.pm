@@ -269,7 +269,7 @@ sub PerlInfoGet {
             Linux::Distribution
             Locale::Codes
             LWP
-            Mail::Address
+            Email::Address::XS
             Mail::Internet
             MIME::Tools
             Module::Refresh

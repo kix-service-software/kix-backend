@@ -822,6 +822,8 @@ sub _MigrateTimeUnits {
             RelevantAttr => [
                 'ticket_id',
                 'article_id',
+                'time_unit',
+                'create_time',
                 'create_by'
             ]
         );

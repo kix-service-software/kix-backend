@@ -13,7 +13,7 @@ package Kernel::System::Email;
 use strict;
 use warnings;
 
-use Mail::Address;
+use Email::Address::XS;
 use MIME::Entity;
 use MIME::Parser;
 use MIME::Words;
@@ -736,7 +736,7 @@ sub Send {
     RECIPIENT:
     for my $Recipient (qw(To Cc Bcc)) {
         next RECIPIENT if !$Param{$Recipient};
-        for my $Email ( Mail::Address->parse( $Param{$Recipient} ) ) {
+        for my $Email ( Email::Address::XS->parse( $Param{$Recipient} ) ) {
             push( @ToArray, $Email->address() );
             if ($To) {
                 $To .= ', ';
@@ -755,7 +755,7 @@ sub Send {
     # set envelope sender for replies
     my $RealFrom = $ConfigObject->Get('SendmailEnvelopeFrom') || '';
     if ( !$RealFrom ) {
-        my @Sender = Mail::Address->parse( $Param{From} );
+        my @Sender = Email::Address::XS->parse( $Param{From} );
         $RealFrom = $Sender[0]->address();
     }
 
@@ -861,7 +861,7 @@ sub Bounce {
     my $EmailObject = Mail::Internet->new( \@EmailPlain );
 
     # get sender
-    my @Sender   = Mail::Address->parse( $Param{From} );
+    my @Sender   = Email::Address::XS->parse( $Param{From} );
     my $RealFrom = $Sender[0]->address();
 
     # add ReSent header (see https://www.ietf.org/rfc/rfc2822.txt A.3. Resent messages)

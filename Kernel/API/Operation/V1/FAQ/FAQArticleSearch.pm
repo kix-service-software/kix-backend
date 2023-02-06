@@ -87,6 +87,7 @@ sub Run {
                     ( $SearchItem->{Field} eq 'Language' && $SearchItem->{Operator} eq 'IN' ) ||
                     ( $SearchItem->{Field} eq 'CustomerVisible' && $SearchItem->{Operator} eq 'EQ' ) ||
                     ( $SearchItem->{Field} eq 'ValidID' && $SearchItem->{Operator} eq 'IN' ) ||
+                    ( $SearchItem->{Field} eq 'CategoryID' && $SearchItem->{Operator} eq 'IN' ) ||
                     (
                         $SearchItem->{Field} =~ m/(Fulltext|Number|Title|Keywords|Field)/ &&
                         $SearchItem->{Operator} =~ m/(CONTAINS|STARTSWITH|ENDSWITH|LIKE)/
@@ -133,6 +134,8 @@ sub Run {
                     $Value = $Value ? ['external', 'public'] : ['internal'];
                 } elsif ( $SearchItem->{Field} eq 'ValidID' ) {
                     $SearchItem->{Field} = 'ValidIDs';
+                } elsif ( $SearchItem->{Field} eq 'CategoryID' ) {
+                    $SearchItem->{Field} = 'CategoryIDs';
                 }
 
                 if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
