@@ -329,7 +329,11 @@ sub _CheckArticle {
                     $Article->{$Attribute} = [ $Article->{$Attribute} ];
                 }
                 for my $UserID ( @{ $Article->{$Attribute} } ) {
-                    if ( !$Self->ValidateUserID( UserID => $UserID ) ) {
+                    my $UserLogin = $Kernel::OM->Get('User')->UserLookup( 
+                        UserID => $UserID,
+                        Silent => 1,
+                    );
+                    if ( !$UserLogin ) {
                         return $Self->_Error(
                             Code    => 'BadRequest',
                             Message => "Parameter UserID $UserID in parameter $Attribute is invalid!",
