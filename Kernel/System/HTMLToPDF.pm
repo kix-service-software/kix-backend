@@ -366,8 +366,8 @@ END
         $Data{CreatedBy} = $Row[6];
         $Data{Changed}   = $Row[7];
         $Data{ChangedBy} = $Row[8];
-        $Data{IDKey}     = $Self->{"Backend$Row[1]"}->{IDKey}     || q{};
-        $Data{NumberKey} = $Self->{"Backend$Row[1]"}->{NumberKey} || q{};
+        $Data{IDKey}     = $Self->{"Backend$Row[2]"}->{IDKey}     || q{};
+        $Data{NumberKey} = $Self->{"Backend$Row[2]"}->{NumberKey} || q{};
     }
 
     return %Data;
