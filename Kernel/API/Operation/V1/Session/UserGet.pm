@@ -130,7 +130,7 @@ sub Run {
         $UserData{Tickets}->{OwnedAndLockedAndUnseen} = $Tickets->{Unseen};
 
         # get tickets watched by user
-        $Tickets = $Self->_GetWatchedTickets(TicketFilter => $TicketFilter);
+        $Tickets = $Self->_GetWatchedTickets();
         $UserData{Tickets}->{Watched} = $Tickets->{All};
         $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
 
