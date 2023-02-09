@@ -1065,9 +1065,12 @@ sub _ExecuteVariableFilters {
             $Value = `echo '$Value' | jq -r '$JqExpression'`;
             chomp $Value;
         }
-        elsif ( $Filter eq 'base64' ) {
+        elsif ( $Filter =~ /^(base64|ToBase64)$/i ) {
             $Value = MIME::Base64::encode_base64($Value);
             $Value =~ s/\n//g;
+        }
+        elsif ( $Filter =~ /^FromBase64$/i ) {
+            $Value = MIME::Base64::decode_base64($Value);
         }
         elsif (IsHashRefWithData($Self->{VariableFilter})) {
             $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
