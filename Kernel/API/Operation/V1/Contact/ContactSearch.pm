@@ -72,6 +72,12 @@ sub Run {
                     $Value = $Value . '*';
                 } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                     $Value = '*' . $Value;
+                } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
+                    $Value .= '*';
+                    # just prefix needed as config, because some DB do not use indices with leading wildcard - performance!
+                    if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
+                        $Value = '*' . $Value;
+                    }
                 }
 
                 if ( $SearchItem->{Field} =~ /^(Login|UserLogin)$/ ) {
