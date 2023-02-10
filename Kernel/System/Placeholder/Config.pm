@@ -78,9 +78,12 @@ sub _Replace {
                     $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound})
                     : $Param{ReplaceNotFound};
             }
-        } {
+        }
+
+        if ( !$Exists && $Param{UserID} == 1 ) {
             $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound});
         }
+
         $Replace;
     }egx;
 
