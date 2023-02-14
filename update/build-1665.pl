@@ -17,6 +17,7 @@ use lib dirname($Bin) . '/Kernel/cpan-lib';
 
 use Kernel::System::ObjectManager;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::Role::Permission;
 
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
@@ -29,6 +30,7 @@ use vars qw(%INC);
 
 _UpdateReports();
 _MigrateCheckboxDFValues();
+_AddNewPermissions();
 
 # correct states in inital reports (e.g. "pending_reminder" => "pending reminder")
 sub _UpdateReports {
@@ -125,6 +127,72 @@ sub _MigrateCheckboxDFValues {
             Message  => "Update values of migrated \"Checkbox\" dynamic fields."
         );
     }
+
+    return 1;
+}
+
+sub _AddNewPermissions {
+    my ( $Self, %Param ) = @_;
+
+    my $LogObject  = $Kernel::OM->Get('Log');
+    my $DBObject = $Kernel::OM->Get('DB');
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    my %RoleList           = reverse $RoleObject->RoleList();
+    my %PermissionTypeList = reverse $RoleObject->PermissionTypeList();
+
+    # add new permissions
+    my @NewPermissions = (
+        {
+            Role   => 'Customer',
+            Type   => 'Resource',
+            Target => '/system/config/definitions',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{DENY}
+        },
+    );
+
+    my $PermissionID;
+    my $AllPermsOK = 1;
+    foreach my $Permission (@NewPermissions) {
+        my $RoleID = $RoleList{$Permission->{Role}};
+        if (!$RoleID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find role "'.$Permission->{Role}.'"!'
+            );
+            next;
+        }
+        my $PermissionTypeID = $PermissionTypeList{$Permission->{Type}};
+        if (!$PermissionTypeID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Unable to find permission type "'.$Permission->{Type}.'"!'
+            );
+            next;
+        }
+
+        $PermissionID = $RoleObject->PermissionAdd(
+            RoleID     => $RoleID,
+            TypeID     => $PermissionTypeID,
+            Target     => $Permission->{Target},
+            Value      => $Permission->{Value},
+            IsRequired => 0,
+            Comment    => '',
+            UserID     => 1,
+        );
+
+        if (!$PermissionID) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Unable to add permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target}!"
+            );
+            $AllPermsOK = 0;
+        }
+    }
+
+
+    # delete whole cache
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     return 1;
 }
