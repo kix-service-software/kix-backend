@@ -210,6 +210,7 @@
 "Customer";"Resource";"/tickets/*/articles/*/flags";"x";"x";;;
 "Customer";"Resource";"/system/config";;"x";;;
 "Customer";"Resource";"/system/config/*";;"x";;;
+"Customer";"Resource";"/system/config/definitions";;;;;"x"
 "Customer";"Object";"/system/config{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
