@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "DynamicFieldCollectionResponse.json",
+  "type": "object",
+  "description": "A list of dynamic fields.",
+  "properties": {
+    "DynamicField": {
+      "type": "array",
+      "items": {
+        "$ref": "DynamicField.json"
+      }
+    }
+  },
+  "required": [
+    "DynamicField"
+  ]
+}

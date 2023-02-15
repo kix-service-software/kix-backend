@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "DynamicFieldPostPatchResponse.json",
+  "type": "object",
+  "description": "The ID of the created or updated dynamic field.",
+  "properties": {
+    "DynamicFieldID": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "DynamicFieldID"
+  ]
+}

@@ -50,14 +50,6 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class => 'DynamicField::DisplayGroup',
-    );
-    my @DisplayGroupIDs;
-    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
-       @DisplayGroupIDs = sort keys %{$GeneralCatalogItemList};
-    }
-
     return {
         'DynamicField' => {
             Type => 'HASH',
@@ -71,10 +63,6 @@ sub ParameterDefinition {
         },
         'DynamicField::FieldType' => {
             Required => 1
-        },
-        'DynamicField::DisplayGroupID' => {
-            RequiresValueIfUsed => 1,
-            OneOf => \@DisplayGroupIDs
         },
         'DynamicField::ObjectType' => {
             Required => 1
@@ -98,18 +86,18 @@ perform DynamicFieldCreate Operation. This will return the created DynamicFieldI
         Data => {
             DynamicFieldID => 123,
             DynamicField   => {
-	            Name            => '...',
-	            Label           => '...',
+                Name            => '...',
+                Label           => '...',
                 Comment         => '...'
                 FieldType       => '...',
                 ObjectType      => '...',
                 Config          => { },
                 CustomerVisible => 0,
-	            InternalField   => 0|1,              # optional
-	            ValidID         => 1,                # optional
+                InternalField   => 0|1,              # optional
+                ValidID         => 1,                # optional
             }
-	    },
-	);
+        },
+    );
 
 
     $Result = {
@@ -172,6 +160,7 @@ sub Run {
         CustomerVisible => $DynamicField->{CustomerVisible},
         ValidID         => $DynamicField->{ValidID} || 1,
         UserID          => $Self->{Authorization}->{UserID},
+        Comment         => $DynamicField->{Comment} || ''
     );
 
     if ( !$ID ) {
