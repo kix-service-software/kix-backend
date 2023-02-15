@@ -1,0 +1,59 @@
+{
+    "DynamicField": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2021-07-21 07:48:01",
+            "Comment": null,
+            "Config": {
+                "CountDefault": "1",
+                "CountMax": "1",
+                "CountMin": "0",
+                "DefaultValue": "",
+                "ItemSeparator": "",
+                "RegExList": [
+                    {
+                        "ErrorMessage": "Value has to be an positive integer (used as minutes).",
+                        "Value": "^\\d+$"
+                    }
+                ]
+            },
+            "CreateBy": 1,
+            "CreateTime": "2021-05-31 08:39:59",
+            "CustomerVisible": 1,
+            "FieldType": "Text",
+            "FieldTypeDisplayName": "Text",
+            "ID": 15,
+            "InternalField": 0,
+            "Label": "Planned Effort (min)",
+            "Name": "PlannedEffort",
+            "ObjectType": "Ticket",
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2022-06-10 11:59:48",
+            "Comment": null,
+            "Config": {
+                "CountDefault": "0",
+                "CountMax": "1",
+                "CountMin": "0",
+                "DateRestriction": "none",
+                "DefaultValue": "0",
+                "ItemSeparator": "",
+                "YearsInFuture": "0",
+                "YearsInPast": "0"
+            },
+            "CreateBy": 1,
+            "CreateTime": "2021-05-31 08:59:06",
+            "CustomerVisible": 0,
+            "FieldType": "DateTime",
+            "FieldTypeDisplayName": "Date / Time",
+            "ID": 16,
+            "InternalField": 0,
+            "Label": "Plan Begin",
+            "Name": "PlanBegin",
+            "ObjectType": "Ticket",
+            "ValidID": 1
+        }
+    ]
+}

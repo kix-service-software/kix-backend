@@ -436,7 +436,7 @@ sub CleanUp {
     my ( $Self, %Param ) = @_;
 
     my %TokenList = %{$Self->GetAllTokens()};
-    $Param{TokenType} ||= 'Nomal';
+    $Param{TokenType} ||= 'Normal';
 
     foreach my $Token ( keys %TokenList ) {
         my $Payload = $Self->ExtractToken(

@@ -1,0 +1,19 @@
+{
+    "DynamicField": {
+        "Label": "Simple selection renamed",
+        "Config": {
+            "CountDefault": "0",
+            "CountMax": "1",
+            "CountMin": "0",
+            "DefaultValue": "",
+            "ItemSeparator": ";",
+            "PossibleValues": {
+                "value1": "first value",
+                "value2": "second value",
+                "value3": "third value",
+                "value4": "fourth value"
+            },
+            "TranslatableValues": "1"
+        }
+    }
+}

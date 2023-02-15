@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "DynamicFieldPostRequest.json",
+  "type": "object",
+  "description": "The dynamic field request object for creation.",
+  "properties": {
+    "DynamicField": {
+      "type": "object",
+      "properties": {
+        "Comment": {
+          "type": "string"
+        },
+        "Config": {
+          "type": "object",
+          "properties": {
+            "CountDefault": {
+              "type": "integer"
+            },
+            "CountMax": {
+              "type": "integer"
+            },
+            "CountMin": {
+              "type": "integer"
+            },
+            "ItemSeparator": {
+              "type": "string"
+            }
+          },
+          "description": "Configuration of the dynamic field depending on the field type, the shown properties are for every type, some further are needed for some types"
+        },
+        "CustomerVisible": {
+          "type": "integer",
+          "description": "1 or 0 as value"
+        },
+        "FieldType": {
+          "type": "string",
+          "description": "Possible values are given in the dynamic field type resource"
+        },
+        "InternalField": {
+          "type": "integer",
+          "description": "1 or 0 as value"
+        },
+        "Label": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "ObjectType": {
+          "type": "string",
+          "description": "Possible values are given in the dynamic field object type resource"
+        },
+        "ValidID": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Config",
+        "CustomerVisible",
+        "FieldType",
+        "Label",
+        "Name",
+        "ObjectType"
+      ]
+    }
+  },
+  "required": [
+    "DynamicField"
+  ]
+}

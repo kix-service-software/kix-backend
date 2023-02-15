@@ -1,0 +1,24 @@
+{
+    "DynamicFieldObject": [
+        {
+            "DisplayName": "Contact",
+            "Name": "Contact"
+        },
+        {
+            "DisplayName": "FAQ",
+            "Name": "FAQArticle"
+        },
+        {
+            "DisplayName": "News",
+            "Name": "News"
+        },
+        {
+            "DisplayName": "Organisation",
+            "Name": "Organisation"
+        },
+        {
+            "DisplayName": "Ticket",
+            "Name": "Ticket"
+        }
+    ]
+}
