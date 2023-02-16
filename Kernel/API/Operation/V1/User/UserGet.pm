@@ -143,20 +143,20 @@ sub _GetUserData {
         NoPreferences => 1
     );
 
-    if ( !IsHashRefWithData( \%UserData ) ) {
+    if ( !IsHashRefWithData(\%UserData) ) {
         return;
     }
 
     # filter valid attributes
     if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
-        foreach my $Attr (sort keys %UserData) {
+        foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
         }
     }
 
     # filter valid attributes
     if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
-        foreach my $Attr (sort keys %UserData) {
+        foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
         }
     }
@@ -164,7 +164,8 @@ sub _GetUserData {
     #FIXME: workaoround KIX2018-3308###########
     $Self->AddCacheDependency(Type => 'Contact');
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        UserID => $UserID,
+        UserID        => $UserID,
+        DynamicFields => $Param{Data}->{include}->{DynamicFields},
     );
     $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
     $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
@@ -172,14 +173,59 @@ sub _GetUserData {
     $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
     ##################################
 
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        my @DynamicFields;
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'DynamicField');
+
+        # remove all dynamic fields from contact hash and set them into an array.
+        ATTRIBUTE:
+        for my $Attribute ( sort keys %ContactData ) {
+
+            if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+                if ( $ContactData{$Attribute} ) {
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                        my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                            Config          => $DynamicFieldConfig,
+                            Value           => $ContactData{$Attribute},
+                            NoDisplayValues => [split(',', $Param{Data}->{NoDynamicFieldDisplayValues} || '')]
+                        );
+
+                        if ( IsHashRefWithData($PreparedValue) ) {
+                            push(@DynamicFields, $PreparedValue);
+                        }
+                    }
+                    delete $ContactData{$Attribute};
+                }
+                next ATTRIBUTE;
+            }
+        }
+
+        # add dynamic fields array into 'DynamicFields' hash key if any
+        if ( @DynamicFields ) {
+            $ContactData{DynamicFields} = \@DynamicFields;
+        }
+        else {
+            $ContactData{DynamicFields} = [];
+        }
+    }
+
     #FIXME: comment back in when 3308 is resolved properly
-    if ($Param{Data}->{include}->{Contact}) {
+    if ( $Param{Data}->{include}->{Contact} ) {
         # $Self->AddCacheDependency( Type => 'Contact' );
         $UserData{Contact} = undef;
         # my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         #         UserID => $UserID,
         # );
-        $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
+        $UserData{Contact} = ( %ContactData ) ? \%ContactData : undef;
     }
 
     return \%UserData;

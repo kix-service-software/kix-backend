@@ -217,18 +217,6 @@ sub ArticleCreate {
         DynamicFields => 1,
     );
 
-    # TODO: replace placeholder in subject
-    # $Param{Subject} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-    #     RichText => 0,
-    #     Text     => $Param{Subject},
-    #     TicketID => $Param{TicketID},
-    #     Data     => {},
-    #     UserID   => $Param{UserID},
-    # );
-    # if (IsHashRefWithData($Param{OrigHeader}) && $Param{OrigHeader}->{Subject}) {
-    #     $Param{OrigHeader}->{Subject} = $Param{Subject};
-    # }
-
     # get html utils object
     my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
@@ -238,14 +226,6 @@ sub ArticleCreate {
         $Param{Body} = 'No body';
     } else {
 
-        # replace placeholders
-        $Param{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => $Param{MimeType} =~ m/text\/html/i ? 1 : 0,
-            Text     => $Param{Body},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-        );
         if (IsHashRefWithData($Param{OrigHeader}) && $Param{OrigHeader}->{Body}) {
             $Param{OrigHeader}->{Body} = $Param{Body};
         }
