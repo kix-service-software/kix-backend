@@ -199,6 +199,7 @@
 "Customer";"Resource";"/system/faq/categories";;"x";;;
 "Customer";"Resource";"/system/ticket";;"x";;;
 "Customer";"Resource";"/system/users";;"x";;;
+"Customer";"Object";"/system/users/*{User.UserID NE $CurrentUser.UserID}";;;;;
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
 "Customer";"Object";"/tickets/*{Ticket.OrganisationID !IN $CurrentUser.Contact.OrganisationIDs}";;;;;
