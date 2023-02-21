@@ -375,7 +375,7 @@ sub QueueLookup {
     elsif ( $Param{SystemAddressID} ) {
         foreach my $QueueID ( keys %QueueList ) {
             my %QueueData = $Self->QueueGet(
-                QueueID => $QueueID
+                ID => $QueueID
             );
             next if $QueueData{SystemAddressID} ne $Param{SystemAddressID};
             $ReturnData = $QueueID;

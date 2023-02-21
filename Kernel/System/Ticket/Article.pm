@@ -168,8 +168,10 @@ sub ArticleCreate {
         }
     }
 
-    # correct charset if necessary (KIX2018-8418)
-    $Param{Charset} =~ s/utf8/utf-8/i;
+    # correct charset if necessary
+    if ($Param{Charset}) {
+        $Param{Charset} =~ s/utf8/utf-8/i;
+    }
 
     # check ContentType vs. Charset & MimeType
     if ( !$Param{ContentType} ) {
@@ -187,7 +189,7 @@ sub ArticleCreate {
     else {
         if ( $Param{ContentType} =~ /charset=/i ) {
 
-            # correct charset if necessary (KIX2018-8418)
+            # correct charset if necessary
             $Param{ContentType} =~ s/utf8/utf-8/i;
 
             my $Charset = $Param{ContentType};
