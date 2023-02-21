@@ -502,6 +502,7 @@ sub Run {
         InReplyTo        => $GetParam{'In-Reply-To'},
         References       => $GetParam{'References'},
         ContentType      => $GetParam{'Content-Type'} || 'text/html',
+        Charset          => $GetParam{'Charset'},
         Body             => $GetParam{Body},
         UserID           => $Param{InmailUserID},
         HistoryType      => 'FollowUp',

@@ -1142,6 +1142,8 @@ sub ContactSearch {
     # where
     if ( $Param{Search} ) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
+        $Join .= ' LEFT JOIN contact_organisation co ON c.id = co.contact_id';
+        $Join .= ' LEFT JOIN organisation o ON o.id = co.org_id';
 
         my $AddWildcards = 1 if ($Param{Search} =~ m/^\*.+\*$/);
         my @OrCombinedGroups = split( /\|/, $Param{Search});
@@ -1176,6 +1178,12 @@ sub ContactSearch {
                 }
 
                 push(@WhereParts, "$Self->{Lower}(u.login) LIKE $Self->{Lower}(?)");
+                push(@Bind, \$Part);
+
+                push(@WhereParts, "$Self->{Lower}(o.number) LIKE $Self->{Lower}(?)");
+                push(@Bind, \$Part);
+
+                push(@WhereParts, "$Self->{Lower}(o.name) LIKE $Self->{Lower}(?)");
                 push(@Bind, \$Part);
 
                 if (@WhereParts) {

@@ -92,7 +92,8 @@ sub Run {
                 } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                     $Value = '*' . $Value;
                 } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
-                    $Value = $Value . '*';
+                    $Value .= '*';
+                    # just prefix needed as config, because some DB do not use indices with leading wildcard - performance!
                     if( $Kernel::OM->Get('Config')->Get('OrganisationSearch::UseWildcardPrefix') ) {
                         $Value = '*' . $Value;
                     }

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-2-2 21:08+0000\n"
+"POT-Creation-Date: 2023-2-21 12:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1740,6 +1740,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
 msgid "Defines which attributes of the contact data hash should be exported. Key = Attribute, Value = 1 if attribute should be exported. If nothing is defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Contact.xml
+msgid "Enable wildcard praefix for contact fulltext search."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/ObjectIcon.xml

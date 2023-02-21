@@ -366,8 +366,8 @@ END
         $Data{CreatedBy} = $Row[6];
         $Data{Changed}   = $Row[7];
         $Data{ChangedBy} = $Row[8];
-        $Data{IDKey}     = $Self->{"Backend$Row[1]"}->{IDKey}     || q{};
-        $Data{NumberKey} = $Self->{"Backend$Row[1]"}->{NumberKey} || q{};
+        $Data{IDKey}     = $Self->{"Backend$Row[2]"}->{IDKey}     || q{};
+        $Data{NumberKey} = $Self->{"Backend$Row[2]"}->{NumberKey} || q{};
     }
 
     return %Data;
@@ -988,31 +988,13 @@ sub _RenderTable {
         Name => 'HTML'
     );
 
-    if (
-        IsHashRefWithData($Param{Ignores})
-        && $Param{Ignores}->{$Block->{ID}}
-    ) {
-        %Ignore = %{$Param{Ignores}->{$Block->{ID}}}
-    }
-    elsif (
-        $Block->{Ignore}
-        && IsHashRefWithData($Block->{Ignore})
-    ) {
-        %Ignore = %{$Block->{Ignore}}
-    }
-
-    if (
-        IsHashRefWithData($Param{Allows})
-        && $Param{Allows}->{$Block->{ID}}
-    ) {
-        %Allow = %{$Param{Allows}->{$Block->{ID}}}
-    }
-    elsif (
-        $Block->{Allow}
-        && IsHashRefWithData($Block->{Allow})
-    ) {
-        %Allow = %{$Block->{Allow}}
-    }
+    $Self->_CheckTableRestriction(
+        Allow   => \%Allow,
+        Ignore  => \%Ignore,
+        Block   => $Block,
+        Ignores => $Param{Ignores},
+        Allows  => $Param{Allows}
+    );
 
     my %AddClass;
     my $IsDefault = 0;
@@ -1067,10 +1049,7 @@ sub _RenderTable {
                 next if $Allow{$Key} ne 'KEY' && $Datas->{$Key} !~ m/$Allow{$Key}/smx;
             }
 
-            if (
-                %Ignore
-                && !%Allow
-            ) {
+            if ( %Ignore ) {
                 next if defined $Ignore{$Key} && $Ignore{$Key} eq 'KEY';
                 next if defined $Ignore{$Key} && $Datas->{$Key} =~ m/$Ignore{$Key}/smx;
             }
@@ -1443,6 +1422,40 @@ sub _FilenameCreate {
     $Filename .= $CurrentTime;
 
     return $Filename;
+}
+
+sub _CheckTableRestriction {
+    my ($Self, %Param) = @_;
+
+    my $Block = $Param{Block};
+
+    if (
+        IsHashRefWithData($Param{Allows})
+        && $Param{Allows}->{$Block->{ID}}
+    ) {
+        %{$Param{Allow}} = %{$Param{Allows}->{$Block->{ID}}};
+    }
+    elsif (
+        $Block->{Allow}
+        && IsHashRefWithData($Block->{Allow})
+    ) {
+        %{$Param{Allow}} = %{$Block->{Allow}};
+    }
+
+    if (
+        IsHashRefWithData($Param{Ignores})
+        && $Param{Ignores}->{$Block->{ID}}
+    ) {
+        %{$Param{Ignore}} = %{$Param{Ignores}->{$Block->{ID}}};
+    }
+    elsif (
+        $Block->{Ignore}
+        && IsHashRefWithData($Block->{Ignore})
+    ) {
+        %{$Param{Ignore}} = %{$Block->{Ignore}};
+    }
+
+    return 1;
 }
 
 1;

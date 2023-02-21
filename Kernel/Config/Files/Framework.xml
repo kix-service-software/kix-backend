@@ -2393,7 +2393,7 @@
             <String Regex="^(..|.._..)$">de</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DefaultUsedLanguages" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="DefaultUsedLanguages" Required="1" Valid="1">
         <Description Translatable="1">Defines all the languages that are available to the application. Specify only English names of languages here.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>

@@ -1,0 +1,102 @@
+{
+   "$schema": "http://json-schema.org/draft-07/schema",
+   "$id": "DynamicField.json",
+   "type": "object",
+   "description": "The dynamic field object.",
+   "properties": {
+      "ChangeBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "ChangeTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Comment": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Config": {
+         "type": "object",
+         "readOnly": true,
+         "properties": {
+            "CountDefault": {
+               "type": "integer",
+               "readOnly": true
+            },
+            "CountMax": {
+               "type": "integer",
+               "readOnly": true
+            },
+            "CountMin": {
+               "type": "integer",
+               "readOnly": true
+            },
+            "ItemSeparator": {
+               "type": "string",
+               "readOnly": true
+            }
+         },
+         "description": "Configuration of the dynamic field depending on the field type, the shown properties are for every type - added via include \"Config\""
+      },
+      "CreateBy": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "CreateTime": {
+         "type": "string",
+         "readOnly": true
+      },
+      "CustomerVisible": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "FieldType": {
+         "type": "string",
+         "readOnly": true
+      },
+      "FieldTypeDisplayName": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "InternalField": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "Label": {
+         "type": "string",
+         "readOnly": true
+      },
+      "Name": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ObjectType": {
+         "type": "string",
+         "readOnly": true
+      },
+      "ValidID": {
+         "type": "integer",
+         "readOnly": true
+      }
+   },
+   "required": [
+      "ChangeBy",
+      "ChangeTime",
+      "CreateBy",
+      "CreateTime",
+      "CustomerVisible",
+      "FieldType",
+      "FieldTypeDisplayName",
+      "ID",
+      "InternalField",
+      "Label",
+      "Name",
+      "ObjectType",
+      "ValidID"
+   ]
+}

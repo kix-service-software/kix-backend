@@ -398,7 +398,7 @@ sub TicketCreate {
         }
         else {
             $Param{StateID} = 1;
-        }        
+        }
     }
 
     # StateID/State lookup!
@@ -539,7 +539,7 @@ sub TicketCreate {
                 );
             }
 
-            my @NameChunks = split(' ', $ContactEmailRealname);
+            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : undef;
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 Email  => $ContactEmail,
                 Silent => 1,
