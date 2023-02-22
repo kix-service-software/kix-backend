@@ -57,6 +57,12 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    $Self->SetDefaultSort(
+        Ticket => [ 
+            { Field => 'CreateTime' },
+        ]
+    );
+
     # check for customer relevant ids if necessary
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerTicketIDList = $Self->_GetCustomerUserVisibleObjectIds(
@@ -92,7 +98,7 @@ sub Run {
         Result     => 'ARRAY',
         Search     => $Self->{Search}->{Ticket},
         Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
-        Sort       => $Self->{Sort}->{Ticket},
+        Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},
         UserID     => $Self->{Authorization}->{UserID}
     );

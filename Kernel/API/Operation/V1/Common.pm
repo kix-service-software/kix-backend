@@ -851,6 +851,44 @@ sub AddCacheKeyExtension {
     }
 }
 
+=item SetDefaultSort()
+
+suppress a sub-resource include if it's already done somewhere else (due to performance reasons etc.)
+
+    $CommonObject->SetDefaultSort(
+        Ticket => [
+            {
+                Field     => 'Title',
+                Direction => 'descending',      # optional, default: ascending
+                Type      => 'NATURAL',         # optional, default: TEXTUAL
+            }
+        ]
+    );
+
+=cut
+
+sub SetDefaultSort {
+    my ( $Self, %Param ) = @_;
+
+    foreach my $Object ( keys %Param ) {
+        foreach my $SortItem ( @{$Param{$Object}} ) {
+            if ( !$SortItem->{Field} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Default filter for \"$Object\" contains not \"Field\" property!",
+                );
+                return 0;
+            }
+            $SortItem->{Type} = 'cmp' if !$SortItem->{Type};
+            $SortItem->{Direction} = 'ascending' if !$SortItem->{Direction};
+        }
+    }
+
+    $Self->{DefaultSort} = \%Param;
+
+    return 1;
+}
+
 =item HandleSearchInAPI()
 
 Tell the API core to handle the "search" parameter in the API. This is needed for operations that don't handle the "search" parameter and leave the work to the API core.
@@ -936,7 +974,7 @@ sub _Success {
         }
 
         # honor a sorter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Sort} ) ) {
+        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplySort(
@@ -1764,7 +1802,7 @@ sub _ApplySort {
         return;
     }
 
-    foreach my $Object ( keys %{ $Self->{Sort} } ) {
+    foreach my $Object ( keys %{ $Self->{Sort} || $Self->{DefaultSort} } ) {
         if ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("sorting %i objects of type %s", scalar @{$Param{Data}->{$Object}}, $Object));
@@ -1772,7 +1810,7 @@ sub _ApplySort {
             # sort array by given criteria
             my @SortCriteria;
             my %SpecialSort;
-            foreach my $Sort ( @{ $Self->{Sort}->{$Object} } ) {
+            foreach my $Sort ( @{ $Self->{Sort}->{$Object} || $Self->{DefaultSort}->{$Object} } ) {
                 my $SortField = $Sort->{Field};
                 my $Type      = $Sort->{Type};
 

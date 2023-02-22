@@ -703,6 +703,8 @@ sub OrganisationSearch {
         $SQL .= "WHERE ".$Where;
     }
 
+    $SQL .= ' ORDER BY o.name, o.number';
+
     # ask database
     $DBObject->Prepare(
         SQL   => $SQL,
