@@ -1569,6 +1569,19 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::MailAccountFetch::Debug" Required="1" Valid="1">
+        <Description Translatable="1">Enable PostMaster MailAccountFetch debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0">Off</Item>
+                <Item Key="1">Info</Item>
+                <Item Key="2">On</Item>
+                <Item Key="3">with GetHeaderParam</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0001-SystemMonitoring" Required="0" Valid="1">
         <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
