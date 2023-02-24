@@ -115,16 +115,11 @@ sub Auth {
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
     my $LDAP = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
     if ( !$LDAP ) {
-        if ( $Self->{Die} ) {
-            die "Can't connect to $Self->{Host}: $@";
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
-            );
-            return;
-        }
+        $Kernel::OM->Get('Log')->Log(
+           Priority => 'error',
+           Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+        );
+        return;
     }
     my $Result = '';
     if ( $Self->{SearchUserDN} && $Self->{SearchUserPw} ) {
