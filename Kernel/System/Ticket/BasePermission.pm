@@ -53,6 +53,9 @@ sub BasePermissionValidate {
         }
     }
 
+    # wildcard is always valid
+    return 1 if $Param{Target} eq '*';
+
     return $Kernel::OM->Get('Queue')->QueueLookup(
         QueueID => $Param{Target} || 0,
         Silent  => 1,

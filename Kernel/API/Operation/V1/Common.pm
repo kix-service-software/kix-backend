@@ -252,6 +252,20 @@ sub RunOperation {
         $Result = $Self->Run(
             %Param,
         );
+
+        # handle optional permissions
+        if ( $Result->{Success} && $Self->{RequestMethod} =~ /^(PATCH|POST)$/g ) {
+            OBJECT:
+            foreach my $Object ( keys %{$Param{Data}} ) {
+                next OBJECT if !IsHashRefWithData($Param{Data}->{$Object}) || !IsArrayRef($Param{Data}->{$Object}->{Permissions});
+                $Self->_HandlePermissions(
+                    ObjectID    => (values %{$Result->{Data}})[0],
+                    Object      => $Object,
+                    Data        => $Param{Data}->{$Object},
+                    Permissions => $Param{Data}->{$Object}->{Permissions},
+                );
+            }
+        }
     }
 
     # log created ID of POST requests
@@ -901,6 +915,74 @@ sub HandleSearchInAPI {
     my ( $Self, %Param ) = @_;
 
     $Self->{HandleSearchInAPI} = 1;
+}
+
+=item _HandlePermissions()
+
+Handle the optional "Permissions" property
+
+    $CommonObject->_HandlePermissions(
+        ObjectID    => 123,
+        Object      => 'Queue',
+        Data        => {...},
+        Permissions => [],
+    );
+
+=cut
+
+sub _HandlePermissions {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ObjectID Object Data Permissions)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my @BasePermissions;
+    PERMISSION:
+    foreach my $Permission ( @{$Param{Permissions}} ) {
+        next PERMISSION if $Permission->{Type} ne 'Base';
+
+        if ( !$Permission->{RoleID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "RoleID missing in Permission!"
+            );
+            return;
+        }
+        push @BasePermissions, $Permission;
+    }
+
+    my $HandlerObject = $Kernel::OM->Get($Param{Object});
+
+    if ( !$HandlerObject || !$HandlerObject->can('UpdateBasePermissions') ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No base permission handler for \"$Param{Object}\"!",
+        );
+        return;
+    }
+
+    my $Success = $HandlerObject->UpdateBasePermissions(
+        ObjectID       => $Param{ObjectID},
+        PermissionList => \@BasePermissions,
+        UserID         => $Self->{Authorization}->{UserID},
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Base permission handler for \"Param{Object}\" returned error !",
+        );
+        return;
+    }
+
+    return 1;
 }
 
 =item _Success()

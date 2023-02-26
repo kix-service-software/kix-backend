@@ -35,9 +35,9 @@ This will return a list with objects.
 
     my $Result = $Object->Run();
 
-    $Result = {
-        Assigned => [],
-        DependingObjects => []
+    $Result = [
+        {...},
+        {...}
     }
 
 =cut
@@ -45,16 +45,14 @@ This will return a list with objects.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @RelevantObjectPermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantObjectPermissions} || ''));
+    my @RelevantBasePermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantBasePermissions} || ''));
 
-    my %Permissions = $Kernel::OM->Get('Role')->PermissionListForObject(
-        RelevantObjectPermissions => \@RelevantObjectPermissions,
-        Target        => $Param{RequestURI},
-        ObjectID      => $Param{ObjectID},
-        ObjectIDAttr  => $Param{OperationConfig}->{ObjectID},
+    my @Permissions = $Kernel::OM->Get('Role')->PermissionListForObject(
+        RelevantBasePermissions => \@RelevantBasePermissions,
+        Target                  => $Param{RequestURI},
     );
 
-    return \%Permissions;
+    return \@Permissions;
 }
 
 1;

@@ -604,15 +604,17 @@ sub PermissionUpdate {
 
 =item PermissionList()
 
-returns a hash of all permissions for a role
+returns array of all PermissionIDs for a role
 
-    my @Permissions = $RoleObject->PermissionList(
-        RoleID => 1
+    my @PermissionIDs = $RoleObject->PermissionList(
+        RoleID => 1,                                    # optional
+        Types  => ['Resource', 'Base::Ticket'],         # optional
+        Target => '...'                                 # optional
     );
 
 the result looks like
 
-    @Permissions = (
+    @PermissionIDs = (
         1,
         2,
         3
@@ -623,19 +625,8 @@ the result looks like
 sub PermissionList {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for (qw(RoleID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
     # create cache key
-    my $CacheKey = 'PermissionList::' . $Param{RoleID};
+    my $CacheKey = 'PermissionList::' . ($Param{RoleID}||'') . '::'.join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -644,14 +635,89 @@ sub PermissionList {
     );
     return @{$Cache} if $Cache;
 
+    my $SQL = 'SELECT rp.id FROM role_permission rp, permission_type pt WHERE pt.id = rp.type_id';
+
+    my @Bind;
+
+    if ( $Param{RoleID} ) {
+        $SQL .= ' AND rp.role_id = ?';
+        push @Bind, \$Param{RoleID};
+    }
+
+    if ( IsArrayRefWithData($Param{Types}) ) {
+        $SQL .= ' AND pt.name IN (' . join( ', ', map {'?'} @{ $Param{Types} } ) . ')';
+        push @Bind, map { \$_ } @{ $Param{Types} };
+    }
+
+    if ( $Param{Target} ) {
+        $SQL .= ' AND rp.target LIKE ?';
+        push @Bind, \$Param{Target};
+    }
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT id FROM role_permission WHERE role_id = ?',
-        Bind => [ \$Param{RoleID} ]
+        SQL  => $SQL,
+        Bind => \@Bind,
     );
 
     my @Result;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return @Result;
+}
+
+=item PermissionListGet()
+
+returns a hash of all permissions for a role
+
+    my @Permissions = $RoleObject->PermissionListGet(
+        RoleID => 1,
+        Types  => ['Resource', 'Base::Ticket'],         # optional
+        Target => '...'                                 # optional
+    );
+
+the result looks like
+
+    @Permissions = (
+        {...},
+        {...},
+        {...}
+    );
+
+=cut
+
+sub PermissionListGet {
+    my ( $Self, %Param ) = @_;
+
+    # create cache key
+    my $CacheKey = 'PermissionListGet::' . ($Param{RoleID}||'') . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    my @PermissionIDs = $Self->PermissionList(%Param);
+
+    my @Result;
+    foreach my $PermissionID ( @PermissionIDs ) {
+        my %Permission = $Self->PermissionGet(
+            ID => $PermissionID
+        );
+        if ( %Permission ) {
+            push @Result, \%Permission;
+        }
     }
 
     # set cache
@@ -716,20 +782,18 @@ sub PermissionDelete {
 
 =item PermissionListForObject()
 
-returns a two lists of directly assigned permissions für the given object
+returns a list of directly assigned permissions for the given object
 
     my %Permissions = $UserObject->PermissionsListForObject(
-        RelevantObjectPermissions => [ 'Queue-to-Ticket' ]
-        Target       => '/queue/1',
-        ObjectID     => 123
-        ObjectIDAttr => 'QueueID',
+        RelevantBasePermissions => [ 'Base::Ticket' ]
+        Target                  => '/ticket/queues/1',
     );
 
 returns
-    {
-        Assigned => [],
-        DependingObjects => [],
-    }
+    [
+        {...},
+        {...}
+    ]
 
 =cut
 
@@ -737,7 +801,7 @@ sub PermissionListForObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    foreach my $Key ( qw(Target ObjectID ObjectIDAttr) ) {
+    foreach my $Key ( qw(Target) ) {
         if ( !$Param{$Key} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -747,74 +811,50 @@ sub PermissionListForObject {
         }
     }
 
-    # prepare relevant Object patterns
-    my %RelevantObjectPermissions;
-    if ( IsArrayRefWithData($Param{RelevantObjectPermissions}) ) {
-        my $Config = $Kernel::OM->Get('Config')->Get('Permission::Object');
-        if ( IsHashRefWithData($Config) ) {
-            foreach my $Key ( @{$Param{RelevantObjectPermissions}} ) {
-                foreach my $Pattern ( values %{$Config->{$Key}} ) {
-                    my $PreparedPattern = $Pattern;
-                    $PreparedPattern =~ s/<$Param{ObjectIDAttr}>/$Param{ObjectID}/g;
-                    $RelevantObjectPermissions{$PreparedPattern} = 1;
-                }
-            }
-        }
-    }
+    my $ObjectID = (split('/', $Param{Target}))[-1];
 
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
-    # get all relevant permissions
-    return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => "SELECT id FROM role_permission WHERE type_id IN (SELECT id FROM permission_type WHERE name IN ('Object', 'Object'))",
-    );
-
-    my @PermissionIDs;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        push(@PermissionIDs, $Row[0]);
+    my %BasePermissionTypes;
+    foreach my $BasePermission ( @{$Param{RelevantBasePermissions}||[]} ) {
+        $BasePermissionTypes{$PermissionTypeList{$BasePermission}} = $BasePermission;
     }
 
-    my @AssignedPermissions;
-    my @DependingObjectsPermissions;
-    foreach my $ID ( sort @PermissionIDs ) {
-        my %Permission = $Self->PermissionGet(
-            ID => $ID,
+    # get resource, object and property permissions
+    my @PermissionList = $Self->PermissionListGet(
+        Target => $Param{Target}.'*',
+    );
+    
+    my @Result;
+
+    PERMISSION:
+    foreach my $Permission ( @PermissionList ) {
+        next PERMISSION if !$BasePermissionTypes{$Permission->{TypeID}} && $Permission->{Target} !~ /^$Param{Target}\{.*\}$/;
+
+    }
+
+    # get base permissions
+    if ( IsArrayRefWithData($Param{RelevantBasePermissions}) ) {
+        my @PermissionList = $Self->PermissionListGet(
+            Type   => $Param{RelevantBasePermissions},
+            Target => $ObjectID,
         );
 
-        if ( !%Permission ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to get permission ID $ID!"
+        foreach my $Permission ( @PermissionList ) {
+            my $ValueStr = $Self->GetReadablePermissionValue(
+                Value  => $Permission->{Value},
+                Format => 'Long'
             );
-            return;
-        }
 
-        # ignore permissions of type Resource without filters (non Object)
-        next if ( $Permission{TypeID} == $PermissionTypeList{Resource} && $Permission{Target} !~ /[{}]/ );
-
-        # ignore wildcard targets on type Object
-        next if ( $PermissionTypeList{Object} && $Permission{Target} =~ /\*/ && $Permission{TypeID} == $PermissionTypeList{Object} );
-
-        # prepare target
-        my $Target = $Permission{Target};
-        $Target =~ s/\//\\\//g;
-        $Target =~ s/\{.+?\}//g;
-
-        my @SplitParts = split(/\//, $Param{Target});
-        my $ObjectID = $SplitParts[-1];
-
-        # check for assigned permission
-        if ( $Param{Target} =~ /^$Target/ ) {
-            push(@AssignedPermissions, \%Permission);
-        }
-
-        # check for Object permission (depending objects)
-        if ( $RelevantObjectPermissions{$Permission{Target}} ) {
-            push(@DependingObjectsPermissions, \%Permission);
+            push @Result, {
+                Type       => 'Base',
+                RoleID     => $Permission->{RoleID},
+                Permission => $ValueStr,
+            };
         }
     }
 
-    return ( Assigned => \@AssignedPermissions, DependingObjects => \@DependingObjectsPermissions );
+    return @Result;
 }
 
 =item ValidatePermission()
@@ -866,7 +906,7 @@ returns the permission value in a readable format
 
     my $ValueStr = $RoleObject->GetReadablePermissionValue(
         Value  => 123,
-        Format => 'Short|Long'          # default is Short
+        Format => 'Short|Long|ExtraLong'          # default is Short
     );
 
 =cut
@@ -887,13 +927,21 @@ sub GetReadablePermissionValue {
 
     my $Result;
 
-    if ( $Param{Format} && $Param{Format} eq 'Long' ) {
-        my @Permissions;
-        foreach my $PermissionName ( sort keys %{$Self->PERMISSION} ) {
+    if ( $Param{Format} && $Param{Format} =~ /Long/ ) {
+        my %Permissions;
+        foreach my $PermissionName ( reverse sort keys %{$Self->PERMISSION} ) {
+            next if $PermissionName eq 'NONE';
+            next if ($Permissions{WRITE} && $PermissionName =~ /CREATE|UPDATE|DELETE/);
             next if ($Param{Value} & $Self->PERMISSION->{$PermissionName}) != $Self->PERMISSION->{$PermissionName};
-            push(@Permissions, $PermissionName);
+            $Permissions{$PermissionName} = 1;
         }
-        $Result = (join(' + ', @Permissions) || 'NONE') . ' (0x'. (sprintf('%04x', $Param{Value})).')';
+        if ( $Param{Format} eq 'ExtraLong' ) {
+            $Result = (join(' + ', sort keys %Permissions) || 'NONE') . ' (0x'. (sprintf('%04x', $Param{Value})).')';
+            $Result = 'NONE' if !$Result;
+        }
+        else {
+            $Result = join('+', sort keys %Permissions);
+        }
     }
     else {
         foreach my $PermissionName ( qw( CREATE READ UPDATE DELETE DENY ) ) {

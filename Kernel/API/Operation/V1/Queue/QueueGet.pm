@@ -169,7 +169,7 @@ sub Run {
         }
 
         # add "pseudo" ParentID
-        my $ParentName = join('::', @QueueParts);        
+        my $ParentName = join('::', @QueueParts);
 
         if ( $ParentName ) {
             if ( !$QueueDataListByName{$ParentName} ) {
