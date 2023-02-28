@@ -25,9 +25,11 @@
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]
+<div class="[% Data.ID %]">
 [% IF Data.Translate %]
 [% Translate("Page") %] <span class="page"></span>[% IF Data.PageOf %] [% Translate("of") %] <span class="topage"></span>[% END %]
 [% ELSE %]
 Page <span class="page"></span>[% IF Data.PageOf %] of <span class="topage"></span>[% END %]
 [% END %]
+</div>
 [% RenderBlockEnd("HTML") %]

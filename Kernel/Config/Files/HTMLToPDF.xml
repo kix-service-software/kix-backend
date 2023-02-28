@@ -2,7 +2,7 @@
 <kix_config version="1.0" init="Framework">
     <ConfigItem AccessLevel="internal" Name="HTMLToPDF::wkhtmltopdf" Required="0" Valid="1">
         <Description Translatable="1">Settings for 'wkhtmltopdf'</Description>
-        <Group>Framework</Group>
+        <Group>PDFConvert</Group>
         <SubGroup>Core::HTMLToPDF</SubGroup>
         <Setting>
             <Hash>
@@ -23,21 +23,82 @@
 
     <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Module###Ticket" Required="0" Valid="1">
         <Description Translatable="1">Module registration for configuration print.</Description>
-        <Group>Framework</Group>
+        <Group>PDFConvert</Group>
         <SubGroup>Core::HTMLToPDF::Module</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::HTMLToPDF::Ticket</Item>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Object::Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Module###Article" Required="0" Valid="1">
         <Description Translatable="1">Module registration for configuration print.</Description>
-        <Group>Framework</Group>
+        <Group>PDFConvert</Group>
         <SubGroup>Core::HTMLToPDF::Module</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::HTMLToPDF::Article</Item>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Object::Article</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Text" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Text</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Richtext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Richtext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Image" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Image</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Page" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Page</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Container" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Container</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Table" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::Table</Item>
             </Hash>
         </Setting>
     </ConfigItem>

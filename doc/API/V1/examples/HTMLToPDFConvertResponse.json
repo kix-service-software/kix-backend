@@ -1,0 +1,7 @@
+{
+    "HTMLToPDF": {
+        "Content": "someBase64EncodedContentString",
+        "ContentType": "application/pdf",
+        "Filename": "Ticket_2023022217000032_20230222_1222.pdf"
+    }
+}

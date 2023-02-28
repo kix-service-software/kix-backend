@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "HTMLToPDFConvertResponse.json",
+  "type": "object",
+  "description": "A response for a htmltopdf convert GET request.",
+  "properties": {
+    "HTMLToPDF": {
+      "$ref": "HTMLToPDFConvert.json"
+    }
+  },
+  "required": [
+    "HTMLToPDF"
+  ]
+}

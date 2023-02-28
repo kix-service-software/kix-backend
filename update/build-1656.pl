@@ -33,16 +33,16 @@ sub _UpdateHTMLToPDF {
 
     my $HTMLTOPDFObject = $Kernel::OM->Get('HTMLToPDF');
 
-    my %Template = $HTMLTOPDFObject->DefinitionGet(
+    my %Template = $HTMLTOPDFObject->TemplateGet(
         Name   => 'Article',
         UserID => 1
     );
 
     return 1 if !%Template;
 
-    $HTMLTOPDFObject->DefinitionUpdate(
+    $HTMLTOPDFObject->TemplateUpdate(
         %Template,
-        Definition => '{"Expands":["DynamicField"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"10","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}}],"Content":[{"ID":"Subject","Type":"Text","Value":"<KIX_ARTICLE_Subject>","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"Blocks":[{"ID":"ArticleMeta","Type":"Table","Columns":["<Font_Bold>Key","Value"],"Allow":{"From":"KEY","Subject":"KEY","CreateTime":"KEY","Channel":"KEY"},"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"<KIX_ARTICLE_BodyRichtext>"}]}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":0,"Translate":true,"Style":{"Float":"right"}}]}',
+        Definition => '{"Expands":["DynamicField"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"1","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}}],"Content":[{"ID":"Subject","Type":"Text","Value":"<KIX_ARTICLE_Subject>","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"Blocks":[{"ID":"ArticleMeta","Type":"Table","Columns":["<Font_Bold>Key","Value"],"Allow":{"From":"KEY","Subject":"KEY","CreateTime":"KEY","Channel":"KEY"},"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"<KIX_ARTICLE_BodyRichtext>"}]}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":0,"Translate":true,"Style":{"Float":"right"}}]}',
         UserID     => 1
     );
 

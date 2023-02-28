@@ -26,5 +26,7 @@
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]
-<img src="[% Data.Value %]" />
+<div class="[% Data.ID %] picture" >
+    <img src="[% Data.Value %]" />
+</div>
 [% RenderBlockEnd("HTML") %]
