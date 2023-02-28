@@ -20,7 +20,7 @@
 [% END %]
         padding: 0.5rem 0;
     }
-    .[% Data.ID %] > .Text {
+    .[% Data.ID %].Text {
 [% IF Data.Style.Height %]
         height: [% Data.Style.Height | html %];
 [% END %]
@@ -29,6 +29,8 @@
 [% END %]
 [% IF Data.Style.Float %]
         float: [% Data.Style.Float | html %];
+[% ELSE %]
+        clear: both;
 [% END %]
 [% IF Data.Style.Size %]
         font-size: [% Data.Style.Size | html %];
@@ -45,8 +47,8 @@
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]
 [% IF Data.IsLink %]
-<a class="Text [% Data.Class | html %]" href="[% Data.Value %]"></a>
+<a class="[% Data.ID %] Text [% Data.Class | html %]" href="[% Data.Value %]"></a>
 [% ELSE %]
-<p class="Text [% Data.Class | html %]">[% Data.Value %]</p>
+<p class="[% Data.ID %] Text [% Data.Class | html %]">[% Data.Value %]</p>
 [% END %]
 [% RenderBlockEnd("HTML") %]
