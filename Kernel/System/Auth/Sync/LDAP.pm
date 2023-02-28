@@ -223,20 +223,40 @@ sub Sync {
                     $AttributeNames = [$AttributeNames];
                 }
 
-                ATTRIBUTE_NAME:
+
+              ATTRIBUTE_NAME:
                 for my $AttributeName ( @{$AttributeNames} ) {
+                    # set a fixed value...
                     if ( $AttributeName =~ /^SET:/i ) {
-                        $Value = substr($AttributeName, 4);
+                        $Value = substr( $AttributeName, 4 );
                         $Value =~ s/^\s+|\s+$//g;
                     }
+                    # set a value concatenation of multiple attributes
+                    # LDAP attributes are marked with curly brackets
+                    elsif ( $AttributeName =~ /^CONCAT\:(.+)$/i ) {
+                        $Value = $1;
+                        $Value =~ s/^\s+|\s+$//g;
+                        while ( $Value =~ /\{(.+?)\}/) {
+                            $AttributeName = $1;
+                            my $ValuePart = $Entry->get_value($AttributeName) || '';
+                            $ValuePart =~ s/^\s+|\s+$//g;
+                            $Value =~s/\{(.+?)\}/$ValuePart/;
+                        }
+                    }
+                    # just set the attribute...
                     elsif ( $Entry->get_value($AttributeName) ) {
                         $Value = $Entry->get_value($AttributeName);
+                        $Value =~ s/^\s+|\s+$//g;
                     }
+                    # set empty if no value can be retrieved or the attribute is not available..
                     else {
                         $Value = "";
                     }
-                    $Value = $Self->_ConvertFrom($Value, 'utf-8',);
 
+                    # ensure proper encoding, i.e. utf-8
+                    $Value = $Self->_ConvertFrom( $Value, 'utf-8', );
+
+                    # "special treatment"
                     # do we have to look up organisation id?
                     if ( $Key eq "PrimaryOrganisationID" || $Key eq "OrganisationIDs" ) {
                         my $FoundOrgID = "";
@@ -318,7 +338,7 @@ sub Sync {
                 return;
             }
 
-            if ( !IsHashRefWithData(\%ContactData) ) {
+            if ( !%ContactData ) {
                 # create new contact
                 $ContactID = $ContactObject->ContactAdd(
                     %SyncContact,
@@ -649,14 +669,18 @@ sub Sync {
     $UserContextFromLDAP{IsAgent} = $SyncContact{IsAgent} if ( exists($SyncContact{IsAgent}) );
 
     if ( %User ) {
-        my $Result = $UserObject->UserUpdate(
+
+    # remove UserPw to avoid overwrite
+    $User{UserPw} = undef if defined $User{UserPw};
+
+        my $Success = $UserObject->UserUpdate(
             %User,
             %UserContextFromLDAP,
             ValidID      => ( $UserContextFromLDAP{IsCustomer} || $UserContextFromLDAP{IsAgent} ) ? 1 : 2,
             ChangeUserID => 1,
         );
 
-        if ( !$Result ) {
+        if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to update usage context of user \"$Param{User}\" (UserID: $UserID)!",
