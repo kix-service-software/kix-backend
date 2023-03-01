@@ -2618,30 +2618,29 @@ sub _CheckBasePermission {
 
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
-    my %Result = $Self->GetBasePermissionObjectIDs(
+    my $Result = $Self->GetBasePermissionObjectIDs(
         %Param,
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
         Permission   => $PermissionName,
     );
-    if ( !%Result ) {
+    if ( !$Result ) {
         # return 403, because we don't have permission
         return $Self->_Error(
             Code => 'Forbidden',
         );
     }
-    if ( !IsArrayRefWithData($Result{ObjectIDs}) ) {
-        # we don't have any relevant base permissions
+    elsif ( $Result && !IsHashRef($Result) ) {
         return $Self->_Success();
     }
 
     # add corresponding permission filter 
     my %Filter = $Self->_CreateFilterForObject(
         Filter   => {},
-        Object   => $Result{Object},
-        Field    => $Result{Attribute},
+        Object   => $Result->{Object},
+        Field    => $Result->{Attribute},
         Operator => 'IN',
-        Value    => $Result{ObjectIDs},
+        Value    => $Result->{ObjectIDs},
     );
     if ( !%Filter ) {
         # we can't generate the filter, so this is a false

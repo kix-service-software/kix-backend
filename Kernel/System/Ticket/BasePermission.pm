@@ -67,8 +67,9 @@ sub BasePermissionValidate {
 validate a given base permission.
 
     my $Success = $QueueObject->BasePermissionRelevantObjectIDList(
-        Target => '...',
-        Value  => ...
+        Permission    => '...',
+        UsageContext  => ...,
+        UserID        => 1,
     );
 =cut
 
@@ -86,24 +87,26 @@ sub BasePermissionRelevantObjectIDList {
         }
     }
 
-    my @Values = (
-        Kernel::System::Role::Permission::PERMISSION_CRUD
-    );
-    if ( $Param{Permission} eq 'READ' ) {
-        push @Values, Kernel::System::Role::Permission::PERMISSION->{READ};
+
+    my $Value = 0;
+    foreach my $Permission ( split(/\+/, $Param{Permission}) ) {
+        $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
     }
 
+    # check if we have base permissions for this user in this usage context
     my %PermissionList = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
         Types        => ['Base::Ticket'],
-        Values       => \@Values,
     );
+    return if !%PermissionList;
 
     my @QueueIDs;
 
     PERMISSION:
     foreach my $Permission ( values %PermissionList ) {
+        next PERMISSION if ($Permission->{Value} & $Value) == 0;
+
         if ( $Permission->{Target} !~ /\*/ ) {
             push @QueueIDs, $Permission->{Target};
         }
@@ -122,7 +125,9 @@ sub BasePermissionRelevantObjectIDList {
         }
     }
 
-    return @QueueIDs;
+    return if !@QueueIDs;
+
+    return \@QueueIDs;
 }
 
 1;
