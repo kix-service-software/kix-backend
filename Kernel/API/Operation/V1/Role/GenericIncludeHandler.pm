@@ -45,11 +45,22 @@ This will return a list with objects.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # check required parameters
+    foreach my $Key ( qw(Object ObjectID UserID) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
     my @RelevantBasePermissions = split(/\s*,\s*/, ($Param{OperationConfig}->{RelevantBasePermissions} || ''));
 
     my @Permissions = $Kernel::OM->Get('Role')->PermissionListForObject(
         RelevantBasePermissions => \@RelevantBasePermissions,
-        Target                  => $Param{RequestURI},
+        Target                  => $Param{ObjectID},
     );
 
     return \@Permissions;

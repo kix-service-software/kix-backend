@@ -782,7 +782,7 @@ sub PermissionDelete {
 
 =item PermissionListForObject()
 
-returns a list of directly assigned permissions for the given object
+returns a list of directly assigned permissions for the given object (atm only BasePermissions are supported)
 
     my %Permissions = $UserObject->PermissionsListForObject(
         RelevantBasePermissions => [ 'Base::Ticket' ]
@@ -800,6 +800,9 @@ returns
 sub PermissionListForObject {
     my ( $Self, %Param ) = @_;
 
+    # atm only BasePermissions are supported...
+    return if !$Param{RelevantBasePermissions};
+
     # check needed stuff
     foreach my $Key ( qw(Target) ) {
         if ( !$Param{$Key} ) {
@@ -811,8 +814,6 @@ sub PermissionListForObject {
         }
     }
 
-    my $ObjectID = (split('/', $Param{Target}))[-1];
-
     my %PermissionTypeList = reverse $Self->PermissionTypeList();
 
     my %BasePermissionTypes;
@@ -820,38 +821,25 @@ sub PermissionListForObject {
         $BasePermissionTypes{$PermissionTypeList{$BasePermission}} = $BasePermission;
     }
 
-    # get resource, object and property permissions
-    my @PermissionList = $Self->PermissionListGet(
-        Target => $Param{Target}.'*',
-    );
-    
     my @Result;
 
-    PERMISSION:
+    # get all relevant permissions for this object
+    my @PermissionList = $Self->PermissionListGet(
+        Types  => $Param{RelevantBasePermissions},
+        Target => $Param{Target},
+    );
+
     foreach my $Permission ( @PermissionList ) {
-        next PERMISSION if !$BasePermissionTypes{$Permission->{TypeID}} && $Permission->{Target} !~ /^$Param{Target}\{.*\}$/;
-
-    }
-
-    # get base permissions
-    if ( IsArrayRefWithData($Param{RelevantBasePermissions}) ) {
-        my @PermissionList = $Self->PermissionListGet(
-            Type   => $Param{RelevantBasePermissions},
-            Target => $ObjectID,
+        my $ValueStr = $Self->GetReadablePermissionValue(
+            Value  => $Permission->{Value},
+            Format => 'Long'
         );
 
-        foreach my $Permission ( @PermissionList ) {
-            my $ValueStr = $Self->GetReadablePermissionValue(
-                Value  => $Permission->{Value},
-                Format => 'Long'
-            );
-
-            push @Result, {
-                Type       => 'Base',
-                RoleID     => $Permission->{RoleID},
-                Permission => $ValueStr,
-            };
-        }
+        push @Result, {
+            Type       => 'Base',
+            RoleID     => $Permission->{RoleID},
+            Permission => $ValueStr,
+        };
     }
 
     return @Result;
