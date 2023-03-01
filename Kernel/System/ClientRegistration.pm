@@ -410,6 +410,17 @@ sub NotificationSend {
         NoStatsUpdate => 1,
     );
     return 1 if !@EventList;
+    
+    # delete the cached events we sent
+    foreach my $Key ( @Keys ) {
+        $CacheObject->Delete(
+            Type          => 'ClientNotification',
+            Key           => $Key,
+            UseRawKey     => 1,
+            NoStatsUpdate => 1,
+        );
+    }
+
 
     # get list of clients that requested to be notified
     my @ClientIDs = $Self->ClientRegistrationList(
@@ -427,16 +438,6 @@ sub NotificationSend {
         },
         NoStatsUpdate => 1,
     );
-
-    # delete the cached events we sent
-    foreach my $Key ( @Keys ) {
-        $CacheObject->Delete(
-            Type          => 'ClientNotification',
-            Key           => $Key,
-            UseRawKey     => 1,
-            NoStatsUpdate => 1,
-        );
-    }
 
     return 1;
 }
