@@ -13,13 +13,22 @@ package Kernel::System::Email::SMTPTLS;
 use strict;
 use warnings;
 
-use Net::SSLGlue::SMTP;
+use Net::SMTP;
 
 use base qw(Kernel::System::Email::SMTP);
 
 our @ObjectDependencies = (
     'Log',
 );
+
+## no critic qw(Subroutines::ProhibitUnusedPrivateSubroutines)
+
+# Use Net::SSLGlue::SMTP on systems with older Net::SMTP modules that do not provide starttls
+BEGIN {
+    if ( !defined &Net::SMTP::starttls ) {
+        require Net::SSLGlue::SMTP;
+    }
+}
 
 sub _Connect {
     my ( $Self, %Param ) = @_;
