@@ -2648,7 +2648,49 @@ sub _CheckBasePermission {
         return;
     }
 
-    $Self->{BasePermissionFilter} = \%Filter;
+    if ( $Self->{RequestMethod} ne 'GET' ) {
+        # load the object data (if we have to)
+        my %ObjectData = ();
+        if ( $Self->{RequestMethod} eq 'POST' ) {
+            # we need some special handling here since we don't have an object in the DB yet
+            # so we have to use the object given in the request data
+            %ObjectData = %{$Param{Data}};
+        }
+        elsif ( IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+
+            # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
+            # a GET request will be handled differently
+            my $GetResult = $Self->ExecOperation(
+                RequestMethod     => 'GET',
+                OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
+                Data              => $Param{Data},
+                IgnorePermissions => 1,
+            );
+
+            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                # no success, simply return what we got
+                return $GetResult;
+            }
+
+            %ObjectData = %{$GetResult->{Data}};
+        }
+
+        $Self->_ApplyFilter(
+            Data               => \%ObjectData,
+            Filter             => \%Filter,
+            IsPermissionFilter => 1,
+        );
+
+        if ( !IsHashRefWithData($ObjectData{$Result->{Object}}) ) {
+            # return 403, because we don't have permission
+            return $Self->_Error(
+                Code => 'Forbidden',
+            );
+        }
+    }
+    else {
+        $Self->{BasePermissionFilter} = \%Filter;
+    }
 
     return $Self->_Success();
 }

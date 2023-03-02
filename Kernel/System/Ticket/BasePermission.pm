@@ -87,7 +87,6 @@ sub BasePermissionRelevantObjectIDList {
         }
     }
 
-
     my $Value = 0;
     foreach my $Permission ( split(/\+/, $Param{Permission}) ) {
         $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
