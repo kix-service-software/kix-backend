@@ -2652,9 +2652,31 @@ sub _CheckBasePermission {
         # load the object data (if we have to)
         my %ObjectData = ();
         if ( $Self->{RequestMethod} eq 'POST' ) {
-            # we need some special handling here since we don't have an object in the DB yet
-            # so we have to use the object given in the request data
-            %ObjectData = %{$Param{Data}};
+            if ( IsHashRefWithData($Param{Data}->{$Result->{Object}}) ) {
+                # we need some special handling here since we don't have an object in the DB yet
+                # so we have to use the object given in the request data
+                %ObjectData = %{$Param{Data}};
+
+                $Self->_ApplyFilter(
+                    Data               => \%ObjectData,
+                    Filter             => \%Filter,
+                    IsPermissionFilter => 1,
+                );
+
+                if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {
+                    # return 403, because we don't have permission
+                    return $Self->_Error(
+                        Code => 'Forbidden',
+                    );
+                }
+            }
+            elsif ( !IsArrayRefWithData($Result->{ObjectIDs}) ) {
+                # we don't have a given object in the request data, we are returning 403
+                # because we don't have any possible ObjectIDs matching the relevant base permission
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                );
+            }
         }
         elsif ( IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
 
@@ -2673,19 +2695,19 @@ sub _CheckBasePermission {
             }
 
             %ObjectData = %{$GetResult->{Data}};
-        }
 
-        $Self->_ApplyFilter(
-            Data               => \%ObjectData,
-            Filter             => \%Filter,
-            IsPermissionFilter => 1,
-        );
-
-        if ( !IsHashRefWithData($ObjectData{$Result->{Object}}) ) {
-            # return 403, because we don't have permission
-            return $Self->_Error(
-                Code => 'Forbidden',
+            $Self->_ApplyFilter(
+                Data               => \%ObjectData,
+                Filter             => \%Filter,
+                IsPermissionFilter => 1,
             );
+
+            if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {
+                # return 403, because we don't have permission
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                );
+            }
         }
     }
     else {
