@@ -5653,7 +5653,7 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">4</Data>
-    <Data Key="type_id"></Data>
+    <Data Key="type_id">4</Data>
     <Data Key="target" Type="Quote"><![CDATA[*]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
@@ -5963,7 +5963,7 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">5</Data>
-    <Data Key="type_id"></Data>
+    <Data Key="type_id">4</Data>
     <Data Key="target" Type="Quote"><![CDATA[*]]></Data>
     <Data Key="value">15</Data>
     <Data Key="create_by">1</Data>
@@ -7393,7 +7393,7 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
-    <Data Key="type_id"></Data>
+    <Data Key="type_id">4</Data>
     <Data Key="target" Type="Quote"><![CDATA[*]]></Data>
     <Data Key="value">15</Data>
     <Data Key="create_by">1</Data>
