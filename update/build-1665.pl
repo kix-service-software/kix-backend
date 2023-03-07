@@ -29,6 +29,7 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 use vars qw(%INC);
 
 _UpdateReports();
+_MigrateObjectReferenceDFValues();
 _MigrateCheckboxDFValues();
 _AddNewPermissions();
 
@@ -101,6 +102,92 @@ sub _UpdateReports {
                     );
                 }
             }
+        }
+    }
+
+    return 1;
+}
+
+sub _MigrateObjectReferenceDFValues {
+    my ( $Self, %Param ) = @_;
+
+    my $LogObject = $Kernel::OM->Get('Log');
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    my $SQL = "SELECT dfv.id, field_type, value_text " 
+            . "FROM dynamic_field df, dynamic_field_value dfv "
+            . "WHERE dfv.field_id = df.id "
+            . "AND df.field_type IN ('Contact','Organisation') "
+            . "AND dfv.value_text IS NOT NULL "
+            . "AND dfv.value_int IS NULL";
+
+    $DBObject->Prepare(
+        SQL => $SQL,
+    );
+
+    my $Data = $DBObject->FetchAllArrayRef(
+        Columns => [ 'id', 'field_type', 'value_text' ]
+    );
+
+    my $Count = 0;
+    my $Success = 0;
+    foreach my $Row ( @{$Data || []} ) {
+        $Count++;
+        if ( $Row->{field_type} eq 'Contact' && $Row->{value_text} && $Row->{value_text} !~ /^d+$/ ) {
+            $Row->{value_text} = $Kernel::OM->Get('Contact')->ContactLookup(
+                UserLogin => $Row->{value_text},
+            );
+        }
+        if ( $Row->{field_type} eq 'Organisation' && $Row->{value_text} && $Row->{value_text} !~ /^d+$/ ) {
+            $Row->{value_text} = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                Number => $Row->{value_text},
+            );
+        }
+
+        my $Result = $DBObject->Do(
+            SQL => '
+                UPDATE dynamic_field_value SET value_text = ? WHERE id = ?',
+            Bind => [
+                \$Row->{value_text}, \$Row->{id}
+            ],
+        );
+        if ( !$Result ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Unable to update DF value ID $Row->{id}!"
+            );
+        }
+        else {
+            $Success++;
+        }
+    }
+
+    $LogObject->Log(
+        Priority => 'info',
+        Message  => "Updated $Success/$Count DF values."
+    );
+
+    foreach my $Type ( qw(Contact Organisation) ) {
+        my $NewType = $Type.'Reference';
+
+        my $Result = $DBObject->Do(
+            SQL => '
+                UPDATE dynamic_field SET field_type = ? WHERE field_type = ?',
+            Bind => [
+                \$NewType, \$Type
+            ],
+        );
+        if ( !$Result ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Unable to update field type \"$Type\" in DF config!"
+            );
+        }
+        else {
+            $LogObject->Log(
+                Priority => 'info',
+                Message  => "Updated field type \"$Type\" to \"$NewType\" in DF config."
+            );
         }
     }
 

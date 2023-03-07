@@ -24,16 +24,19 @@ our @ObjectDependencies = (
 );
 
 my %ObjectTypeReferenceMapping = (
-    'Article'        => 'article',
-    'Ticket'         => 'ticket',
-    'ITSMConfigItem' => 'configitem',
-    'FAQ'            => 'faq_item',
-    'Contact'        => 'contact',
+    'Article'         => 'article',
+    'Ticket'          => 'ticket',
+    'ITSMConfigItem'  => 'configitem',
+    'FAQ'             => 'faq_item',
+    'CustomerUser'    => 'contact',
+    'CustomerCompany' => 'organisation',
 );
 
 my %FieldTypeReferenceMapping = (
     'TicketReference'         => 'ticket',
     'ITSMConfigItemReference' => 'configitem',
+    'ContactReference'        => 'contact',
+    'OrganisationReference'   => 'organisation',
 );
 
 =item Describe()
@@ -122,77 +125,111 @@ sub _Run {
         ObjectType     => 'dynamic_field_value',
         SourceObjectID => $Item->{id}
     );
+
     if ( $MappedID ) {
         return 'Ignored';
     }
 
-    # check if this item already exists (i.e. some initial data)
-    my $ID = $Self->Lookup(
-        Table        => 'dynamic_field_value',
-        PrimaryKey   => 'id',
-        Item         => $Item,
-        RelevantAttr => [
-            'field_id',
-            'object_id',
-        ]
-    );
+    my $ObjectID = $Item->{object_id} || $Item->{object_id_text};
 
-    # insert row
-    if ( !$ID ) {
-        # map the object ID
-        my $ObjectType = $ObjectTypeReferenceMapping{$Self->{DynamicFieldObjectTypes}->{$Item->{field_id}}};
-        if ( !$ObjectType ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to migrate dynamic field type \"$Self->{DynamicFieldObjectTypes}->{$Item->{field_id}}\"!"
-            );
-            return "Ignored";
-        }
-        my $ReferencedID = $Self->GetOIDMapping(
-            ObjectType     => $ObjectType,
-            SourceObjectID => $Item->{object_id}
+    # map the object ID
+    my $ObjectType = $ObjectTypeReferenceMapping{$Self->{DynamicFieldObjectTypes}->{$Item->{field_id}}};
+    if ( !$ObjectType ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to migrate dynamic field type \"$Self->{DynamicFieldObjectTypes}->{$Item->{field_id}}\"!"
         );
-        if ( !$ReferencedID ) {
+        return "Ignored";
+    }
+    my $ReferencedID;
+    if ( $Self->{DynamicFieldObjectTypes}->{$Item->{field_id}} eq 'CustomerUser' ) {
+        # some special handling here
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+            UserLogin => $ObjectID,
+            Silent    => 1,
+        );
+
+        if ( !$ContactID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Can't find the referenced $Self->{DynamicFieldObjectTypes}->{$Item->{field_id}} object with ID $Item->{object_id}!"
+                Message  => "Can't find the referenced Contact object with user login \"$ObjectID\"!"
             );
             return 'Error';
         }
-        $Item->{object_id} = $ReferencedID;
 
-        my $FieldIDSrc = $Item->{field_id};
-
-        # map the field_id
-        $Item->{field_id} = $Self->GetOIDMapping(
-            ObjectType     => 'dynamic_field',
-            SourceObjectID => $Item->{field_id}
-        );
-
-        # special handling for value if needed
-        if ( $Self->{DynamicFieldTypesSrc}->{$FieldIDSrc} eq 'Checkbox' ) {
-            $Item->{value_text} = $Item->{value_int};
-            $Item->{value_int} = undef;
-        }
-        elsif ( $FieldTypeReferenceMapping{$Self->{DynamicFieldTypes}->{$Item->{field_id}}} ) {
-            # map the value to the new object
-            ATTR:
-            foreach my $Attr ( qw(value_text value_int) ) {
-                next ATTR if !$Item->{$Attr};
-                $Item->{$Attr} = $Self->GetOIDMapping(
-                    ObjectType     => $FieldTypeReferenceMapping{$Self->{DynamicFieldTypes}->{$Item->{field_id}}},
-                    SourceObjectID => $Item->{$Attr}
-                );
-            }
-        }
-
-        $ID = $Self->Insert(
-            Table          => 'dynamic_field_value',
-            PrimaryKey     => 'id',
-            Item           => $Item,
-            AutoPrimaryKey => 1,
+        $ReferencedID = $Self->GetOIDMapping(
+            ObjectType => 'Contact',
+            ObjectID   => $ContactID,
+        ) || $ContactID;
+    }
+    else {
+        $ReferencedID = $Self->GetOIDMapping(
+            ObjectType     => $ObjectType,
+            SourceObjectID => $ObjectID,
         );
     }
+
+    if ( !$ReferencedID ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Can't find the referenced $Self->{DynamicFieldObjectTypes}->{$Item->{field_id}} ($ObjectType) object with ID $ObjectID!"
+        );
+        return 'Error';
+    }
+    $Item->{object_id} = $ReferencedID;
+
+    my $FieldIDSrc = $Item->{field_id};
+
+    # map the field_id
+    $Item->{field_id} = $Self->GetOIDMapping(
+        ObjectType     => 'dynamic_field',
+        SourceObjectID => $Item->{field_id}
+    );
+
+    # # check if this item already exists (i.e. some initial data)
+    # my $ID = $Self->Lookup(
+    #     Table        => 'dynamic_field_value',
+    #     PrimaryKey   => 'id',
+    #     Item         => $Item,
+    #     RelevantAttr => [
+    #         'field_id',
+    #         'object_id',
+    #     ]
+    # );
+
+    # special handling for value if needed
+    if ( $Self->{DynamicFieldTypesSrc}->{$FieldIDSrc} eq 'Checkbox' ) {
+        $Item->{value_text} = $Item->{value_int};
+        $Item->{value_int} = undef;
+    }
+    if ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'ContactReference' ) {
+        $Item->{value_text} = $Kernel::OM->Get('Contact')->ContactLookup(
+            UserLogin => $Item->{value_text},
+        );
+    }
+    elsif ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'OrganisationReference' ) {
+        $Item->{value_text} = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            Number => $Item->{value_text},
+        );
+    }
+    elsif ( $FieldTypeReferenceMapping{$Self->{DynamicFieldTypes}->{$Item->{field_id}}} ) {
+        # map the value to the new object
+        ATTR:
+        foreach my $Attr ( qw(value_text value_int) ) {
+            next ATTR if !$Item->{$Attr};
+            $Item->{$Attr} = $Self->GetOIDMapping(
+                ObjectType     => $FieldTypeReferenceMapping{$Self->{DynamicFieldTypes}->{$Item->{field_id}}},
+                SourceObjectID => $Item->{$Attr}
+            );
+        }
+    }
+
+    my $ID = $Self->Insert(
+        Table          => 'dynamic_field_value',
+        PrimaryKey     => 'id',
+        Item           => $Item,
+        AutoPrimaryKey => 1,
+    );
 
     if ( $ID ) {
         $Result = 'OK';
