@@ -141,9 +141,8 @@ sub Run {
                                 push(@DynamicFields, $PreparedValue);
                             }
                         }
-                        delete $OrganisationData{$Attribute};
                     }
-                    next ATTRIBUTE;
+                    delete $OrganisationData{$Attribute};
                 }
             }
 
