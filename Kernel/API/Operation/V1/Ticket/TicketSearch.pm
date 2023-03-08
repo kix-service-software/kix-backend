@@ -105,12 +105,22 @@ sub Run {
 
    if ( @TicketIndex ) {
 
+        # inform the API core of the total number of tickets
+        $Self->SetTotalItemCount(
+            Ticket => scalar @TicketIndex
+        );
+        
+        # restrict data to the request window
+        my %PagedResult = $Self->ApplyPaging(
+            Ticket => \@TicketIndex
+        );
+
         # get already prepared Ticket data from TicketGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::TicketGet',
             SuppressPermissionErrors => 1,
             Data                     => {
-                TicketID                    => join(',', @TicketIndex),
+                TicketID                    => join(',', @{$PagedResult{Ticket}}),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues}

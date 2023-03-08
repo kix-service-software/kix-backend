@@ -333,7 +333,7 @@ sub _PrepareRedisKey {
         $Key = Digest::MD5::md5_hex($Self->{CachePrefix}.$Param{Key});
     };
     if ( $@ ) {
-        print STDERR "($$) Redis: error in preparing cache key (Key: $Param{Key})\n";
+        print STDERR "($$) Redis: error in preparing cache key (Key: $Param{Key}, Error: $@)\n";
     }
     return $Key;
 }

@@ -98,7 +98,7 @@ sub BasePermissionRelevantObjectIDList {
         UsageContext => $Param{UsageContext},
         Types        => ['Base::Ticket'],
     );
-    return if !%PermissionList;
+    return 1 if !%PermissionList;
 
     my @QueueIDs;
 

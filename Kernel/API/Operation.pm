@@ -112,6 +112,9 @@ sub new {
         );
     }
 
+    # prepare ImplicitPagingFor config
+    $Self->{OperationConfig}->{ImplicitPagingFor} =  { map { $_ => 1 } split(/,/, $Self->{OperationConfig}->{ImplicitPagingFor}) };
+
     # init call level
     $Self->{Level} = $Param{Level} || 0;
     $Self->{LevelIndent} = '    ' x $Self->{Level} || '';

@@ -166,7 +166,8 @@ sub GetBasePermissionObjectIDs {
     my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
         %Param,
     );
-    return if !$QueueIDs && !IsArrayRef($QueueIDs);
+    return if !$QueueIDs;
+    return 1 if !IsArrayRef($QueueIDs);
     
     return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
 }
