@@ -2597,8 +2597,6 @@ sub _GetCacheKey {
         'ascii+noindent'
     );
 
-print STDERR "CacheKey: $CacheKey\n";
-
     return $CacheKey;
 }
 
