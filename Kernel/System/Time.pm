@@ -582,16 +582,15 @@ sub WorkingTime {
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
+    my $TimeVacationDaysOneTime = {};
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
-            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
+            $TimeWorkingHours = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
+            $TimeVacationDays = $Self->GetVacationDays( Calendar => $Param{Calendar} );
 
             my $Zone = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
             if ($Zone) {
-                my $TimeZoneObject   = DateTime::TimeZone->new(
+                my $TimeZoneObject = DateTime::TimeZone->new(
                     name => $Zone
                 );
                 $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
@@ -669,9 +668,18 @@ sub WorkingTime {
             last WORKINGDAY;
         }
 
+        # prepare vacation days if needed
+        if ( ref( $TimeVacationDaysOneTime->{ $Year } ) ne 'HASH' ) {
+            $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+                Calendar => $Param{Calendar},
+                Year     => $Year,
+            );
+        }
+
         if ( %TimeWorking ) {
             # get WorkingDay
             my $WorkingDay = $LDay{$WDay};
+
             # check for VacationDay
             if ( $TimeVacationDays->{$Month}->{$Day} ) {
                 $WorkingDay = $TimeVacationDays->{$Month}->{$Day};
@@ -913,14 +921,13 @@ sub DestinationTime {
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
+    my $TimeVacationDaysOneTime = {};
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
-            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
+            $TimeWorkingHours = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
+            $TimeVacationDays = $Self->GetVacationDays( Calendar => $Param{Calendar} );
 
-            my $TimeZoneObject   = DateTime::TimeZone->new(
+            my $TimeZoneObject = DateTime::TimeZone->new(
                 name => $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} )
             );
             $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
@@ -974,6 +981,14 @@ sub DestinationTime {
             $Month += 1;
 
             $DestinationTime += 3600;
+        }
+
+        # prepare vacation days if needed
+        if ( ref( $TimeVacationDaysOneTime->{ $Year } ) ne 'HASH' ) {
+            $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+                Calendar => $Param{Calendar},
+                Year     => $Year,
+            );
         }
 
         if ( %TimeWorking ) {
@@ -1178,14 +1193,20 @@ sub VacationCheck {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
-    if ( $Param{Calendar} ) {
-        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
-        }
+    my $TimeVacationDays;
+    if (
+        $Param{Calendar}
+        && $ConfigObject->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDays = $Self->GetVacationDays( Calendar => $Param{Calendar} );
     }
+    else {
+        $TimeVacationDays = $Self->GetVacationDays();
+    }
+    my $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+        Calendar => $Param{Calendar},
+        Year     => $Year,
+    );
 
     # '01' - format
     if ( defined $TimeVacationDays->{$Month}->{$Day} ) {
@@ -1223,48 +1244,21 @@ sub GetVacationDays {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDays');
-    if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
-        }
+    my $TimeVacationDays;
+    if (
+        $Param{Calendar}
+        && $Kernel::OM->Get('Config')->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
+    }
+    else {
+        $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDays');
     }
 
     return {} if !IsArrayRefWithData($TimeVacationDays);
 
     foreach my $Item ( @{$TimeVacationDays} ) {
         $Result->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
-    }
-
-    return $Result;
-}
-
-=item GetVacationDaysOneTime()
-
-get TimeVacationDaysOneTime from Config and prepare internal representation
-
-    $TimeObject->GetVacationDaysOneTime(
-        Calendar => '...'           # optional
-    );
-
-
-=cut
-
-sub GetVacationDaysOneTime {
-    my ( $Self, %Param ) = @_;
-    my $Result;
-
-    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDaysOneTime');
-    if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
-        }
-    }
-
-    return {} if !IsArrayRefWithData($TimeVacationDays);
-
-    foreach my $Item ( @{$TimeVacationDays} ) {
-        $Result->{$Item->{Year}}->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
     }
 
     return $Result;
@@ -1451,6 +1445,89 @@ sub _GetTimeWorking {
         Depends => ['SysConfig'] # delete also if config is changed (TimeWorkingHours)
     );
     return %TimeWorking;
+}
+
+sub PrepareVacationDaysOfYear {
+    my ( $Self, %Param ) = @_;
+
+    # init return value
+    my %VacationDaysOfYear = ();
+
+    # check data
+    if ( !defined( $Param{Year} ) ) {
+        return \%VacationDaysOfYear;
+    }
+
+    # get config object
+    my $ConfigObject = $Kernel::OM->Get('Config');
+
+    # process sysconfig
+    my $TimeVacationDaysOneTime;
+    my $TimeVacationDaysModules;
+    if (
+        $Param{Calendar}
+        && $ConfigObject->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDaysOneTime = $ConfigObject->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
+        $TimeVacationDaysModules = $ConfigObject->Get( 'TimeVacationDaysModules::Calendar' . $Param{Calendar} );
+    }
+    else {
+        $TimeVacationDaysOneTime = $ConfigObject->Get('TimeVacationDaysOneTime');
+        $TimeVacationDaysModules = $ConfigObject->Get('TimeVacationDaysModules');
+    }
+
+    # process modules
+    if ( ref( $TimeVacationDaysModules ) eq 'HASH' ) {
+
+        CONFIG:
+        for my $ModuleConfig ( sort( keys( %{ $TimeVacationDaysModules } ) ) ) {
+
+            next CONFIG if (
+                ref( $TimeVacationDaysModules->{$ModuleConfig} ) ne 'HASH'
+                || !$TimeVacationDaysModules->{$ModuleConfig}->{Name}
+                || !$TimeVacationDaysModules->{$ModuleConfig}->{Module}
+            );
+            last CONFIG if ( !$Kernel::OM->Get('Main')->Require( $TimeVacationDaysModules->{$ModuleConfig}->{Module} ) );
+
+            my $VacationObject = $TimeVacationDaysModules->{$ModuleConfig}->{Module}->new(
+                %{$Self},
+            );
+
+            if ( !$VacationObject ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "new() of vacation module $TimeVacationDaysModules->{$ModuleConfig}->{Module} not successfully!",
+                );
+                next CONFIG;
+            }
+
+            # run module
+            my %ModuleVacationDaysOfYear = $VacationObject->Run(
+                Name => $TimeVacationDaysModules->{$ModuleConfig}->{Name},
+                Year => $Param{Year},
+            );
+
+            # merge hashes
+            if ( %ModuleVacationDaysOfYear ) {
+                for my $Month ( keys( %ModuleVacationDaysOfYear ) ) {
+                    if ( ref( $ModuleVacationDaysOfYear{ $Month } ) eq 'HASH' ) {
+                        for my $Day ( keys ( %{ $ModuleVacationDaysOfYear{ $Month } } ) ) {
+                            $VacationDaysOfYear{ $Month }->{ $Day } = $ModuleVacationDaysOfYear{ $Month }->{ $Day };
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (
+        ref( $TimeVacationDaysOneTime ) eq 'HASH'
+        && ref( $TimeVacationDaysOneTime->{ $Param{Year} } ) eq 'HASH'
+    ) {
+        %VacationDaysOfYear = %{ $TimeVacationDaysOneTime->{ $Param{Year} } };
+    }
+
+    return \%VacationDaysOfYear;
 }
 
 1;
