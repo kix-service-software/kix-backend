@@ -68,6 +68,7 @@ sub Run {
     # migrate as long as there are users to migrate
     foreach my $Item ( @{$SourceData} ) {
         my %Contact;
+        my $CreatedContactID;
 
         # prepare contact attributes
         foreach my $Attr ( qw( title first_name last_name ) ) {
@@ -159,7 +160,7 @@ sub Run {
 
             if ( !$ContactID ) {
                 # create associated contact
-                $Success = $Kernel::OM->Get('Contact')->ContactAdd(
+                $CreatedContactID = $Kernel::OM->Get('Contact')->ContactAdd(
                     AssignedUserID => $ID,
                     Firstname      => $Contact{first_name},
                     Lastname       => $Contact{last_name},
@@ -170,7 +171,7 @@ sub Run {
                     ValidID        => 1,
                     UserID         => 1,
                 );
-                if ( !$Success ) {
+                if ( !$CreatedContactID ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Unable to create contact for user $ID!"
@@ -200,30 +201,22 @@ sub Run {
                 }
             }
 
+            my $UserObject = $Kernel::OM->Get('User');
+
+            # delete user cache
+            $Kernel::OM->Get('Cache')->CleanUp(
+                Type => $UserObject->{CacheType},
+            );
+
             # assign role
-            ROLE:
-            foreach my $Role ( 'Agent User', 'Customer' ) {
-                my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-                    Role => $Role
+            my $Success = $UserObject->_AssignRolesByContext(
+                UserID => $ID,
+            );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to assign context roles to user $ID!"
                 );
-                if ( !$RoleID ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "No role \"$Role\" found!"
-                    );
-                    next;
-                }
-                my $Success = $Kernel::OM->Get('Role')->RoleUserAdd(
-                    RoleID       => $RoleID,
-                    AssignUserID => $ID,
-                    UserID       => 1,
-                );
-                if ( !$Success ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to assign \"$Role\" to user $ID!"
-                    );
-                }
             }
         }
         else {
