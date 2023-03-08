@@ -157,6 +157,21 @@ sub ExecOperation {
     return $Self->SUPER::ExecOperation(%Param);
 }
 
+sub GetBasePermissionObjectIDs {
+    my ( $Self, %Param ) = @_;
+
+    # we don't have to do the checks if we have been called by TicketSearch
+    return 1 if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
+
+    my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+        %Param,
+    );
+    return if !$QueueIDs;
+    return 1 if !IsArrayRef($QueueIDs);
+    
+    return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
+}
+
 =begin Internal:
 
 =item _CheckTicket()

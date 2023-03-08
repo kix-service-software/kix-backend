@@ -412,16 +412,16 @@ sub _CreatePermissionSQL {
         return;
     }
 
-    my @QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+    my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
         %Param,
         Types        => ['Basic::Queue'],
         UsageContext => $Param{UserType},
         Permission   => 'READ',
     );
 
-    if ( @QueueIDs ) {
+    if ( IsArrayRef($QueueIDs) ) {
         $Result{From}  = 'INNER JOIN queue q ON q.id = st.queue_id ';
-        $Result{Where} = 'q.id IN (' . join(',', @QueueIDs) . ')';
+        $Result{Where} = 'q.id IN (' . join(',', @{$QueueIDs}) . ')';
     }
 
     return %Result;

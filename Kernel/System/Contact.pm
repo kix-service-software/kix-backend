@@ -1338,7 +1338,7 @@ sub ContactSearch {
         }
     }
 
-    my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join ";
+    my $SQL = "SELECT DISTINCT c.id, c.email, c.lastname, c.firstname FROM contact c $Join ";
     if ( $Where ) {
         $SQL .= "WHERE ".$Where;
     }
