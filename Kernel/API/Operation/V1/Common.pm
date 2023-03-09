@@ -2569,13 +2569,12 @@ sub _GetCacheKey {
         delete $RequestData{offset};
         delete $RequestData{limit};
     }
+    delete $RequestData{sort};
+    delete $RequestData{filter};
 
-    my @CacheKeyParts = qw(include expand);
+    my @CacheKeyParts;
     if ( IsArrayRefWithData( $Self->{CacheKeyExtensions} ) ) {
-        @CacheKeyParts = (
-            @CacheKeyParts,
-            @{ $Self->{CacheKeyExtensions} }
-            )
+        @CacheKeyParts = @{ $Self->{CacheKeyExtensions} };
     }
 
     # sort some things to make sure you always get the same cache key independent of the given order
