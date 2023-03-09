@@ -1115,7 +1115,7 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
         }
 
-        if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
+        if ( $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFilter(
@@ -1169,7 +1169,7 @@ sub _Success {
         }
 
         # honor a filter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Filter} ) ) {
+        if ( IsHashRefWithData( $Self->{Filter} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFilter(
@@ -1180,7 +1180,7 @@ sub _Success {
         }
 
         # honor a sorter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
+        if ( IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplySort(
@@ -1191,7 +1191,7 @@ sub _Success {
         }
 
         # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
+        if ( IsHashRefWithData( $Self->{Fields} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFieldSelector(
