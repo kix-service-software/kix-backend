@@ -52,6 +52,8 @@ sub new {
     $Self->{AttributeBasedRoleSync}       = $Param{Config}->{AttributeBasedRoleSync} || {};
     $Self->{UnknownOrgIDFallback}         = $Param{Config}->{UnknownOrgIDFallback} || "1";
 
+    $Self->{EmailUniqueCheck}             = $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck');
+
     return $Self;
 }
 
@@ -308,7 +310,7 @@ sub Sync {
             my %ContactData;
             # lookup the contact
 
-            if ( $SyncContact{Email} ) {
+            if ( $SyncContact{Email} && $Self->{EmailUniqueCheck} ) {
                 $ContactID = $ContactObject->ContactLookup(
                     Email  => $SyncContact{Email},
                     Silent => 1,
