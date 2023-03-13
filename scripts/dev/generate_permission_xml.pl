@@ -58,9 +58,10 @@ my %RoleList = (
 );
 
 my %PermissionTypeList = (
-    'Resource' => 1,
-    'Object'   => 2,
-    'Property' => 3,
+    'Resource'     => 1,
+    'Object'       => 2,
+    'Property'     => 3,
+    'Base::Ticket' => 4,
 );
 
 # define permission bit values

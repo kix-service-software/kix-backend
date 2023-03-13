@@ -9506,26 +9506,6 @@ You can log in via the following URL:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Permission::Object###Queue-to-Ticket" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a supported permission of type Object.</Description>
-        <Group>Permission</Group>
-        <Setting>
-            <Hash>
-                <Item Key="CREATE">/tickets{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
-                <Item Key="READ_UPDATE_DELETE">/tickets/*{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Permission::Object###CIClass-to-ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a supported permission of type Object.</Description>
-        <Group>Permission</Group>
-        <Setting>
-            <Hash>
-                <Item Key="CREATE">/cmdb/configitems{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>
-                <Item Key="READ_UPDATE_DELETE">/cmdb/configitems/*{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
 
     <!-- links for user manuals -->
     <ConfigItem AccessLevel="internal" Name="KIX::SelfServiceManual" Required="0" Valid="1">

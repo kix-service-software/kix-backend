@@ -54,6 +54,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
     my @ContactList;
 
+    $Self->SetDefaultSort(
+        Contact => [ 
+            { Field => 'Lastname' },
+            { Field => 'Firstname' },
+        ]
+    );
+
     # prepare search if given
     if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
         # do first OR to prevent replacement of prior AND search with empty result

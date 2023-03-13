@@ -57,6 +57,12 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    $Self->SetDefaultSort(
+        Ticket => [ 
+            { Field => 'CreateTime' },
+        ]
+    );
+
     # check for customer relevant ids if necessary
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerTicketIDList = $Self->_GetCustomerUserVisibleObjectIds(
@@ -92,19 +98,29 @@ sub Run {
         Result     => 'ARRAY',
         Search     => $Self->{Search}->{Ticket},
         Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
-        Sort       => $Self->{Sort}->{Ticket},
+        Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
         UserType   => $Self->{Authorization}->{UserType},
         UserID     => $Self->{Authorization}->{UserID}
     );
 
    if ( @TicketIndex ) {
 
+        # inform the API core of the total number of tickets
+        $Self->SetTotalItemCount(
+            Ticket => scalar @TicketIndex
+        );
+        
+        # restrict data to the request window
+        my %PagedResult = $Self->ApplyPaging(
+            Ticket => \@TicketIndex
+        );
+
         # get already prepared Ticket data from TicketGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::TicketGet',
             SuppressPermissionErrors => 1,
             Data                     => {
-                TicketID                    => join(',', @TicketIndex),
+                TicketID                    => join(',', @{$PagedResult{Ticket}}),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues}

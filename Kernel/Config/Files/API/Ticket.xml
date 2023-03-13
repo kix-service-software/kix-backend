@@ -27,6 +27,7 @@
                 <Item Key="ResponseSchema">TicketCollectionResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
+                <Item Key="ImplicitPagingFor">Ticket</Item>
             </Hash>
         </Setting>
     </ConfigItem>
