@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-3-9 06:33+0000\n"
+"POT-Creation-Date: 2023-3-13 05:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -120,6 +120,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Backup Device"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Base::Ticket"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -396,6 +400,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Periodic Reports"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type for core object dependency Queue->Ticket."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -2251,6 +2259,10 @@ msgid "Defines a regular expression that filters all email addresses that should
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines a regular expression that filters all email addresses that should not receive emails from the application."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines all the (additional) redis parameters."
 msgstr ""
 
@@ -2644,6 +2656,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Depends on"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Dis-/Enables uniqueness check for email-addresses of contacts. If this setting is disabled, notifications may be read by contacts who are not supposed to receive personal information about the actual contact. This may cause a violation of GDPR regulation! Thus, you have to ensure that no notification contains relevant information. Furthermore, any email-based contact retrieval or identification may potentially deliver ambiguous results. Incoming emails are assigned to the first contact ordered by last name, first name assigned to the email-address. Some features like e-mail based authentication, email-based contact data update from LDAP or macro action CreateOrUpdateContact will be disabled if no other lookup value than email is provided. Once disabled you MUST NOT enable it again before ensuring unique email addresses."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3176,10 +3192,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a report type for reporting."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a supported permission of type Object."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
