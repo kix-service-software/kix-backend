@@ -35,14 +35,15 @@ sub _UpdateHTMLToPDF {
 
     for my $Name ( qw(Ticket Article) ) {
         my %Template = $HTMLTOPDFObject->TemplateGet(
-            Name   => 'Article',
+            Name   => $Name,
             UserID => 1
         );
 
         next if !%Template;
 
-        my $Definition = $Template{Definition};
-        $Definition =~ s/\"SpacingHeader\"\:\"\d+\"/"SpacingHeader":"12"/msx;
+        $Template{Definition}->{Page}->{SpacingHeader} = 12;
+
+        my $Definition = $Kernel::OM->Get('JSON')->Encode( Data => $Template{Definition});
 
         $HTMLTOPDFObject->TemplateUpdate(
             %Template,
