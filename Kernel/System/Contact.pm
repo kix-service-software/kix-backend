@@ -137,7 +137,7 @@ sub ContactAdd {
         my $uuid = Data::UUID->new();
         $Param{Email} = "noreply-" . $uuid->to_hexstring($uuid->create()) . '@nomail.com';
     }
-    else {
+    elsif ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
         # check duplicate email
         my %Existing = $Self->ContactSearch(
             PostMasterSearch => $Param{Email},
@@ -232,9 +232,9 @@ sub ContactAdd {
 
     # find ID of new item
     $Kernel::OM->Get('DB')->Prepare(
-        SQL => 'SELECT id FROM contact WHERE LOWER(email) LIKE LOWER(?)',
+        SQL => 'SELECT id FROM contact WHERE email = ? AND firstname = ? AND lastname = ? ORDER BY id DESC',
         Bind  => [
-            \$Param{Email}
+            \$Param{Email}, \$Param{Firstname}, \$Param{Lastname}
         ],
         Limit => 1,
     );
@@ -543,7 +543,7 @@ sub ContactLookup {
         my $Email = lc $Param{Email};
 
         return if !$DBObject->Prepare(
-            SQL => "SELECT id FROM contact WHERE $Self->{Lower}(email) = ?",
+            SQL   => "SELECT id FROM contact WHERE $Self->{Lower}(email) = ? ORDER BY lastname, firstname",
             Bind  => [ \$Email ],
             Limit => 1,
         );
@@ -766,7 +766,7 @@ sub ContactUpdate {
     }
 
     # check duplicate email
-    if ( $Param{Email} ) {
+    if ( $Param{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
         my $ExistingContactID = $Self->ContactLookup(
             Email  => $Param{Email},
             Silent => 1,
@@ -1207,6 +1207,12 @@ sub ContactSearch {
 
         $Where .= "$Self->{Lower}(c.email) LIKE $Self->{Lower}(?)";
         push(@Bind, \$Email);
+
+        # we force a limit if we are using non-unique email addresses
+        if ( !$Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+            $Where .= " ORDER BY c.lastname, c.firstname";
+            $Param{Limit} = 1;
+        }
     }
     elsif ( $Param{OrganisationID} ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';

@@ -55,6 +55,8 @@ create a new item in the DB
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $EmailUniqueCheck = $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck');
+
     # get source data
     my $SourceData = $Self->GetSourceData(Type => 'customer_user');
 
@@ -104,16 +106,17 @@ sub Run {
         }
 
         # check if this item already exists (i.e. some initial data)
+        my @RelevantAttr = ( 'firstname', 'lastname' );
+        if ( $EmailUniqueCheck ) {
+            push @RelevantAttr, 'email';
+        }
+        
         my $ID = $Self->Lookup(
             Table        => 'contact',
             PrimaryKey   => 'id',
             IgnoreCase   => 1,
             Item         => $Item,
-            RelevantAttr => [
-                'firstname',
-                'lastname',
-                'email'
-            ]
+            RelevantAttr => \@RelevantAttr
         );
 
         # insert row

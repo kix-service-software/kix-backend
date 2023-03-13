@@ -1121,9 +1121,6 @@
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
     <Column Name="user_id" Required="false" Type="INTEGER"/>
-    <Unique Name="contact_email">
-        <UniqueColumn Name="email"/>
-    </Unique>
     <Unique Name="contact_user_id">
         <UniqueColumn Name="user_id"/>
     </Unique>

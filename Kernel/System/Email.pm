@@ -243,6 +243,14 @@ sub Send {
         $Header{$Attribute} = $Param{$Attribute};
     }
 
+    my $IgnoreEmailPattern = $Kernel::OM->Get('Config')->Get('IgnoreEmailAddressesAsRecipients');
+    for my $Attribute (qw(To Cc Bcc)) {
+        if ( $Header{$Attribute} && $Header{$Attribute} =~ /$IgnoreEmailPattern/ ) {
+            $Header{$Attribute} =~ s/$IgnoreEmailPattern//gi;
+            $Header{$Attribute} =~ s/,\s*,/,/g;
+        }
+    }
+
     # loop
     if ( $Param{Loop} ) {
         $Header{'X-Loop'}          = 'yes';
@@ -731,25 +739,28 @@ sub Send {
 
     # get recipients
     my @ToArray;
-    my $To = '';
 
     RECIPIENT:
-    for my $Recipient (qw(To Cc Bcc)) {
+    for my $Recipient ( qw(To Cc Bcc) ) {
         next RECIPIENT if !$Param{$Recipient};
-        for my $Email ( Email::Address::XS->parse( $Param{$Recipient} ) ) {
-            push( @ToArray, $Email->address() );
-            if ($To) {
-                $To .= ', ';
+        for my $Email ( Email::Address::XS->parse($Param{$Recipient}) ) {
+            my $EmailAddress = $Email->address();
+            if ( $EmailAddress !~ /$IgnoreEmailPattern/gix ) {
+                push(@ToArray, $EmailAddress);
+
             }
-            $To .= $Email->address();
         }
     }
 
     # add Bcc recipients
     my $SendmailBcc = $ConfigObject->Get('SendmailBcc');
-    if ($SendmailBcc) {
-        push @ToArray, $SendmailBcc;
-        $To .= ', ' . $SendmailBcc;
+    if ( $SendmailBcc ) {
+        for my $Email ( Email::Address::XS->parse($SendmailBcc) ) {
+            my $EmailAddress = $Email->address();
+            if ( $EmailAddress !~ /$IgnoreEmailPattern/gix ) {
+                push(@ToArray, $SendmailBcc);
+            }
+        }
     }
 
     # set envelope sender for replies
@@ -770,6 +781,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 1 ) {
+        my $To = join(',', @ToArray);
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$To' from '$RealFrom'. Subject => '$Param{Subject}';",
