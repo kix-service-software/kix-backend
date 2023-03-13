@@ -45,6 +45,7 @@
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/8";;"x";;;
 "Ticket Reader";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Reader";"Resource";"/system/htmltopdf/convert";;"x";;;
+"Ticket Reader";"Base::Ticket";"*";;"x";;;
 "Ticket Agent";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent";"Resource";"/system/ticket";;"x";;;
@@ -75,6 +76,7 @@
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/8";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf/convert";;"x";;;
+"Ticket Agent";"Base::Ticket";"*";"x";"x";"x";"x";
 "Ticket Agent (w/o teams)";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket";;"x";;;
@@ -217,6 +219,7 @@
 "Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
 "Customer";"Resource";"/system/templates/categories ";;"x";;;
 "Customer";"Resource";"/system/templates/categories/* ";;"x";;;
+"Customer";"Base::Ticket";"*";"x";"x";"x";"x";
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;

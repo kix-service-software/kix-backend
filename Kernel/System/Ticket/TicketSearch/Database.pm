@@ -216,7 +216,7 @@ sub TicketSearch {
     }
 
     # check required params
-    if ( !$Param{UserID} && !$Param{UserType} ) {
+    if ( !$Param{UserID} || !$Param{UserType} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need UserID and UserType params for permission check!',
@@ -239,16 +239,20 @@ sub TicketSearch {
     else {
         $SQL = 'SELECT DISTINCT st.id, st.tn';
     }
-    $SQLDef{SQLFrom}  = 'FROM ticket st INNER JOIN queue sq ON sq.id = st.queue_id';
+    $SQLDef{SQLFrom}  = 'FROM ticket st';
 
     # check permission and prepare relevat part of SQL statement
-    my $PermissionSQL = $Self->_CreatePermissionSQL(
+    my %PermissionSQL = $Self->_CreatePermissionSQL(
         %Param
     );
-    if ( !$PermissionSQL ) {
-        return;
+    $SQLDef{SQLFrom}  .= ' '.$PermissionSQL{From} if $PermissionSQL{From};
+    if ( $PermissionSQL{Where} ) {
+        $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where};
     }
-    $SQLDef{SQLWhere} .= ' '.$PermissionSQL;
+    else {
+        $SQLDef{SQLWhere} .= ' 1=1 ';
+    }
+
 
     # filter
     if ( IsHashRefWithData($Param{Search}) ) {
@@ -389,27 +393,38 @@ sub TicketSearch {
 
 generate SQL for permission restrictions
 
-    my $SQLWhere = $Object->_CreatePermissionSQL(
+    my %SQL = $Object->_CreatePermissionSQL(
         UserID    => ...,                    # required
         UserType  => 'Agent' | 'Customer'    # required
-        Permisson => '...'                   # optional
     );
 
 =cut
 
 sub _CreatePermissionSQL {
     my ( $Self, %Param ) = @_;
-    my $SQLWhere = '1=1';
+    my %Result;
 
-    # if ( !$Param{UserID} && !$Param{UserType} ) {
-    #     $Kernel::OM->Get('Log')->Log(
-    #         Priority => 'error',
-    #         Message  => 'No user information for permission check!',
-    #     );
-    #     return;
-    # }
+    if ( !$Param{UserID} || !$Param{UserType} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No user information for permission check!',
+        );
+        return;
+    }
 
-    return $SQLWhere;
+    my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+        %Param,
+        Types        => ['Basic::Queue'],
+        UsageContext => $Param{UserType},
+        Permission   => 'READ',
+    );
+
+    if ( IsArrayRef($QueueIDs) ) {
+        $Result{From}  = 'INNER JOIN queue q ON q.id = st.queue_id ';
+        $Result{Where} = 'q.id IN (' . join(',', @{$QueueIDs}) . ')';
+    }
+
+    return %Result;
 }
 
 =item _CreateAttributeSQL()

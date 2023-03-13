@@ -55,6 +55,13 @@ perform ConfigItemSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    $Self->SetDefaultSort(
+        ConfigItem => [ 
+            { Field => 'Name' },
+            { Field => 'Number' },
+        ]
+    );
+
     # get customer relevant ids if necessary
     my $CustomerCIIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
@@ -86,6 +93,13 @@ sub Run {
                 );
             }
         }
+    }
+
+    if ( !%Sorting ) {
+        %Sorting = (
+            OrderBy          => ['Name', 'Number'],
+            OrderByDirection => ['Up', 'Up'],
+        );
     }
 
     my $ConfigItemList;

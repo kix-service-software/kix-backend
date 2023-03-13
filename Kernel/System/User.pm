@@ -1196,11 +1196,13 @@ sub UserLoginExistsCheck {
 return a list of all permission of a given user
 
     my %List = $UserObject->PermissionList(
-        UserID => 123
+        UserID  => 123
         UsageContext => 'Agent'|'Customer',
-        RoleID => 456,                           # optional, restrict result to this role
-        Types  => [ 'Resource', 'Object' ],      # optional
-        Valid  => 1                              # optional
+        RoleID  => 456,                           # optional, restrict result to this role
+        Types   => [ 'Resource', 'Object' ],      # optional
+        Targets => [ '...', '...' ],              # optional
+        Values  => [123, 234],                    # optional
+        Valid   => 1                              # optional
     );
 
 =cut
@@ -1227,7 +1229,10 @@ sub PermissionList {
         . ( $Param{RoleID} || '' ) . '::'
         . ( $Param{UsageContext} || '' ) . '::'
         . $Valid . '::'
-        . ( IsArrayRefWithData( $Param{Types} ) ? join( '::', @{ $Param{Types} } ) : '' );
+        . ( IsArrayRefWithData( $Param{Types} ) ? join( '::', @{ $Param{Types} } ) : '' )
+        . ( IsArrayRefWithData( $Param{Targets} ) ? join( '::', @{ $Param{Targets} } ) : '' )
+        . ( IsArrayRefWithData( $Param{Values} ) ? join( '::', @{ $Param{Values} } ) : '' );
+
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1250,21 +1255,36 @@ sub PermissionList {
 
     if ( $Param{RoleID} ) {
         $SQL .= ' AND role_id = ?';
-        push( @Bind, \$Param{RoleID} );
+        push @Bind, \$Param{RoleID};
     }
 
     # filter specific permission types
     if ( IsArrayRefWithData( $Param{Types} ) ) {
-        my %TypesMap = map { $_ => 1 } @{ $Param{Types} };
-        my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
+        my %PermissionTypeList = reverse $Kernel::OM->Get('Role')->PermissionTypeList();
         my @PermissionTypeIDs;
-        foreach my $ID ( sort keys %PermissionTypeList ) {
-            next if !$TypesMap{ $PermissionTypeList{$ID} };
-            push( @PermissionTypeIDs, $ID );
+        foreach my $Type ( @{$Param{Types}} ) {
+            if ( !$PermissionTypeList{$Type} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Unknown permission type "'.$Type.'"!'
+                );
+                next;
+            }
+            push @PermissionTypeIDs, $PermissionTypeList{$Type};
         }
         if (@PermissionTypeIDs) {
             $SQL .= ' AND type_id IN (' . join( ',', sort @PermissionTypeIDs ) . ')';
         }
+    }
+    # filter specific permission targets
+    if ( IsArrayRefWithData( $Param{Targets} ) ) {
+        $SQL .= ' AND target IN (' . join( ', ', map {'?'} @{ $Param{Targets} } ) . ')';
+        push @Bind, map { \$_ } @{ $Param{Targets} };
+    }
+    # filter specific permission values
+    if ( IsArrayRefWithData( $Param{Values} ) ) {
+        $SQL .= ' AND value IN (' . join( ', ', map {'?'} @{ $Param{Values} } ) . ')';
+        push @Bind, map { \$_ } @{ $Param{Values} };
     }
 
     # get database object

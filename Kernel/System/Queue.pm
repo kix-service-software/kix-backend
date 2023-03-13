@@ -18,6 +18,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(
     Kernel::System::Queue::FollowUp
     Kernel::System::EventHandler
+    Kernel::System::BasePermissionHandler
 );
 
 our @ObjectDependencies = (
@@ -94,6 +95,11 @@ sub new {
     # init of event handler
     $Self->EventHandlerInit(
         Config => 'Queue::EventModulePost',
+    );
+
+    # init of base permission handler
+    $Self->BasePermissionHandlerInit(
+        Type => 'Base::Ticket'
     );
 
     return $Self;
@@ -1088,12 +1094,7 @@ sub QueueDelete {
     return 1;
 }
 
-
 1;
-
-
-
-
 
 =back
 

@@ -1338,10 +1338,11 @@ sub ContactSearch {
         }
     }
 
-    my $SQL = "SELECT DISTINCT c.id, c.email FROM contact c $Join ";
+    my $SQL = "SELECT DISTINCT c.id, c.email, c.lastname, c.firstname FROM contact c $Join ";
     if ( $Where ) {
         $SQL .= "WHERE ".$Where;
     }
+    $SQL .= ' ORDER BY c.lastname, c.firstname';
 
     # ask database
     $DBObject->Prepare(
@@ -1674,6 +1675,7 @@ sub ContactList {
         $SQL
             .= " WHERE c.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
     }
+    $SQL .= ' ORDER BY c.lastname, c.firstname';
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');

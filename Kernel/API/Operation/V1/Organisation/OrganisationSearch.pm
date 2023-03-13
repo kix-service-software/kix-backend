@@ -58,6 +58,13 @@ sub Run {
 
     my $OrgList;
 
+    $Self->SetDefaultSort(
+        Organisation => [ 
+            { Field => 'Name' },
+            { Field => 'Number' },
+        ]
+    );
+
     # TODO: filter search - currently not all properties are possible
     my %OrgSearch;
     if ( IsHashRefWithData( $Self->{Search}->{Organisation} ) ) {
