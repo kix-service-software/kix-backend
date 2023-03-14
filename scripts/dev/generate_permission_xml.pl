@@ -55,6 +55,7 @@ my %RoleList = (
     'Report Manager'             => 15,
     'Ticket Agent (w/o teams)'   => 16,
     'Ticket Agent (Servicedesk)' => 17,
+    'Ticket Agent (Servicedesk)' => 18,
 );
 
 my %PermissionTypeList = (
