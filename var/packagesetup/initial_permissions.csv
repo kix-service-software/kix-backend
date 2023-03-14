@@ -127,7 +127,6 @@
 "Ticket Agent Base Permission";"Resource";"/contacts";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/links";"x";"x";"x";"x";
 "Ticket Agent Base Permission";"Resource";"/system/textmodules";;"x";;;
-"Ticket Agent Base Permission";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent Base Permission";"Resource";"/reporting";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reports";;"x";;;
 "Ticket Agent Base Permission";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}";;;;;
