@@ -6633,7 +6633,7 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
-    <Data Key="role_id">17</Data>
+    <Data Key="role_id">18</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues/1]]></Data>
     <Data Key="value">2</Data>
@@ -6643,7 +6643,7 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
-    <Data Key="role_id">17</Data>
+    <Data Key="role_id">18</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/ticket/queues/2]]></Data>
     <Data Key="value">2</Data>
@@ -6653,7 +6653,7 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
-    <Data Key="role_id">17</Data>
+    <Data Key="role_id">18</Data>
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.QueueID IN [1,2]}]]></Data>
     <Data Key="value">15</Data>
