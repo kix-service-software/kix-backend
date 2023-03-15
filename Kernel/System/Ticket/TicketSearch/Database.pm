@@ -253,7 +253,6 @@ sub TicketSearch {
         $SQLDef{SQLWhere} .= ' 1=1 ';
     }
 
-
     # filter
     if ( IsHashRefWithData($Param{Search}) ) {
         my %Result = $Self->_CreateAttributeSQL(
@@ -511,6 +510,7 @@ sub _CreateAttributeSQL {
                 UserType     => $Param{UserType},
                 BoolOperator => $BoolOperator,
                 Search       => $Search,
+                WholeSearch  => $Param{Search}->{$BoolOperator}   # forward "whole" search, e.g. if behavior depends on other attributes
             );
 
             if ( !IsHashRefWithData($Result) ) {
