@@ -400,7 +400,7 @@ prepare data, check given parameters and parse them according to type
         },
         Parameters => {
             <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserLogin"
-                Type                => 'ARRAY' | 'ARRAYtoHASH',         # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values
+                Type                => 'ARRAY' | 'ARRAYtoHASH | HASH',  # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values or a JSON string into a HASH
                 DataType            => 'NUMERIC',                       # optional, use this to force numeric datatype in JSON response
                 Required            => 1,                               # optional
                 RequiredIfNot       => [ '<AltParameter>', ... ]        # optional, specify the alternate parameters to be checked, if one of them has a value
@@ -650,7 +650,7 @@ sub PrepareData {
                 if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
                     $Result->{Success} = 0;
                     $Result->{Message} = "Required parameter $Parameter is missing!",
-                        last;
+                    last;
                 }
             }
 
@@ -676,6 +676,24 @@ sub PrepareData {
                     Value     => \%NewHash,
                 );
             }
+
+            # convert string to hash if we have to
+            if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} eq 'HASH' && $Data{$Parameter} && IsString( $Param{Data}->{$Parameter} ) ) {
+                my $Object = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Param{Data}->{$Parameter},
+                );
+                if ( !$Object )  {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Parameter $Parameter is not a valid JSON object!",
+                    last;
+                }
+                $Self->_SetParameter(
+                    Data      => $Param{Data},
+                    Attribute => $Parameter,
+                    Value     => $Object,
+                );
+            }
+
 
             # set default value
             if ( !$Data{$Parameter} && exists( $Parameters{$Parameter}->{Default} ) ) {

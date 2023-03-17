@@ -131,7 +131,7 @@ sub Run {
     # get data of all relevant queues (due to performance)
     my $QueueDataRef = $Kernel::OM->Get('Queue')->QueueListGet(
         IDs => $Param{Data}->{QueueID},
-    );    
+    );
 
     my %QueueDataListByID = map { $_->{QueueID} => $_ } @{$QueueDataRef || []};
     my %QueueDataListByName = map { $_->{Name} => $_ } @{$QueueDataRef || []};

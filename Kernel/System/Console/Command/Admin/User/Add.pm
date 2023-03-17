@@ -39,6 +39,13 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
+        Name        => 'context',
+        Description => 'The context of the new user. Can be Agent, Customer or Both (Default: Agent).',
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/(Agent|Customer|Both)/smx,
+    );
+    $Self->AddOption(
         Name        => 'roles',
         Description => "Comma separated list of roles to which the new user should be added.",
         Required    => 0,
@@ -72,14 +79,17 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new user...</yellow>\n");
 
+    my $Context = $Self->GetOption('context') || '';
+
     # add user
     my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => $Self->GetOption('user-name'),
         UserPw       => $Self->GetOption('password'),
+        IsAgent      => (!$Context || $Context =~ /(Agent|Both)/) ? 1 : 0,
+        IsCustomer   => ($Context =~ /(Customer|Both)/) ? 1 : 0,
         ChangeUserID => 1,
         UserID       => 1,
         ValidID      => 1,
-        IsAgent      => 1,
     );
 
     if ( !$UserID ) {

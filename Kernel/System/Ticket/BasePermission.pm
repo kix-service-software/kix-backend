@@ -89,23 +89,23 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     my $Value = 0;
-    foreach my $Permission ( split(/\+/, $Param{Permission}) ) {
+    foreach my $Permission ( split(/,/, $Param{Permission}) ) {        
         $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
-    }
+    }    
 
     # check if we have base permissions for this user in this usage context
     my %PermissionList = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
         Types        => ['Base::Ticket'],
-    );
+    );    
     return 1 if !%PermissionList;
 
     my @QueueIDs;
 
     PERMISSION:
     foreach my $Permission ( values %PermissionList ) {
-        next PERMISSION if ($Permission->{Value} & $Value) == 0;
+        next PERMISSION if ($Permission->{Value} & $Value) != $Value;
 
         if ( $Permission->{Target} !~ /\*/ ) {
             push @QueueIDs, $Permission->{Target};
@@ -126,7 +126,7 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     return if !@QueueIDs;
-
+    
     return \@QueueIDs;
 }
 

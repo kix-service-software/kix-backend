@@ -265,6 +265,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###100-ForceOwnerAndResponsibleResetOnMissingPermission" Required="0" Valid="1">
+        <Description Translatable="1">Resets owner and responsible if they don't have the required permission.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::ForceOwnerAndResponsibleResetOnMissingPermission</Item>
+                <Item Key="Event">Ticket(Create|QueueUpdate|OwnerUpdate|ResponsibleUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###110-TicketIndexUpdate" Required="0" Valid="1">
         <Description Translatable="1">Updates the ticket index.</Description>
         <Group>Ticket</Group>
