@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-3-17 10:56+0000\n"
+"POT-Creation-Date: 2023-3-17 12:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -595,6 +595,10 @@ msgid "Ticket Agent (w/o teams)"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Agent Base Permission"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
 msgstr ""
 
@@ -660,6 +664,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "agent"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows basic ticket access, but requires team specific roles with base permissions"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
