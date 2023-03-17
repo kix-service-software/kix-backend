@@ -87,9 +87,6 @@ sub Run {
         Valid => 0
     );
 
-        use Data::Dumper;
-        print STDERR "Param: ".Data::Dumper::Dumper(\%Param);
-
     if ( %QueueList && IsHashRefWithData($Param{Data}->{requiredPermission}) && $Param{Data}->{requiredPermission}->{Permission}) {
         # get relevant QueueIDs from base permissions
         my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission}->{Permission});
