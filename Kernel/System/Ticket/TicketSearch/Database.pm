@@ -215,15 +215,6 @@ sub TicketSearch {
         $Param{UserType} = 'Agent';
     }
 
-    # check required params
-    if ( !$Param{UserID} || !$Param{UserType} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID and UserType params for permission check!',
-        );
-        return;
-    }
-
     my $Result = $Param{Result} || 'HASH';
 
     # init attribute backend modules
@@ -241,15 +232,16 @@ sub TicketSearch {
     }
     $SQLDef{SQLFrom}  = 'FROM ticket st';
 
-    # check permission and prepare relevat part of SQL statement
-    my %PermissionSQL = $Self->_CreatePermissionSQL(
-        %Param
-    );
-    $SQLDef{SQLFrom}  .= ' '.$PermissionSQL{From} if $PermissionSQL{From};
-    if ( $PermissionSQL{Where} ) {
-        $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where};
-    }
-    else {
+    # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
+    if ($Param{UserID} && $Param{UserID} != 1) {
+        my %PermissionSQL = $Self->_CreatePermissionSQL(
+            %Param
+        );
+        $SQLDef{SQLFrom} .= ' '.$PermissionSQL{From} if $PermissionSQL{From};
+        if ( $PermissionSQL{Where} ) {
+            $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where};
+        }
+    } else {
         $SQLDef{SQLWhere} .= ' 1=1 ';
     }
 

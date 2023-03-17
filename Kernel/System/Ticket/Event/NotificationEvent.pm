@@ -124,7 +124,7 @@ sub Run {
 sub _Run {
     my ( $Self, %Param ) = @_;
 
-my $StartTime = Time::HiRes::time();
+    my $StartTime = Time::HiRes::time();
 
     my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( $Param{Data} );
 
@@ -136,7 +136,7 @@ my $StartTime = Time::HiRes::time();
 
         my $StartTimeTicket = Time::HiRes::time();
         $Self->_HandleTicket(
-            Event  => $Param{Event}, 
+            Event  => $Param{Event},
             Data   => $Ticket,
             UserID => $Param{UserID},
         );
@@ -446,7 +446,7 @@ sub _NotificationFilter {
     my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result => 'ARRAY',
         Search => $Filter,
-        Limit  => 1,
+        Limit  => 1
     );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
@@ -584,17 +584,6 @@ sub _RecipientsGet {
                             );
                             $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} = $Granted;
                         }
-                        if ( $Granted ) {
-                            push @UserIDs, $UserID;
-                        }
-                    }
-                    foreach my $UserID ( sort keys %UserList ) {
-                        my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                            UserID              => $UserID,
-                            Target              => '/tickets/' . $Ticket{TicketID},
-                            UsageContext        => 'Agent',
-                            RequestedPermission => 'UPDATE'
-                        );
                         if ( $Granted ) {
                             push @UserIDs, $UserID;
                         }
