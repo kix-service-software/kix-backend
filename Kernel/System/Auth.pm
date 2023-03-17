@@ -292,7 +292,7 @@ sub Auth {
                 Valid  => 1,
             );
 
-            my $Count = $UserData{UserLoginFailed} || 0;
+            my $Count = $UserData{Preferences}->{UserLoginFailed} || 0;
             $Count++;
 
             $UserObject->SetPreferences(
@@ -348,42 +348,12 @@ sub Auth {
 
     return $User if !$UserID;
 
-    # on system maintenance just admin users
-    # should be allowed to get into the system
-    my $ActiveMaintenance = $Kernel::OM->Get('SystemMaintenance')->SystemMaintenanceIsActive();
-
     # reset failed logins
     $UserObject->SetPreferences(
         Key    => 'UserLoginFailed',
         Value  => 0,
         UserID => $UserID,
     );
-
-    # check if system maintenance is active
-    if ($ActiveMaintenance) {
-
-        # TODO!!! rbo-190327
-        # # check if user is allow to login
-        # # get current user groups
-        # my %Groups = $Kernel::OM->Get('Group')->PermissionUserGet(
-        #     UserID => $UserID,
-        #     Type   => 'move_into',
-        # );
-
-        # # reverse groups hash for easy look up
-        # %Groups = reverse %Groups;
-
-        # # check if the user is in the Admin group
-        # # if that is not the case return
-        # if ( !$Groups{admin} ) {
-
-        #     $Self->{LastErrorMessage} =
-        #         $ConfigObject->Get('SystemMaintenance::IsActiveDefaultLoginErrorMessage')
-        #         || Translatable("It is currently not possible to login due to a scheduled system maintenance.");
-
-        #     return;
-        # }
-    }
 
     # last login preferences update
     $UserObject->SetPreferences(
