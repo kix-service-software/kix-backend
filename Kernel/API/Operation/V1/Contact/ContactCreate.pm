@@ -123,7 +123,7 @@ sub Run {
     }
 
     # check if Email is provided and if so if it exists
-    if ($Contact->{Email}) {
+    if ($Contact->{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck')) {
         my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
             Email => $Contact->{Email},
             Silent           => 1,

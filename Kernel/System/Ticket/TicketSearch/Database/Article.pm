@@ -120,10 +120,25 @@ sub Search {
         'Body'              => 'a_body',
     );
 
+    my $HasArticleIDSearch = 0;
+    if (IsArrayRefWithData($Param{WholeSearch})) {
+        foreach my $Search ( @{$Param{WholeSearch}} ) {
+            if ($Search->{Field} eq 'ArticleID') {
+                $HasArticleIDSearch = 1;
+                last;
+            }
+        }
+    }
+
     my $IsStaticSearch = 0;
-    my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
-    if ( $SearchIndexModule =~ /::StaticDB$/ ) {
-        $IsStaticSearch = 1;
+
+    # if no articl ID is search is given, use static search (if active),
+    # else use all data (e.g. to match articles with very short bodies, too (WordLengthMin for article index))
+    if (!$HasArticleIDSearch) {
+        my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
+        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
+            $IsStaticSearch = 1;
+        }
     }
 
     # check if we have to add a join

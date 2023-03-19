@@ -190,12 +190,7 @@ sub _PrepareValue {
         }
     }
 
-    return _GetUnique(@NewValue);
-}
-
-sub _GetUnique {
-  my %Known;
-  return grep { !$Known{$_}++ } @_;
+    return $Kernel::OM->Get('Main')->GetUnique(@NewValue);
 }
 
 1;

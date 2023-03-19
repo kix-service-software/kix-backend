@@ -33,6 +33,50 @@ Kernel::API::Operation::V1::HTMLToPDF::TemplateConvert - API HTMLToPDF Template 
 
 =cut
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'TemplateID' => {
+            DataType => 'NUMERIC',
+            Type     => 'STRING',
+            RequiredIfNot => [
+                'TemplateName'
+            ]
+        },
+        'TemplateName' => {
+            Type     => 'STRING',
+            RequiredIfNot => [
+                'TemplateID'
+            ]
+        },
+        'IdentifierType' => {
+            Type     => 'STRING',
+            Required => 1
+        },
+        'IdentifierIDorNumber' => {
+            Type     => 'STRING',
+            Required => 1
+        },
+    }
+}
+
 =item Run()
 
 perform TemplateConvert Operation. This function is able to return
@@ -96,7 +140,7 @@ sub Run {
     }
 
     # get the template data
-    my %Template = $Kernel::OM->Get('HTMLToPDF')->DefinitionGet(
+    my %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
         %TemplateParam
     );
 

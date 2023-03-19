@@ -215,7 +215,7 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my %Data = $PrintObject->DefinitionGet(
+    my %Data = $PrintObject->TemplateGet(
         Name   => $Object,
         UserID => $UserID
     );
@@ -225,7 +225,7 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my $Backend = $Kernel::OM->Get("Kernel::System::HTMLToPDF::$Data{Object}");
+    my $Backend = $Kernel::OM->Get("Kernel::System::HTMLToPDF::Object::$Data{Object}");
 
     my %CheckDatas;
     for my $Key ( qw(IDKey NumberKey) ) {

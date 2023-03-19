@@ -23,6 +23,7 @@ use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
 use Kernel::System::Ticket::TicketIndex;
 use Kernel::System::Ticket::TicketSearch;
+use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
 
@@ -93,6 +94,7 @@ sub new {
         Kernel::System::Ticket::Article
         Kernel::System::Ticket::TicketIndex
         Kernel::System::Ticket::TicketSearch
+        Kernel::System::Ticket::BasePermission
         Kernel::System::EventHandler
         Kernel::System::PerfLog
     );
@@ -389,7 +391,7 @@ sub TicketCreate {
         my $DefaultTicketState = $Kernel::OM->Get('Config')->Get('Ticket::State::Default');
 
         # check if default ticket state exists
-        my %AllTicketStates = reverse $StateObject->StateList();
+        my %AllTicketStates = reverse $StateObject->StateList( UserID => 1);
 
         if ( $AllTicketStates{$DefaultTicketState} ) {
             $Param{State} = $DefaultTicketState;
@@ -537,7 +539,7 @@ sub TicketCreate {
                 );
             }
 
-            my @NameChunks = split(' ', $ContactEmailRealname);
+            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : undef;
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 Email  => $ContactEmail,
                 Silent => 1,
@@ -619,6 +621,7 @@ sub TicketCreate {
                 );
             } elsif (!grep {$_ == $ExistingOrganisationID} @{ $ContactData{OrganisationIDs} }) {
                 push( @{ $ContactData{OrganisationIDs} }, $ExistingOrganisationID );
+
                 $Kernel::OM->Get('Contact')->ContactUpdate(
                     %ContactData,
                     UserID => $Param{UserID}

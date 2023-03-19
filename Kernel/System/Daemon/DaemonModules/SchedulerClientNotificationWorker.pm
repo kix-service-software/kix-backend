@@ -93,19 +93,19 @@ sub Run {
     );
     return 1 if !@Jobs;
 
-    foreach my $Job ( @Jobs ) {
-        # send the notifications
-        $Self->{ClientRegistrationObject}->NotificationSendWorker(
-            %{$Job}
-        );
-    }
-
     foreach my $Key ( @Keys ) {
         $Self->{CacheObject}->Delete(
             Type          => 'ClientNotificationToSend',
             Key           => $Key,
             UseRawKey     => 1,
             NoStatsUpdate => 1,
+        );
+    }
+
+    foreach my $Job ( @Jobs ) {
+        # send the notifications
+        $Self->{ClientRegistrationObject}->NotificationSendWorker(
+            %{$Job}
         );
     }
 
@@ -119,10 +119,6 @@ sub DESTROY {
 }
 
 1;
-
-
-
-
 
 =back
 

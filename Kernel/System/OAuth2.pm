@@ -748,7 +748,7 @@ Returns:
 sub RequestAccessToken {
     my ( $Self, %Param ) = @_;
 
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
     # check needed stuff
     for (qw(ProfileID GrantType)) {
         if ( !$Param{$_} ) {
@@ -849,17 +849,21 @@ sub RequestAccessToken {
             Token     => $ResponseData->{refresh_token},
         );
     }
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
 
-    # Cache the access token until it expires.
-    $Kernel::OM->Get('Cache')->Set(
-        Type           => $Self->{CacheType},
-        TTL            => ( $ResponseData->{expires_in} - 90 ),               # Add a buffer for latency reasons.
-        Key            => "AccessToken::$Param{ProfileID}",
-        Value          => $ResponseData->{access_token},
-        CacheInMemory  => 0,                                            # Cache in Backend only to enforce TTL
-        CacheInBackend => 1,
-    );
+    # Cache the access token until it expires - add a buffer (90 seconds) for latency reasons
+    my $TTL = $ResponseData->{expires_in} ? ($ResponseData->{expires_in} - 90) : 0;
+    if ($TTL > 0) {
+        $Kernel::OM->Get('Cache')->Set(
+            Type           => $Self->{CacheType},
+            TTL            => $TTL,
+            Key            => "AccessToken::$Param{ProfileID}",
+            Value          => $ResponseData->{access_token},
+            CacheInMemory  => 0,                                            # Cache in Backend only to enforce TTL
+            CacheInBackend => 1,
+            NoStatsUpdate  => 1
+        );
+    }
 
     if (
         $Param{GrantType} eq 'authorization_code'

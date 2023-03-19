@@ -103,9 +103,7 @@ our %FieldTypeMigration = (
         }
     },
     'CustomerCompany' => {
-        Type => 'Organisation',
-        Deactivate => 1,
-        Warning    => 1,
+        Type => 'OrganisationReference',
         ConfigChange => {
             Add => {
                 CountMin => 1,
@@ -115,9 +113,7 @@ our %FieldTypeMigration = (
         }
     },
     'CustomerUser' => {
-        Type => 'Contact',
-        Deactivate => 1,
-        Warning    => 1,
+        Type => 'ContactReference',
         ConfigChange => {
             Add => {
                 CountMin => 1,
@@ -127,9 +123,7 @@ our %FieldTypeMigration = (
         }
     },
     'User' => {
-        Type => 'Contact',
-        Deactivate => 1,
-        Warning    => 1,
+        Type => 'ContactReference',
         ConfigChange => {
             Add => {
                 CountMin => 1,
@@ -184,6 +178,12 @@ our %FieldTypeMigration = (
     },
 );
 
+our %ObjectTypeMigration = (
+    'FAQ'             => 'FAQArticle',
+    'CustomerUser'    => 'Contact',
+    'CustomerCompany' => 'Organisation'
+);
+
 =item Describe()
 
 describe what is supported and what is required
@@ -214,7 +214,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get source data
-    my $SourceData = $Self->GetSourceData(Type => 'dynamic_field');
+    my $SourceData = $Self->GetSourceData(Type => 'dynamic_field', OrderBy => 'id');
 
     # bail out if we don't have something to todo
     return if !IsArrayRefWithData($SourceData);
@@ -238,7 +238,9 @@ sub Run {
     } else {
         %ActiveObjectTypes = (
             Ticket       => 1,
-            FAQArticle   => 1
+            FAQArticle   => 1,
+            Contact      => 1,
+            Organisation => 1,
         );
     }
 
@@ -288,10 +290,11 @@ sub Run {
         if ( !$ID ) {
 
             # migrate field type if needed
+            my $FieldTypeSrc = $Item->{field_type};
             $Item->{field_type} = $Migration->{Type} ? $Migration->{Type} : $Item->{field_type};
 
             # migrate object type if needed
-            $Item->{object_type} = $Item->{object_type} eq 'FAQ' ? 'FAQArticle' : $Item->{object_type};
+            $Item->{object_type} = $ObjectTypeMigration{$Item->{object_type}} ? $ObjectTypeMigration{$Item->{object_type}} : $Item->{object_type};
 
             # deactivate field if needed
             $Item->{valid_id} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} }) ? 2 : $Item->{valid_id};
@@ -323,6 +326,7 @@ sub Run {
                 PrimaryKey     => 'id',
                 Item           => $Item,
                 AutoPrimaryKey => 1,
+                AdditionalData => { FieldTypeSource => $FieldTypeSrc }
             );
         }
 

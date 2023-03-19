@@ -86,6 +86,8 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{CallingOperationType} = $Param{CallingOperationType};
+
     # check operation
     if ( !IsStringWithData( $Param{OperationType} ) ) {
 
@@ -109,6 +111,9 @@ sub new {
             Message => 'No OperationConfig found!',
         );
     }
+
+    # prepare ImplicitPagingFor config
+    $Self->{OperationConfig}->{ImplicitPagingFor} =  { map { $_ => 1 } split(/,/, $Self->{OperationConfig}->{ImplicitPagingFor}) };
 
     # init call level
     $Self->{Level} = $Param{Level} || 0;

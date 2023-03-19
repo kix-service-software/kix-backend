@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "DynamicFieldTypeCollectionResponse.json",
+  "type": "object",
+  "description": "A list of dynamic field types.",
+  "properties": {
+    "DynamicFieldType": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "readOnly": true,
+        "properties": {
+           "DisplayName": {
+              "type": "string",
+              "readOnly": true
+           },
+           "Name": {
+              "type": "string",
+              "readOnly": true
+           }
+        }
+      }
+    }
+  },
+  "required": [
+    "DynamicFieldType"
+  ]
+}

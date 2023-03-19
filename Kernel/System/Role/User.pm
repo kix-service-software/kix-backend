@@ -11,6 +11,8 @@ package Kernel::System::Role::User;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'Cache',
@@ -88,7 +90,11 @@ sub RoleUserAdd {
 returns a list with all users of a role
 
     my @UserList = $RoleObject->RoleUserList(
-        RoleID => $RoleID,
+        RoleID => 123,
+    );
+
+    my @UserList = $RoleObject->RoleUserList(
+        RoleIDs => [ 123, 345 ],
     );
 
     @UserList = (
@@ -103,18 +109,18 @@ sub RoleUserList {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(RoleID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if ( !$Param{RoleID} && !IsArrayRefWithData($Param{RoleIDs}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need RoleID or RoleIDs!"
+        );
+        return;
     }
 
+    my @RoleIDs = IsArrayRefWithData($Param{RoleIDs}) ? @{$Param{RoleIDs}} : ( $Param{RoleID} );
+
     # create cache key
-    my $CacheKey = 'RoleUserList::' . $Param{RoleID};
+    my $CacheKey = 'RoleUserList::' . join(',', @RoleIDs);
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -124,8 +130,8 @@ sub RoleUserList {
     return @{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT user_id FROM role_user WHERE role_id = ?',
-        Bind => [ \$Param{RoleID} ]
+        SQL  => 'SELECT user_id FROM role_user WHERE role_id IN ('.join( ', ', map {'?'} @RoleIDs ).')',
+        Bind => [ map { \$_ } @RoleIDs ],
     );
 
     my @Result;

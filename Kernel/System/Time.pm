@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use Time::Local;
+use Time::Seconds;
 use DateTime;
 use DateTime::TimeZone;
 use Date::Pcalc qw(Add_Delta_YMDHMS);
@@ -244,7 +245,6 @@ sub TimeStamp2SystemTime {
         # we have a real timestamp
         $TimeStamp = (shift @Parts);
         $TimeStamp .= (' ' . shift @Parts) if $Parts[0];
-        
     }
     else {
         # we have to use NOW as TimeStamp
@@ -577,29 +577,45 @@ sub WorkingTime {
         }
     }
 
+    if ($Param{Debug}) {
+        print STDERR "WorkingTime - debugging infos ___________________\n";
+        # handle it as UTC time (no TZ), so no offset is considered
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+        print STDERR "  START given:       " . $DebugDateTimeObject->datetime(" ") . "\n";
+        $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StopTime} );
+        print STDERR "  STOP given:        " . $DebugDateTimeObject->datetime(" ") . "\n";
+    }
+
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
+    my $TimeVacationDaysOneTime = {};
+    my $TimeZone = $Self->{TimeZone};
     if ( $Param{Calendar} ) {
-        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
-            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
-
-            my $Zone = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
-            if ($Zone) {
-                my $TimeZoneObject   = DateTime::TimeZone->new(
-                    name => $Zone
-                );
-                $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
-                $Param{StartTime} += $Zone;
-                $Param{StopTime}  += $Zone;
-            }
+        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} ) ) {
+            $TimeWorkingHours = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
+            $TimeVacationDays = $Self->GetVacationDays( Calendar => $Param{Calendar} );
+            $TimeZone         = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
         }
     }
+    $TimeZone ||= 'UTC';
+
+    # add offsets
+    my $DateTimeObject = DateTime->from_epoch(
+        epoch     => $Param{StartTime},
+        time_zone => $TimeZone
+    );
+    my $StartTZOffset = $DateTimeObject->offset;
+    $Param{StartTime} += $StartTZOffset;
+
+    $DateTimeObject = DateTime->from_epoch(
+        epoch     => $Param{StopTime},
+        time_zone => $TimeZone
+    );
+    my $StopTZOffset = $DateTimeObject->offset;
+    $Param{StopTime}  += $StopTZOffset;
 
     # get TimeWorking
     my %TimeWorking;
@@ -608,6 +624,13 @@ sub WorkingTime {
             TimeWorkingHours => $TimeWorkingHours,
             Calendar         => $Param{Calendar} || '',
         );
+    }
+    if ($Param{Debug}) {
+        # handle it as UTC time (no TZ), so no offset is considered
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+        print STDERR "  START calendar:    " . $DebugDateTimeObject->datetime(" ") . " - used timezone: $TimeZone, offset: $StartTZOffset (" . ($StartTZOffset/60/60) . "h)\n";
+        $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StopTime} );
+        print STDERR "  STOP calendar:     " . $DebugDateTimeObject->datetime(" ") . " - used timezone: $TimeZone, offset: $StopTZOffset (" . ($StopTZOffset/60/60) . "h)\n";
     }
 
     my %LDay = (
@@ -621,57 +644,66 @@ sub WorkingTime {
     );
 
     my $Counted = 0;
-    my ( $ASec, $AMin, $AHour, $ADay, $AMonth, $AYear, $AWDay ) = localtime $Param{StartTime};    ## no critic
-    $AYear  += 1900;
-    $AMonth += 1;
-    my $ADate  = $AYear . "-" . sprintf("%02d", $AMonth) . "-" . sprintf("%02d", $ADay);
-    my ( $BSec, $BMin, $BHour, $BDay, $BMonth, $BYear, $BWDay ) = localtime $Param{StopTime};     ## no critic
-    $BYear  += 1900;
-    $BMonth += 1;
-    my $BDate  = $BYear . "-" . sprintf("%02d", $BMonth) . "-" . sprintf("%02d", $BDay);
-    my $NextDay;
+
+    my $ADateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+    my $AYear  = $ADateTimeObject->year;
+    my $AMonth = $ADateTimeObject->month;
+    my $ADay   = $ADateTimeObject->day;
+    my $AHour  = $ADateTimeObject->hour;
+    my $AMin   = $ADateTimeObject->minute;
+    my $ASec   = $ADateTimeObject->second;
+    my $AWDay  = $ADateTimeObject->wday == 7 ? 0 : $ADateTimeObject->wday;
+    my $ADate  = $ADateTimeObject->date;
+
+    my $BDateTimeObject = DateTime->from_epoch( epoch => $Param{StopTime} );
+    my $BYear  = $BDateTimeObject->year;
+    my $BMonth = $BDateTimeObject->month;
+    my $BDay   = $BDateTimeObject->day;
+    my $BHour  = $BDateTimeObject->hour;
+    my $BMin   = $BDateTimeObject->minute;
+    my $BSec   = $BDateTimeObject->second;
+    my $BWDay  = $BDateTimeObject->wday == 7 ? 0 : $BDateTimeObject->wday;
+    my $BDate  = $BDateTimeObject->date;
 
     my $CInit = 1;
+    my $DayLightSavingSwitch = 0;
+
     WORKINGDAY:
     while ( 1 ) {
-        my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WDay ) = localtime $Param{StartTime};       ## no critic
-        $Year  += 1900;
-        $Month += 1;
-        my $CDate  = $Year . "-" . sprintf("%02d", $Month) . "-" . sprintf("%02d", $Day);
+        my $DateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+        my $Year  = $DateTimeObject->year;
+        my $Month = $DateTimeObject->month;
+        my $Day   = $DateTimeObject->day;
+        my $Hour  = $DateTimeObject->hour;
+        my $Min   = $DateTimeObject->minute;
+        my $Sec   = $DateTimeObject->second;
+        my $WDay  = $DateTimeObject->wday == 7 ? 0 : $DateTimeObject->wday;
+
+        my $CDate  = $DateTimeObject->date;
         my $CTime00 = $Param{StartTime} - ( ( $Hour * 60 + $Min ) * 60 + $Sec );                  # 00:00:00
-
-        # compensate for switching to/from daylight saving time
-        # in case daylight saving time from 00:00:00 turned backward 1 hour to 23:00:00
-        if ( $NextDay && $Hour == 23 ) {
-            $Param{StartTime} += 3600;
-            $CTime00 = $Param{StartTime};
-
-            # get $Year, $Month, $Day for $CDate
-            # there is needed next day, but $Day++ would be wrong in case it was end of month
-            ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WDay ) = localtime $Param{StartTime} + 1;
-            $Year  += 1900;
-            $Month += 1;
-            $CDate = $Year . "-" . sprintf("%02d", $Month) . "-" . sprintf("%02d", $Day);;
-        }
-        if ( $CInit ) {
-            $CInit = 0;
-
-            $Day     = $ADay;
-            $Month   = $AMonth;
-            $Year    = $AYear;
-            $WDay    = $AWDay;
-            $CDate   = $ADate;
-            $CTime00 = $Param{StartTime} - ( ( $AHour * 60 + $AMin ) * 60 + $ASec );
-        }
 
         # stop if actual date is after end date
         if ($BDate lt $CDate) {
             last WORKINGDAY;
         }
 
+        my $DayStartHour;
+        my $DayStartMinute;
+        my $DayStartSecond;
+        my $UsedWorkTime = 0;
+
+        # prepare vacation days if needed
+        if ( ref( $TimeVacationDaysOneTime->{ $Year } ) ne 'HASH' ) {
+            $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+                Calendar => $Param{Calendar},
+                Year     => $Year,
+            );
+        }
+
         if ( %TimeWorking ) {
             # get WorkingDay
             my $WorkingDay = $LDay{$WDay};
+
             # check for VacationDay
             if ( $TimeVacationDays->{$Month}->{$Day} ) {
                 $WorkingDay = $TimeVacationDays->{$Month}->{$Day};
@@ -684,13 +716,34 @@ sub WorkingTime {
             if ( $TimeWorking{ $WorkingDay } ) {
                 WORKINGHOUR:
                 for my $WorkingHour ( sort{ $a <=> $b }( keys( %{ $TimeWorking{$WorkingDay} } ) ) ) {
+                    next WORKINGHOUR if ($WorkingHour < 0);
 
-                    # not date of start or end
+                    # not date of start or end (day between) => consider hole working time
                     if (
                         $CDate ne $ADate
                         && $CDate ne $BDate
                     ) {
-                        $Counted += $TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'};
+                        $UsedWorkTime += $TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'};
+
+                        # remember working day start
+                        if (!defined $DayStartHour) {
+                            DAYSTART:
+                            for my $StartHour ( sort{ $a <=> $b }( keys( %{ $TimeWorking{$WorkingDay} } ) ) ) {
+                                next if ($StartHour < 0);
+                                if ($TimeWorking{$WorkingDay}->{$StartHour}->{'WorkingTime'}) {
+                                    $DayStartHour = $StartHour;
+                                    my %Minutes = %{ $TimeWorking{$WorkingDay}->{$StartHour} };
+                                    delete $Minutes{WorkingTime};
+                                    for my $StartMinute ( sort{ $a <=> $b }( keys( %Minutes ) ) ) {
+                                        if ($TimeWorking{$WorkingDay}->{$StartHour}->{$StartMinute}) {
+                                            $DayStartMinute = $StartMinute;
+                                            last DAYSTART;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         last WORKINGHOUR;
                     }
 
@@ -715,9 +768,19 @@ sub WorkingTime {
                         && $AHour == $BHour
                         && $AHour == $WorkingHour
                     ) {
+                        # remember working day start hour
+                        if (!defined $DayStartHour) {
+                            $DayStartHour = $WorkingHour;
+                            $DayStartMinute = undef;
+                        }
                         for my $WorkingMin (qw($AMin..$BMin)) {
                             if ($TimeWorking{$WorkingDay}->{$WorkingHour}->{$WorkingMin}) {
-                                $Counted += 60;
+                                # remember working day start minute
+                                if (!defined $DayStartMinute) {
+                                    $DayStartMinute = $WorkingMin;
+                                    $DayStartSecond = $Sec;
+                                }
+                                $UsedWorkTime += 60;
                             }
                         }
                         last WORKINGHOUR;
@@ -736,7 +799,13 @@ sub WorkingTime {
                         && $AHour == $WorkingHour
                         && $TimeWorking{$WorkingDay}->{$WorkingHour}->{'WorkingTime'} == 3600
                     ) {
-                        $Counted += ((59 - $AMin) * 60) + (60 - $ASec);
+                        # remember working day start hour
+                        if (!defined $DayStartHour) {
+                            $DayStartHour = $WorkingHour;
+                            $DayStartMinute = $AMin;
+                            $DayStartSecond = $ASec;
+                        }
+                        $UsedWorkTime += ((59 - $AMin) * 60) + (60 - $ASec);
                     }
 
                     # date and hour of start
@@ -747,9 +816,9 @@ sub WorkingTime {
                         for my $WorkingMin (qw($AMin..59)) {
                             if ($TimeWorking{$WorkingDay}->{$WorkingHour}->{$WorkingMin}) {
                                 if ($AMin == $WorkingMin) {
-                                    $Counted += (60 - $ASec);
+                                    $UsedWorkTime += (60 - $ASec);
                                 } else {
-                                    $Counted += 60;
+                                    $UsedWorkTime += 60;
                                 }
                             }
                         }
@@ -768,7 +837,7 @@ sub WorkingTime {
                         && $BHour == $WorkingHour
                         && $TimeWorking{$WorkingDay}->{$WorkingHour}->{'WorkingTime'} == 3600
                     ) {
-                        $Counted += ($BMin * 60) + $BSec;
+                        $UsedWorkTime += ($BMin * 60) + $BSec;
                     }
 
                     # date and hour from end
@@ -779,9 +848,9 @@ sub WorkingTime {
                         for my $WorkingMin (qw(0..$BMin)) {
                             if ($TimeWorking{$WorkingDay}->{$WorkingHour}->{$WorkingMin}) {
                                 if ($BMin == $WorkingMin) {
-                                    $Counted += $BSec;
+                                    $UsedWorkTime += $BSec;
                                 } else {
-                                    $Counted += 60;
+                                    $UsedWorkTime += 60;
                                 }
                             }
                         }
@@ -789,75 +858,72 @@ sub WorkingTime {
 
                     # service time that is not first or last hour
                     else {
-                        $Counted += $TimeWorking{$WorkingDay}->{$WorkingHour}->{'WorkingTime'};
+                        if (!defined $DayStartHour) {
+                            $DayStartHour = $WorkingHour;
+                            $DayStartMinute = $Min;
+                            $DayStartSecond = $Sec;
+                        }
+                        $UsedWorkTime += $TimeWorking{$WorkingDay}->{$WorkingHour}->{'WorkingTime'};
                     }
                 }
             }
         }
-        # FALLBACK
-        else {
-            # count nothing because of vacation
-            if (
-                $TimeVacationDays->{$Month}->{$Day}
-                || $TimeVacationDaysOneTime->{$Year}->{$Month}->{$Day}
-                )
-            {
 
-                # do nothing
+        $Counted += $UsedWorkTime;
+
+        # only consider DST if happend during working time and calendar TZ is != UTC (etc/UTC, ...)
+        my $DayLightOfStart = 0;
+        my $DayLightOfEnd = 0;
+        if ($TimeZone !~ /UTC/i) {
+            # get DST state of working time start
+            my $DSTDateTimeObject = DateTime->new(
+                year => $Year, month => $Month, day => $Day,
+                hour => ($DayStartHour||0), minute => ($DayStartMinute||0), second => ($DayStartSecond||0),
+                time_zone => $TimeZone
+            );
+            $DayLightOfStart = $DSTDateTimeObject->is_dst;
+
+            # add seconds to get calculated working end time and DST state
+            $DSTDateTimeObject->add(seconds => $UsedWorkTime);
+            $DayLightOfEnd = $DSTDateTimeObject->is_dst;
+
+            # check for DST change during working time (if so one hour is just counted and not really done or not counted but "used" for work)
+            if ($DayLightOfStart != $DayLightOfEnd) {
+                $Counted -= $DSTDateTimeObject->offset - $StartTZOffset;
             }
-            else {
-                if ( $TimeWorkingHours->{ $LDay{$WDay} } ) {
-                    for my $WorkingHour ( @{ $TimeWorkingHours->{ $LDay{$WDay} } } ) {
 
-                        # same date and same hour of start/end date within service hour
-                        # => start counting and finish immediatly
-                        if ( $ADate eq $BDate && $AHour == $BHour && $AHour == $WorkingHour ) {
-                            return $Param{StopTime} - $Param{StartTime};
-                        }
-
-                        # do nothing because we are on start day and not yet within service hour
-                        elsif ( $CDate eq $ADate && $WorkingHour < $AHour ) {
-                        }
-
-                        # we are on start day and within start hour => count to end of this hour
-                        elsif ( $CDate eq $ADate && $AHour == $WorkingHour ) {
-                            $Counted
-                                += ( $CTime00 + ( $WorkingHour + 1 ) * 60 * 60 ) - $Param{StartTime};
-                        }
-
-                        # do nothing because we are on end day but greater than service hour
-                        elsif ( $CDate eq $BDate && $BHour < $WorkingHour ) {
-                        }
-
-                        # we are on end day and within end hour => count from start of this hour
-                        elsif ( $CDate eq $BDate && $BHour == $WorkingHour ) {
-                            $Counted += $Param{StopTime} - ( $CTime00 + $WorkingHour * 60 * 60 );
-                        }
-
-                        # count full hour because we are in service hour that is greater than
-                        # start hour and smaller than end hour
-                        else {
-                            $Counted = $Counted + ( 60 * 60 );
-                        }
-                    }
-                }
+            # set new offset (if DST happend - even if not during working time
+            if ($StartTZOffset != $DSTDateTimeObject->offset) {
+                # $DayLightSavingSwitch++;
+                $StartTZOffset = $DSTDateTimeObject->offset;
             }
+        }
+
+        if ($Param{Debug} && 0) {
+            my $DebugDateTimeObject = DateTime->new(
+                year => $Year, month => $Month, day => $Day,
+                hour => ($DayStartHour||0), minute => ($DayStartMinute||0), second => ($DayStartSecond||0)
+            );
+            print STDERR "      calculation start: " . $DebugDateTimeObject->datetime(" ") . " (working day start or incoming time if first iteration)\n";
+            print STDERR "      calculation start is DST: $DayLightOfStart\n";
+            $DebugDateTimeObject->add(seconds => $UsedWorkTime);
+            print STDERR "      calculation end:   " . $DebugDateTimeObject->datetime(" ") . " (working day end or destination if last iteration)\n";
+            print STDERR "      calculation end is DST: $DayLightOfEnd\n";
         }
 
         # reduce time => go to next day 00:00:00
-        $Param{StartTime} = $Self->Date2SystemTime(
-            Year   => $Year,
-            Month  => $Month,
-            Day    => $Day,
-            Hour   => 23,
-            Minute => 59,
-            Second => 59,
-        ) + 1;
-
-        # it will be used for checking daylight saving time
-        $NextDay = 1;
-
+        my $NextDayDateTimeObject = DateTime->new(
+            year => $Year, month => $Month, day => $Day,
+            hour => 23, minute => 59, second => 59
+        );
+        $NextDayDateTimeObject->add(seconds => 1);
+        $Param{StartTime} = $NextDayDateTimeObject->epoch;
     }
+    if ($Param{Debug}) {
+        print STDERR "  DayLightSaving switched $DayLightSavingSwitch times\n";
+        print STDERR "  End Working time:  " . $Counted . "s => " . Time::Seconds->new($Counted)->pretty . "\n";
+    }
+
     return $Counted;
 }
 
@@ -886,7 +952,8 @@ NOTE: Currently, the implementation stops silently after 600 iterations, making 
     my $DestinationTime = $TimeObject->DestinationTime(
         StartTime => $Created,
         Time      => 60*60*24*2,
-        Calendar  => 3, # '' is default
+        Calendar  => 3,                   # '' is default
+        Debug     => 1                    # 1|0 (0 is default) to output debug logs (e.g. start time, intermediate results, ...)
     );
 
 =cut
@@ -895,7 +962,7 @@ sub DestinationTime {
     my ( $Self, %Param ) = @_;
 
     # "Time zone" diff in seconds
-    my $Zone = 0;
+    my $TZOffset = 0;
 
     # check needed stuff
     for (qw(StartTime Time)) {
@@ -908,27 +975,45 @@ sub DestinationTime {
         }
     }
 
+    if ($Param{Debug}) {
+        print STDERR "DestinationTime - debugging infos ___________________\n";
+        # handle it as UTC time (no TZ), so no offset is considered
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+        print STDERR "  START given:    " . $DebugDateTimeObject->datetime(" ") . "\n";
+    }
+
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
+    my $TimeVacationDaysOneTime = {};
+    my $TimeZone = $Self->{TimeZone};
     if ( $Param{Calendar} ) {
-        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
+        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} ) ) {
             $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
             $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
-
-            my $TimeZoneObject   = DateTime::TimeZone->new(
-                name => $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} )
-            );
-            $Zone = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
-            $Param{StartTime} += $Zone;
+            $TimeZone                = $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} );
         }
     }
+    $TimeZone ||= 'UTC';
+
+    # consider offset
+    my $DateTimeObject = DateTime->from_epoch(
+        epoch     => $Param{StartTime},
+        time_zone => $TimeZone
+    );
+    $TZOffset = $DateTimeObject->offset;
+    $Param{StartTime} += $TZOffset;
+
     my $DestinationTime = $Param{StartTime};
     my $CTime           = $Param{StartTime};
+
+    if ($Param{Debug}) {
+        # handle it as UTC time (no TZ), so no offset is considered
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $Param{StartTime} );
+        print STDERR "  START calendar: " . $DebugDateTimeObject->datetime(" ") . " (used timezone: $TimeZone, offset: $TZOffset (" . ($TZOffset/60/60) . "h))\n";
+    }
 
     # get TimeWorking
     my %TimeWorking;
@@ -949,31 +1034,41 @@ sub DestinationTime {
         0 => 'Sun',
     );
 
-    my $LoopCounter;
-    my $DayLightSaving;
+    my $LoopCounter = 0;
+    my $DayLightSavingSwitch = 0;
 
     LOOP:
     while ( $Param{Time} > 1 ) {
         $LoopCounter++;
         last LOOP if $LoopCounter > 5000;
 
-        my ( $Second, $Minute, $Hour, $Day, $Month, $Year, $WDay ) = localtime $CTime;    ## no critic
-        $Year  += 1900;
-        $Month += 1;
-        my $CTime00 = $CTime - ( ( $Hour * 60 + $Minute ) * 60 + $Second );               # 00:00:00
+        if ($Param{Debug}) {
+            print STDERR "    $LoopCounter. Iteration\n";
+            print STDERR "      time remaining start: $Param{Time}s => " . Time::Seconds->new($Param{Time})->pretty . "\n";
+        }
 
-        # compensate for switching to/from daylight saving time
-        # in case daylight saving time from 00:00:00 turned backward 1 hour to 23:00:00
-        if ( $DayLightSaving && $Hour == 23 ) {
-            $CTime += 3600;
-            $CTime00 = $CTime;
+        my $CTimeDateTimeObject = DateTime->from_epoch( epoch => $CTime );
+        my $Year   = $CTimeDateTimeObject->year;
+        my $Month  = $CTimeDateTimeObject->month;
+        my $Day    = $CTimeDateTimeObject->day;
+        my $Hour   = $CTimeDateTimeObject->hour;
+        my $Minute = $CTimeDateTimeObject->minute;
+        my $Second = $CTimeDateTimeObject->second;
+        my $WDay   = $CTimeDateTimeObject->wday == 7 ? 0 : $CTimeDateTimeObject->wday;
 
-            # there is needed next day, but $Day++ would be wrong in case it was end of month
-            ( $Second, $Minute, $Hour, $Day, $Month, $Year, $WDay ) = localtime $CTime + 1;
-            $Year  += 1900;
-            $Month += 1;
+        my $CTime00 = $CTime - ( ( $Hour * 60 + $Minute ) * 60 + $Second ); # 00:00:00
 
-            $DestinationTime += 3600;
+        my $DayStartHour;
+        my $DayStartMinute;
+        my $DayStartSecond;
+        my $UsedWorkTime = 0;
+
+        # prepare vacation days if needed
+        if ( ref( $TimeVacationDaysOneTime->{ $Year } ) ne 'HASH' ) {
+            $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+                Calendar => $Param{Calendar},
+                Year     => $Year,
+            );
         }
 
         if ( %TimeWorking ) {
@@ -989,22 +1084,21 @@ sub DestinationTime {
                 $WorkingDay = $TimeVacationDaysOneTime->{$Year}->{$Month}->{$Day};
             }
 
-            # Skip days without working hours
+            # skip days without working hours
             if ( !$TimeWorking{$WorkingDay}->{-1}->{'DayWorkingTime'} ) {
 
-                # Set destination time to next day, 00:00:00
-                $DestinationTime = $Self->Date2SystemTime(
-                    Year   => $Year,
-                    Month  => $Month,
-                    Day    => $Day,
-                    Hour   => 23,
-                    Minute => 59,
-                    Second => 59,
-                ) + 1;
+                # set destination time to next day, 00:00:00 - handle it as UTC (do not consider offset)
+                my $NextDayDateTimeObject = DateTime->new(
+                    year => $Year, month => $Month, day => $Day,
+                    hour => 23, minute => 59, second => 59
+                );
+                $NextDayDateTimeObject->add(seconds => 1);
+                $DestinationTime = $NextDayDateTimeObject->epoch;
             }
 
-            # Working time
+            # working time
             else {
+                $DayStartHour = undef;
                 HOUR:
                 for my $WorkingHour ( $Hour .. 23 ) {
                     my $DiffDestTime = 0;
@@ -1012,11 +1106,21 @@ sub DestinationTime {
 
                     # Working hour
                     if ( $TimeWorking{$WorkingDay}->{$WorkingHour} ) {
+                        # remember working day start hour
+                        if (!defined $DayStartHour) {
+                            $DayStartHour = $WorkingHour;
+                            $DayStartMinute = undef;
+                        }
                         MINUTE:
                         for my $Min ( $Minute..59 ) {
 
                             # Working minute
                             if ( $TimeWorking{$WorkingDay}->{$WorkingHour}->{$Min} ) {
+                                # remember working day start minute
+                                if (!defined $DayStartMinute) {
+                                    $DayStartMinute = $Min;
+                                    $DayStartSecond = $Second;
+                                }
                                 if ( ($Param{Time} - $DiffWorkTime) > (60 - $Second) ) {
                                     $DiffDestTime += (60 - $Second);
                                     $DiffWorkTime += (60 - $Second);
@@ -1033,6 +1137,8 @@ sub DestinationTime {
                             }
                             $Second = 0;
                         }
+                        # remember working day end
+                        $UsedWorkTime += $DiffWorkTime;
                     }
 
                     # Not working hour
@@ -1053,85 +1159,73 @@ sub DestinationTime {
                 }
             }
         }
-        # FALLBACK
-        else {
 
-            # Skip vacation days, or days without working hours, do not count.
-            if (
-                $TimeVacationDays->{$Month}->{$Day}
-                || $TimeVacationDaysOneTime->{$Year}->{$Month}->{$Day}
-                || !$TimeWorkingHours->{ $LDay{$WDay} }
-                )
-            {
-                # Set destination time to next day, 00:00:00
-                $DestinationTime = $Self->Date2SystemTime(
-                    Year   => $Year,
-                    Month  => $Month,
-                    Day    => $Day,
-                    Hour   => 23,
-                    Minute => 59,
-                    Second => 59,
-                ) + 1;
+        # only consider DST if happend during working time and calendar TZ is != UTC (etc/UTC, ...)
+        my $DayLightOfStart = 0;
+        my $DayLightOfEnd = 0;
+        if ($TimeZone !~ /UTC/i) {
+            # get DST state of working time start
+            my $DSTDateTimeObject = DateTime->new(
+                year => $Year, month => $Month, day => $Day,
+                hour => ($DayStartHour||0), minute => ($DayStartMinute||0), second => ($DayStartSecond||0),
+                time_zone => $TimeZone
+            );
+            $DayLightOfStart = $DSTDateTimeObject->is_dst;
+
+            # add seconds to get calculated working end time and DST state
+            $DSTDateTimeObject->add(seconds => $UsedWorkTime);
+            $DayLightOfEnd = $DSTDateTimeObject->is_dst;
+
+            # check for DST change during working time (if so one hour is just counted and not really done or not counted but "used" for work)
+            if ($DayLightOfStart != $DayLightOfEnd) {
+                $DestinationTime += $DSTDateTimeObject->offset - $TZOffset;
             }
 
-            # Regular day with working hours
-            else {
-                HOUR:
-                for my $H ( $Hour .. 23 ) {
-
-                    # Check if we have a working hour
-                    if ( grep { $H == $_ } @{ $TimeWorkingHours->{ $LDay{$WDay} } } ) {
-                        if ( $Param{Time} > 60 * 60 ) {
-                            my $RestOfHour = 3600 - ( $Minute * 60 + $Second );
-                            $DestinationTime += $RestOfHour;
-                            $Param{Time} -= $RestOfHour;
-                        }
-                        else {
-                            $DestinationTime += $Param{Time};
-                            last LOOP;
-                        }
-                    }
-
-                    # Not a working hour
-                    else {
-                        my $RestOfHour = 3600 - ( $Minute * 60 + $Second );
-                        $DestinationTime += $RestOfHour;
-                    }
-
-                    # Here we are always aligned at an hour boundary
-                    $Minute = 0;
-                    $Second = 0;
-                }
+            # set new offset (if DST happend - even if not during working time
+            if ($TZOffset != $DSTDateTimeObject->offset) {
+                $DayLightSavingSwitch++;
+                $TZOffset = $DSTDateTimeObject->offset;
             }
         }
 
-        # Find the unix time stamp for the next day at 00:00:00 to start for calculation.
-        my $NewCTime = $Self->Date2SystemTime(
-            Year   => $Year,
-            Month  => $Month,
-            Day    => $Day,
-            Hour   => 23,
-            Minute => 59,
-            Second => 59,
-        ) + 1;
 
-        if ( !%TimeWorking ) {
-
-            # Compensate for switching to/from daylight saving time
-            # (day is shorter or longer than 24h)
-            if ( $NewCTime != $CTime00 + 24 * 60 * 60 ) {
-                my $Diff = $NewCTime - $CTime00 - 24 * 60 * 60;
-                $DestinationTime += $Diff;
-                $DayLightSaving = 1;
-            }
+        if ($Param{Debug}) {
+            my $DebugDateTimeObject = DateTime->new(
+                year => $Year, month => $Month, day => $Day,
+                hour => ($DayStartHour||0), minute => ($DayStartMinute||0), second => ($DayStartSecond||0)
+            );
+            print STDERR "      calculation start: " . $DebugDateTimeObject->datetime(" ") . " (working day start or incoming time if first iteration)\n";
+            print STDERR "      calculation start is DST: $DayLightOfStart\n";
+            $DebugDateTimeObject->add(seconds => $UsedWorkTime);
+            print STDERR "      calculation end:   " . $DebugDateTimeObject->datetime(" ") . " (working day end or destination if last iteration)\n";
+            print STDERR "      calculation end is DST: $DayLightOfEnd\n";
+            $DebugDateTimeObject = DateTime->from_epoch( epoch => $DestinationTime );
+            print STDERR "      destination time:  " . $DebugDateTimeObject->datetime(" ") . " (next day if not last iteration)\n";
+            print STDERR "      used time: " . $UsedWorkTime . "s => " . Time::Seconds->new($UsedWorkTime)->pretty . "\n";
+            print STDERR "      time remaining end: $Param{Time}s => " . Time::Seconds->new($Param{Time})->pretty . "\n";
         }
 
-        # Set next loop time to 00:00:00 of next day.
-        $CTime = $NewCTime;
+        # get next loop time (next day) - handle it as UTC (do not consider offset)
+        my $NextDayDateTimeObject = DateTime->new(
+            year => $Year, month => $Month, day => $Day,
+            hour => 23, minute => 59, second => 59
+        );
+        $NextDayDateTimeObject->add(seconds => 1);
+        $CTime = $NextDayDateTimeObject->epoch;
     }
 
-    # return destination time - e. g. with diff of calendar time zone
-    return $DestinationTime - $Zone;
+    if ($Param{Debug}) {
+        print STDERR "  DayLightSaving switched $DayLightSavingSwitch times\n";
+        # handle it as UTC time (no TZ), so no offset is considered
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $DestinationTime );
+        print STDERR "  END calendar: " . $DebugDateTimeObject->datetime(" ") . "\n";
+        # handle it as UTC time (no TZ), so no offset is considered
+        $DebugDateTimeObject = DateTime->from_epoch( epoch => ($DestinationTime - $TZOffset) );
+        print STDERR "  END outgoing: " . $DebugDateTimeObject->datetime(" ") . " (calendar offset: $TZOffset (" . ($TZOffset/60/60) . "h))\n";
+    }
+
+    # return destination time - diff of calendar time zone
+    return $DestinationTime - $TZOffset;
 }
 
 =item VacationCheck()
@@ -1161,11 +1255,11 @@ sub VacationCheck {
     my ( $Self, %Param ) = @_;
 
     # check required params
-    for (qw(Year Month Day)) {
-        if ( !$Param{$_} ) {
+    for my $ReqParam (qw(Year Month Day)) {
+        if ( !$Param{$ReqParam} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "VacationCheck: Need $_!",
+                Message  => "VacationCheck: Need $ReqParam!",
             );
             return;
         }
@@ -1178,14 +1272,20 @@ sub VacationCheck {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    my $TimeVacationDays        = $Self->GetVacationDays();
-    my $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime();
-    if ( $Param{Calendar} ) {
-        if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays        = $Self->GetVacationDays( Calendar => $Param{Calendar} );
-            $TimeVacationDaysOneTime = $Self->GetVacationDaysOneTime( Calendar => $Param{Calendar} );
-        }
+    my $TimeVacationDays;
+    if (
+        $Param{Calendar}
+        && $ConfigObject->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDays = $Self->GetVacationDays( Calendar => $Param{Calendar} );
     }
+    else {
+        $TimeVacationDays = $Self->GetVacationDays();
+    }
+    my $TimeVacationDaysOneTime->{ $Year } = $Self->PrepareVacationDaysOfYear(
+        Calendar => $Param{Calendar},
+        Year     => $Year,
+    );
 
     # '01' - format
     if ( defined $TimeVacationDays->{$Month}->{$Day} ) {
@@ -1223,48 +1323,21 @@ sub GetVacationDays {
     my ( $Self, %Param ) = @_;
     my $Result;
 
-    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDays');
-    if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
-        }
+    my $TimeVacationDays;
+    if (
+        $Param{Calendar}
+        && $Kernel::OM->Get('Config')->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDays::Calendar' . $Param{Calendar} );
+    }
+    else {
+        $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDays');
     }
 
     return {} if !IsArrayRefWithData($TimeVacationDays);
 
     foreach my $Item ( @{$TimeVacationDays} ) {
         $Result->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
-    }
-
-    return $Result;
-}
-
-=item GetVacationDaysOneTime()
-
-get TimeVacationDaysOneTime from Config and prepare internal representation
-
-    $TimeObject->GetVacationDaysOneTime(
-        Calendar => '...'           # optional
-    );
-
-
-=cut
-
-sub GetVacationDaysOneTime {
-    my ( $Self, %Param ) = @_;
-    my $Result;
-
-    my $TimeVacationDays = $Kernel::OM->Get('Config')->Get('TimeVacationDaysOneTime');
-    if ( $Param{Calendar} ) {
-        if ( $Kernel::OM->Get('Config')->Get( "TimeZone::Calendar" . $Param{Calendar} . "Name" ) ) {
-            $TimeVacationDays = $Kernel::OM->Get('Config')->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
-        }
-    }
-
-    return {} if !IsArrayRefWithData($TimeVacationDays);
-
-    foreach my $Item ( @{$TimeVacationDays} ) {
-        $Result->{$Item->{Year}}->{$Item->{Month}}->{$Item->{Day}} = $Item->{content}
     }
 
     return $Result;
@@ -1451,6 +1524,89 @@ sub _GetTimeWorking {
         Depends => ['SysConfig'] # delete also if config is changed (TimeWorkingHours)
     );
     return %TimeWorking;
+}
+
+sub PrepareVacationDaysOfYear {
+    my ( $Self, %Param ) = @_;
+
+    # init return value
+    my %VacationDaysOfYear = ();
+
+    # check data
+    if ( !defined( $Param{Year} ) ) {
+        return \%VacationDaysOfYear;
+    }
+
+    # get config object
+    my $ConfigObject = $Kernel::OM->Get('Config');
+
+    # process sysconfig
+    my $TimeVacationDaysOneTime;
+    my $TimeVacationDaysModules;
+    if (
+        $Param{Calendar}
+        && $ConfigObject->Get( 'TimeZone::Calendar' . $Param{Calendar} . 'Name' )
+    ) {
+        $TimeVacationDaysOneTime = $ConfigObject->Get( 'TimeVacationDaysOneTime::Calendar' . $Param{Calendar} );
+        $TimeVacationDaysModules = $ConfigObject->Get( 'TimeVacationDaysModules::Calendar' . $Param{Calendar} );
+    }
+    else {
+        $TimeVacationDaysOneTime = $ConfigObject->Get('TimeVacationDaysOneTime');
+        $TimeVacationDaysModules = $ConfigObject->Get('TimeVacationDaysModules');
+    }
+
+    # process modules
+    if ( ref( $TimeVacationDaysModules ) eq 'HASH' ) {
+
+        CONFIG:
+        for my $ModuleConfig ( sort( keys( %{ $TimeVacationDaysModules } ) ) ) {
+
+            next CONFIG if (
+                ref( $TimeVacationDaysModules->{$ModuleConfig} ) ne 'HASH'
+                || !$TimeVacationDaysModules->{$ModuleConfig}->{Name}
+                || !$TimeVacationDaysModules->{$ModuleConfig}->{Module}
+            );
+            last CONFIG if ( !$Kernel::OM->Get('Main')->Require( $TimeVacationDaysModules->{$ModuleConfig}->{Module} ) );
+
+            my $VacationObject = $TimeVacationDaysModules->{$ModuleConfig}->{Module}->new(
+                %{$Self},
+            );
+
+            if ( !$VacationObject ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "new() of vacation module $TimeVacationDaysModules->{$ModuleConfig}->{Module} not successfully!",
+                );
+                next CONFIG;
+            }
+
+            # run module
+            my %ModuleVacationDaysOfYear = $VacationObject->Run(
+                Name => $TimeVacationDaysModules->{$ModuleConfig}->{Name},
+                Year => $Param{Year},
+            );
+
+            # merge hashes
+            if ( %ModuleVacationDaysOfYear ) {
+                for my $Month ( keys( %ModuleVacationDaysOfYear ) ) {
+                    if ( ref( $ModuleVacationDaysOfYear{ $Month } ) eq 'HASH' ) {
+                        for my $Day ( keys ( %{ $ModuleVacationDaysOfYear{ $Month } } ) ) {
+                            $VacationDaysOfYear{ $Month }->{ $Day } = $ModuleVacationDaysOfYear{ $Month }->{ $Day };
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (
+        ref( $TimeVacationDaysOneTime ) eq 'HASH'
+        && ref( $TimeVacationDaysOneTime->{ $Param{Year} } ) eq 'HASH'
+    ) {
+        %VacationDaysOfYear = %{ $TimeVacationDaysOneTime->{ $Param{Year} } };
+    }
+
+    return \%VacationDaysOfYear;
 }
 
 1;

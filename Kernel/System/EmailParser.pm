@@ -18,7 +18,7 @@ use MIME::Parser;
 use MIME::QuotedPrint;
 use MIME::Base64;
 use MIME::Words qw(:all);
-use Mail::Address;
+use Email::Address::XS;
 
 our $ObjectManagerDisabled = 1;
 
@@ -172,10 +172,10 @@ sub GetParam {
     my $ReturnLine;
 
     # We need to split address lists before decoding; see "6.2. Display of 'encoded-word's"
-    # in RFC 2047. Mail::Address routines will quote stuff if necessary (i.e. comma
+    # in RFC 2047. Email::Address::XS routines will quote stuff if necessary (i.e. comma
     # or semicolon found in phrase).
     if ( $What =~ /^(From|To|Cc)/ ) {
-        for my $Address ( Mail::Address->parse($Line) ) {
+        for my $Address ( Email::Address::XS->parse($Line) ) {
             $Address->phrase( $Self->_DecodeString( String => $Address->phrase() ) );
             $Address->address( $Self->_DecodeString( String => $Address->address() ) );
             $Address->comment( $Self->_DecodeString( String => $Address->comment() ) );
@@ -239,7 +239,7 @@ sub GetRealname {
     my ( $Self, %Param ) = @_;
     my $Realname = '';
 
-    # find "NamePart, NamePart" <some@example.com> (get not recognized by Mail::Address)
+    # find "NamePart, NamePart" <some@example.com> (get not recognized by Email::Address::XS)
     if ( $Param{Email} =~ /"(.+?)"\s+?\<.+?@.+?\..+?\>/ ) {
         $Realname = $1;
 
@@ -249,7 +249,7 @@ sub GetRealname {
         return $Realname;
     }
 
-    # fallback of Mail::Address
+    # fallback of Email::Address::XS
     for my $EmailSplit ( $Self->_MailAddressParse( Email => $Param{Email} ) ) {
         $Realname = $EmailSplit->phrase();
     }
@@ -1019,7 +1019,7 @@ sub _DecodeString {
 
     my @Chunks = $ParserObject->_MailAddressParse(Email => $Email);
 
-Wrapper for C<Mail::Address->parse($Email)>, but cache it, since it's
+Wrapper for C<Email::Address::XS->parse($Email)>, but cache it, since it's
 not too fast, and often called.
 
 =cut
@@ -1034,7 +1034,7 @@ sub _MailAddressParse {
         return @{ $Self->{EmailCache}->{$Email} };
     }
 
-    my @Chunks = Mail::Address->parse($Email);
+    my @Chunks = Email::Address::XS->parse($Email);
     $Self->{EmailCache}->{$Email} = \@Chunks;
 
     return @Chunks;
