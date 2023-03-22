@@ -109,7 +109,10 @@ our %FieldTypeMigration = (
                 CountMin => 1,
                 CountMax => 1,
                 CountDefault => 1,
-            }
+            },
+            StringToArray => [
+                'DefaultValue'
+            ]
         }
     },
     'CustomerUser' => {
@@ -119,7 +122,10 @@ our %FieldTypeMigration = (
                 CountMin => 1,
                 CountMax => 1,
                 CountDefault => 1,
-            }
+            },
+            StringToArray => [
+                'DefaultValue'
+            ]
         }
     },
     'User' => {
@@ -129,7 +135,10 @@ our %FieldTypeMigration = (
                 CountMin => 1,
                 CountMax => 1,
                 CountDefault => 1,
-            }
+            },
+            StringToArray => [
+                'DefaultValue'
+            ]
         }
     },
     'ActivityID' => {
@@ -311,6 +320,19 @@ sub Run {
                     $Config = {
                         %{$Config},
                         %{$Migration->{ConfigChange}->{Add}},
+                    }
+                }
+                if ( IsArrayRefWithData($Migration->{ConfigChange}->{StringToArray}) ) {
+                    foreach my $Attr ( @{$Migration->{ConfigChange}->{StringToArray}} ) {
+                        next if !defined $Config->{$Attr};
+                        next if ref $Config->{$Attr} eq 'Array';
+
+                        if ( $Config->{$Attr} eq q{} ) {
+                            $Config->{$Attr} = [];
+                        }
+                        else {
+                            $Config->{$Attr} = [$Config->{$Attr}];
+                        }
                     }
                 }
                 foreach my $Attr ( @{$Migration->{ConfigChange}->{Remove} || []}, 'ValueTTL', 'ValueTTLData', 'ValueTTLMultiplier' ) {
