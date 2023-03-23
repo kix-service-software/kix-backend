@@ -290,7 +290,7 @@ sub Run {
 
         # some special handling if the DF already exists
         if ( $ID ) {
-            $Item->{name} = 'Migration-'.$Item->{name};
+            $Item->{name} = 'Migration'.$Item->{name};
             # do the lookup again
             goto LOOKUP;
         }
