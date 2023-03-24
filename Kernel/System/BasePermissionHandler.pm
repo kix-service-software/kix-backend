@@ -15,6 +15,7 @@ use warnings;
 
 use Time::HiRes;
 
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
