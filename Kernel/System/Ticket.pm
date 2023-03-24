@@ -547,8 +547,8 @@ sub TicketCreate {
 
             if (!$ExistingContactID) {
                 $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                    Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                    Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                    Firstname             => IsArrayRefWithData(@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                    Lastname              => IsArrayRefWithData(@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
                     Email                 => $ContactEmail,
                     PrimaryOrganisationID => $ExistingOrganisationID,
                     ValidID               => 1,
