@@ -88,26 +88,25 @@ sub Run {
     );
 
     if ( %QueueList && IsHashRefWithData($Param{Data}->{requiredPermission}) && $Param{Data}->{requiredPermission}->{Permission}) {
-        # get relevant QueueIDs from base permissions
-        my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission}->{Permission});
         my %BasePermissionQueueIDs;
 
-        PERMISSION:
-        foreach my $Permission (@Permissions) {
-            my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
-                UserID       => $Self->{Authorization}->{UserID},
-                UsageContext => $Self->{Authorization}->{UserType},
-                Permission   => $Permission,
+        my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+            UserID       => $Self->{Authorization}->{UserID},
+            UsageContext => $Self->{Authorization}->{UserType},
+            Permission   => $Param{Data}->{requiredPermission}->{Permission},
+        );
+
+        if ( IsArrayRefWithData($Result) ) {
+            %BasePermissionQueueIDs = (
+                %BasePermissionQueueIDs,
+                map { $_ => 1 } @{$Result},
             );
-            if ( IsArrayRefWithData($Result) ) {
-                %BasePermissionQueueIDs = (
-                    %BasePermissionQueueIDs,
-                    map { $_ => 1 } @{$Result},
-                );
-            }
         }
+        
         if ( %BasePermissionQueueIDs ) {
             %QueueList = %BasePermissionQueueIDs;
+        } else {
+            %QueueList = ();
         }
 
         $Self->AddCacheKeyExtension(
