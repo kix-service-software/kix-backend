@@ -539,7 +539,7 @@ sub TicketCreate {
                 );
             }
 
-            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : undef;
+            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 Email  => $ContactEmail,
                 Silent => 1,
@@ -547,8 +547,8 @@ sub TicketCreate {
 
             if (!$ExistingContactID) {
                 $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                    Firstname             => IsArrayRefWithData(@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                    Lastname              => IsArrayRefWithData(@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                    Firstname             => IsArrayRefWithData(\@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                    Lastname              => IsArrayRefWithData(\@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
                     Email                 => $ContactEmail,
                     PrimaryOrganisationID => $ExistingOrganisationID,
                     ValidID               => 1,
