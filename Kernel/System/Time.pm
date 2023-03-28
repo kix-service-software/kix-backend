@@ -62,11 +62,10 @@ sub new {
 
     $Self->{TimeZone} = $Param{TimeZone}
         || $Param{UserTimeZone}
-        || $Kernel::OM->Get('Config')->Get('TimeZone')
-        || 'Etc/UTC';   # fallback
+        || $Kernel::OM->Get('Config')->Get('TimeZone'); # may config is "empty" if time object is created during sysonfig object creation
 
     $Self->{TimeSecDiff} = 0;
-    if ( lc $Self->{TimeZone} ne 'local' ) {
+    if ( $Self->{TimeZone} && lc $Self->{TimeZone} ne 'local' ) {
         my $TimeZoneObject   = DateTime::TimeZone->new(name => $Self->{TimeZone});
         $Self->{TimeSecDiff} = $TimeZoneObject->offset_for_datetime(DateTime->now);     # time zone offset in seconds
     }
@@ -558,7 +557,8 @@ get the working time in seconds between these local system times.
     my $WorkingTime = $TimeObject->WorkingTime(
         StartTime => $Created,
         StopTime  => $TimeObject->SystemTime(),
-        Calendar  => 3, # '' is default
+        Calendar  => 3,           # '' is default
+        Debug     => 1            # 1|0 (0 is default) to output debug logs (e.g. given times, some calculation results, ...)
     );
 
 =cut
@@ -592,7 +592,7 @@ sub WorkingTime {
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
     my $TimeVacationDaysOneTime = {};
-    my $TimeZone = $Self->{TimeZone};
+    my $TimeZone = $Self->{TimeZone} || $Kernel::OM->Get('Config')->Get('TimeZone');
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} ) ) {
             $TimeWorkingHours = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
@@ -922,6 +922,7 @@ sub WorkingTime {
     if ($Param{Debug}) {
         print STDERR "  DayLightSaving switched $DayLightSavingSwitch times\n";
         print STDERR "  End Working time:  " . $Counted . "s => " . Time::Seconds->new($Counted)->pretty . "\n";
+        print STDERR "EO WorkingTime - debugging infos ___________________\n";
     }
 
     return $Counted;
@@ -988,7 +989,7 @@ sub DestinationTime {
     my $TimeWorkingHours        = $ConfigObject->Get('TimeWorkingHours');
     my $TimeVacationDays        = $Self->GetVacationDays();
     my $TimeVacationDaysOneTime = {};
-    my $TimeZone = $Self->{TimeZone};
+    my $TimeZone = $Self->{TimeZone} || $Kernel::OM->Get('Config')->Get('TimeZone');
     if ( $Param{Calendar} ) {
         if ( $ConfigObject->Get( "TimeZone::Calendar" . $Param{Calendar} ) ) {
             $TimeWorkingHours        = $ConfigObject->Get( "TimeWorkingHours::Calendar" . $Param{Calendar} );
@@ -1222,6 +1223,7 @@ sub DestinationTime {
         # handle it as UTC time (no TZ), so no offset is considered
         $DebugDateTimeObject = DateTime->from_epoch( epoch => ($DestinationTime - $TZOffset) );
         print STDERR "  END outgoing: " . $DebugDateTimeObject->datetime(" ") . " (calendar offset: $TZOffset (" . ($TZOffset/60/60) . "h))\n";
+        print STDERR "EO DestinationTime - debugging infos ___________________\n";
     }
 
     # return destination time - diff of calendar time zone
@@ -1366,6 +1368,11 @@ sub BOB {
         return;
     }
 
+    if ( $Param{Debug} ) {
+        print STDERR "BOB - debugging infos ___________________\n";
+        print STDERR "  IN: $Param{String}\n";
+    }
+
     # get date parts
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Self->SystemTime2Date(
         SystemTime => $Self->TimeStamp2SystemTime(
@@ -1380,13 +1387,19 @@ sub BOB {
             String => "$Year-$Month-$Day 00:00:00",
         ),
         Time     => 2,   # at least 2 seconds needed, is substracted after next line
-        Calendar => $Param{Calendar}
+        Calendar => $Param{Calendar},
+        Debug    => $Param{Debug}
     ) - 2;
 
     # get BOB date time string
     my $BOB = $Self->SystemTime2TimeStamp(
         SystemTime => $BOBUnix
     );
+
+    if ( $Param{Debug} ) {
+        print STDERR "  OUT: $BOB\n";
+        print STDERR "EO BOB - debugging infos ___________________\n";
+    }
 
     return $BOB;
 }
@@ -1414,6 +1427,11 @@ sub EOB {
         return;
     }
 
+    if ( $Param{Debug} ) {
+        print STDERR "EOB - debugging infos ___________________\n";
+        print STDERR "  IN: $Param{String}\n";
+    }
+
     # get date parts
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Self->SystemTime2Date(
         SystemTime => $Self->TimeStamp2SystemTime(
@@ -1422,30 +1440,49 @@ sub EOB {
     );
     return if (!$Year);
 
-    # get working time of relevant day (seconds)
-    my $WorkingTime = $Self->WorkingTime(
-        StartTime => $Self->TimeStamp2SystemTime(
-            String => "$Year-$Month-$Day 00:00:01",
-        ),
-        StopTime => $Self->TimeStamp2SystemTime(
-            String => "$Year-$Month-$Day 23:59:59",
-        ),
-        Calendar => $Param{Calendar}
-    );
-
     # get BOB unix
     my $BOBUnix = $Self->DestinationTime(
         StartTime => $Self->TimeStamp2SystemTime(
             String => "$Year-$Month-$Day 00:00:00",
         ),
         Time     => 2,   # at least 2 seconds needed, is substracted after next line
-        Calendar => $Param{Calendar}
+        Calendar => $Param{Calendar},
+        Debug    => $Param{Debug}
     ) - 2;
+
+    # get 0:00 to 24:00 of relevant day
+    my $BOBDateTimeObject = DateTime->from_epoch( epoch => $BOBUnix );
+    $BOBDateTimeObject = DateTime->new(
+        year => $BOBDateTimeObject->year, month => $BOBDateTimeObject->month, day => $BOBDateTimeObject->day,
+        hour => 0, minute => 0, second => 0
+    );
+    my $StartTime = $BOBDateTimeObject->epoch;
+    $BOBDateTimeObject->add(days => 1);
+    my $StopTime = $BOBDateTimeObject->epoch;
+
+    # get working time of relevant day (seconds)
+    my $WorkingTime = $Self->WorkingTime(
+        StartTime => $StartTime,
+        StopTime  => $StopTime,
+        Calendar  => $Param{Calendar},
+        Debug     => $Param{Debug}
+    );
+
+    if ( $Param{Debug} ) {
+        my $DebugDateTimeObject = DateTime->from_epoch( epoch => $BOBUnix );
+        print STDERR "  BOB for EOB: " . $DebugDateTimeObject->datetime(" ") . "\n";
+        print STDERR "  WorkingTime: " . Time::Seconds->new($WorkingTime)->pretty . "\n";
+    }
 
     # get EOB date time string (= BOB + working time for this day)
     my $EOB = $Self->SystemTime2TimeStamp(
         SystemTime => $BOBUnix + $WorkingTime
     );
+
+    if ( $Param{Debug} ) {
+        print STDERR "  OUT: $EOB\n";
+        print STDERR "EO EOB - debugging infos ___________________\n";
+    }
 
     return $EOB;
 }
