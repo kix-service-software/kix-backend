@@ -393,8 +393,7 @@ sub _TicketUpdate {
 
         # set pending time
         elsif ($StateData{TypeName} =~ /^pending/i) {
-
-            if (!(defined $TicketData{PendingTime} || defined $Ticket->{PendingTime})) {
+            if (!$TicketData{PendingTime} && !defined $Ticket->{PendingTime}) {
                 return $Self->_Error(
                     Code    => 'Object.UnableToUpdate',
                     Message => 'Unable to update pending state without pending time!',
