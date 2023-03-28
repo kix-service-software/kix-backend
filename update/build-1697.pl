@@ -45,6 +45,12 @@ sub _AddNewPermissions {
     # add new permissions
     my @NewPermissions = (
         {
+            Role   => 'Superuser',
+            Type   => 'Base::Ticket',
+            Target => '*',
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ} + Kernel::System::Role::Permission::PERMISSION->{WRITE},
+        },
+        {
             Role   => 'Ticket Agent',
             Type   => 'Base::Ticket',
             Target => '*',
