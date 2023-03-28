@@ -197,6 +197,7 @@
 "Superuser";"Resource";"/*";"x";"x";"x";"x";
 "Superuser";"Object";"/*{}";"x";"x";"x";"x";
 "Superuser";"Property";"/*{}";"x";"x";"x";"x";
+"Superuser";"Base::Ticket";"*";"x";"x";"x";"x";
 "Customer";"Resource";"/auth";"x";;;;
 "Customer";"Resource";"/cmdb";;"x";;;
 "Customer";"Resource";"/faq";;"x";;;
