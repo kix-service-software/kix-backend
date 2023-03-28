@@ -2741,6 +2741,14 @@ sub TicketPendingTimeSet {
         return if !$Time;
     }
 
+    # check if update is needed
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+        DynamicFields => 0,
+    );
+    return 1 if $Ticket{PendingTimeUnix} eq $Time;
+
     # db update
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE ticket SET until_time = ?, change_time = current_timestamp, change_by = ?'
