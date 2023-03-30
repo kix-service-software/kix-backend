@@ -2730,7 +2730,7 @@ sub _CheckBasePermission {
             Code => 'Forbidden',
         );
     }
-    elsif ( $Result && !IsHashRef($Result) ) {
+    elsif ( !IsHashRef($Result) || IsHashRefWithData($Result) && !exists $Param{Data}->{$Result->{Object}} ) {
         return $Self->_Success();
     }
 
