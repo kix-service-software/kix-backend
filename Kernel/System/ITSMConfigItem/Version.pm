@@ -1591,21 +1591,15 @@ sub VersionSearch {
     }
 
     # build SQL
-    # KIX4OTRS-capeIT
-    # my $SQL = 'SELECT DISTINCT(vr.configitem_id) '
-    #     . 'FROM configitem ci, configitem_version vr '
-    #     . $WhereString;
     my $SQL = 'SELECT DISTINCT(vr.configitem_id) ';
     if (@SQLOrderBy) {
         my $SQLOrderBy = join ', ', @SQLOrderBy;
-        $SQLOrderBy =~ s/DESC//;
-        $SQLOrderBy =~ s/ASC//;
+        $SQLOrderBy =~ s/DESC//g;
+        $SQLOrderBy =~ s/ASC//g;
         $SQL .= ', ' . $SQLOrderBy . ' ';
     }
     $SQL .= 'FROM configitem ci, configitem_version vr '
         . $WhereString;
-
-    # EO KIX4OTRS-capeIT
 
     # add the ORDER BY clause
     if (@SQLOrderBy) {
