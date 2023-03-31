@@ -102,10 +102,10 @@ sub Run {
                 map { $_ => 1 } @{$Result},
             );
         }
-        
+
         if ( %BasePermissionQueueIDs ) {
             %QueueList = %BasePermissionQueueIDs;
-        } else {
+        } elsif ( $Result ne 1 ) {
             %QueueList = ();
         }
 
