@@ -130,7 +130,7 @@ sub RoleUserList {
     return @{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT user_id FROM role_user WHERE role_id IN ('.join( ', ', map {'?'} @RoleIDs ).')',
+        SQL  => 'SELECT DISTINCT(user_id) FROM role_user WHERE role_id IN ('.join( ', ', map {'?'} @RoleIDs ).') ORDER BY user_id',
         Bind => [ map { \$_ } @RoleIDs ],
     );
 

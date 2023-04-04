@@ -100,7 +100,7 @@ sub Run {
             return $Self->_Success(
                 User => [],
             );
-        }
+        }        
 
         $UserSearch{AND} //= [];
         push @{$UserSearch{AND}}, { Field => 'UserIDs', Operator => 'IN', Value => \@AllowedUserIDs };
@@ -218,51 +218,6 @@ sub Run {
 
     my @UserIDs = sort keys %{$UserList};
 
-    if ( @UserIDs && $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue' ) {
-        # check requested permissions (AND combined)
-        my @AllowedUserIDs;
-
-        my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission}->{Permission});
-        
-        PERMISSION:
-        foreach my $Permission (@Permissions) {
-            USERID:
-            foreach my $UserID (@UserIDs) {
-
-                # check resource permission
-                my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                    UserID              => $UserID,
-                    Target              => '/tickets',
-                    RequestedPermission => $Permission,
-                    UsageContext        => $Self->{Authorization}->{UserType}
-                );
-                next USERID if !$Granted;
-
-                # check base permission
-                my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
-                    UserID       => $UserID,
-                    UsageContext => $Self->{Authorization}->{UserType},
-                    Permission   => $Permission,
-                );
-                next USERID if !$Result;
-
-                if ( IsArrayRefWithData($Result) ) {
-                    my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
-                    next USERID if !$AllowedQueueIDs{$Param{Data}->{requiredPermission}->{ObjectID}};
-                }
-
-                # ok, accept this user
-                push @AllowedUserIDs, $UserID;
-            }
-        }
-
-        @UserIDs = $Kernel::OM->Get('Main')->GetUnique(@AllowedUserIDs);
-
-        $Self->AddCacheKeyExtension(
-            Extension => ['requiredPermission']
-        );
-    }
-
     if ( @UserIDs ) {
         # get already prepared user data from UserGet operation
         my $GetResult = $Self->ExecOperation(
@@ -370,7 +325,7 @@ sub _GetUserIDsWithRequiredPermission {
 
     # get UserIDs with relevant permissions
     my @Permissions = split(/, ?/, $Param{RequiredPermission}->{Permission});
-    
+
     my $RoleObject = $Kernel::OM->Get('Role');
 
     # get all users with resource permission for /tickets
@@ -378,8 +333,17 @@ sub _GetUserIDsWithRequiredPermission {
         Types  => ['Resource'],
         Target => '/tickets'
     );
+
+    # get all users with wildcard resource permission for /*
+    my @WildcardResourcePermissions = $RoleObject->PermissionListGet(
+        Types  => ['Resource'],
+        Target => '/*'
+    );
+
+    push(@ResourcePermissions, @WildcardResourcePermissions);
+
     my %ResourceRoleIDs = map { $_->{RoleID} => 1 } @ResourcePermissions;
-    
+
     # get all users with base permissions for the given QueueID
     my @BasePermissions = $RoleObject->PermissionListGet(
         Types  => ['Base::Ticket'],
@@ -399,7 +363,7 @@ sub _GetUserIDsWithRequiredPermission {
     PERMISSION:
     foreach my $Permission (@Permissions) {
         USERID:
-        foreach my $UserID (@UserIDs) {
+        foreach my $UserID (@UserIDs) {            
 
             # check resource permission
             my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
@@ -407,7 +371,7 @@ sub _GetUserIDsWithRequiredPermission {
                 Target              => '/tickets',
                 RequestedPermission => $Permission,
                 UsageContext        => $Self->{Authorization}->{UserType}
-            );
+            );            
             next USERID if !$Granted;
 
             # check base permission
@@ -415,13 +379,13 @@ sub _GetUserIDsWithRequiredPermission {
                 UserID       => $UserID,
                 UsageContext => $Self->{Authorization}->{UserType},
                 Permission   => $Param{RequiredPermission}->{Permission},
-            );
+            );            
             next USERID if !$Result;
 
-            if ( IsArrayRefWithData($Result) ) {
+            if ( IsArrayRefWithData($Result) && $Param{RequiredPermission}->{ObjectID}) {                
                 my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
                 next USERID if !$AllowedQueueIDs{$Param{RequiredPermission}->{ObjectID}};
-            }
+            } 
 
             # ok, accept this user
             push @AllowedUserIDs, $UserID;
