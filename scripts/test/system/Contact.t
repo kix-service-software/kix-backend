@@ -234,28 +234,28 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     }
 
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => 'test@example.org' . $Key,
-        ValidID          => 1,
+        Email   => 'test@example.org' . $Key,
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
-        "ContactSearch() - PostMasterSearch - $ContactID",
+        "ContactSearch() - Email - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => lc( 'test@example.org' . $Key ),
-        ValidID          => 1,
+        Email   => lc( 'test@example.org' . $Key ),
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
-        "ContactSearch() - PostMasterSearch lc() - $ContactID",
+        "ContactSearch() - Email lc() - $ContactID",
     );
     %List = $ContactObject->ContactSearch(
-        PostMasterSearch => uc( 'test@example.org' . $Key ),
-        ValidID          => 1,
+        Email   => uc( 'test@example.org' . $Key ),
+        ValidID => 1,
     );
     $Self->True(
         $List{$ContactID},
-        "ContactSearch() - PostMasterSearch uc() - $ContactID",
+        "ContactSearch() - Email uc() - $ContactID",
     );
 
     %List = $ContactObject->ContactSearch(
