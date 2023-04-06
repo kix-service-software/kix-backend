@@ -1103,21 +1103,36 @@ sub _Success {
             );
         }
 
+        # honor base permissions
         if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{BasePermissionFilter} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_Debug($Self->{LevelIndent}, "applying base permission");
 
-            $Self->_ApplyFilter(
+            my $FilterResult = $Self->_ApplyFilter(
                 Data               => \%Param,
                 Filter             => $Self->{BasePermissionFilter},
                 IsPermissionFilter => 1,
             );
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+
+            if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($FilterResult) ) {
+                foreach my $Object ( sort keys %{$FilterResult} ) {
+                    if ( $FilterResult->{$Object} == 0 && !defined $Param{$Object} ) {
+                        # we have a single object and no permission, return a forbidden
+                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                }
+            }
         }
 
-        # at first honor permissions
+        # honor object permissions
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{RelevantObjectPermissions} ) ) {
             my $StartTime = Time::HiRes::time();
 
@@ -1664,6 +1679,7 @@ sub _ValidateFilter {
 
 sub _ApplyFilter {
     my ( $Self, %Param ) = @_;
+    my %Result;
 
     if ( !IsHashRefWithData( \%Param ) || !IsHashRefWithData( $Param{Data} ) ) {
 
@@ -1719,10 +1735,12 @@ sub _ApplyFilter {
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
-                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @FilteredResult));
+                $Result{$Object} = scalar @FilteredResult;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
             }
             else {
                 $Param{Data}->{$Object} = \@FilteredResult;
+                $Result{$Object} = scalar @FilteredResult;
             }
             if ( ref $Param{Data}->{$Object} eq 'ARRAY' ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
@@ -1730,7 +1748,7 @@ sub _ApplyFilter {
         }
     }
 
-    return 1;
+    return \%Result;
 }
 
 sub _ApplyFieldSelector {
@@ -2730,7 +2748,7 @@ sub _CheckBasePermission {
             Code => 'Forbidden',
         );
     }
-    elsif ( !IsHashRef($Result) || IsHashRefWithData($Result) && !exists $Param{Data}->{$Result->{Object}} ) {
+    elsif ( !IsHashRef($Result) ) {
         return $Self->_Success();
     }
 
@@ -2796,17 +2814,20 @@ sub _CheckBasePermission {
 
             %ObjectData = %{$GetResult->{Data}};
 
-            $Self->_ApplyFilter(
-                Data               => \%ObjectData,
-                Filter             => \%Filter,
-                IsPermissionFilter => 1,
-            );
-
-            if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {
-                # return 403, because we don't have permission
-                return $Self->_Error(
-                    Code => 'Forbidden',
+            if ( exists $ObjectData{$Result->{Object}} ) {
+                # only filter if there is a relevant object to filter
+                $Self->_ApplyFilter(
+                    Data               => \%ObjectData,
+                    Filter             => \%Filter,
+                    IsPermissionFilter => 1,
                 );
+
+                if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {#
+                    # return 403, because we don't have permission
+                    return $Self->_Error(
+                        Code => 'Forbidden',
+                    );
+                }
             }
         }
     }
