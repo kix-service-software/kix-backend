@@ -55,7 +55,7 @@ sub Run {
     my @ContactList;
 
     $Self->SetDefaultSort(
-        Contact => [ 
+        Contact => [
             { Field => 'Lastname' },
             { Field => 'Firstname' },
         ]
@@ -101,7 +101,7 @@ sub Run {
                     } elsif ($SearchItem->{Operator} eq 'IN') {
                         $SearchParams{EmailIn} = $Value;
                     } else {
-                        $SearchParams{PostMasterSearch} = $Value;
+                        $SearchParams{Email} = $Value;
                     }
                 } elsif ( $SearchItem->{Field} eq 'PrimaryOrganisationID' ) {
                     $SearchParams{OrganisationID} = $Value;

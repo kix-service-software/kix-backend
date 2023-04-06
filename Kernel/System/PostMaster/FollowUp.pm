@@ -404,8 +404,8 @@ sub Run {
         for my $FromAddress (@SplitFrom) {
             my $UserObject = $Kernel::OM->Get('User');
             my %UserData = $UserObject->UserSearch(
-                PostMasterSearch => $FromAddress,
-                ValidID          => 1,
+                Search  => $FromAddress,
+                ValidID => 1
             );
 
             for my $CurrUserID ( keys(%UserData) ) {
@@ -425,9 +425,9 @@ sub Run {
         for my $FromAddress (@SplitFrom) {
             my $ContactObject = $Kernel::OM->Get('Contact');
             my %UserListCustomer = $ContactObject->ContactSearch(
-                PostMasterSearch => $FromAddress,
+                Email => $FromAddress
             );
-
+            # FIXME: some attributes do not exisit anymore (e.g. UserCUstomerID)
             if (keys %UserListCustomer) {
                 for my $CurrKey ( keys(%UserListCustomer) ) {
                     my %ContactData = $ContactObject->ContactGet(

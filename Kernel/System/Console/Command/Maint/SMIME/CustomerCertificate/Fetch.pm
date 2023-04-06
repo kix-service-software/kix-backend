@@ -117,7 +117,7 @@ sub Run {
 
     # Check customer user for UserSMIMECertificate property
     my %Contacts = $ContactObject->ContactSearch(
-        PostMasterSearch => '*',
+        Email => '*',
     );
 
     CONTACT:

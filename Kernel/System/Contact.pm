@@ -139,11 +139,11 @@ sub ContactAdd {
     }
     elsif ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
         # check duplicate email
-        my %Existing = $Self->ContactSearch(
-            PostMasterSearch => $Param{Email},
-            Valid            => 0
+        my $ExistingContactID = $Self->ContactLookup(
+            Email  => $Param{Email},
+            Silent => 1
         );
-        if (IsHashRefWithData(\%Existing)) {
+        if ($ExistingContactID) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot add contact. Email \"$Param{Email}\" already exists.",
@@ -288,7 +288,7 @@ sub ContactAdd {
     else {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Cannot find new contact with email $Param{Email}!",
+            Message  => "Cannot find new contact with email $Param{Email} (and firstname: $Param{Firstname}, lastname: $Param{Lastname})!",
         );
     }
 
@@ -899,6 +899,7 @@ sub ContactUpdate {
             Bind => [ \$Param{ID} ],
         );
     }
+
     # remove duplicates
     @InsertOrgIDs = $Kernel::OM->Get('Main')->GetUnique(@InsertOrgIDs);
     for my $orgID (@InsertOrgIDs) {
@@ -973,13 +974,6 @@ to search contacts
         Limit  => 100       # (optional)
     );
 
-    # email search
-    my %List = $ContactObject->ContactSearch(
-        PostMasterSearch => '*email@example.com*',
-        Valid            => 1,                      # (optional) default 1
-        Limit            => 100                     # (optional)
-    );
-
     # title search
     my %List = $ContactObject->ContactSearch(
         Title     => '*Sir*',
@@ -1017,6 +1011,13 @@ to search contacts
     # email search (exact match)
     my %List = $ContactObject->ContactSearch(
         EmailEquals => 'email@example.com',
+        Valid       => 1,                      # (optional) default 1
+        Limit       => 100                     # (optional)
+    );
+
+    # email search (like match)
+    my %List = $ContactObject->ContactSearch(
+        Email       => 'email*com',
         Valid       => 1,                      # (optional) default 1
         Limit       => 100                     # (optional)
     );
@@ -1091,11 +1092,12 @@ sub ContactSearch {
     foreach my $Key (
         qw(
             OrganisationIDs OrganisationID AssignedUserID UserID
-            Search PostMasterSearch Limit Login LoginEquals
-            EmailEquals EmailIn DynamicField
+            Search Limit Login LoginEquals
+            EmailEquals Email EmailIn DynamicField
             Title Firstname Lastname
             City Country Fax Mobil Phone Street Zip
             ValidID
+            PostMasterSearch
         )
     ) {
         my $CacheStrg;
@@ -1195,24 +1197,17 @@ sub ContactSearch {
         }
         $Where .= '(' . join( ' OR ', @ORParts ) . ')';
     }
-    elsif ( $Param{PostMasterSearch} ) {
-
+    elsif ( $Param{PostMasterSearch} || $Param{Email} ) {
         if ( defined $Where ) {
             $Where .= " AND ";
         }
 
-        my $Email = $Param{PostMasterSearch};
+        my $Email = $Param{Email} || $Param{PostMasterSearch}; # TODO: PostMasterSearch is deprecated
         $Email =~ s/\*/%/g;
         $Email =~ s/%%/%/g;
 
         $Where .= "$Self->{Lower}(c.email) LIKE $Self->{Lower}(?)";
         push(@Bind, \$Email);
-
-        # we force a limit if we are using non-unique email addresses
-        if ( !$Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
-            $Where .= " ORDER BY c.lastname, c.firstname";
-            $Param{Limit} = 1;
-        }
     }
     elsif ( $Param{OrganisationID} ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
