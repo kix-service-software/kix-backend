@@ -11,71 +11,90 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <style type="text/css">
-            body {
-                color: black;
-                font-size: 9pt;
+[% IF Data.IsContent %]
+            @page {
+                size: A4;
                 margin: 0;
-                border: 0;
             }
+[% END %]
+            @media screen, print {
+                body {
+                    color: black;
+                    font-size: 9pt;
+                    margin: 0;
+                    border: 0;
+[% IF Data.IsContent %]
+                    /* width: 180mm; */
+                    height: 267mm;
+[% END %]
+                }
 
-            a {
-                color: #787878;
-            }
+                a {
+                    color: #787878;
+                }
 
-            a:hover {
-                color          : #002244;
-                text-decoration: none;
-            }
+                a:hover {
+                    color          : #002244;
+                    text-decoration: none;
+                }
 
-            .Proportional {
-                font-family: Sans-serif;
-                font-style : normal;
-                font-weight: normal;
+                .Proportional {
+                    font-family: Sans-serif;
+                    font-style : normal;
+                    font-weight: normal;
+                }
+                .ProportionalBold {
+                    font-family: Sans-serif;
+                    font-style : normal;
+                    font-weight: bold;
+                }
+                .ProportionalItalic {
+                    font-family: Sans-serif;
+                    font-style : italic;
+                    font-weight: normal;
+                }
+                .ProportionalBoldItalic {
+                    font-family: Sans-serif;
+                    font-style : italic;
+                    font-weight: bold;
+                }
+                .Monospaced {
+                    font-family: Monospace;
+                    font-style : normal;
+                    font-weight: normal;
+                }
+                .MonospacedBold {
+                    font-family: Monospace;
+                    font-style : normal;
+                    font-weight: bold;
+                }
+                .MonospacedItalic {
+                    font-family: Monospace;
+                    font-style : italic;
+                    font-weight: normal;
+                }
+                .MonospacedBoldItalic {
+                    font-family: Monospace;
+                    font-style : italic;
+                    font-weight: bold;
+                }
             }
-            .ProportionalBold {
-                font-family: Sans-serif;
-                font-style : normal;
-                font-weight: bold;
-            }
-            .ProportionalItalic {
-                font-family: Sans-serif;
-                font-style : italic;
-                font-weight: normal;
-            }
-            .ProportionalBoldItalic {
-                font-family: Sans-serif;
-                font-style : italic;
-                font-weight: bold;
-            }
-            .Monospaced {
-                font-family: Monospace;
-                font-style : normal;
-                font-weight: normal;
-            }
-            .MonospacedBold {
-                font-family: Monospace;
-                font-style : normal;
-                font-weight: bold;
-            }
-            .MonospacedItalic {
-                font-family: Monospace;
-                font-style : italic;
-                font-weight: normal;
-            }
-            .MonospacedBoldItalic {
-                font-family: Monospace;
-                font-style : italic;
-                font-weight: bold;
-            }
-            .Blocks {
-                display: block;
-                overflow: auto;
-            }
-            .Header {
-                background-color: #55ff22;
-            }
-            .Footer {
-                background-color: #ff5522;
+            @media print {
+                table {
+                    break-after: avoid;
+                    break-before: avoid;
+                    break-inside: auto;
+                }
+                img {
+                    break-after: auto;
+                    break-before: auto;
+                    break-inside: avoid;
+                    display: block;
+                }
+                p {
+                    orphans:5;
+                    widows: 5;
+                }
             }
         </style>
         [% Data.CSS %]
@@ -100,16 +119,16 @@
                     }
                 }
 [% END %]
-                // var elements = document.querySelectorAll("p > img");
-                // if ( elements.length ) {
-                //     var bwidth = 660;
-                //     for (var j = 0; j < elements.length; ++j) {
-                //         var ewidth = elements[j].naturalWidth;
-                //         if ( bwidth < ewidth ) {
-                //             elements[j].style.width = bwidth + 'px';
-                //         }
-                //     }
-                // }
+                var elements = document.querySelectorAll("div:not(.picture) > img");
+                if ( elements.length ) {
+                    var bwidth = 660;
+                    for (var j = 0; j < elements.length; ++j) {
+                        var ewidth = elements[j].naturalWidth;
+                        if ( bwidth < ewidth ) {
+                            elements[j].style.width = bwidth + 'px';
+                        }
+                    }
+                }
             }
         </script>
     </head>

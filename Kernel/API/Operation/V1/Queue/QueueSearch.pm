@@ -30,6 +30,32 @@ Kernel::API::Operation::Queue::QueueSearch - API Queue Search Operation backend
 
 =cut
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'requiredPermission' => {
+            Type     => 'HASH',
+        }
+    }
+}
+
 =item Run()
 
 perform QueueSearch Operation. This will return a Queue ID list.
@@ -61,8 +87,36 @@ sub Run {
         Valid => 0
     );
 
-	# get already prepared Queue data from QueueGet operation
-    if ( IsHashRefWithData(\%QueueList) ) {
+    if ( %QueueList && IsHashRefWithData($Param{Data}->{requiredPermission}) && $Param{Data}->{requiredPermission}->{Permission}) {
+        my %BasePermissionQueueIDs;
+
+        my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+            UserID       => $Self->{Authorization}->{UserID},
+            UsageContext => $Self->{Authorization}->{UserType},
+            Permission   => $Param{Data}->{requiredPermission}->{Permission},
+        );
+
+        if ( IsArrayRefWithData($Result) ) {
+            %BasePermissionQueueIDs = (
+                %BasePermissionQueueIDs,
+                map { $_ => 1 } @{$Result},
+            );
+        }
+
+        if ( %BasePermissionQueueIDs ) {
+            %QueueList = %BasePermissionQueueIDs;
+        } elsif ( $Result ne 1 ) {
+            %QueueList = ();
+        }
+
+        $Self->AddCacheKeyExtension(
+            Extension => ['requiredPermission']
+        );
+    }
+
+    # get already prepared Queue data from QueueGet operation
+    if ( %QueueList ) {
+
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Queue::QueueGet',
             SuppressPermissionErrors => 1,

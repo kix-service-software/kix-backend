@@ -13,6 +13,8 @@ package Kernel::System::TemplateGenerator;
 use strict;
 use warnings;
 
+use URI::Escape;
+
 use Kernel::Language;
 
 use Kernel::System::VariableCheck qw(:all);

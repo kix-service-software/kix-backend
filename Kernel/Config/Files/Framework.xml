@@ -396,48 +396,6 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AutoCreateLinkedPerson###Blacklist" Required="1" Valid="1">
-        <Description Translatable="1">Defines which persons should not be added on AutoCreateLinkedPerson.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Array>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###Agent" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "agent".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">Agent</Item>
-                <Item Key="TargetName">Agent</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###Customer" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "customer".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">Customer</Item>
-                <Item Key="TargetName">Customer</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::Type###3rdParty" Required="1" Valid="1">
-        <Description Translatable="1">This setting defines the person link type "3rd party".</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SourceName">3rd party</Item>
-                <Item Key="TargetName">3rd party</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FAQWorkflow::Basic" Required="1" Valid="1">
         <Description Translatable="1">Basic settings for FAQ edit workflow.</Description>
         <Group>Framework</Group>
@@ -467,7 +425,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Cache</SubGroup>
         <Setting>
-            <String Regex="">localhost:6479</String>
+            <String Regex="">localhost:6379</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Cache::Module::Redis###Parameters" Required="0" Valid="1">
@@ -1611,6 +1569,19 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::MailAccountFetch::Debug" Required="1" Valid="1">
+        <Description Translatable="1">Enable PostMaster MailAccountFetch debugging.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0">Off</Item>
+                <Item Key="1">Info</Item>
+                <Item Key="2">On</Item>
+                <Item Key="3">with GetHeaderParam</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0001-SystemMonitoring" Required="0" Valid="1">
         <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
@@ -2435,7 +2406,7 @@
             <String Regex="^(..|.._..)$">de</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DefaultUsedLanguages" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="DefaultUsedLanguages" Required="1" Valid="1">
         <Description Translatable="1">Defines all the languages that are available to the application. Specify only English names of languages here.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
@@ -2553,6 +2524,14 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <String Regex="">@(example)\.(..|...)$</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="IgnoreEmailAddressesAsRecipients" Required="1" Valid="1">
+        <Description Translatable="1">Defines a regular expression that filters all email addresses that should not receive emails from the application.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <String Regex="">noreply-.*?@nomail\.com</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LinkObject::Type###Normal" Required="1" Valid="1">
@@ -3247,6 +3226,83 @@
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times to count as working time.
@@ -3664,6 +3720,83 @@ Notes:
             <TimeVacationDaysOneTime>
                 <Item Year="2004" Month="1" Day="1">test</Item>
             </TimeVacationDaysOneTime>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar1###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar1</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar1" Required="0" Valid="1">
@@ -4084,6 +4217,83 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar2###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar2</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar2" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
@@ -4500,6 +4710,83 @@ Notes:
             <TimeVacationDaysOneTime>
                 <Item Year="2004" Month="1" Day="1">test</Item>
             </TimeVacationDaysOneTime>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar3###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar3</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar3" Required="0" Valid="1">
@@ -4920,6 +5207,83 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar4###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar4</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar4" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
@@ -5336,6 +5700,83 @@ Notes:
             <TimeVacationDaysOneTime>
                 <Item Year="2004" Month="1" Day="1">test</Item>
             </TimeVacationDaysOneTime>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar5###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar5</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar5" Required="0" Valid="1">
@@ -5756,6 +6197,83 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar6###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar6</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar6" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
@@ -6172,6 +6690,83 @@ Notes:
             <TimeVacationDaysOneTime>
                 <Item Year="2004" Month="1" Day="1">test</Item>
             </TimeVacationDaysOneTime>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar7###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar7</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar7" Required="0" Valid="1">
@@ -6592,6 +7187,83 @@ Notes:
             </TimeVacationDaysOneTime>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar8###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar8</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar8" Required="0" Valid="1">
         <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
@@ -7008,6 +7680,83 @@ Notes:
             <TimeVacationDaysOneTime>
                 <Item Year="2004" Month="1" Day="1">test</Item>
             </TimeVacationDaysOneTime>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###000-MaundyThursday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of maundy thursday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::MaundyThursday</Item>
+                <Item Key="Name">Maundy Thursday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###001-GoodFriday" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of good friday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::GoodFriday</Item>
+                <Item Key="Name">Good Friday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###002-EasterMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of easter monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::EasterMonday</Item>
+                <Item Key="Name">Easter Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###003-AscensionDay" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of ascension day for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::AscensionDay</Item>
+                <Item Key="Name">Ascension Day</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###004-WhitMonday" Required="0" Valid="1">
+        <Description Translatable="1">Adds module to calculate date of whit monday for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::WhitMonday</Item>
+                <Item Key="Name">Whit Monday</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###005-CorpusChristi" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of feast of corpus christi for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::CorpusChristi</Item>
+                <Item Key="Name">Feast of Corpus Christi</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="TimeVacationDaysModules::Calendar9###006-RepentancePrayer" Required="0" Valid="0">
+        <Description Translatable="1">Adds module to calculate date of day of repentance and prayer for the indicated calendar.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Time::Calendar9</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Time::VacationDay::RepentancePrayer</Item>
+                <Item Key="Name">Day of Repentance and Prayer</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar9" Required="0" Valid="1">
@@ -7749,7 +8498,7 @@ You can log in via the following URL:
                 <Item Key="PasswordMin2Lower2UpperCharacters">0</Item>
                 <Item Key="PasswordMin2Characters">0</Item>
                 <Item Key="PasswordNeedDigit">0</Item>
-                <Item Key="PasswordMaxLoginFailed">0</Item>
+                <Item Key="PasswordMaxLoginFailed">5</Item>
                 <Item Key="Active">1</Item>
             </Hash>
         </Setting>
@@ -7860,6 +8609,17 @@ You can log in via the following URL:
                 <Item Key="Prio">5000</Item>
                 <Item Key="Active">1</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ContactEmailUniqueCheck" Required="1" Valid="1">
+        <Description Translatable="1">Dis-/Enables uniqueness check for email-addresses of contacts. If this setting is disabled, notifications may be read by contacts who are not supposed to receive personal information about the actual contact. This may cause a violation of GDPR regulation! Thus, you have to ensure that no notification contains relevant information. Furthermore, any email-based contact retrieval or identification may potentially deliver ambiguous results. Incoming emails are assigned to the first contact ordered by last name, first name assigned to the email-address. Some features like e-mail based authentication, email-based contact data update from LDAP or macro action CreateOrUpdateContact will be disabled if no other lookup value than email is provided. Once disabled you MUST NOT enable it again before ensuring unique email addresses.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Contact</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ContactPreferences" Required="1" Valid="1" ConfigLevel="200">
@@ -8763,26 +9523,6 @@ You can log in via the following URL:
                 <Item Key="0" Translatable="1">No</Item>
                 <Item Key="1" Translatable="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Permission::Object###Queue-to-Ticket" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a supported permission of type Object.</Description>
-        <Group>Permission</Group>
-        <Setting>
-            <Hash>
-                <Item Key="CREATE">/tickets{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
-                <Item Key="READ_UPDATE_DELETE">/tickets/*{Ticket.QueueID EQ &lt;QueueID&gt;}</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Permission::Object###CIClass-to-ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a supported permission of type Object.</Description>
-        <Group>Permission</Group>
-        <Setting>
-            <Hash>
-                <Item Key="CREATE">/cmdb/configitems{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>
-                <Item Key="READ_UPDATE_DELETE">/cmdb/configitems/*{ConfigItem.ClassID EQ &lt;ClassID&gt;}</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
 

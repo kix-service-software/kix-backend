@@ -39,6 +39,9 @@ sub Describe {
         Supports => [
             'faq_item'
         ],
+        DependsOnType => [
+            'customer_user',
+        ],
         Depends => {
             'category_id' => 'faq_category',
             'created_by'  => 'users',
@@ -193,9 +196,7 @@ sub _MigrateVoting {
         Type       => 'faq_voting',
         Where      => "item_id = $Param{SourceItemID}",
         References => {
-            'item_id'     => 'faq_item',
-            'created_by'  => 'users',
-            'changed_by'  => 'users',
+            'item_id' => 'faq_item',
         },
         NoProgress => 1
     );
@@ -212,6 +213,44 @@ sub _MigrateVoting {
         );
         next if $MappedID;
 
+        # prepare create_by by interface
+        my $UserID;
+        # agent interface
+        if ( $Item->{interface} == 1 ) {
+            $UserID = $Self->GetOIDMapping(
+                ObjectType     => 'users',
+                SourceObjectID => $Item->{created_by},
+            );
+        }
+        # customer interface
+        elsif ( $Item->{interface} == 2 ) {
+            # check for user with the same login
+            $UserID = $Kernel::OM->Get('User')->UserLookup(
+                UserLogin => $Item->{created_by},
+                Silent    => 1
+            );
+        }
+        # ignore other interfaces
+        else {
+            next;
+        }
+
+        if ( !$UserID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Dependency for \"created_by\" cannot be resolved (users: $Item->{created_by})!"
+            );
+
+            $Result{Error}++;
+
+            next;
+        }
+        # set found user for create_by
+        else {
+            $Item->{created_by} = $UserID;
+        }
+
+
         # check if this item already exists (i.e. some initial data)
         my $ID = $Self->Lookup(
             Table        => 'faq_voting',
@@ -224,7 +263,11 @@ sub _MigrateVoting {
         );
 
         if ( !$ID ) {
-            # normalize
+            # remove irrelevant data
+            delete $Item->{interface};
+            delete $Item->{ip};
+
+            # normalize rating
             $Item->{rate} = ceil($Item->{rate} * 5 / 100);
 
             # insert row

@@ -3,10 +3,10 @@
 When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)
 
 * [search](#search_objects)
-* [filter](#filter_results)
-* [sort](#sort_results)
 * [offset](#limit_results)
 * [limit](#limit_results)
+* [filter](#filter_results)
+* [sort](#sort_results)
 
 ### Query items
 

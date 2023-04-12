@@ -231,7 +231,7 @@ sub ObjectSearch {
     if ( $PersonType eq 'Customer' ) {
 
         # search customer
-        my %Contacts = $Self->{ContactObject}->CustomerSearch(
+        my %Contacts = $Self->{ContactObject}->ContactSearch(
             Search => $Param{SearchParams}->{PersonAttributes},
             Valid  => 1,
             Limit  => $Limit,
@@ -266,9 +266,9 @@ sub ObjectSearch {
         # ...skipping other wildcards...
 
         my %Users2 = $Self->{UserObject}->UserSearch(
-            PostMasterSearch => $Param{SearchParams}->{PersonAttributes},
-            Valid            => 1,
-            Limit            => $Limit,
+            Search => $Param{SearchParams}->{PersonAttributes},
+            Valid  => 1,
+            Limit  => $Limit
         );
 
         for my $ID ( keys %Users2 ) {

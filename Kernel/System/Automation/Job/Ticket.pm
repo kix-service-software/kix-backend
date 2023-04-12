@@ -93,6 +93,7 @@ sub Run {
     my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result => 'ARRAY',
         Search => $Filter,
+        UserID => 1,
     );
 
     return @TicketIDs;

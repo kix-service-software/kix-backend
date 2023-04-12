@@ -56,7 +56,7 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my %Data = $PrintObject->DefinitionGet(
+    my %Data = $PrintObject->TemplateGet(
         Name   => $Name,
         ID     => $ID,
         UserID => 1

@@ -1,0 +1,20 @@
+{
+    "DynamicFieldType": [
+        {
+            "DisplayName": "Checklist",
+            "Name": "CheckList"
+        },
+        {
+            "DisplayName": "Checkbox",
+            "Name": "Checkbox"
+        },
+        {
+            "DisplayName": "Date",
+            "Name": "Date"
+        },
+        {
+            "DisplayName": "Date / Time",
+            "Name": "DateTime"
+        }
+    ]
+}

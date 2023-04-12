@@ -594,7 +594,7 @@ pre code {
     text-decoration: underline;
   }
   
-    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?search={...}</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?filter={...}</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="language-bash">{
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?search={...}</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?filter={...}</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="language-bash">{
 "&lt;Object&gt;": {
 "AND": [
 {
@@ -640,7 +640,7 @@ pre code {
 }
 ]
 }
-}</code></pre></div><div class="chapter"><h2 id="sort_results"><a href="#sort_results">Sort results</a></h2><p>Every collection resource supports the sorting of items in the response. This can be done with the optional query parameter <code>sort</code>.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?sort=&lt;Object&gt;.[-]&lt;Fieldname&gt;[:&lt;Type&gt;]</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response to be sorted.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td align="center">yes</td><td>The attribute in each item of the response to be sorted by. If the fieldname starts with <code>-</code> the attribute will be sorted in descending order.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td align="center"></td><td>The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.</td></tr></tbody></table><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>numeric</code></td><td>The attribute value will be sorted as a number (integer or float).</td></tr><tr><td><code>textual</code></td><td>The attribute value will be sorted as ASCII text. Case and spaces will be ignored.</td></tr><tr><td><code>natural</code></td><td>Multi-type-sort. Sorting of different parts of value, starting with spaces, followed by numbers, non-text characters and text characters. Additionally subsidiary words will be moved to the end of the value. Example: "The Book of Verse" will be sorted as "Book of Verse, The"</td></tr><tr><td><code>date</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>datetime</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p>Multiple attributes can be sorted by separating the sort definition with comma.</p><p><strong>Example</strong></p><p>Query all users and sort the result for the creation time ascending + UserID descending + first name ascending.</p><pre><code class="language-bash">.../users?sort=User.CreateTime:date,User.-UserID:numeric,User.UserFirstname</code></pre></div><div class="chapter"><h2 id="limit_results"><a href="#limit_results">Limit results</a></h2><p>There are two optional functions <code>offset</code> and <code>limit</code> to limit the number of items in a response of a collection resource. The combination of both functions is a powerful instrument to create paged responses.</p><h3 id="using-offsets">Using offsets</h3><p>By using the optional query parameter <code>offset</code> a collection resource can be forced to return its response starting at a specific array index. This function will be executed before the <a href="#limit_results">limit</a> function.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?offset=[&lt;Object&gt;:]&lt;Offset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Offset&gt;</code></td><td align="center">yes</td><td>The numeric offset to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?offset=100,User:10</code></pre><h3 id="limit-api-results">Limit API results</h3><p>The optional query parameter <code>limit</code> allows to limit the number objects contained in the response of a collection.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?limit=[&lt;Object&gt;:]&lt;Limit&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Limit&gt;</code></td><td align="center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate limits can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?limit=100,User:10</code></pre><h3 id="limit-search-results">Limit Search results</h3><p>The optional query parameter <code>searchlimit</code> is provided to the core search and limits the search result at database layer.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?searchlimit=[&lt;Object&gt;:]&lt;Limit&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;SearchLimit&gt;</code></td><td align="center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p><strong>Example</strong></p><pre><code class="language-bash">.../users?searchlimit=100,Ticket:10</code></pre></div><div class="chapter"><h2 id="select_properties"><a href="#select_properties">Select properties</a></h2><p>With the use of the optional query parameter <code>fields</code> it is possible to select which properties of an object should be included in the response. There are three ways to do this: a general style, a compact style and the use of pre-defined fieldsets.</p><p><strong>Usage in URL</strong></p><p>General:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.&lt;Property&gt;</code></pre><p>Compact:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.[&lt;Property&gt;;&lt;Property&gt;;&lt;Property&gt;]</code></pre><p>Please note that the "[]" characters do not declare optional content but define an actual array list in this case.</p><p>Fieldset:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=:&lt;Fieldset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response for which the properties should be selected.</td></tr><tr><td><code>&lt;Property&gt;</code></td><td align="center">yes</td><td>The name of the property that should be included in the response.</td></tr></tbody></table><p>When using the general style, multiple properties can be selected by multiplying the whole<object>.<property>part and separating it with comma. In the compact style the object has to be specified only once and the relevant properties are separated by semicolon in the array part.</property></object></p><p>A fieldset is a pre-defined property selection with a name. Please see the documentation of a specific resource whether fieldsets are available.</p><p><strong>Example</strong></p><p>Only select the attributes "UserLogin" and "UserID" from the users collection. In our example a fieldset named "Short" exists which selects those two properties.</p><p>General:</p><pre><code class="language-bash">.../users?fields=User.UserLogin,User.UserID</code></pre><p>Compact:</p><pre><code class="language-bash">.../users?fields=User.[UserLogin;UserID]</code></pre><p>Fieldset:</p><pre><code class="language-bash">.../users?fields=:Short</code></pre></div><div class="chapter"><h2 id="include_more_information"><a href="#include_more_information">Include more information</a></h2><p>When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter <code>include</code>. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?include=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>ConfiguredPermissions</code></td><td>Include the configured permissions for this item and its dependent items.</td></tr><tr><td><code>Watchers</code></td><td>Include the watchers for this object if possible.</td></tr><tr><td><code>DynamicFields</code></td><td>Include the dynamic field values for this object if possible.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to transform these IDs to actual objects.</p><p>The <code>ConfiguredPermissions</code> include will include an object with two arrays that each contain the relevant configured permissions <code>Assigned</code> and <code>DependingObjects</code>. The <code>Assigned</code> list contains the permissions that are configured exactly for this specific object. The second list <code>DependingObjects</code> contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).</p><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts</code></pre></div><div class="chapter"><h2 id="expand_objects"><a href="#expand_objects">Expand objects</a></h2><p>When requesting items and using the optional function <a href="#include_more_information"><code>include</code></a> to include another depending resource, a list of IDs will be the result. This can be used to count the relevant objects without the need to include unnecessary and huge additional data. To replace this list of IDs with the actual objects you can use the optional query parameter <code>expand</code>. Whether a resource supports expanding of includes and which includes can be expanded can be found in the documentation of the specific resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?expand=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts&amp;expand=Tickets</code></pre></div></div><div class="chapter"><h2 id="resources"><a href="#resources">Resources</a></h2><div class="panel panel-default resource"><div class="panel-heading"><h3 id="auth" class="panel-title">Authentication</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_auth" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/auth</span> <span class="methods"><a href="#auth_post"><span class="badge badge_post">post</span></a></span></h4></div><div class="modal fade" tabindex="0" id="auth_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent uri"></span><span class="uri">/auth</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Manage existing sessions.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#auth_post_request" data-toggle="tab">Request</a></li><li><a href="#auth_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="auth_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: AuthRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div><div class="chapter"><h2 id="sort_results"><a href="#sort_results">Sort results</a></h2><p>Every collection resource supports the sorting of items in the response. This can be done with the optional query parameter <code>sort</code>.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?sort=&lt;Object&gt;.[-]&lt;Fieldname&gt;[:&lt;Type&gt;]</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response to be sorted.</td></tr><tr><td><code>&lt;Fieldname&gt;</code></td><td align="center">yes</td><td>The attribute in each item of the response to be sorted by. If the fieldname starts with <code>-</code> the attribute will be sorted in descending order.</td></tr><tr><td><code>&lt;Type&gt;</code></td><td align="center"></td><td>The type of data that should be used to compare the value. If not given, the the value will be sorted as ASCII text and case-insensitive.</td></tr></tbody></table><p><strong>Supported types</strong></p><table class="table"><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>numeric</code></td><td>The attribute value will be sorted as a number (integer or float).</td></tr><tr><td><code>textual</code></td><td>The attribute value will be sorted as ASCII text. Case and spaces will be ignored.</td></tr><tr><td><code>natural</code></td><td>Multi-type-sort. Sorting of different parts of value, starting with spaces, followed by numbers, non-text characters and text characters. Additionally subsidiary words will be moved to the end of the value. Example: "The Book of Verse" will be sorted as "Book of Verse, The"</td></tr><tr><td><code>date</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD</code></td></tr><tr><td><code>datetime</code></td><td>The attribute value will be sorted as a date in the form <code>YYYY-MM-DD HH24:MI:SS</code></td></tr></tbody></table><p>Multiple attributes can be sorted by separating the sort definition with comma.</p><p><strong>Example</strong></p><p>Query all users and sort the result for the creation time ascending + UserID descending + first name ascending.</p><pre><code class="language-bash">.../users?sort=User.CreateTime:date,User.-UserID:numeric,User.UserFirstname</code></pre></div><div class="chapter"><h2 id="limit_results"><a href="#limit_results">Limit results</a></h2><p>There are two optional functions <code>offset</code> and <code>limit</code> to limit the number of items in a response of a collection resource. The combination of both functions is a powerful instrument to create paged responses.</p><h3 id="using-offsets">Using offsets</h3><p>By using the optional query parameter <code>offset</code> a collection resource can be forced to return its response starting at a specific array index. This function will be executed before the <a href="#limit_results">limit</a> function.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?offset=[&lt;Object&gt;:]&lt;Offset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply an offset to. If omitted the offset will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Offset&gt;</code></td><td align="center">yes</td><td>The numeric offset to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate offsets can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?offset=100,User:10</code></pre><h3 id="limit-api-results">Limit API results</h3><p>The optional query parameter <code>limit</code> allows to limit the number objects contained in the response of a collection.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?limit=[&lt;Object&gt;:]&lt;Limit&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;Limit&gt;</code></td><td align="center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p>If a response contains different objects in different lists, separate limits can be applied by separating them the with comma.</p><p><strong>Example</strong></p><pre><code class="language-bash">.../users?limit=100,User:10</code></pre><h3 id="limit-search-results">Limit Search results</h3><p>The optional query parameter <code>searchlimit</code> is provided to the core search and limits the search result at database layer.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?searchlimit=[&lt;Object&gt;:]&lt;Limit&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center"></td><td>The object in the JSON response to apply a limit to. If omitted the limit will be applied to all object lists in the response (if the response contains such).</td></tr><tr><td><code>&lt;SearchLimit&gt;</code></td><td align="center">yes</td><td>The numeric limit to apply.</td></tr></tbody></table><p><strong>Example</strong></p><pre><code class="language-bash">.../users?searchlimit=100,Ticket:10</code></pre></div><div class="chapter"><h2 id="select_properties"><a href="#select_properties">Select properties</a></h2><p>With the use of the optional query parameter <code>fields</code> it is possible to select which properties of an object should be included in the response. There are three ways to do this: a general style, a compact style and the use of pre-defined fieldsets.</p><p><strong>Usage in URL</strong></p><p>General:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.&lt;Property&gt;</code></pre><p>Compact:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=&lt;Object&gt;.[&lt;Property&gt;;&lt;Property&gt;;&lt;Property&gt;]</code></pre><p>Please note that the "[]" characters do not declare optional content but define an actual array list in this case.</p><p>Fieldset:</p><pre><code class="language-bash">.../&lt;resource&gt;?fields=:&lt;Fieldset&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Object&gt;</code></td><td align="center">yes</td><td>The object in the JSON response for which the properties should be selected.</td></tr><tr><td><code>&lt;Property&gt;</code></td><td align="center">yes</td><td>The name of the property that should be included in the response.</td></tr></tbody></table><p>When using the general style, multiple properties can be selected by multiplying the whole<object>.<property>part and separating it with comma. In the compact style the object has to be specified only once and the relevant properties are separated by semicolon in the array part.</property></object></p><p>A fieldset is a pre-defined property selection with a name. Please see the documentation of a specific resource whether fieldsets are available.</p><p><strong>Example</strong></p><p>Only select the attributes "UserLogin" and "UserID" from the users collection. In our example a fieldset named "Short" exists which selects those two properties.</p><p>General:</p><pre><code class="language-bash">.../users?fields=User.UserLogin,User.UserID</code></pre><p>Compact:</p><pre><code class="language-bash">.../users?fields=User.[UserLogin;UserID]</code></pre><p>Fieldset:</p><pre><code class="language-bash">.../users?fields=:Short</code></pre></div><div class="chapter"><h2 id="include_more_information"><a href="#include_more_information">Include more information</a></h2><p>When requesting items it is possible to include more information into the response than the base object data. To do this you can use the optional query parameter <code>include</code>. Every resource can always include its own direct sub-resources. What exactly can be included additionally, depends on the actual resource you are querying. Therefore it will be documented in the description of the resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?include=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The additional data to include into the response. You can separate multiple ones by comma.</td></tr></tbody></table><p>There are some generic includes that can be used in every query regardless of a specific resource. At the moment those generic includes are:</p><table class="table"><thead><tr><th>Generic Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Links</code></td><td>Include all the the linked objects of this item.</td></tr><tr><td><code>ObjectIcon</code></td><td>Include the icon for this item.</td></tr><tr><td><code>AssignedPermissions</code></td><td>Include the assigned base permissions for this item.</td></tr><tr><td><code>Watchers</code></td><td>Include the watchers for this object if possible.</td></tr><tr><td><code>DynamicFields</code></td><td>Include the dynamic field values for this object if possible.</td></tr></tbody></table><p>Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function <a href="#expand_objects"><code>expand</code></a> for information on how to transform these IDs to actual objects.</p><p>The <code>AssignedPermissions</code> include adds an array property that contains the relevant base permissions. At the moment only Queues can have base permissions.</p><p><em>*Example</em></p><p>Query all organisations and include a list of tickets and contacts of each organisation.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts</code></pre></div><div class="chapter"><h2 id="expand_objects"><a href="#expand_objects">Expand objects</a></h2><p>When requesting items and using the optional function <a href="#include_more_information"><code>include</code></a> to include another depending resource, a list of IDs will be the result. This can be used to count the relevant objects without the need to include unnecessary and huge additional data. To replace this list of IDs with the actual objects you can use the optional query parameter <code>expand</code>. Whether a resource supports expanding of includes and which includes can be expanded can be found in the documentation of the specific resource.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?expand=&lt;What&gt;</code></pre><p><strong>Explanation</strong></p><table class="table"><thead><tr><th>Parameter</th><th align="center">Required?</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;What&gt;</code></td><td align="center">yes</td><td>The includes in the response that should be expanded. You can specify multiple ones by separating them with comma.</td></tr></tbody></table><p><strong>Example</strong></p><p>Query all organisations and include a list of tickets and contacts of each organisation. Expand the list of tickets with the actual ticket objects.</p><pre><code class="language-bash">.../organisations?include=Tickets,Contacts&amp;expand=Tickets</code></pre></div></div><div class="chapter"><h2 id="resources"><a href="#resources">Resources</a></h2><div class="panel panel-default resource"><div class="panel-heading"><h3 id="auth" class="panel-title">Authentication</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_auth" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/auth</span> <span class="methods"><a href="#auth_post"><span class="badge badge_post">post</span></a></span></h4></div><div class="modal fade" tabindex="0" id="auth_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post</span> <span class="parent uri"></span><span class="uri">/auth</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Manage existing sessions.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#auth_post_request" data-toggle="tab">Request</a></li><li><a href="#auth_post_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="auth_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: AuthRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "AuthRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "An authorization object.",
@@ -25476,7 +25476,7 @@ pre code {
 }</code></pre></div></div></div><div class="tab-pane" id="system_automation_execplans_types_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_automation_execplans_types_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_automation_execplans__execplanid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/automation/execplans</span><span class="uri">/{execPlanId}</span> <span class="methods"><a href="#system_automation_execplans__execplanid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_automation_execplans__execplanid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_automation_execplans__execplanid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_automation_execplans__execplanid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/automation/execplans</span><span class="uri">/{execPlanId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_automation_execplans__execplanid__get_request" data-toggle="tab">Request</a></li><li><a href="#system_automation_execplans__execplanid__get_response" data-toggle="tab">Response</a></li><li><a href="#system_automation_execplans__execplanid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_automation_execplans__execplanid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">execPlanId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_automation_execplans__execplanid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_automation_execplans__execplanid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ExecPlanResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "ExecPlanResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A response for a execution plan GET request.",
+   "description" : "A response for an execution plan GET request.",
    "type" : "object",
    "properties" : {
       "ExecPlan" : {
@@ -33528,7 +33528,873 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_console__consolecommand__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_console__consolecommand__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_faq" class="panel-title">[System] FAQ</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/system/faq.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_faq_categories" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/system/faq/categories.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/faq</span><span class="uri">/categories</span> <span class="methods"><a href="#system_faq_categories_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_faq_categories_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_faq_categories_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/faq</span><span class="uri">/categories</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_faq_categories_get_request" data-toggle="tab">Request</a></li><li><a href="#system_faq_categories_get_response" data-toggle="tab">Response</a></li><li><a href="#system_faq_categories_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_faq_categories_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_faq_categories_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_faq_categories_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: FAQCategoryCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_console__consolecommand__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_console__consolecommand__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_dynamicfields" class="panel-title">[System] Dynamic Fields</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="dynamic-fields">Dynamic Fields</h4><p>Allows to create, get, update and delete dynamic fields. On Update the full config has to be given if changed, else the missing attributes are lost and only not internal fields are updatable.</p><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Config</code></td><td>Adds the config of the dynamic field depending on its field type.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_dynamicfields" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/dynamicfields</span> <span class="methods"><a href="#system_dynamicfields_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_dynamicfields_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_dynamicfields_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/dynamicfields</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields_get_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields_get_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_dynamicfields_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of dynamic fields.",
+   "type" : "object",
+   "properties" : {
+      "DynamicField" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_DynamicField_json"
+         }
+      }
+   },
+   "required" : [
+      "DynamicField"
+   ],
+   "definitions" : {
+      "_DynamicField_json" : {
+         "$id" : "DynamicField.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Config" : {
+               "description" : "Configuration of the dynamic field depending on the field type, the shown properties are for every type - added via include \"Config\"",
+               "type" : "object",
+               "properties" : {
+                  "CountDefault" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "CountMax" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "CountMin" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "ItemSeparator" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "FieldType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FieldTypeDisplayName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "InternalField" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "CustomerVisible",
+            "FieldType",
+            "FieldTypeDisplayName",
+            "ID",
+            "InternalField",
+            "Label",
+            "Name",
+            "ObjectType",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicField": [
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2021-07-21 07:48:01",
+            "Comment": null,
+            "Config": {
+                "CountDefault": "1",
+                "CountMax": "1",
+                "CountMin": "0",
+                "DefaultValue": "",
+                "ItemSeparator": "",
+                "RegExList": [
+                    {
+                        "ErrorMessage": "Value has to be an positive integer (used as minutes).",
+                        "Value": "^\\d+$"
+                    }
+                ]
+            },
+            "CreateBy": 1,
+            "CreateTime": "2021-05-31 08:39:59",
+            "CustomerVisible": 1,
+            "FieldType": "Text",
+            "FieldTypeDisplayName": "Text",
+            "ID": 15,
+            "InternalField": 0,
+            "Label": "Planned Effort (min)",
+            "Name": "PlannedEffort",
+            "ObjectType": "Ticket",
+            "ValidID": 1
+        },
+        {
+            "ChangeBy": 1,
+            "ChangeTime": "2022-06-10 11:59:48",
+            "Comment": null,
+            "Config": {
+                "CountDefault": "0",
+                "CountMax": "1",
+                "CountMin": "0",
+                "DateRestriction": "none",
+                "DefaultValue": "0",
+                "ItemSeparator": "",
+                "YearsInFuture": "0",
+                "YearsInPast": "0"
+            },
+            "CreateBy": 1,
+            "CreateTime": "2021-05-31 08:59:06",
+            "CustomerVisible": 0,
+            "FieldType": "DateTime",
+            "FieldTypeDisplayName": "Date / Time",
+            "ID": 16,
+            "InternalField": 0,
+            "Label": "Plan Begin",
+            "Name": "PlanBegin",
+            "ObjectType": "Ticket",
+            "ValidID": 1
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_dynamicfields_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/dynamicfields</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields_post_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields_post_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The dynamic field request object for creation.",
+   "type" : "object",
+   "properties" : {
+      "DynamicField" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Config" : {
+               "description" : "Configuration of the dynamic field depending on the field type, the shown properties are for every type, some further are needed for some types",
+               "type" : "object",
+               "properties" : {
+                  "CountDefault" : {
+                     "type" : "integer"
+                  },
+                  "CountMax" : {
+                     "type" : "integer"
+                  },
+                  "CountMin" : {
+                     "type" : "integer"
+                  },
+                  "ItemSeparator" : {
+                     "type" : "string"
+                  }
+               }
+            },
+            "CustomerVisible" : {
+               "description" : " or 0 as value",
+               "type" : "integer"
+            },
+            "FieldType" : {
+               "description" : "Possible values are given in the dynamic field type resource",
+               "type" : "string"
+            },
+            "InternalField" : {
+               "description" : " or 0 as value",
+               "type" : "integer"
+            },
+            "Label" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ObjectType" : {
+               "description" : "Possible values are given in the dynamic field object type resource",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Config",
+            "CustomerVisible",
+            "FieldType",
+            "Label",
+            "Name",
+            "ObjectType"
+         ]
+      }
+   },
+   "required" : [
+      "DynamicField"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicField": {
+        "Name": "SimpleSelection",
+        "Label": "Simple selection",
+        "FieldType": "Multiselect",
+        "ObjectType": "Ticket",
+        "InternalField": 0,
+        "ValidID": 1,
+        "CustomerVisible": 1,
+        "Config": {
+            "CountDefault": "0",
+            "CountMax": "1",
+            "CountMin": "0",
+            "DefaultValue": "",
+            "ItemSeparator": ";",
+            "PossibleValues": {
+                "value1": "first value",
+                "value2": "second value",
+                "value3": "third value"
+            },
+            "TranslatableValues": "1"
+        }
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_dynamicfields_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The DynamicField has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldPostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated dynamic field.",
+   "type" : "object",
+   "properties" : {
+      "DynamicFieldID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "DynamicFieldID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicFieldID": 13
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_dynamicfields_objecttypes" class="panel"><div class="resource-description"><p>Can not resolve ../../descriptions/resources/system/dynamicfields/objecttypes.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/dynamicfields</span><span class="uri">/objecttypes</span> <span class="methods"><a href="#system_dynamicfields_objecttypes_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_dynamicfields_objecttypes_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/dynamicfields</span><span class="uri">/objecttypes</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all DynamicFieldObjectType items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields_objecttypes_get_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields_objecttypes_get_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields_objecttypes_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields_objecttypes_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_dynamicfields_objecttypes_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_objecttypes_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldObjectTypeCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldTypeCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of dynamic field object types.",
+   "type" : "object",
+   "properties" : {
+      "DynamicFieldObject" : {
+         "type" : "array",
+         "items" : {
+            "type" : "object",
+            "properties" : {
+               "DisplayName" : {
+                  "type" : "string",
+                  "readOnly" : true
+               },
+               "Name" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "readOnly" : true
+         }
+      }
+   },
+   "required" : [
+      "DynamicFieldObject"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicFieldObject": [
+        {
+            "DisplayName": "Contact",
+            "Name": "Contact"
+        },
+        {
+            "DisplayName": "FAQ",
+            "Name": "FAQArticle"
+        },
+        {
+            "DisplayName": "News",
+            "Name": "News"
+        },
+        {
+            "DisplayName": "Organisation",
+            "Name": "Organisation"
+        },
+        {
+            "DisplayName": "Ticket",
+            "Name": "Ticket"
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields_objecttypes_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields_objecttypes_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_objecttypes_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_dynamicfields_types" class="panel"><div class="resource-description"><p>Can not resolve ../../descriptions/resources/system/dynamicfields/types.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/dynamicfields</span><span class="uri">/types</span> <span class="methods"><a href="#system_dynamicfields_types_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_dynamicfields_types_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/dynamicfields</span><span class="uri">/types</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all DynamicFieldType items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields_types_get_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields_types_get_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields_types_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields_types_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_dynamicfields_types_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_types_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldTypeCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldTypeCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of dynamic field types.",
+   "type" : "object",
+   "properties" : {
+      "DynamicFieldType" : {
+         "type" : "array",
+         "items" : {
+            "type" : "object",
+            "properties" : {
+               "DisplayName" : {
+                  "type" : "string",
+                  "readOnly" : true
+               },
+               "Name" : {
+                  "type" : "string",
+                  "readOnly" : true
+               }
+            },
+            "readOnly" : true
+         }
+      }
+   },
+   "required" : [
+      "DynamicFieldType"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicFieldType": [
+        {
+            "DisplayName": "Checklist",
+            "Name": "CheckList"
+        },
+        {
+            "DisplayName": "Checkbox",
+            "Name": "Checkbox"
+        },
+        {
+            "DisplayName": "Date",
+            "Name": "Date"
+        },
+        {
+            "DisplayName": "Date / Time",
+            "Name": "DateTime"
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields_types_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields_types_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields_types_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_dynamicfields__dynamicfieldid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/dynamicfields</span><span class="uri">/{dynamicFieldId}</span> <span class="methods"><a href="#system_dynamicfields__dynamicfieldid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_dynamicfields__dynamicfieldid__patch"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_dynamicfields__dynamicfieldid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_dynamicfields__dynamicfieldid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/dynamicfields</span><span class="uri">/{dynamicFieldId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields__dynamicfieldid__get_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields__dynamicfieldid__get_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields__dynamicfieldid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields__dynamicfieldid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">dynamicFieldId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a dynamic field GET request.",
+   "type" : "object",
+   "properties" : {
+      "DynamicField" : {
+         "$ref" : "#/definitions/_DynamicField_json"
+      }
+   },
+   "required" : [
+      "DynamicField"
+   ],
+   "definitions" : {
+      "_DynamicField_json" : {
+         "$id" : "DynamicField.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Config" : {
+               "description" : "Configuration of the dynamic field depending on the field type, the shown properties are for every type - added via include \"Config\"",
+               "type" : "object",
+               "properties" : {
+                  "CountDefault" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "CountMax" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "CountMin" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  },
+                  "ItemSeparator" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "FieldType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FieldTypeDisplayName" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "InternalField" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "CustomerVisible",
+            "FieldType",
+            "FieldTypeDisplayName",
+            "ID",
+            "InternalField",
+            "Label",
+            "Name",
+            "ObjectType",
+            "ValidID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicField": {
+        "ChangeBy": 1,
+        "ChangeTime": "2022-10-21 09:17:41",
+        "Comment": null,
+        "CreateBy": 1,
+        "CreateTime": "2021-10-06 13:16:09",
+        "CustomerVisible": 1,
+        "FieldType": "Text",
+        "FieldTypeDisplayName": "Text",
+        "ID": 46,
+        "InternalField": 0,
+        "Label": "Some Text",
+        "Name": "SomeText",
+        "ObjectType": "Ticket",
+        "ValidID": 1
+    }
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_dynamicfields__dynamicfieldid__patch"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_patch">patch <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/dynamicfields</span><span class="uri">/{dynamicFieldId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields__dynamicfieldid__patch_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields__dynamicfieldid__patch_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields__dynamicfieldid__patch_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields__dynamicfieldid__patch_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">dynamicFieldId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldPatchRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldPatchRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The dynamic field request object for update.",
+   "type" : "object",
+   "properties" : {
+      "DynamicField" : {
+         "type" : "object",
+         "properties" : {
+            "Comment" : {
+               "type" : "string"
+            },
+            "Config" : {
+               "description" : "Configuration of the dynamic field depending on the field type, the shown properties are for every type, some further are needed for some types",
+               "type" : "object",
+               "properties" : {
+                  "CountDefault" : {
+                     "type" : "integer"
+                  },
+                  "CountMax" : {
+                     "type" : "integer"
+                  },
+                  "CountMin" : {
+                     "type" : "integer"
+                  },
+                  "ItemSeparator" : {
+                     "type" : "string"
+                  }
+               }
+            },
+            "CustomerVisible" : {
+               "description" : " or 0 as value",
+               "type" : "integer"
+            },
+            "FieldType" : {
+               "description" : "Possible values are given in the dynamic field type resource",
+               "type" : "string"
+            },
+            "Label" : {
+               "type" : "string"
+            },
+            "Name" : {
+               "type" : "string"
+            },
+            "ObjectType" : {
+               "description" : "Possible values are given in the dynamic field object type resource",
+               "type" : "string"
+            },
+            "ValidID" : {
+               "type" : "integer"
+            }
+         }
+      }
+   },
+   "required" : [
+      "DynamicField"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicField": {
+        "Label": "Simple selection renamed",
+        "Config": {
+            "CountDefault": "0",
+            "CountMax": "1",
+            "CountMin": "0",
+            "DefaultValue": "",
+            "ItemSeparator": ";",
+            "PossibleValues": {
+                "value1": "first value",
+                "value2": "second value",
+                "value3": "third value",
+                "value4": "fourth value"
+            },
+            "TranslatableValues": "1"
+        }
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__patch_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__patch_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: DynamicFieldPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "DynamicFieldPostPatchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created or updated dynamic field.",
+   "type" : "object",
+   "properties" : {
+      "DynamicFieldID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "DynamicFieldID"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "DynamicFieldID": 13
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__patch_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__patch_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_dynamicfields__dynamicfieldid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/dynamicfields</span><span class="uri">/{dynamicFieldId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_dynamicfields__dynamicfieldid__delete_request" data-toggle="tab">Request</a></li><li><a href="#system_dynamicfields__dynamicfieldid__delete_response" data-toggle="tab">Response</a></li><li><a href="#system_dynamicfields__dynamicfieldid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_dynamicfields__dynamicfieldid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">dynamicFieldId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_dynamicfields__dynamicfieldid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_dynamicfields__dynamicfieldid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_faq" class="panel-title">[System] FAQ</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../descriptions/resources/system/faq.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_faq_categories" class="panel"><div class="resource-description"><p>Can not resolve ../descriptions/resources/system/faq/categories.md</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/faq</span><span class="uri">/categories</span> <span class="methods"><a href="#system_faq_categories_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_faq_categories_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_faq_categories_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/faq</span><span class="uri">/categories</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_faq_categories_get_request" data-toggle="tab">Request</a></li><li><a href="#system_faq_categories_get_response" data-toggle="tab">Response</a></li><li><a href="#system_faq_categories_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_faq_categories_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_faq_categories_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_faq_categories_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: FAQCategoryCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "FAQCategoryCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of all FAQ categories.",
@@ -36804,7 +37670,107 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_generalcatalog_classes__classname__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_generalcatalog_classes__classname__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_logs" class="panel-title">[System] Logs</h3></div><div class="panel-body"><div class="top-resource-description"><p>This resource allows readable access to the logs files in the KIX backend log directory.</p><h5 id="tailing-and-filtering">Tailing and Filtering</h5><p>With <code>Tail</code> you can specify the number of lines you want to fetch from the end of the file. Additionally you can filter for log categories by giving a comma separated list as <code>Categories</code>. Combining both options, you can do something like "give me the last 10 errors or debug messages". The tailed and/or filtered content will only be returned, if you include <code>Content</code>.</p><h5 id="supported-includes">Supported Includes</h5><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Content</code></td><td>Adds the content of the log file (base64 encoded).</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_logs" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/logs</span> <span class="methods"><a href="#system_logs_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_logs_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/logs</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all LogFile items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_logs_get_request" data-toggle="tab">Request</a></li><li><a href="#system_logs_get_response" data-toggle="tab">Response</a></li><li><a href="#system_logs_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_logs_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_logs_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_logs_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: LogFileCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_generalcatalog_classes__classname__patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_generalcatalog_classes__classname__patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_htmltopdf_convert" class="panel-title">[System] HTMLToPDF Convert</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="convert">Convert</h4><p>This ressources don&#39;t support default includes, expands, limits. Only specific queries will be allowed.</p><h5 id="supported-queries">Supported Queries</h5><table class="table"><thead><tr><th>Query</th><th>Description</th><th>Required</th></tr></thead><tbody><tr><td><code>TemplateID</code></td><td>Is required to get the template to be used. (Alternatively <code>TemplateName</code> can be used)</td><td>x</td></tr><tr><td><code>TemplateName</code></td><td>Is required to get the template to be used. (Alternatively <code>TemplateID</code> can be used)</td><td>x</td></tr><tr><td><code>IdentifierType</code></td><td>Is required to set the identification type. <code>IDKey</code> or <code>NumberKey</code> can be set.</td><td>x</td></tr><tr><td><code>IdentifierIDorNumber</code></td><td>Is required to set the identifier. This depends on what is set in <code>IdentifierType</code>. <code>IDKey</code> is the ID of the ticket and if <code>NumberKey</code> it would be the ticket number.</td><td>x</td></tr><tr><td><code>Expands</code></td><td>This <code>Expand</code> means the data expansion of the object which is applied to the template. (as array or comma separated string)</td><td>-</td></tr><tr><td><code>Filters</code></td><td>Optional filters can be used to restrict certain extensions (format as JSON).</td><td>-</td></tr><tr><td><code>Allows</code></td><td>Defines a whitelist that only shows the attributes that are named in it. If no allow is specified, everything appears.The Allows overwrites the Allow of the specified table in the template.(format as JSON)</td><td>-</td></tr><tr><td><code>Ignores</code></td><td>Defines a blacklist that removes the attributes that made it through the whitelist. If no ignore is set, the final result is the result of the allow application. If both are emptied, all information from the objects is displayed. Ignores overwrites the Ignore of the specified table in the template.(format as JSON)</td><td>-</td></tr><tr><td><code>Filename</code></td><td>user-specific filename of the PDF. It is possible to use placeholders, including special ones.</td><td>-</td></tr></tbody></table><h5 id="special-placeholders">Special Placeholders</h5><table class="table"><thead><tr><th>Placeholder</th><th>Description</th></tr></thead><tbody><tr><td><code>&lt;Current_Time&gt;</code></td><td>Returns the current date</td></tr><tr><td><code>&lt;Current_User&gt;</code></td><td>Returns the full name of the trigger of the print job.</td></tr><tr><td><code>&lt;Count&gt;</code></td><td>Returns the current count. (Basically used for article numbering)</td></tr><tr><td><code>&lt;TIME_YYMMDD_hhmm&gt;</code></td><td>Returns the current time in the format <code>YYYYMMDD_hhmm</code></td></tr><tr><td><code>&lt;TIME_YYMMDD&gt;</code></td><td>Returns the current time in the format <code>YYYYMMDD</code></td></tr><tr><td><code>&lt;TIME_YYMMDDhhmm&gt;</code></td><td>Returns the current time in the format <code>YYYYMMDDhhmm</code></td></tr></tbody></table><h5 id="filters">Filters</h5><h6 id="syntax">Syntax</h6><p>Filters can only be applied where in the template <code>Data</code> is contained in the block and exists as an object. (e.g. ticket, article) Only attributes that the object can supply can be filtered.</p><pre><code>{
+"&lt;Data-Object&gt;": {
+"AND": [
+{
+"Field": "&lt;Attribute&gt;",
+"Type": "&lt;EQ|CONTAINS&gt;",
+"Value": "&lt;ARRAY|STRING&gt;"
+}
+]
+}
+}</code></pre><h6 id="example">Example</h6><p>A ticket should only take into account the articles that are visible to the customer.</p><pre><code>{
+"Article": {
+"AND": [
+{
+"Field": "CustomerVisible",
+"Type": "EQ",
+"Value": "1"
+}
+]
+}
+}</code></pre><h5 id="allowsignores">Allows/Ignores</h5><h6 id="syntax-1">Syntax</h6><p>In order to address the respective table, its <code>Reference ID</code> is required first. This can be found in the template structure. If the ID is known, a JSON can be created that contains the attributes to be restricted. There are two options for the restriction:</p><ul><li>By using the shortcut <code>KEY</code>, the entire attribute will be ignored or displayed without further checking.</li><li>By using a regular expression, the values of an attribute can be checked. If the respective value applies, the attribute is ignored or displayed. The regular expression is freely selectable. However, it must not contain <code>KEY</code> because <code>KEY</code> is the keyword for the entire attribute.</li></ul><pre><code>{
+"Reference-ID": {
+"Attribute": "KEY",
+"Attribute": "regex"
+}
+}</code></pre><h6 id="example-1">Example</h6><pre><code>{
+"ArticleMeta": {
+"Channel": "KEY",
+"From": "cape-it.de$"
+}
+}</code></pre></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_htmltopdf_convert" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/htmltopdf/convert</span> <span class="methods"><a href="#system_htmltopdf_convert_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_htmltopdf_convert_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/htmltopdf/convert</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_htmltopdf_convert_get_request" data-toggle="tab">Request</a></li><li><a href="#system_htmltopdf_convert_get_response" data-toggle="tab">Response</a></li><li><a href="#system_htmltopdf_convert_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_htmltopdf_convert_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_htmltopdf_convert_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_htmltopdf_convert_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: HTMLToPDFConvertResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "HTMLToPDFConvertResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a htmltopdf convert GET request.",
+   "type" : "object",
+   "properties" : {
+      "HTMLToPDF" : {
+         "$ref" : "#/definitions/_HTMLToPDFConvert_json"
+      }
+   },
+   "required" : [
+      "HTMLToPDF"
+   ],
+   "definitions" : {
+      "_HTMLToPDFConvert_json" : {
+         "$id" : "HTMLToPDFConvert.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The htmltopdf convert object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Content",
+            "ContentType",
+            "Filename"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "HTMLToPDF": {
+        "Content": "someBase64EncodedContentString",
+        "ContentType": "application/pdf",
+        "Filename": "Ticket_2023022217000032_20230222_1222.pdf"
+    }
+}</code></pre></div></div><h2 class="response-title" id="system_htmltopdf_convert_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_htmltopdf_convert_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_htmltopdf_convert_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_logs" class="panel-title">[System] Logs</h3></div><div class="panel-body"><div class="top-resource-description"><p>This resource allows readable access to the logs files in the KIX backend log directory.</p><h5 id="tailing-and-filtering">Tailing and Filtering</h5><p>With <code>Tail</code> you can specify the number of lines you want to fetch from the end of the file. Additionally you can filter for log categories by giving a comma separated list as <code>Categories</code>. Combining both options, you can do something like "give me the last 10 errors or debug messages". The tailed and/or filtered content will only be returned, if you include <code>Content</code>.</p><h5 id="supported-includes">Supported Includes</h5><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>Content</code></td><td>Adds the content of the log file (base64 encoded).</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_logs" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/logs</span> <span class="methods"><a href="#system_logs_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_logs_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/logs</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all LogFile items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_logs_get_request" data-toggle="tab">Request</a></li><li><a href="#system_logs_get_response" data-toggle="tab">Response</a></li><li><a href="#system_logs_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_logs_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_logs_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_logs_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: LogFileCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "LogFileCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of log files.",
@@ -41409,7 +42375,12 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_ticket_priorities__priorityid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_ticket_priorities__priorityid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_ticket_queues" class="panel-title">[System] Ticket Queues</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>SubQueues</code></td><td>Adds the die tree of sub-queues to the response.</td></tr><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets in this queue. It will contain the total number of tickets and the number of locked tickets, based on the given URL parameter <code>TicketStats.StateType</code> or <code>TicketStats.StateID</code>. Both can contain multiple values separated by a comma. The two virtual StateTypes <code>Open</code> and <code>Viewable</code> represent only the viewable state types (see SysConfig option <code>Ticket::ViewableStateType</code>).</td></tr><tr><td><code>Tickets</code></td><td>Adds the list of tickets to the response.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_ticket_queues" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/ticket/queues</span> <span class="methods"><a href="#system_ticket_queues_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_ticket_queues_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_ticket_queues_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/ticket/queues</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_ticket_queues_get_request" data-toggle="tab">Request</a></li><li><a href="#system_ticket_queues_get_response" data-toggle="tab">Response</a></li><li><a href="#system_ticket_queues_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_ticket_queues_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_ticket_queues_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_ticket_queues_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueueCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_ticket_priorities__priorityid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_ticket_priorities__priorityid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_ticket_queues" class="panel-title">[System] Ticket Queues</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources (as far as they exist), this resource supports the following includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>SubQueues</code></td><td>Adds the die tree of sub-queues to the response.</td></tr><tr><td><code>TicketStats</code></td><td>Adds some statistics to the response, about the tickets in this queue. It will contain the total number of tickets and the number of locked tickets, based on the given URL parameter <code>TicketStats.StateType</code> or <code>TicketStats.StateID</code>. Both can contain multiple values separated by a comma. The two virtual StateTypes <code>Open</code> and <code>Viewable</code> represent only the viewable state types (see SysConfig option <code>Ticket::ViewableStateType</code>).</td></tr><tr><td><code>Tickets</code></td><td>Adds the list of tickets to the response.</td></tr></tbody></table><h5 id="supported-generic-properties">Supported Generic Properties</h5><p>The queues resource supports the generic property <code>Permissions</code> in POST and PATCH requests. This property is an array of base permission objects.</p><p>*<em>Base Permission Object (Example) *</em></p><pre><code class="language-bash">{
+
+"Type":       "Base",
+"RoleID":     123,
+"Permission": "READ+WRITE"
+}</code></pre></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_ticket_queues" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/ticket/queues</span> <span class="methods"><a href="#system_ticket_queues_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_ticket_queues_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_ticket_queues_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/ticket/queues</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_ticket_queues_get_request" data-toggle="tab">Request</a></li><li><a href="#system_ticket_queues_get_response" data-toggle="tab">Response</a></li><li><a href="#system_ticket_queues_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_ticket_queues_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_ticket_queues_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_ticket_queues_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: QueueCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "QueueCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of queues.",
@@ -46686,4 +47657,4 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_oauth2_authcode">[System] OAuth2 - Authorization Code & State</a></li><li><a class="nav-resource" href="#system_oauth2_profiles">[System] OAuth2 - Profiles</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_plugins">[System] Plugins</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_dynamicfields">[System] Dynamic Fields</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_htmltopdf_convert">[System] HTMLToPDF Convert</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_oauth2_authcode">[System] OAuth2 - Authorization Code & State</a></li><li><a class="nav-resource" href="#system_oauth2_profiles">[System] OAuth2 - Profiles</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_plugins">[System] Plugins</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>

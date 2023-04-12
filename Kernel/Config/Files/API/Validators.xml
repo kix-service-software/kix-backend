@@ -336,7 +336,7 @@
                 <Item Key="Module">Kernel::API::Validator::UserValidator</Item>
                 <Item Key="Validates">Owner,OwnerID,Responsible,ResponsibleID,UserID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(UserGet|NotificationCreate|NotificationUpdate|ConfigItemVersionCreate|ConfigItemCreate)</Item>
+                <Item Key="IgnoreOperationRegEx">(UserGet|NotificationCreate|NotificationUpdate|ConfigItemVersionCreate|ConfigItemCreate|ConfigItemUpdate|ConfigItemGet)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

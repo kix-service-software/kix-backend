@@ -528,3 +528,27 @@ msgstr "Entwurf"
 
 msgid "Locally recorded"
 msgstr "lokal erfasst"
+
+msgid "Delete the local ticket draft"
+msgid "Lokalen Ticketentwurf löschen"
+
+msgid "If you choose to remove any locally stored data, not yet uploaded information will be lost. The app will be reset to installation default."
+msgstr "Wenn Sie lokal gespeicherte Daten entfernen, gehen noch nicht hochgeladene Informationen verloren. Die App wird auf den Installationsstandard zurückgesetzt."
+
+msgid "The time tracking is active for another ticket and has to be stopped. If you continue, this active time tracking will be stopped."
+msgstr "Die Zeiterfassung ist für ein anderes Ticket aktiv und muss gestoppt werden. Wenn Sie fortfahren, wird diese aktive Zeiterfassung beendet."
+
+msgid "travel time"
+msgstr "An-/Abfahrt"
+
+msgid "processed as noted"
+msgstr "bearbeiten wie beschrieben"
+
+msgid "processed as specified"
+msgstr "bearbeiten wie angefordert"
+
+msgid "see checklists"
+msgstr "siehe Checklisten"
+
+msgid "see work notes"
+msgstr "siehe Notizen"

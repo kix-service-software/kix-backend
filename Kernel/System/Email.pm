@@ -13,7 +13,7 @@ package Kernel::System::Email;
 use strict;
 use warnings;
 
-use Mail::Address;
+use Email::Address::XS;
 use MIME::Entity;
 use MIME::Parser;
 use MIME::Words;
@@ -241,6 +241,14 @@ sub Send {
     for my $Attribute (qw(From To Cc Subject Charset Reply-To)) {
         next ATTRIBUTE if !$Param{$Attribute};
         $Header{$Attribute} = $Param{$Attribute};
+    }
+
+    my $IgnoreEmailPattern = $Kernel::OM->Get('Config')->Get('IgnoreEmailAddressesAsRecipients');
+    for my $Attribute (qw(To Cc Bcc)) {
+        if ( $Header{$Attribute} && $Header{$Attribute} =~ /$IgnoreEmailPattern/ ) {
+            $Header{$Attribute} =~ s/$IgnoreEmailPattern//gi;
+            $Header{$Attribute} =~ s/,\s*,/,/g;
+        }
     }
 
     # loop
@@ -731,31 +739,34 @@ sub Send {
 
     # get recipients
     my @ToArray;
-    my $To = '';
 
     RECIPIENT:
-    for my $Recipient (qw(To Cc Bcc)) {
+    for my $Recipient ( qw(To Cc Bcc) ) {
         next RECIPIENT if !$Param{$Recipient};
-        for my $Email ( Mail::Address->parse( $Param{$Recipient} ) ) {
-            push( @ToArray, $Email->address() );
-            if ($To) {
-                $To .= ', ';
+        for my $Email ( Email::Address::XS->parse($Param{$Recipient}) ) {
+            my $EmailAddress = $Email->address();
+            if ( $EmailAddress !~ /$IgnoreEmailPattern/gix ) {
+                push(@ToArray, $EmailAddress);
+
             }
-            $To .= $Email->address();
         }
     }
 
     # add Bcc recipients
     my $SendmailBcc = $ConfigObject->Get('SendmailBcc');
-    if ($SendmailBcc) {
-        push @ToArray, $SendmailBcc;
-        $To .= ', ' . $SendmailBcc;
+    if ( $SendmailBcc ) {
+        for my $Email ( Email::Address::XS->parse($SendmailBcc) ) {
+            my $EmailAddress = $Email->address();
+            if ( $EmailAddress !~ /$IgnoreEmailPattern/gix ) {
+                push(@ToArray, $SendmailBcc);
+            }
+        }
     }
 
     # set envelope sender for replies
     my $RealFrom = $ConfigObject->Get('SendmailEnvelopeFrom') || '';
     if ( !$RealFrom ) {
-        my @Sender = Mail::Address->parse( $Param{From} );
+        my @Sender = Email::Address::XS->parse( $Param{From} );
         $RealFrom = $Sender[0]->address();
     }
 
@@ -770,6 +781,7 @@ sub Send {
 
     # debug
     if ( $Self->{Debug} > 1 ) {
+        my $To = join(',', @ToArray);
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$To' from '$RealFrom'. Subject => '$Param{Subject}';",
@@ -861,7 +873,7 @@ sub Bounce {
     my $EmailObject = Mail::Internet->new( \@EmailPlain );
 
     # get sender
-    my @Sender   = Mail::Address->parse( $Param{From} );
+    my @Sender   = Email::Address::XS->parse( $Param{From} );
     my $RealFrom = $Sender[0]->address();
 
     # add ReSent header (see https://www.ietf.org/rfc/rfc2822.txt A.3. Resent messages)

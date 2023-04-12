@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 use MIME::Base64();
-use Mail::Address;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -156,6 +155,21 @@ sub ExecOperation {
     }
 
     return $Self->SUPER::ExecOperation(%Param);
+}
+
+sub GetBasePermissionObjectIDs {
+    my ( $Self, %Param ) = @_;
+
+    # we don't have to do the checks if we have been called by TicketSearch
+    return 1 if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
+
+    my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+        %Param,
+    );
+    return if !$QueueIDs;
+    return 1 if !IsArrayRef($QueueIDs);
+    
+    return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
 }
 
 =begin Internal:
@@ -330,7 +344,11 @@ sub _CheckArticle {
                     $Article->{$Attribute} = [ $Article->{$Attribute} ];
                 }
                 for my $UserID ( @{ $Article->{$Attribute} } ) {
-                    if ( !$Self->ValidateUserID( UserID => $UserID ) ) {
+                    my $UserLogin = $Kernel::OM->Get('User')->UserLookup( 
+                        UserID => $UserID,
+                        Silent => 1,
+                    );
+                    if ( !$UserLogin ) {
                         return $Self->_Error(
                             Code    => 'BadRequest',
                             Message => "Parameter UserID $UserID in parameter $Attribute is invalid!",

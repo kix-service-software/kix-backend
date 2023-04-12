@@ -1,0 +1,18 @@
+{
+    "DynamicField": {
+        "ChangeBy": 1,
+        "ChangeTime": "2022-10-21 09:17:41",
+        "Comment": null,
+        "CreateBy": 1,
+        "CreateTime": "2021-10-06 13:16:09",
+        "CustomerVisible": 1,
+        "FieldType": "Text",
+        "FieldTypeDisplayName": "Text",
+        "ID": 46,
+        "InternalField": 0,
+        "Label": "Some Text",
+        "Name": "SomeText",
+        "ObjectType": "Ticket",
+        "ValidID": 1
+    }
+}

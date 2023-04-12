@@ -131,7 +131,7 @@ sub Run {
         foreach my $ImportItem ( @ImportItems ) {
 
             # get all relevant PO files in given directory
-            @POFiles = $Kernel::OM->Get('Main')->DirectoryRead(
+            push @POFiles, $Kernel::OM->Get('Main')->DirectoryRead(
                 Directory => $ImportItem->{Directory},
                 Filter    => $Language ? "$Language.po" : '*.po',
                 Recursive => 1,

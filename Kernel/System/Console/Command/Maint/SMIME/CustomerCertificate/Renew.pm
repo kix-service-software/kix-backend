@@ -67,8 +67,8 @@ sub Run {
     for my $Email ( sort keys %{$EmailsFromCertificates} ) {
 
         my %ContactList = $ContactObject->ContactSearch(
-            PostMasterSearch => $Email,
-            Limit            => 1,
+            Email => $Email,
+            Limit => 1
         );
 
         next EMAIL if !%ContactList;

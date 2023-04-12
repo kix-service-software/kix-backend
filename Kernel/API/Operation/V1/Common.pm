@@ -146,6 +146,20 @@ sub RunOperation {
         }
 
         # check if we have permission for this object
+        if ( $Self->can('GetBasePermissionObjectIDs') ) {
+            my $StartTime = Time::HiRes::time();
+            my $Result =  $Self->_CheckBasePermission(
+                %Param,
+                Data => $Param{Data},
+            );
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+
+            if ( !$Result->{Success} ) {
+                return $Result;
+            }
+        }
+
+        # check if we have permission for this object
         my $StartTime = Time::HiRes::time();
         my $Result =  $Self->_CheckObjectPermission(
             %Param,
@@ -225,9 +239,16 @@ sub RunOperation {
 
         # exec pre run method (if possible)
         if ($Self->can('PreRun')) {
+            $Self->_Debug($Self->{LevelIndent}, "executing PreRun...");
+
+            my $StartTime = Time::HiRes::time();
+
             my $PreRunResult = $Self->PreRun(
                 %Param,
             );
+            
+            $Self->_Debug($Self->{LevelIndent}, sprintf("PreRun took %i ms", TimeDiff($StartTime)));
+
             if ( !$PreRunResult->{Success} ) {
                 return $Self->_Error(
                     %{$PreRunResult},
@@ -238,6 +259,20 @@ sub RunOperation {
         $Result = $Self->Run(
             %Param,
         );
+
+        # handle optional permissions
+        if ( $Result->{Success} && $Self->{RequestMethod} =~ /^(PATCH|POST)$/g ) {
+            OBJECT:
+            foreach my $Object ( keys %{$Param{Data}} ) {
+                next OBJECT if !IsHashRefWithData($Param{Data}->{$Object}) || !IsArrayRef($Param{Data}->{$Object}->{Permissions});
+                $Self->_HandlePermissions(
+                    ObjectID    => (values %{$Result->{Data}})[0],
+                    Object      => $Object,
+                    Data        => $Param{Data}->{$Object},
+                    Permissions => $Param{Data}->{$Object}->{Permissions},
+                );
+            }
+        }
     }
 
     # log created ID of POST requests
@@ -365,7 +400,7 @@ prepare data, check given parameters and parse them according to type
         },
         Parameters => {
             <Parameter> => {                                            # if Parameter is a attribute of a hashref, just separate it by ::, i.e. "User::UserLogin"
-                Type                => 'ARRAY' | 'ARRAYtoHASH',         # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values
+                Type                => 'ARRAY' | 'ARRAYtoHASH | HASH',  # optional, use this to parse a comma separated string into an array or a hash with all array entries as keys and 1 as values or a JSON string into a HASH
                 DataType            => 'NUMERIC',                       # optional, use this to force numeric datatype in JSON response
                 Required            => 1,                               # optional
                 RequiredIfNot       => [ '<AltParameter>', ... ]        # optional, specify the alternate parameters to be checked, if one of them has a value
@@ -615,7 +650,7 @@ sub PrepareData {
                 if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
                     $Result->{Success} = 0;
                     $Result->{Message} = "Required parameter $Parameter is missing!",
-                        last;
+                    last;
                 }
             }
 
@@ -641,6 +676,24 @@ sub PrepareData {
                     Value     => \%NewHash,
                 );
             }
+
+            # convert string to hash if we have to
+            if ( $Parameters{$Parameter}->{Type} && $Parameters{$Parameter}->{Type} eq 'HASH' && $Data{$Parameter} && IsString( $Param{Data}->{$Parameter} ) ) {
+                my $Object = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Param{Data}->{$Parameter},
+                );
+                if ( !$Object )  {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Parameter $Parameter is not a valid JSON object!",
+                    last;
+                }
+                $Self->_SetParameter(
+                    Data      => $Param{Data},
+                    Attribute => $Parameter,
+                    Value     => $Object,
+                );
+            }
+
 
             # set default value
             if ( !$Data{$Parameter} && exists( $Parameters{$Parameter}->{Default} ) ) {
@@ -837,6 +890,66 @@ sub AddCacheKeyExtension {
     }
 }
 
+=item SetDefaultSort()
+
+suppress a sub-resource include if it's already done somewhere else (due to performance reasons etc.)
+
+    $CommonObject->SetDefaultSort(
+        Ticket => [
+            {
+                Field     => 'Title',
+                Direction => 'descending',      # optional, default: ascending
+                Type      => 'NATURAL',         # optional, default: TEXTUAL
+            }
+        ]
+    );
+
+=cut
+
+sub SetDefaultSort {
+    my ( $Self, %Param ) = @_;
+
+    foreach my $Object ( keys %Param ) {
+        foreach my $SortItem ( @{$Param{$Object}} ) {
+            if ( !$SortItem->{Field} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Default filter for \"$Object\" contains not \"Field\" property!",
+                );
+                return 0;
+            }
+            $SortItem->{Type} = 'cmp' if !$SortItem->{Type};
+            $SortItem->{Direction} = 'ascending' if !$SortItem->{Direction};
+        }
+    }
+
+    $Self->{DefaultSort} = \%Param;
+
+    return 1;
+}
+
+=item SetTotalItemCount()
+
+set the total item count for specific object types (can be used in conjuction with implicit paging)
+
+    $CommonObject->SetTotalItemCount(
+        Ticket => 123,
+    );
+
+=cut
+
+sub SetTotalItemCount {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{TotalItemCount} //= {};
+
+    foreach my $Object ( keys %Param ) {
+        $Self->{TotalItemCount}->{$Object} = $Param{$Object},
+    }
+
+    return 1;
+}
+
 =item HandleSearchInAPI()
 
 Tell the API core to handle the "search" parameter in the API. This is needed for operations that don't handle the "search" parameter and leave the work to the API core.
@@ -851,6 +964,120 @@ sub HandleSearchInAPI {
     $Self->{HandleSearchInAPI} = 1;
 }
 
+=item ApplyPaging()
+
+Apply the relevant limit and offset to the given data.
+
+    $CommonObject->ApplyPaging(
+        Ticket => [...],
+    );
+
+=cut
+
+sub ApplyPaging {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsHashRefWithData( \%Param ) ) {
+
+        # nothing to do
+        return;
+    }
+
+    my %Data = (
+        Data => \%Param,
+    );
+
+    $Self->_Debug($Self->{LevelIndent}, "applying paging...");
+
+    my $StartTime = Time::HiRes::time();
+
+    if ( IsHashRefWithData( $Self->{Offset} ) ) {
+        $Self->_ApplyOffset(
+            %Data,
+            Force => 1,
+        );
+    }
+
+    if ( IsHashRefWithData( $Self->{Limit} ) ) {
+        $Self->_ApplyLimit(
+            %Data,
+            Force => 1,
+        );
+    }
+
+    $Self->_Debug($Self->{LevelIndent}, sprintf("applying paging took %i ms", TimeDiff($StartTime)));
+
+    return %Param;
+}
+
+=item _HandlePermissions()
+
+Handle the optional "Permissions" property
+
+    $CommonObject->_HandlePermissions(
+        ObjectID    => 123,
+        Object      => 'Queue',
+        Data        => {...},
+        Permissions => [],
+    );
+
+=cut
+
+sub _HandlePermissions {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(ObjectID Object Data Permissions)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my @BasePermissions;
+    PERMISSION:
+    foreach my $Permission ( @{$Param{Permissions}} ) {
+        next PERMISSION if $Permission->{Type} ne 'Base';
+
+        if ( !$Permission->{RoleID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "RoleID missing in Permission!"
+            );
+            return;
+        }
+        push @BasePermissions, $Permission;
+    }
+
+    my $HandlerObject = $Kernel::OM->Get($Param{Object});
+
+    if ( !$HandlerObject || !$HandlerObject->can('UpdateBasePermissions') ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No base permission handler for \"$Param{Object}\"!",
+        );
+        return;
+    }
+
+    my $Success = $HandlerObject->UpdateBasePermissions(
+        ObjectID       => $Param{ObjectID},
+        PermissionList => \@BasePermissions,
+        UserID         => $Self->{Authorization}->{UserID},
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Base permission handler for \"Param{Object}\" returned error !",
+        );
+        return;
+    }
+
+    return 1;
+}
+
 =item _Success()
 
 helper function to return a successful result.
@@ -863,12 +1090,49 @@ helper function to return a successful result.
 
 sub _Success {
     my ( $Self, %Param ) = @_;
+    my %Headers;
 
     # ignore cached values if we have a cached response (see end of Init method)
 
     # handle Search parameter if we have to
     if ( !$Param{IsOptionsResponse} ) {
-        # at first honor permissions
+        # cache request if CacheType is set for this operation
+        if ( $Kernel::OM->Get('Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
+            $Self->_CacheRequest(
+                Data => \%Param,
+            );
+        }
+
+        # honor base permissions
+        if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{BasePermissionFilter} ) ) {
+            my $StartTime = Time::HiRes::time();
+
+            $Self->_Debug($Self->{LevelIndent}, "applying base permission");
+
+            my $FilterResult = $Self->_ApplyFilter(
+                Data               => \%Param,
+                Filter             => $Self->{BasePermissionFilter},
+                IsPermissionFilter => 1,
+            );
+
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+
+            if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($FilterResult) ) {
+                foreach my $Object ( sort keys %{$FilterResult} ) {
+                    if ( $FilterResult->{$Object} == 0 && !defined $Param{$Object} ) {
+                        # we have a single object and no permission, return a forbidden
+                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+
+                        # return 403, because we don't have permission to execute this
+                        return $Self->_Error(
+                            Code => 'Forbidden',
+                        );
+                    }
+                }
+            }
+        }
+
+        # honor object permissions
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{RelevantObjectPermissions} ) ) {
             my $StartTime = Time::HiRes::time();
 
@@ -884,7 +1148,7 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
         }
 
-        if ( !$Self->{'_CachedResponse'} && $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
+        if ( $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFilter(
@@ -895,8 +1159,50 @@ sub _Success {
             $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", TimeDiff($StartTime)));
         }
 
+        # add header
+        my $TotalCount;
+        OBJECT:
+        foreach my $Object ( sort keys %Param ) {
+            next OBJECT if !IsArrayRef($Param{$Object});
+            if ( $Self->{TotalItemCount}->{$Object} ) {
+                $Headers{'X-Total-Count-'.$Object} = $Self->{TotalItemCount}->{$Object};
+                $TotalCount += $Self->{TotalItemCount}->{$Object};
+            }
+            else {
+                my $Count = scalar @{$Param{$Object}};
+                $Headers{'X-Total-Count-'.$Object} = $Count;
+                $TotalCount += $Count;
+            }
+        }
+        $Headers{'X-Total-Count'} = $TotalCount if defined $TotalCount;
+
+        # apply offset and limit only for collections
+        if ( !$Self->{PermissionCheckOnly} && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor}) && $Self->{OperationRouteMapping}->{$Self->{OperationType}} !~ /\/:\w+$/ ) {
+            # honor an offset, if we have one
+            if ( IsHashRefWithData( $Self->{Offset} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyOffset(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
+            }
+
+            # honor a limiter, if we have one
+            if ( IsHashRefWithData( $Self->{Limit} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyLimit(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
+            }
+        }
+
         # honor a filter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Filter} ) ) {
+        if ( IsHashRefWithData( $Self->{Filter} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFilter(
@@ -907,7 +1213,7 @@ sub _Success {
         }
 
         # honor a sorter, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Sort} ) ) {
+        if ( IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplySort(
@@ -918,7 +1224,7 @@ sub _Success {
         }
 
         # honor a field selector, if we have one
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Fields} ) ) {
+        if ( IsHashRefWithData( $Self->{Fields} ) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplyFieldSelector(
@@ -930,8 +1236,9 @@ sub _Success {
         }
 
         if ( !$Self->{PermissionCheckOnly} ) {
+
             # honor a generic include, if we have one
-            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Include} ) ) {
+            if ( IsHashRefWithData( $Self->{Include} ) ) {
                 my $StartTime = Time::HiRes::time();
 
                 $Self->_ApplyInclude(
@@ -942,7 +1249,7 @@ sub _Success {
             }
 
             # honor an expander, if we have one
-            if ( !$Self->{'_CachedResponse'} && IsHashRefWithData( $Self->{Expand} ) ) {
+            if ( IsHashRefWithData( $Self->{Expand} ) ) {
                 my $StartTime = Time::HiRes::time();
 
                 $Self->_ApplyExpand(
@@ -955,7 +1262,7 @@ sub _Success {
         }
 
         # honor a permission field selector, if we have one - make sure nothing gets out what should not get out
-        if ( !$Self->{'_CachedResponse'} && IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
+        if ( IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
@@ -967,35 +1274,6 @@ sub _Success {
             );
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", TimeDiff($StartTime)));
-        }
-
-        # cache request without offset and limit if CacheType is set for this operation
-        if ( $Kernel::OM->Get('Config')->Get('API::Cache') && !$Self->{'_CachedResponse'} && IsHashRefWithData( \%Param ) && $Self->{OperationConfig}->{CacheType} ) {
-            $Self->_CacheRequest(
-                Data => \%Param,
-            );
-        }
-
-        # honor an offset, if we have one
-        if ( IsHashRefWithData( $Self->{Offset} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyOffset(
-                Data => \%Param,
-            );
-
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
-        }
-
-        # honor a limiter, if we have one
-        if ( IsHashRefWithData( $Self->{Limit} ) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_ApplyLimit(
-                Data => \%Param,
-            );
-
-            $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
         }
     }
 
@@ -1012,6 +1290,9 @@ sub _Success {
         Code    => $Code,
         Message => $Message,
     };
+    if ( IsHashRefWithData( \%Headers )) {
+        $Result->{Additional}->{AddHeader} = \%Headers
+    }
     if ( IsHashRefWithData( \%Param ) ) {
         $Result->{Data} = {
             %Param
@@ -1065,6 +1346,7 @@ helper function to execute another operation to work with its result.
         IgnoreInclude            => 1,                                  # optional
         IgnoreExpand             => 1,                                  # optional
         PermissionCheckOnly      => 1,                                  # optional
+        ApplyPaging              => ['TicketID'],                       # optional, apply paging to attribute
     );
 
 =cut
@@ -1181,6 +1463,7 @@ sub ExecOperation {
     }
 
     my $OperationObject = $OperationModule->new(
+        CallingOperationType     => $Self->{OperationType},
         Operation                => (split(/::/, $Param{OperationType}))[-1],
         OperationType            => $Param{OperationType},
         WebserviceID             => $Self->{WebserviceID},
@@ -1396,6 +1679,7 @@ sub _ValidateFilter {
 
 sub _ApplyFilter {
     my ( $Self, %Param ) = @_;
+    my %Result;
 
     if ( !IsHashRefWithData( \%Param ) || !IsHashRefWithData( $Param{Data} ) ) {
 
@@ -1451,10 +1735,12 @@ sub _ApplyFilter {
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
-                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @FilteredResult));
+                $Result{$Object} = scalar @FilteredResult;
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
             }
             else {
                 $Param{Data}->{$Object} = \@FilteredResult;
+                $Result{$Object} = scalar @FilteredResult;
             }
             if ( ref $Param{Data}->{$Object} eq 'ARRAY' ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
@@ -1462,7 +1748,7 @@ sub _ApplyFilter {
         }
     }
 
-    return 1;
+    return \%Result;
 }
 
 sub _ApplyFieldSelector {
@@ -1661,9 +1947,8 @@ sub _ApplyOffset {
     foreach my $Object ( keys %{ $Self->{Offset} } ) {
         if ( $Object eq '__COMMON' ) {
             foreach my $DataObject ( keys %{ $Param{Data} } ) {
-
                 # ignore the object if we have a specific start index for it
-                next if exists( $Self->{Offset}->{$DataObject} );
+                next if exists( $Self->{Offset}->{$DataObject} ) || (!$Param{Force} && $Self->{OperationConfig}->{ImplicitPagingFor}->{$DataObject});
 
                 if ( ref( $Param{Data}->{$DataObject} ) eq 'ARRAY' ) {
                     my @ResultArray = splice @{ $Param{Data}->{$DataObject} }, $Self->{Offset}->{$Object};
@@ -1671,7 +1956,7 @@ sub _ApplyOffset {
                 }
             }
         }
-        elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
+        elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' && (!$Self->{OperationConfig}->{ImplicitPagingFor}->{$Object} || $Param{Force}) ) {
             my @ResultArray = splice @{ $Param{Data}->{$Object} }, $Self->{Offset}->{$Object};
             $Param{Data}->{$Object} = \@ResultArray;
         }
@@ -1692,7 +1977,7 @@ sub _ApplyLimit {
             foreach my $DataObject ( keys %{ $Param{Data} } ) {
 
                 # ignore the object if we have a specific limiter for it
-                next if exists( $Self->{Limit}->{$DataObject} );
+                next if exists( $Self->{Limit}->{$DataObject} ) || (!$Param{Force} && $Self->{OperationConfig}->{ImplicitPagingFor}->{$DataObject});
 
                 if ( $Self->{Limit}->{$Object} && ref( $Param{Data}->{$DataObject} ) eq 'ARRAY' ) {
                     my @LimitedArray = splice @{ $Param{Data}->{$DataObject} }, 0, $Self->{Limit}->{$Object};
@@ -1700,7 +1985,7 @@ sub _ApplyLimit {
                 }
             }
         }
-        elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
+        elsif ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' && (!$Self->{OperationConfig}->{ImplicitPagingFor}->{$Object} || $Param{Force}) ) {
             my @LimitedArray = splice @{ $Param{Data}->{$Object} }, 0, $Self->{Limit}->{$Object};
             $Param{Data}->{$Object} = \@LimitedArray;
         }
@@ -1716,7 +2001,7 @@ sub _ApplySort {
         return;
     }
 
-    foreach my $Object ( keys %{ $Self->{Sort} } ) {
+    foreach my $Object ( keys %{ $Self->{Sort} || $Self->{DefaultSort} } ) {
         if ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("sorting %i objects of type %s", scalar @{$Param{Data}->{$Object}}, $Object));
@@ -1724,7 +2009,7 @@ sub _ApplySort {
             # sort array by given criteria
             my @SortCriteria;
             my %SpecialSort;
-            foreach my $Sort ( @{ $Self->{Sort}->{$Object} } ) {
+            foreach my $Sort ( @{ $Self->{Sort}->{$Object} || $Self->{DefaultSort}->{$Object} } ) {
                 my $SortField = $Sort->{Field};
                 my $Type      = $Sort->{Type};
 
@@ -2316,15 +2601,16 @@ sub _GetCacheKey {
 
     # generate key without offset & limit
     my %RequestData = %{ $Self->{RequestData} };
-    delete $RequestData{offset};
-    delete $RequestData{limit};
+    if ( !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor}) ) {
+        delete $RequestData{offset};
+        delete $RequestData{limit};
+    }
+    delete $RequestData{sort};
+    delete $RequestData{filter};
 
-    my @CacheKeyParts = qw(include expand);
+    my @CacheKeyParts;
     if ( IsArrayRefWithData( $Self->{CacheKeyExtensions} ) ) {
-        @CacheKeyParts = (
-            @CacheKeyParts,
-            @{ $Self->{CacheKeyExtensions} }
-            )
+        @CacheKeyParts = @{ $Self->{CacheKeyExtensions} };
     }
 
     # sort some things to make sure you always get the same cache key independent of the given order
@@ -2419,6 +2705,139 @@ sub _ExecPermissionChecks {
     return $Allowed;
 }
 
+=item _CheckBasePermission()
+
+check base permissions
+
+    my $Return = $CommonObject->_CheckBasePermission(
+        Data         => {},
+        Permission   => ...,
+        UsageContext => 'Agent'|'Customer',
+        UserID       => 1
+    );
+
+    $Return = _Success if granted
+
+=cut
+
+sub _CheckBasePermission {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Data)) {
+        if ( !defined $Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
+
+    my $Result = $Self->GetBasePermissionObjectIDs(
+        %Param,
+        UserID       => $Self->{Authorization}->{UserID},
+        UsageContext => $Self->{Authorization}->{UserType},
+        Permission   => $PermissionName,
+    );
+    if ( !$Result ) {
+        # return 403, because we don't have permission
+        return $Self->_Error(
+            Code => 'Forbidden',
+        );
+    }
+    elsif ( !IsHashRef($Result) ) {
+        return $Self->_Success();
+    }
+
+    # add corresponding permission filter 
+    my %Filter = $Self->_CreateFilterForObject(
+        Filter   => {},
+        Object   => $Result->{Object},
+        Field    => $Result->{Attribute},
+        Operator => 'IN',
+        Value    => $Result->{ObjectIDs},
+    );
+    if ( !%Filter ) {
+        # we can't generate the filter, so this is a false
+        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+        return;
+    }
+
+    if ( $Self->{RequestMethod} ne 'GET' ) {
+        # load the object data (if we have to)
+        my %ObjectData = ();
+        if ( $Self->{RequestMethod} eq 'POST' ) {
+            if ( IsHashRefWithData($Param{Data}->{$Result->{Object}}) ) {
+                # we need some special handling here since we don't have an object in the DB yet
+                # so we have to use the object given in the request data
+                %ObjectData = %{$Param{Data}};
+
+                $Self->_ApplyFilter(
+                    Data               => \%ObjectData,
+                    Filter             => \%Filter,
+                    IsPermissionFilter => 1,
+                );
+
+                if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {
+                    # return 403, because we don't have permission
+                    return $Self->_Error(
+                        Code => 'Forbidden',
+                    );
+                }
+            }
+            elsif ( !IsArrayRefWithData($Result->{ObjectIDs}) ) {
+                # we don't have a given object in the request data, we are returning 403
+                # because we don't have any possible ObjectIDs matching the relevant base permission
+                return $Self->_Error(
+                    Code => 'Forbidden',
+                );
+            }
+        }
+        elsif ( IsHashRefWithData($Self->{AvailableMethods}->{GET}) && $Self->{AvailableMethods}->{GET}->{Operation} ) {
+
+            # get the object data from the DB using a faked GET operation (we are ignoring permissions, just to get the data)
+            # a GET request will be handled differently
+            my $GetResult = $Self->ExecOperation(
+                RequestMethod     => 'GET',
+                OperationType     => $Self->{AvailableMethods}->{GET}->{Operation},
+                Data              => $Param{Data},
+                IgnorePermissions => 1,
+            );
+
+            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                # no success, simply return what we got
+                return $GetResult;
+            }
+
+            %ObjectData = %{$GetResult->{Data}};
+
+            if ( exists $ObjectData{$Result->{Object}} ) {
+                # only filter if there is a relevant object to filter
+                $Self->_ApplyFilter(
+                    Data               => \%ObjectData,
+                    Filter             => \%Filter,
+                    IsPermissionFilter => 1,
+                );
+
+                if ( !IsHashRefWithData($ObjectData{$Result->{Object}} ) ) {#
+                    # return 403, because we don't have permission
+                    return $Self->_Error(
+                        Code => 'Forbidden',
+                    );
+                }
+            }
+        }
+    }
+    else {
+        $Self->{BasePermissionFilter} = \%Filter;
+    }
+
+    return $Self->_Success();
+}
+
 =item _CheckObjectPermission()
 
 check object permissions
@@ -2443,7 +2862,7 @@ sub _CheckObjectPermission {
     # get list of permission types
     my %PermissionTypeList = $Kernel::OM->Get('Role')->PermissionTypeList();
 
-    # get all Object and Property permissions for this user
+    # get all Object permissions for this user
     my %Permissions = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
