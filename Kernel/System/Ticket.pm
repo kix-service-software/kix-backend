@@ -539,7 +539,7 @@ sub TicketCreate {
                 );
             }
 
-            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : undef;
+            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
             my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 Email  => $ContactEmail,
                 Silent => 1,
@@ -547,8 +547,8 @@ sub TicketCreate {
 
             if (!$ExistingContactID) {
                 $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                    Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                    Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                    Firstname             => IsArrayRefWithData(\@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                    Lastname              => IsArrayRefWithData(\@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
                     Email                 => $ContactEmail,
                     PrimaryOrganisationID => $ExistingOrganisationID,
                     ValidID               => 1,
@@ -2740,6 +2740,14 @@ sub TicketPendingTimeSet {
         # return if no convert is possible
         return if !$Time;
     }
+
+    # check if update is needed
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+        DynamicFields => 0,
+    );
+    return 1 if $Ticket{PendingTimeUnix} eq $Time;
 
     # db update
     return if !$Kernel::OM->Get('DB')->Do(

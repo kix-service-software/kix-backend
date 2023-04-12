@@ -685,10 +685,10 @@ sub FetchFromCustomer {
             Address => $Param{Search},
         );
 
-        # If valid email address, only do a PostMasterSearch
+        # If valid email address, only do a email search
         if ($ValidEmail) {
             %Contacts = $ContactObject->ContactSearch(
-                PostMasterSearch => $Param{Search},
+                Email => $Param{Search},
             );
         }
     }

@@ -240,6 +240,8 @@ sub TicketSearch {
         $SQLDef{SQLFrom} .= ' '.$PermissionSQL{From} if $PermissionSQL{From};
         if ( $PermissionSQL{Where} ) {
             $SQLDef{SQLWhere} .= ' '.$PermissionSQL{Where};
+        } else {
+            $SQLDef{SQLWhere} .= ' 1=1 ';
         }
     } else {
         $SQLDef{SQLWhere} .= ' 1=1 ';
