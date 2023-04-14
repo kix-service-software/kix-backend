@@ -508,6 +508,7 @@ sub _MapAttributeValue {
         }
     }
     my $PreparedKey = join('.', @PreparedKeyParts);
+    return 1 if $PreparedKey eq 'CIAttachments';
     return 1 if !$PreparedKey;
     return 1 if !$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey};
 
@@ -579,6 +580,41 @@ sub _MapAttributeValue {
             }
 
             return 0;
+        }
+    }
+    elsif ( $Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey} eq 'Attachment' ) {
+        my $AttachmentMeta = $Self->GetSourceData(
+            Type       => 'attachment_directory',
+            Where      => "id = $Param{Item}->{xml_content_value}",
+            NoProgress => 1
+        );
+        if ( IsArrayRefWithData($AttachmentMeta) ) {
+            my $AttachmentContent = $Self->GetSourceData(
+                Type       => 'attachment_storage',
+                Where      => "attachment_directory_id = $Param{Item}->{xml_content_value}",
+                NoProgress => 1
+            );
+
+            if ( IsArrayRefWithData($AttachmentContent) ) {
+                my $AttachmentPrefs = $Self->GetSourceData(
+                    Type       => 'attachment_dir_preferences',
+                    Where      => "attachment_directory_id = $Param{Item}->{xml_content_value}",
+                    NoProgress => 1
+                );
+                my %Attachment = (
+                    Filename => $AttachmentMeta->[0]->{file_name},
+                    Content  => $AttachmentContent->[0]->{data},
+                );
+                foreach my $Pref ( @{$AttachmentPrefs || []} ) {
+                    $Attachment{$Pref->{preferences_key}} = $Pref->{preferences_value};
+                }
+                $Attachment{ContentType} = $Attachment{DataType};
+
+                my $AttachmentDirID = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Attachment')->InternalValuePrepare(
+                    Value => \%Attachment,
+                );
+                $Param{Item}->{xml_content_value} = $AttachmentDirID;
+            }
         }
     }
 
