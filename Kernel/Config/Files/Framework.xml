@@ -1942,7 +1942,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="10">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="0">
         <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>

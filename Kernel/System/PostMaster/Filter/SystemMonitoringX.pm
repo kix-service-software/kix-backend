@@ -448,12 +448,46 @@ sub _TicketCreate {
         || $Param->{GetParam}->{'X-KIX-SenderType'};
     $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
         || $Param->{GetParam}->{'X-KIX-Channel'};
-    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
-        || $Param->{GetParam}->{'X-KIX-Queue'};
-    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
-        || $Param->{GetParam}->{'X-KIX-State'};
-    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
-        || $Param->{GetParam}->{'X-KIX-Type'};
+
+    # check queue if given
+    if ( $Param->{GetParam}->{'X-KIX-Queue'} ) {
+        if ( !$Kernel::OM->Get('Queue')->NameExistsCheck( Name => $Param->{GetParam}->{'X-KIX-Queue'} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Queue of X-KIX-Queue " . $Param->{GetParam}->{'X-KIX-Queue'} . " not found, using standard " . $Self->{Config}->{CreateTicketQueue},
+            );
+            $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
+    }
+
+    # check state if given
+    if ( $Param->{GetParam}->{'X-KIX-State'} ) {
+        if ( !$Kernel::OM->Get('State')->StateLookup( State => $Param->{GetParam}->{'X-KIX-State'}, Silent => 1 ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "State if X-KIX-State " . $Param->{GetParam}->{'X-KIX-State'} . " not found, using standard " . $Self->{Config}->{CreateTicketState},
+            );
+            $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState};
+    }
+
+    # check type if given
+    if ( $Param->{GetParam}->{'X-KIX-Type'} ) {
+        if ( !$Kernel::OM->Get('Type')->TypeLookup( Type => $Param->{GetParam}->{'X-KIX-Type'}, Silent => 1 ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Type if X-KIX-Type " . $Param->{GetParam}->{'X-KIX-Type'} . " not found, using standard " . $Self->{Config}->{CreateTicketType},
+            );
+            $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType};
+    }
+
     $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
 
