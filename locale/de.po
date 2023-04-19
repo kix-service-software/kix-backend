@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-3-17 15:07+0000\n"
 "PO-Revision-Date: 2023-04-19 10:19+0000\n"
-"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
+"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -5262,7 +5262,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Article"
-msgstr ""
+msgstr "Artikel Löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
@@ -6044,7 +6044,7 @@ msgstr "Stadt"
 
 #. manual entry from templates.pot.manual
 msgid "ConnectedTo"
-msgstr ""
+msgstr "verbunden mit"
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
@@ -6248,7 +6248,7 @@ msgstr "Übergeordneter Standort"
 
 #. manual entry from templates.pot.manual
 msgid "PendingTime"
-msgstr ""
+msgstr "Wartezeit"
 
 #. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
@@ -6391,7 +6391,7 @@ msgstr "Teilweise bearbeitet"
 
 #. manual entry from templates.pot.manual
 msgid "printed by"
-msgstr ""
+msgstr "gedruckt von"
 
 #. manual entry from templates.pot.manual
 msgid "processing"
