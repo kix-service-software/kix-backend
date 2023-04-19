@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -44,6 +44,13 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
+    $Self->AddOption(
+        Name        => 'no-update',
+        Description => "If an icon already exists, no update will be done.",
+        Required    => 0,
+        HasValue    => 0,
+        ValueRegex  => qr/.*/smx,
+    );
 
     my $Name = $Self->Name();
 
@@ -55,9 +62,10 @@ sub Run {
 
     my $Home      = $Kernel::OM->Get('Config')->Get('Home');
 
-    my $IconDir = $Self->GetOption('icon-directory');
+    my $IconDir  = $Self->GetOption('icon-directory');
+    my $CSVFile  = $Self->GetOption('file');
+    my $NoUpdate = $Self->GetOption('no-update');
 
-    my $CSVFile = $Self->GetOption('file');
     if ( !-f $CSVFile ) {
         $Self->PrintError("File $CSVFile does not exist or is not readable!");
         return $Self->ExitCodeError();
@@ -121,19 +129,19 @@ sub Run {
 
         my $Result;
         if ( IsArrayRefWithData($ObjectIconList) ) {
-            # update
-            $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconUpdate(
-                ID          => $ObjectIconList->[0],
-                Object      => $Object,
-                ObjectID    => $Value,
-                ContentType => $ContentType,
-                Content     => MIME::Base64::encode_base64($$Content),
-                UserID      => 1,
-            );
-        }
-        else
-        {
-            # import
+            if ( $NoUpdate ) { # ignore update
+                $Result = 1;
+            } else {
+                $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconUpdate(
+                    ID          => $ObjectIconList->[0],
+                    Object      => $Object,
+                    ObjectID    => $Value,
+                    ContentType => $ContentType,
+                    Content     => MIME::Base64::encode_base64($$Content),
+                    UserID      => 1,
+                );
+            }
+        } else {
             $Result = $Kernel::OM->Get('ObjectIcon')->ObjectIconAdd(
                 Object      => $Object,
                 ObjectID    => $Value,

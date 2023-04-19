@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -74,6 +74,9 @@ sub Run {
     );
 
     foreach my $File ( sort @Files ) {
+
+        next if ($File =~ m/\.old$/); # ignore "old" files (dev environment, module-linker)
+
         my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
             Result   => 'ARRAY'
@@ -88,6 +91,7 @@ sub Run {
         }
 
         foreach my $Line ( @{$Content} ) {
+
             # ignore empty lines and comments
             next if ( $Line =~ /^\s*$/ || $Line =~ /^\s*#/ );
 
