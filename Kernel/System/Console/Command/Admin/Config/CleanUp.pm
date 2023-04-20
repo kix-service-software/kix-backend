@@ -21,7 +21,12 @@ sub Configure {
     my ( $Self, %Param ) = @_;
 
     $Self->Description('Cleaning up the system configuration.');
-
+    $Self->AddOption(
+        Name        => 'confirm',
+        Description => "If not given, command will not be executed.",
+        HasValue    => 0,
+        Required    => 1,
+    );
     return;
 }
 
