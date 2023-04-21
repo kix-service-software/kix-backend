@@ -18,15 +18,15 @@ There are some generic includes that can be used in every query regardless of a 
 |-|-|
 |```Links```|Include all the the linked objects of this item.|
 |```ObjectIcon```|Include the icon for this item.|
-|```ConfiguredPermissions```|Include the configured permissions for this item and its dependent items.|
+|```AssignedPermissions```|Include the assigned base permissions for this item.|
 |```Watchers```|Include the watchers for this object if possible.|
 |```DynamicFields```|Include the dynamic field values for this object if possible.|
 
 Please note that the include extends each item in the response with an additional attribute that is named like the include itself. Also the including of data that is not related to sub-resources sometimes results in a list of IDs of the relevant objects. Please see the optional function [```expand```](#expand_objects) for information on how to transform these IDs to actual objects.
 
-The ```ConfiguredPermissions``` include will include an object with two arrays that each contain the relevant configured permissions ```Assigned``` and ```DependingObjects```. The ```Assigned``` list contains the permissions that are configured exactly for this specific object. The second list ```DependingObjects``` contains the list of permissions configured for the depending objects of this specific object (i.e. the permissions for ticket in queue xyz).
+The ```AssignedPermissions``` include adds an array property that contains the relevant base permissions. At the moment only Queues can have base permissions.
 
-**Example**
+**Example*
 
 Query all organisations and include a list of tickets and contacts of each organisation.
 

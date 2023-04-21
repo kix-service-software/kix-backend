@@ -10,7 +10,7 @@ package Kernel::API::Validator::ContactValidator;
 
 use strict;
 use warnings;
-use Mail::Address;
+use Email::Address::XS;
 
 use base qw(
     Kernel::API::Validator::Common
@@ -72,7 +72,7 @@ sub Validate {
         if ( !$Found ) {
             # contact is not in database, check if it is a valid email address
             $Found = 0;
-            for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
+            for my $Email ( Email::Address::XS->parse( $Param{Data}->{$Param{Attribute}} ) ) {
                 $Found = 1;
                 if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                     $Found = 0;

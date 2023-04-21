@@ -69,7 +69,7 @@ sub Run {
             UserID   => 1,
         );
 
-        my %States = %{ $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') };
+        my $States = $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') || {};
 
         TICKETID:
         for my $TicketID (@TicketIDs) {
@@ -81,24 +81,22 @@ sub Run {
                 DynamicFields => 0,
             );
 
-            # KIX4OTRS-capeIT
-            if ( $States{ $Ticket{Type} . ':::' . $Ticket{State} } || $States{ $Ticket{State} } ) {
-                $States{ $Ticket{State} } = $States{ $Ticket{Type} . ':::' . $Ticket{State} }
-                    || $States{ $Ticket{State} };
+            my $NewState;
+
+            if ( $States->{"$Ticket{Type}:::$Ticket{State}" } || $States->{$Ticket{State}} ) {
+                $NewState = $States->{"$Ticket{Type}:::$Ticket{State}"} || $States->{$Ticket{State}};
             }
 
-            # EO KIX4OTRS-capeIT
-
-            next TICKETID if !$States{ $Ticket{State} };
+            next TICKETID if !$NewState;
 
             $Self->Print(
-                " Update ticket state for ticket $Ticket{TicketNumber} ($TicketID) to '$States{$Ticket{State}}'..."
+                " Update ticket state for ticket $Ticket{TicketNumber} ($TicketID) to '$NewState'..."
             );
 
             # set new state
             my $Success = $TicketObject->StateSet(
                 TicketID => $TicketID,
-                State    => $States{ $Ticket{State} },
+                State    => $NewState,
                 UserID   => 1,
             );
 
@@ -110,7 +108,7 @@ sub Run {
 
             # get state type for new state
             my %State = $StateObject->StateGet(
-                Name => $States{ $Ticket{State} },
+                Name => $States->{$Ticket{State}},
             );
             if ( $State{TypeName} eq 'closed' ) {
 

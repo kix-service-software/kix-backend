@@ -571,14 +571,6 @@ sub OrganisationSearch {
         $Valid = 0;
     }
 
-    if (
-        $Param{DynamicField}
-        && $Param{DynamicField}->{Value}
-        && IsArrayRefWithData($Param{DynamicField}->{Value})
-    ) {
-        $Param{DynamicField}->{Value} = join( q{,} , @{$Param{DynamicField}->{Value}});
-    }
-
     # check cache
     my $CacheKey = "OrganisationSearch::${Valid}::";
     foreach my $Key (
@@ -586,20 +578,25 @@ sub OrganisationSearch {
             Search Limit Number Name DynamicField
         )
     ) {
-        if ( $Key eq 'DynamicField' ) {
-            $CacheKey .= q{::} . ($Param{$Key}->{Value} || q{});
+        if (
+            $Key eq 'DynamicField'
+            && ref( $Param{ $Key } ) eq 'HASH'
+        ) {
+            my $CacheStrg = ( $Param{ $Key }->{Field} // '' )
+                        . q{;}
+                        . ( $Param{ $Key }->{Operator} // '' )
+                        . q{;};
+            if ( defined( $Param{ $Key }->{Value} ) ) {
+                $CacheStrg .= $Kernel::OM->Get('JSON')->Encode(
+                    Data => $Param{ $Key }->{Value},
+                );
+            }
+
+            $CacheKey .= q{::} . $CacheStrg;
         }
         else {
             $CacheKey .= q{::} . ($Param{$Key} || q{});
         }
-    }
-
-    if (
-        $Param{DynamicField}
-        && $Param{DynamicField}->{Value}
-    ) {
-        my @Values = split( m/,/smx , $Param{DynamicField}->{Value});
-        $Param{DynamicField}->{Value} = \@Values;
     }
 
     my $Data = $CacheObject->Get(
@@ -687,6 +684,10 @@ sub OrganisationSearch {
         $Param{DynamicField}
         && IsHashRefWithData($Param{DynamicField})
     ) {
+        if ( defined $Where ) {
+            $Where .= " AND ";
+        }
+
         my $SQLReturn = $Self->_SearchInDynamicField(
            Search       => $Param{DynamicField},
             BoolOperator => 'AND',
@@ -701,6 +702,8 @@ sub OrganisationSearch {
     if ( $Where ) {
         $SQL .= "WHERE ".$Where;
     }
+
+    $SQL .= ' ORDER BY o.name, o.number';
 
     # ask database
     $DBObject->Prepare(

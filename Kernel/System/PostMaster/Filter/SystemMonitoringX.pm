@@ -111,7 +111,7 @@ sub Run {
         }
 
         my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-            Line => $Recipient,
+            Line => substr($Recipient, 0, 1000)     # reduce parse length to prevent DoS (OSA-2022-13)
         );
         for my $CurrKey (@EmailAddresses) {
             my $Address = $Self->{ParserObject}->GetEmailAddress( Email => $CurrKey ) || '';

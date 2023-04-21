@@ -17,6 +17,9 @@ use DateTime::TimeZone;
 use vars (qw($Self));
 
 # get needed objects
+## IMPORTANT - First get time object,
+## or it will not use the same config object as the test somehow
+my $TimeObject   = $Kernel::OM->Get('Time');
 my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
@@ -44,8 +47,6 @@ $TimeZoneObject = DateTime::TimeZone->new(
     name => $ConfigObject->Get( 'TimeZone::Calendar8' )
 );
 my $Calendar8_DST = $TimeZoneObject->is_dst_for_datetime(DateTime->now);
-
-my $TimeObject = $Kernel::OM->Get('Time');
 
 my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => '2005-10-20T10:00:00Z' );
 $Self->Is(
@@ -571,9 +572,9 @@ for my $Test (@WorkingTimeDestinationTimeRoundtrip) {
     for my $Run ( 1 .. 40 ) {
 
         # Use random start/stop dates around base date
-        my $StartTime = $BaseTime - int( $DaysBefore * 24 * 60 * 60 );
+        my $StartTime = $BaseTime - int( rand( $DaysBefore * 24 * 60 * 60 ) );
         my $StartDate = $TimeObject->SystemTime2TimeStamp( SystemTime => $StartTime );
-        my $StopTime  = $BaseTime + int( $DaysAfter * 24 * 60 * 60 );
+        my $StopTime  = $BaseTime + int( rand( $DaysAfter * 24 * 60 * 60 ) );
         my $StopDate  = $TimeObject->SystemTime2TimeStamp( SystemTime => $StopTime );
 
         my $WorkingTime = $TimeObject->WorkingTime(
@@ -617,179 +618,300 @@ for my $Test (@WorkingTimeDestinationTimeRoundtrip) {
     }
 }
 
-# check the vacations
-my $Vacation = '';
-
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year  => '2005',
-    Month => '1',
-    Day   => '1',
+my @VacationDays = (
+    {
+        Name        => 'VacationCheck - Base calendar - 2005-01-01',
+        Year        => '2005',
+        Month       => '1',
+        Day         => '1',
+        Calendar    => '',
+        VacationDay => 'New Year\'s Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - 2005-01-01 - Leading zeros',
+        Year        => '2005',
+        Month       => '01',
+        Day         => '01',
+        Calendar    => '',
+        VacationDay => 'New Year\'s Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - 2005-12-31',
+        Year        => '2005',
+        Month       => '12',
+        Day         => '31',
+        Calendar    => '',
+        VacationDay => 'New Year\'s Eve',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Easter Monday 2005',
+        Year        => '2005',
+        Month       => '3',
+        Day         => '28',
+        Calendar    => '',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Ascension Day 2005',
+        Year        => '2005',
+        Month       => '5',
+        Day         => '5',
+        Calendar    => '',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Whit Monday 2005',
+        Year        => '2005',
+        Month       => '5',
+        Day         => '16',
+        Calendar    => '',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Easter Monday 2023',
+        Year        => '2023',
+        Month       => '4',
+        Day         => '10',
+        Calendar    => '',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Ascension Day 2023',
+        Year        => '2023',
+        Month       => '5',
+        Day         => '18',
+        Calendar    => '',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Whit Monday 2023',
+        Year        => '2023',
+        Month       => '5',
+        Day         => '29',
+        Calendar    => '',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Easter Monday 2024',
+        Year        => '2024',
+        Month       => '4',
+        Day         => '1',
+        Calendar    => '',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Ascension Day 2024',
+        Year        => '2024',
+        Month       => '5',
+        Day         => '9',
+        Calendar    => '',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Whit Monday 2024',
+        Year        => '2024',
+        Month       => '5',
+        Day         => '20',
+        Calendar    => '',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Easter Monday 2030',
+        Year        => '2030',
+        Month       => '4',
+        Day         => '22',
+        Calendar    => '',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Ascension Day 2030',
+        Year        => '2030',
+        Month       => '5',
+        Day         => '30',
+        Calendar    => '',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - Whit Monday 2030',
+        Year        => '2030',
+        Month       => '6',
+        Day         => '10',
+        Calendar    => '',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Base calendar - 2005-02-14',
+        Year        => '2005',
+        Month       => '02',
+        Day         => '14',
+        Calendar    => '',
+        VacationDay => 'no vacation day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - 2005-01-01',
+        Year        => '2005',
+        Month       => '1',
+        Day         => '1',
+        Calendar    => '1',
+        VacationDay => 'New Year\'s Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - 2005-01-01 - Leading zeros',
+        Year        => '2005',
+        Month       => '01',
+        Day         => '01',
+        Calendar    => '1',
+        VacationDay => 'New Year\'s Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Easter Monday 2005',
+        Year        => '2005',
+        Month       => '3',
+        Day         => '28',
+        Calendar    => '1',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Ascension Day 2005',
+        Year        => '2005',
+        Month       => '5',
+        Day         => '5',
+        Calendar    => '1',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Whit Monday 2005',
+        Year        => '2005',
+        Month       => '5',
+        Day         => '16',
+        Calendar    => '1',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Easter Monday 2023',
+        Year        => '2023',
+        Month       => '4',
+        Day         => '10',
+        Calendar    => '1',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Ascension Day 2023',
+        Year        => '2023',
+        Month       => '5',
+        Day         => '18',
+        Calendar    => '1',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Whit Monday 2023',
+        Year        => '2023',
+        Month       => '5',
+        Day         => '29',
+        Calendar    => '1',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Easter Monday 2024',
+        Year        => '2024',
+        Month       => '4',
+        Day         => '1',
+        Calendar    => '1',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Ascension Day 2024',
+        Year        => '2024',
+        Month       => '5',
+        Day         => '9',
+        Calendar    => '1',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Whit Monday 2024',
+        Year        => '2024',
+        Month       => '5',
+        Day         => '20',
+        Calendar    => '1',
+        VacationDay => 'Whit Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Easter Monday 2030',
+        Year        => '2030',
+        Month       => '4',
+        Day         => '22',
+        Calendar    => '1',
+        VacationDay => 'Easter Monday',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Ascension Day 2030',
+        Year        => '2030',
+        Month       => '5',
+        Day         => '30',
+        Calendar    => '1',
+        VacationDay => 'Ascension Day',
+    },
+    {
+        Name        => 'VacationCheck - Calendar 1 - Whit Monday 2030',
+        Year        => '2030',
+        Month       => '6',
+        Day         => '10',
+        Calendar    => '1',
+        VacationDay => 'Whit Monday',
+    },
 );
 
-$Self->Is(
-    $Vacation || 0,
-    "New Year's Day",
-    'Vacation - 2005-01-01',
-);
+for my $Test (@VacationDays) {
+    my $Vacation = $TimeObject->VacationCheck(
+        Year     => $Test->{Year},
+        Month    => $Test->{Month},
+        Day      => $Test->{Day},
+        Calendar => $Test->{Calendar},
+    );
 
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year  => '2005',
-    Month => '01',
-    Day   => '01',
-);
+    $Self->Is(
+        $Vacation || 'no vacation day',
+        $Test->{VacationDay},
+        $Test->{Name},
+    );
+}
 
-$Self->Is(
-    $Vacation || 0,
-    "New Year's Day",
-    'Vacation - 2005-01-01',
-);
-
-# 2005-12-31
-$Vacation = $TimeObject->VacationCheck(
-    Year  => '2005',
-    Month => '12',
-    Day   => '31',
-);
-
-$Self->Is(
-    $Vacation || 0,
-    'New Year\'s Eve',
-    'Vacation - 2005-12-31',
-);
-
-# 2005-02-14
-$Vacation = $TimeObject->VacationCheck(
-    Year  => 2005,
-    Month => '02',
-    Day   => '14',
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2005-02-14',
-);
-
-# modify calendar 1
-my $TimeVacationDays1        = $TimeObject->GetVacationDays(Calendar => 'TimeVacationDays::Calendar1');
-my $TimeVacationDaysOneTime1 = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDaysOneTime::Calendar1');
-
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2005,
-    Month    => 1,
-    Day      => 1,
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 0,
-    'New Year\'s Day',
-    'Vacation - 2005-01-01 (Calendar1)',
-);
-
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2005,
-    Month    => '01',
-    Day      => '01',
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 0,
-    'New Year\'s Day',
-    'Vacation - 2005-01-01 (Calendar1)',
-);
-
-# remove vacation days
-$TimeVacationDays1->{1}->{1} = undef;
-$TimeVacationDaysOneTime1->{2004}->{1}->{1} = undef;
-
+# disable all vacations on calendar 1
 $ConfigObject->Set(
     Key   => 'TimeVacationDays::Calendar1',
-    Value => $TimeVacationDays1
+    Value => undef,
 );
 $ConfigObject->Set(
     Key   => 'TimeVacationDaysOneTime::Calendar1',
-    Value => $TimeVacationDaysOneTime1
+    Value => undef,
+);
+$ConfigObject->Set(
+    Key   => 'TimeVacationDaysModules::Calendar1',
+    Value => undef,
 );
 
-$TimeVacationDays1        = $TimeObject->GetVacationDays(Calendar => 'TimeVacationDays::Calendar1');
-$TimeVacationDaysOneTime1 = $TimeObject->GetVacationDaysOneTime(Calendar => 'TimeVacationDaysOneTime::Calendar1');
+for my $Test (@VacationDays) {
+    my $Vacation = $TimeObject->VacationCheck(
+        Year     => $Test->{Year},
+        Month    => $Test->{Month},
+        Day      => $Test->{Day},
+        Calendar => $Test->{Calendar},
+    );
 
+    my $VacationDay;
+    if ( $Test->{Calendar} eq '1' ) {
+        $VacationDay = 'no vacation day';
+    }
+    else {
+        $VacationDay = $Test->{VacationDay};
+    }
 
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2005,
-    Month    => 1,
-    Day      => 1,
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2005-01-01 (Calendar1)',
-);
-
-# 2005-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2005,
-    Month    => '01',
-    Day      => '01',
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2005-01-01 (Calendar1)',
-);
-
-# 2004-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2004,
-    Month    => 1,
-    Day      => 1,
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2004-01-01 (Calendar1)',
-);
-
-# 2004-01-01
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2004,
-    Month    => '01',
-    Day      => '01',
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2004-01-01 (Calendar1)',
-);
-
-# 2005-02-14
-$Vacation = $TimeObject->VacationCheck(
-    Year     => 2005,
-    Month    => '02',
-    Day      => '14',
-    Calendar => 1,
-);
-
-$Self->Is(
-    $Vacation || 'no vacation day',
-    'no vacation day',
-    'Vacation - 2005-02-14 (Calendar1)',
-);
+    $Self->Is(
+        $Vacation || 'no vacation day',
+        $VacationDay,
+        $Test->{Name} . ' - Calendar 1 disabled vacations',
+    );
+}
 
 # UTC tests
 $ENV{TZ} = 'UTC';

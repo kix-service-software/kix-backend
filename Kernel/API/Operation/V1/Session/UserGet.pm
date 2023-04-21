@@ -65,7 +65,7 @@ sub Run {
         NoPreferences => 1
     );
 
-    if ( !IsHashRefWithData( \%UserData ) ) {
+    if ( !IsHashRefWithData(\%UserData) ) {
 
         return $Self->_Error(
             Code => 'Object.NotFound',
@@ -73,49 +73,49 @@ sub Run {
     }
 
     # filter valid attributes
-    if ( IsHashRefWithData( $Self->{Config}->{AttributeWhitelist} ) ) {
+    if ( IsHashRefWithData($Self->{Config}->{AttributeWhitelist}) ) {
         foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if !$Self->{Config}->{AttributeWhitelist}->{$Attr};
         }
     }
 
     # filter valid attributes
-    if ( IsHashRefWithData( $Self->{Config}->{AttributeBlacklist} ) ) {
+    if ( IsHashRefWithData($Self->{Config}->{AttributeBlacklist}) ) {
         foreach my $Attr ( sort keys %UserData ) {
             delete $UserData{$Attr} if $Self->{Config}->{AttributeBlacklist}->{$Attr};
         }
     }
 
     # include preferences if requested - we can't do that with our generic sub-resource include function, because we don't have a UserID in our request
-    if ($Param{Data}->{include}->{Preferences}) {
+    if ( $Param{Data}->{include}->{Preferences} ) {
 
         # get already prepared preferences data from UserPreferenceSearch operation
         my $Result = $Self->ExecOperation(
             OperationType => 'V1::Session::UserPreferenceSearch',
             Data          => {}
         );
-        if (IsHashRefWithData($Result) && $Result->{Success}) {
+        if ( IsHashRefWithData($Result) && $Result->{Success} ) {
             $UserData{Preferences} = $Result->{Data}->{UserPreference};
         }
     }
 
     # include tickets if requested
-    if ($Param{Data}->{include}->{Tickets}) {
+    if ( $Param{Data}->{include}->{Tickets} ) {
         my @TicketIDs;
 
         my $TicketFilter;
-        if ($Param{Data}->{'Tickets.StateType'}) {
+        if ( $Param{Data}->{'Tickets.StateType'} ) {
             $TicketFilter = {
                 Field    => 'StateType',
                 Operator => 'IN',
-                Value    => [ split(/,/, $Param{Data}->{'Tickets.StateType'}) ],
+                Value    => [split(/,/, $Param{Data}->{'Tickets.StateType'})],
             };
         }
-        elsif ($Param{Data}->{'Tickets.StateID'}) {
+        elsif ( $Param{Data}->{'Tickets.StateID'} ) {
             $TicketFilter = {
                 Field    => 'StateID',
                 Operator => 'IN',
-                Value    => [ split(/,/, $Param{Data}->{'Tickets.StateID'}) ],
+                Value    => [split(/,/, $Param{Data}->{'Tickets.StateID'})],
             };
         }
 
@@ -130,13 +130,13 @@ sub Run {
         $UserData{Tickets}->{OwnedAndLockedAndUnseen} = $Tickets->{Unseen};
 
         # get tickets watched by user
-        $Tickets = $Self->_GetWatchedTickets(TicketFilter => $TicketFilter);
+        $Tickets = $Self->_GetWatchedTickets();
         $UserData{Tickets}->{Watched} = $Tickets->{All};
         $UserData{Tickets}->{WatchedAndUnseen} = $Tickets->{Unseen};
 
         # force integer TicketIDs in response
-        foreach my $Type (sort keys %{$UserData{Tickets}}) {
-            my @TicketIDs = map {0 + $_} @{$UserData{Tickets}->{$Type}};
+        foreach my $Type ( sort keys %{$UserData{Tickets}} ) {
+            my @TicketIDs = map { 0 + $_ } @{$UserData{Tickets}->{$Type}};
             $UserData{Tickets}->{$Type} = \@TicketIDs;
         }
 
@@ -147,14 +147,14 @@ sub Run {
     }
 
     # include roleids if requested
-    if ($Param{Data}->{include}->{RoleIDs}) {
+    if ( $Param{Data}->{include}->{RoleIDs} ) {
 
         # get roles list
         my @RoleList = $Kernel::OM->Get('User')->RoleList(
             UserID => $Self->{Authorization}->{UserID},
         );
         my @RoleIDs;
-        foreach my $RoleID (sort @RoleList) {
+        foreach my $RoleID ( sort @RoleList ) {
             push(@RoleIDs, 0 + $RoleID); # enforce nummeric ID
         }
         $UserData{RoleIDs} = \@RoleIDs;
@@ -163,14 +163,62 @@ sub Run {
     #FIXME: workaoround KIX2018-3308
     $Self->AddCacheDependency(Type => 'Contact');
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        UserID => $Self->{Authorization}->{UserID},
+        UserID        => $Self->{Authorization}->{UserID},
+        DynamicFields => $Param{Data}->{include}->{DynamicFields},
     );
     $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
     $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
     $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
     $UserData{UserEmail} = %ContactData ? $ContactData{Email} : undef;
     ###########################################################
-    $UserData{Contact} = (%ContactData) ? \%ContactData : undef;
+
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        my @DynamicFields;
+
+        # inform API caching about a new dependency
+        $Self->AddCacheDependency(Type => 'DynamicField');
+
+        # remove all dynamic fields from contact hash and set them into an array.
+        ATTRIBUTE:
+        for my $Attribute ( sort keys %ContactData ) {
+
+            if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
+                if ( $ContactData{$Attribute} ) {
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                        my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                            Config          => $DynamicFieldConfig,
+                            Value           => $ContactData{$Attribute},
+                            NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
+                        );
+
+                        if (IsHashRefWithData($PreparedValue)) {
+                            push(@DynamicFields, $PreparedValue);
+                        }
+                    }
+                    delete $ContactData{$Attribute};
+                }
+                next ATTRIBUTE;
+            }
+        }
+
+        # add dynamic fields array into 'DynamicFields' hash key if any
+        if (@DynamicFields) {
+            $ContactData{DynamicFields} = \@DynamicFields;
+        }
+        else {
+            $ContactData{DynamicFields} = [];
+        }
+    }
+
+    $UserData{Contact} = ( %ContactData ) ? \%ContactData : undef;
+
 
     return $Self->_Success(
         User => \%UserData,
@@ -202,7 +250,6 @@ sub _GetOwnedTickets {
         Result => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
-
 
     @Filter = (
         {
@@ -238,9 +285,9 @@ sub _GetOwnedTickets {
 
     # extract all unseen tickets
     my @UnseenTicketIDs;
-    foreach my $TicketID (@TicketIDs) {
-        next if grep( /^$TicketID$/, @SeenTicketIDs );
-        push( @UnseenTicketIDs, $TicketID );
+    foreach my $TicketID ( @TicketIDs ) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 
@@ -317,9 +364,9 @@ sub _GetOwnedAndLockedTickets {
 
     # extract all unseen tickets
     my @UnseenTicketIDs;
-    foreach my $TicketID (@TicketIDs) {
-        next if grep( /^$TicketID$/, @SeenTicketIDs );
-        push( @UnseenTicketIDs, $TicketID );
+    foreach my $TicketID ( @TicketIDs ) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 
@@ -386,9 +433,9 @@ sub _GetWatchedTickets {
 
     # extract all unseen tickets
     my @UnseenTicketIDs;
-    foreach my $TicketID (@TicketIDs) {
-        next if grep( /^$TicketID$/, @SeenTicketIDs );
-        push( @UnseenTicketIDs, $TicketID );
+    foreach my $TicketID ( @TicketIDs ) {
+        next if grep(/^$TicketID$/, @SeenTicketIDs);
+        push(@UnseenTicketIDs, $TicketID);
     }
     $Tickets{Unseen} = \@UnseenTicketIDs;
 

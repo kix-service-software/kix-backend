@@ -52,15 +52,24 @@ perform ContactSearch Operation. This will return a Contact ID list.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    my $ContactList;
+    my @ContactList;
+
+    $Self->SetDefaultSort(
+        Contact => [
+            { Field => 'Lastname' },
+            { Field => 'Firstname' },
+        ]
+    );
 
     # prepare search if given
     if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
-        foreach my $SearchType ( keys %{$Self->{Search}->{Contact}} ) {
-            my %SearchTypeResult;
+        # do first OR to prevent replacement of prior AND search with empty result
+        my %SearchParams;
+        SEARCHTYPE:
+        foreach my $SearchType ( qw(OR AND) ) {
+            next SEARCHTYPE if ( !IsArrayRefWithData($Self->{Search}->{Contact}->{$SearchType}) );
+            my @SearchTypeResult;
             foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
-
-                my %SearchResult;
 
                 my $Value = $SearchItem->{Value};
 
@@ -70,95 +79,98 @@ sub Run {
                     $Value = $Value . '*';
                 } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
                     $Value = '*' . $Value;
+                } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
+                    $Value .= '*';
+                    # just prefix needed as config, because some DB do not use indices with leading wildcard - performance!
+                    if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
+                        $Value = '*' . $Value;
+                    }
                 }
 
-                # perform Contact search
-                if ( $SearchItem->{Field} eq 'Fulltext' ) {
-                    %SearchResult = $Self->_DoFulltextSearch( Search => $Value );
+                if ( $SearchItem->{Field} =~ /^(Login|UserLogin)$/ ) {
+                    if ( $SearchItem->{Operator} eq 'EQ' ) {
+                        $SearchParams{LoginEquals} = $Value;
+                    } else {
+                        $SearchParams{Login} = $Value;
+                    }
+                } elsif ( $SearchItem->{Field} =~ /^(AssignedUserID|UserID|OrganisationIDs|Title|Firstname|Lastname|City|Country|Fax|Mobil|Phone|Street|Zip|ValidID)$/ ) {
+                    $SearchParams{$SearchItem->{Field}} = $Value;
+                } elsif ( $SearchItem->{Field} eq 'Email' ) {
+                    if ($SearchItem->{Operator} eq 'EQ') {
+                        $SearchParams{EmailEquals} = $Value;
+                    } elsif ($SearchItem->{Operator} eq 'IN') {
+                        $SearchParams{EmailIn} = $Value;
+                    } else {
+                        $SearchParams{Email} = $Value;
+                    }
+                } elsif ( $SearchItem->{Field} eq 'PrimaryOrganisationID' ) {
+                    $SearchParams{OrganisationID} = $Value;
+                } elsif ($SearchItem->{Field} =~ /^DynamicField_/smx ) {
+                    $SearchParams{DynamicField} = {
+                        Field    => $SearchItem->{Field},
+                        Operator => $SearchItem->{Operator},
+                        Value    => $Value
+                    };
                 } else {
-                    my %SearchParam;
-
-                    if ( $SearchItem->{Field} =~ /^(Login|UserLogin)$/ ) {
-                        if ( $SearchItem->{Operator} eq 'EQ' ) {
-                            $SearchParam{LoginEquals} = $Value;
-                        }
-                        else {
-                            $SearchParam{Login} = $Value;
-                        }
-                    }
-                    elsif ( $SearchItem->{Field} =~ /^(AssignedUserID|UserID|OrganisationIDs)$/ ) {
-                        $SearchParam{$SearchItem->{Field}} = $Value;
-                    }
-                    elsif ( $SearchItem->{Field} eq 'Email' ) {
-                        if ($SearchItem->{Operator} eq 'EQ') {
-                            $SearchParam{EmailEquals} = $Value;
-                        } elsif ($SearchItem->{Operator} eq 'IN') {
-                            $SearchParam{EmailIn} = $Value;
-                        } else {
-                            $SearchParam{PostMasterSearch} = $Value;
-                        }
-                    }
-                    elsif ( $SearchItem->{Field} eq 'PrimaryOrganisationID' ) {
-                        $SearchParam{OrganisationID} = $Value;
-                    }
-                    else {
-                        $SearchParam{Search} = $Value;
-                    }
-
-                    %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                        %SearchParam,
-                        Valid => 0,
-                        Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
-                    );
+                    $SearchParams{Search} = $Value;
                 }
 
                 # merge results
-                if ( $SearchType eq 'AND' ) {
-                    if ( !%SearchTypeResult ) {
-                        %SearchTypeResult = %SearchResult;
-                    }
-                    else {
-                        # remove all IDs from type result that we don't have in this search
-                        foreach my $Key ( keys %SearchTypeResult ) {
-                            delete $SearchTypeResult{$Key} if !exists $SearchResult{$Key};
-                        }
-                    }
-                }
-                elsif ( $SearchType eq 'OR' ) {
-                    %SearchTypeResult = (
-                        %SearchTypeResult,
-                        %SearchResult,
+                if ( $SearchType eq 'OR' ) {
+                    my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
+                        %SearchParams,
+                        Valid => 0,
+                        Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                     );
+
+                    @SearchTypeResult = $Self->_GetCombinedList(
+                        ListA => \@SearchTypeResult,
+                        ListB => [ keys %SearchResult ],
+                        Union => 1
+                    );
+
+                    # reset
+                    %SearchParams = ();
                 }
+            }
+            if ( $SearchType eq 'AND' ) {
+                my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
+                    %SearchParams,
+                    Valid => 0,
+                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
+                );
+                @SearchTypeResult = %SearchResult ? @{[keys %SearchResult]} : ();
             }
 
-            if ( !defined $ContactList ) {
-                $ContactList = \%SearchTypeResult;
-            }
-            else {
-                # combine both results by AND
+            if ( !@ContactList ) {
+                @ContactList = @SearchTypeResult;
+            } else {
+
+                # combine both results (OR and AND)
                 # remove all IDs from type result that we don't have in this search
-                foreach my $Key ( keys %{$ContactList} ) {
-                    delete $ContactList->{$Key} if !exists $SearchTypeResult{$Key};
-                }
+                @ContactList = $Self->_GetCombinedList(
+                    ListA => \@SearchTypeResult,
+                    ListB => \@ContactList
+                );
             }
         }
-    }
-    else {
-        # get contact list
-        $ContactList = { $Kernel::OM->Get('Contact')->ContactList(
+    } else {
+
+        # get full contact list
+        my %ContactList = $Kernel::OM->Get('Contact')->ContactList(
             Valid => 0
-        ) };
+        );
+        @ContactList = %ContactList ? @{[keys %ContactList]} : ();
     }
 
-    if ( IsHashRefWithData( $ContactList ) ) {
+    if ( IsArrayRefWithData( \@ContactList ) ) {
 
         # get already prepared Contact data from ContactGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Contact::ContactGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                ContactID                   => join( ',', sort keys %{$ContactList} ),
+                ContactID                   => join( ',', sort @ContactList ),
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
             }
         );
@@ -184,71 +196,16 @@ sub Run {
     );
 }
 
-sub _DoFulltextSearch {
+sub _GetCombinedList {
     my ( $Self, %Param ) = @_;
 
-    my %EndSearchResult;
-    if ( $Param{Search} ) {
-
-        # split on OR
-        my @OrCombinedGroups = split( /\|/, $Param{Search} );
-        for my $OrCombined (@OrCombinedGroups) {
-
-            my %AndResult;
-
-            # split on AND
-            my @AndCombinedGroups = split( /\+|\&/, $OrCombined );
-
-            # allow phone numbers with + (e.g. +49123456789)
-            if ($OrCombined =~ m/^\+/) {
-                $AndCombinedGroups[1] =  "+$AndCombinedGroups[1]";
-                shift(@AndCombinedGroups);
-            }
-            for my $AndSearchString (@AndCombinedGroups) {
-
-                $AndSearchString = $AndSearchString . '*';
-                if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
-                    $AndSearchString = '*' . $AndSearchString;
-                }
-
-                my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                    Search => $AndSearchString,
-                    Valid  => 0,
-                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
-                );
-                my %LoginResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                    Login => $AndSearchString,
-                    Valid  => 0,
-                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
-                );
-
-                # search and login are OR combined
-                %SearchResult = (
-                    %SearchResult,
-                    %LoginResult
-                );
-
-                if ( !%AndResult ) {
-                    %AndResult = %SearchResult;
-                }
-                else {
-
-                    # remove all IDs from last result that we don't have in this search
-                    foreach my $Key ( keys %AndResult ) {
-                        delete $AndResult{$Key} if !exists $SearchResult{$Key};
-                    }
-                }
-            }
-
-            # merge OR results
-            %EndSearchResult = (
-                %EndSearchResult,
-                %AndResult,
-            );
-        }
-
+    my %Union;
+    my %Isect;
+    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+        $Union{$E}++ && $Isect{$E}++
     }
-    return %EndSearchResult;
+
+    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 1;

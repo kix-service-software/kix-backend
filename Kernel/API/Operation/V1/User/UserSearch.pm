@@ -29,6 +29,32 @@ Kernel::API::Operation::User::UserSearch - API User Search Operation backend
 
 =cut
 
+=item ParameterDefinition()
+
+define parameter preparation and check for this operation
+
+    my $Result = $OperationObject->ParameterDefinition(
+        Data => {
+            ...
+        },
+    );
+
+    $Result = {
+        ...
+    };
+
+=cut
+
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'requiredPermission' => {
+            Type     => 'HASH',
+        }
+    }
+}
+
 =item Run()
 
 perform UserSearch Operation. This will return a User ID list.
@@ -56,35 +82,36 @@ perform UserSearch Operation. This will return a User ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
     my $UserList;
+    my %UserSearch;
 
-    my %SupportedRequiredPermission = (
-        TicketRead => {
-            Target => '/tickets',
-            Permission => 'READ'
-        },
-        TicketCreate => {
-            Target => '/tickets',
-            Permission => 'CREATE'
-        }
-    );
+    my @AllowedUserIDs;
 
-    # extend limit to broaden the result list for permission filter (requiredPermissions)
-    my $SearchLimit = $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'};
-    # remember search limitation for end result
-    my $OrgSearchLimit = $SearchLimit;
-    if ($Param{Data}->{requiredPermission} && $SearchLimit && $SearchLimit < 100) {
-        $SearchLimit = 100;
+    if ( $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue' ) {
+        @AllowedUserIDs = $Self->_GetUserIDsWithRequiredPermission(
+            RequiredPermission => $Param{Data}->{requiredPermission}
+        );
+
+        $Self->AddCacheKeyExtension(
+            Extension => ['requiredPermission']
+        );
+
+        # we don't have any allowed users
+        if ( !@AllowedUserIDs ) {
+            return $Self->_Success(
+                User => [],
+            );
+        }        
+
+        $UserSearch{AND} //= [];
+        push @{$UserSearch{AND}}, { Field => 'UserIDs', Operator => 'IN', Value => \@AllowedUserIDs };
     }
 
-    my %UserSearch;
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
                 if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
-                    if (!$UserSearch{$SearchType}) {
-                        $UserSearch{$SearchType} = [];
-                    }
-                    push(@{$UserSearch{$SearchType}}, $SearchItem);
+                    $UserSearch{$SearchType} //= [];
+                    push @{$UserSearch{$SearchType}}, $SearchItem;
                 }
             }
         }
@@ -105,7 +132,7 @@ sub Run {
                     if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
                         %SearchResult = $Self->_GetPreferenceSearchResult(
                             SearchItem  => $SearchItem,
-                            SearchLimit => $SearchLimit
+                            SearchLimit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
                         );
                     } else {
                         my %SearchParam = $Self->_GetSearchParam(
@@ -115,7 +142,7 @@ sub Run {
                         if ( !%SearchResult && %SearchParam ) {
                             %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                                 %SearchParam,
-                                Limit => $SearchLimit,
+                                Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
                                 Valid => 0
                             );
                         }
@@ -162,7 +189,7 @@ sub Run {
                 if (%SearchParam) {
                     %SearchTypeResult = $Kernel::OM->Get('User')->UserSearch(
                         %SearchParam,
-                        Limit => $SearchLimit,
+                        Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
                         Valid => 0
                     );
                 }
@@ -184,53 +211,20 @@ sub Run {
         # perform User search without any search params
         $UserList = { $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
-            Limit => $SearchLimit,
+            Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
             Valid => 0
         ) };
     }
 
-    if (IsHashRefWithData($UserList)) {
+    my @UserIDs = sort keys %{$UserList};
 
-        # check requested permissions (AND combined)
-        my @GetUserIDs = keys %{$UserList};
-        if( $Param{Data} && $Param{Data}->{requiredPermission} ) {
-            my @Permissions = split(/, ?/, $Param{Data}->{requiredPermission});
-
-            PERMISSION:
-            for my $Permission (@Permissions) {
-                next PERMISSION if !$SupportedRequiredPermission{$Permission};
-
-                my @AllowedUserIDs;
-                for my $UserID (@GetUserIDs) {
-
-                    my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
-                        UserID              => $UserID,
-                        Target              => $SupportedRequiredPermission{$Permission}->{Target},
-                        RequestedPermission => $SupportedRequiredPermission{$Permission}->{Permission},
-                        UsageContext        => $Self->{Authorization}->{UserType}
-                    );
-
-                    if ($Granted) {
-                        push(@AllowedUserIDs, $UserID);
-                    }
-                }
-
-                # set allowed ids for next permission
-                @GetUserIDs = @AllowedUserIDs;
-            }
-        }
-
-        # limit results if necessary (0 = no limit)
-        if ($OrgSearchLimit && scalar(@GetUserIDs) > $OrgSearchLimit) {
-            splice(@GetUserIDs, $OrgSearchLimit);
-        }
-
+    if ( @UserIDs ) {
         # get already prepared user data from UserGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::User::UserGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                UserID => join(',', @GetUserIDs),
+                UserID => join(',', @UserIDs),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
@@ -272,7 +266,11 @@ sub _GetSearchParam {
     }
     elsif ( $Param{SearchItem}->{Field} eq 'ValidID' ) {
         $SearchParam{ValidID} = $Value;
-    } else {
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'UserIDs' ) {
+        $SearchParam{UserIDs} = $Value;
+    }
+    else {
         $SearchParam{Search} = $Value;
     }
 
@@ -320,6 +318,83 @@ sub _PrepareSearchValue {
     }
 
     return $Value;
+}
+
+sub _GetUserIDsWithRequiredPermission {
+    my ( $Self, %Param ) = @_;
+
+    # get UserIDs with relevant permissions
+    my @Permissions = split(/, ?/, $Param{RequiredPermission}->{Permission});
+
+    my $RoleObject = $Kernel::OM->Get('Role');
+
+    # get all users with resource permission for /tickets
+    my @ResourcePermissions = $RoleObject->PermissionListGet(
+        Types  => ['Resource'],
+        Target => '/tickets'
+    );
+
+    # get all users with wildcard resource permission for /*
+    my @WildcardResourcePermissions = $RoleObject->PermissionListGet(
+        Types  => ['Resource'],
+        Target => '/*'
+    );
+
+    push(@ResourcePermissions, @WildcardResourcePermissions);
+
+    my %ResourceRoleIDs = map { $_->{RoleID} => 1 } @ResourcePermissions;
+
+    # get all users with base permissions for the given QueueID
+    my @BasePermissions = $RoleObject->PermissionListGet(
+        Types  => ['Base::Ticket'],
+        Target => $Param{RequiredPermission}->{ObjectID}
+    );
+    my %BaseRoleIDs = map { $_->{RoleID} => 1 } @BasePermissions;
+
+    my @UserIDs = $RoleObject->RoleUserList(
+        RoleIDs => [
+            (keys %ResourceRoleIDs),
+            (keys %BaseRoleIDs),
+        ]
+    );
+
+    my @AllowedUserIDs;
+
+    PERMISSION:
+    foreach my $Permission (@Permissions) {
+        USERID:
+        foreach my $UserID (@UserIDs) {            
+
+            # check resource permission
+            my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
+                UserID              => $UserID,
+                Target              => '/tickets',
+                RequestedPermission => $Permission,
+                UsageContext        => $Self->{Authorization}->{UserType}
+            );            
+            next USERID if !$Granted;
+
+            # check base permission
+            my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+                UserID       => $UserID,
+                UsageContext => $Self->{Authorization}->{UserType},
+                Permission   => $Param{RequiredPermission}->{Permission},
+            );            
+            next USERID if !$Result;
+
+            if ( IsArrayRefWithData($Result) && $Param{RequiredPermission}->{ObjectID}) {                
+                my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
+                next USERID if !$AllowedQueueIDs{$Param{RequiredPermission}->{ObjectID}};
+            } 
+
+            # ok, accept this user
+            push @AllowedUserIDs, $UserID;
+        }
+    }
+
+    @AllowedUserIDs = $Kernel::OM->Get('Main')->GetUnique(@AllowedUserIDs);
+
+    return @AllowedUserIDs;
 }
 
 1;

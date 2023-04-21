@@ -77,27 +77,30 @@ sub Run {
 
     my %Products = map { $_->{Product} => 1 } @PluginList;
 
-    # get already prepared user data from UserGet operation
-    my $GetResult = $Self->ExecOperation(
-        OperationType            => 'V1::Plugin::PluginGet',
-        SuppressPermissionErrors => 1,
-        Data          => {
-            Product => join(',', sort keys %Products),
+    if ( %Products ) {
+
+        # get already prepared user data from UserGet operation
+        my $GetResult = $Self->ExecOperation(
+            OperationType            => 'V1::Plugin::PluginGet',
+            SuppressPermissionErrors => 1,
+            Data          => {
+                Product => join(',', sort keys %Products),
+            }
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
         }
-    );
-    if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-        return $GetResult;
-    }
 
-    my @ResultList;
-    if ( defined $GetResult->{Data}->{Plugin} ) {
-        @ResultList = IsArrayRef($GetResult->{Data}->{Plugin}) ? @{$GetResult->{Data}->{Plugin}} : ( $GetResult->{Data}->{Plugin} );
-    }
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{Plugin} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{Plugin}) ? @{$GetResult->{Data}->{Plugin}} : ( $GetResult->{Data}->{Plugin} );
+        }
 
-    if ( IsArrayRefWithData(\@ResultList) ) {
-        return $Self->_Success(
-            Plugin => \@ResultList,
-        )
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                Plugin => \@ResultList,
+            )
+        }
     }
 
     # return result

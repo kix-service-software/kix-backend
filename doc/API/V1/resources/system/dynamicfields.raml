@@ -1,0 +1,15 @@
+  displayName: "[System] Dynamic Fields"
+  description: !include ../../descriptions/resources/system/dynamicfields.md
+  type: { collection: { typeName: DynamicField } }
+  /objecttypes:
+    description: !include ../../descriptions/resources/system/dynamicfields/objecttypes.md
+    type: { collection-readonly: { typeName: DynamicFieldObjectType } }
+  /types:
+    description: !include ../../descriptions/resources/system/dynamicfields/types.md
+    type: { collection-readonly: { typeName: DynamicFieldType } }
+  /{dynamicFieldId}:
+    type: { item: { typeName: DynamicField } }
+    uriParameters:
+      dynamicFieldId:
+        displayName: DynamicFieldID
+        type: integer

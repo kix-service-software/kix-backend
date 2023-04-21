@@ -103,7 +103,7 @@
 /system/generalcatalog/:GeneralCatalogItemID                                               | PATCH            | V1::GeneralCatalog::GeneralCatalogItemUpdate     |
 /system/generalcatalog/classes                                                             | GET              | V1::GeneralCatalog::GeneralCatalogClassSearch    |
 /system/generalcatalog/classes/:GeneralCatalogClass                                        | PATCH            | V1::GeneralCatalog::GeneralCatalogClassUpdate    |
-/system/htmltopdf/convert                                                                  | GET              | V1::HTMLToPDF::TemplateConvert
+/system/htmltopdf/convert                                                                  | GET              | V1::HTMLToPDF::TemplateConvert                   |
 /system/i18n/translations                                                                  | GET              | V1::I18n::TranslationPatternSearch               |
 /system/i18n/translations                                                                  | POST             | V1::I18n::TranslationPatternCreate               |
 /system/i18n/translations/:PatternID                                                       | DELETE           | V1::I18n::TranslationPatternDelete               |

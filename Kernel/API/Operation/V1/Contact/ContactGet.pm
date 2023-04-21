@@ -175,6 +175,7 @@ sub _GetContactData {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $ContactData{$Attribute} ) {
+                    
                     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                         Name => $1,
                     );
@@ -193,9 +194,8 @@ sub _GetContactData {
                             push(@DynamicFields, $PreparedValue);
                         }
                     }
-                    delete $ContactData{$Attribute};
                 }
-                next ATTRIBUTE;
+                delete $ContactData{$Attribute};
             }
         }
 

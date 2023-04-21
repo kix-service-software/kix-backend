@@ -118,6 +118,9 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.type_id = '.$TypeIDs[0] );
     }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        push( @SQLWhere, 'st.type_id != '.$TypeIDs[0] );
+    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
     }

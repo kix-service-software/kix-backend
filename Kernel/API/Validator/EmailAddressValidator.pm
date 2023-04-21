@@ -10,7 +10,7 @@ package Kernel::API::Validator::EmailAddressValidator;
 
 use strict;
 use warnings;
-use Mail::Address;
+use Email::Address::XS;
 
 use base qw(
     Kernel::API::Validator::Common
@@ -64,7 +64,7 @@ sub Validate {
 
     my $FailedMail = '';
     if ($Param{Attribute} =~ /^(From|Cc|Bcc|To|Email)$/g) {
-        for my $Email ( Mail::Address->parse( $Param{Data}->{$Param{Attribute}} ) ) {
+        for my $Email ( Email::Address::XS->parse( $Param{Data}->{$Param{Attribute}} ) ) {
             if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                 $FailedMail = $Email->address();
                 last;

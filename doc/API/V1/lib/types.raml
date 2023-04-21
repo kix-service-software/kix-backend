@@ -70,6 +70,25 @@
   DataSourceResponse: !include ../types/DataSource/DataSourceResponse.raml
   DataSourceCollectionResponse: !include ../types/DataSource/DataSourceCollectionResponse.raml
 
+# DynamicField
+  DynamicFieldResponse: !include ../types/DynamicField/DynamicFieldResponse.raml
+  DynamicFieldCollectionResponse: !include ../types/DynamicField/DynamicFieldCollectionResponse.raml
+  DynamicFieldPostRequest: !include ../types/DynamicField/DynamicFieldPostRequest.raml
+  DynamicFieldPatchRequest: !include ../types/DynamicField/DynamicFieldPatchRequest.raml
+  DynamicFieldPostPatchResponse: !include ../types/DynamicField/DynamicFieldPostPatchResponse.raml
+
+# TODO: currently not needed, maybe removed sometime
+# # DynamicFieldConfig
+#   DynamicFieldConfigResponse: !include ../types/DynamicField/DynamicFieldConfigResponse.raml
+#   DynamicFieldConfigPatchRequest: !include ../types/DynamicField/DynamicFieldConfigPatchRequest.raml
+#   DynamicFieldConfigPatchResponse: !include ../types/DynamicField/DynamicFieldConfigPatchResponse.raml
+
+# DynamicFieldObjectType
+  DynamicFieldObjectTypeCollectionResponse: !include ../types/DynamicField/DynamicFieldObjectTypeCollectionResponse.raml
+
+# DynamicFieldType
+  DynamicFieldTypeCollectionResponse: !include ../types/DynamicField/DynamicFieldTypeCollectionResponse.raml
+
 # Error
   Error: !include ../types/Error/Error.raml
 
@@ -131,6 +150,9 @@
   GeneralCatalogItemPostRequest: !include ../types/GeneralCatalogItem/GeneralCatalogItemPostRequest.raml
   GeneralCatalogItemPatchRequest: !include ../types/GeneralCatalogItem/GeneralCatalogItemPatchRequest.raml
   GeneralCatalogItemPostPatchResponse: !include ../types/GeneralCatalogItem/GeneralCatalogItemPostPatchResponse.raml
+
+# HTMLToPDFConvert
+  HTMLToPDFConvertResponse: !include ../types/HTMLToPDF/ConvertResponse.raml
 
 # ImportExportTemplate
   ImportExportTemplateResponse: !include ../types/ImportExport/TemplateResponse.raml

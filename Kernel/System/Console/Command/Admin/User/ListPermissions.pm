@@ -84,7 +84,7 @@ sub Run {
                 if ( $Key eq 'Value' ) {
                     $Value = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                         Value  => $Permission{Value},
-                        Format => 'Long'
+                        Format => 'ExtraLong'
                     );
                 }
                 elsif ( $Key eq 'TypeID' ) {

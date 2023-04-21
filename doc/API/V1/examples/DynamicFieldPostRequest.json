@@ -1,0 +1,24 @@
+{
+    "DynamicField": {
+        "Name": "SimpleSelection",
+        "Label": "Simple selection",
+        "FieldType": "Multiselect",
+        "ObjectType": "Ticket",
+        "InternalField": 0,
+        "ValidID": 1,
+        "CustomerVisible": 1,
+        "Config": {
+            "CountDefault": "0",
+            "CountMax": "1",
+            "CountMin": "0",
+            "DefaultValue": "",
+            "ItemSeparator": ";",
+            "PossibleValues": {
+                "value1": "first value",
+                "value2": "second value",
+                "value3": "third value"
+            },
+            "TranslatableValues": "1"
+        }
+    }
+}

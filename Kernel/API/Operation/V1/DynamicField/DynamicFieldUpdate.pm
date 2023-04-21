@@ -50,14 +50,6 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class => 'DynamicField::DisplayGroup',
-    );
-    my @DisplayGroupIDs;
-    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
-       @DisplayGroupIDs = keys %{$GeneralCatalogItemList};
-    }
-
     return {
         'DynamicFieldID' => {
             Required => 1
@@ -65,10 +57,6 @@ sub ParameterDefinition {
         'DynamicField' => {
             Type => 'HASH',
             Required => 1
-        },
-        'DynamicField::DisplayGroupID' => {
-            RequiresValueIfUsed => 1,
-            OneOf => \@DisplayGroupIDs
         },
         'DynamicField::CustomerVisible' => {
             RequiresValueIfUsed => 1,
@@ -85,17 +73,16 @@ perform DynamicFieldUpdate Operation. This will return the updated DynamicFieldI
         Data => {
             DynamicFieldID => 123,
             DynamicField   => {
-	            Name            => '...',            # optional
-	            Label           => '...',            # optional
+                Name            => '...',            # optional
+                Label           => '...',            # optional
                 FieldType       => '...',            # optional
-                DisplayGroupID  => 123,              # optional
                 ObjectType      => '...',            # optional
                 Config          => { },              # optional
                 CustomerVisible => 0                 # optional
-	            ValidID         => 1,                # optional
+                ValidID         => 1,                # optional
             }
-	    },
-	);
+        },
+    );
 
 
     $Result = {
@@ -166,6 +153,7 @@ sub Run {
         );
     }
 
+    # needed if internal fields can be update (if check above is deactived or removed)
     # if it's an internal field, it's name should not change
     if ( $DynamicField->{Name} && $DynamicFieldData->{InternalField} && $DynamicField->{Name} ne $DynamicFieldData->{Name} ) {
         return $Self->_Error(
@@ -180,12 +168,12 @@ sub Run {
         Name            => $DynamicField->{Name} || $DynamicFieldData->{Name},
         Label           => $DynamicField->{Label} || $DynamicFieldData->{Label},
         FieldType       => $DynamicField->{FieldType} || $DynamicFieldData->{FieldType},
-        DisplayGroupID  => $DynamicField->{DisplayGroupID} || $DynamicFieldData->{DisplayGroupID},
         ObjectType      => $DynamicField->{ObjectType} || $DynamicFieldData->{ObjectType},
         Config          => $DynamicField->{Config} || $DynamicFieldData->{Config},
         CustomerVisible => exists $DynamicField->{CustomerVisible} ? $DynamicField->{CustomerVisible} : $DynamicFieldData->{CustomerVisible},
         ValidID         => $DynamicField->{ValidID} || $DynamicFieldData->{ValidID},
-        UserID          => $Self->{Authorization}->{UserID}
+        UserID          => $Self->{Authorization}->{UserID},
+        Comment         => exists $DynamicField->{Comment} ? $DynamicField->{Comment} : $DynamicFieldData->{Comment}
     );
 
     if ( !$Success ) {

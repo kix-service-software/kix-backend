@@ -22,6 +22,8 @@
 [% END %]
 [% IF Data.Style.Float %]
         float: [% Data.Style.Float | html %];
+[% ELSE %]
+        clear: both;
 [% END %]
 [% IF Data.Style.BGColor %]
         background-color: [% Data.Style.BGColor | html %];
@@ -31,24 +33,16 @@
         overflow: hidden;
         white-space: pre-line;
         padding: 1px 0 0 0;
-        break-before: always !important;
-        break-inside: avoid !important;
     }
     .[% Data.ID %] > img {
         padding: 4px 0;
         display:block;
         max-width: 660px !important;
     }
-    @media print {
-        .[% Data.ID %] > img {
-            page-break-before: auto;
-            page-break-after: auto;
-            page-break-inside: avoid;
-            position: relative;
-        }
-     }
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]
-[% Data.Value %]
+<div class="[% Data.ID %]">
+    [% Data.Value %]
+</div>
 [% RenderBlockEnd("HTML") %]

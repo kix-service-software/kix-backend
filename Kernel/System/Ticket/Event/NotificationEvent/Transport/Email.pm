@@ -13,6 +13,8 @@ package Kernel::System::Ticket::Event::NotificationEvent::Transport::Email;
 use strict;
 use warnings;
 
+use Email::Address::XS;
+
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::Language qw(Translatable);
 
@@ -509,7 +511,7 @@ sub GetTransportRecipients {
         }
 
         # parse mail addresses
-        my @ParsedMailAddresses = Mail::Address->parse($RecipientString);
+        my @ParsedMailAddresses = Email::Address::XS->parse($RecipientString);
 
         foreach my $MailAddress (@ParsedMailAddresses) {
             my %Recipient;

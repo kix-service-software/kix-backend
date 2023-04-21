@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2022-12-6 07:16+0000\n"
+"POT-Creation-Date: 2023-3-17 15:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -120,6 +120,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Backup Device"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Base::Ticket"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -399,6 +403,10 @@ msgid "Periodic Reports"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type for core object dependency Queue->Ticket."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Permission type that corresponds with a API resource."
 msgstr ""
 
@@ -587,6 +595,10 @@ msgid "Ticket Agent (w/o teams)"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Ticket Agent Base Permission"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
 msgstr ""
 
@@ -652,6 +664,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "agent"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "allows basic ticket access, but requires team specific roles with base permissions"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -824,10 +840,6 @@ msgstr ""
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "Time Zone"
-msgstr ""
-
-#. Perl Module: Kernel/System/Auth.pm
-msgid "It is currently not possible to login due to a scheduled system maintenance."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/EventBased.pm
@@ -1975,6 +1987,62 @@ msgid "Additional and extended TextModule methods."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of ascension day for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of ascension day."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of day of repentance and prayer for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of day of repentance and prayer."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of easter monday for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of easter monday."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of feast of corpus christi for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of feast of corpus christi."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of good friday for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of good friday."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of maundy thursday for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of maundy thursday."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of whit monday for the indicated calendar."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Adds module to calculate date of whit monday."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Adds the one time vacation days for the indicated calendar. Please use single digit pattern for numbers from 1 to 9 (instead of 01 - 09)."
 msgstr ""
 
@@ -2192,6 +2260,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines a regular expression that filters all email addresses that should not be used in the application."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines a regular expression that filters all email addresses that should not receive emails from the application."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2575,10 +2647,6 @@ msgid "Defines which email address to use if not defined - strongly depends on b
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines which persons should not be added on AutoCreateLinkedPerson."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines which state will unlock the ticket."
 msgstr ""
 
@@ -2592,6 +2660,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Depends on"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Dis-/Enables uniqueness check for email-addresses of contacts. If this setting is disabled, notifications may be read by contacts who are not supposed to receive personal information about the actual contact. This may cause a violation of GDPR regulation! Thus, you have to ensure that no notification contains relevant information. Furthermore, any email-based contact retrieval or identification may potentially deliver ambiguous results. Incoming emails are assigned to the first contact ordered by last name, first name assigned to the email-address. Some features like e-mail based authentication, email-based contact data update from LDAP or macro action CreateOrUpdateContact will be disabled if no other lookup value than email is provided. Once disabled you MUST NOT enable it again before ensuring unique email addresses."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2628,6 +2700,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable Event Handler debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable PostMaster MailAccountFetch debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3123,10 +3199,6 @@ msgid "Registration of a report type for reporting."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a supported permission of type Object."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a variable filter module."
 msgstr ""
 
@@ -3519,18 +3591,6 @@ msgid "This setting defines the link type 'RelevantTo'. If the source name and t
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"3rd party\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"agent\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "This setting defines the person link type \"customer\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Time Based"
 msgstr ""
 
@@ -3636,6 +3696,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "notice"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
+msgid "Defines the render module that should be used to build special sections."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
@@ -3972,10 +4036,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create link between ticket and config item on DynamicFieldUpdate (This event only create links, links can only be deleted manually)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Create new linked person on create new Article or Update Owner."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4339,10 +4399,6 @@ msgid "Module registration for user attribute placeholders such as owner, respon
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to check if arrived emails should be marked as email-internal (because of original forwarded internal email). ArticleType and SenderType define the values for the arrived email/article."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to fetch contacts SMIME certificates of incoming messages."
 msgstr ""
 
@@ -4447,6 +4503,10 @@ msgid "Resets and unlocks the owner of a ticket if it was moved to another queue
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Resets owner and responsible if they don't have the required permission."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Restores a ticket from the archive (only if the event is a state change, from closed to any open available state)."
 msgstr ""
 
@@ -4523,7 +4583,7 @@ msgid "Sets the PendingTime of a ticket to 0 if the state is changed to a non-pe
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Sets the minimal ticket counter size if \"AutoIncrement\", \"Date\" or \"DateChecksum\" was selected as TicketNumberGenerator. Default is 5, this means the counter starts from 10000."
+msgid "Sets the minimal ticket counter size if \"AutoIncrement\", \"Date\" or \"DateChecksum\" was selected as TicketNumberGenerator. Default is 5, this means the counter starts from 00001."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4671,19 +4731,7 @@ msgid "Updates ticket type if configured or required after queue move."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the body of this note (this text cannot be changed by the agent)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "When tickets are merged, a note will be added automatically to the ticket which is no longer active. Here you can define the subject of this note (this subject cannot be changed by the agent)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Workflowmodule which sets the ticket responsible based on ticket type if not given."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "email-internal"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4752,6 +4800,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "City"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "ConnectedTo"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -5083,6 +5135,10 @@ msgid "partially executed"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "printed by"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "processing"
 msgstr ""
 
@@ -5110,3 +5166,78 @@ msgstr ""
 msgid "yes"
 msgstr ""
 
+#. manual entry from templates.pot.manual
+msgid "Sun"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Mon"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Tue"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Wed"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Thu"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Fri"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sat"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Jan"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Feb"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Mar"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Apr"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "May"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Jun"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Jul"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Aug"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Sep"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Oct"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Nov"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "Dec"
+msgstr ""

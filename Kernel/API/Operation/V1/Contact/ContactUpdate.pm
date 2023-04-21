@@ -140,7 +140,7 @@ sub Run {
     }
 
     # check ContactEmail exists
-    if ( IsStringWithData( $Contact->{Email} ) ) {
+    if ( $Contact->{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
         my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $Contact->{Email},
             Silent => 1,

@@ -39,7 +39,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'type',
-        Description => 'The new type of the permission (Resource, Object, Property).',
+        Description => 'The new type of the permission (Base::Ticket, Resource, Object, Property).',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -53,7 +53,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'value',
-        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY,NONE). You can combine different values by using a comma and plus or minus sign to add or remove the permission, i.e. +READ,-UPDATE.',
+        Description => 'The value of the new permission (CREATE,READ,UPDATE,DELETE,DENY,NONE). You can combine different values by using a comma and plus or minus sign to add or remove the permission, i.e. +READ,-UPDATE. You can also use the alias WRITE to combine CREATE,UPDATE and DELETE.',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,

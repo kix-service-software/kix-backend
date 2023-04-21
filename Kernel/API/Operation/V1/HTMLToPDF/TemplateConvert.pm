@@ -140,7 +140,7 @@ sub Run {
     }
 
     # get the template data
-    my %Template = $Kernel::OM->Get('HTMLToPDF')->DefinitionGet(
+    my %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
         %TemplateParam
     );
 

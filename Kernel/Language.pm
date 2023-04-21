@@ -25,8 +25,29 @@ our @ObjectDependencies = (
     'Time',
 );
 
-my @DAYS = qw/Sun Mon Tue Wed Thu Fri Sat/;
-my @MONS = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
+my @DAYS = (
+    Translatable('Sun'),
+    Translatable('Mon'),
+    Translatable('Tue'),
+    Translatable('Wed'),
+    Translatable('Thu'),
+    Translatable('Fri'),
+    Translatable('Sat')
+);
+my @MONS = (
+    Translatable('Jan'),
+    Translatable('Feb'),
+    Translatable('Mar'),
+    Translatable('Apr'),
+    Translatable('May'),
+    Translatable('Jun'),
+    Translatable('Jul'),
+    Translatable('Aug'),
+    Translatable('Sep'),
+    Translatable('Oct'),
+    Translatable('Nov'),
+    Translatable('Dec')
+);
 
 =head1 NAME
 

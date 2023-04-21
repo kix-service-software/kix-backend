@@ -30,20 +30,22 @@ sub new {
     bless( $Self, $Type );
 
     # Debug 0=off 1=on
-    $Self->{Debug}        = $Param{Config}->{Debug} || 0;
-    $Self->{Die}          = $Param{Config}->{Die} // 1;
-    $Self->{Host}         = $Param{Config}->{Host} || '';
-    $Self->{BaseDN}       = $Param{Config}->{BaseDN} || '';
-    $Self->{UID}          = $Param{Config}->{UID} || '';
-    $Self->{SearchUserDN} = $Param{Config}->{SearchUserDN} || '';
-    $Self->{SearchUserPw} = $Param{Config}->{SearchUserPw} || '';
-    $Self->{GroupDN}      = $Param{Config}->{GroupDN} || '';
-    $Self->{AuthAttr}     = $Param{Config}->{AuthAttr} || $Self->{UID};     # optional Auth attribute
-    $Self->{AccessAttr}   = $Param{Config}->{AccessAttr} || 'memberUid';
-    $Self->{UserAttr}     = $Param{Config}->{UserAttr} || 'DN';
-    $Self->{DestCharset}  = $Param{Config}->{Charset} || 'utf-8';
-    $Self->{AlwaysFilter} = $Param{Config}->{AlwaysFilter} || '';
-    $Self->{Params}       = $Param{Config}->{Params} || {};
+    $Self->{Debug}            = $Param{Config}->{Debug} || 0;
+    $Self->{Die}              = $Param{Config}->{Die} // 1;
+    $Self->{Host}             = $Param{Config}->{Host} || '';
+    $Self->{BaseDN}           = $Param{Config}->{BaseDN} || '';
+    $Self->{UID}              = $Param{Config}->{UID} || '';
+    $Self->{SearchUserDN}     = $Param{Config}->{SearchUserDN} || '';
+    $Self->{SearchUserPw}     = $Param{Config}->{SearchUserPw} || '';
+    $Self->{GroupDN}          = $Param{Config}->{GroupDN} || '';
+    $Self->{AuthAttr}         = $Param{Config}->{AuthAttr} || $Self->{UID};     # optional Auth attribute
+    $Self->{AccessAttr}       = $Param{Config}->{AccessAttr} || 'memberUid';
+    $Self->{UserAttr}         = $Param{Config}->{UserAttr} || 'DN';
+    $Self->{DestCharset}      = $Param{Config}->{Charset} || 'utf-8';
+    $Self->{AlwaysFilter}     = $Param{Config}->{AlwaysFilter} || '';
+    $Self->{Params}           = $Param{Config}->{Params} || {};
+
+    $Self->{EmailUniqueCheck} = $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck');
 
     return $Self;
 }
@@ -74,6 +76,15 @@ sub Auth {
 
     # do nothing if we have no relevant data for us
     return if !$Param{User} || !$Param{Pw};
+
+    # we can't accept email as AuthAttr without unique email addresses
+    if ( $Self->{AuthAttr} && $Self->{AuthAttr} =~ /mail/i && !$Self->{EmailUniqueCheck} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "LDAP Auth: AuthAttr \"$Self->{AuthAttr}\" not possible since \"ContactEmailUniqueCheck\" option is not active (Backend: \"$Self->{Config}->{Name}\")!",
+        );
+        return;
+    }
 
     $Param{User} = $Self->_ConvertTo( $Param{User}, 'utf-8' );
     $Param{Pw}   = $Self->_ConvertTo( $Param{Pw},   'utf-8' );
@@ -115,16 +126,11 @@ sub Auth {
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
     my $LDAP = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
     if ( !$LDAP ) {
-        if ( $Self->{Die} ) {
-            die "Can't connect to $Self->{Host}: $@";
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
-            );
-            return;
-        }
+        $Kernel::OM->Get('Log')->Log(
+           Priority => 'error',
+           Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+        );
+        return;
     }
     my $Result = '';
     if ( $Self->{SearchUserDN} && $Self->{SearchUserPw} ) {

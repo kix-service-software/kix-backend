@@ -62,29 +62,29 @@ $Self->True(
 my @Tests = (
     {
         Name             => "Exact match",
-        PostMasterSearch => "john.doe.$Contact\@example.com",
+        Email            => "john.doe.$Contact\@example.com",
         ResultCount      => 1,
     },
     {
         Name             => "Exact match with different casing",
-        PostMasterSearch => "John.Doe.$Contact\@example.com",
+        Email            => "John.Doe.$Contact\@example.com",
         ResultCount      => 1,
     },
     {
         Name             => "Partial string",
-        PostMasterSearch => "doe.$Contact\@example.com",
+        Email            => "doe.$Contact\@example.com",
         ResultCount      => 0,
     },
     {
         Name             => "Partial string with different casing",
-        PostMasterSearch => "Doe.$Contact\@example.com",
+        Email            => "Doe.$Contact\@example.com",
         ResultCount      => 0,
     },
 );
 
 for my $Test (@Tests) {
     my %Result = $ContactObject->ContactSearch(
-        PostMasterSearch => $Test->{PostMasterSearch},
+        Email => $Test->{Email},
     );
 
     $Self->Is(
