@@ -1,2 +1,2 @@
 # refresh default icons
-Admin::ObjectIcon::Import --allow-root --file <KIX_CONFIG_Home>/var/packagesetup/initial_object_icons.csv --icon-directory <KIX_CONFIG_Home>/var/packagesetup/icons 
+Admin::ObjectIcon::Import --allow-root --file <KIX_CONFIG_Home>/var/packagesetup/initial_object_icons.csv --icon-directory <KIX_CONFIG_Home>/var/packagesetup/icons --no-update
