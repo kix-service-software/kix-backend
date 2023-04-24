@@ -97,7 +97,7 @@ sub Configure {
 
 
     my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
-    my %List        = $PrintObject->DefinitionDataList(
+    my %List        = $PrintObject->TemplateDataList(
         Valid => 1
     );
 
