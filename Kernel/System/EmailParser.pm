@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -664,9 +664,13 @@ sub PartsAttachments {
     my %Data = $Self->GetContentTypeParams( ContentType => $PartData{ContentType} );
     if ( $Data{Charset} ) {
         $PartData{Charset} = $Data{Charset};
-    }
-    else {
+    } else {
         $PartData{Charset} = '';
+    }
+
+    # remove additional data
+    if ($Data{ContentType}) {
+        $PartData{ContentType} = $Data{ContentType};
     }
 
     # get content (if possible)
@@ -703,6 +707,11 @@ sub PartsAttachments {
             );
             if ( $Data{Charset} ) {
                 $PartData{Charset} = $Data{Charset};
+            }
+
+            # remove additional data
+            if ( $Data{ContentType} ) {
+                $PartData{ContentDisposition} = $Data{ContentType};
             }
         }
         else {
@@ -892,6 +901,10 @@ sub GetContentTypeParams {
     if ( $Param{ContentType} =~ /Content-Type:\s{0,1}(.+?\/.+?)(;|'|"|\s)/i ) {
         $Param{MimeType} = $1;
         $Param{MimeType} =~ s/"|'//g;
+    }
+    my @Parts = split(/;\s*/, $Param{ContentType});
+    if (@Parts > 1) {
+        $Param{ContentType} = $Parts[0];
     }
     return %Param;
 }
