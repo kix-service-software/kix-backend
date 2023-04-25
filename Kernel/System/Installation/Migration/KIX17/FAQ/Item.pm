@@ -389,9 +389,13 @@ sub _MigrateAttachments {
     return %Result if !IsArrayRefWithData($SourceData);
 
     foreach my $Item ( @{$SourceData} ) {
-        $Item->{disposition}  = 'inline' if $Item->{inlineattachment};
-        $Item->{content_id}   = $InlineAttachments{$Item->{id}} ? "<$InlineAttachments{$Item->{id}}>" : '';
-        $Item->{content}      = MIME::Base64::decode_base64($Item->{content});
+        $Item->{disposition} = 'inline' if $Item->{inlineattachment};
+        $Item->{content_id}  = $InlineAttachments{$Item->{id}} ? "<$InlineAttachments{$Item->{id}}>" : '';
+        # decode attachment content, when database supports direct blob
+        if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('DirectBlob') ) {
+            $Item->{content} = MIME::Base64::decode_base64($Item->{content});
+        }
+        
         if ( $Item->{content_type} =~ /\s+;/ ) {
             $Item->{content_type} = split(/\s+;/, $Item->{content_type}, 1);
         }
