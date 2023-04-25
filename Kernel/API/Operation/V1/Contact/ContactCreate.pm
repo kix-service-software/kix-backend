@@ -122,17 +122,21 @@ sub Run {
         }
     }
 
-    # check if Email is provided and if so if it exists
-    if ($Contact->{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck')) {
-        my $ExistingContact = $Kernel::OM->Get('Contact')->ContactLookup(
-            Email => $Contact->{Email},
-            Silent           => 1,
-        );
-        if ($ExistingContact) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => 'Cannot create contact. Another contact with same email address already exists.',
-            );
+    # check if emails are provided and if so if one already exists
+    if ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+        for my $MailAttr ( qw(Email Email1 Email2 Email3 Email4 Email5) ) {
+            if ($Contact->{$MailAttr}) {
+                my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    Email  => $Contact->{$MailAttr},
+                    Silent => 1
+                );
+                if ($ExistingContactID) {
+                    return $Self->_Error(
+                        Code    => 'Object.AlreadyExists',
+                        Message => "Cannot create contact. Another contact with email address \"$Contact->{$MailAttr}\" already exists.",
+                    );
+                }
+            }
         }
     }
 

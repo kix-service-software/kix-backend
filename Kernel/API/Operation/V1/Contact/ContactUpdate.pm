@@ -140,16 +140,20 @@ sub Run {
     }
 
     # check ContactEmail exists
-    if ( $Contact->{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
-        my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-            Email  => $Contact->{Email},
-            Silent => 1,
-        );
-        if ( $ExistingContactID && $ExistingContactID != $Param{Data}->{ContactID} ) {
-            return $Self->_Error(
-                Code    => 'Object.AlreadyExists',
-                Message => 'Cannot update contact. Different Contact with this email already exists.',
-            );
+    if ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+        for my $MailAttr ( qw(Email Email1 Email2 Email3 Email4 Email5) ) {
+            if ($Contact->{$MailAttr}) {
+                my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    Email  => $Contact->{$MailAttr},
+                    Silent => 1
+                );
+                if ($ExistingContactID && $ExistingContactID != $Param{Data}->{ContactID}) {
+                    return $Self->_Error(
+                        Code    => 'Object.AlreadyExists',
+                        Message => "Cannot update contact. Another contact with email address \"$Contact->{$MailAttr}\" already exists.",
+                    );
+                }
+            }
         }
     }
 
