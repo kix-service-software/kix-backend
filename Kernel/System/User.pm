@@ -669,7 +669,7 @@ sub UserSearch {
         $Param{Search} =~ s/%%/%/g;
 
         my %QueryCondition = $DBObject->QueryCondition(
-            Key      => [qw(u.login c.firstname c.lastname c.email)], # ignore rest for now: c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
+            Key      => [qw(u.login c.firstname c.lastname c.email c.email1 c.email2 c.email3 c.email4 c.email5)], # ignore rest for now: c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
             Value    => $Param{Search},
             BindMode => 1,
         );
@@ -1506,7 +1506,7 @@ sub CheckResourcePermission {
             if ( !defined $RolePermission && $ParentTarget ) {
                 $RolePermission = $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$ParentTarget}->{$Param{RequestedPermission}}->{$RoleID};
                 $Self->{Cache}->{PermissionCache}->{$Param{UserID}}->{$Target}->{$Param{RequestedPermission}}->{$RoleID} = $RolePermission;
-                
+
                 if ( IsArrayRefWithData($RolePermission) ) {
                     $RolePermission = $RolePermission->[1];
                 }
