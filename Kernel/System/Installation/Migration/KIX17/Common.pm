@@ -39,7 +39,7 @@ sub new {
     }
 
     # init some more things
-    $Self->{Mapping} = {};
+    $Self->{Mapping} = undef;
 
     return $Self;
 }
@@ -355,6 +355,8 @@ sub SetMapping {
             return;
         }
     }
+
+    $Self->{Mapping} //= {};
 
     $Self->{Mapping}->{$Param{Type}} = $Param{Mapping};
 
@@ -708,10 +710,17 @@ sub SetCacheOptions {
 sub Lookup {
     my ( $Self, %Param ) = @_;
 
+    my $Mapping = $Self->{Mapping};
+    if ( !$Mapping ) {
+        $Mapping = {
+            $Param{Table} => $Self->Describe()->{Mapping}
+        }
+    }
+
     return $Kernel::OM->Get('Migration')->Lookup(
         Source   => $Self->{Source},
         SourceID => $Self->{SourceID},
-        Mapping  => $Self->{Mapping} || $Self->Describe()->{Mapping},
+        Mapping  => $Mapping,
         %Param,
     );
 }
