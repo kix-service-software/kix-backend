@@ -22,6 +22,7 @@
         "IncomingTime": 1586413516,
         "MessageID": "",
         "MimeType": "text/plain",
+        "NotSentError": "",
         "References": "",
         "ReplyTo": "",
         "SenderType": "agent",

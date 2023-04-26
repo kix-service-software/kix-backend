@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -261,14 +261,15 @@ sub Run {
             $ArticleData{Plain} = $PlainMessage;
         }
 
-        # add unseen information
-        my $Exists = $TicketObject->ArticleUserFlagExists(
+        my %Flags = $TicketObject->ArticleFlagGet(
+            TicketID  => $Param{Data}->{TicketID},
             ArticleID => $ArticleID,
-            Flag      => 'Seen',
-            Value     => 1,
-            UserID    => $Self->{Authorization}->{UserID},
+            UserID    => $Self->{Authorization}->{UserID}
         );
-        $ArticleData{Unseen} = $Exists ? 0 : 1;
+        # add unseen information
+        $ArticleData{Unseen} = $Flags{Seen} ? 0 : 1;
+        # add unsent information
+        $ArticleData{NotSentError} = $Flags{NotSentError} ? $Flags{NotSentError} : '';
 
         # add
         push(@ArticleList, \%ArticleData);
