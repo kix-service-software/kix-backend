@@ -345,7 +345,6 @@ sub Run {
         Richtext  => 1
     );
 
-
     # replace placeholders in non-richtext attributes
     for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
         next if !defined $ArticleParam{$Attribute};
@@ -534,19 +533,43 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{ContactEmailOrID} && $Param{ContactEmailOrID} =~ /^\d+$/) {
-        my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-            ID     => $Param{ContactEmailOrID},
-            Silent => 1,
-        );
-        if (!$ContactID) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "Couldn't create new ticket - can't find contact for contact id \"$Param{ContactEmailOrID}\"!",
-                UserID   => $Param{UserID}
+    if ($Param{ContactEmailOrID}) {
+        if ($Param{ContactEmailOrID} =~ /^\d+$/) {
+            my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                ID     => $Param{ContactEmailOrID},
+                Silent => 1
             );
-            return;
+            if (!$ContactID) {
+                $Kernel::OM->Get('Automation')->LogError(
+                    Referrer => $Self,
+                    Message  => "Couldn't create new ticket - can't find contact for contact id \"$Param{ContactEmailOrID}\" of ContactEmailOrID!",
+                    UserID   => $Param{UserID}
+                );
+                return;
+            }
+        } else {
+            my $ParserObject = Kernel::System::EmailParser->new(
+                Mode => 'Standalone'
+            );
+            my $ContactEmail = $ParserObject->GetEmailAddress(
+                Email => $Param{ContactEmailOrID}
+            );
+            if (!$ContactEmail) {
+                $Kernel::OM->Get('Automation')->LogError(
+                    Referrer => $Self,
+                    Message  => "Couldn't create new ticket - value \"$Param{ContactEmailOrID}\" of ContactEmailOrID is no valid email address!",
+                    UserID   => $Param{UserID}
+                );
+                return;
+            }
         }
+    } else {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't create new ticket - no ContactEmailOrID given!",
+            UserID   => $Param{UserID}
+        );
+        return;
     }
 
     return 1;
