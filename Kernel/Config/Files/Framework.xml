@@ -2428,7 +2428,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Frontend::RichText::DefaultCSS" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="Frontend::RichText::DefaultCSS" Required="1" Valid="1">
         <Description Translatable="1">Defines the default CSS used in rich text editors.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Web</SubGroup>
