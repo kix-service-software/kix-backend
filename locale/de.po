@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-04-19 10:19+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"PO-Revision-Date: 2023-04-27 13:19+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -629,7 +629,7 @@ msgstr "Ticket Agent (ohne Teamberechtigung)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent Base Permission"
-msgstr ""
+msgstr "Ticket Agent Basis Berechtigungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
