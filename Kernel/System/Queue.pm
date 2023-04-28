@@ -1044,15 +1044,10 @@ sub NameExistsCheck {
     );
 
     # fetch the result
-    my $Flag;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         if ( !$Param{ID} || $Param{ID} ne $Row[0] ) {
-            $Flag = 1;
+            return 1;
         }
-    }
-
-    if ($Flag) {
-        return 1;
     }
 
     return 0;
