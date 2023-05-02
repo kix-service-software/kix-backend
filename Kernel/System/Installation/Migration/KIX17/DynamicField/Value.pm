@@ -203,6 +203,10 @@ sub _Run {
         $Item->{value_int} = undef;
     }
     if ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'ContactReference' ) {
+        # some special handling here
+        if ( $Item->{value_text} eq 'root@localhost' ) {
+            $Item->{value_text} = 'admin'
+        }
         $Item->{value_text} = $Kernel::OM->Get('Contact')->ContactLookup(
             UserLogin => $Item->{value_text},
         );

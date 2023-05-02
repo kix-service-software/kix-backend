@@ -88,6 +88,11 @@ sub Run {
             next;
         }
 
+        # special handling for UserID 1
+        if ( $Item->{id} == 1 ) {
+            $Item->{login} = 'admin';
+        }
+
         # check if this item already exists (i.e. some initial data)
         LOOKUP:
         my $ID = $Self->Lookup(
@@ -98,6 +103,7 @@ sub Run {
                 'login'
             ],
         );
+        next if $Item->{id} == 1;
 
         # insert row
         if ( !$ID ) {
