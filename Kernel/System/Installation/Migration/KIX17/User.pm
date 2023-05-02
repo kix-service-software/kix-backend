@@ -174,7 +174,7 @@ sub Run {
                     Phone          => $Contact{UserPhone},
                     Mobile         => $Contact{UserMobile},
                     Email          => $Contact{UserEmail},
-                    ValidID        => 1,
+                    ValidID        => $Item->{valid_id},
                     UserID         => 1,
                 );
                 if ( !$CreatedContactID ) {
