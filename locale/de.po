@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-04-27 13:19+0000\n"
+"PO-Revision-Date: 2023-05-02 12:19+0000\n"
 "Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -128,7 +128,7 @@ msgstr "Backup Gerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Base::Ticket"
-msgstr ""
+msgstr "Basis::Ticket"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Beamer"
@@ -2543,7 +2543,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Change password"
-msgstr ""
+msgstr "Passwort ändern"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checkbox"
@@ -2634,11 +2634,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Date / Time"
-msgstr ""
+msgstr "Datum / Uhrzeit"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3477,7 +3477,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Firstname Lastname"
-msgstr ""
+msgstr "Vorname Nachname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Firstname Lastname (UserLogin)"
@@ -3748,7 +3748,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname"
-msgstr ""
+msgstr "Nachname, Vorname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname (UserLogin)"
@@ -3820,7 +3820,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Multiple Selection"
-msgstr ""
+msgstr "Mehrfachauswahl"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "MultiselectGeneralCatalog"
@@ -4076,7 +4076,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Set Variable"
-msgstr ""
+msgstr "Variable setzen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4329,11 +4329,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Table"
-msgstr ""
+msgstr "Tabelle"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea"
-msgstr ""
+msgstr "Textbereich"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
@@ -4590,7 +4590,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "attachment"
-msgstr ""
+msgstr "Anhang"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "debug"
@@ -6106,7 +6106,7 @@ msgstr "Inbetriebnahme"
 
 #. manual entry from templates.pot.manual
 msgid "FirstResponse"
-msgstr ""
+msgstr "Erste Antwort"
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
