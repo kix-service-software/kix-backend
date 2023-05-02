@@ -1487,6 +1487,71 @@ sub EOB {
     return $EOB;
 }
 
+=item CalculateTimeInterval()
+
+returns given seconds as counted days, hours, minutes, seconds string
+
+    $TimeObject->CalculateTimeInterval(
+        Seconds => 60*60*24*2 + 60*60*5 + 30        # not as string!
+    );
+
+given seconds => result
+    60*60*24*2 + 60*60*5 + 30 => 2d 5h 0m 30s
+    60*60*24*2 + 30           => 2d 0h 0m 30s
+    60*60*5 + 30              => 5h 0m 30s
+    123                       => 2m 3s
+    -123                      => -2m 3s
+
+=cut
+
+sub CalculateTimeInterval {
+    my ( $Self, %Param ) = @_;
+
+    return if (!defined $Param{Seconds} || $Param{Seconds} !~ m/^-?\d+$/);
+
+    my $IsNegative = 0;
+    if ( $Param{Seconds} < 0 ) {
+        $IsNegative = 1;
+        $Param{Seconds} *= -1;
+    }
+
+    my $Result = '';
+    if ( $Param{Seconds} > 59) {
+        my $HourSec   = 60*60;
+        my $DaySec    = 60*60*24;
+
+        my $Seconds    = $Param{Seconds};
+
+        my $Days    = int($Seconds / $DaySec);
+        my $Hours   = int(($Seconds - $Days * $DaySec) / $HourSec);
+        my $Minutes = int(($Seconds - $Days * $DaySec - $Hours * $HourSec) / 60);
+        $Seconds = $Seconds - $Days * $DaySec - $Hours * $HourSec - $Minutes * 60;
+
+        my @Parts;
+        if ($Days) {
+            push(@Parts, $Days . 'd');
+        }
+        if ($Hours || (@Parts && ($Minutes || $Seconds))) {
+            push(@Parts, $Hours . 'h');
+        }
+        if ($Minutes || (@Parts && $Seconds)) {
+            push(@Parts, $Minutes . 'm');
+        }
+        if ($Seconds) {
+            push(@Parts, $Seconds . 's');
+        }
+        $Result = join(' ', @Parts);
+    } else {
+        $Result = $Param{Seconds} . 's';
+    }
+
+    if ($IsNegative) {
+        $Result = '-' . $Result;
+    }
+
+    return $Result;
+}
+
 sub _GetTimeWorking {
     my ( $Self, %Param ) = @_;
 
