@@ -387,6 +387,11 @@ sub _MigrateXMLData {
     );
 
     if ( IsArrayRefWithData($CIAttachments) ) {
+        my $XMLType = 'ITSM::ConfigItem';
+        if ( $SourceData->[0]->{xml_type} =~ /^(.*?)::\d+$/ ) {
+            $XMLType = $1;
+        }
+        
         my $BackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Attachment');
         my $Index = 1;
         foreach my $Attachment ( @{$CIAttachments} ) {
@@ -394,13 +399,13 @@ sub _MigrateXMLData {
                 Value => $Attachment,
             );
             push @{$SourceData}, {
-                'xml_type'          => "ITSM::ConfigItem::$Param{SourceClassID}",
+                'xml_type'          => $XMLType.'::'.$Param{SourceClassID},
                 'xml_key'           => $Param{SourceVersionID},
                 'xml_content_key'   => "[1]{Version}[1]{CIAttachments}[$Index]{TagKey}",
                 'xml_content_value' => "[1]{Version}[1]{CIAttachments}[$Index]",
             };
             push @{$SourceData}, {
-                'xml_type'          => "ITSM::ConfigItem::$Param{SourceClassID}",
+                'xml_type'          => $XMLType.'::'.$Param{SourceClassID},
                 'xml_key'           => $Param{SourceVersionID},
                 'xml_content_key'   => "[1]{Version}[1]{CIAttachments}[$Index]{Content}",
                 'xml_content_value' => $AttachmentDirID,
