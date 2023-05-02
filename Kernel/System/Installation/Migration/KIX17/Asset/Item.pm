@@ -528,6 +528,11 @@ sub _MapAttributeValue {
                 'contact' => 'login',
             );
 
+            # some special handling here
+            if ( $Param{Item}->{xml_content_value} eq 'root@localhost' ) {
+                $Param{Item}->{xml_content_value} = 'admin'
+            }
+
             # get source data if not already cached
             if ( !IsArrayRef($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
                 $Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}} = $Self->GetSourceData(Type => $LookupTypeMapping{$TypeMapping}, Where => "$LookupAttributeMapping{$TypeMapping} = '$Param{Item}->{xml_content_value}'");
