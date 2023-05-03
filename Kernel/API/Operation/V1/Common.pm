@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -115,6 +115,22 @@ sub RunOperation {
             $ParentCheckMethod = 'GET';
         }
 
+        # if object to be created is a ticket and no queue id is given,
+        # fallback from sysconfig needs to be set for later base permission check
+        if ($Param{Data}->{Ticket} && !$Param{Data}->{Ticket}->{QueueID} && $Self->{RequestMethod} eq 'POST') {
+            my $QueueObject = $Kernel::OM->Get('Queue');
+            my $DefaultTicketQueue = $Kernel::OM->Get('Config')->Get('Ticket::Queue::Default');
+            my %AllTicketQueues = reverse $QueueObject->QueueList();
+            if ($AllTicketQueues{$DefaultTicketQueue}) {
+                $Param{Data}->{Ticket}->{QueueID} = $AllTicketQueues{$DefaultTicketQueue};
+            }
+            else {
+                return $Self->_Error(
+                    Code => 'Object.UnableToCreate',
+                );
+            }
+        }
+
         # check the necessary permission of the parent object if needed
         if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
 
@@ -124,7 +140,7 @@ sub RunOperation {
             my $Data = $OperationConfig->{ObjectID} ? {
                     $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
 
-                    # TODO: find generic solution ("AlwaysForwardAttrbutes" config?)
+                    # TODO: find generic solution ("AlwaysForwardAttributes" config?)
                     RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
                 } : $Param{Data};
 
@@ -246,7 +262,7 @@ sub RunOperation {
             my $PreRunResult = $Self->PreRun(
                 %Param,
             );
-            
+
             $Self->_Debug($Self->{LevelIndent}, sprintf("PreRun took %i ms", TimeDiff($StartTime)));
 
             if ( !$PreRunResult->{Success} ) {
@@ -2752,7 +2768,7 @@ sub _CheckBasePermission {
         return $Self->_Success();
     }
 
-    # add corresponding permission filter 
+    # add corresponding permission filter
     my %Filter = $Self->_CreateFilterForObject(
         Filter   => {},
         Object   => $Result->{Object},
