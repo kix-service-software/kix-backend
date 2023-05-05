@@ -609,6 +609,26 @@ for my $ModuleFile (@BackendModuleFiles) {
             }
         }
 
+        # check wide character key
+        $CacheSet = $CacheObject->Set(
+            Type  => 'WideCharacterTest',
+            Key   => "Test \x{2639}",
+            Value => '1',
+            TTL   => 60,
+        );
+        $Self->True(
+            $CacheSet,
+            "#9 - $Module - CacheSet() - Wide Character Key check",
+        );
+        $CacheGet = $CacheObject->Get(
+            Type => 'WideCharacterTest',
+            Key  => "Test \x{2639}",
+        );
+        $Self->True(
+            $CacheGet,
+            "#9 - $Module - CacheGet() - Wide Character Key check",
+        );
+
         # flush the cache
         $CacheObject->CleanUp();
     }
