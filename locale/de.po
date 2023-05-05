@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-05-02 12:19+0000\n"
+"PO-Revision-Date: 2023-05-05 07:19+0000\n"
 "Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1719,7 +1719,7 @@ msgstr "abgebrochen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "finished"
-msgstr "beendet"
+msgstr "abgeschlossen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "loading data from source"
@@ -2654,15 +2654,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default spelling dictionary"
-msgstr ""
+msgstr "Standard-Rechtschreibwörterbuch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default ticket queue"
-msgstr ""
+msgstr "Standard-Ticket-Team"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default ticket type"
-msgstr ""
+msgstr "Standard-Ticket-Typ"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default value for NameX"
@@ -3740,7 +3740,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname Firstname"
-msgstr ""
+msgstr "Nachname Vorname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname Firstname (UserLogin)"
@@ -4337,7 +4337,7 @@ msgstr "Textbereich"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
-msgstr ""
+msgstr "Textarea-Eingabe"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler automation task manager."
