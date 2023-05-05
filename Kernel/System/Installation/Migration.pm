@@ -449,7 +449,7 @@ sub GetOIDMapping {
 
     # check cache
     my $CacheType = 'MigrationOIDMapping_'.$Param{ObjectType};
-    my $CacheKey  = join('::', values %Param);
+    my $CacheKey  = $Param{Source} . '::' . $Param{SourceID} . '::' . $Param{ObjectType} . '::' . ($Param{SourceObjectID}||'') . '::' . ($Param{ObjectID}||'');
     if ( !$Param{NoCache} ) {
         my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $CacheType,
