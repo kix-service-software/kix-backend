@@ -43,6 +43,11 @@
 [% END %]
         margin: 0.1rem 0;
     }
+[% RenderBlockStart("StyleClass") %]
+    .[% Data.ID %][% Data.Selector %] {
+        [% Data.CSS %]
+    }
+[% RenderBlockEnd("StyleClass") %]
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]

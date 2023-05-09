@@ -17,6 +17,8 @@ use base qw(
     Kernel::System::HTMLToPDF::Render::Common
 );
 
+use Kernel::System::VariableCheck qw(:all);
+
 sub Run {
     my ($Self, %Param) = @_;
 
@@ -39,6 +41,20 @@ sub Run {
             Data => $Block
         );
 
+        if ( IsArrayRefWithData($Block->{Style}->{Class}) ) {
+            for my $Style ( @{$Block->{Style}->{Class}} ) {
+                next if ( !$Style->{Selector} || !$Style->{CSS} );
+
+                $LayoutObject->Block(
+                    Name => 'StyleClass',
+                    Data => {
+                        %{$Block},
+                        %{$Style}
+                    }
+                );
+            }
+        }
+
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Text',
         );
@@ -52,11 +68,13 @@ sub Run {
                 String    => $Entry,
                 UserID    => $Param{UserID},
                 Count     => $Param{Count},
-                Translate => $Block->{Translate}
+                Translate => $Block->{Translate},
+                Object    => $Param{Object},
+                Datas     => $Datas
             );
 
             if ( !$Class ) {
-                $Class = $Result{Font};
+                $Class = $Result{Class};
             }
 
             my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
@@ -80,11 +98,13 @@ sub Run {
             String    => $Block->{Value},
             UserID    => $Param{UserID},
             Count     => $Param{Count},
-            Translate => $Block->{Translate}
+            Translate => $Block->{Translate},
+            Object    => $Param{Object},
+            Datas     => $Datas
         );
 
         if ( !$Class ) {
-            $Class = $Result{Font};
+            $Class = $Result{Class};
         }
 
         $Value = $TemplateGeneratorObject->ReplacePlaceHolder(

@@ -155,7 +155,8 @@ sub Render {
                 UserID  => $Param{UserID},
                 Count   => $Param{Count},
                 Allows  => $Param{Allows},
-                Ignores => $Param{Ignores}
+                Ignores => $Param{Ignores},
+                Object  => $Block->{Object} || $Object
             );
             $Css     .= $HTML{Css};
             $Content .= $HTML{HTML};

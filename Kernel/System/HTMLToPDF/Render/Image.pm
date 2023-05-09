@@ -17,6 +17,7 @@ use base qw(
 
 our $ObjectManagerDisabled = 1;
 
+use Kernel::System::VariableCheck qw(:all);
 
 sub Run {
     my ($Self, %Param) = @_;
@@ -37,6 +38,20 @@ sub Run {
             Name => 'CSS',
             Data => $Block
         );
+
+        if ( IsArrayRefWithData($Block->{Style}->{Class}) ) {
+            for my $Style ( @{$Block->{Style}->{Class}} ) {
+                next if ( !$Style->{Selector} || !$Style->{CSS} );
+
+                $LayoutObject->Block(
+                    Name => 'StyleClass',
+                    Data => {
+                        %{$Block},
+                        %{$Style}
+                    }
+                );
+            }
+        }
 
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Image',
