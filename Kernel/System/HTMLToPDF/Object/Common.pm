@@ -53,13 +53,15 @@ sub GetPossibleExpands {
 sub _GetDynamicFields {
     my ( $Self, %Param ) = @_;
 
+    return 1 if !$Param{Expands};
+    return 1 if IsHashRefWithData($Param{Data}->{Expands}->{DynamicField});
+
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
-    my $Type  = $Param{Type};
-    my $IDKey = $Param{IDKey};
-    my $ID    = $Param{$IDKey};
+    my $Type = $Param{Type};
+    my $ID   = $Param{ObjectID};
 
     # get all dynamic fields for the object type xyz
     my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(

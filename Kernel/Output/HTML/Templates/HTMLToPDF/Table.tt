@@ -44,6 +44,11 @@
 [% END %]
         word-break: break-word;
     }
+[% RenderBlockStart("StyleClass") %]
+    .[% Data.ID %][% Data.Selector %] {
+        [% Data.CSS %]
+    }
+[% RenderBlockEnd("StyleClass") %]
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]

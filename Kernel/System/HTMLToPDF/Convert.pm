@@ -175,9 +175,9 @@ sub Convert {
         );
     }
 
-    # $Self->_FileDelete(
-    #     Data => \@DeleteData
-    # );
+    $Self->_FileDelete(
+        Data => \@DeleteData
+    );
 
     return (
         Content     => $Output,

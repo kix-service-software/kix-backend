@@ -39,6 +39,11 @@
         display:block;
         max-width: 660px !important;
     }
+[% RenderBlockStart("StyleClass") %]
+    .[% Data.ID %][% Data.Selector %] {
+        [% Data.CSS %]
+    }
+[% RenderBlockEnd("StyleClass") %]
 </style>
 [% RenderBlockEnd("CSS") %]
 [% RenderBlockStart("HTML") %]
