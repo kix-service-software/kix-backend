@@ -137,7 +137,7 @@ sub LogFileGet {
     elsif ( $Param{Tail} ) {
         if ( IsArrayRefWithData($Param{Categories}) ) {
             my $Categories = join('|', @{$Param{Categories}});
-            $LogFile{Content} = `grep -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
+            $LogFile{Content} = `grep -a -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
         }
         else {
             $LogFile{Content} = `tail -n $Param{Tail} $LogDir/$LogFileList{$Param{ID}}`;
