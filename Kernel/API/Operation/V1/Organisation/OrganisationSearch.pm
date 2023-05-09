@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -59,7 +59,7 @@ sub Run {
     my $OrgList;
 
     $Self->SetDefaultSort(
-        Organisation => [ 
+        Organisation => [
             { Field => 'Name' },
             { Field => 'Number' },
         ]
@@ -125,7 +125,8 @@ sub Run {
                 # perform search...
                 %SearchResult = $Kernel::OM->Get('Organisation')->OrganisationSearch(
                     %SearchParam,
-                    Valid => 0
+                    Valid => 0,
+                    Limit => $Self->{SearchLimit}->{Organisation} || $Self->{SearchLimit}->{'__COMMON'}
                 );
 
                 # merge results
@@ -164,7 +165,8 @@ sub Run {
 
         # get full organisation list
         $OrgList = { $Kernel::OM->Get('Organisation')->OrganisationSearch(
-            Valid  => 0,
+            Valid => 0,
+            Limit => $Self->{SearchLimit}->{Organisation} || $Self->{SearchLimit}->{'__COMMON'}
         ) };
     }
 
