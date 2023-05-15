@@ -313,7 +313,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AssignedConfigItemsMapping" Required="1" Valid="1">
-        <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut").</Description>
+        <Description Translatable="1">Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon ("ParentAttribute::ChildAttribute::RelevantAttribut"). All attributes are OR combined, except "Name", "Number", "DeploymentState" and "IncidentState" which are used as AND conditions if given.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>

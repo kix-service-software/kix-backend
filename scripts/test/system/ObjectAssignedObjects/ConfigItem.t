@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -218,8 +218,8 @@ sub _PrepareData {
             ConfigItemID => $OrgaCIID,
             Name         => 'OrgaCI - 1st version',
             DefinitionID => $Class_A_Def_ID,
-            DeplStateID  => $DeplStateListReverse{Production},
-            InciStateID  => $InciStateListReverse{Operational},
+            DeplStateID  => $DeplStateListReverse{Repair},
+            InciStateID  => $InciStateListReverse{Incident},
             UserID       => 1,
             XMLData      => [
                 undef,
@@ -332,7 +332,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactOrgaCIIDList}),
         2,
-        'Article list should contain 2 article [contact/orga]',
+        'Asset list should contain 2 asset [contact/orga]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -380,7 +380,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         2,
-        'Article list should contain 2 article [contact]',
+        'Asset list should contain 2 asset [contact]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -435,7 +435,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         1,
-        'Article list should contain 2 article [contact v2]',
+        'Asset list should contain 2 asset [contact v2]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -475,7 +475,7 @@ sub _CheckConfig {
             }
         }'
     );
-    my $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
         UserID     => 1
@@ -483,7 +483,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         2,
-        'Article list should contain 2 article [contact static]',
+        'Asset list should contain 2 asset [contact static]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -499,6 +499,148 @@ sub _CheckConfig {
         $TestData{OrgaCIID},
         $ContactCIIDList,
         'List should NOT contain CI with orga [contact static]',
+    );
+
+    # check name
+    _SetConfig(
+        'contact for both classes - static',
+        '{
+            "Contact": {
+                "'.$TestData{ClassAName}.'": {
+                    "Name": {
+                        "SearchStatic": [
+                            "OrgaCI*"
+                        ]
+                    }
+                }
+            }
+        }'
+    );
+    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
+        UserID     => 1
+    );
+    $Self->Is(
+        scalar(@{$ContactCIIDList}),
+        1,
+        'Asset list should contain 1 asset [name static]',
+    );
+    $Self->ContainedIn(
+        $TestData{OrgaCIID},
+        $ContactCIIDList,
+        'List should contain CI with matching name [name static]',
+    );
+    $Self->NotContainedIn(
+        $TestData{ContactOrgaCIID},
+        $ContactCIIDList,
+        'List should NOT contain CI with contact and orga [name static]',
+    );
+
+    # check name - not as list
+    _SetConfig(
+        'contact for class A - static name',
+        '{
+            "Contact": {
+                "'.$TestData{ClassAName}.'": {
+                    "Name": {
+                        "SearchStatic": "ContactOrgaCI*"
+                    }
+                }
+            }
+        }'
+    );
+    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
+        UserID     => 1
+    );
+    $Self->Is(
+        scalar(@{$ContactCIIDList}),
+        1,
+        'Asset list should contain 1 asset [name static simple]',
+    );
+    $Self->ContainedIn(
+        $TestData{ContactOrgaCIID},
+        $ContactCIIDList,
+        'List should contain CI with matching name [name static simple]',
+    );
+    $Self->NotContainedIn(
+        $TestData{OrgaCIID},
+        $ContactCIIDList,
+        'List should NOT contain CI with only orga [name static simple]',
+    );
+
+    # check deployment state
+    _SetConfig(
+        'contact for class A - static deployment state',
+        '{
+            "Contact": {
+                "'.$TestData{ClassAName}.'": {
+                    "DeploymentState": {
+                        "SearchStatic": [
+                            "Repair"
+                        ]
+                    }
+                }
+            }
+        }'
+    );
+    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
+        UserID     => 1
+    );
+    $Self->Is(
+        scalar(@{$ContactCIIDList}),
+        1,
+        'Asset list should contain 1 asset [deployment state static]',
+    );
+    $Self->ContainedIn(
+        $TestData{OrgaCIID},
+        $ContactCIIDList,
+        'List should contain CI with matching deployment state [deployment state static]',
+    );
+    $Self->NotContainedIn(
+        $TestData{ContactOrgaCIID},
+        $ContactCIIDList,
+        'List should NOT contain CI with contact and orga [deployment state static]',
+    );
+
+    # check incident state
+    _SetConfig(
+        'contact for class A - static incident state',
+        '{
+            "Contact": {
+                "'.$TestData{ClassAName}.'": {
+                    "IncidentState": {
+                        "SearchStatic": [
+                            "Incident"
+                        ]
+                    }
+                }
+            }
+        }'
+    );
+    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
+        UserID     => 1
+    );
+    $Self->Is(
+        scalar(@{$ContactCIIDList}),
+        1,
+        'Asset list should contain 1 asset [incident state static]',
+    );
+    $Self->ContainedIn(
+        $TestData{OrgaCIID},
+        $ContactCIIDList,
+        'List should contain CI with matching incident state [incident state static]',
+    );
+    $Self->NotContainedIn(
+        $TestData{ContactOrgaCIID},
+        $ContactCIIDList,
+        'List should NOT contain CI with contact and orga [incident state static]',
     );
 }
 
@@ -526,7 +668,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [unknown attribute]',
+        'Asset list should be empty [unknown attribute]',
     );
 
     # negative (known attribute but wrong class / wrong structure) ---------------------------
@@ -551,7 +693,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [known attribute but wrong class / wrong structure]',
+        'Asset list should be empty [known attribute but wrong class / wrong structure]',
     );
 
     # negative (known attribute but unknown class) ---------------------------
@@ -576,7 +718,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [known attribute but unknwon class]',
+        'Asset list should be empty [known attribute but unknwon class]',
     );
 
     # negative (missing object type) ---------------------------
@@ -601,7 +743,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [missing object type]',
+        'Asset list should be empty [missing object type]',
     );
 
     # negative (empty object type config) ---------------------------
@@ -618,7 +760,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [empty object type config]',
+        'Asset list should be empty [empty object type config]',
     );
 
     # negative (empty class config) ---------------------------
@@ -637,7 +779,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [empty class config]',
+        'Asset list should be empty [empty class config]',
     );
 
     # negative (empty attribute) ---------------------------
@@ -658,7 +800,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [empty attribute]',
+        'Asset list should be empty [empty attribute]',
     );
 
     # negative (empty value) ---------------------------
@@ -681,7 +823,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [empty value]',
+        'Asset list should be empty [empty value]',
     );
 
     # negative (empty config) ---------------------------
@@ -696,7 +838,7 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [empty config]',
+        'Asset list should be empty [empty config]',
     );
 
     # negative (invalid config, missing " and unnecessary ,) ---------------------------
@@ -721,7 +863,33 @@ sub _DoNegativeTests {
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Article list should be empty [invalid config]',
+        'Asset list should be empty [invalid config]',
+    );
+
+    # check unknown deployment state
+    _SetConfig(
+        'unknown deployment state',
+        '{
+            "Contact": {
+                "'.$TestData{ClassAName}.'": {
+                    "DeploymentState": {
+                        "SearchStatic": [
+                            "Production",
+                            "Unknown"
+                        ]
+                    }
+                }
+            }
+        }'
+    );
+    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+        ObjectType => 'Contact',
+        UserID     => 1
+    );
+    $Self->Is(
+        scalar(@{$CIIDList}),
+        0,
+        'Asset list should be empty [unknown DeploymentState]',
     );
 }
 
