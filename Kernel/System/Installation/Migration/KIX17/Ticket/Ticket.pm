@@ -280,16 +280,6 @@ sub _AssignOrganisation {
         }
     }
 
-    if ( !$OrgID ) {
-        # we still don't have an organisation -> create a new one
-        $OrgID = $OrganisationObject->OrganisationAdd(
-            Number => $Param{Ticket}->{customer_id},
-            Name   => $Param{Ticket}->{customer_id},
-            UserID => 1,
-        );
-    }
-
-
     return $OrgID;
 }
 
@@ -553,7 +543,7 @@ sub _MigrateArticleFlags {
 
         # get source data
         my $SourceData = $Self->GetSourceData(
-            Type       => 'article_flag', 
+            Type       => 'article_flag',
             Where      => "article_id >= $Param{SourceArticleID} AND article_id <= $Param{SourceArticleID} + $PreloadBlockSize",
             References => {
                 'create_by'  => 'users',
@@ -640,7 +630,7 @@ sub _MigrateTicketFlags {
 
         # get source data
         my $SourceData = $Self->GetSourceData(
-            Type       => 'ticket_flag', 
+            Type       => 'ticket_flag',
             Where      => "ticket_id >= $Param{SourceTicketID} AND ticket_id <= $Param{SourceTicketID} + $PreloadBlockSize",
             References => {
                 'create_by'  => 'users',
