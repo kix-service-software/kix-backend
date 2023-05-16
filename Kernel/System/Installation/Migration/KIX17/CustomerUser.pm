@@ -276,21 +276,6 @@ sub _AssignOrganisation {
         Silent => 1,
     );
 
-    if ( !$OrgID ) {
-        # create a new organisation
-        $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-            Number => substr($Param{CustomerID}, 0, 150),
-            Name   => $Param{CustomerID},
-            UserID => 1,
-        );
-        if ( !$OrgID ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create organisation for contact $Param{ContactID}!"
-            );
-        }
-    }
-
     if ( $OrgID ) {
         # check if contact-org mapping exists
         my $Success = $Self->Lookup(

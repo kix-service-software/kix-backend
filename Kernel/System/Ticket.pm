@@ -564,12 +564,11 @@ sub TicketCreate {
                     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                         ID => $Param{ContactID},
                     );
-                    if (IsHashRefWithData(\%ContactData)) {
-                        if ($ContactData{PrimaryOrganisationID}) {
-                            $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
-                        } else {
-                            $Param{OrganisationID} = $ContactEmail;
-                        }
+                    if (
+                        IsHashRefWithData(\%ContactData)
+                        && $ContactData{PrimaryOrganisationID}
+                    ) {
+                        $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
                     }
                 }
             }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -808,41 +808,45 @@ sub ContactUpdate {
         }
     }
 
+    my %OrgaIDs;
     # check if primary OrganisationID exists
     if ($Param{PrimaryOrganisationID}) {
         my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Param{PrimaryOrganisationID},
         );
 
-        if (!%OrgData || $OrgData{ValidID} != 1) {
+        if (
+            !%OrgData
+            || $OrgData{ValidID} != 1
+        ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
+                Message  => "No valid organisation found for primary organisation ID \"$Param{PrimaryOrganisationID}\".",
             );
             return;
         }
+        $OrgaIDs{$Param{PrimaryOrganisationID}} = 1;
     }
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
+            next if %OrgaIDs && $OrgaIDs{$OrgID};
+
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
-            if (!%OrgData || $OrgData{ValidID} != 1) {
+            if (
+                !%OrgData
+                || $OrgData{ValidID} != 1
+            ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
+                    Message  => "No valid organisation found for assigned organisation ID \"$OrgID\".",
                 );
                 return;
             }
+            $OrgaIDs{$OrgID} = 1;
         }
-    } elsif (!defined $Param{OrganisationIDs}) {
-        $Param{OrganisationIDs} = $Contact{OrganisationIDs};
-    }
-
-    # check if primary OrganisationID is contained in assigned OrganisationIDs
-    if ($Param{PrimaryOrganisationID} && !grep /$Param{PrimaryOrganisationID}/, @{$Param{OrganisationIDs}}) {
-        push(@{$Param{OrganisationIDs}}, $Param{PrimaryOrganisationID});
     }
 
     # if assigned user ist given, check associated user exists
@@ -873,12 +877,19 @@ sub ContactUpdate {
     }
 
     # set default value
-    $Param{Comment} ||= '';
+    $Param{Comment} ||= q{};
 
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Firstname Lastname Email Email1 Email2 Email3 Email4 Email5 Title Phone Fax Mobile Street Zip City Country Comment ValidID AssignedUserID)) {
+    for my $Key (
+        qw(
+            Firstname Lastname
+            Email Email1 Email2 Email3 Email4 Email5
+            Title Phone Fax Mobile Street Zip City Country
+            Comment ValidID AssignedUserID
+        )
+    ) {
         next KEY if defined $Contact{$Key} && $Contact{$Key} eq $Param{$Key};
         $ChangeRequired = 1;
         last KEY;
@@ -886,15 +897,12 @@ sub ContactUpdate {
 
     my @DeleteOrgIDs;
     my @InsertOrgIDs;
-    for my $OrgID (@{$Param{OrganisationIDs}}) {
-        if (!grep ( /^$OrgID$/, @{$Contact{OrganisationIDs}})) {
-            push(@InsertOrgIDs, $OrgID);
-        }
-    }
     for my $OrgID (@{$Contact{OrganisationIDs}}) {
-        if (!grep ( /^$OrgID$/, @{$Param{OrganisationIDs}})) {
-            push(@DeleteOrgIDs, $OrgID);
-        }
+        next if %OrgaIDs && $OrgaIDs{$OrgID};
+        push(@DeleteOrgIDs, $OrgID);
+    }
+    if ( %OrgaIDs ) {
+        @InsertOrgIDs = keys %OrgaIDs;
     }
 
     $ChangeRequired = 1 if (
