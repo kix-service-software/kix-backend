@@ -194,6 +194,16 @@ sub Run {
         }
     }
 
+    $Self->EventHandler(
+        Event => 'ArticleCreateFollowUpReject',
+        Data  => {
+            ArticleID     => $ArticleID,
+            TicketID      => $Param{TicketID},
+            OldTicketData => \%Ticket,
+        },
+        UserID => $Param{InmailUserID},
+    );
+
     # write log
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',

@@ -1249,12 +1249,6 @@ my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
 my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
 my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
 
-print STDERR "SendmailModule: ConfigObject: $ConfigObject\n";
-
-    use Data::Dumper;
-print STDERR "SendmailModule (Raw): ".Data::Dumper::Dumper($ConfigObject->{Config}->{'SendmailModule'});
-print STDERR "SendmailModule (Get): ".Data::Dumper::Dumper($ConfigObject->Get('SendmailModule'));
-
 my $Count = 0;
 my $NotificationID;
 TEST:
