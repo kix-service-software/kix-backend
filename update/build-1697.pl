@@ -111,9 +111,15 @@ sub _AddNewPermissions {
         if (!$PermissionID) {
             $LogObject->Log(
                 Priority => 'error',
-                Message  => "Unable to add permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target}!"
+                Message  => "Unable to add permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target})!"
             );
             $AllPermsOK = 0;
+        }
+        else {
+            $LogObject->Log(
+                Priority => 'info',
+                Message  => "Added permission (role=$Permission->{Role}, type=$Permission->{Type}, target=$Permission->{Target})."
+            );
         }
     }
 

@@ -2082,6 +2082,7 @@
         <Setting>
             <Array>
                 <Item>ArticleCreate</Item>
+                <Item>ArticleCreateFollowUpReject</Item>
                 <Item>ArticleUpdate</Item>
                 <Item>ArticleSend</Item>
                 <Item>ArticleBounce</Item>
