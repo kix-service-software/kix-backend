@@ -332,7 +332,7 @@ our %FieldTypeMigration = (
         }
     },
     'TextArea' => {
-        Type         => 'Text',
+        Type         => 'TextArea',
         ConfigChange => {
             Add => {
                 CountMin      => 1,
@@ -693,6 +693,11 @@ sub Run {
                     $FieldTypeSrc eq 'Text'
                     || $FieldTypeSrc eq 'TextArea'
                 ) {
+                    # init default value, if missing
+                    if ( !defined( $Config->{DefaultValue} ) ) {
+                        $Config->{DefaultValue} = '';
+                    }
+
                     # init regular expression list, if missing
                     if ( !defined( $Config->{RegExList} ) ) {
                         $Config->{RegExList} = [];
