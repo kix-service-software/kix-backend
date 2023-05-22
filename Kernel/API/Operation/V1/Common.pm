@@ -241,7 +241,8 @@ sub RunOperation {
             Key  => $CacheKey,
         );
 
-        if ( IsHashRefWithData($CacheResult) ) {
+        # FIXME: get specific object type for implicit paging
+        if ( IsHashRefWithData($CacheResult) && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor})) {
             $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
@@ -461,7 +462,7 @@ sub PrepareData {
         );
         if ( IsHashRefWithData($Result) && exists $Result->{Success} && $Result->{Success} == 0 ) {
 
-            # error occured
+            # error occurred
             return $Result;
         }
         $Self->{Filter} = $Result;
@@ -787,7 +788,7 @@ sub SuppressSubResourceInclude {
         if ( exists $Self->{SuppressedSubResourceIncludes}->{$SubResource} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "supress including of sub-resource \"$SubResource\"" );
+        $Self->_Debug( $Self->{LevelIndent}, "suppress including of sub-resource \"$SubResource\"" );
         $Self->{SuppressSubResourceIncludes}->{lc($SubResource)} = 1;
     }
 }
@@ -946,7 +947,7 @@ sub SetDefaultSort {
 
 =item SetTotalItemCount()
 
-set the total item count for specific object types (can be used in conjuction with implicit paging)
+set the total item count for specific object types (can be used in conjunction with implicit paging)
 
     $CommonObject->SetTotalItemCount(
         Ticket => 123,

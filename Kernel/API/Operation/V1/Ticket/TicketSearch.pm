@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,7 +58,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Self->SetDefaultSort(
-        Ticket => [ 
+        Ticket => [
             { Field => 'CreateTime' },
         ]
     );
@@ -95,12 +95,12 @@ sub Run {
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @TicketIndex = $TicketObject->TicketSearch(
-        Result     => 'ARRAY',
-        Search     => $Self->{Search}->{Ticket},
-        Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
-        Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
-        UserType   => $Self->{Authorization}->{UserType},
-        UserID     => $Self->{Authorization}->{UserID}
+        Result   => 'ARRAY',
+        Search   => $Self->{Search}->{Ticket},
+        Limit    => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort     => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
+        UserType => $Self->{Authorization}->{UserType},
+        UserID   => $Self->{Authorization}->{UserID}
     );
 
    if ( @TicketIndex ) {
@@ -109,7 +109,7 @@ sub Run {
         $Self->SetTotalItemCount(
             Ticket => scalar @TicketIndex
         );
-        
+
         # restrict data to the request window
         my %PagedResult = $Self->ApplyPaging(
             Ticket => \@TicketIndex
