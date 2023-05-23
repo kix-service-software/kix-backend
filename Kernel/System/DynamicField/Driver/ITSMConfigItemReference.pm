@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -375,6 +375,26 @@ sub ShortDisplayValueRender {
         %Param,
         DisplayPattern => '<CI_Name>'
     );
+}
+
+sub DFValueObjectReplace {
+    my ( $Self, %Param ) = @_;
+
+    return if ( !$Param{Placeholder} || !IsArrayRefWithData($Param{Value}) );
+
+    if ($Param{Placeholder} =~ m/(?:<.+)?_Object_(\d+)_(.+)>?/) {
+        if (($1 || $1 == 0) && $2 && $Param{Value}->[$1]) {
+            return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                Text        => "<KIX_ASSET_$2>",
+                ObjectType  => 'ITSMConfigItem',
+                ObjectID    => $Param{Value}->[$1],
+                UserID      => $Param{UserID},
+                Language    => $Param{Language}
+            );
+        }
+    }
+
+    return;
 }
 
 sub ExportConfigPrepare {

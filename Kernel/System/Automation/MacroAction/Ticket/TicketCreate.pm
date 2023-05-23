@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -338,28 +338,13 @@ sub Run {
         }
     }
     $ArticleParam{Subject} = $TicketParam{Title};
-    $ArticleParam{Body}    = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value     => $ArticleParam{Body},
-        Translate => 1,
-        Richtext  => 1
-    );
-
-    # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
-        next if !defined $ArticleParam{$Attribute};
-
-        $ArticleParam{$Attribute} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $ArticleParam{$Attribute}
-        );
-    }
 
     # create article
     my $ArticleBackendResult = $Self->SUPER::Run(
-        Config   => \%ArticleParam,
-        TicketID => $TicketID,
-        UserID   => $Param{UserID}
+        EventData => $Param{EventData},
+        Config    => \%ArticleParam,
+        TicketID  => $TicketID,
+        UserID    => $Param{UserID}
     );
 
     # reset definition

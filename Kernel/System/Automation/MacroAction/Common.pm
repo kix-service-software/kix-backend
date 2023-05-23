@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -339,8 +339,10 @@ sub _ReplaceValuePlaceholder {
         Data            => $Data,
         ReplaceNotFound => $Param{ReplaceNotFound},
 
-        # FIXME: use object id as ticket id, but it could be another object (needed if no event data is given)!
-        TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
+        # FIXME: use correct object id for typ (could be a sub macro of other type)
+        # or get and use job type by JobID in $Self
+        ObjectType => $Param{MacroType},
+        ObjectID   => $Self->{RootObjectID} || $Param{ObjectID}
     );
 }
 

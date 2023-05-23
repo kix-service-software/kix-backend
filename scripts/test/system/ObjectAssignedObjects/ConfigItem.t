@@ -57,7 +57,7 @@ sub _PrepareData {
         $CustomerContactID,
         'CustomerContactCreate',
     );
-    my %CustomerContact = $ContactObject->ContactGet(ID => $CustomerContactID);
+    my %CustomerContact = $ContactObject->ContactGet(ID => $CustomerContactID, UserID => 1);
     my %CustomerUser    = $UserObject->GetUserData(UserID => $CustomerContact{AssignedUserID});
     if (IsHashRefWithData(\%CustomerUser)) {
         $CustomerContact{User} = \%CustomerUser;
