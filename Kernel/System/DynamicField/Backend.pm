@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -413,6 +413,45 @@ sub DisplayKeyRender {
 
     # call DisplayValueRender on the specific backend
     my $ValueStrg = $Self->{$DynamicFieldBackend}->DisplayKeyRender(%Param);
+
+    return $ValueStrg;
+}
+
+=item DFValueObjectReplace()
+
+gets the object specific value.
+
+    my $ValueStrg = $BackendObject->DFValueObjectReplace(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        Value              => 'Any value',
+        Placeholder        => '_Object_0_SomeAttribute',
+        UserID             => 1
+    );
+
+    Returns
+
+    $ValueStrg = 'some value' or undef
+
+=cut
+
+sub DFValueObjectReplace {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    # call DFValueObjectReplace on the specific backend
+    my $ValueStrg = $Self->{$DynamicFieldBackend}->DFValueObjectReplace(%Param);
 
     return $ValueStrg;
 }
