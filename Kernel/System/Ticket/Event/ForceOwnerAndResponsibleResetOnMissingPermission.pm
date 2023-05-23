@@ -72,8 +72,17 @@ sub Run {
 
     TYPE:
     foreach my $Type ( qw(Owner Responsible) ) {
-        # check resource permission
+        # check resource READ permission
         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
+            UserID              => $Ticket{$Type.'ID'},
+            Target              => '/tickets',
+            RequestedPermission => 'READ',
+            UsageContext        => 'Agent'
+        );
+        next TYPE if !$Granted;
+
+        # check resource WRITE permission
+        ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
             UserID              => $Ticket{$Type.'ID'},
             Target              => '/tickets',
             RequestedPermission => 'UPDATE',

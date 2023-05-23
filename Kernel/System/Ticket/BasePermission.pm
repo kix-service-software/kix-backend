@@ -71,6 +71,7 @@ validate a given base permission.
         Permission    => '...',
         UsageContext  => ...,
         UserID        => 1,
+        Strict        => 0|1            # Default: 0, only the given permission, no combined ones (example: READ + Strict = READONLY)
     );
 =cut
 
@@ -89,32 +90,41 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     my $Value = 0;
-    foreach my $Permission ( split(/,/, $Param{Permission}) ) {        
+    PERMISSION:
+    foreach my $Permission ( split(/,/, $Param{Permission}) ) {
         $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
-    }    
+    }
 
     # check if we have base permissions for this user in this usage context
     my %PermissionList = $Kernel::OM->Get('User')->PermissionList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
         Types        => ['Base::Ticket'],
-    );    
+    );
     return 1 if !%PermissionList;
+
+    # combine permissions on same target
+    my %CombinedPermissions;
+    foreach my $Permission ( values %PermissionList ) {
+        $CombinedPermissions{$Permission->{Target}} //= 0;
+        $CombinedPermissions{$Permission->{Target}} |= $Permission->{Value};
+    }
 
     my @QueueIDs;
 
-    PERMISSION:
-    foreach my $Permission ( values %PermissionList ) {
-        next PERMISSION if ($Permission->{Value} & $Value) != $Value;
+    TARGET:
+    foreach my $Target ( keys %CombinedPermissions ) {
+        next TARGET if !$Param{Strict} && ($CombinedPermissions{$Target} & $Value) != $Value;
+        next TARGET if $Param{Strict} && $CombinedPermissions{$Target} ne $Value;
 
-        if ( $Permission->{Target} !~ /\*/ ) {
-            push @QueueIDs, $Permission->{Target};
+        if ( $Target !~ /\*/ ) {
+            push @QueueIDs, $Target;
         }
         else {
             if ( !IsHashRef($Self->{QueueListReverse}) ) {
                 $Self->{QueueListReverse} = { reverse $Kernel::OM->Get('Queue')->QueueList(Valid => 0) };
             }
-            my $Pattern = $Permission->{Target};
+            my $Pattern = $Target;
             $Pattern =~ s/\*/.*/g;
 
             QUEUE:

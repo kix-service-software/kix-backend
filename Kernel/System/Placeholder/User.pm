@@ -152,8 +152,6 @@ sub _ReplaceUserPlaceholder {
     }
 
     return $Self->_HashGlobalReplace( $Param{Text}, join('|', @{$Param{Tags}}), %ContactOfUser, %User );
-
-    return $Param{Text};
 }
 
 1;

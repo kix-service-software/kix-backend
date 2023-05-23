@@ -73,6 +73,17 @@ $Self->True(
     "Disable Agent Self Notify On Action",
 );
 
+# disable async notifications
+$Success = $Helper->ConfigSettingChange(
+    Key   => 'TicketNotification::SendAsynchronously',
+    Value => 0,
+);
+
+$Self->True(
+    $Success,
+    "Deactivate asynchronous notifications",
+);
+
 my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
@@ -105,6 +116,12 @@ my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
+            }
         ]
     }
 );
@@ -116,6 +133,12 @@ my $TicketDenyRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
+                Value  => Kernel::System::Role::Permission::PERMISSION->{DENY},
+            }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
                 Value  => Kernel::System::Role::Permission::PERMISSION->{DENY},
             }
         ]
@@ -131,6 +154,12 @@ my $TicketReadRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
+            }
         ]
     }
 );
@@ -143,6 +172,12 @@ my $TicketWriteRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
             {
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{UPDATE},
+            }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{WRITE},
             }
         ]
     }
@@ -258,6 +293,10 @@ my $TicketID = $TicketObject->TicketCreate(
 $Self->True(
     $TicketID,
     "TicketCreate() successful for Ticket ID $TicketID",
+);
+
+my %Ticket = $TicketObject->TicketGet(
+    TicketID => $TicketID
 );
 
 # create article
@@ -691,10 +730,6 @@ my @Tests = (
             UserID => 1,
         },
         ExpectedResults => [
-            {
-                ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
-            },
             {
                 ToArray => [ $UserContactData4{Email} ],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
@@ -1352,6 +1387,9 @@ for my $Test (@Tests) {
         # set out of office should always be true
         next TEST if !$SuccessOOO;
     }
+
+    # reset event mapping
+    $EventNotificationEventObject->{NotificationEventMapping} = undef;
 
     my $Result = $EventNotificationEventObject->Run( %{ $Test->{Config} } );
 
