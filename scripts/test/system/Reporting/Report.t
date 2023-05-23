@@ -179,6 +179,25 @@ $Self->True(
     'ReportDelete()',
 );
 
+my $Success = $ReportingObject->ReportDelete(
+    ID => $ReportID + 1,
+);
+
+$Self->False(
+    $Success,
+    'ReportDelete() - non-existing ID',
+);
+
+my $Success = $ReportingObject->ReportDelete(
+    ID => $ReportID + 1,
+    Silent => 1,
+);
+
+$Self->False(
+    $Success,
+    'ReportDelete() - non-existing ID (silent)',
+);
+
 @ReportList = $ReportingObject->ReportList(
     DefinitionID => $DefinitionID,
 );
