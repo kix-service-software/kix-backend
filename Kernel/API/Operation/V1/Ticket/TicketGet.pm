@@ -104,7 +104,6 @@ one or more ticket entries in one call.
                     TypeID             => 123,
                     Responsible        => 'some_responsible_login',
                     ResponsibleID      => 123,
-                    Age                => 3456,
                     Created            => '2010-10-27 20:15:00'
                     CreateTimeUnix     => '1231414141',
                     CreateBy           => 123,
@@ -366,6 +365,8 @@ sub _GetTicketData {
     $TicketData{ContactID}      = "" . $TicketData{ContactID};
     $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
 
+    delete $TicketData{Age};
+    
     return \%TicketData;
 }
 
