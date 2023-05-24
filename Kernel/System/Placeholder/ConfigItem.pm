@@ -70,7 +70,22 @@ sub _Replace {
     if ( IsHashRefWithData($ConfigItem) || IsHashRefWithData($Version) ) {
         $ConfigItem->{ID} = $ConfigItem->{ConfigItemID};
 
-        $Self->_prepareVersion(Language => $Param{Language}, Version => $Version);
+        my $LanguageObject;
+        if ($Param{Language}) {
+            $LanguageObject = Kernel::Language->new(
+                UserLanguage => $Param{Language}
+            );
+            if ($LanguageObject) {
+                $ConfigItem->{CreateTime} = $LanguageObject->FormatTimeString(
+                    $ConfigItem->{CreateTime}, 'DateFormat', 'NoSeconds'
+                );
+                $ConfigItem->{ChangeTime} = $LanguageObject->FormatTimeString(
+                    $ConfigItem->{ChangeTime}, 'DateFormat', 'NoSeconds'
+                );
+            }
+        }
+
+        $Self->_prepareVersion(LanguageObject => $LanguageObject, Version => $Version);
 
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Version }, %{ $ConfigItem } );
@@ -99,14 +114,8 @@ sub _prepareVersion {
         # <..._AttributeName_0_Value> like above
         # <..._AttributeName_0_Key> first value (_1 = second value)
         # for sub attributes: ..._ParentAttribute_0_SubAttribute_0_Value
-        my $LanguageObject;
-        if ($Param{Language}) {
-            $LanguageObject = Kernel::Language->new(
-                UserLanguage => $Param{Language},
-            );
-        }
         $Self->_prepareData(
-            LanguageObject => $LanguageObject,
+            LanguageObject => $Param{LanguageObject},
             Version        => $Param{Version},
             XMLData        => $Param{Version}->{XMLData}->[1]->{Version}->[1],
             XMLDefinition  => $Param{Version}->{XMLDefinition}

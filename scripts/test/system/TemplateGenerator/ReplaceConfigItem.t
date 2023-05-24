@@ -237,12 +237,12 @@ my %Data = (
     },
     Attachment => 'someFileName.txt'
 );
-my $IDs = _AddConfigItem();
+my $ResultData = _AddConfigItem();
 
-if ($IDs->[0]) {
+if ($ResultData->{ReplaceCIID}) {
 
     my $VersionData = $ConfigItemObject->VersionGet(
-        ConfigItemID => $IDs->[0],
+        ConfigItemID => $ResultData->{ReplaceCIID},
         XMLDataGet   => 1
     );
     $Self->True(
@@ -261,6 +261,12 @@ if ($IDs->[0]) {
             XMLDefinition => $VersionData->{XMLDefinition}
         );
 
+        my $LanguageObjectEN = Kernel::Language->new(
+            UserLanguage => 'en'
+        );
+        my $LanguageObjectDE = Kernel::Language->new(
+            UserLanguage => 'de'
+        );
         my @Tests = (
             {
                 Name   => 'KIX_ASSET_Name',
@@ -275,12 +281,12 @@ if ($IDs->[0]) {
             {
                 Name   => 'KIX_ASSET_ Orga attribute',
                 Text   => 'Orga: <KIX_ASSET_SectionOwner_0_OwnerOrganisation_0> ## <KIX_ASSET_SectionOwner_0_OwnerOrganisation_0_Key>',
-                Result => "Orga: $Data{Organisation} ## $IDs->[2]"
+                Result => "Orga: $Data{Organisation} ## $ResultData->{TestOrgaID}"
             },
             {
                 Name   => 'KIX_ASSET_ Contact attribute',
                 Text   => 'Contact: <KIX_ASSET_SectionOwner_0_OwnerContact_0> ## <KIX_ASSET_SectionOwner_0_OwnerContact_0_Key>',
-                Result => "Contact: $ContactValue->[0] ## $IDs->[3]"
+                Result => "Contact: $ContactValue->[0] ## $ResultData->{TestContactID}"
             },
             {
                 Name   => 'KIX_ASSET_ GeneralCatalog attribute',
@@ -320,7 +326,7 @@ if ($IDs->[0]) {
             {
                 Name   => 'KIX_ASSET_ ConfigItemRef attribute',
                 Text   => 'ConfigItemRef: <KIX_ASSET_RelevantAsset_0> ## <KIX_ASSET_RelevantAsset_0_Key>',
-                Result => "ConfigItemRef: $RefAssetValue->[0] ## $IDs->[4]"
+                Result => "ConfigItemRef: $RefAssetValue->[0] ## $ResultData->{RefCIID}"
             },
             {
                 Name   => 'KIX_ASSET_ TextArea attribute',
@@ -330,7 +336,7 @@ if ($IDs->[0]) {
             {
                 Name   => 'KIX_ASSET_ Attachment attribute',
                 Text   => 'Attachment: <KIX_ASSET_Attachment_0_Key> ## <KIX_ASSET_Attachment>',
-                Result => "Attachment: $IDs->[5] ## $Data{Attachment}"
+                Result => "Attachment: $ResultData->{AttachmentID} ## $Data{Attachment}"
             },
             # negative test
             {
@@ -363,27 +369,42 @@ if ($IDs->[0]) {
                 Result => "DateTime: $Data{MaintenanceDateTimesGerman}->[0]",
                 Translation => 1
             },
+            {
+                Name   => 'KIX_ASSET CreateTime',
+                Text   => 'CreateTime: <KIX_ASSET_CreateTime>',
+                Result => 'CreateTime: ' . $LanguageObjectEN->FormatTimeString(
+                    $ResultData->{Now}, 'DateFormat', 'NoSeconds'
+                )
+            },
+            {
+                Name   => 'KIX_ASSET ChangeTime',
+                Text   => 'ChangeTime: <KIX_ASSET_ChangeTime>',
+                Result => 'ChangeTime: ' . $LanguageObjectDE->FormatTimeString(
+                    $ResultData->{Now}, 'DateFormat', 'NoSeconds'
+                ),
+                Translation => 1
+            }
         );
 
         for my $Test (@Tests) {
             my $Result = $TemplateGeneratorObject->ReplacePlaceHolder(
                 Text       => $Test->{Text},
                 ObjectType => 'ITSMConfigItem',
-                ObjectID   => $IDs->[0],
+                ObjectID   => $ResultData->{ReplaceCIID},
                 UserID     => 1,
-                Language   => $Test->{Translation} ? 'de' : 'en',
+                Language   => $Test->{Translation} ? 'de' : 'en'
             );
             if ($Test->{Result}) {
                 $Self->Is(
                     $Result,
                     $Test->{Result},
-                    "$Test->{Name} (by ID) - _Replace()",
+                    "$Test->{Name} (by ID) - _Replace()"
                 );
             } elsif ($Test->{ResultList}) {
                 $Self->IsDeeply(
                     $Result,
                     $Test->{ResultList},
-                    '$Test->{Name} (by ID - List) - _Replace()',
+                    "$Test->{Name} (by ID - List) - _Replace()"
                 );
             }
         }
@@ -595,6 +616,7 @@ sub _AddConfigItem {
         ClassID => $ClassID,
         UserID  => 1
     );
+    my $Now = $Kernel::OM->Get('Time')->CurrentTimestamp();
     $Self->True(
         $ReplaceCIID,
         '_AddConfigItem - create replace config item',
@@ -714,7 +736,15 @@ sub _AddConfigItem {
         );
     }
 
-    return [$ReplaceCIID, $TestUserID, $TestOrgaID, $TestContactID, $RefCIID, $AttachmentID];
+    return {
+        ReplaceCIID   => $ReplaceCIID,
+        RefCIID       => $RefCIID,
+        TestUserID    => $TestUserID,
+        TestOrgaID    => $TestOrgaID,
+        TestContactID => $TestContactID,
+        AttachmentID  => $AttachmentID,
+        Now           => $Now
+    };
 }
 
 
