@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-05-05 07:19+0000\n"
-"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
+"PO-Revision-Date: 2023-05-24 09:19+0000\n"
+"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -344,7 +344,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Maintenance"
-msgstr "In Wartung"
+msgstr "Wartung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Middleware"
