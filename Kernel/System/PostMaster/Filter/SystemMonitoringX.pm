@@ -208,46 +208,73 @@ sub _MailParse {
         return;
     }
 
-    my @DynamicFieldContentTicket = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle = split( ',', ($Self->{Config}->{'DynamicFieldContent::Article'} || ''));
-    my @DynamicFieldContent = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
+    # get configured items
+    my @DynamicFieldContentTicket  = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
+    my @DynamicFieldContentArticle = split( ',', $Self->{Config}->{'DynamicFieldContent::Article'} );
+    my @DynamicFieldContent        = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
-    my $Subject = $Param{GetParam}->{Subject};
+    # init hash to remember matched items
     my %AlreadyMatched;
 
-    # examine email SUBJECT...
-    my @SubjectLines = split /\n/, $Subject;
-    for my $Line (@SubjectLines) {
+    # Try to get configured items by pattern from email SUBJECT
+    my $Subject      = $Param{GetParam}->{Subject};
+    my @SubjectLines = split( /\n/, $Subject );
+    ITEM:
+    for my $Item ( @DynamicFieldContent ) {
+        # skip items without pattern
+        next ITEM if ( !$Self->{Config}->{ $Item . 'RegExp' } );
 
-        # extract to SysMon-State, -Host, -Service, -Address from email BODY
-        ITEM:
-        for my $Item (@DynamicFieldContent) {
-            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
-            my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
+        # isolate regex
+        my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
+
+        # process subject lines
+        for my $Line ( @SubjectLines ) {
             if ( $Line =~ /$Regex/ ) {
-                $Self->{$Item} = $1;
-                $AlreadyMatched{$Item} = 1;
+                # get first capture group for item
+                $Self->{ $Item } = $1;
+
+                # remember matched item
+                $AlreadyMatched{ $Item } = 1;
+
+                # only get first match
+                next ITEM;
             }
         }
     }
 
-    # examine email BODY line by line...
-    my $Body = $Param{GetParam}->{Body} || die "Message has no Body";
-    my @BodyLines = split /\n/, $Body;
+    # check for existing body
+    if ( $Param{GetParam}->{Body} ) {
+        my $Body      = $Param{GetParam}->{Body};
+        my @BodyLines = split( /\n/, $Body );
 
-    LINE:
-    for my $Line (@BodyLines) {
-
-        # extract to SysMon-State, -Host, -Service, -Address from email BODY
+        # Try to get configured items by pattern from email BODY
         ITEM:
-        for my $Item (@DynamicFieldContent) {
-            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
-            next ITEM if $AlreadyMatched{$Item};
+        for my $Item ( @DynamicFieldContent ) {
+            # skip already matched items
+            next ITEM if ( $AlreadyMatched{ $Item } );
 
+            # skip items without pattern
+            next ITEM if ( !$Self->{Config}->{ $Item . 'RegExp' } );
+
+            # isolate and prepare regex
             my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
-            if ( $Line =~ /$Regex/ ) {
-                $Self->{$Item} = $1;
-                $AlreadyMatched{$Item} = 1;
+            if (
+                $Regex =~ m/^\.\+/
+                || $Regex =~ m/^\(\.\+/
+                || $Regex =~ m/^\(\?\:\.\+/
+            ) {
+                $Regex = '^' . $Regex;
+            }
+
+            # process body lines
+            for my $Line ( @BodyLines ) {
+                if ( $Line =~ /$Regex/ ) {
+                    # get first capture group for item
+                    $Self->{ $Item } = $1;
+
+                    # only get first match
+                    next ITEM;
+                }
             }
         }
     }
