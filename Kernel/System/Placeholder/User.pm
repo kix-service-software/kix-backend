@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -152,8 +152,6 @@ sub _ReplaceUserPlaceholder {
     }
 
     return $Self->_HashGlobalReplace( $Param{Text}, join('|', @{$Param{Tags}}), %ContactOfUser, %User );
-
-    return $Param{Text};
 }
 
 1;

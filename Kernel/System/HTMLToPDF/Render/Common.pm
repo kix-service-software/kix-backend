@@ -59,35 +59,42 @@ sub _ReplacePlaceholders {
     }
 
     my %Result = (
-        Text => $Param{String},
-        Font => 'Proportional',
+        Text  => $Param{String},
+        Class => 'Proportional',
     );
 
     # replace Font
-    while ($Result{Text} =~ m{<Font_([^>]+)>}smx ) {
+    while ($Result{Text} =~ m{<Font_([^>]+)>}sm ) {
         my $Font = $1;
         $Result{Text} =~ s/<Font_$Font>//gsm;
         if ( $Font eq 'Bold' ) {
-            $Result{Font} = 'ProportionalBold';
+            $Result{Class} = 'ProportionalBold';
         }
         if ( $Font eq 'Italic' ) {
-            $Result{Font} = 'ProportionalItalic';
+            $Result{Class} = 'ProportionalItalic';
         }
         if ( $Font eq 'BoldItalic' ) {
-            $Result{Font} = 'ProportionalBoldItalic';
+            $Result{Class} = 'ProportionalBoldItalic';
         }
         if ( $Font eq 'Mono' ) {
-            $Result{Font} = 'Monospaced';
+            $Result{Class} = 'Monospaced';
         }
         if ( $Font eq 'MonoBold' ) {
-            $Result{Font} = 'MonospacedBold';
+            $Result{Class} = 'MonospacedBold';
         }
         if ( $Font eq 'MonoItalic' ) {
-            $Result{Font} = 'MonospacedItalic';
+            $Result{Class} = 'MonospacedItalic';
         }
         if ( $Font eq 'MonoBoldItalic' ) {
-            $Result{Font} = 'MonospacedBoldItalic';
+            $Result{Class} = 'MonospacedBoldItalic';
         }
+    }
+
+    # replace custom classes
+    while ($Result{Text} =~ m{<Class_([^>]+)>}sm ) {
+        my $Class = $1;
+        $Result{Text} =~ s/<Class_$Class>//gsm;
+        $Result{Class} .= " $Class";
     }
 
     # replace current user and time
@@ -153,6 +160,56 @@ sub _ReplacePlaceholders {
         }
 
         $Result{Text} =~ s/<TIME_.*>//gsxm;
+    }
+
+    # replace object attributes
+    if (
+        $Param{Datas}
+        && $Param{Object}
+    ) {
+        for my $Tag ( sort keys %{$Param{Datas}} ) {
+            my $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Key';
+            if ( $Result{Text} =~ m/$Pattern/smg ) {
+                $Result{Text} =~ s/$Pattern/$Tag/smg;
+                $Result{Text} =~ s/$Pattern/-/smg;
+            }
+
+            $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Value(:?[.](\d+)|)';
+            if ( $Result{Text} =~ m/$Pattern/smg ) {
+                my $Index = $1;
+                my $Value;
+
+                if ( $Tag =~ /^DynamicField_/sm ) {
+                    $Value = $Param{Datas}->{$Tag}->{Value};
+                }
+                elsif ( $Index ) {
+                    if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
+                        $Value = $Param{Datas}->{$Tag}->[$Index];
+                    }
+                    else {
+                        $Value = $Param{Datas}->{$Tag};
+                    }
+                }
+                else {
+                    if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
+                        $Value = join( q{,}, $Param{Datas}->{$Tag});
+                    }
+                    else {
+                        $Value = $Param{Datas}->{$Tag};
+                    }
+                }
+                if ( $Tag =~ /^(?:Create|Change)(?:d|Time)$/sm ) {
+                    $Value = $LayoutObject->{LanguageObject}->FormatTimeString( $Value, "DateFormat" );
+                }
+                $Result{Text} =~ s/$Pattern/$Value/smg;
+                $Result{Text} =~ s/$Pattern/-/smg;
+            }
+        }
+        # replace not exists placeholders of that object
+        my $Pattern = $Param{Object} . '[.].*[.]Key';
+        my $Pattern2 = $Param{Object} . '[.].*[.]Value(:?[.]\d+|)';
+        $Result{Text} =~ s/$Pattern/-/smg;
+        $Result{Text} =~ s/$Pattern2/-/smg;
     }
 
     return %Result;

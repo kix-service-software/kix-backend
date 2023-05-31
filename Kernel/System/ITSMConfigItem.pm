@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1180,12 +1180,12 @@ sub ConfigItemSearchExtended {
     # configitem search is required if Number or Name is given
     # special handling for config item number and name
     # number 0 is allowed but not the empty string
-    if ( (defined $Param{Number} && $Param{Number} ne '') || $Param{Name} ) {
+    if ( (defined $Param{Number} && $Param{Number} ne '') || $Param{Name} || $Param{InciStateIDs} ) {
         $RequiredSearch{ConfigItem} = 1;
     }
 
     # version search is required if What or PreviousVersionSearch is given
-    if ( ( defined $Param{What} && $Param{What} ne '' ) || $Param{PreviousVersionSearch} ) {
+    if ( ( defined $Param{What} && $Param{What} ne '' && !$RequiredSearch{ConfigItem} ) || $Param{PreviousVersionSearch} ) {
         $RequiredSearch{Version} = 1;
     }
 
@@ -2754,49 +2754,52 @@ sub GetAssignedConfigItemsForObject {
                     next if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute} ) );
 
                     my $ObjectSearchAttributes = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchAttributes};
+                    if ($ObjectSearchAttributes && !IsArrayRefWithData($ObjectSearchAttributes)) {
+                        $ObjectSearchAttributes = [$ObjectSearchAttributes];
+                    }
                     my $SearchStatics = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchStatic};
-                    next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+                    if ($SearchStatics && !IsArrayRefWithData($SearchStatics)) {
+                        $SearchStatics = [$SearchStatics];
+                    }
+
+                    next if ( !IsArrayRefWithData($ObjectSearchAttributes) && !IsArrayRefWithData($SearchStatics) );
 
                     $CISearchAttribute =~ s/^\s+//g;
                     $CISearchAttribute =~ s/\s+$//g;
 
                     next if !$CISearchAttribute;
 
-                    # ignore not xml attributes
-                    next if (
-                        $CISearchAttribute eq 'Name' ||
-                        $CISearchAttribute eq 'Number' ||
-                        $CISearchAttribute eq 'DeploymentState' ||
-                        $CISearchAttribute eq 'IncidentState'
-                    );
-
                     $SearchData{$CISearchAttribute} = [];
 
                     # get attributes search data
                     if (IsHashRefWithData( $Param{Object} )) {
-                        for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                            my $Value;
-                            if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                                my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                                next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                                $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                            } else {
-                                $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        if (IsArrayRefWithData($ObjectSearchAttributes)) {
+                            for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                                my $Value;
+                                if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                                    my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                                    next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                                    $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                                } else {
+                                    $Value = $Param{Object}->{$ObjectSearchAttribute};
+                                }
+
+                                next if ( !defined $Value );
+
+                                push (
+                                    @{ $SearchData{$CISearchAttribute} },
+                                    IsArrayRefWithData($Value) ? @{$Value} : $Value
+                                );
                             }
-
-                            next if ( !defined $Value );
-
-                            push (
-                                @{ $SearchData{$CISearchAttribute} },
-                                IsArrayRefWithData($Value) ? @{$Value} : $Value
-                            );
                         }
                     }
 
                     # get static search data
-                    for my $SearchStatic ( @{$SearchStatics} ) {
-                        next if ( !defined $SearchStatic );
-                        push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
+                    if (IsArrayRefWithData($SearchStatics)) {
+                        for my $SearchStatic ( @{$SearchStatics} ) {
+                            next if ( !defined $SearchStatic );
+                            push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
+                        }
                     }
 
                     if (!scalar(@{ $SearchData{$CISearchAttribute} })) {
@@ -2804,31 +2807,44 @@ sub GetAssignedConfigItemsForObject {
                     }
                 }
 
-                # build search params (What)
-                my %SearchWhat;
-                $Self->_GetXMLSearchDataForAssignedCIs(
-                    XMLDefinition => $XMLDefinition->{DefinitionRef},
-                    SearchWhat    => \%SearchWhat,
+                # ignore class if not search is given/usable
+                next if (!scalar(keys %SearchData));
+
+                # prepare default search params
+                my %SearchDefault;
+                my $PrepareSuccess = $Self->_GetDefaultSearchDataForAssignedCIs(
+                    SearchDefault => \%SearchDefault,
                     SearchData    => \%SearchData,
                 );
+                if ($PrepareSuccess) {
 
-                # do search
-                if (scalar keys %SearchWhat) {
-
-                    # if this CI class doesn't contain all the search attributes then we have to ignore it
-                    next CICLASS if scalar( keys %SearchWhat ) < scalar( keys %SearchData );
-
-                    my $ConfigItemList = $Self->ConfigItemSearchExtended(
-                        What     => [ \%SearchWhat ],
-                        ClassIDs => [ $ClassItemRef->{ItemID} ],
-                        UserID   => $Param{UserID}
+                    # prepare xml search params (What)
+                    my %SearchWhat;
+                    $Self->_GetXMLSearchDataForAssignedCIs(
+                        XMLDefinition => $XMLDefinition->{DefinitionRef},
+                        SearchWhat    => \%SearchWhat,
+                        SearchData    => \%SearchData,
                     );
-                    if ( IsArrayRefWithData($ConfigItemList) ) {
 
-                        # add only not existing items
-                        for my $ListItem ( @{$ConfigItemList} ) {
-                            next if grep { $_ == $ListItem } @AssignedCIIDs;
-                            push @AssignedCIIDs, $ListItem;
+                    # do search - if this CI class doesn't contain all the search attributes then we have to ignore it
+                    if ( (scalar( keys %SearchWhat ) + scalar( keys %SearchDefault)) >= scalar( keys %SearchData ) ) {
+                        my %What;
+                        if (scalar keys %SearchWhat) {
+                            $What{What} = [\%SearchWhat];
+                        }
+                        my $ConfigItemList = $Self->ConfigItemSearchExtended(
+                            ClassIDs => [ $ClassItemRef->{ItemID} ],
+                            UserID   => $Param{UserID},
+                            %SearchDefault,
+                            %What
+                        );
+                        if ( IsArrayRefWithData($ConfigItemList) ) {
+
+                            # add only not existing items
+                            for my $ListItem ( @{$ConfigItemList} ) {
+                                next if (grep { $_ == $ListItem } @AssignedCIIDs);
+                                push(@AssignedCIIDs, $ListItem);
+                            }
                         }
                     }
                 }
@@ -3173,13 +3189,63 @@ sub UpdateCounters {
 
 =begin Internal:
 
+=item _GetDefaultSearchDataForAssignedCIs()
+
+function to prepare the defaut search params (deployment/incident state, name and number)
+
+    $ObjectBackend->_GetDefaultSearchDataForAssignedCIs(
+        SearchData    => $HashRef,     # { "DeploymentState" => ['Repair'], ... }
+        SearchDefault => $HashRef      # container for prepared attributes
+    );
+
+=cut
+
+sub _GetDefaultSearchDataForAssignedCIs {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff - do nothing if not given
+    return 1 if (!$Param{SearchDefault} || ref $Param{SearchDefault} ne 'HASH');
+    return 1 if (!$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH');
+
+    for my $Attribute (qw(DeploymentState IncidentState Name Number)) {
+        if ($Attribute eq 'DeploymentState' || $Attribute eq 'IncidentState') {
+            my $StateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class => $Attribute eq 'DeploymentState' ? 'ITSM::ConfigItem::DeploymentState' : 'ITSM::Core::IncidentState'
+            );
+            my %StateList = reverse %{$StateList || {}};
+            my @StateIDs;
+            for my $State ( @{ $Param{SearchData}->{$Attribute} } ) {
+                if ($StateList{$State}) {
+                    push(@StateIDs, $StateList{$State});
+                } else {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "AssignedConfigItemsMapping: unknown $Attribute: $State!"
+                    );
+                    return;
+                }
+            }
+            if (@StateIDs) {
+                my $SearchAttribute = $Attribute eq 'DeploymentState' ? 'DeplStateIDs' : 'InciStateIDs';
+                $Param{SearchDefault}->{$SearchAttribute} = \@StateIDs;
+            }
+        } elsif ($Attribute eq 'Name' || $Attribute eq 'Number') {
+            if ($Param{SearchData}->{$Attribute}->[0]) {
+                $Param{SearchDefault}->{$Attribute} = $Param{SearchData}->{$Attribute}->[0];
+            }
+        }
+        delete $Param{SearchData}->{$Attribute};
+    }
+    return 1;
+}
+
 =item _GetXMLSearchDataForAssignedCIs()
 
-recusion function to prepare the export XML search params
+recusion function to prepare the XML search params
 
     $ObjectBackend->_GetXMLSearchDataForAssignedCIs(
         XMLDefinition => $ArrayRef,
-        SearchWhat    => $HashRef,     # empty at first
+        SearchWhat    => $HashRef,     # container for prepared attributes
         SearchData    => $HashRef,     # { "ParentAttribute::ChildAttribute" => [1,2,'test'], ... }
     );
 

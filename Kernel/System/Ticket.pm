@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -537,38 +537,38 @@ sub TicketCreate {
                     Priority => 'error',
                     Message => 'No Contact ID or valid Email provided.',
                 );
-            }
-
-            my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
-            my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                Email  => $ContactEmail,
-                Silent => 1,
-            );
-
-            if (!$ExistingContactID) {
-                $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                    Firstname             => IsArrayRefWithData(\@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                    Lastname              => IsArrayRefWithData(\@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
-                    Email                 => $ContactEmail,
-                    PrimaryOrganisationID => $ExistingOrganisationID,
-                    ValidID               => 1,
-                    UserID                => $Param{UserID}
-                );
+                $Param{ContactID} = undef;
             } else {
-                $Param{ContactID} = $ExistingContactID;
-            }
-
-            # set organisation if not given
-            # FIXME: remove this with KIX2018-6884
-            if ($Param{ContactID} && !$Param{OrganisationID}) {
-                my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                    ID => $Param{ContactID},
+                my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
+                my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    Email  => $ContactEmail,
+                    Silent => 1,
                 );
-                if (IsHashRefWithData(\%ContactData)) {
-                    if ($ContactData{PrimaryOrganisationID}) {
+
+                if (!$ExistingContactID) {
+                    $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
+                        Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
+                        Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                        Email                 => $ContactEmail,
+                        PrimaryOrganisationID => $ExistingOrganisationID,
+                        ValidID               => 1,
+                        UserID                => $Param{UserID}
+                    );
+                } else {
+                    $Param{ContactID} = $ExistingContactID;
+                }
+
+                # set organisation if not given
+                # FIXME: remove this with KIX2018-6884
+                if ($Param{ContactID} && !$Param{OrganisationID}) {
+                    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                        ID => $Param{ContactID},
+                    );
+                    if (
+                        IsHashRefWithData(\%ContactData)
+                        && $ContactData{PrimaryOrganisationID}
+                    ) {
                         $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
-                    } else {
-                        $Param{OrganisationID} = $ContactEmail;
                     }
                 }
             }

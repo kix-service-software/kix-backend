@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -86,8 +86,8 @@ sub Auth {
         return;
     }
 
-    $Param{User} = $Self->_ConvertTo( $Param{User}, 'utf-8' );
-    $Param{Pw}   = $Self->_ConvertTo( $Param{Pw},   'utf-8' );
+    $Param{User} = $Self->_ConvertTo( $Param{User}, $Self->{DestCharset} );
+    $Param{Pw}   = $Self->_ConvertTo( $Param{Pw},   $Self->{DestCharset} );
 
     # get params
     my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
@@ -198,6 +198,8 @@ sub Auth {
         $LDAP->disconnect();
         return;
     }
+
+    $User = $Self->_ConvertTo($User, $Self->{DestCharset});
 
     # check if user need to be in a group!
     if ( $Self->{AccessAttr} && $Self->{GroupDN} ) {

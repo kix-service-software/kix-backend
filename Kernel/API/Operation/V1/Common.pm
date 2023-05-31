@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -115,6 +115,22 @@ sub RunOperation {
             $ParentCheckMethod = 'GET';
         }
 
+        # if object to be created is a ticket and no queue id is given,
+        # fallback from sysconfig needs to be set for later base permission check
+        if ($Param{Data}->{Ticket} && !$Param{Data}->{Ticket}->{QueueID} && $Self->{RequestMethod} eq 'POST') {
+            my $QueueObject = $Kernel::OM->Get('Queue');
+            my $DefaultTicketQueue = $Kernel::OM->Get('Config')->Get('Ticket::Queue::Default');
+            my %AllTicketQueues = reverse $QueueObject->QueueList();
+            if ($AllTicketQueues{$DefaultTicketQueue}) {
+                $Param{Data}->{Ticket}->{QueueID} = $AllTicketQueues{$DefaultTicketQueue};
+            }
+            else {
+                return $Self->_Error(
+                    Code => 'Object.UnableToCreate',
+                );
+            }
+        }
+
         # check the necessary permission of the parent object if needed
         if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
 
@@ -124,7 +140,7 @@ sub RunOperation {
             my $Data = $OperationConfig->{ObjectID} ? {
                     $OperationConfig->{ObjectID} => $Param{Data}->{$OperationConfig->{ObjectID}},
 
-                    # TODO: find generic solution ("AlwaysForwardAttrbutes" config?)
+                    # TODO: find generic solution ("AlwaysForwardAttributes" config?)
                     RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
                 } : $Param{Data};
 
@@ -225,7 +241,8 @@ sub RunOperation {
             Key  => $CacheKey,
         );
 
-        if ( IsHashRefWithData($CacheResult) ) {
+        # FIXME: get specific object type for implicit paging
+        if ( IsHashRefWithData($CacheResult) && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor})) {
             $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
@@ -246,7 +263,7 @@ sub RunOperation {
             my $PreRunResult = $Self->PreRun(
                 %Param,
             );
-            
+
             $Self->_Debug($Self->{LevelIndent}, sprintf("PreRun took %i ms", TimeDiff($StartTime)));
 
             if ( !$PreRunResult->{Success} ) {
@@ -445,7 +462,7 @@ sub PrepareData {
         );
         if ( IsHashRefWithData($Result) && exists $Result->{Success} && $Result->{Success} == 0 ) {
 
-            # error occured
+            # error occurred
             return $Result;
         }
         $Self->{Filter} = $Result;
@@ -771,7 +788,7 @@ sub SuppressSubResourceInclude {
         if ( exists $Self->{SuppressedSubResourceIncludes}->{$SubResource} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "supress including of sub-resource \"$SubResource\"" );
+        $Self->_Debug( $Self->{LevelIndent}, "suppress including of sub-resource \"$SubResource\"" );
         $Self->{SuppressSubResourceIncludes}->{lc($SubResource)} = 1;
     }
 }
@@ -930,7 +947,7 @@ sub SetDefaultSort {
 
 =item SetTotalItemCount()
 
-set the total item count for specific object types (can be used in conjuction with implicit paging)
+set the total item count for specific object types (can be used in conjunction with implicit paging)
 
     $CommonObject->SetTotalItemCount(
         Ticket => 123,
@@ -2752,7 +2769,7 @@ sub _CheckBasePermission {
         return $Self->_Success();
     }
 
-    # add corresponding permission filter 
+    # add corresponding permission filter
     my %Filter = $Self->_CreateFilterForObject(
         Filter   => {},
         Object   => $Result->{Object},

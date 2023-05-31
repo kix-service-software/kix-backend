@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,13 +13,20 @@ package Kernel::System::MailAccount::POP3TLS;
 use strict;
 use warnings;
 
-use Net::SSLGlue::POP3;
+use Net::POP3;
 
 use base qw(Kernel::System::MailAccount::POP3);
 
 our @ObjectDependencies = (
     'Log',
 );
+
+# Use Net::SSLGlue::POP3 on systems with older Net::POP3 modules that do not provide starttls
+BEGIN {
+    if ( !defined &Net::POP3::starttls ) {
+        require Net::SSLGlue::POP3;
+    }
+}
 
 sub Connect {
     my ( $Self, %Param ) = @_;
@@ -75,9 +82,6 @@ sub Connect {
 }
 
 1;
-
-
-
 
 =back
 

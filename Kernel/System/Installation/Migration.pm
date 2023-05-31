@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -449,7 +449,7 @@ sub GetOIDMapping {
 
     # check cache
     my $CacheType = 'MigrationOIDMapping_'.$Param{ObjectType};
-    my $CacheKey  = join('::', values %Param);
+    my $CacheKey  = $Param{Source} . '::' . $Param{SourceID} . '::' . $Param{ObjectType} . '::' . ($Param{SourceObjectID}||'') . '::' . ($Param{ObjectID}||'');
     if ( !$Param{NoCache} ) {
         my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $CacheType,

@@ -2082,6 +2082,7 @@
         <Setting>
             <Array>
                 <Item>ArticleCreate</Item>
+                <Item>ArticleCreateFollowUpReject</Item>
                 <Item>ArticleUpdate</Item>
                 <Item>ArticleSend</Item>
                 <Item>ArticleBounce</Item>
@@ -3423,6 +3424,14 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Placeholder::Recipient</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###700-ConfigItem" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for notification config item placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>

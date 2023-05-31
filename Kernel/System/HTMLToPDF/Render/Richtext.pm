@@ -17,6 +17,8 @@ use base qw(
 
 our $ObjectManagerDisabled = 1;
 
+use Kernel::System::VariableCheck qw(:all);
+
 sub Run {
     my ($Self, %Param) = @_;
 
@@ -38,6 +40,20 @@ sub Run {
             Data => $Block
         );
 
+        if ( IsArrayRefWithData($Block->{Style}->{Class}) ) {
+            for my $Style ( @{$Block->{Style}->{Class}} ) {
+                next if ( !$Style->{Selector} || !$Style->{CSS} );
+
+                $LayoutObject->Block(
+                    Name => 'StyleClass',
+                    Data => {
+                        %{$Block},
+                        %{$Style}
+                    }
+                );
+            }
+        }
+
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Richtext',
         );
@@ -47,8 +63,17 @@ sub Run {
     if ( ref $Block->{Value} eq 'ARRAY' ) {
         my @Values;
         for my $Entry ( @{$Param{Data}->{Value}} ) {
+            my %Result = $Self->_ReplacePlaceholders(
+                String    => $Entry,
+                UserID    => $Param{UserID},
+                Count     => $Param{Count},
+                Translate => $Block->{Translate},
+                Object    => $Param{Object},
+                Datas     => $Datas
+            );
+
             my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                Text     => $Entry,
+                Text     => $Result{Text},
                 $IDKey   => $Param{$IDKey},
                 Data     => {},
                 UserID   => $Param{UserID},
@@ -67,8 +92,17 @@ sub Run {
         $Value = join( ($Block->{Join} // q{ }), @Values);
     }
     else {
+        my %Result = $Self->_ReplacePlaceholders(
+            String    => $Block->{Value},
+            UserID    => $Param{UserID},
+            Count     => $Param{Count},
+            Translate => $Block->{Translate},
+            Object    => $Param{Object},
+            Datas     => $Datas
+        );
+
         $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-            Text     => $Block->{Value},
+            Text     => $Result{Text},
             $IDKey   => $Param{$IDKey},
             Data     => {},
             UserID   => $Param{UserID},

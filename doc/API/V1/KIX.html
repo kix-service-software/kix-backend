@@ -1,6 +1,6 @@
 <!DOCTYPE HTML><html><head><title>KIX REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.6.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
       // --
-// Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -94,7 +94,7 @@ $(document).ready(function() {
 });
 
       // --
-// Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+// Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -265,7 +265,7 @@ $(document).ready(function() {
     </script><style>
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+ * Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright c.a.p.e. IT GmbH
@@ -513,7 +513,7 @@ pre code {
 }
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2021 c.a.p.e. IT GmbH, https://www.cape-it.de
+ * Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright c.a.p.e. IT GmbH
@@ -4348,6 +4348,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -4418,6 +4423,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -5529,6 +5535,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -5599,6 +5610,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -6547,6 +6559,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -6617,6 +6634,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -10756,6 +10774,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -10826,6 +10849,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -12013,6 +12037,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -12083,6 +12112,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -13214,6 +13244,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -13284,6 +13319,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -13960,6 +13996,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -14030,6 +14071,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -17237,6 +17279,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -17307,6 +17354,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -18656,6 +18704,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -18726,6 +18779,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -19792,6 +19846,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -19862,6 +19921,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -20841,6 +20901,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -20911,6 +20976,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -21557,6 +21623,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -21627,6 +21698,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -21665,6 +21737,7 @@ pre code {
         "IncomingTime": 1586413516,
         "MessageID": "",
         "MimeType": "text/plain",
+        "NotSentError": "",
         "References": "",
         "ReplyTo": "",
         "SenderType": "agent",
@@ -44922,6 +44995,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -44992,6 +45070,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",
@@ -46168,6 +46247,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
             "Plain" : {
                "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
                "type" : "string",
@@ -46238,6 +46322,7 @@ pre code {
             "IncomingTime",
             "MessageID",
             "MimeType",
+            "NotSentError",
             "References",
             "ReplyTo",
             "SenderType",

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -387,6 +387,11 @@ sub _MigrateXMLData {
     );
 
     if ( IsArrayRefWithData($CIAttachments) ) {
+        my $XMLType = 'ITSM::ConfigItem';
+        if ( $SourceData->[0]->{xml_type} =~ /^(.*?)::\d+$/ ) {
+            $XMLType = $1;
+        }
+        
         my $BackendObject = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Attachment');
         my $Index = 1;
         foreach my $Attachment ( @{$CIAttachments} ) {
@@ -394,13 +399,13 @@ sub _MigrateXMLData {
                 Value => $Attachment,
             );
             push @{$SourceData}, {
-                'xml_type'          => "ITSM::ConfigItem::$Param{SourceClassID}",
+                'xml_type'          => $XMLType.'::'.$Param{SourceClassID},
                 'xml_key'           => $Param{SourceVersionID},
                 'xml_content_key'   => "[1]{Version}[1]{CIAttachments}[$Index]{TagKey}",
                 'xml_content_value' => "[1]{Version}[1]{CIAttachments}[$Index]",
             };
             push @{$SourceData}, {
-                'xml_type'          => "ITSM::ConfigItem::$Param{SourceClassID}",
+                'xml_type'          => $XMLType.'::'.$Param{SourceClassID},
                 'xml_key'           => $Param{SourceVersionID},
                 'xml_content_key'   => "[1]{Version}[1]{CIAttachments}[$Index]{Content}",
                 'xml_content_value' => $AttachmentDirID,
@@ -508,6 +513,7 @@ sub _MapAttributeValue {
         }
     }
     my $PreparedKey = join('.', @PreparedKeyParts);
+    return 1 if $PreparedKey eq 'CIAttachments';
     return 1 if !$PreparedKey;
     return 1 if !$Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey};
 
@@ -526,6 +532,11 @@ sub _MapAttributeValue {
             my %LookupAttributeMapping = (
                 'contact' => 'login',
             );
+
+            # some special handling here
+            if ( $Param{Item}->{xml_content_value} eq 'root@localhost' ) {
+                $Param{Item}->{xml_content_value} = 'admin'
+            }
 
             # get source data if not already cached
             if ( !IsArrayRef($Self->{LookupSourceData}->{$TypeMapping}->{$Param{Item}->{xml_content_value}}) ) {
@@ -579,6 +590,41 @@ sub _MapAttributeValue {
             }
 
             return 0;
+        }
+    }
+    elsif ( $Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey} eq 'Attachment' ) {
+        my $AttachmentMeta = $Self->GetSourceData(
+            Type       => 'attachment_directory',
+            Where      => "id = $Param{Item}->{xml_content_value}",
+            NoProgress => 1
+        );
+        if ( IsArrayRefWithData($AttachmentMeta) ) {
+            my $AttachmentContent = $Self->GetSourceData(
+                Type       => 'attachment_storage',
+                Where      => "attachment_directory_id = $Param{Item}->{xml_content_value}",
+                NoProgress => 1
+            );
+
+            if ( IsArrayRefWithData($AttachmentContent) ) {
+                my $AttachmentPrefs = $Self->GetSourceData(
+                    Type       => 'attachment_dir_preferences',
+                    Where      => "attachment_directory_id = $Param{Item}->{xml_content_value}",
+                    NoProgress => 1
+                );
+                my %Attachment = (
+                    Filename => $AttachmentMeta->[0]->{file_name},
+                    Content  => $AttachmentContent->[0]->{data},
+                );
+                foreach my $Pref ( @{$AttachmentPrefs || []} ) {
+                    $Attachment{$Pref->{preferences_key}} = $Pref->{preferences_value};
+                }
+                $Attachment{ContentType} = $Attachment{DataType};
+
+                my $AttachmentDirID = $Kernel::OM->Get('ITSMConfigItem::XML::Type::Attachment')->InternalValuePrepare(
+                    Value => \%Attachment,
+                );
+                $Param{Item}->{xml_content_value} = $AttachmentDirID;
+            }
         }
     }
 

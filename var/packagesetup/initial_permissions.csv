@@ -77,7 +77,6 @@
 "Ticket Agent";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent";"Base::Ticket";"*";"x";"x";"x";"x";
-"Ticket Agent (w/o teams)";"Resource";"/tickets";"x";"x";"x";"x";
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/locks";;"x";;;

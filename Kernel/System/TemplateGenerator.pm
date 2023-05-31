@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -586,12 +586,14 @@ sub NotificationEvent {
     just a wrapper for external access to sub _Replace
 
     my $ReplacedString = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        RichText  => 0,                                         # if html qouting is needed
         Text      => 'title of ticket: <KIX_TICKET_Title>',     # the relevant string to replace
-        Data      => {},                                        # some additional data some placeholder modules look into
         UserID    => 1,
+        Data      => {},                                        # optional - some additional data some placeholder modules look into
+        RichText  => 0,                                         # optional - if html qouting is needed
         Translate => 0,                                         # optional - if not given 1 is used
-        TicketID  => 1,                                         # optional - used to replace ticket placeholders, else Data should be used
+        TicketID  => 1,                                         # optional - used to replace ticket placeholders, else Data should be used - depricated
+        ObjectID  => 1,                                         # optional - used to replace object specific placeholders, else Data should be used
+        ObjectType => 'Ticket'                                  # optional - needed if ObjectID is given
         ReplaceNotFound => ''                                   # optional - string which is used if placeholder could not resolved - default is '-'
     );
 
@@ -601,7 +603,7 @@ sub ReplacePlaceHolder {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Text Data UserID)) {
+    for (qw(Text UserID)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
@@ -632,7 +634,7 @@ sub _Replace {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Text RichText Data UserID)) {
+    for (qw(Text UserID)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -643,6 +645,8 @@ sub _Replace {
     }
 
     $Param{ReplaceNotFound} //= '-';
+    $Param{RichText} //= 0;
+    $Param{Data} //= {};
 
     # check for mailto links
     # since the subject and body of those mailto links are
@@ -681,6 +685,8 @@ sub _Replace {
     # return if no placeholders included
     return $Param{Text} if $Param{Text} !~ m/(<|&lt;)KIX_.+/g;
 
+    # TODO: move ticket specific handling
+    $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
     $Param{TicketID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{TicketID} : undef;
     my %Ticket;
     if ( $Param{TicketID} ) {
@@ -688,6 +694,8 @@ sub _Replace {
             TicketID      => $Param{TicketID},
             DynamicFields => 1,
         );
+        $Param{ObjectType} = 'Ticket';
+        $Param{ObjectID}   = $Param{TicketID};
     }
 
     # translate ticket values if needed
@@ -697,7 +705,7 @@ sub _Replace {
             UserLanguage => $Param{Language},
         );
 
-        # Translate the diffrent values.
+        # Translate the different values.
         for my $Field (qw(Type State StateType Lock Priority)) {
             $Ticket{$Field} = $LanguageObject->Translate( $Ticket{$Field} );
         }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -73,6 +73,17 @@ $Self->True(
     "Disable Agent Self Notify On Action",
 );
 
+# disable async notifications
+$Success = $Helper->ConfigSettingChange(
+    Key   => 'TicketNotification::SendAsynchronously',
+    Value => 0,
+);
+
+$Self->True(
+    $Success,
+    "Deactivate asynchronous notifications",
+);
+
 my $TestEmailObject = $Kernel::OM->Get('Email::Test');
 
 $Success = $TestEmailObject->CleanUp();
@@ -105,6 +116,12 @@ my $RoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
+            }
         ]
     }
 );
@@ -116,6 +133,12 @@ my $TicketDenyRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
         Resource => [
             {
                 Target => '/tickets',
+                Value  => Kernel::System::Role::Permission::PERMISSION->{DENY},
+            }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
                 Value  => Kernel::System::Role::Permission::PERMISSION->{DENY},
             }
         ]
@@ -131,6 +154,12 @@ my $TicketReadRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
             }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{READ},
+            }
         ]
     }
 );
@@ -143,6 +172,12 @@ my $TicketWriteRoleID = $Kernel::OM->Get('UnitTest::Helper')->TestRoleCreate(
             {
                 Target => '/tickets',
                 Value  => Kernel::System::Role::Permission::PERMISSION->{UPDATE},
+            }
+        ],
+        'Base::Ticket' => [
+            {
+                Target => 1,
+                Value  => Kernel::System::Role::Permission::PERMISSION->{WRITE},
             }
         ]
     }
@@ -258,6 +293,10 @@ my $TicketID = $TicketObject->TicketCreate(
 $Self->True(
     $TicketID,
     "TicketCreate() successful for Ticket ID $TicketID",
+);
+
+my %Ticket = $TicketObject->TicketGet(
+    TicketID => $TicketID
 );
 
 # create article
@@ -691,10 +730,6 @@ my @Tests = (
             UserID => 1,
         },
         ExpectedResults => [
-            {
-                ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
-            },
             {
                 ToArray => [ $UserContactData4{Email} ],
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
@@ -1249,12 +1284,6 @@ my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
 my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
 my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
 
-print STDERR "SendmailModule: ConfigObject: $ConfigObject\n";
-
-    use Data::Dumper;
-print STDERR "SendmailModule (Raw): ".Data::Dumper::Dumper($ConfigObject->{Config}->{'SendmailModule'});
-print STDERR "SendmailModule (Get): ".Data::Dumper::Dumper($ConfigObject->Get('SendmailModule'));
-
 my $Count = 0;
 my $NotificationID;
 TEST:
@@ -1358,6 +1387,9 @@ for my $Test (@Tests) {
         # set out of office should always be true
         next TEST if !$SuccessOOO;
     }
+
+    # reset event mapping
+    $EventNotificationEventObject->{NotificationEventMapping} = undef;
 
     my $Result = $EventNotificationEventObject->Run( %{ $Test->{Config} } );
 

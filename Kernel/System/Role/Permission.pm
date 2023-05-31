@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -607,9 +607,10 @@ sub PermissionUpdate {
 returns array of all PermissionIDs for a role
 
     my @PermissionIDs = $RoleObject->PermissionList(
-        RoleID => 1,                                    # optional
-        Types  => ['Resource', 'Base::Ticket'],         # optional
-        Target => '...'                                 # optional
+        RoleID  => 1,                                    # optional
+        RoleIDs => [1,2,3],                              # optional, ignored if RoleID is given
+        Types   => ['Resource', 'Base::Ticket'],         # optional
+        Target  => '...'                                 # optional
     );
 
 the result looks like
@@ -625,8 +626,10 @@ the result looks like
 sub PermissionList {
     my ( $Self, %Param ) = @_;
 
+    my @RoleIDs = $Param{RoleIDs} || ( $Param{RoleID} );
+
     # create cache key
-    my $CacheKey = 'PermissionList::' . ($Param{RoleID}||'') . '::'.join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
+    my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -639,9 +642,9 @@ sub PermissionList {
 
     my @Bind;
 
-    if ( $Param{RoleID} ) {
-        $SQL .= ' AND rp.role_id = ?';
-        push @Bind, \$Param{RoleID};
+    if ( @RoleIDs ) {
+        $SQL .= ' AND rp.role_id IN (' . join( ', ', map {'?'} @RoleIDs ) . ')';
+        push @Bind, map { \$_ } @RoleIDs;
     }
 
     if ( IsArrayRefWithData($Param{Types}) ) {

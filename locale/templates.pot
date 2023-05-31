@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
+"POT-Creation-Date: 2023-4-24 11:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -667,10 +667,6 @@ msgid "agent"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "allows basic ticket access, but requires team specific roles with base permissions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "allows the customer to login and read ticket, FAQ and asset data, allows to create FAQ votes, allows to change data of the personal user, allows to set ticket article flags"
 msgstr ""
 
@@ -808,6 +804,82 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
@@ -1700,6 +1772,10 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1697.pl
+msgid "allows basic ticket access, but requires team specific roles with base permissions"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -5166,78 +5242,3 @@ msgstr ""
 msgid "yes"
 msgstr ""
 
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr ""
