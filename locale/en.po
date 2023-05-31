@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-4-24 11:18+0000\n"
+"POT-Creation-Date: 2023-5-31 12:44+0000\n"
 "PO-Revision-Date: 2023-04-19 10:19+0000\n"
 "Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -169,6 +169,10 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
 msgstr "Customer"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer - Follow Up Rejection"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer - New Ticket Receipt"
@@ -2473,10 +2477,6 @@ msgid "Change password"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Checkbox"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checklist"
 msgstr ""
 
@@ -3722,10 +3722,6 @@ msgid "Multiple Selection"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "MultiselectGeneralCatalog"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
 msgstr ""
 
@@ -4426,10 +4422,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "User"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Uses richtext for viewing and editing: articles, salutations, signatures, "
 "standard templates, auto responses and notifications."
@@ -4571,7 +4563,9 @@ msgid ""
 "attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
 "should contain their structure separated with double colon "
-"(\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+"(\"ParentAttribute::ChildAttribute::RelevantAttribut\"). All attributes are "
+"OR combined, except \"Name\", \"Number\", \"DeploymentState\" and "
+"\"IncidentState\" which are used as AND conditions if given."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -5400,6 +5394,10 @@ msgid "Module registration for dynamic field attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for notification config item placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for notification recipient placeholders."
 msgstr ""
 
@@ -5928,6 +5926,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Country"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CreateTime"
 msgstr ""
 
 #. manual entry from templates.pot.manual
