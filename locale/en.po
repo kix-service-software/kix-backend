@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
+"POT-Creation-Date: 2023-4-24 11:18+0000\n"
 "PO-Revision-Date: 2023-04-19 10:19+0000\n"
 "Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -686,12 +686,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"allows basic ticket access, but requires team specific roles with base "
-"permissions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
 "allows the customer to login and read ticket, FAQ and asset data, allows to "
 "create FAQ votes, allows to change data of the personal user, allows to set "
 "ticket article flags"
@@ -857,6 +851,82 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
 msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr "Apr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr "Aug"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr "Dec"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr "Feb"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr "Fri"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr "Jan"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr "Jul"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr "Jun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr "Mar"
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr "May"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr "Mon"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr "Nov"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr "Oct"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr "Sat"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr "Sep"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr "Sun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr "Thu"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr "Tue"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
+msgstr "Wed"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
@@ -1890,6 +1960,12 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1697.pl
+msgid ""
+"allows basic ticket access, but requires team specific roles with base "
+"permissions"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -6187,82 +6263,6 @@ msgstr ""
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr "Sun"
-
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr "Mon"
-
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr "Tue"
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr "Wed"
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr "Thu"
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr "Fri"
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr "Sat"
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr "Jan"
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr "Feb"
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr "Mar"
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr "Apr"
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr "May"
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr "Jun"
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr "Jul"
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr "Aug"
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr "Sep"
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr "Oct"
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr "Nov"
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr "Dec"
 
 #~ msgid ""
 #~ "The assembled object containing two the attributes \"Type\" and "

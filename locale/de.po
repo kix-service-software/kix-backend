@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
+"POT-Creation-Date: 2023-4-24 11:18+0000\n"
 "PO-Revision-Date: 2023-05-24 09:19+0000\n"
 "Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -702,12 +702,6 @@ msgstr "Agent"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"allows basic ticket access, but requires team specific roles with base "
-"permissions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
 "allows the customer to login and read ticket, FAQ and asset data, allows to "
 "create FAQ votes, allows to change data of the personal user, allows to set "
 "ticket article flags"
@@ -893,6 +887,82 @@ msgstr "gültig"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
 msgstr "Warnung"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr "Apr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr "Aug"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr "Dez"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr "Feb"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr "Fr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr "Jan"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr "Jul"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr "Jun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr "Mär"
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr "Mai"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr "Mo"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr "Nov"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr "Okt"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr "Sa"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr "Sep"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr "So"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr "Do"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr "Di"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
+msgstr "Mi"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
@@ -2035,6 +2105,12 @@ msgstr ""
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
 msgstr "Anzahl erstellter Tickets der letzten 7 Tage"
+
+#. Perl Module: update/build-1697.pl
+msgid ""
+"allows basic ticket access, but requires team specific roles with base "
+"permissions"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
@@ -6420,82 +6496,6 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
-
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr "So"
-
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr "Mo"
-
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr "Di"
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr "Mi"
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr "Do"
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr "Fr"
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr "Sa"
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr "Jan"
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr "Feb"
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr "Mär"
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr "Apr"
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr "Mai"
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr "Jun"
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr "Jul"
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr "Aug"
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr "Sep"
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr "Okt"
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr "Nov"
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr "Dez"
 
 #~ msgid ""
 #~ "It is currently not possible to login due to a scheduled system "
