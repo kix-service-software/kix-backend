@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-5-31 12:51+0000\n"
+"POT-Creation-Date: 2023-6-1 08:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1527,11 +1527,11 @@ msgid "pending"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
+msgid "DF not fully migrated!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
