@@ -26,28 +26,34 @@ our @ObjectDependencies = (
 
 our %FieldTypeMigration = (
     'ActivityID' => {
+        Type         => 'Text',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin       => 0,
-                CountMax       => 1,
-                CountDefault   => 0,
+                CountMin      => 1,
+                CountMax      => 1,
+                CountDefault  => 1,
                 ItemSeparator => '',
+                RegExList     => [],
             }
         }
     },
     'Attachment' => {
+        Type         => 'Text',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
-                CountMax      => 1,
-                CountDefault  => 0,
+                CountMin     => 0,
+                CountMax     => 1,
+                CountDefault => 0,
+                RegExList    => [],
             },
             Remove => [
-                'MaxArraySize'
+                'AllowedFileExtensions',
+                'ForbiddenFileExtensions',
+                'MaxArraySize',
             ]
         }
     },
@@ -162,15 +168,18 @@ our %FieldTypeMigration = (
         }
     },
     'DropdownGeneralCatalog' => {
-        Type         => 'Multiselect',
+        Type         => 'DataSource',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
-                CountMax      => 1,
-                CountDefault  => 0,
-                ItemSeparator => '',
+                CountMin              => 0,
+                CountMax              => 1,
+                CountDefault          => 0,
+                DataSourceID          => '',
+                DisplayPattern        => '',
+                DefaultDisplayColumns => [],
+                CacheTTL              => 0,
             },
             Remove => [
                 'Link',
@@ -180,42 +189,60 @@ our %FieldTypeMigration = (
         }
     },
     'Invoker' => {
+        Type         => 'DataSource',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin     => 0,
-                CountMax     => 1,
-                CountDefault => 0,
+                CountMin              => 0,
+                CountMax              => 1,
+                CountDefault          => 0,
+                DataSourceID          => '',
+                DisplayPattern        => '',
+                DefaultDisplayColumns => [],
+                CacheTTL              => 0,
             },
             Remove => [
                 'AgentLink',
+                'CacheTTLLookup',
+                'CacheTTLSearch',
                 'CustomerLink',
+                'DefaultValues',
                 'MaxArraySize',
                 'MaxQueryResult',
                 'MinQueryLength',
-                'QueryDelay'
+                'QueryDelay',
+                'SearchPrefix',
+                'SearchSuffix',
+                'WebserviceInvokerLookup',
+                'WebserviceInvokerSearch',
             ]
         }
     },
     'InvokerDropdown' => {
+        Type         => 'DataSource',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
-                CountMax      => 1,
-                CountDefault  => 0,
-                ItemSeparator => '',
+                CountMin              => 0,
+                CountMax              => 1,
+                CountDefault          => 0,
+                DataSourceID          => '',
+                DisplayPattern        => '',
+                DefaultDisplayColumns => [],
+                CacheTTL              => 0,
             },
             Remove => [
+                'CacheTTLLookup',
+                'CacheTTLSearch',
                 'Link',
                 'LinkPreview',
                 'PossibleNone',
-                'TreeView'
-            ],
-            StringToArray => [
-                'DefaultValue'
+                'TranslatableValues',
+                'TreeView',
+                'WebserviceInvokerLookup',
+                'WebserviceInvokerSearch',
             ]
         }
     },
@@ -262,15 +289,18 @@ our %FieldTypeMigration = (
         }
     },
     'MultiselectGeneralCatalog' => {
-        Type         => 'Multiselect',
+        Type         => 'DataSource',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
-                CountMax      => 99,
-                CountDefault  => 0,
-                ItemSeparator => ', ',
+                CountMin              => 0,
+                CountMax              => 99,
+                CountDefault          => 0,
+                DataSourceID          => '',
+                DisplayPattern        => '',
+                DefaultDisplayColumns => [],
+                CacheTTL              => 0,
             },
             Remove => [
                 'PossibleNone'
@@ -281,25 +311,32 @@ our %FieldTypeMigration = (
         }
     },
     'ProcessID' => {
+        Type         => 'Text',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
+                CountMin      => 1,
                 CountMax      => 1,
-                CountDefault  => 0,
+                CountDefault  => 1,
                 ItemSeparator => '',
+                RegExList     => [],
             }
         }
     },
     'RemoteDB' => {
-        Deactivate => 1,
-        Warning    => 1,
+        Type         => 'DataSource',
+        Deactivate   => 1,
+        Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin      => 0,
-                CountMax      => 99,
-                CountDefault  => 0,
+                CountMin              => 0,
+                CountMax              => 1,
+                CountDefault          => 0,
+                DataSourceID          => '',
+                DisplayPattern        => '',
+                DefaultDisplayColumns => [],
+                CacheTTL              => 0,
             },
             Remove => [
                 'AgentLink',
@@ -312,8 +349,26 @@ our %FieldTypeMigration = (
         }
     },
     'RichText' => {
-        Deactivate => 1,
-        Warning    => 1,
+        Type         => 'Text',
+        Deactivate   => 1,
+        Warning      => 1,
+        ConfigChange => {
+            Add => {
+                CountMin      => 1,
+                CountMax      => 1,
+                CountDefault  => 1,
+                ItemSeparator => '',
+                RegExList     => [],
+            },
+            Remove => [
+                'Cols',
+                'Rows',
+                'WordCountMax',
+                'WordLengthMin',
+                'WordLengthMax',
+
+            ]
+        }
     },
     'Table' => {}, # no changes needed for Table
     'Text' => {
@@ -347,10 +402,33 @@ our %FieldTypeMigration = (
         }
     },
     'TicketReference' => {
-        Deactivate => 1,
-        Warning    => 1,
+        Type         => 'TicketReference',
+        Deactivate   => 1,
+        Warning      => 1,
+        ConfigChange => {
+            Add => {
+                CountMin      => 0,
+                CountMax      => 1,
+                CountDefault  => 0,
+                TicketStates  => [],
+                TicketTypes   => [],
+                LinkType      => '',
+            },
+            Remove => [
+                'AgentLink',
+                'Constrictions',
+                'CustomerLink',
+                'DefaultValues',
+                'DisplayPattern',
+                'MaxArraySize',
+                'MaxQueryResult',
+                'MinQueryLength',
+                'QueryDelay',
+            ]
+        }
     },
     'Token' => {
+        Type         => 'Text',
         Deactivate   => 1,
         Warning      => 1,
         ConfigChange => {
@@ -358,9 +436,12 @@ our %FieldTypeMigration = (
                 CountMin      => 1,
                 CountMax      => 1,
                 CountDefault  => 1,
-                DefaultValue  => '',
-                ItemSeparator => ''
-            }
+                ItemSeparator => '',
+                RegExList     => [],
+            },
+            Remove => [
+                'Length',
+            ]
         }
     },
     'User' => {
@@ -465,41 +546,6 @@ sub Run {
                 $ActiveFieldTypes{$Type} = 1;
             }
         }
-    } else {
-        %ActiveFieldTypes = (
-            CheckList               => 1,
-            DateTime                => 1,
-            Date                    => 1,
-            ITSMConfigItemReference => 1,
-            Multiselect             => 1,
-            Table                   => 1,
-            Text                    => 1,
-            TextArea                => 1,
-        );
-
-        # check for KIXPro
-        my $KIXProIsAvailable = $Kernel::OM->Get('Installation')->PluginAvailable(
-            Plugin => 'KIXPro'
-        );
-        if ( $KIXProIsAvailable ) {
-            my %PluginActiveFieldTypes = (
-                ContactReference      => 1,
-                OrganisationReference => 1,
-                TicketReference       => 1,
-            );
-            %ActiveFieldTypes = ( %ActiveFieldTypes, %PluginActiveFieldTypes );
-        }
-
-        # check for KIXConnect
-        my $KIXConnectIsAvailable = $Kernel::OM->Get('Installation')->PluginAvailable(
-            Plugin => 'KIXConnect'
-        );
-        if ( $KIXConnectIsAvailable ) {
-            my %PluginActiveFieldTypes= (
-                DataSource => 1,
-            );
-            %ActiveFieldTypes = ( %ActiveFieldTypes, %PluginActiveFieldTypes );
-        }
     }
 
     foreach my $Item ( @{$SourceData} ) {
@@ -558,10 +604,10 @@ sub Run {
             $Item->{valid_id} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} } || !$ActiveFieldTypes{ $Item->{field_type} }) ? 2 : $Item->{valid_id};
 
             # add a warning comment if needed
-            $Item->{label} = ($Migration->{Warning} || !$ActiveFieldTypes{ $Item->{field_type} }) ? $Item->{label} . ' - ' . Kernel::Language::Translatable('DF Type not yet supported!') : $Item->{label};
+            $Item->{label} = ($Migration->{Warning} || !$ActiveFieldTypes{ $Item->{field_type} }) ? $Item->{label} . ' - ' . Kernel::Language::Translatable('DF not fully migrated!') : $Item->{label};
 
             # add a warning comment if needed
-            $Item->{comments} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} } || !$ActiveFieldTypes{ $Item->{field_type} }) ? Kernel::Language::Translatable('DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!') : undef;
+            $Item->{comments} = ($Migration->{Deactivate} || !$ActiveObjectTypes{ $Item->{object_type} } || !$ActiveFieldTypes{ $Item->{field_type} }) ? Kernel::Language::Translatable('DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!') : undef;
 
             if ( $Item->{config} ) {
                 my $Config = $YAMLObject->Load(Data => $Item->{config});
@@ -723,6 +769,39 @@ sub Run {
                 for my $Attr ( @{ $Migration->{ConfigChange}->{Remove} || [] }, 'ValueTTL', 'ValueTTLData', 'ValueTTLMultiplier' ) {
                     delete $Config->{ $Attr };
                 }
+
+                # check for not supported field type
+                if ( !$ActiveFieldTypes{ $Item->{field_type} } ) {
+                    # cleanup config
+                    for my $Attr ( keys( %{ $Config } ) ) {
+                        # skip needed config
+                        next if (
+                            $Attr eq 'CountMin'
+                            || $Attr eq 'CountMax'
+                            || $Attr eq 'CountDefault'
+                            || $Attr eq 'RegExList'
+                        );
+
+                        # initialize needed config if missing
+                        if ( !defined( $Config->{CountMin} ) ) {
+                            $Config->{CountMin} = 0;
+                        }
+                        if ( !defined( $Config->{CountMax} ) ) {
+                            $Config->{CountMax} = 99;
+                        }
+                        if ( !defined( $Config->{CountDefault} ) ) {
+                            $Config->{CountDefault} = 0;
+                        }
+                        if ( !defined( $Config->{RegExList} ) ) {
+                            $Config->{RegExList} = [];
+                        }
+
+                        # change field type to text
+                        $Item->{field_type} = 'Text';
+                    }
+                }
+
+                # get yaml string
                 $Item->{config} = $YAMLObject->Dump(Data => $Config);
             }
 
