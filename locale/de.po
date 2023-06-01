@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-5-31 12:51+0000\n"
+"POT-Creation-Date: 2023-6-1 08:14+0000\n"
 "PO-Revision-Date: 2023-05-24 09:19+0000\n"
 "Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -1804,12 +1804,12 @@ msgid "pending"
 msgstr "wartend"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
-msgstr "DF Typ nicht unterstützt!"
+msgid "DF not fully migrated!"
+msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
-msgstr "DIESES FELD NICHT AKTIVIEREN BIS DER TYP UNTERSTÜTZT WIRD!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
+msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid ""
@@ -6498,6 +6498,12 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "DF Type not yet supported!"
+#~ msgstr "DF Typ nicht unterstützt!"
+
+#~ msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+#~ msgstr "DIESES FELD NICHT AKTIVIEREN BIS DER TYP UNTERSTÜTZT WIRD!"
 
 #~ msgid "User"
 #~ msgstr "Nutzer"
