@@ -407,7 +407,7 @@ sub _CreatePermissionSQL {
 
     my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
         %Param,
-        Types        => ['Basic::Queue'],
+        Types        => ['Base::Ticket'],
         UsageContext => $Param{UserType},
         Permission   => 'READ',
     );

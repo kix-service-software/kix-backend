@@ -7097,10 +7097,8 @@ sub GetAssignedTicketsForObject {
                 %Search,
                 OR => \@ORSearch
             },
-            UserID => $Param{UserID},
-
-            # TODO: use correct type for permission check if activated
-            # UserType   => 'Agent',
+            UserID   => $Param{UserID},
+            UserType => $Param{UserType},
         );
 
         if ( IsArrayRefWithData(\@AssignedTicketIDs) ) {
