@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -607,8 +607,8 @@ sub PermissionUpdate {
 returns array of all PermissionIDs for a role
 
     my @PermissionIDs = $RoleObject->PermissionList(
-        RoleID  => 1,                                    # optional
-        RoleIDs => [1,2,3],                              # optional, ignored if RoleID is given
+        RoleID  => 1,                                    # optional, ignored if RoleIDs is given
+        RoleIDs => [1,2,3],                              # optional
         Types   => ['Resource', 'Base::Ticket'],         # optional
         Target  => '...'                                 # optional
     );
@@ -626,7 +626,7 @@ the result looks like
 sub PermissionList {
     my ( $Self, %Param ) = @_;
 
-    my @RoleIDs = $Param{RoleIDs} || ( $Param{RoleID} );
+    my @RoleIDs = $Param{RoleIDs} ? $Param{RoleIDs} : $Param{RoleID} ? ( $Param{RoleID} ) : ();
 
     # create cache key
     my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
