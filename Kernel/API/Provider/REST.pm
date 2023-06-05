@@ -164,7 +164,7 @@ sub ProcessRequest {
         #       Password  => 'secret',
         #    );
         for my $QueryParam ( split '&|;', $QueryParamsStr ) {
-            my ( $Key, $Value ) = split '=', $QueryParam;
+            my ( $Key, $Value ) = split '=', $QueryParam, 2;
 
             # Convert + characters to its encoded representation, see bug#11917
             $Value =~ s{\+}{%20}g;
