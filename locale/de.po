@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-6-5 08:35+0000\n"
-"PO-Revision-Date: 2023-05-24 09:19+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"PO-Revision-Date: 2023-06-05 12:20+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -6118,7 +6118,7 @@ msgstr "Stadt"
 
 #. manual entry from templates.pot.manual
 msgid "ConnectedTo"
-msgstr "verbunden mit"
+msgstr "Verbunden mit"
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
@@ -6156,7 +6156,7 @@ msgstr "Land"
 
 #. manual entry from templates.pot.manual
 msgid "CreateTime"
-msgstr ""
+msgstr "Erstellzeit"
 
 #. manual entry from templates.pot.manual
 msgid "Dark mode"
