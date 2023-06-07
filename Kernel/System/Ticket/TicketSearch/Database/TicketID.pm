@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -91,6 +91,9 @@ sub Search {
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+    }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        push( @SQLWhere, 'st.id NOT IN ('.$Param{Search}->{Value}.')' );
     }
     else {
         $Kernel::OM->Get('Log')->Log(
