@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-6-7 08:28+0000\n"
+"POT-Creation-Date: 2023-6-7 10:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4839,6 +4839,10 @@ msgid "Address Information"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr ""
 
@@ -4916,6 +4920,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -5096,6 +5104,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Region"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "RelevantTo"
 msgstr ""
 
 #. manual entry from templates.pot.manual
