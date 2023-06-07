@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-6-7 08:28+0000\n"
+"POT-Creation-Date: 2023-6-7 10:27+0000\n"
 "PO-Revision-Date: 2023-06-05 14:20+0000\n"
 "Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -6080,6 +6080,10 @@ msgid "Address Information"
 msgstr "Adressinformationen"
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr "Zugeordneter Kontakt"
 
@@ -6165,6 +6169,10 @@ msgstr "Dunkle Darstellung"
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
 msgstr "Abhängige Objekte verhindern die Ausführung dieser Operation."
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Description"
@@ -6348,6 +6356,10 @@ msgstr "Anzahl"
 #. manual entry from templates.pot.manual
 msgid "Region"
 msgstr "Region"
+
+#. manual entry from templates.pot.manual
+msgid "RelevantTo"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Room"
