@@ -51,20 +51,35 @@ sub _Replace {
 
     my $ConfigItem = {};
     my $Version    = {};
+
+    # if objects given (or use ID in data for fallback below)
     if ( IsHashRefWithData($Param{Data}) ) {
-        if ( IsHashRefWithData($Param{Data}->{ConfigItem}) ) {
+        if ( $Param{Data}->{ConfigItem} && IsHashRefWithData($Param{Data}->{ConfigItem}) ) {
             $ConfigItem = $Param{Data}->{ConfigItem};
+        } elsif ($Param{Data}->{ConfigItemID}) {
+            $Param{ObjectType} = 'ITSMConfigItem';
+            $Param{ObjectID} = $Param{Data}->{ConfigItemID};
         }
-        if ( IsHashRefWithData($Param{Data}->{Version}) ) {
+        if ( $Param{Data}->{Version} && IsHashRefWithData($Param{Data}->{Version}) ) {
             $Version = $Param{Data}->{Version};
         }
-    } elsif ($Param{ObjectType} && $Param{ObjectType} eq 'ITSMConfigItem' && $Param{ObjectID}) {
-        $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
-            ConfigItemID => $Param{ObjectID}
-        ) || {};
-        $Version = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
-            ConfigItemID => $ConfigItem->{ConfigItemID},
-        ) || {};
+    }
+
+    # use ID if objects not given
+    if ($Param{ObjectType} && $Param{ObjectType} eq 'ITSMConfigItem' && $Param{ObjectID}) {
+        if (!IsHashRefWithData($ConfigItem)) {
+            $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
+                ConfigItemID => $Param{ObjectID}
+            ) || {};
+        }
+        if (
+            !IsHashRefWithData($Version)
+            && IsHashRefWithData($ConfigItem)
+        ) {
+            $Version = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
+                ConfigItemID => $ConfigItem->{ConfigItemID},
+            ) || {};
+        }
     }
 
     if ( IsHashRefWithData($ConfigItem) || IsHashRefWithData($Version) ) {
