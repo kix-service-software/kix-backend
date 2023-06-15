@@ -830,7 +830,7 @@ sub ContactUpdate {
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
-            next if %OrgaIDs && $OrgaIDs{$OrgID};
+            next if ($OrgaIDs{$OrgID});
 
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
@@ -898,11 +898,13 @@ sub ContactUpdate {
     my @DeleteOrgIDs;
     my @InsertOrgIDs;
     for my $OrgID (@{$Contact{OrganisationIDs}}) {
-        next if %OrgaIDs && $OrgaIDs{$OrgID};
+        next if ($OrgaIDs{$OrgID});
         push(@DeleteOrgIDs, $OrgID);
     }
-    if ( %OrgaIDs ) {
-        @InsertOrgIDs = keys %OrgaIDs;
+    my %KnownIDs = map { $_ => 1 } @{$Contact{OrganisationIDs} || []};
+    for my $OrgID ( keys %OrgaIDs ) {
+        next if ($KnownIDs{$OrgID});
+        push(@InsertOrgIDs, $OrgID);
     }
 
     $ChangeRequired = 1 if (
