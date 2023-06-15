@@ -87,13 +87,23 @@ sub Search {
     }
 
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.id = '.$Param{Search}->{Value} );
+        if ($Param{Search}->{Value}) {
+            push( @SQLWhere, 'st.id = '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'st.id IS NULL' );
+        }
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        if (IsArrayRefWithData($Param{Search}->{Value})) {
+            push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        }
     }
     elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, 'st.id NOT IN ('.$Param{Search}->{Value}.')' );
+        if ($Param{Search}->{Value}) {
+            push( @SQLWhere, 'st.id != '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'st.id IS NOT NULL' );
+        }
     }
     else {
         $Kernel::OM->Get('Log')->Log(
