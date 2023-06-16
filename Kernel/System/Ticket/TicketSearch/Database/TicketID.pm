@@ -11,6 +11,8 @@ package Kernel::System::Ticket::TicketSearch::Database::TicketID;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
