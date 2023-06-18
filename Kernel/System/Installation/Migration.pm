@@ -701,7 +701,7 @@ sub Lookup {
 
     return if @Result > 1;
 
-    if ( $Result[0] && ( $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID} ) ) {
+    if ( $Result[0] && !$Param{NoOIDMapping} && ( $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID} ) ) {
         # check if OID mapping exists and create one if not or replace it
         my $MappedID = $Self->GetOIDMapping(
             %Param,
