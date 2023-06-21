@@ -98,6 +98,8 @@ sub Search {
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         if (IsArrayRefWithData($Param{Search}->{Value})) {
             push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        } else {
+            push( @SQLWhere, '1=0' );
         }
     }
     elsif ( $Param{Search}->{Operator} eq 'NE' ) {
