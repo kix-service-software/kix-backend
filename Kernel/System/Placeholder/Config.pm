@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -61,11 +61,16 @@ sub _Replace {
             my %ConfigDefinition = $SysConfigObject->OptionGet(
                 Name => $Key,
             );
-            if ($Kernel::OM->{Authorization}->{UserType} && $ConfigDefinition{AccessLevel} &&
+            if (
+                $ConfigDefinition{AccessLevel} &&
                 (
-                    ($Kernel::OM->{Authorization}->{UserType} eq 'Agent' && $ConfigDefinition{AccessLevel} eq 'internal')
-                        || $ConfigDefinition{AccessLevel} eq 'external'
-                        || $ConfigDefinition{AccessLevel} eq 'public'
+                    $ConfigDefinition{AccessLevel} eq 'external' ||
+                    $ConfigDefinition{AccessLevel} eq 'public' ||
+                    (
+                        $Kernel::OM->{Authorization}->{UserType} &&
+                        $Kernel::OM->{Authorization}->{UserType} eq 'Agent' &&
+                        $ConfigDefinition{AccessLevel} eq 'internal'
+                    )
                 )
             ) {
                 $Replace = $Self->_GetReplaceValue(
