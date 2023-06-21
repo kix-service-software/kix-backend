@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -518,11 +518,17 @@ sub Run {
             TicketID => $TicketID,
             UserID   => $Param{InmailUserID},
         );
+
+        my $msg = "Can't process email with MessageID <$GetParam{'Message-ID'}>! ";
+
+        if ( !$Param{FileIngest} ) {
+            $msg .= "Please create a bug report with this email (From: $GetParam{From}, Located "
+                . "under var/spool/problem-email*) on https://www.kixdesk.com/!"
+        }
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can't process email with MessageID <$GetParam{'Message-ID'}>! "
-                . "Please create a bug report with this email (From: $GetParam{From}, Located "
-                . "under var/spool/problem-email*) on http://www.kixdesk.com/!",
+            Message  => $msg,
         );
         return;
     }
