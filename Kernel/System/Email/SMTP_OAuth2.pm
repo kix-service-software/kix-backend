@@ -128,7 +128,7 @@ sub Check {
 
         # get a new access token
         $AccessToken = $OAuth2Object->RequestAccessToken(
-            ProfileID => $Param{ProfileID},
+            ProfileID => $ProfileID,
             GrantType => 'refresh_token'
         );
         if ( !$AccessToken ) {
