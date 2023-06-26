@@ -3091,13 +3091,22 @@ sub UpdateCounters {
 
     # build functionality mapping and full state list
     my %FunctionalityList;
+    DEPLSTATE:
     foreach my $DeplStateID ( keys %{$DeplStateList} ) {
         my $Item = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
             ItemID => $DeplStateID,
         );
+        $DeplStateList->{$DeplStateID} = $Item;
+
+        if ( !$Item->{Functionality} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "DeploymentState \"$Item->{Name}\" (ID: $DeplStateID) has no functionality! Ignoring it."
+            );
+            next DEPLSTATE;
+        }
         $FunctionalityList{$Item->{Functionality}} //= [];
         push @{$FunctionalityList{$Item->{Functionality}}}, $DeplStateID;
-        $DeplStateList->{$DeplStateID} = $Item;
     }
 
     # get all incident states
@@ -3182,6 +3191,11 @@ sub UpdateCounters {
             );
         }
     }
+
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return 1;
 }
