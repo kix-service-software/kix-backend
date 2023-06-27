@@ -619,7 +619,7 @@ sub _RecipientsGet {
                 }
 
                 # get language and send recipient
-                $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
+                $Recipient{UserLanguage} = $ConfigObject->Get('DefaultLanguage') || 'en';
 
                 if ( $Ticket{ContactID} ) {
 
@@ -630,9 +630,12 @@ sub _RecipientsGet {
                     # join Recipient data with Contact data
                     %Recipient = ( %Recipient, %Contact );
 
-                    # get user language
-                    if ( $Contact{Language} ) {
-                        $Recipient{Language} = $Contact{Language};
+                    # set recipient language
+                    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+                        UserID => $Contact{AssignedUserID}
+                    );
+                    if ( $Language ) {
+                        $Recipient{UserLanguage} = $Language;
                     }
 
                     $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
@@ -721,8 +724,15 @@ sub _RecipientsGet {
         my %User = $UserObject->GetUserData(
             UserID => $UserID,
             Valid  => 1,
+
         );
         next RECIPIENT if !%User;
+
+        # set recipient language
+        my $Language = $UserObject->GetUserLanguage(UserID => $UserID);
+        if ( $Language ) {
+            $User{UserLanguage} = $Language;
+        }
 
         # check if the notification needs to be sent just one time per day
         if (
