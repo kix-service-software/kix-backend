@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -3255,6 +3255,163 @@ sub _GetAssignedSearchParams {
     }
 
     return %SearchData;
+}
+
+sub PrepareArticle {
+    my ( $Self, %Param ) = @_;
+
+    $Param{CustomerVisible} = $Param{CustomerVisible} // 0,
+    $Param{Channel} = $Param{Channel} || 'note';
+    $Param{SenderType} = $Param{SenderType} || 'agent';
+    $Param{Charset} = $Param{Charset} || 'utf-8';
+    $Param{MimeType} = $Param{MimeType} || 'text/html';
+    $Param{HistoryType} = $Param{HistoryType} || 'AddNote';
+    $Param{HistoryComment} = $Param{HistoryComment} || 'Added during job execution.';
+
+    # replace placeholders in non-richtext attributes
+    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
+        next if !defined $Param{$Attribute};
+
+        $Param{$Attribute} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value       => $Param{$Attribute},
+            TicketID    => $Param{TicketID},
+            UserID      => $Param{UserID}
+        );
+    }
+
+    if ( !$Param{ChannelID} && $Param{Channel} ) {
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $Param{Channel} );
+
+        if ( !$ChannelID ) {
+            $Kernel::OM->Get('Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find channel with name \"$Param{Channel}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+
+        $Param{ChannelID} = $ChannelID;
+    }
+
+    if ( !$Param{SenderTypeID} && $Param{SenderType} ) {
+        my $SenderTypeID = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $Param{SenderType} );
+
+        if ( !$SenderTypeID ) {
+            $Kernel::OM->Get('Automation')->LogError(
+                Referrer => $Self,
+                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find sender type with name \"$Param{SenderType}\"!",
+                UserID   => $Param{UserID}
+            );
+            return;
+        }
+
+        $Param{SenderTypeID} = $SenderTypeID;
+    }
+
+    # FIXME: needed?
+    # convert scalar items into array references
+    for my $Attribute ( qw(ForceNotificationToUserID ExcludeNotificationToUserID ExcludeMuteNotificationToUserID) ) {
+        if ( IsStringWithData( $Param{$Attribute} ) ) {
+            $Param{$Attribute} = $Self->_ConvertScalar2ArrayRef(
+                Data => $Param{$Attribute},
+            );
+        }
+    }
+
+    # if "From" is not set use current user
+    if ( !$Param{From} ) {
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID => $Param{UserID},
+        );
+        if (IsHashRefWithData(\%Contact)) {
+            $Param{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
+        }
+    }
+
+    # replace placeholders in attachment attributes
+    for my $ID ( 1..5 ) {
+        next if !defined $Param{"AttachmentObject$ID"};
+
+        $Param{"AttachmentObject$ID"} = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Value       => $Param{"AttachmentObject$ID"},
+            TicketID    => $Param{TicketID},
+            UserID      => $Param{UserID}
+        );
+    }
+
+    $Param{Subject} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value       => $Param{Subject},
+        Translate   => 1,
+        TicketID    => $Param{TicketID},
+        UserID      => $Param{UserID}
+    );
+
+    $Param{Body} = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value       => $Param{Body},
+        Translate   => 1,
+        Richtext    => 1,
+        TicketID    => $Param{TicketID},
+        UserID      => $Param{UserID}
+    );
+
+    # prepare subject if necessary
+    if ( $Param{Channel} && $Param{Channel} eq 'email' ) {
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+            TicketID => $Param{TicketID},
+        );
+        if (IsHashRefWithData(\%Ticket)) {
+            $Param{Subject} = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+                TicketNumber => $Ticket{TicketNumber},
+                Subject      => $Param{Subject},
+                Type         => 'New'
+            );
+        }
+    }
+
+    # prepare attachments
+    my @Attachments = ();
+    foreach my $ID ( 1..5 ) {
+        next if !$Param{"AttachmentObject$ID"} || !IsObject($Param{"AttachmentObject$ID"}, $Kernel::OM->GetModuleFor('Automation::Helper::Object'));
+
+        my $Attachment = $Param{"AttachmentObject$ID"}->AsObject();
+        if ( IsBase64($Attachment->{Content}) ) {
+            $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
+        }
+        # convert back from byte sequence to prevent double encoding when storing the attachment
+        utf8::decode($Attachment->{Content});
+
+        push @Attachments, $Attachment;
+    }
+
+    $Param{TimeUnit} = $Param{AccountTime};
+
+    if ( IsArrayRefWithData($Param{Attachment}) ) {
+        push (@{$Param{Attachment}}, @Attachments);
+    } else {
+        $Param{Attachment}  = \@Attachments;
+    }
+
+    return %Param;
+}
+
+sub _ReplaceValuePlaceholder {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/(<|&lt;)KIX_/);
+
+    return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        Text            => $Param{Value},
+        RichText        => $Param{Richtext} || 0,
+        Translate       => $Param{Translate} || 0,
+        UserID          => $Param{UserID} || 1,
+        Data            => $Param{Data},
+        ReplaceNotFound => $Param{ReplaceNotFound}
+    );
 }
 
 1;

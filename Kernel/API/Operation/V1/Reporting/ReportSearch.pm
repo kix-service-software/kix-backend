@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,10 +55,67 @@ perform ReportSearch Operation. This will return a Report list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # we don't do any core search filtering, inform the API to do it for us, based on the given search
-    $Self->HandleSearchInAPI();
+    my @ReportList;
 
-    my @ReportList = $Kernel::OM->Get('Reporting')->ReportList();
+    # prepare search if given
+    if ( IsHashRefWithData( $Self->{Search}->{Report} ) ) {
+        my %SearchParams;
+        SEARCHTYPE:
+        foreach my $SearchType ( qw(OR AND) ) {
+            next SEARCHTYPE if ( !IsArrayRefWithData($Self->{Search}->{Report}->{$SearchType}) );
+            my @SearchTypeResult;
+            foreach my $SearchItem ( @{ $Self->{Search}->{Report}->{$SearchType} } ) {
+
+                my $Value = $SearchItem->{Value};
+
+                if ( $SearchItem->{Field} eq 'DefinitionID' ) {
+                    $SearchParams{DefinitionID} = $Value;
+                }
+
+                # merge results
+                if ( $SearchType eq 'OR' ) {
+                    my @SearchResult = $Kernel::OM->Get('Reporting')->ReportList(
+                        %SearchParams,
+                        Valid => 0,
+                        Limit => $Self->{SearchLimit}->{Report} || $Self->{SearchLimit}->{'__COMMON'},
+                    );
+
+                    @SearchTypeResult = $Self->_GetCombinedList(
+                        ListA => \@SearchTypeResult,
+                        ListB => \@SearchResult,
+                        Union => 1
+                    );
+
+                    # reset
+                    %SearchParams = ();
+                }
+            }
+            if ( $SearchType eq 'AND' ) {
+                my @SearchResult = $Kernel::OM->Get('Reporting')->ReportList(
+                    %SearchParams,
+                    Valid => 0,
+                    Limit => $Self->{SearchLimit}->{Report} || $Self->{SearchLimit}->{'__COMMON'},
+                );
+                @SearchTypeResult = @SearchResult;
+            }
+
+            if ( !@ReportList ) {
+                @ReportList = @SearchTypeResult;
+            } else {
+
+                # combine both results (OR and AND)
+                # remove all IDs from type result that we don't have in this search
+                @ReportList = $Self->_GetCombinedList(
+                    ListA => \@SearchTypeResult,
+                    ListB => \@ReportList
+                );
+            }
+        }
+    } else {
+
+        # get full report list
+        @ReportList = $Kernel::OM->Get('Reporting')->ReportList();
+    }
 
     # get already prepared Report data from ReportGet operation
     if ( IsArrayRefWithData(\@ReportList) ) {
@@ -66,8 +123,7 @@ sub Run {
             OperationType            => 'V1::Reporting::ReportGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                ReportDefinitionID => $Param{Data}->{ReportDefinitionID},
-                ReportID           => join(',', @ReportList),
+                ReportID => join(',', @ReportList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

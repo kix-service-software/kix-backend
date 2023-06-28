@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # Copyright (C) 2019–2021 Efflux GmbH, https://efflux.de/
@@ -76,14 +76,14 @@ sub Connect {
         Ignoresizeerrors => 1,
     );
 
-# KIX-capeIT, Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
     if ( !$IMAPObject ) {
         return (
             Successful => 0,
             Message    => "$Type: Can't connect to $Param{Host}: $!!"
         );
     }
-# EO KIX-capeIT, Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# EO KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 
     # auth via SASL XOAUTH2
     my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
@@ -99,9 +99,9 @@ sub Connect {
     return (
         Successful => 1,
         IMAPObject => $IMAPObject,
-# KIX-capeIT, Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
         Type       => $Type,
-# EO KIX-capeIT, Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# EO KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
     );
 ### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
 }
@@ -249,7 +249,10 @@ sub _Fetch {
                     );
                     my @Return = $PostMasterObject->Run( QueueID => $Param{QueueID} || 0 );
                     if ( !$Return[0] ) {
-                        my $Lines = $IMAPObject->get($Messageno);
+                        # get original message again
+                        $Message = $IMAPObject->message_string($Messageno);
+
+                        # process failed message
                         my $File = $Self->_ProcessFailed( Email => $Message );
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',

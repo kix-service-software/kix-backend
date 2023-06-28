@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -88,6 +88,11 @@ sub Run {
             next;
         }
 
+        # special handling for UserID 1
+        if ( $Item->{id} == 1 ) {
+            $Item->{login} = 'admin';
+        }
+
         # check if this item already exists (i.e. some initial data)
         LOOKUP:
         my $ID = $Self->Lookup(
@@ -98,6 +103,7 @@ sub Run {
                 'login'
             ],
         );
+        next if $Item->{id} == 1;
 
         # insert row
         if ( !$ID ) {
@@ -168,7 +174,7 @@ sub Run {
                     Phone          => $Contact{UserPhone},
                     Mobile         => $Contact{UserMobile},
                     Email          => $Contact{UserEmail},
-                    ValidID        => 1,
+                    ValidID        => $Item->{valid_id},
                     UserID         => 1,
                 );
                 if ( !$CreatedContactID ) {

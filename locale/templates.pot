@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
+"POT-Creation-Date: 2023-6-28 09:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -164,6 +164,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer - Follow Up Rejection"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -667,10 +671,6 @@ msgid "agent"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "allows basic ticket access, but requires team specific roles with base permissions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "allows the customer to login and read ticket, FAQ and asset data, allows to create FAQ votes, allows to change data of the personal user, allows to set ticket article flags"
 msgstr ""
 
@@ -808,6 +808,82 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
 msgstr ""
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
@@ -1451,11 +1527,11 @@ msgid "pending"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
+msgid "DF not fully migrated!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
@@ -1700,6 +1776,10 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1697.pl
+msgid "allows basic ticket access, but requires team specific roles with base permissions"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -2120,10 +2200,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Change password"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Checkbox"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3055,10 +3131,6 @@ msgid "Multiple Selection"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "MultiselectGeneralCatalog"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
 msgstr ""
 
@@ -3619,10 +3691,6 @@ msgid "Used ticket state, if \"_PREVIOUS_\" ticket state could not be determined
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "User"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Uses richtext for viewing and editing: articles, salutations, signatures, standard templates, auto responses and notifications."
 msgstr ""
 
@@ -3735,7 +3803,7 @@ msgid "Config item event module that updates the counters for basic configitem s
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+msgid "Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\"). All attributes are OR combined, except \"Name\", \"Number\", \"DeploymentState\" and \"IncidentState\" which are used as AND conditions if given."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4387,6 +4455,10 @@ msgid "Module registration for dynamic field attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for notification config item placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for notification recipient placeholders."
 msgstr ""
 
@@ -4767,6 +4839,10 @@ msgid "Address Information"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr ""
 
@@ -4835,11 +4911,19 @@ msgid "Country"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "CreateTime"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Dark mode"
 msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -5023,6 +5107,10 @@ msgid "Region"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "RelevantTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Room"
 msgstr ""
 
@@ -5166,78 +5254,3 @@ msgstr ""
 msgid "yes"
 msgstr ""
 
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr ""

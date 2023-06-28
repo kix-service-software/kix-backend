@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -54,7 +54,7 @@ sub new {
         'IsACLReducible'               => 0,
         'IsNotificationEventCondition' => 0,
         'IsSortable'                   => 0,
-        'IsFiltrable'                  => 0,
+        'IsFilterable'                 => 0,
         'IsStatsCondition'             => 0,
         'IsCustomerInterfaceCapable'   => 1,
     };
@@ -397,7 +397,7 @@ END
     for my $Column ( @{$FieldConfig->{Columns}} ) {
         my $Col = $Column;
 
-        # get column header transatlation
+        # get column header translation
         if (
             $Col
             && $FieldConfig->{TranslatableColumn}
@@ -423,7 +423,8 @@ END
             $Output .= <<"END";
         <tr>
 END
-            for my $Col ( @{$Row} ) {
+            my $RowValues = IsArrayRefWithData($Row) ? $Row : [$Row];
+            for my $Col ( @{$RowValues} ) {
                 $Output .= <<"END";
             <td>$Col</td>
 END

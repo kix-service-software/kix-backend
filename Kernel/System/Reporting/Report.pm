@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -414,7 +414,8 @@ sub ReportList {
 deletes a report
 
     my $Success = $ReportingObject->ReportDelete(
-        ID => 123,
+        ID     => 123,          # required
+        Silent => 0|1           # optional, default 0
     );
 
 =cut
@@ -438,10 +439,12 @@ sub ReportDelete {
         ID => $Param{ID},
     );
     if ( !%Report ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A report with the ID $Param{ID} does not exist.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A report with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -629,7 +632,8 @@ sub _RemoveExcessReports {
     while ( @Reports > $Definition{MaxReports} ) {
         my $ReportID = shift @Reports;
         $Self->ReportDelete(
-            ID => $ReportID
+            ID     => $ReportID,
+            Silent => 1,
         );
     }
 

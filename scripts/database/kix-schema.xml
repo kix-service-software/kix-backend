@@ -1104,6 +1104,11 @@
 <Table Name="contact">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="email" Required="true" Size="255" Type="VARCHAR"/>
+    <Column Name="email1" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="email2" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="email3" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="email4" Required="false" Size="255" Type="VARCHAR"/>
+    <Column Name="email5" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="title" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="firstname" Required="true" Size="100" Type="VARCHAR"/>
     <Column Name="lastname" Required="true" Size="100" Type="VARCHAR"/>

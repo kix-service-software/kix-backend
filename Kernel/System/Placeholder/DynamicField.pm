@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -63,7 +63,7 @@ sub _Replace {
             if ( !IsHashRefWithData($Object) && $Param{TicketID} ) {
                 my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Param{TicketID},
-                    DynamicFields => 1,
+                    DynamicFields => 1
                 );
                 $Object = \%Ticket;
             }
@@ -95,14 +95,25 @@ sub _Replace {
             # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
             # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
             # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
-            # <KIX_TICKET_DynamicField_NameX_ObjectValue> returns the raw value(s) - with position ("_0" at the end) a certain value can be used, wihtout the value with index 0 is used
+            # <KIX_TICKET_DynamicField_NameX_ObjectValue...> returns the raw value(s) - with position ("_0" at the end) a certain value can be used, wihtout the value with index 0 is used
+            # <KIX_TICKET_DynamicField_NameX_Object...> returns the value of the corresponding object (for reference types) - something like "_0_Name" is needed (would be the name of the first object)
 
             my %DynamicFields;
+            my %DynamicFieldsObject;
 
             # For systems with many Dynamic fields we do not want to load them all unless needed
             # Find what Dynamic Field Values are requested
-            while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?)? $Self->{End}/gixms ) {
-                $DynamicFields{$1} = 1;
+            while ( $Param{Text} =~ m/$Tag(\S+?)(_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?|_Object_\d+.+?)?$Self->{End}/gixms ) {
+                    my $DFName = $1;
+                    my $Type = $2;
+                    $DynamicFields{$DFName} = 1;
+                    if ($Type && $Type =~ m/_Object_/) {
+                        # remember every object placeholder
+                        if (!IsArrayRefWithData($DynamicFieldsObject{$DFName})) {
+                            $DynamicFieldsObject{$DFName} = [];
+                        }
+                        push( @{ $DynamicFieldsObject{$DFName} }, $Type);
+                    }
             }
 
             # to store all the required DynamicField display values
@@ -192,6 +203,23 @@ sub _Replace {
                 } elsif (IsHashRefWithData($DisplayValueStrg)) {
                     $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
                         = $DisplayValueStrg->{Value};
+                }
+
+                # prepare object values if needed
+                if ( IsArrayRefWithData( $DynamicFieldsObject{ $DynamicFieldConfig->{Name} } ) ) {
+                    for my $ObjectPlaceholder ( @{ $DynamicFieldsObject{ $DynamicFieldConfig->{Name} } } ) {
+                        my $ObjectValueStrg = $DynamicFieldBackendObject->DFValueObjectReplace(
+                            DynamicFieldConfig => $DynamicFieldConfig,
+                            Value              => $Object->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                            Placeholder        => $ObjectPlaceholder,
+                            UserID             => $Param{UserID},
+                            Language           => $Param{Language}
+                        );
+                        if ( $ObjectValueStrg ) {
+                            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . $ObjectPlaceholder }
+                                = $ObjectValueStrg;
+                        }
+                    }
                 }
             }
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -183,128 +183,19 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    # FIXME: needed?
-    # convert scalar items into array references
-    for my $Attribute ( qw(ForceNotificationToUserID ExcludeNotificationToUserID ExcludeMuteNotificationToUserID) ) {
-        if ( IsStringWithData( $Param{Config}->{$Attribute} ) ) {
-            $Param{Config}->{$Attribute} = $Self->_ConvertScalar2ArrayRef(
-                Data => $Param{Config}->{$Attribute},
-            );
-        }
-    }
+    %Param = $Self->_PrepareEventData(%Param);
 
-    # if "From" is not set use current user
-    if ( !$Param{Config}->{From} ) {
-        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            UserID => $Param{UserID},
-        );
-        if (IsHashRefWithData(\%Contact)) {
-            $Param{Config}->{From} = $Contact{Fullname} . ' <' . $Contact{Email} . '>';
-        }
-    }
-
-    $Param{Config}->{CustomerVisible} = $Param{Config}->{CustomerVisible} // 0,
-    $Param{Config}->{Channel} = $Param{Config}->{Channel} || 'note';
-    $Param{Config}->{SenderType} = $Param{Config}->{SenderType} || 'agent';
-    $Param{Config}->{Charset} = $Param{Config}->{Charset} || 'utf-8';
-    $Param{Config}->{MimeType} = $Param{Config}->{MimeType} || 'text/html';
-    $Param{Config}->{HistoryType} = $Param{Config}->{HistoryType} || 'AddNote';
-    $Param{Config}->{HistoryComment} = $Param{Config}->{HistoryComment} || 'Added during job execution.';
-
-    if ( $Param{Config}->{Channel} ) {
-        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $Param{Config}->{Channel} );
-
-        if ( !$ChannelID ) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find channel with name \"$Param{Config}->{Channel}\"!",
-                UserID   => $Param{UserID}
-            );
-            return;
-        }
-    }
-
-    if ( $Param{Config}->{SenderType} ) {
-        my $SenderTypeID = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $Param{Config}->{SenderType} );
-
-        if ( !$SenderTypeID ) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "Couldn't create article for ticket $Param{TicketID}. Can't find sender type with name \"$Param{Config}->{SenderType}\"!",
-                UserID   => $Param{UserID}
-            );
-            return;
-        }
-    }
-
-    # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
-        next if !defined $Param{Config}->{$Attribute};
-
-        $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{$Attribute}
-        );
-    }
-
-    # replace placeholders in attachment attributes
-    for my $ID ( 1..5 ) {
-        next if !defined $Param{Config}->{"AttachmentObject$ID"};
-
-        $Param{Config}->{"AttachmentObject$ID"} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{"AttachmentObject$ID"},
-        );
-    }
-
-    $Param{Config}->{Subject} = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value     => $Param{Config}->{Subject},
-        Translate => 1
-    );
-
-    $Param{Config}->{Body} = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value     => $Param{Config}->{Body},
-        Translate => 1,
-        Richtext  => 1
-    );
-
-    # prepare subject if necessary
-    if ( $Param{Config}->{Channel} && $Param{Config}->{Channel} eq 'email' ) {
-        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-            TicketID => $Param{TicketID},
-        );
-        if (IsHashRefWithData(\%Ticket)) {
-            $Param{Config}->{Subject} = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
-                TicketNumber => $Ticket{TicketNumber},
-                Subject      => $Param{Config}->{Subject},
-                Type         => 'New'
-            );
-        }
-    }
-
-    # prepare attachments
-    my @Attachments;
-    foreach my $ID ( 1..5 ) {
-        next if !$Param{Config}->{"AttachmentObject$ID"} || !IsObject($Param{Config}->{"AttachmentObject$ID"}, $Kernel::OM->GetModuleFor('Automation::Helper::Object'));
-
-        my $Attachment = $Param{Config}->{"AttachmentObject$ID"}->AsObject();
-        if ( IsBase64($Attachment->{Content}) ) {
-            $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
-        }
-        # convert back from byte sequence to prevent double encoding when storing the attachment
-        utf8::decode($Attachment->{Content});
-
-        push @Attachments, $Attachment;
-    }
-
-    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    my %ArticleData = $Kernel::OM->Get('Ticket')->PrepareArticle(
         %{ $Param{Config} },
-        TimeUnit   => $Param{Config}->{AccountTime},
         TicketID   => $Param{TicketID},
         UserID     => $Param{UserID},
-        Attachment => \@Attachments
+        Data       => $Param{EventData}
+    );
+
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        %ArticleData,
+        TicketID   => $Param{TicketID},
+        UserID     => $Param{UserID}
     );
 
     if ( !$ArticleID ) {

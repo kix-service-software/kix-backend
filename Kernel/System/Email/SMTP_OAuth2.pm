@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -128,7 +128,7 @@ sub Check {
 
         # get a new access token
         $AccessToken = $OAuth2Object->RequestAccessToken(
-            ProfileID => $Param{ProfileID},
+            ProfileID => $ProfileID,
             GrantType => 'refresh_token'
         );
         if ( !$AccessToken ) {

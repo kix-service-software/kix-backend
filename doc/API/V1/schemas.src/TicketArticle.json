@@ -115,6 +115,11 @@
             "type": "string",
             "readOnly": true
         },
+        "NotSentError": {
+            "type": "string",
+            "description": "error string if article is an outgoing email article which could not be sent",
+            "readOnly": true
+        },
         "Plain": {
             "type": "string",
             "description": "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
@@ -185,6 +190,7 @@
         "IncomingTime",
         "MessageID",
         "MimeType",
+        "NotSentError",
         "References",
         "ReplyTo",
         "SenderType",

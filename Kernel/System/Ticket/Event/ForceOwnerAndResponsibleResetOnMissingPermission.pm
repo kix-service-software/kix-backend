@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2022 OTRS AG, https://otrs.com/
 # --
@@ -72,8 +72,17 @@ sub Run {
 
     TYPE:
     foreach my $Type ( qw(Owner Responsible) ) {
-        # check resource permission
+        # check resource READ permission
         my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
+            UserID              => $Ticket{$Type.'ID'},
+            Target              => '/tickets',
+            RequestedPermission => 'READ',
+            UsageContext        => 'Agent'
+        );
+        next TYPE if !$Granted;
+
+        # check resource WRITE permission
+        ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
             UserID              => $Ticket{$Type.'ID'},
             Target              => '/tickets',
             RequestedPermission => 'UPDATE',

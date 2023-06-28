@@ -39,7 +39,9 @@ sub GetPossibleExpands {
     return [
         'DynamicField',
         'Article',
-        'LinkObject'
+        'LinkObject',
+        'Organisation',
+        'Contact'
     ];
 }
 
@@ -73,8 +75,17 @@ sub DataGet {
         %Expands = map { $_ => 1 } @{$Param{Expands}};
     }
     elsif( $Param{Expands} ) {
-        %Expands = map { $_ => 1 } split( /[,]/smx, $Param{Expands});
+        %Expands = map { $_ => 1 } split( /[,]/sm, $Param{Expands});
     }
+
+    my %ExpendFunc = (
+        Article      => '_GetArticleIDs',
+        LinkObject   => '_GetLinkedObjects',
+        DynamicField => '_GetDynamicFields',
+        Organisation => '_GetOrganisationID',
+        Contact      => '_GetContactID',
+        Asset        => '_GetAssetIDs',
+    );
 
     if (
         $Param{Filters}
@@ -115,19 +126,24 @@ sub DataGet {
     }
 
     my $DynamicFields;
-    if (
-        $Expands{DynamicField}
-        && !IsHashRefWithData($Ticket{Expands}->{DynamicField})
-    ) {
-        $Self->_GetDynamicFields(
-            IDKey    => 'TicketID',
-            Type     => 'Ticket',
-            TicketID => $Ticket{TicketID} || $TicketID,
-            UserID   => $Param{UserID},
-            Data     => \%Ticket
-        );
+    if ( %Expands ) {
+        for my $Expand ( keys %Expands ) {
+            my $Function = $ExpendFunc{$Expand};
 
-        $DynamicFields = $Ticket{Expands}->{DynamicFied};
+            next if !$Function;
+
+            $Self->$Function(
+                Expands  => $Expands{$Expand} || 0,
+                ObjectID => $Ticket{TicketID} || $TicketID,
+                UserID   => $Param{UserID},
+                Data     => \%Ticket,
+                Type     => 'Ticket'
+            );
+
+            if ( $Expand eq 'DynamicField' ) {
+                $DynamicFields = $Ticket{Expands}->{DynamicFied};
+            }
+        }
     }
 
     if ( %Filters ) {
@@ -142,55 +158,49 @@ sub DataGet {
         return if !$Match;
     }
 
-    if (
-        $Expands{Article}
-        && !IsArrayRefWithData($Ticket{Expands}->{Article})
-    ) {
-        $Self->_GetArticleIDs(
-            TicketID => $Ticket{TicketID} || $TicketID,
-            UserID   => $Param{UserID},
-            Ticket   => \%Ticket
-        );
-    }
-
-    if (
-        $Expands{LinkObject}
-        && !IsHashRefWithData($Ticket{Expands}->{LinkObject})
-    ) {
-        $Self->_GetLinkedObjects(
-            TicketID => $Ticket{TicketID} || $TicketID,
-            UserID   => $Param{UserID},
-            Ticket   => \%Ticket
-        );
-    }
-
-    if (
-        $Expands{Asset}
-        && !IsHashRefWithData($Ticket{Expands}->{Asset})
-    ) {
-        $Self->_GetAssetIDs(
-            TicketID => $Ticket{TicketID} || $TicketID,
-            UserID   => $Param{UserID},
-            Ticket   => \%Ticket
-        );
-    }
-
     return \%Ticket;
+}
+
+sub _GetOrganisationID {
+    my ($Self, %Param) = @_;
+
+    return 1 if !$Param{Expands};
+    return 1 if IsArrayRefWithData($Param{Ticket}->{Expands}->{Organisation});
+    return 1 if !$Param{Data}->{OrganisationID};
+
+    $Param{Data}->{Expands}->{Organisation} = [$Param{Data}->{OrganisationID}];
+
+    return 1;
+}
+
+sub _GetContactID {
+    my ($Self, %Param) = @_;
+
+    return 1 if !$Param{Expands};
+    return 1 if IsArrayRefWithData($Param{Data}->{Expands}->{Contact});
+    return 1 if !$Param{Data}->{ContactID};
+
+    $Param{Data}->{Expands}->{Contact} = [$Param{Data}->{ContactID}];
+
+    return 1;
 }
 
 sub _GetArticleIDs {
     my ($Self, %Param) = @_;
 
+    return 1 if !$Param{Expands};
+    return 1 if IsArrayRefWithData($Param{Data}->{Expands}->{Article});
+
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my @ArticleIDs = $TicketObject->ArticleIndex(
-        TicketID => $Param{TicketID},
+        TicketID => $Param{ObjectID},
         UserID   => $Param{UserID}
     );
 
     if ( scalar(@ArticleIDs) ) {
         my $Count = 1;
-        $Param{Ticket}->{Expands}->{Article} = \@ArticleIDs;
+        $Param{Data}->{Expands}->{Article} = \@ArticleIDs;
     }
 
     return 1;
@@ -198,6 +208,9 @@ sub _GetArticleIDs {
 
 sub _GetLinkedObjects {
     my ( $Self, %Param ) = @_;
+
+    return 1 if !$Param{Expands};
+    return 1 if IsHashRefWithData($Param{Data}->{Expands}->{LinkObject});
 
     my $LinkObject   = $Kernel::OM->Get('LinkObject');
     my $ConfigObject = $Kernel::OM->Get('Config');
@@ -210,7 +223,7 @@ sub _GetLinkedObjects {
     );
     my $LinkList = $LinkObject->LinkListWithData(
         Object           => 'Ticket',
-        Key              => $Param{TicketID},
+        Key              => $Param{ObjectID},
         State            => 'Valid',
         UserID           => $Param{UserID},
         ObjectParameters => {
@@ -241,7 +254,7 @@ sub _GetLinkedObjects {
 
                     if ( $LinkType eq 'Ticket' ) {
                         push(
-                            @{$Param{Ticket}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
+                            @{$Param{Data}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
                             "$TicketHook$TicketHookDivider$Data->{TicketNumber}: $Data->{Title}"
                         );
                     }
@@ -249,21 +262,21 @@ sub _GetLinkedObjects {
                     if ( $LinkType eq 'Person' ) {
                         my $Type = ( $Data->{Type} =~ /Agent/smx ) ? 'Agent' : 'Customer';
                         push(
-                            @{$Param{Ticket}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
+                            @{$Param{Data}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
                             "$Data->{UserFirstnam} $Data->{UserLastname}"
                         );
                     }
 
                     if ( $LinkType eq 'FAQArticle' ) {
                         push(
-                            @{$Param{Ticket}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
+                            @{$Param{Data}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
                             "$FAQHook$Data->{Number}: $Data->{Title}"
                         );
                     }
 
                     if ( $LinkType eq 'ConfigItem' ) {
                         push(
-                            @{$Param{Ticket}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
+                            @{$Param{Data}->{Expands}->{LinkObject}->{$TypeList{$DirectionType}->{$Direction . 'Name'}}},
                             "Asset#$Data->{Number} ($Data->{Class}): $Data->{Name}"
                         );
                     }
@@ -278,18 +291,21 @@ sub _GetLinkedObjects {
 sub _GetAssetIDs {
     my ( $Self, %Param ) = @_;
 
+    return 1 if !$Param{Expands};
+    return 1 if IsHashRefWithData($Param{Data}->{Expands}->{Asset});
+
     my $LinkObject = $Kernel::OM->Get('LinkObject');
 
     my %LinkKeyList = $LinkObject->LinkKeyList(
         Object1   => 'Ticket',
-        Key1      => $Param{TicketID},
+        Key1      => $Param{ObjectID},
         Object2   => 'ITSMConfigItem',
         State     => 'Valid',
         UserID    => $Param{UserID},
     );
 
     if ( %LinkKeyList ) {
-        $Param{Ticket}->{Expands}->{Asset} = keys %LinkKeyList;
+        $Param{Data}->{Expands}->{Asset} = keys %LinkKeyList;
     }
 
     return 1;

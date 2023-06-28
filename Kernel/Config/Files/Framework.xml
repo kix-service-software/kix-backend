@@ -113,18 +113,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###Checkbox" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Checkbox</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::Checkbox</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldCheckbox</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###DateTime" Required="0" Valid="1">
         <Description Translatable="1">DynamicField backend registration.</Description>
         <Group>Framework</Group>
@@ -456,18 +444,6 @@
             <Hash>
                 <Item Key="Module">Kernel::System::ImportExport::ObjectBackend::CustomerCompany</Item>
                 <Item Key="Name">CustomerCompany</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###MultiselectGeneralCatalog" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">MultiselectGeneralCatalog</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::MultiselectGeneralCatalog</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldMultiselectGeneralCatalog</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1942,7 +1918,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="10">
+    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###0010-SystemMonitoring" Required="0" Valid="0">
         <Description Translatable="1">Basic mail interface to System Monitoring Suites. See also event "TicketAutoLinkConfigItem" for more specific asset search, than by host-/service name.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
@@ -2428,7 +2404,7 @@
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Frontend::RichText::DefaultCSS" Required="1" Valid="1">
+    <ConfigItem AccessLevel="external" Name="Frontend::RichText::DefaultCSS" Required="1" Valid="1">
         <Description Translatable="1">Defines the default CSS used in rich text editors.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Web</SubGroup>
@@ -9357,18 +9333,6 @@ You can log in via the following URL:
             </Array>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###RemoteDB" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName">RemoteDB</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::RemoteDB</Item>
-                <Item Key="ConfigDialog">AdminDynamicFieldRemoteDB</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SysConfig::EventModulePost###000-LogSysConfigChanges" Required="0" Valid="0">
         <Description Translatable="1">Logs the configuration changes of SysConfig options.</Description>
         <Group>Framework</Group>
@@ -9425,17 +9389,6 @@ You can log in via the following URL:
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DynamicFields::Driver###User" Required="0" Valid="1">
-        <Description Translatable="1">DynamicField backend registration.</Description>
-        <Group>Framework</Group>
-        <SubGroup>DynamicFields::Driver::Registration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">User</Item>
-                <Item Key="Module">Kernel::System::DynamicField::Driver::User</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###888-ExtendedFollowUp" Required="0" Valid="1">

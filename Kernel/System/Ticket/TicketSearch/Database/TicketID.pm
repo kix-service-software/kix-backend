@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::Ticket::TicketSearch::Database::TicketID;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
@@ -87,10 +89,25 @@ sub Search {
     }
 
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.id = '.$Param{Search}->{Value} );
+        if ($Param{Search}->{Value}) {
+            push( @SQLWhere, 'st.id = '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'st.id IS NULL' );
+        }
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        if (IsArrayRefWithData($Param{Search}->{Value})) {
+            push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+        } else {
+            push( @SQLWhere, '1=0' );
+        }
+    }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        if ($Param{Search}->{Value}) {
+            push( @SQLWhere, 'st.id != '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'st.id IS NOT NULL' );
+        }
     }
     else {
         $Kernel::OM->Get('Log')->Log(

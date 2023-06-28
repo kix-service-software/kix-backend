@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -275,21 +275,6 @@ sub _AssignOrganisation {
         Number => $Param{CustomerID},
         Silent => 1,
     );
-
-    if ( !$OrgID ) {
-        # create a new organisation
-        $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-            Number => substr($Param{CustomerID}, 0, 150),
-            Name   => $Param{CustomerID},
-            UserID => 1,
-        );
-        if ( !$OrgID ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create organisation for contact $Param{ContactID}!"
-            );
-        }
-    }
 
     if ( $OrgID ) {
         # check if contact-org mapping exists

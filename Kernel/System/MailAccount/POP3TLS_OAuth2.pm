@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019–2021 Efflux GmbH, https://efflux.de/
@@ -30,7 +30,7 @@ our @ObjectDependencies = (
     'Kernel::System::OAuth2',
 );
 
-# Use Net::SSLGlue::POP3 on systems with older Net::POP3 modules that cannot handle POP3.
+# Use Net::SSLGlue::POP3 on systems with older Net::POP3 modules that do not provide starttls
 BEGIN {
     if ( !defined &Net::POP3::starttls ) {
         require Net::SSLGlue::POP3;

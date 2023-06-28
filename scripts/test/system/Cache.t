@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -608,6 +608,26 @@ for my $ModuleFile (@BackendModuleFiles) {
                 }
             }
         }
+
+        # check wide character key
+        $CacheSet = $CacheObject->Set(
+            Type  => 'WideCharacterTest',
+            Key   => "Test \x{2639}",
+            Value => '1',
+            TTL   => 60,
+        );
+        $Self->True(
+            $CacheSet,
+            "#9 - $Module - CacheSet() - Wide Character Key check",
+        );
+        $CacheGet = $CacheObject->Get(
+            Type => 'WideCharacterTest',
+            Key  => "Test \x{2639}",
+        );
+        $Self->True(
+            $CacheGet,
+            "#9 - $Module - CacheGet() - Wide Character Key check",
+        );
 
         # flush the cache
         $CacheObject->CleanUp();
