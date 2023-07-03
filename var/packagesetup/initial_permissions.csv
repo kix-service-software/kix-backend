@@ -143,6 +143,8 @@
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/1";;"x";;;
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/2";;"x";;;
 "Ticket Agent (Servicedesk)";"Object";"/tickets/*{Ticket.QueueID IN [1,2]}";"x";"x";"x";"x";
+"Ticket Agent (Servicedesk)";"Base::Ticket";"1";"x";"x";"x";"x";
+"Ticket Agent (Servicedesk)";"Base::Ticket";"2";"x";"x";"x";"x";
 "Webform Ticket Creator";"Resource";"/auth";"x";;;;
 "Webform Ticket Creator";"Resource";"/session";;;;"x";
 "Webform Ticket Creator";"Resource";"/tickets";"x";;"x";;
