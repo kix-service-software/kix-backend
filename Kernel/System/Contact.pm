@@ -992,6 +992,7 @@ sub ContactUpdate {
         my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
             || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
         if ($NewUserValid != $ExistingUser{ValidID}) {
+            delete $ExistingUser{UserPw};
             my $Success = $Kernel::OM->Get('User')->UserUpdate(
                 %ExistingUser,
                 ValidID      => $NewUserValid,
