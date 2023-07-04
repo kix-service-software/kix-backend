@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-04-06 10:19+0000\n"
-"Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
+"POT-Creation-Date: 2023-6-28 09:47+0000\n"
+"PO-Revision-Date: 2023-04-19 10:19+0000\n"
+"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
 "Language: en\n"
@@ -169,6 +169,10 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
 msgstr "Customer"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer - Follow Up Rejection"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer - New Ticket Receipt"
@@ -686,12 +690,6 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"allows basic ticket access, but requires team specific roles with base "
-"permissions"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
 "allows the customer to login and read ticket, FAQ and asset data, allows to "
 "create FAQ votes, allows to change data of the personal user, allows to set "
 "ticket article flags"
@@ -857,6 +855,82 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "warning"
 msgstr ""
+
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr "Apr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr "Aug"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr "Dec"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr "Feb"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr "Fri"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr "Jan"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr "Jul"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr "Jun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr "Mar"
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr "May"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr "Mon"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr "Nov"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr "Oct"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr "Sat"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr "Sep"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr "Sun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr "Thu"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr "Tue"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
+msgstr "Wed"
 
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
@@ -1614,11 +1688,11 @@ msgid "pending"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
+msgid "DF not fully migrated!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
@@ -1890,6 +1964,12 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
+msgstr ""
+
+#. Perl Module: update/build-1697.pl
+msgid ""
+"allows basic ticket access, but requires team specific roles with base "
+"permissions"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
@@ -2394,10 +2474,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Change password"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Checkbox"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3646,10 +3722,6 @@ msgid "Multiple Selection"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "MultiselectGeneralCatalog"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
 msgstr ""
 
@@ -4350,10 +4422,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "User"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Uses richtext for viewing and editing: articles, salutations, signatures, "
 "standard templates, auto responses and notifications."
@@ -4495,7 +4563,9 @@ msgid ""
 "attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
 "should contain their structure separated with double colon "
-"(\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+"(\"ParentAttribute::ChildAttribute::RelevantAttribut\"). All attributes are "
+"OR combined, except \"Name\", \"Number\", \"DeploymentState\" and "
+"\"IncidentState\" which are used as AND conditions if given."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -5074,7 +5144,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Article"
-msgstr ""
+msgstr "Delete Article"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
@@ -5321,6 +5391,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for dynamic field attribute placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for notification config item placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5787,6 +5861,10 @@ msgid "Address Information"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr ""
 
@@ -5824,7 +5902,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "ConnectedTo"
-msgstr ""
+msgstr "connected to"
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
@@ -5855,11 +5933,19 @@ msgid "Country"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "CreateTime"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Dark mode"
 msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -6020,7 +6106,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "PendingTime"
-msgstr ""
+msgstr "pending time"
 
 #. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
@@ -6040,6 +6126,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Region"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "RelevantTo"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -6158,7 +6248,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "printed by"
-msgstr ""
+msgstr "printed by"
 
 #. manual entry from templates.pot.manual
 msgid "processing"
@@ -6187,82 +6277,6 @@ msgstr ""
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr ""
-
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr "Sun"
-
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr "Mon"
-
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr "Tue"
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr "Wed"
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr "Thu"
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr "Fri"
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr "Sat"
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr "Jan"
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr "Feb"
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr "Mar"
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr "Apr"
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr "May"
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr "Jun"
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr "Jul"
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr "Aug"
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr "Sep"
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr "Oct"
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr "Nov"
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr "Dec"
 
 #~ msgid ""
 #~ "The assembled object containing two the attributes \"Type\" and "

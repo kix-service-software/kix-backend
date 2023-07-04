@@ -18,3 +18,9 @@ Here is an example of such a parameters property:
     ```
 
 The ```OutputFormats``` property can only contain output formats defined in the report definition.
+
+This resource supports a special ```search``` property
+
+|Search|Description|
+|-|-|
+|```DefinitionID```| Restricts the database query to the given DefinitionID. Only the operator "EQ" is supported.|

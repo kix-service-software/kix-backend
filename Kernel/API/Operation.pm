@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -113,7 +113,9 @@ sub new {
     }
 
     # prepare ImplicitPagingFor config
-    $Self->{OperationConfig}->{ImplicitPagingFor} =  { map { $_ => 1 } split(/,/, $Self->{OperationConfig}->{ImplicitPagingFor}) };
+    if ($Self->{OperationConfig}->{ImplicitPagingFor}) {
+        $Self->{OperationConfig}->{ImplicitPagingFor} =  { map { $_ => 1 } split(/,/, $Self->{OperationConfig}->{ImplicitPagingFor}) };
+    }
 
     # init call level
     $Self->{Level} = $Param{Level} || 0;

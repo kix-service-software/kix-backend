@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -194,7 +194,7 @@ sub Run {
         }
     }
 
-    $Self->EventHandler(
+    $TicketObject->EventHandler(
         Event => 'ArticleCreateFollowUpReject',
         Data  => {
             ArticleID     => $ArticleID,

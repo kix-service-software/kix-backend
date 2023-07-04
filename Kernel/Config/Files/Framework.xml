@@ -9486,8 +9486,8 @@ You can log in via the following URL:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/KSSPC/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18SelfServicePortalEN/manual/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/display/K18SSPDECommunity/Handbuch</Item>
+                <Item Key="en">https://docs.kixdesk.com/display/KIX18SelfServicePortalENCommunity/Manual</Item>
             </Hash>
         </Setting>
     </ConfigItem>

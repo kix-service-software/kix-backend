@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2023-4-24 11:18+0000\n"
+"POT-Creation-Date: 2023-6-28 09:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -164,6 +164,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer - Follow Up Rejection"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1523,11 +1527,11 @@ msgid "pending"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
+msgid "DF not fully migrated!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
@@ -2196,10 +2200,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Change password"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Checkbox"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3131,10 +3131,6 @@ msgid "Multiple Selection"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "MultiselectGeneralCatalog"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
 msgstr ""
 
@@ -3695,10 +3691,6 @@ msgid "Used ticket state, if \"_PREVIOUS_\" ticket state could not be determined
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "User"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Uses richtext for viewing and editing: articles, salutations, signatures, standard templates, auto responses and notifications."
 msgstr ""
 
@@ -3811,7 +3803,7 @@ msgid "Config item event module that updates the counters for basic configitem s
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+msgid "Defines for which object type in which configitem class in which configitem attributes will be searched with which object attributes values (SearchAttributes) or static values (SearchStatic). Configitem attributes should contain their structure separated with double colon (\"ParentAttribute::ChildAttribute::RelevantAttribut\"). All attributes are OR combined, except \"Name\", \"Number\", \"DeploymentState\" and \"IncidentState\" which are used as AND conditions if given."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4463,6 +4455,10 @@ msgid "Module registration for dynamic field attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for notification config item placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for notification recipient placeholders."
 msgstr ""
 
@@ -4843,6 +4839,10 @@ msgid "Address Information"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr ""
 
@@ -4911,11 +4911,19 @@ msgid "Country"
 msgstr ""
 
 #. manual entry from templates.pot.manual
+msgid "CreateTime"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Dark mode"
 msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
 msgstr ""
 
 #. manual entry from templates.pot.manual
@@ -5096,6 +5104,10 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Region"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "RelevantTo"
 msgstr ""
 
 #. manual entry from templates.pot.manual

@@ -82,12 +82,16 @@ sub Run {
                 'general_catalog_class',
                 'name'
             ],
-            ReplaceOIDMapping => 1,
+            NoOIDMapping => 1,
         );
 
         # some special handling for CI classes if one already exists
         if ( $ID && $Item->{general_catalog_class} eq 'ITSM::ConfigItem::Class' ) {
             $Item->{name} = 'Migration-'.$Item->{name};
+            # clear lookup cache for this object type
+            $Kernel::OM->Get('Cache')->CleanUp(
+                Type => 'MigrationLookup_general_catalog'
+            );
             # do the lookup again
             goto LOOKUP;
         }
@@ -103,12 +107,24 @@ sub Run {
         }
 
         if ( $ID ) {
+            # create OID mapping
+            $Self->CreateOIDMapping(
+                ObjectType     => 'general_catalog',
+                ObjectID       => $ID,
+                SourceObjectID => $Item->{id},
+            );
+
             $Self->UpdateProgress($Param{Type}, 'OK');
         }
         else {
             $Self->UpdateProgress($Param{Type}, 'Error');
         }
     }
+
+    # clear GC cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('GeneralCatalog')->{CacheType},
+    );
 
     return 1;
 }

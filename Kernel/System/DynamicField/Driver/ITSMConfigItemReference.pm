@@ -61,7 +61,7 @@ sub new {
     $Self->{Behaviors} = {
         'IsNotificationEventCondition' => 1,
         'IsSortable'                   => 1,
-        'IsFiltrable'                  => 1,
+        'IsFilterable'                 => 1,
         'IsStatsCondition'             => 1,
         'IsCustomerInterfaceCapable'   => 1,
     };

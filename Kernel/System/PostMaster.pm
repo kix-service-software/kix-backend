@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -136,8 +136,9 @@ sub new {
 to execute the run process
 
     $PostMasterObject->Run(
-        Queue   => 'Junk',  # optional, specify target queue for new tickets
-        QueueID => 1,       # optional, specify target queue for new tickets
+        Queue      => 'Junk',  # optional, specify target queue for new tickets
+        QueueID    => 1,       # optional, specify target queue for new tickets
+        FileIngest => 0,       # optional, defaults to 0, only used for mail ingest from console
     );
 
 return params
@@ -165,6 +166,16 @@ sub Run {
 
     # ConfigObject section / get params
     my $GetParam = $Self->GetEmailParams();
+
+    $GetParam->{From} = $GetParam->{From} || $GetParam->{'MAIL FROM'} || $GetParam->{'X-KIX-From'};
+
+    if (!$GetParam->{From}) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Headers 'From', 'MAIL FROM' or 'X-KIX-From' are missing. At least one of them must be set to ingest a mail. ",
+        );
+        return;
+    }
 
     # get tickets containing this message
     my @SkipTicketIDs = $TicketObject->ArticleGetTicketIDsOfMessageID(
@@ -346,10 +357,11 @@ sub Run {
                 # create new ticket
                 if ($QueueID) {
                     my $TicketID = $Self->{NewTicketObject}->Run(
-                        InmailUserID     => $Self->{PostmasterUserID},
-                        GetParam         => $GetParam,
-                        QueueID          => $QueueID,
-                        SkipTicketIDs    => \%SkipTicketIDHash
+                        InmailUserID  => $Self->{PostmasterUserID},
+                        GetParam      => $GetParam,
+                        QueueID       => $QueueID,
+                        SkipTicketIDs => \%SkipTicketIDHash,
+                        FileIngest    => $Param{FileIngest} || 0,
                     );
 
                     if ( !$TicketID ) {

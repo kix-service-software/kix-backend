@@ -2727,10 +2727,7 @@ sub _ExecPermissionChecks {
 check base permissions
 
     my $Return = $CommonObject->_CheckBasePermission(
-        Data         => {},
-        Permission   => ...,
-        UsageContext => 'Agent'|'Customer',
-        UserID       => 1
+        Data => {},
     );
 
     $Return = _Success if granted
@@ -3877,28 +3874,32 @@ sub _GetCustomerUserVisibleObjectIds {
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
-                    UserID     => $Self->{Authorization}->{UserID}
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
                 );
             } elsif ($Param{ObjectType} eq 'Ticket') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
-                    UserID     => $Self->{Authorization}->{UserID}
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
                 );
             } elsif ($Param{ObjectType} eq 'TicketArticle') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedArticlesForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
-                    UserID     => $Self->{Authorization}->{UserID}
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
                 );
             } elsif ($Param{ObjectType} eq 'FAQArticle') {
                 return $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
                     %Param,
                     ObjectType => 'Contact',
                     Object     => \%ContactData,
-                    UserID     => $Self->{Authorization}->{UserID}
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
                 );
             }
         }

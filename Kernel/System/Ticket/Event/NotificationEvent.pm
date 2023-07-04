@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -957,7 +957,7 @@ sub _GetUserIDsWithRequiredPermission {
             Strict       => $Param{Strict}
         );
         next USERID if !$Result;
-        
+
         if ( IsArrayRefWithData($Result) ) {
             my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
             next USERID if !$AllowedQueueIDs{$Param{Ticket}->{QueueID}};

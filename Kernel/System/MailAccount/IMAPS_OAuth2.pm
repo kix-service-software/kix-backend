@@ -249,7 +249,10 @@ sub _Fetch {
                     );
                     my @Return = $PostMasterObject->Run( QueueID => $Param{QueueID} || 0 );
                     if ( !$Return[0] ) {
-                        my $Lines = $IMAPObject->get($Messageno);
+                        # get original message again
+                        $Message = $IMAPObject->message_string($Messageno);
+
+                        # process failed message
                         my $File = $Self->_ProcessFailed( Email => $Message );
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',

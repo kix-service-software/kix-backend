@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -174,7 +174,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
-            'IsFiltrable'                  => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -187,7 +187,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 0,
-            'IsFiltrable'                  => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -200,7 +200,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
-            'IsFiltrable'                  => 1,
+            'IsFilterable'                 => 1,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -213,7 +213,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
-            'IsFiltrable'                  => 1,
+            'IsFilterable'                 => 1,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -226,7 +226,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 0,
-            'IsFiltrable'                  => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -239,7 +239,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 0,
             'IsSortable'                   => 1,
-            'IsFiltrable'                  => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -252,7 +252,7 @@ my @Tests = (
         ExpectedResults => {
             'IsNotificationEventCondition' => 0,
             'IsSortable'                   => 1,
-            'IsFiltrable'                  => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
@@ -266,7 +266,7 @@ for my $Test (@Tests) {
     BEHAVIOR:
     for my $Behavior (
         qw(
-        IsNotificationEventCondition IsSortable IsFiltrable IsStatsCondition
+        IsNotificationEventCondition IsSortable IsFilterable IsStatsCondition
         IsCustomerInterfaceCapable NotExisting
         )
         )
