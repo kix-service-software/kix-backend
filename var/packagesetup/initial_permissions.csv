@@ -271,3 +271,6 @@
 "Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}";;"x";;;
 "Report Manager";"Resource";"/reporting";"x";"x";"x";"x";
 "Report Manager";"Resource";"/system/roles";"";"x";"x";"";
+"Textmodule Admin";"Resource";"/system/textmodules";"x";"x";"x";"x";
+"FAQ Admin";"Resource";"/system/faq";"x";"x";"x";"x";
+"FAQ Admin";"Resource";"/system/objecticons";"x";"x";"x";"x";

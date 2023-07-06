@@ -273,6 +273,28 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">19</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Textmodule Admin</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows to create, edit, delete text modules</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="roles">
+        <Data Key="id" Type="AutoIncrement">20</Data>
+        <Data Key="name" Type="Quote" Translatable="1">FAQ Admin</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">allows to create, edit, delete FAQ categories</Data>
+        <Data Key="usage_context">1</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- role_user -->
     <!-- assign role "Superuser" to admin -->
@@ -7989,6 +8011,36 @@ DefaultValue:
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/roles]]></Data>
     <Data Key="value">6</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">19</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/textmodules]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">20</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/faq]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">20</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
+    <Data Key="value">15</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
