@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -20,7 +20,6 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Placeholder::Base);
 
 our @ObjectDependencies = (
-    'Config',
     'Log',
     'Queue'
 );
@@ -50,9 +49,9 @@ sub _Replace {
     }
 
     my %Queue;
-    if ( $Param{QueueID} ) {
+    if ( $Param{QueueID} || (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{QueueID}) ) {
         %Queue = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $Param{QueueID},
+            ID => $Param{QueueID} || $Param{Ticket}->{QueueID}
         );
     }
 
