@@ -3411,6 +3411,14 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###400-Queue" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for queue attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Placeholder::Module###500-Ticket" Required="0" Valid="1">
         <Description Translatable="1">Module registration for ticket attribute placeholders.</Description>
         <Setting>
