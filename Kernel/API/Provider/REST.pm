@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -164,7 +164,7 @@ sub ProcessRequest {
         #       Password  => 'secret',
         #    );
         for my $QueryParam ( split '&|;', $QueryParamsStr ) {
-            my ( $Key, $Value ) = split '=', $QueryParam;
+            my ( $Key, $Value ) = split '=', $QueryParam, 2;
 
             # Convert + characters to its encoded representation, see bug#11917
             $Value =~ s{\+}{%20}g;

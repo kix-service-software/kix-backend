@@ -2,7 +2,7 @@
   description: !include ../../descriptions/resources/system/users.md
   type: { collection: { typeName: User } }
   /{userId}:
-    type: { item: { typeName: User } }
+    type: { item-nodelete: { typeName: User } }
     uriParameters:
       userId:
         displayName: UserID

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -21,7 +21,12 @@ sub Configure {
     my ( $Self, %Param ) = @_;
 
     $Self->Description('Cleaning up the system configuration.');
-
+    $Self->AddOption(
+        Name        => 'confirm',
+        Description => "If not given, command will not be executed.",
+        HasValue    => 0,
+        Required    => 1,
+    );
     return;
 }
 

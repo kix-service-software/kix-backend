@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -203,6 +203,10 @@ sub _Run {
         $Item->{value_int} = undef;
     }
     if ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'ContactReference' ) {
+        # some special handling here
+        if ( $Item->{value_text} eq 'root@localhost' ) {
+            $Item->{value_text} = 'admin'
+        }
         $Item->{value_text} = $Kernel::OM->Get('Contact')->ContactLookup(
             UserLogin => $Item->{value_text},
         );

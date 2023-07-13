@@ -315,3 +315,15 @@ msgstr ""
 
 msgid "ConnectedTo"
 msgstr ""
+
+msgid "CreateTime"
+msgstr ""
+
+msgid "DependsOn"
+msgstr ""
+
+msgid "RelevantTo"
+msgstr ""
+
+msgid "AlternativeTo"
+msgstr ""

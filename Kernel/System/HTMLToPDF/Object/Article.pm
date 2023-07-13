@@ -71,9 +71,13 @@ sub DataGet {
     if ( IsArrayRefWithData($Param{Expands}) ) {
         %Expands = map { $_ => 1 } @{$Param{Expands}};
     }
-    elsif( $Param{Include} ) {
+    elsif( $Param{Expands} ) {
         %Expands = map { $_ => 1 } split( /[,]/smx, $Param{Expands});
     }
+
+    my %ExpendFunc = (
+        DynamicField => '_GetDynamicFields',
+    );
 
     if (
         $Param{Filters}
@@ -138,7 +142,6 @@ sub DataGet {
             );
 
             my %Attachments = %AttachmentIndex;
-            my %AttachmentAlreadyUsed;
             $Body =~ s{
                 (=|"|')cid:(.*?)("|'|>|\/>|\s)
             }
@@ -199,20 +202,25 @@ sub DataGet {
     }
 
     my $DynamicFields;
-    if (
-        $Expands{DynamicField}
-        && !IsHashRefWithData($Article{Expands}->{DynamicField})
-    ) {
-        $Self->_GetDynamicFields(
-            ArticleID => $Article{ArticleID} || $Param{ArticleID},
-            UserID    => $Param{UserID},
-            Data      => \%Article,
-            IDKey     => 'ArticleID',
-            Type      => 'Article'
-        );
-        $DynamicFields = $Article{Expands}->{DynamicFied};
-    }
+    if ( %Expands ) {
+        for my $Expand ( keys %Expands ) {
+            my $Function = $ExpendFunc{$Expand};
 
+            next if !$Function;
+
+            $Self->$Function(
+                Expands  => $Expands{$Expand} || 0,
+                ObjectID => $Article{ArticleID} || $Param{ArticleID},
+                UserID   => $Param{UserID},
+                Type     => 'Article',
+                Data     => \%Article,
+            );
+
+            if ( $Expand eq 'DynamicField' ) {
+                $DynamicFields = $Article{Expands}->{DynamicFied};
+            }
+        }
+    }
 
     if ( %Filters ) {
         my $Match = $Self->_Filter(

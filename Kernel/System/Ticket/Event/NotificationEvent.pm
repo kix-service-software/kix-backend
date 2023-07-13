@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -47,12 +47,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get notification event object
-    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
-
-    # check if event is affected
-    $Self->{NotificationEventMapping} = { $NotificationEventObject->NotificationEventList() };
-
     return $Self;
 }
 
@@ -70,6 +64,10 @@ sub Run {
         }
     }
 
+    # check if event is affected
+    if ( !IsHashRef($Self->{NotificationEventMapping}) ) {
+        $Self->{NotificationEventMapping} = { $Kernel::OM->Get('NotificationEvent')->NotificationEventList() };
+    }
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
     if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
@@ -126,6 +124,12 @@ sub _Run {
 
     my $StartTime = Time::HiRes::time();
 
+    # check if event is affected
+    if ( !IsHashRef($Self->{NotificationEventMapping}) ) {
+        $Self->{NotificationEventMapping} = { $Kernel::OM->Get('NotificationEvent')->NotificationEventList() };
+    }
+    return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
+
     my @TicketList = IsArrayRef($Param{Data}->{TicketList}) ? @{$Param{Data}->{TicketList}} : ( $Param{Data} );
 
     my $Counter = 0;
@@ -141,13 +145,13 @@ sub _Run {
             UserID => $Param{UserID},
         );
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
+            Priority => 'debug',
             Message  => sprintf "NotificationEvent::_HandleTicket %i/%i (TicketID: %i): %i ms\n", ++$Counter, (scalar @TicketList), $Ticket->{TicketID}, (Time::HiRes::time() - $StartTimeTicket) * 1000,
         );
     }
 
     $Kernel::OM->Get('Log')->Log(
-        Priority => 'info',
+        Priority => 'debug',
         Message  => sprintf "NotificationEvent::_Run (%i tickets): %i ms\n", (scalar @TicketList), (Time::HiRes::time() - $StartTime) * 1000,
     );
 
@@ -169,6 +173,7 @@ sub _HandleTicket {
         UserID        => $Param{UserID},
         DynamicFields => 0,
     );
+
 
     NOTIFICATION:
     for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
@@ -222,15 +227,12 @@ sub _HandleTicket {
                         );
                         next FILE_ID if !%Attachment;
 
-                        # KIX4OTRS-capeIT
                         # remove HTML-Attachments (HTML-Emails)
                         next
                             if (
                             $Index{$FileID}->{Filename} =~ /^file-[12]$/
                             && $Index{$FileID}->{ContentType} =~ /text\/html/i
                             );
-
-                        # EO KIX4OTRS-capeIT
 
                         push @Attachments, \%Attachment;
                     }
@@ -491,9 +493,7 @@ sub _RecipientsGet {
 
             if (
                 $Recipient
-                # KIX4OTRS-capeIT
                 =~ /^Agent(Owner|Responsible|Watcher|ReadPermissions|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|)$/
-                # EO KIX4OTRS-capeIT
                 )
             {
 
@@ -519,75 +519,20 @@ sub _RecipientsGet {
                 }
                 elsif ( $Recipient eq 'AgentReadPermissions' ) {
 
-                    # check each valid user if he has READ permission on /tickets
-                    my @UserIDs;
-                    my %UserList;
-                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
-                        %UserList = %{$Self->{Cache}->{UserList}};
-                    }
-                    else {
-                        %UserList = $Kernel::OM->Get('User')->UserList(
-                            Valid => 1,
-                            Short => 1,
-                        );
-                        $Self->{Cache}->{UserList} = \%UserList;
-                    }
-                    my $Resource = '/tickets/' . $Ticket{TicketID};
-                    foreach my $UserID ( sort keys %UserList ) {
-                        my $Granted;
-                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} ) {
-                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ};
-                        }
-                        else {
-                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
-                                UserID              => $UserID,
-                                Target              => $Resource,
-                                UsageContext        => 'Agent',
-                                RequestedPermission => 'READ'
-                            );
-                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{READ} = $Granted;
-                        }
-                        if ( $Granted ) {
-                            push @UserIDs, $UserID;
-                        }
-                    }
+                    my @UserIDs = $Self->_GetUserIDsWithRequiredPermission(
+                        Ticket     => \%Ticket,
+                        Permission => 'READ',
+                        Strict     => 1,    # READONLY permission needed
+                    );
 
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentWritePermissions' ) {
 
-                    # check each valid user if he has UPDATE permission on /tickets
-                    my @UserIDs;
-                    my %UserList;
-                    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
-                        %UserList = %{$Self->{Cache}->{UserList}};
-                    }
-                    else {
-                        %UserList = $Kernel::OM->Get('User')->UserList(
-                            Valid => 1,
-                            Short => 1,
-                        );
-                        $Self->{Cache}->{UserList} = \%UserList;
-                    }
-                    my $Resource = '/tickets/' . $Ticket{TicketID};
-                    foreach my $UserID ( sort keys %UserList ) {
-                        my $Granted;
-                        if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} ) {
-                            $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE};
-                        }
-                        else {
-                            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
-                                UserID              => $UserID,
-                                Target              => $Resource,
-                                UsageContext        => 'Agent',
-                                RequestedPermission => 'UPDATE'
-                            );
-                            $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{UPDATE} = $Granted;
-                        }
-                        if ( $Granted ) {
-                            push @UserIDs, $UserID;
-                        }
-                    }
+                    my @UserIDs = $Self->_GetUserIDsWithRequiredPermission(
+                        Ticket     => \%Ticket,
+                        Permission => 'WRITE,READ'
+                    );
 
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
@@ -951,6 +896,67 @@ sub _SendRecipientNotification {
     );
 
     return 1;
+}
+
+sub _GetUserIDsWithRequiredPermission {
+    my ( $Self, %Param ) = @_;
+
+    # check each valid user if he has requested permission on /tickets
+    my @UserIDs;
+    my %UserList;
+    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
+        %UserList = %{$Self->{Cache}->{UserList}};
+    }
+    else {
+        %UserList = $Kernel::OM->Get('User')->UserList(
+            Valid => 1,
+            Short => 1,
+        );
+        $Self->{Cache}->{UserList} = \%UserList;
+    }
+    my $Resource = '/tickets/' . $Param{Ticket}->{TicketID};
+
+    USERID:
+    foreach my $UserID ( sort keys %UserList ) {
+        my @Permissions = split(/, ?/, $Param{Permission});
+
+        PERMISSION:
+        foreach my $Permission (@Permissions) {
+            my $Granted;
+            if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission} ) {
+                $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission};
+            }
+            else {
+                $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                    UserID              => $UserID,
+                    Target              => $Resource,
+                    UsageContext        => 'Agent',
+                    RequestedPermission => $Permission
+                );
+                $Self->{Cache}->{UserPermission}->{$UserID}->{Resource}->{$Resource}->{$Permission} = $Granted;
+            }
+
+            next USERID if !$Granted;
+        }
+
+        # check base permission
+        my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
+            UserID       => $UserID,
+            UsageContext => 'Agent',
+            Permission   => $Param{Permission},
+            Strict       => $Param{Strict}
+        );
+        next USERID if !$Result;
+
+        if ( IsArrayRefWithData($Result) ) {
+            my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
+            next USERID if !$AllowedQueueIDs{$Param{Ticket}->{QueueID}};
+        }
+
+        push @UserIDs, $UserID;
+    }
+
+    return @UserIDs;
 }
 
 sub _GetSubscribedUserIDsByQueueID {

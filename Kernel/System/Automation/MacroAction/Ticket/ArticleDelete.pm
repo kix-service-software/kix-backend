@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -90,19 +90,21 @@ sub Run {
         );
     }
 
-    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-        ArticleID => $Param{Config}->{ArticleID}
-    );
+    my %Article;
+    if ($Param{Config}->{ArticleID} =~ /^\d+$/) {
+        %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+            ArticleID => $Param{Config}->{ArticleID}
+        );
+    }
 
     if ( !%Article ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't delete article $Article{ArticleID} - article not found!",
+            Message  => "Couldn't delete article $Param{Config}->{ArticleID} - article not found!",
             UserID   => $Param{UserID}
         );
         return;
-    }
-    elsif ( $Article{TicketID} ne $Param{TicketID} ) {
+    } elsif ( $Article{TicketID} ne $Param{TicketID} ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't delete article $Article{ArticleID} - article not part of ticket $Param{TicketID}!",

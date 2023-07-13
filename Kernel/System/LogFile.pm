@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -137,7 +137,7 @@ sub LogFileGet {
     elsif ( $Param{Tail} ) {
         if ( IsArrayRefWithData($Param{Categories}) ) {
             my $Categories = join('|', @{$Param{Categories}});
-            $LogFile{Content} = `grep -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
+            $LogFile{Content} = `grep -a -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
         }
         else {
             $LogFile{Content} = `tail -n $Param{Tail} $LogDir/$LogFileList{$Param{ID}}`;

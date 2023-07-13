@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -63,7 +63,14 @@ sub _ConvertScalar2ArrayRef {
 sub _ReplaceValuePlaceholder {
     my ( $Self, %Param ) = @_;
 
-    # add ticket id, to be sure
+    %Param = $Self->_PrepareEventData(%Param);
+
+    return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
+}
+
+sub _PrepareEventData {
+    my ( $Self, %Param ) = @_;
+
     $Param{EventData} ||= IsHashRefWithData($Self->{EventData}) ? $Self->{EventData} : {};
     if ( !$Param{EventData}->{TicketID} ) {
         $Param{EventData}->{TicketID}  = $Self->{RootObjectID} || $Param{TicketID};
@@ -72,7 +79,7 @@ sub _ReplaceValuePlaceholder {
         $Param{EventData}->{ArticleID} = $Param{AdditionalData}->{ArticleID} ? $Param{AdditionalData}->{ArticleID}->[0] : q{};
     }
 
-    return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
+    return %Param;
 }
 
 1;

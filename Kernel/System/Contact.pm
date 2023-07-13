@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -96,7 +96,12 @@ add a new contact
     my $ID = $ContactObject->ContactAdd(
         Firstname             => 'Huber',
         Lastname              => 'Manfred',
-        Email                 => 'email@example.com',      # optional
+        Email                 => 'email@example.com',      # optional, but will be set with something like "noreply-somethingRandom@nomail.com"
+        Email1                => 'email1@example.com',     # optional
+        Email2                => 'email2@example.com',     # optional
+        Email3                => 'email3@example.com',     # optional
+        Email4                => 'email4@example.com',     # optional
+        Email5                => 'email5@example.com',     # optional
         PrimaryOrganisationID => 123,                      # optional
         OrganisationIDs       => [                         # optional, if only PrimaryOrganisationID should be set.
             123,
@@ -132,24 +137,31 @@ sub ContactAdd {
         }
     }
 
-    #if no mail is given for a new contact, a random, but unique, dummy email address is generated.
+    # prepare emails
+    for my $MailAttr ( qw(Email Email1 Email2 Email3 Email4 Email5) ) {
+        if ($Param{$MailAttr}) {
+            if ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+                my $ExistingContactID = $Self->ContactLookup(
+                    Email  => $Param{$MailAttr},
+                    Silent => 1
+                );
+                if ($ExistingContactID) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Cannot add contact. Email \"$Param{$MailAttr}\" ($MailAttr) already exists.",
+                    );
+                    return;
+                }
+            }
+        } else {
+            $Param{$MailAttr} = '';
+        }
+    }
+
+    # if no mail is given for a new contact, a random, but unique, dummy email address is generated.
     if (!$Param{Email}) {
         my $uuid = Data::UUID->new();
         $Param{Email} = "noreply-" . $uuid->to_hexstring($uuid->create()) . '@nomail.com';
-    }
-    elsif ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
-        # check duplicate email
-        my $ExistingContactID = $Self->ContactLookup(
-            Email  => $Param{Email},
-            Silent => 1
-        );
-        if ($ExistingContactID) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Cannot add contact. Email \"$Param{Email}\" already exists.",
-            );
-            return;
-        }
     }
 
     # check if primary OrganisationID exists
@@ -217,14 +229,17 @@ sub ContactAdd {
     }
 
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'INSERT INTO contact (firstname, lastname, email, title, phone, fax,
-                     mobile, street, zip, city, country, comments, valid_id,
-                     create_time, create_by, change_time, change_by, user_id)
-            VALUES ( ?, ?, ?, ?, ?, ?,
-                     ?, ?, ?, ?, ?, ?, ?,
+        SQL => 'INSERT INTO contact (
+                    firstname, lastname, email, email1, email2, email3, email4, email5,
+                    title, phone, fax, mobile, street, zip, city, country, comments, valid_id,
+                    create_time, create_by, change_time, change_by, user_id
+            ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     current_timestamp, ?, current_timestamp, ?, ?)',
         Bind => [
-            \$Param{Firstname}, \$Param{Lastname}, \$Param{Email}, \$Param{Title}, \$Param{Phone}, \$Param{Fax},
+            \$Param{Firstname}, \$Param{Lastname}, \$Param{Email}, \$Param{Email1}, \$Param{Email2}, \$Param{Email3}, \$Param{Email4}, \$Param{Email5},
+            \$Param{Title}, \$Param{Phone}, \$Param{Fax},
             \$Param{Mobile}, \$Param{Street}, \$Param{Zip}, \$Param{City}, \$Param{Country}, \$Param{Comment}, \$Param{ValidID},
             \$Param{UserID}, \$Param{UserID}, \$Param{AssignedUserID}
         ],
@@ -260,8 +275,7 @@ sub ContactAdd {
         # log notice
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  =>
-                "Contact: $ContactID ('$Param{Firstname}/$Param{Lastname}') created successfully (created by user id $Param{UserID})!",
+            Message  => "Contact: $ContactID ('$Param{Firstname}/$Param{Lastname}') created successfully (created by user id $Param{UserID})!",
         );
         # reset cache
         $Kernel::OM->Get('Cache')->CleanUp(
@@ -380,7 +394,7 @@ sub ContactGet {
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL   => 'SELECT id, firstname, lastname, email, title, phone, fax, mobile, street, zip, city, country, comments,'
-                . 'valid_id, create_time, create_by, change_time, change_by, user_id FROM contact ' . $SQLWhere,
+                . 'valid_id, create_time, create_by, change_time, change_by, user_id, email1, email2, email3, email4, email5 FROM contact ' . $SQLWhere,
         Bind  => \@BindVars,
         Limit => 1,
     );
@@ -409,6 +423,11 @@ sub ContactGet {
         $Contact{ChangeTime}            = $Row[16];
         $Contact{ChangeBy}              = $Row[17];
         $Contact{AssignedUserID}        = $Row[18];
+        $Contact{Email1}                = $Row[19] || '';
+        $Contact{Email2}                = $Row[20] || '';
+        $Contact{Email3}                = $Row[21] || '';
+        $Contact{Email4}                = $Row[22] || '';
+        $Contact{Email5}                = $Row[23] || '';
         last;
     }
     # get organisations
@@ -543,8 +562,8 @@ sub ContactLookup {
         my $Email = lc $Param{Email};
 
         return if !$DBObject->Prepare(
-            SQL   => "SELECT id FROM contact WHERE $Self->{Lower}(email) = ? ORDER BY lastname, firstname",
-            Bind  => [ \$Email ],
+            SQL   => "SELECT id FROM contact WHERE $Self->{Lower}(email) = ? OR $Self->{Lower}(email1) = ? OR $Self->{Lower}(email2) = ? OR $Self->{Lower}(email3) = ? OR $Self->{Lower}(email4) = ? OR $Self->{Lower}(email5) = ? ORDER BY lastname, firstname",
+            Bind  => [ \$Email, \$Email, \$Email, \$Email, \$Email, \$Email ],
             Limit => 1,
         );
 
@@ -718,6 +737,11 @@ update contact attributes
         Firstname  => 'Huber',
         Lastname   => 'Manfred',
         Email      => 'email@example.com',
+        Email1     => 'email1@example.com',
+        Email2     => 'email2@example.com',
+        Email3     => 'email3@example.com',
+        Email4     => 'email4@example.com',
+        Email5     => 'email5@example.com',
         PrimaryOrganisationID => 123,
         OrganisationIDs => [
             123,
@@ -766,55 +790,63 @@ sub ContactUpdate {
     }
 
     # check duplicate email
-    if ( $Param{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
-        my $ExistingContactID = $Self->ContactLookup(
-            Email  => $Param{Email},
-            Silent => 1,
-        );
-        if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Cannot update contact. Email \"$Param{Email}\" already in use by a contact.",
-            );
-            return;
+    for my $MailAttr ( qw(Email Email1 Email2 Email3 Email4 Email5) ) {
+        if ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+            if ($Param{$MailAttr}) {
+                my $ExistingContactID = $Self->ContactLookup(
+                    Email  => $Param{$MailAttr},
+                    Silent => 1
+                );
+                if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Cannot update contact. Email \"$Param{$MailAttr}\" ($MailAttr) already in use by a contact.",
+                    );
+                    return;
+                }
+            }
         }
     }
 
+    my %OrgaIDs;
     # check if primary OrganisationID exists
     if ($Param{PrimaryOrganisationID}) {
         my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $Param{PrimaryOrganisationID},
         );
 
-        if (!%OrgData || $OrgData{ValidID} != 1) {
+        if (
+            !%OrgData
+            || $OrgData{ValidID} != 1
+        ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
+                Message  => "No valid organisation found for primary organisation ID \"$Param{PrimaryOrganisationID}\".",
             );
             return;
         }
+        $OrgaIDs{$Param{PrimaryOrganisationID}} = 1;
     }
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
+            next if ($OrgaIDs{$OrgID});
+
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
-            if (!%OrgData || $OrgData{ValidID} != 1) {
+            if (
+                !%OrgData
+                || $OrgData{ValidID} != 1
+            ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
+                    Message  => "No valid organisation found for assigned organisation ID \"$OrgID\".",
                 );
                 return;
             }
+            $OrgaIDs{$OrgID} = 1;
         }
-    } elsif (!defined $Param{OrganisationIDs}) {
-        $Param{OrganisationIDs} = $Contact{OrganisationIDs};
-    }
-
-    # check if primary OrganisationID is contained in assigned OrganisationIDs
-    if ($Param{PrimaryOrganisationID} && !grep /$Param{PrimaryOrganisationID}/, @{$Param{OrganisationIDs}}) {
-        push(@{$Param{OrganisationIDs}}, $Param{PrimaryOrganisationID});
     }
 
     # if assigned user ist given, check associated user exists
@@ -845,12 +877,19 @@ sub ContactUpdate {
     }
 
     # set default value
-    $Param{Comment} ||= '';
+    $Param{Comment} ||= q{};
 
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Firstname Lastname Email Title Phone Fax Mobile Street Zip City Country Comment ValidID AssignedUserID)) {
+    for my $Key (
+        qw(
+            Firstname Lastname
+            Email Email1 Email2 Email3 Email4 Email5
+            Title Phone Fax Mobile Street Zip City Country
+            Comment ValidID AssignedUserID
+        )
+    ) {
         next KEY if defined $Contact{$Key} && $Contact{$Key} eq $Param{$Key};
         $ChangeRequired = 1;
         last KEY;
@@ -858,15 +897,14 @@ sub ContactUpdate {
 
     my @DeleteOrgIDs;
     my @InsertOrgIDs;
-    for my $OrgID (@{$Param{OrganisationIDs}}) {
-        if (!grep ( /^$OrgID$/, @{$Contact{OrganisationIDs}})) {
-            push(@InsertOrgIDs, $OrgID);
-        }
-    }
     for my $OrgID (@{$Contact{OrganisationIDs}}) {
-        if (!grep ( /^$OrgID$/, @{$Param{OrganisationIDs}})) {
-            push(@DeleteOrgIDs, $OrgID);
-        }
+        next if ($OrgaIDs{$OrgID});
+        push(@DeleteOrgIDs, $OrgID);
+    }
+    my %KnownIDs = map { $_ => 1 } @{$Contact{OrganisationIDs} || []};
+    for my $OrgID ( keys %OrgaIDs ) {
+        next if ($KnownIDs{$OrgID});
+        push(@InsertOrgIDs, $OrgID);
     }
 
     $ChangeRequired = 1 if (
@@ -881,12 +919,14 @@ sub ContactUpdate {
     # update contact in database
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE contact SET firstname = ?, lastname = ?, '
-            . 'email = ?, title = ?, phone = ?, fax = ?, mobile = ?, street = ?, '
+            . 'email = ?, email1 = ?, email2 = ?, email3 = ?, email4 = ?, email5 = ?, '
+            . 'title = ?, phone = ?, fax = ?, mobile = ?, street = ?, '
             . 'zip = ?, city = ?, country = ?, comments = ?, valid_id = ?, '
             . 'change_time = current_timestamp, change_by = ?, user_id = ? WHERE id = ?',
         Bind => [
             \$Param{Firstname}, \$Param{Lastname},
-            \$Param{Email}, \$Param{Title}, \$Param{Phone}, \$Param{Fax}, \$Param{Mobile}, \$Param{Street},
+            \$Param{Email}, \$Param{Email1}, \$Param{Email2}, \$Param{Email3}, \$Param{Email4}, \$Param{Email5},
+            \$Param{Title}, \$Param{Phone}, \$Param{Fax}, \$Param{Mobile}, \$Param{Street},
             \$Param{Zip}, \$Param{City}, \$Param{Country}, \$Param{Comment}, \$Param{ValidID},
             \$Param{UserID}, \$Param{AssignedUserID}, \$Param{ID}
         ],
@@ -952,6 +992,7 @@ sub ContactUpdate {
         my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
             || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
         if ($NewUserValid != $ExistingUser{ValidID}) {
+            delete $ExistingUser{UserPw};
             my $Success = $Kernel::OM->Get('User')->UserUpdate(
                 %ExistingUser,
                 ValidID      => $NewUserValid,
@@ -1174,7 +1215,7 @@ sub ContactSearch {
                 $Part =~ s/%%/%/g;
 
                 my @WhereParts;
-                for my $Field ( qw(firstname lastname email title phone fax mobile street zip city country) ) {
+                for my $Field ( qw(firstname lastname email email1 email2 email3 email4 email5 title phone fax mobile street zip city country) ) {
                     push(@WhereParts, "$Self->{Lower}(c.$Field) LIKE $Self->{Lower}(?)");
                     push(@Bind, \$Part);
                 }
@@ -1206,8 +1247,12 @@ sub ContactSearch {
         $Email =~ s/\*/%/g;
         $Email =~ s/%%/%/g;
 
-        $Where .= "$Self->{Lower}(c.email) LIKE $Self->{Lower}(?)";
-        push(@Bind, \$Email);
+        my @EmailWheres;
+        for my $EMailAttr ( qw(email email1 email2 email3 email4 email5) ) {
+            push(@EmailWheres, "$Self->{Lower}(c.$EMailAttr) LIKE $Self->{Lower}(?)");
+            push(@Bind, \$Email);
+        }
+        $Where .= '( ' . join(' OR ', @EmailWheres) . ' )';
     }
     elsif ( $Param{OrganisationID} ) {
         $Join = 'LEFT JOIN contact_organisation co ON c.id = co.contact_id';
@@ -1669,7 +1714,7 @@ sub ContactList {
     );
     return %{$Cache} if $Cache;
 
-    my $SQL = "SELECT c.id, c.firstname, c.lastname, c.email, c.user_id FROM contact c ";
+    my $SQL = "SELECT c.id, c.firstname, c.lastname, c.email, c.email1, c.email2, c.email3, c.email4, c.email5, c.user_id FROM contact c ";
 
     # sql query
     if ($Valid) {
@@ -1926,6 +1971,7 @@ sub _SearchInDynamicField {
 =end Internal
 
 =cut
+
 sub DESTROY {
     my $Self = shift;
 

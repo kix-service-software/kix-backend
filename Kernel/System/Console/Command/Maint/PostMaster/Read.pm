@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -22,7 +22,7 @@ our @ObjectDependencies = (
 );
 
 sub Configure {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     $Self->Description('Read incoming email from STDIN.');
     $Self->AddOption(
@@ -49,11 +49,11 @@ sub Configure {
 }
 
 sub PreRun {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     my $Name = $Self->Name();
 
-    if ( $Self->GetOption('debug') ) {
+    if ($Self->GetOption('debug')) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) started.",
@@ -62,7 +62,7 @@ sub PreRun {
 }
 
 sub Run {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     my $Debug = $Self->GetOption('debug');
 
@@ -75,7 +75,7 @@ sub Run {
 
     # get email from SDTIN
     my @Email = <STDIN>;
-    if ( !@Email ) {
+    if (!@Email) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no email on STDIN!',
@@ -86,7 +86,7 @@ sub Run {
     if ($Debug) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
-            Message  => "Email with " . ( scalar @Email ) . " lines successfully read from STDIN.",
+            Message  => "Email with " . (scalar @Email) . " lines successfully read from STDIN.",
         );
     }
 
@@ -111,18 +111,19 @@ sub Run {
         }
 
         my @Return = $Kernel::OM->Get('PostMaster')->Run(
-            Queue => $Self->GetOption('target-queue'),
+            Queue      => $Self->GetOption('target-queue'),
+            FileIngest => 1,
         );
 
         if ($Debug) {
-            my $Dump = $Kernel::OM->Get('Main')->Dump( \@Return );
+            my $Dump = $Kernel::OM->Get('Main')->Dump(\@Return);
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Email processing completed, return data: $Dump",
             );
         }
 
-        if ( !$Return[0] ) {
+        if (!$Return[0]) {
             die "Can't process mail, see log!\n";
         }
     };
@@ -147,11 +148,11 @@ sub Run {
 }
 
 sub PostRun {
-    my ( $Self, %Param ) = @_;
+    my ($Self, %Param) = @_;
 
     my $Name = $Self->Name();
 
-    if ( $Self->GetOption('debug') ) {
+    if ($Self->GetOption('debug')) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "KIX email handle ($Name) stopped.",

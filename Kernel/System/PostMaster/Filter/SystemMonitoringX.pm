@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -208,46 +208,73 @@ sub _MailParse {
         return;
     }
 
-    my @DynamicFieldContentTicket = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle = split( ',', ($Self->{Config}->{'DynamicFieldContent::Article'} || ''));
-    my @DynamicFieldContent = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
+    # get configured items
+    my @DynamicFieldContentTicket  = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
+    my @DynamicFieldContentArticle = split( ',', $Self->{Config}->{'DynamicFieldContent::Article'} );
+    my @DynamicFieldContent        = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
-    my $Subject = $Param{GetParam}->{Subject};
+    # init hash to remember matched items
     my %AlreadyMatched;
 
-    # examine email SUBJECT...
-    my @SubjectLines = split /\n/, $Subject;
-    for my $Line (@SubjectLines) {
+    # Try to get configured items by pattern from email SUBJECT
+    my $Subject      = $Param{GetParam}->{Subject};
+    my @SubjectLines = split( /\n/, $Subject );
+    ITEM:
+    for my $Item ( @DynamicFieldContent ) {
+        # skip items without pattern
+        next ITEM if ( !$Self->{Config}->{ $Item . 'RegExp' } );
 
-        # extract to SysMon-State, -Host, -Service, -Address from email BODY
-        ITEM:
-        for my $Item (@DynamicFieldContent) {
-            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
-            my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
+        # isolate regex
+        my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
+
+        # process subject lines
+        for my $Line ( @SubjectLines ) {
             if ( $Line =~ /$Regex/ ) {
-                $Self->{$Item} = $1;
-                $AlreadyMatched{$Item} = 1;
+                # get first capture group for item
+                $Self->{ $Item } = $1;
+
+                # remember matched item
+                $AlreadyMatched{ $Item } = 1;
+
+                # only get first match
+                next ITEM;
             }
         }
     }
 
-    # examine email BODY line by line...
-    my $Body = $Param{GetParam}->{Body} || die "Message has no Body";
-    my @BodyLines = split /\n/, $Body;
+    # check for existing body
+    if ( $Param{GetParam}->{Body} ) {
+        my $Body      = $Param{GetParam}->{Body};
+        my @BodyLines = split( /\n/, $Body );
 
-    LINE:
-    for my $Line (@BodyLines) {
-
-        # extract to SysMon-State, -Host, -Service, -Address from email BODY
+        # Try to get configured items by pattern from email BODY
         ITEM:
-        for my $Item (@DynamicFieldContent) {
-            next ITEM if !$Self->{Config}->{ $Item . 'RegExp' };
-            next ITEM if $AlreadyMatched{$Item};
+        for my $Item ( @DynamicFieldContent ) {
+            # skip already matched items
+            next ITEM if ( $AlreadyMatched{ $Item } );
 
+            # skip items without pattern
+            next ITEM if ( !$Self->{Config}->{ $Item . 'RegExp' } );
+
+            # isolate and prepare regex
             my $Regex = $Self->{Config}->{ $Item . 'RegExp' };
-            if ( $Line =~ /$Regex/ ) {
-                $Self->{$Item} = $1;
-                $AlreadyMatched{$Item} = 1;
+            if (
+                $Regex =~ m/^\.\+/
+                || $Regex =~ m/^\(\.\+/
+                || $Regex =~ m/^\(\?\:\.\+/
+            ) {
+                $Regex = '^' . $Regex;
+            }
+
+            # process body lines
+            for my $Line ( @BodyLines ) {
+                if ( $Line =~ /$Regex/ ) {
+                    # get first capture group for item
+                    $Self->{ $Item } = $1;
+
+                    # only get first match
+                    next ITEM;
+                }
             }
         }
     }
@@ -448,12 +475,46 @@ sub _TicketCreate {
         || $Param->{GetParam}->{'X-KIX-SenderType'};
     $Param->{GetParam}->{'X-KIX-Channel'} = $Self->{Config}->{CreateChannel}
         || $Param->{GetParam}->{'X-KIX-Channel'};
-    $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue}
-        || $Param->{GetParam}->{'X-KIX-Queue'};
-    $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState}
-        || $Param->{GetParam}->{'X-KIX-State'};
-    $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType}
-        || $Param->{GetParam}->{'X-KIX-Type'};
+
+    # check queue if given
+    if ( $Param->{GetParam}->{'X-KIX-Queue'} ) {
+        if ( !$Kernel::OM->Get('Queue')->NameExistsCheck( Name => $Param->{GetParam}->{'X-KIX-Queue'} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Queue of X-KIX-Queue " . $Param->{GetParam}->{'X-KIX-Queue'} . " not found, using standard " . $Self->{Config}->{CreateTicketQueue},
+            );
+            $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
+    }
+
+    # check state if given
+    if ( $Param->{GetParam}->{'X-KIX-State'} ) {
+        if ( !$Kernel::OM->Get('State')->StateLookup( State => $Param->{GetParam}->{'X-KIX-State'}, Silent => 1 ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "State if X-KIX-State " . $Param->{GetParam}->{'X-KIX-State'} . " not found, using standard " . $Self->{Config}->{CreateTicketState},
+            );
+            $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState};
+    }
+
+    # check type if given
+    if ( $Param->{GetParam}->{'X-KIX-Type'} ) {
+        if ( !$Kernel::OM->Get('Type')->TypeLookup( Type => $Param->{GetParam}->{'X-KIX-Type'}, Silent => 1 ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Type if X-KIX-Type " . $Param->{GetParam}->{'X-KIX-Type'} . " not found, using standard " . $Self->{Config}->{CreateTicketType},
+            );
+            $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType};
+        }
+    } else {
+        $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType};
+    }
+
     $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
 

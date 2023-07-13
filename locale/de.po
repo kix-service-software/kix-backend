@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-3-17 15:07+0000\n"
-"PO-Revision-Date: 2023-04-06 10:19+0000\n"
-"Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
+"POT-Creation-Date: 2023-6-28 09:47+0000\n"
+"PO-Revision-Date: 2023-06-13 09:20+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -128,7 +128,7 @@ msgstr "Backup Gerät"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Base::Ticket"
-msgstr ""
+msgstr "Basis::Ticket"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Beamer"
@@ -169,6 +169,10 @@ msgstr "Gleichzeitige Nutzer"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer"
 msgstr "Kunde"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Customer - Follow Up Rejection"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Customer - New Ticket Receipt"
@@ -344,7 +348,7 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Maintenance"
-msgstr "In Wartung"
+msgstr "Wartung"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Middleware"
@@ -629,7 +633,7 @@ msgstr "Ticket Agent (ohne Teamberechtigung)"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent Base Permission"
-msgstr ""
+msgstr "Ticket Agent Basis Berechtigungen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Reader"
@@ -699,12 +703,6 @@ msgstr "Workplace"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "agent"
 msgstr "Agent"
-
-#. Database: scripts/database/kix-initial_insert.xml
-msgid ""
-"allows basic ticket access, but requires team specific roles with base "
-"permissions"
-msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -894,6 +892,82 @@ msgstr "gültig"
 msgid "warning"
 msgstr "Warnung"
 
+#. Perl Module: Kernel/Language.pm
+msgid "Apr"
+msgstr "Apr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Aug"
+msgstr "Aug"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Dec"
+msgstr "Dez"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Feb"
+msgstr "Feb"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Fri"
+msgstr "Fr"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jan"
+msgstr "Jan"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jul"
+msgstr "Jul"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Jun"
+msgstr "Jun"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mar"
+msgstr "Mär"
+
+#. Perl Module: Kernel/Language.pm
+msgid "May"
+msgstr "Mai"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Mon"
+msgstr "Mo"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Nov"
+msgstr "Nov"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Oct"
+msgstr "Okt"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sat"
+msgstr "Sa"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sep"
+msgstr "Sep"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Sun"
+msgstr "So"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Thu"
+msgstr "Do"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Tue"
+msgstr "Di"
+
+#. Perl Module: Kernel/Language.pm
+msgid "Wed"
+msgstr "Mi"
+
 #. Perl Module: Kernel/Output/HTML/Layout.pm
 msgid "d"
 msgstr "d"
@@ -963,7 +1037,7 @@ msgid ""
 "An array of weekdays (Mon,Tue,Wed,Thu,Fri,Sat,Sun) when the job should be "
 "executed."
 msgstr ""
-"Eine Reihe von Wochentagen (Mon,Tue,Wed,Thu,Fri,Sat,Sun) zu denen der Job "
+"Eine Reihe von Wochentagen (Mo,Di,Mi,Do,Fr,Sa,So) zu denen der Job "
 "ausgeführt wird."
 
 #. Perl Module: Kernel/System/Automation/ExecPlan/TimeBased.pm
@@ -1719,7 +1793,7 @@ msgstr "abgebrochen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "finished"
-msgstr "beendet"
+msgstr "abgeschlossen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "loading data from source"
@@ -1730,12 +1804,12 @@ msgid "pending"
 msgstr "wartend"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DF Type not yet supported!"
-msgstr "DF Typ nicht unterstützt!"
+msgid "DF not fully migrated!"
+msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/DynamicField/Config.pm
-msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
-msgstr "DIESES FELD NICHT AKTIVIEREN BIS DER TYP UNTERSTÜTZT WIRD!"
+msgid "DO NOT ENABLE THIS FIELD BEFORE ADAPTING THE CONFIG!"
+msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL.pm
 msgid ""
@@ -2035,6 +2109,12 @@ msgstr ""
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
 msgstr "Anzahl erstellter Tickets der letzten 7 Tage"
+
+#. Perl Module: update/build-1697.pl
+msgid ""
+"allows basic ticket access, but requires team specific roles with base "
+"permissions"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
@@ -2543,11 +2623,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Change password"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Checkbox"
-msgstr ""
+msgstr "Passwort ändern"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checklist"
@@ -2634,11 +2710,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Date / Time"
-msgstr ""
+msgstr "Datum / Uhrzeit"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -2654,15 +2730,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default spelling dictionary"
-msgstr ""
+msgstr "Standard-Rechtschreibwörterbuch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default ticket queue"
-msgstr ""
+msgstr "Standard-Ticket-Team"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default ticket type"
-msgstr ""
+msgstr "Standard-Ticket-Typ"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default value for NameX"
@@ -3477,7 +3553,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Firstname Lastname"
-msgstr ""
+msgstr "Vorname Nachname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Firstname Lastname (UserLogin)"
@@ -3740,7 +3816,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname Firstname"
-msgstr ""
+msgstr "Nachname Vorname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname Firstname (UserLogin)"
@@ -3748,7 +3824,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname"
-msgstr ""
+msgstr "Nachname, Vorname"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Lastname, Firstname (UserLogin)"
@@ -3820,11 +3896,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Multiple Selection"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "MultiselectGeneralCatalog"
-msgstr ""
+msgstr "Mehrfachauswahl"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
@@ -4076,7 +4148,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Set Variable"
-msgstr ""
+msgstr "Variable setzen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4329,15 +4401,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Table"
-msgstr ""
+msgstr "Tabelle"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea"
-msgstr ""
+msgstr "Textbereich"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
-msgstr ""
+msgstr "Textarea-Eingabe"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler automation task manager."
@@ -4527,10 +4599,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "User"
-msgstr "Nutzer"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Uses richtext for viewing and editing: articles, salutations, signatures, "
 "standard templates, auto responses and notifications."
@@ -4590,7 +4658,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "attachment"
-msgstr ""
+msgstr "Anhang"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "debug"
@@ -4674,7 +4742,9 @@ msgid ""
 "attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
 "should contain their structure separated with double colon "
-"(\"ParentAttribute::ChildAttribute::RelevantAttribut\")."
+"(\"ParentAttribute::ChildAttribute::RelevantAttribut\"). All attributes are "
+"OR combined, except \"Name\", \"Number\", \"DeploymentState\" and "
+"\"IncidentState\" which are used as AND conditions if given."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -5262,7 +5332,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Article"
-msgstr ""
+msgstr "Artikel Löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
@@ -5516,6 +5586,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for dynamic field attribute placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for notification config item placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6006,6 +6080,10 @@ msgid "Address Information"
 msgstr "Adressinformationen"
 
 #. manual entry from templates.pot.manual
+msgid "AlternativeTo"
+msgstr "Alternativ zu"
+
+#. manual entry from templates.pot.manual
 msgid "Assigned Contact"
 msgstr "Zugeordneter Kontakt"
 
@@ -6044,7 +6122,7 @@ msgstr "Stadt"
 
 #. manual entry from templates.pot.manual
 msgid "ConnectedTo"
-msgstr ""
+msgstr "Verbunden mit"
 
 #. manual entry from templates.pot.manual
 msgid "Contact"
@@ -6081,12 +6159,20 @@ msgid "Country"
 msgstr "Land"
 
 #. manual entry from templates.pot.manual
+msgid "CreateTime"
+msgstr "Erstellzeit"
+
+#. manual entry from templates.pot.manual
 msgid "Dark mode"
 msgstr "Dunkle Darstellung"
 
 #. manual entry from templates.pot.manual
 msgid "Depending objects prevent this operation."
 msgstr "Abhängige Objekte verhindern die Ausführung dieser Operation."
+
+#. manual entry from templates.pot.manual
+msgid "DependsOn"
+msgstr "Hängt ab von"
 
 #. manual entry from templates.pot.manual
 msgid "Description"
@@ -6106,7 +6192,7 @@ msgstr "Inbetriebnahme"
 
 #. manual entry from templates.pot.manual
 msgid "FirstResponse"
-msgstr ""
+msgstr "Erste Antwort"
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
@@ -6248,7 +6334,7 @@ msgstr "Übergeordneter Standort"
 
 #. manual entry from templates.pot.manual
 msgid "PendingTime"
-msgstr ""
+msgstr "Wartezeit"
 
 #. manual entry from templates.pot.manual
 msgid "Please enter a valid IPv4 address in form 123.123.123.123."
@@ -6270,6 +6356,10 @@ msgstr "Anzahl"
 #. manual entry from templates.pot.manual
 msgid "Region"
 msgstr "Region"
+
+#. manual entry from templates.pot.manual
+msgid "RelevantTo"
+msgstr "Relevant für"
 
 #. manual entry from templates.pot.manual
 msgid "Room"
@@ -6391,7 +6481,7 @@ msgstr "Teilweise bearbeitet"
 
 #. manual entry from templates.pot.manual
 msgid "printed by"
-msgstr ""
+msgstr "gedruckt von"
 
 #. manual entry from templates.pot.manual
 msgid "processing"
@@ -6421,81 +6511,14 @@ msgstr "Ausgesetzt"
 msgid "yes"
 msgstr "ja"
 
-#. manual entry from templates.pot.manual
-msgid "Sun"
-msgstr "So"
+#~ msgid "DF Type not yet supported!"
+#~ msgstr "DF Typ nicht unterstützt!"
 
-#. manual entry from templates.pot.manual
-msgid "Mon"
-msgstr "Mo"
+#~ msgid "DO NOT ENABLE THIS FIELD UNTIL THE TYPE IS SUPPORTED!"
+#~ msgstr "DIESES FELD NICHT AKTIVIEREN BIS DER TYP UNTERSTÜTZT WIRD!"
 
-#. manual entry from templates.pot.manual
-msgid "Tue"
-msgstr "Di"
-
-#. manual entry from templates.pot.manual
-msgid "Wed"
-msgstr "Mi"
-
-#. manual entry from templates.pot.manual
-msgid "Thu"
-msgstr "Do"
-
-#. manual entry from templates.pot.manual
-msgid "Fri"
-msgstr "Fr"
-
-#. manual entry from templates.pot.manual
-msgid "Sat"
-msgstr "Sa"
-
-#. manual entry from templates.pot.manual
-msgid "Jan"
-msgstr "Jan"
-
-#. manual entry from templates.pot.manual
-msgid "Feb"
-msgstr "Feb"
-
-#. manual entry from templates.pot.manual
-msgid "Mar"
-msgstr "Mär"
-
-#. manual entry from templates.pot.manual
-msgid "Apr"
-msgstr "Apr"
-
-#. manual entry from templates.pot.manual
-msgid "May"
-msgstr "Mai"
-
-#. manual entry from templates.pot.manual
-msgid "Jun"
-msgstr "Jun"
-
-#. manual entry from templates.pot.manual
-msgid "Jul"
-msgstr "Jul"
-
-#. manual entry from templates.pot.manual
-msgid "Aug"
-msgstr "Aug"
-
-#. manual entry from templates.pot.manual
-msgid "Sep"
-msgstr "Sep"
-
-#. manual entry from templates.pot.manual
-msgid "Oct"
-msgstr "Okt"
-
-#. manual entry from templates.pot.manual
-msgid "Nov"
-msgstr "Nov"
-
-#. manual entry from templates.pot.manual
-msgid "Dec"
-msgstr "Dez"
+#~ msgid "User"
+#~ msgstr "Nutzer"
 
 #~ msgid ""
 #~ "It is currently not possible to login due to a scheduled system "

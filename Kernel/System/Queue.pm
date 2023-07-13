@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1044,15 +1044,10 @@ sub NameExistsCheck {
     );
 
     # fetch the result
-    my $Flag;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         if ( !$Param{ID} || $Param{ID} ne $Row[0] ) {
-            $Flag = 1;
+            return 1;
         }
-    }
-
-    if ($Flag) {
-        return 1;
     }
 
     return 0;
