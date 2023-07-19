@@ -355,7 +355,6 @@ sub _HandleTicket {
                     # No UserID means it's not a mapped customer.
                     next BUNDLE if !$Bundle->{Recipient}->{UserID};
                 }
-
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
                     Notification          => $Bundle->{Notification},
@@ -802,7 +801,6 @@ sub _RecipientsGet {
             );
         }
         next RECIPIENT if !$Granted;
-
         # skip PostMasterUserID
         my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
         next RECIPIENT if $User{UserID} == $PostmasterUserID;
@@ -900,24 +898,18 @@ sub _SendRecipientNotification {
 
 sub _GetUserIDsWithRequiredPermission {
     my ( $Self, %Param ) = @_;
+   
+    my @BasePermissionUserIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantQueueUserIDList(
+        QueueID       => $Param{Ticket}->{QueueID},
+        Permission    => $Param{Permission}
+    );
 
-    # check each valid user if he has requested permission on /tickets
-    my @UserIDs;
-    my %UserList;
-    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
-        %UserList = %{$Self->{Cache}->{UserList}};
-    }
-    else {
-        %UserList = $Kernel::OM->Get('User')->UserList(
-            Valid => 1,
-            Short => 1,
-        );
-        $Self->{Cache}->{UserList} = \%UserList;
-    }
     my $Resource = '/tickets/' . $Param{Ticket}->{TicketID};
 
+    my @UserIDs = ();
+
     USERID:
-    foreach my $UserID ( sort keys %UserList ) {
+    foreach my $UserID (@BasePermissionUserIDs) {
         my @Permissions = split(/, ?/, $Param{Permission});
 
         PERMISSION:
@@ -925,8 +917,7 @@ sub _GetUserIDsWithRequiredPermission {
             my $Granted;
             if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission} ) {
                 $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission};
-            }
-            else {
+            } else {
                 $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
                     UserID              => $UserID,
                     Target              => $Resource,
@@ -937,20 +928,6 @@ sub _GetUserIDsWithRequiredPermission {
             }
 
             next USERID if !$Granted;
-        }
-
-        # check base permission
-        my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
-            UserID       => $UserID,
-            UsageContext => 'Agent',
-            Permission   => $Param{Permission},
-            Strict       => $Param{Strict}
-        );
-        next USERID if !$Result;
-
-        if ( IsArrayRefWithData($Result) ) {
-            my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
-            next USERID if !$AllowedQueueIDs{$Param{Ticket}->{QueueID}};
         }
 
         push @UserIDs, $UserID;
