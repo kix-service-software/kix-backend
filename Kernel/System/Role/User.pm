@@ -85,6 +85,89 @@ sub RoleUserAdd {
     return 1;
 }
 
+=item BasePermissionAgentList()
+
+returns a list with all users (is_agent=1) for given base permission
+
+    my @UserList = $RoleObject->BasePermissionAgentList(
+        Target  => 2,       # e.g. QueueID
+        Value   => 6,       # Permission Value (CRUD)
+    );
+
+    @UserList = (
+        1,
+        2,
+        3
+    );
+
+=cut
+
+sub BasePermissionAgentList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(Target Value) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    # create cache key
+    my $CacheKey = 'BasePermissionAgentList::' . $Param{Target} . '::' . $Param{Value} . '::' . $Param{Strict};
+
+    # read cache
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    my $SQL = << 'END';
+        SELECT DISTINCT(ru.user_id)
+        FROM role_user as ru
+        JOIN role_permission as rp
+            ON ru.role_id=rp.role_id
+        JOIN permission_type as pt
+            ON pt.id=rp.type_id
+        JOIN users as u
+            ON ru.user_id=u.id
+        WHERE pt.name='Base::Ticket'
+            AND rp.target IN ('*', ?)            
+            AND u.is_agent=1
+END
+
+    if ( $Param{Strict} ) {
+        $SQL .= ' AND rp.value=?'
+    } else {
+        $SQL .= ' AND (rp.value&?)=?';
+    }
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => $SQL,
+        Bind => [ \$Param{Target}, \$Param{Value}, \$Param{Value} ],
+    );
+
+    my @Result;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(@Result, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \@Result,
+        TTL   => $Self->{CacheTTL},
+    );
+
+    return @Result;
+
+}
+
 =item RoleUserList()
 
 returns a list with all users of a role
