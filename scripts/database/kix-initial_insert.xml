@@ -1710,7 +1710,7 @@
         <Data Key="notification_id">7</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_AGENT_Subject[64]>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_LAST_Subject_64>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>A new article has been added: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; wrote:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
@@ -1800,7 +1800,7 @@
         <Data Key="notification_id">7</Data>
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
-        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_CUSTOMER_Subject_64>]]></Data>
+        <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_LAST_Subject_64>]]></Data>
         <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
