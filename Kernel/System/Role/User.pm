@@ -136,19 +136,23 @@ sub BasePermissionAgentList {
         JOIN users as u
             ON ru.user_id=u.id
         WHERE pt.name='Base::Ticket'
-            AND rp.target IN ('*', ?)            
+            AND rp.target IN ('*', ?)     
+            AND u.valid_id=1       
             AND u.is_agent=1
 END
+
+    my @Bind = ( \$Param{Target}, \$Param{Value} );
 
     if ( $Param{Strict} ) {
         $SQL .= ' AND rp.value=?'
     } else {
         $SQL .= ' AND (rp.value&?)=?';
+        push ( @Bind, \$Param{Value} );
     }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
-        Bind => [ \$Param{Target}, \$Param{Value}, \$Param{Value} ],
+        Bind => \@Bind,
     );
 
     my @Result;

@@ -901,7 +901,8 @@ sub _GetUserIDsWithRequiredPermission {
    
     my @BasePermissionUserIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantQueueUserIDList(
         QueueID       => $Param{Ticket}->{QueueID},
-        Permission    => $Param{Permission}
+        Permission    => $Param{Permission},
+        Strict        => $Param{Strict}
     );
 
     my $Resource = '/tickets/' . $Param{Ticket}->{TicketID};
