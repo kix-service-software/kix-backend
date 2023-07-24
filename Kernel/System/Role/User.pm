@@ -117,7 +117,11 @@ sub BasePermissionAgentList {
     }
 
     # create cache key
-    my $CacheKey = 'BasePermissionAgentList::' . $Param{Target} . '::' . $Param{Value} . '::' . $Param{Strict};
+    my $CacheKey = 'BasePermissionAgentList::' . $Param{Target} . '::' . $Param{Value};
+
+    if( $Param{Strict} ) {
+        $CacheKey .= '::' . $Param{Strict}
+    }
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
