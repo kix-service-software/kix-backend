@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -161,6 +161,13 @@ sub Sort {
         QueueID  => 'st.queue_id',
     );
 
+    my %Join;
+    if ( $Param{Attribute} eq 'Queue' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN queue sq ON sq.id = st.queue_id'
+        ];
+    }
+
     return {
         SQLAttrs => [
             $AttributeMapping{$Param{Attribute}}
@@ -168,6 +175,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
+        %Join
     };
 }
 

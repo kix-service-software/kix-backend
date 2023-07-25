@@ -184,6 +184,27 @@ sub TicketSearch {
 sub _TicketSearch {
     my ( $Self, %Param ) = @_;
 
+    my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
+        Data     => $Param{Search} || {},
+        SortKeys => 1
+    );
+
+    my $CacheData = $Kernel::OM->Get('Cache')->Get(
+        Type => 'TicketSearch',
+        Key  => $CacheKey,
+    );
+
+    if ( defined $CacheData ) {
+        if ( ref $CacheData eq 'ARRAY' ) {
+            return @{$CacheData};
+        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid ref ' . ref($CacheData) . q{!}
+        );
+        return;
+    }
+
     # the parts or SQL is comprised of
     my @SQLPartsDef = (
         {
@@ -232,7 +253,7 @@ sub _TicketSearch {
     }
 
     # create basic SQL
-    my $SQL = 'SELECT DISTINCT st.id';
+    my $SQL = 'SELECT st.id';
     $SQLDef{SQLFrom}  = 'FROM ticket st';
 
     # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
@@ -279,32 +300,17 @@ sub _TicketSearch {
             . $SQLDef{$SQLPart->{Name}};
     }
 
-    my $CacheKey = $SQL;
-    my $CacheData = $Kernel::OM->Get('Cache')->Get(
-        Type => 'TicketSearch',
-        Key  => $CacheKey,
-    );
-
-    if ( defined $CacheData ) {
-        if ( ref $CacheData eq 'ARRAY' ) {
-            return @{$CacheData};
-        }
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Invalid ref ' . ref($CacheData) . q{!}
-        );
-        return;
-    }
-
     # database query
     return if !$Self->{DBObject}->Prepare(
         SQL => $SQL
     );
 
-    my @TicketIDs;
+    my %Tickets;
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        push(@TicketIDs, $Row[0]);
+        $Tickets{$Row[0]} = 1;
     }
+
+    my @TicketIDs = sort {$a <=> $b} keys %Tickets;
 
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'TicketSearch',
@@ -316,9 +322,44 @@ sub _TicketSearch {
     return @TicketIDs;
 }
 
-
 sub _TicketSort {
     my ( $Self, %Param ) = @_;
+
+    my $Result = $Param{Result} || 'HASH';
+    my $Limit  = $Param{Limit}  || q{};
+
+    # check cache
+    my $CacheKey  = $Kernel::OM->Get('JSON')->Encode(
+        Data    => {
+            TicketIDs => $Param{TicketIDs} || [],
+            Sort      => $Param{Sort}      || {},
+            Limit     => $Limit,
+            Result    => $Result
+        },
+        SortKeys => 1
+    );
+
+    my $CacheData = $Kernel::OM->Get('Cache')->Get(
+        Type => 'TicketSearch',
+        Key  => $CacheKey,
+    );
+
+    if ( defined $CacheData ) {
+        if ( ref $CacheData eq 'HASH' ) {
+            return %{$CacheData};
+        }
+        elsif ( ref $CacheData eq 'ARRAY' ) {
+            return @{$CacheData};
+        }
+        elsif ( ref $CacheData eq q{} ) {
+            return $CacheData;
+        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid ref ' . ref($CacheData) . q{!}
+        );
+        return;
+    }
 
     # the parts or SQL is comprised of
     my @SQLPartsDef = (
@@ -369,16 +410,12 @@ sub _TicketSort {
     if ( !$Param{UserType} ) {
         $Param{UserType} = 'Agent';
     }
-
-    my $Result = $Param{Result} || 'HASH';
-    my $Limit  = $Param{Limit}  || q{};
-
     # create basic SQL
-    my $SQL = 'SELECT DISTINCT st.id, st.tn';
+    my $SQL = 'SELECT st.id, st.tn';
     $SQLDef{SQLFrom}  = 'FROM ticket st';
-    $SQLDef{SQLWhere} .= ' st.id IN ('
+    $SQLDef{SQLJoin} .= ' INNER JOIN unnest(ARRAY['
         . join( q{,}, @{$Param{TicketIDs}} )
-        . q{)};
+        . ']) AS tid ON tid = st.id';
 
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
@@ -409,30 +446,6 @@ sub _TicketSort {
             . $SQLDef{$SQLPart->{Name}};
     }
 
-    # check cache
-    my $CacheKey  = $SQL . $Result . $Limit;
-    my $CacheData = $Kernel::OM->Get('Cache')->Get(
-        Type => 'TicketSearch',
-        Key  => $CacheKey,
-    );
-
-    if ( defined $CacheData ) {
-        if ( ref $CacheData eq 'HASH' ) {
-            return %{$CacheData};
-        }
-        elsif ( ref $CacheData eq 'ARRAY' ) {
-            return @{$CacheData};
-        }
-        elsif ( ref $CacheData eq q{} ) {
-            return $CacheData;
-        }
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Invalid ref ' . ref($CacheData) . q{!}
-        );
-        return;
-    }
-
     # database query
     my %Tickets;
     my @TicketIDs;
@@ -442,13 +455,10 @@ sub _TicketSort {
     );
 
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        push( @TicketIDs, $Row[0] );
+        next if ($Tickets{ $Row[0] });
         $Tickets{ $Row[0] } = $Row[1];
+        push( @TicketIDs, $Row[0] );
     }
-
-    # get unique if distinct id is not given because of joins
-    my %Known;
-    @TicketIDs = grep { !$Known{$_}++ } @TicketIDs;
 
     my $Count = scalar(@TicketIDs);
 
