@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -17,9 +17,9 @@ use base qw(
     Kernel::System::Ticket::TicketSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -56,6 +56,7 @@ sub GetSupportedAttributes {
         ],
         Sort => [
             'TypeID',
+            'Type'
         ]
     };
 }
@@ -122,7 +123,7 @@ sub Search {
         push( @SQLWhere, 'st.type_id != '.$TypeIDs[0] );
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
+        push( @SQLWhere, 'st.type_id IN ('.(join(q{,}, @TypeIDs)).q{)} );
     }
     else {
         $Kernel::OM->Get('Log')->Log(
@@ -155,13 +156,26 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Type    => 'tt.name',
+        TypeID  => 'st.type_id',
+    );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'Type' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN ticket_type tt ON tt.id = st.type_id'
+        ];
+    }
     return {
         SQLAttrs => [
-            'st.type_id'
+            $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            'st.type_id'
+            $AttributeMapping{$Param{Attribute}}
         ],
+        %Join
     };
 }
 

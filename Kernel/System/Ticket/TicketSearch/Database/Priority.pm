@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,6 +56,7 @@ sub GetSupportedAttributes {
             'PriorityID'
         ],
         Sort   => [
+            'Priority',
             'PriorityID'
         ],
     };
@@ -154,13 +155,26 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Priority    => 'tp.name',
+        PriorityID  => 'st.ticket_priority_id',
+    );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'Priority' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN ticket_priority tp ON tp.id = st.ticket_priority_id'
+        ];
+    }
     return {
         SQLAttrs => [
-            'st.ticket_priority_id'
+            $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            'st.ticket_priority_id'
+            $AttributeMapping{$Param{Attribute}}
         ],
+        %Join
     };
 }
 

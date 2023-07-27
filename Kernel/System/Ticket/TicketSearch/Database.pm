@@ -165,176 +165,16 @@ Result: 'COUNT'
 sub TicketSearch {
     my ( $Self, %Param ) = @_;
 
-    my @TicketIDs = $Self->_TicketSearch(
-        %Param
-    );
-
-    return if !@TicketIDs;
-
-    return $Self->_TicketSort(
-        %Param,
-        TicketIDs => \@TicketIDs
-    );
-}
-
-=begin Internal:
-
-=cut
-
-sub _TicketSearch {
-    my ( $Self, %Param ) = @_;
-
-    my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
-        Data     => $Param{Search} || {},
-        SortKeys => 1
-    );
-
-    my $CacheData = $Kernel::OM->Get('Cache')->Get(
-        Type => 'TicketSearch',
-        Key  => $CacheKey,
-    );
-
-    if ( defined $CacheData ) {
-        if ( ref $CacheData eq 'ARRAY' ) {
-            return @{$CacheData};
-        }
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Invalid ref ' . ref($CacheData) . q{!}
-        );
-        return;
-    }
-
-    # the parts or SQL is comprised of
-    my @SQLPartsDef = (
-        {
-            Name        => 'SQLAttrs',
-            JoinBy      => q{, },
-            JoinPreFix  => q{},
-            JoinPostFix => q{},
-            BeginWith   => q{,}
-        },
-        {
-            Name        => 'SQLFrom',
-            JoinBy      => q{, },
-            JoinPreFix  => q{},
-            JoinPostFix => q{},
-        },
-        {
-            Name        => 'SQLJoin',
-            JoinBy      => q{ },
-            JoinPreFix  => q{},
-            JoinPostFix => q{},
-        },
-        {
-            Name        => 'SQLWhere',
-            JoinBy      => ' AND ',
-            JoinPreFix  => q{(},
-            JoinPostFix => q{)},
-            BeginWith   => 'WHERE'
-        },
-    );
-
-    # empty SQL definition
-    my %SQLDef = (
-        SQLAttrs   => q{},
-        SQLFrom    => q{},
-        SQLJoin    => q{},
-        SQLWhere   => q{},
-    );
-
-    if ( !$Param{UserType} ) {
-        $Param{UserType} = 'Agent';
-    }
-
-    # init attribute backend modules
-    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
-        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->Init();
-    }
-
-    # create basic SQL
-    my $SQL = 'SELECT st.id';
-    $SQLDef{SQLFrom}  = 'FROM ticket st';
-
-    # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
-    my $SQLWhere = ' 1=1 ';
-    if (
-        $Param{UserID}
-        && $Param{UserID} != 1
-    ) {
-        my %PermissionSQL = $Self->_CreatePermissionSQL(
-            %Param
-        );
-        if ( $PermissionSQL{From} ) {
-            $SQLDef{SQLFrom} .= " $PermissionSQL{From}";
-        }
-        if ( $PermissionSQL{Where} ) {
-            $SQLWhere = " $PermissionSQL{Where}";
-        }
-    }
-    $SQLDef{SQLWhere} .= $SQLWhere;
-
-    # filter
-    if ( IsHashRefWithData($Param{Search}) ) {
-        my %Result = $Self->_CreateAttributeSQL(
-            SQLPartsDef => \@SQLPartsDef,
-            %Param,
-        );
-
-        # return in case of error
-        return if ( !%Result );
-
-        foreach my $SQLPart ( @SQLPartsDef ) {
-            next if !$Result{$SQLPart->{Name}};
-            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}
-                . $Result{$SQLPart->{Name}};
-        }
-    }
-
-    # generate SQL
-    foreach my $SQLPart ( @SQLPartsDef ) {
-        next if !$SQLDef{$SQLPart->{Name}};
-        $SQL .= q{ }
-            . ($SQLPart->{BeginWith} || q{})
-            . q{ }
-            . $SQLDef{$SQLPart->{Name}};
-    }
-
-    # database query
-    return if !$Self->{DBObject}->Prepare(
-        SQL => $SQL
-    );
-
-    my %Tickets;
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        $Tickets{$Row[0]} = 1;
-    }
-
-    my @TicketIDs = sort {$a <=> $b} keys %Tickets;
-
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => 'TicketSearch',
-        Key   => $CacheKey,
-        Value => \@TicketIDs,
-        TTL   => $Param{CacheTTL} || 60 * 4,
-    );
-
-    return @TicketIDs;
-}
-
-sub _TicketSort {
-    my ( $Self, %Param ) = @_;
-
     my $Result = $Param{Result} || 'HASH';
     my $Limit  = $Param{Limit}  || q{};
 
-    # check cache
-    my $CacheKey  = $Kernel::OM->Get('JSON')->Encode(
-        Data    => {
-            TicketIDs => $Param{TicketIDs} || [],
-            Sort      => $Param{Sort}      || {},
-            Limit     => $Limit,
-            Result    => $Result
+
+    my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
+        Data     => {
+            Search => $Param{Search} || {},
+            Sort   => $Param{Sort}   || {},
+            Result => $Result,
+            Limit  => $Limit
         },
         SortKeys => 1
     );
@@ -410,22 +250,55 @@ sub _TicketSort {
     if ( !$Param{UserType} ) {
         $Param{UserType} = 'Agent';
     }
+
+    # init attribute backend modules
+    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
+        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->Init();
+    }
+
     # create basic SQL
-    my $SQL = 'SELECT st.id, st.tn';
+    my $SQL = 'SELECT DISTINCT(st.id), st.tn';
     $SQLDef{SQLFrom}  = 'FROM ticket st';
-    $SQLDef{SQLJoin} .= ' INNER JOIN unnest(ARRAY['
-        . join( q{,}, @{$Param{TicketIDs}} )
-        . ']) AS tid ON tid = st.id';
+    $SQLDef{SQLWhere} = ' 1=1 ';
+
+    # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
+    if ($Param{UserID} && $Param{UserID} != 1) {
+        my %PermissionSQL = $Self->_CreatePermissionSQL(
+            %Param
+        );
+        if ( $PermissionSQL{From} ) {
+            $SQLDef{SQLFrom} .= " $PermissionSQL{From}";
+        }
+        if ( $PermissionSQL{Where} ) {
+            $SQLDef{SQLWhere} = " $PermissionSQL{Where}";
+        }
+    }
+
+    # filter
+    if ( IsHashRefWithData($Param{Search}) ) {
+        my %Result = $Self->_CreateAttributeSQL(
+            SQLPartsDef => \@SQLPartsDef,
+            %Param,
+        );
+        if ( !%Result ) {
+            # return in case of error
+            return;
+        }
+        foreach my $SQLPart ( @SQLPartsDef ) {
+            next if !$Result{$SQLPart->{Name}};
+            $SQLDef{$SQLPart->{Name}} .= $SQLPart->{JoinBy}.$Result{$SQLPart->{Name}};
+        }
+    }
 
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
         my %Result = $Self->_CreateOrderBySQL(
             Sort => $Param{Sort}
         );
-
-        # return in case of error
-        return if ( !IsHashRef(\%Result) );
-
+        if ( !IsHashRef(\%Result) ) {
+            # return in case of error
+            return;
+        }
         if (IsArrayRefWithData($Result{OrderBy})) {
             $SQLDef{SQLOrderBy} .= join(q{, }, @{$Result{OrderBy}});
         }
@@ -451,13 +324,13 @@ sub _TicketSort {
     my @TicketIDs;
     return if !$Self->{DBObject}->Prepare(
         SQL   => $SQL,
-        Limit => $Limit
+        Limit => $Param{Limit}
     );
 
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        next if ($Tickets{ $Row[0] });
-        $Tickets{ $Row[0] } = $Row[1];
+        next if $Tickets{ $Row[0] };
         push( @TicketIDs, $Row[0] );
+        $Tickets{ $Row[0] } = $Row[1];
     }
 
     my $Count = scalar(@TicketIDs);
@@ -495,6 +368,10 @@ sub _TicketSort {
         return @TicketIDs;
     }
 }
+
+=begin Internal:
+
+=cut
 
 =item _CreatePermissionSQL()
 

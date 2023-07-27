@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -337,36 +337,42 @@ sub _GetTicketData {
     }
 
     # add unseen information
-    my $Exists = $TicketObject->TicketUserFlagExists(
-        TicketID => $TicketID,
-        Flag     => 'Seen',
-        Value    => 1,
-        UserID   => $Self->{Authorization}->{UserID},
-    );
-    $TicketData{Unseen} = $Exists ? 0 : 1;
+    if ( $Param{Data}->{include}->{Flags} ) {
+        my $Exists = $TicketObject->TicketUserFlagExists(
+            TicketID => $TicketID,
+            Flag     => 'Seen',
+            Value    => 1,
+            UserID   => $Self->{Authorization}->{UserID},
+        );
+        $TicketData{Unseen} = $Exists ? 0 : 1;
+    }
 
     # add watcher info
-    my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherLookup(
-        Object      => 'Ticket',
-        ObjectID    => $TicketID,
-        WatchUserID => $Self->{Authorization}->{UserID},
-    );
-    if ( $WatcherID ) {
-        $TicketData{WatcherID} = $WatcherID;
+    if ( $Param{Data}->{include}->{Watcher} ) {
+        my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherLookup(
+            Object      => 'Ticket',
+            ObjectID    => $TicketID,
+            WatchUserID => $Self->{Authorization}->{UserID},
+        );
+        if ( $WatcherID ) {
+            $TicketData{WatcherID} = $WatcherID;
+        }
     }
 
     # add link count
-    $TicketData{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(
-        Object => 'Ticket',
-        Key    => $TicketID
-    );
+    if ( $Param{Data}->{include}->{LinkCount} ) {
+        $TicketData{LinkCount} = 0 + $Kernel::OM->Get('LinkObject')->LinkCount(
+            Object => 'Ticket',
+            Key    => $TicketID
+        );
+    }
 
     #FIXME: workaround KIX2018-3308
     $TicketData{ContactID}      = "" . $TicketData{ContactID};
     $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
 
     delete $TicketData{Age};
-    
+
     return \%TicketData;
 }
 
