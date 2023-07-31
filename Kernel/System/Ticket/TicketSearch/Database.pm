@@ -293,7 +293,8 @@ sub TicketSearch {
     # sorting
     if ( IsArrayRefWithData($Param{Sort}) ) {
         my %Result = $Self->_CreateOrderBySQL(
-            Sort => $Param{Sort}
+            Sort   => $Param{Sort},
+            UserID => $Param{UserID}
         );
         if ( !IsHashRef(\%Result) ) {
             # return in case of error
@@ -591,9 +592,14 @@ sub _CreateOrderBySQL {
             return;
         }
 
+        my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+            UserID => $Param{UserID}
+        ) || 'en';
+
         # execute attribute module to prepare SQL
         my $Result = $AttributeModule->Sort(
-            Attribute => $Attribute
+            Attribute => $Attribute,
+            Language  => $Language
         );
 
         if ( !IsHashRefWithData($Result) ) {

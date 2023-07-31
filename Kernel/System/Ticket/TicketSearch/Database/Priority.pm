@@ -157,22 +157,30 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Priority    => 'tp.name',
+        Priority    => 'COALESCE(tl.value, tp.name) AS TanslateName',
+        PriorityID  => 'st.ticket_priority_id',
+    );
+
+    my %OrderMapping = (
+        Priority    => 'TanslateName',
         PriorityID  => 'st.ticket_priority_id',
     );
 
     my %Join;
     if ( $Param{Attribute} eq 'Priority' ) {
         $Join{SQLJoin} = [
-            'INNER JOIN ticket_priority tp ON tp.id = st.ticket_priority_id'
+            'INNER JOIN ticket_priority tp ON tp.id = st.ticket_priority_id',
+	        'LEFT OUTER JOIN translation_pattern tlp ON tlp.value = tp.name',
+            "LEFT OUTER JOIN translation_language tl ON tl.pattern_id = tlp.id AND tl.language = '$Param{Language}'"
         ];
     }
+
     return {
         SQLAttrs => [
             $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            $AttributeMapping{$Param{Attribute}}
+            $OrderMapping{$Param{Attribute}}
         ],
         %Join
     };
@@ -194,3 +202,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

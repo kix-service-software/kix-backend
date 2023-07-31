@@ -253,14 +253,21 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        State    => 'ts.name',
+        State    => 'COALESCE(tl.value, ts.name) AS TanslateName',
         StateID  => 'st.ticket_state_id',
+    );
+
+    my %OrderMapping = (
+        Priority    => 'TanslateName',
+        PriorityID  => 'st.ticket_state_id',
     );
 
     my %Join;
     if ( $Param{Attribute} eq 'State' ) {
         $Join{SQLJoin} = [
-            'INNER JOIN ticket_state ts ON ts.id = st.ticket_state_id'
+            'INNER JOIN ticket_state ts ON ts.id = st.ticket_state_id',
+	        'LEFT OUTER JOIN translation_pattern tlp ON tlp.value = ts.name',
+            "LEFT OUTER JOIN translation_language tl ON tl.pattern_id = tlp.id AND tl.language = '$Param{Language}'"
         ];
     }
     return {
@@ -268,7 +275,7 @@ sub Sort {
             $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            $AttributeMapping{$Param{Attribute}}
+            $OrderMapping{$Param{Attribute}}
         ],
         %Join
     };
