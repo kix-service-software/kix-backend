@@ -163,8 +163,8 @@ sub Sort {
     );
 
     my %OrderMapping = (
-        Priority    => 'TanslateName',
-        PriorityID  => 'st.type_id',
+        Type    => 'TanslateName',
+        TypeID  => 'st.type_id',
     );
 
     my %Join;

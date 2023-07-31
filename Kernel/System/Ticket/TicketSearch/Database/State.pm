@@ -258,8 +258,8 @@ sub Sort {
     );
 
     my %OrderMapping = (
-        Priority    => 'TanslateName',
-        PriorityID  => 'st.ticket_state_id',
+        State    => 'TanslateName',
+        StateID  => 'st.ticket_state_id',
     );
 
     my %Join;
