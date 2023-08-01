@@ -389,7 +389,7 @@ sub ArticleCreate {
 
     # check if this is the first article (for notifications)
     my @Index = $Self->ArticleIndex( TicketID => $Param{TicketID} );
-    my $FirstArticle = scalar @Index ? 0 : 1;
+    my $IsFirstArticle = scalar @Index ? 0 : 1;
 
     # calculate MD5 of Message ID
     if ( $Param{MessageID} ) {
@@ -648,12 +648,7 @@ sub ArticleCreate {
         }
 
         # send agent notification on ticket create
-        if (
-            $FirstArticle &&
-            $Param{HistoryType}
-            =~ /^(EmailAgent|EmailCustomer|SystemRequest)$/i
-            )
-        {
+        if ( $IsFirstArticle && ( $Param{HistoryType} =~ /^(EmailCustomer|SystemRequest)$/i || $Param{SenderType} ne 'system') ) {
             # trigger notification event
             $Self->EventHandler(
                 Event => 'NotificationNewTicket',
