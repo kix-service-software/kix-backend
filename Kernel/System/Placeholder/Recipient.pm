@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -49,6 +49,14 @@ sub _Replace {
         }
     }
 
+    # get recipient data and replace it with <KIX_NOTIFICATION_RECIPIENT_...
+    my $RecipientTag = $Self->{Start} . 'KIX_NOTIFICATIONRECIPIENT_';
+
+    # FIXME: keep old placeholder syntax for backward compatibility
+    my $OldRecipientTag = $Self->{Start} . 'KIX_NOTIFICATION_RECIPIENT_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$RecipientTag/ && $Param{Text} !~ m/$OldRecipientTag/);
+
     my %Recipient = %{ $Param{Recipient} || {} };
 
     # get user object
@@ -61,12 +69,6 @@ sub _Replace {
             NoOutOfOffice => 1,
         );
     }
-
-    # get recipient data and replace it with <KIX_NOTIFICATION_RECIPIENT_...
-    my $RecipientTag = $Self->{Start} . 'KIX_NOTIFICATIONRECIPIENT_';
-
-    # TODO: keep old placeholder syntax for backward compatibility
-    my $OldRecipientTag = $Self->{Start} . 'KIX_NOTIFICATION_RECIPIENT_';
 
     if (%Recipient) {
 

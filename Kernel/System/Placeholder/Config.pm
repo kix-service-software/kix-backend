@@ -47,6 +47,9 @@ sub _Replace {
     }
 
     my $Tag = $Self->{Start} . 'KIX_CONFIG_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
     $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{

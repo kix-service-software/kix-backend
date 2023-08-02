@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -59,16 +59,18 @@ sub _Replace {
     # TODO: keep old placeholder syntax for backward compatibility
     my $OldTag = $Self->{Start} . 'KIX_TICKET_OWNER_';
 
-    if (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{OwnerID}) {
-        $Param{Text} = $Self->_ReplaceUserPlaceholder(
-            %Param,
-            Tags      => [ $Tag, $Tag2, $OldTag ],
-            UseUserID => $Param{Ticket}->{OwnerID}
-        );
-    }
+    if ($Param{Text} =~ m/$Tag/ || $Param{Text} =~ m/$Tag2/ || $Param{Text} =~ m/$OldTag/) {
+        if (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{OwnerID}) {
+            $Param{Text} = $Self->_ReplaceUserPlaceholder(
+                %Param,
+                Tags      => [ $Tag, $Tag2, $OldTag ],
+                UseUserID => $Param{Ticket}->{OwnerID}
+            );
+        }
 
-    # cleanup
-    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+        # cleanup
+        $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+    }
 
     # replace responsible placeholder
     $Tag  = $Self->{Start} . 'KIX_RESPONSIBLE_';
@@ -77,30 +79,34 @@ sub _Replace {
     # TODO: keep old placeholder syntax for backward compatibility
     $OldTag = $Self->{Start} . 'KIX_TICKET_RESPONSIBLE_';
 
-    if (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{ResponsibleID}) {
-        $Param{Text} = $Self->_ReplaceUserPlaceholder(
-            %Param,
-            Tags      => [ $Tag, $Tag2, $OldTag ],
-            UseUserID => $Param{Ticket}->{ResponsibleID}
-        );
-    }
+    if ($Param{Text} =~ m/$Tag/ || $Param{Text} =~ m/$Tag2/ || $Param{Text} =~ m/$OldTag/) {
+        if (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{ResponsibleID}) {
+            $Param{Text} = $Self->_ReplaceUserPlaceholder(
+                %Param,
+                Tags      => [ $Tag, $Tag2, $OldTag ],
+                UseUserID => $Param{Ticket}->{ResponsibleID}
+            );
+        }
 
-    # cleanup
-    $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+        # cleanup
+        $Param{Text} =~ s/(?:$Tag|$Tag2|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+    }
 
     # replace current agent placeholders
     $Tag = $Self->{Start} . 'KIX_CURRENT_';
 
-    if ($Param{UserID}) {
-        $Param{Text} = $Self->_ReplaceUserPlaceholder(
-            %Param,
-            Tags      => [ $Tag ],
-            UseUserID => $Param{UserID}
-        );
-    }
+    if ($Param{Text} =~ m/$Tag/) {
+        if ($Param{UserID}) {
+            $Param{Text} = $Self->_ReplaceUserPlaceholder(
+                %Param,
+                Tags      => [ $Tag ],
+                UseUserID => $Param{UserID}
+            );
+        }
 
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+        # cleanup
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+    }
 
     return $Param{Text};
 }

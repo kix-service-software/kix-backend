@@ -49,10 +49,18 @@ sub _Replace {
         }
     }
 
+    my $Tag = $Self->{Start} . 'KIX_QUEUE_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+
     my %Queue;
     if ( $Param{QueueID} && $Param{QueueID} =~ m/^\d+$/ ) {
         %Queue = $Kernel::OM->Get('Queue')->QueueGet(
             ID => $Param{QueueID}
+        );
+    } elsif ( $Param{ObjectType} && $Param{ObjectType} eq 'Queue' && $Param{ObjectID} ) {
+        %Queue = $Kernel::OM->Get('Queue')->QueueGet(
+            ID => $Param{ObjectID}
         );
     } elsif ( $Param{Data}->{QueueID} && $Param{Data}->{QueueID} =~ m/^\d+$/ ) {
         %Queue = $Kernel::OM->Get('Queue')->QueueGet(
@@ -70,8 +78,12 @@ sub _Replace {
         }
     }
 
-    my $Tag = $Self->{Start} . 'KIX_QUEUE_';
     if ( IsHashRefWithData(\%Queue) ) {
+
+        # FIXME: handle some old placeholders
+        $Param{Text} =~ s/$Self->{Start} KIX_TICKET_QUEUE $Self->{End}/$Queue{Name}/gixms;
+        $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Queue{Name}/gixms;
+
         my %PreparedQueue = (
             ID           => $Queue{QueueID},
             Signature    => $Queue{Signature}
@@ -146,6 +158,12 @@ sub _Replace {
 
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Queue, %PreparedQueue );
+    } else {
+
+        # cleanup
+        $Param{Text} =~ s/$Self->{Start} KIX_TICKET_QUEUE $Self->{End}/$Param{ReplaceNotFound}/gi;
+        $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{ReplaceNotFound}/gi;
+
     }
 
     # cleanup

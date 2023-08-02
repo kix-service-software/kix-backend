@@ -1,12 +1,14 @@
 # --
 # Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# based on the original work of:
+# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Placeholder::Common;
+package Kernel::System::Placeholder::Organisation;
 
 use strict;
 use warnings;
@@ -18,12 +20,13 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Placeholder::Base);
 
 our @ObjectDependencies = (
-    'Time'
+    'Log',
+    'Organisation'
 );
 
 =head1 NAME
 
-Kernel::System::Placeholder::Common
+Kernel::System::Placeholder::Organisation
 
 =cut
 
@@ -45,22 +48,33 @@ sub _Replace {
         }
     }
 
-    # replace NOW placeholders
-    my $Tag = $Self->{Start} . 'KIX_NOW';
+    # replace organisation placeholder
+    my $Tag = $Self->{Start} . 'KIX_(?:ORG|ORGANISATION)_';
 
     if ($Param{Text} =~ m/$Tag/) {
-        my $Now = $Kernel::OM->Get('Time')->CurrentTimestamp();
-        if ($Now =~ m/(?<Date>.+)\s(?<Time>.+)/) {
-            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$Tag\_",
-                (
-                    DateTime => $Now,
-                    Date     => $+{Date},
-                    Time     => $+{Time},
-                )
+        if (!$Param{Data}->{OrganisationID} && $Param{ObjectType} eq 'Organisation' && $Param{ObjectID}) {
+            $Param{Data}->{OrganisationID} = $Param{ObjectID};
+        }
+        if ( $Param{Data}->{OrganisationID} || $Param{Ticket}->{OrganisationID} ) {
+
+            my $OrganisationID = $Param{Data}->{OrganisationID} || $Param{Ticket}->{OrganisationID};
+
+            my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                ID => $OrganisationID,
             );
 
-            # replace als simple placeholder <KIX_NOW>
-            $Param{Text} =~ s/$Tag$Self->{End}/$Now/gi;
+            # HTML quoting of content
+            if ( $Param{RichText} ) {
+                for my $Attribute ( keys %Organisation ) {
+                    next if !$Organisation{$Attribute};
+                    $Organisation{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+                        String => $Organisation{$Attribute},
+                    );
+                }
+            }
+
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Organisation );
         }
 
         # cleanup
