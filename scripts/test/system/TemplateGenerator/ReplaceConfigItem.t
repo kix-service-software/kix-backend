@@ -201,12 +201,12 @@ my $YesNoList = $GeneralCatalogObject->ItemList(
 );
 my %YesNoListReverse = reverse %{$YesNoList};
 my %Data = (
-    User => 'TestUser',
-    Organisation => 'TestOrga',
+    User => 'ConfigItemTestUser',
+    Organisation => 'ConfigItemTestOrga',
     Contact => {
-        Firstname => 'Test',
-        Lastname => 'Contact',
-        Email => 'test@contact.com'
+        Firstname => 'ConfigItem',
+        Lastname => 'TestContact',
+        Email => 'ci@testcontact.com'
     },
     MaintenanceDates => [
         '2023-05-01',

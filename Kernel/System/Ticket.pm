@@ -497,8 +497,7 @@ sub TicketCreate {
     # check given organisation id
     my $ExistingOrganisationID;
 
-    # FIXME: remove ContactID check with KIX2018-6884
-    if ( $Param{OrganisationID} && $Param{ContactID} ) {
+    if ( $Param{OrganisationID} ) {
         if ($Param{OrganisationID} =~ /^\d+$/) {
             my $FoundOrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                 ID     => $Param{OrganisationID},
@@ -592,10 +591,6 @@ sub TicketCreate {
     # make sure it's undef and no empty string, so that the result is a NULL value in the DB
     if ( !$Param{ContactID} ) {
         $Param{ContactID} = undef;
-
-        # FIXME: if no contact, than no organisation (maybe remove this with KIX2018-6884)
-        $ExistingOrganisationID = undef;
-        $Param{OrganisationID}  = undef;
     }
 
     # create organisation if it doesn't exist

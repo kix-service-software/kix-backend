@@ -3363,35 +3363,19 @@ Thanks for your help!
     </ConfigItem>
 
     <!-- ticket placeholder module registrations -->
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###005-Common" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for configuration placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::Common</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###010-Config" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for configuration placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::Config</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###050-DynamicField" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for dynamic field attribute placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::DynamicField</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Placeholder::Module###100-User" Required="0" Valid="1">
         <Description Translatable="1">Module registration for user attribute placeholders such as owner, responsible or current user.</Description>
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Placeholder::User</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###150-Organisation" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for organisation attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Organisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3432,14 +3416,6 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Placeholder::Recipient</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###700-ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for notification config item placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>

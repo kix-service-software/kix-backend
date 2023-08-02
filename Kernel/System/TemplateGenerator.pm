@@ -683,7 +683,7 @@ sub _Replace {
     }egx;
 
     # return if no placeholders included
-    return $Param{Text} if $Param{Text} !~ m/(<|&lt;)KIX_.+/g;
+    return $Param{Text} if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/);
 
     # TODO: move ticket specific handling
     $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
@@ -742,7 +742,12 @@ sub _Replace {
     # get and execute placeholder modules
     my $PlaceholderModules = $Kernel::OM->Get('Config')->Get('Placeholder::Module');
     if (IsHashRefWithData($PlaceholderModules)) {
+        MODULE:
         for my $Module (sort keys %{$PlaceholderModules}) {
+
+            # stop if every placeholder is replaced
+            last MODULE if ($Param{Text} !~ m/(<|&lt;)KIX_.+/);
+
             next if !IsHashRefWithData($PlaceholderModules->{$Module}) || !$PlaceholderModules->{$Module}->{Module};
 
             if ( !$Kernel::OM->Get('Main')->Require($PlaceholderModules->{$Module}->{Module}) ) {

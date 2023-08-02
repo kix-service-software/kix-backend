@@ -48,18 +48,10 @@ sub _Replace {
         }
     }
 
-    my %Queue;
-    if ( $Param{QueueID} || (IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{QueueID}) ) {
-        %Queue = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $Param{QueueID} || $Param{Ticket}->{QueueID}
-        );
-    }
-
-    if ( IsHashRefWithData(\%Queue) ) {
-        $Param{Text} =~ s/$Self->{Start} KIX_TICKET_QUEUE $Self->{End}/$Queue{Name}/gixms;
-    }
-
     my $Tag = $Self->{Start} . 'KIX_TICKET_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+
     if ( IsHashRefWithData($Param{Ticket}) ) {
 
         # add (simple) ID
@@ -67,7 +59,6 @@ sub _Replace {
 
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_ID $Self->{End}/$Param{Ticket}->{TicketID}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
-        $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
 
         if ( !$Param{Ticket}->{AccountedTime} && $Param{Text} =~ m/AccountedTime/) {
             $Param{Ticket}->{AccountedTime} = $Kernel::OM->Get('Ticket')->TicketAccountedTimeGet(
