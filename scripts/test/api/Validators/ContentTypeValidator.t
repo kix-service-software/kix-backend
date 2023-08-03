@@ -29,38 +29,48 @@ my $ValidData = {
     ContentType => 'text/html; charset=utf8'
 };
 
-my $InvalidData = {
-    ContentType => 'invalid-ContentType'
-};
+my @InvalidDataArray = (
+    {
+        ContentType => 'invalid-ContentType'
+    },
+    {
+        ContentType => "text/html; charset=utf8;\nHost: www.kixdesk.com"
+    },
+    {
+        ContentType => 'text/html; charset=utf08'
+    },
+    {
+        ContentType => 'text /html; charset=utf8'
+    },
+);
 
 # validate valid ContentType
 my $Result = $ValidatorObject->Validate(
     Attribute => 'ContentType',
     Data      => $ValidData,
 );
-
 $Self->True(
     $Result->{Success},
     'Validate() - valid ContentType',
 );
 
 # validate invalid ContentType
-$Result = $ValidatorObject->Validate(
-    Attribute => 'ContentType',
-    Data      => $InvalidData,
-);
-
-$Self->False(
-    $Result->{Success},
-    'Validate() - invalid ContentType',
-);
+for my $InvalidData ( @InvalidDataArray ) {
+    $Result = $ValidatorObject->Validate(
+        Attribute => 'ContentType',
+        Data      => $InvalidData,
+    );
+    $Self->False(
+        $Result->{Success},
+        'Validate() - invalid ContentType',
+    );
+}
 
 # validate invalid attribute
 $Result = $ValidatorObject->Validate(
     Attribute => 'InvalidAttribute',
     Data      => {},
 );
-
 $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
