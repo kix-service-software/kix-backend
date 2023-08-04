@@ -40,7 +40,7 @@ Handles sync jobs.
 
 =item Run()
 
-Run this job module. Returns 1 if the job was executed successful.
+Run this job module. Returns just 1 to run the job without restrictions.
 
 Example:
     my $Result = $Object->Run(

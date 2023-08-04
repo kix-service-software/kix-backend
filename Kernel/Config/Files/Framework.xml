@@ -8978,6 +8978,7 @@ You can log in via the following URL:
             <Array>
                 <Item>ContactAdd</Item>
                 <Item>ContactUpdate</Item>
+                <Item>ContactDelete</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -8989,6 +8990,7 @@ You can log in via the following URL:
             <Array>
                 <Item>OrganisationAdd</Item>
                 <Item>OrganisationUpdate</Item>
+                <Item>OrganisationDelete</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -9534,6 +9536,7 @@ You can log in via the following URL:
             </Option>
         </Setting>
     </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="Automation::JobType###Synchronisation" Required="0" Valid="1">
         <Description Translatable="1">Registration of a job type for automation.</Description>
         <Group>Automation</Group>
@@ -9544,7 +9547,6 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-
     <ConfigItem AccessLevel="internal" Name="Automation::JobType###Reporting" Required="0" Valid="1">
         <Description Translatable="1">Registration of a job type for automation.</Description>
         <Group>Automation</Group>
@@ -9552,6 +9554,16 @@ You can log in via the following URL:
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Reporting</Item>
                 <Item Key="Module">Kernel::System::Automation::Job::Reporting</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Contact" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Contact</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -9566,7 +9578,6 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-
     <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Reporting" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro type for automation.</Description>
         <Group>Automation</Group>
@@ -9574,6 +9585,16 @@ You can log in via the following URL:
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Reporting</Item>
                 <Item Key="Module">Kernel::System::Automation::Macro::Reporting</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Contact" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Contact</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -9812,6 +9833,18 @@ You can log in via the following URL:
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Placeholder::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Contact::EventModulePost###900-Automation" Required="0" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Automation::Event::Handler</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event"></Item>
+                <Item Key="Type">Contact</Item>
             </Hash>
         </Setting>
     </ConfigItem>

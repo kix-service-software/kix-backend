@@ -114,7 +114,7 @@ sub PostValueSet {
             FieldName => $Param{DynamicFieldConfig}->{Name},
             Value     => $Param{Value},
             OldValue  => $Param{OldValue},
-            ItemID    => $Param{ObjectID},
+            ContactID => $Param{ObjectID},
             UserID    => $Param{UserID},
         },
         UserID => $Param{UserID},

@@ -1484,8 +1484,6 @@ sub FilterObjectList {
     return @FilteredResult;
 }
 
-
-
 =item GetUnique()
 
 returns an array with unique values
@@ -1499,6 +1497,30 @@ sub GetUnique {
     my ( $Self, @Array ) = @_;
     my %Known;
     return grep { !$Known{$_}++ } @Array;
+}
+
+=item GetCombinedList()
+
+returns an array of two combined lists
+
+    my @CombinedList = $MainObject->GetCombinedList(
+        ListA => \@Array,
+        ListB => \@Array,
+        Union => 0|1                # Default: 0
+    );
+
+=cut
+
+sub GetCombinedList {
+    my ( $Self, %Param ) = @_;
+
+    my %Union;
+    my %Isect;
+    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+        $Union{$E}++ && $Isect{$E}++
+    }
+
+    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 =begin Internal:
