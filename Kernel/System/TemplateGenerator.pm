@@ -332,6 +332,7 @@ replace all KIX placeholders in the notification body and subject
 
     my %NotificationEvent = $TemplateGeneratorObject->NotificationEvent(
         TicketID              => 123,
+        ArticleID             => 123,                       # optional
         Recipient             => $UserDataHashRef,          # Agent or Customer data get result
         Notification          => $NotificationDataHashRef,
         CustomerMessageParams => $ArticleHashRef,           # optional
@@ -534,6 +535,7 @@ sub NotificationEvent {
         Data      => $Param{CustomerMessageParams},
         DataAgent => \%ArticleAgent,
         TicketID  => $Param{TicketID},
+        ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
 
@@ -549,6 +551,7 @@ sub NotificationEvent {
         Data      => $Param{CustomerMessageParams},
         DataAgent => \%ArticleAgent,
         TicketID  => $Param{TicketID},
+        ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
 
