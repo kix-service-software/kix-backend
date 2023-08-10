@@ -59,6 +59,7 @@ sub _Replace {
 
     if ($Param{Text} =~ m/$Tag/ || $Param{Text} =~ m/$OldTag/) {
         $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
+        $Param{ArticleID} ||= IsHashRefWithData($Param{DataAgent}) ? $Param{DataAgent}->{ArticleID} : undef;
         if ( $Param{ArticleID} ) {
             my %Article = $Self->{TicketObject}->ArticleGet(
                 ArticleID => $Param{ArticleID},
