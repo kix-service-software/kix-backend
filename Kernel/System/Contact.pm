@@ -973,6 +973,7 @@ sub ContactUpdate {
     $Self->EventHandler(
         Event => 'ContactUpdate',
         Data  => {
+            ID      => $Param{ID},
             NewData => \%Param,
             OldData => \%Contact,
         },
@@ -1137,7 +1138,7 @@ sub ContactSearch {
             EmailEquals Email EmailIn DynamicField
             Title Firstname Lastname
             City Country Fax Mobil Phone Street Zip
-            ValidID
+            ValidID ID
             PostMasterSearch
         )
     ) {
@@ -1287,6 +1288,15 @@ sub ContactSearch {
         }
         $Where .= "c.user_id = ?";
         push(@Bind, \$Param{UserID}) if $Param{UserID};
+    }
+    elsif ($Param{ID}) {
+
+        if ( defined $Where ) {
+            $Where .= " AND ";
+        }
+
+        $Where .= "id = ?";
+        push(@Bind, \$Param{ID});
     }
     elsif ($Param{EmailEquals}) {
 
@@ -1485,6 +1495,15 @@ sub ContactDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'ContactDelete',
+        Data   => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

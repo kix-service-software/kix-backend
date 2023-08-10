@@ -509,8 +509,9 @@ sub OrganisationUpdate {
     $Self->EventHandler(
         Event => 'OrganisationUpdate',
         Data  => {
-            NewData       => \%Param,
-            OldData       => \%Organisation,
+            ID      => $Param{ID},
+            NewData => \%Param,
+            OldData => \%Organisation,
         },
         UserID => $Param{UserID},
     );
@@ -785,6 +786,15 @@ sub OrganisationDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'OrganisationDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

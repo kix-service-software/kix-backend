@@ -40,10 +40,10 @@ Handles ticket based jobs.
 
 =item Run()
 
-Run this job module. Returns 1 if the job was executed successful.
+Run this job module. Returns the list of TicketIDs to run this job on.
 
 Example:
-    my $Result = $Object->Run(
+    my @TicketIDs = $Object->Run(
         Filter => {}         # optional, filter for objects
         Data   => {},        # optional, contains the relevant data given by an event or otherwise
         UserID => 123,

@@ -40,10 +40,10 @@ Handles reporting jobs.
 
 =item Run()
 
-Run this job module. Returns 1 if the job was executed successful.
+Run this job module. Returns the list of DefinitionIDs to run this job on.
 
 Example:
-    my $Result = $Object->Run(
+    my @DefinitionIDs = $Object->Run(
         Data   => {},        # optional, contains the relevant data given by an event or otherwise
         UserID => 123,
     );

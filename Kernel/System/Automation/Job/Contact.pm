@@ -6,22 +6,31 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::Contact::ContactSearch;
+package Kernel::System::Automation::Job::Contact;
 
 use strict;
 use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-use base qw(
-    Kernel::API::Operation::V1::Common
-);
+use base qw(Kernel::System::Automation::Job::Common);
 
-our $ObjectManagerDisabled = 1;
+our @ObjectDependencies = (
+    'Config',
+    'Cache',
+    'DB',
+    'Log',
+    'User',
+    'Valid',
+);
 
 =head1 NAME
 
-Kernel::API::Operation::Contact::ContactSearch - API Contact Search Operation backend
+Kernel::System::Automation::Job::Contact - job type for automation lib
+
+=head1 SYNOPSIS
+
+Handles contact based jobs.
 
 =head1 PUBLIC INTERFACE
 
@@ -31,45 +40,54 @@ Kernel::API::Operation::Contact::ContactSearch - API Contact Search Operation ba
 
 =item Run()
 
-perform ContactSearch Operation. This will return a Contact ID list.
+Run this job module. Returns the list of ContactIDs to run this job on.
 
-    my $Result = $OperationObject->Run(
-        Data => { }
+Example:
+    my @ContactIDs = $Object->Run(
+        Filter => {}         # optional, filter for objects
+        Data   => {},        # optional, contains the relevant data given by an event or otherwise
+        UserID => 123,
     );
-
-    $Result = {
-        Success     => 1,                                # 0 or 1
-        Message     => '',                               # In case of an error
-        Data        => {
-            Contact => [
-                { },
-                { }
-            ],
-        },
-    };
 
 =cut
 
 sub Run {
     my ( $Self, %Param ) = @_;
-    my @ContactList;
 
-    $Self->SetDefaultSort(
-        Contact => [
-            { Field => 'Lastname' },
-            { Field => 'Firstname' },
-        ]
-    );
+    # check needed stuff
+    for (qw(UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
 
-    # prepare search if given
-    if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
+    my $Filter =  $Param{Filter};
+
+    if ( IsHashRefWithData($Param{Data}) && ($Param{Data}->{ID} || $Param{Data}->{ContactID}) ) {
+        # add ContactID to filter
+         $Filter //= {};
+         $Filter->{AND} //= [];
+         push @{$Filter->{AND}}, {
+             Field    => 'ID',
+             Operator => 'EQ',
+             Value    => $Param{Data}->{ID} || $Param{Data}->{ContactID}
+         };
+    }
+
+    my @ContactIDs;
+
+    if ( IsHashRefWithData($Filter) ) {
         # do first OR to prevent replacement of prior AND search with empty result
         my %SearchParams;
         SEARCHTYPE:
         foreach my $SearchType ( qw(OR AND) ) {
-            next SEARCHTYPE if ( !IsArrayRefWithData($Self->{Search}->{Contact}->{$SearchType}) );
+            next SEARCHTYPE if ( !IsArrayRefWithData($Filter->{$SearchType}) );
             my @SearchTypeResult;
-            foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
+            foreach my $SearchItem ( @{ $Filter->{$SearchType} } ) {
 
                 my $Value = $SearchItem->{Value};
 
@@ -93,7 +111,7 @@ sub Run {
                     } else {
                         $SearchParams{Login} = $Value;
                     }
-                } elsif ( $SearchItem->{Field} =~ /^(AssignedUserID|UserID|OrganisationIDs|Title|Firstname|Lastname|City|Country|Fax|Mobil|Phone|Street|Zip|ValidID)$/ ) {
+                } elsif ( $SearchItem->{Field} =~ /^(ID|AssignedUserID|UserID|OrganisationIDs|Title|Firstname|Lastname|City|Country|Fax|Mobil|Phone|Street|Zip|ValidID)$/ ) {
                     $SearchParams{$SearchItem->{Field}} = $Value;
                 } elsif ( $SearchItem->{Field} eq 'Email' ) {
                     if ($SearchItem->{Operator} eq 'EQ') {
@@ -120,7 +138,6 @@ sub Run {
                     my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                         %SearchParams,
                         Valid => 0,
-                        Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                     );
 
                     @SearchTypeResult = $Kernel::OM->Get('Main')->GetCombinedList(
@@ -137,20 +154,19 @@ sub Run {
                 my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
                     %SearchParams,
                     Valid => 0,
-                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                 );
                 @SearchTypeResult = %SearchResult ? @{[keys %SearchResult]} : ();
             }
 
-            if ( !@ContactList ) {
-                @ContactList = @SearchTypeResult;
+            if ( !@ContactIDs ) {
+                @ContactIDs = @SearchTypeResult;
             } else {
 
                 # combine both results (OR and AND)
                 # remove all IDs from type result that we don't have in this search
-                @ContactList = $Kernel::OM->Get('Main')->GetCombinedList(
+                @ContactIDs = $Kernel::OM->Get('Main')->GetCombinedList(
                     ListA => \@SearchTypeResult,
-                    ListB => \@ContactList
+                    ListB => \@ContactIDs
                 );
             }
         }
@@ -160,40 +176,10 @@ sub Run {
         my %ContactList = $Kernel::OM->Get('Contact')->ContactList(
             Valid => 0
         );
-        @ContactList = %ContactList ? @{[keys %ContactList]} : ();
+        @ContactIDs = %ContactList ? @{[keys %ContactList]} : ();
     }
 
-    if ( IsArrayRefWithData( \@ContactList ) ) {
-
-        # get already prepared Contact data from ContactGet operation
-        my $GetResult = $Self->ExecOperation(
-            OperationType            => 'V1::Contact::ContactGet',
-            SuppressPermissionErrors => 1,
-            Data          => {
-                ContactID                   => join( ',', sort @ContactList ),
-                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
-            }
-        );
-        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-            return $GetResult;
-        }
-
-        my @ResultList;
-        if ( defined $GetResult->{Data}->{Contact} ) {
-            @ResultList = IsArrayRef($GetResult->{Data}->{Contact}) ? @{$GetResult->{Data}->{Contact}} : ( $GetResult->{Data}->{Contact} );
-        }
-
-        if ( IsArrayRefWithData( \@ResultList ) ) {
-            return $Self->_Success(
-                Contact => \@ResultList,
-            )
-        }
-    }
-
-    # return result
-    return $Self->_Success(
-        Contact => [],
-    );
+    return @ContactIDs;
 }
 
 1;
