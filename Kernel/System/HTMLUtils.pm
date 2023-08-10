@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -645,15 +645,62 @@ sub DocumentComplete {
 
     return $Param{String} if $Param{String} =~ /<html>/i;
 
-    my $Css = $Kernel::OM->Get('Config')->Get('Frontend::RichText::DefaultCSS')
-        || 'font-size: 12px; font-family:Courier,monospace,fixed;';
+    my $Config = $Kernel::OM->Get('Config')->Get('Frontend::RichText::DefaultCSS');
+    my $Style  = q{};
+    if ( $Config ) {
+        my $StyleData = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Config
+        );
+
+        for my $StyleEntry ( @{$StyleData} ) {
+            my $Selector = $StyleEntry->{Selector};
+            my $CSS      = $StyleEntry->{Value};
+
+            next if !$Selector || !$CSS;
+
+            if ( $Selector eq '.cke_editable' ) {
+                $Selector = 'body';
+            }
+
+            $Style .= <<"END";
+            $Selector {
+                $CSS
+            }
+END
+        }
+    }
+
+    if ( !$Style ) {
+        $Style = <<'END';
+        <style>
+            body {
+                font-size: 12px;
+                font-family:Courier,monospace,fixed;
+            }
+        </style>
+END
+    }
+    else {
+$Style = <<"END";
+        <style>
+            $Style
+        </style>
+END
+    }
 
     # Use the HTML5 doctype because it is compatible with HTML4 and causes the browsers
     #   to render the content in standards mode, which is more safe than quirks mode.
-    my $Body = '<!DOCTYPE html><html><head>';
-    $Body
-        .= '<meta http-equiv="Content-Type" content="text/html; charset=' . $Param{Charset} . '"/>';
-    $Body .= '</head><body style="' . $Css . '">' . $Param{String} . '</body></html>';
+    my $Body = <<"END";
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=$Param{Charset}"/>
+        $Style
+    </head>
+    <body>$Param{String}</body>
+</html>
+END
+
     return $Body;
 }
 
