@@ -7755,7 +7755,7 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="FileUpload::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="external" Name="FileUpload::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
         <Group>Framework</Group>
         <SubGroup>Core::FileUpload</SubGroup>
         <Description Translatable="1">Defines the maximal size (in bytes) for file uploads.</Description>
