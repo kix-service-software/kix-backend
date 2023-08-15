@@ -1156,8 +1156,9 @@ sub GenerateRandomString {
 resolve a value from a complex data structure
 
     my $Value = $MainObject->ResolveValueByKey(
-        Data => {} || [],
-        Key  => '...'
+        Data     => {} || [],
+        Key      => '...',
+        Resolver => {},            # optional, used by RuleSet
     );
 =cut
 
@@ -1190,7 +1191,19 @@ sub ResolveValueByKey {
     }
 
     # get the value of $Attribute
-    $Data = exists $Data->{$Attribute} ? $Data->{$Attribute} : return;
+    if (exists $Data->{$Attribute} ) {
+        $Data = $Data->{$Attribute};
+    }
+    # if not, look if there is a reverse resolver available
+    elsif ( $Param{Resolver} && exists $Data->{$Param{Resolver}->{Resolves}} ) {
+        $Data = $Param{Resolver}->{Handler}(
+            $Param{Resolver}->{HandlerObject},
+            Data => $Data->{$Param{Resolver}->{Resolves}},
+        );
+    }
+    else {
+        return;
+    }
 
     if ( defined $ArrayIndex && IsArrayRef($Data) ) {
         $Data = $Data->[$ArrayIndex];
@@ -1198,8 +1211,9 @@ sub ResolveValueByKey {
 
     if ( @Parts ) {
         return $Self->ResolveValueByKey(
-            Key  => join('.', @Parts),
-            Data => $Data,
+            Key      => join('.', @Parts),
+            Data     => $Data,
+            Resolver => $Param{Resolver}
         );
     }
 
