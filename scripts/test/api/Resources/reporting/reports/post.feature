@@ -10,4 +10,4 @@ Feature: POST request to the /reporting/reports resource
     Then the response code is 201
     When I create a report
     Then the response code is 201
-
+    And the response object is ReportPostResponse

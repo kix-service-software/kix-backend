@@ -25,5 +25,5 @@ Feature: POST request to the /auth resource
     Then the response code is 401
     And the response object is Error
     And the error code is "SessionCreate.AuthFail"
-    And the error message is "Need UserLogin or UserID!"
+    And the error message is "Authorization not possible, please contact the system administrator."
 

@@ -36,8 +36,8 @@ Feature: GET request to the /system/cmdb/classes resource
     And the response contains 2 items of type "ConfigItemClass"
     And the response contains the following items of type ConfigItemClass
       | Name     |
-      | Software |
-      | Computer |
+      | Hardware |
+      | Location |
 #    And the response object is ConfigItemClassCollectionResponse
 
   Scenario: get the list of existing classes with sorted

@@ -8,3 +8,4 @@ Feature: GET request to the /reporting/reportdefinitions resource
   Scenario: get the list of existing reportdefinitions
     When I query the reportdefinitions collection
     Then the response code is 200
+#    And the response object is ReportDefinitionCollectionResponse

@@ -12,5 +12,6 @@ Feature: GET request to the /reporting/reports resource
     Then the response code is 201
     When I query the reports collection
     Then the response code is 200
+#    And the response object is ReportDefinitionCollectionResponse
     When I delete this reportdefinition
     Then the response code is 204

@@ -11,6 +11,7 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments r
     Given a article attachment
     When I query the attachments collection
     Then the response code is 200
+#    Then the response object is TicketArticleAttachmentCollectionResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content 

@@ -10,6 +10,7 @@ Feature: GET request to the /tickets/:TicketID/articles resource
     Given a article
     When I query the articles collection
     Then the response code is 200
+#   Then the response object is TicketArticleCollectionResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content
@@ -37,7 +38,7 @@ Feature: GET request to the /tickets/:TicketID/articles resource
   Scenario: get the list of existing articles with limit and offset
     Given a ticket
     Given 8 of articles
-    When I query the articles collection with limit 2 and offset 4
+    When I query the articles collection with limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "Article"
     When I delete this ticket

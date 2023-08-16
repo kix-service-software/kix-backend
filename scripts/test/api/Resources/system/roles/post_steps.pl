@@ -34,7 +34,7 @@ Given qr/a role$/, sub {
       Token   => S->{Token},
       Content => {
         Role => {
-            Name         => "the new stats role GET",
+            Name         => "the new stats role GET".rand(),
             Comment      => "...",
             ValidID      => 1,
             UsageContext => 1
@@ -42,6 +42,22 @@ Given qr/a role$/, sub {
       }
    );
 };
+
+Given qr/a role with Name "the new stats role GET"$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+       URL     => S->{API_URL}.'/system/roles',
+       Token   => S->{Token},
+       Content => {
+           Role => {
+               Name         => "the new stats role GET",
+               Comment      => "...",
+               ValidID      => 1,
+               UsageContext => 1
+           }
+       }
+   );
+};
+
 
 When qr/I create a role$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(

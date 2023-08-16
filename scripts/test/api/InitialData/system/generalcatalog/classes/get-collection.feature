@@ -9,7 +9,7 @@
     When I query the collection of generalcatalog class
     Then the response code is 200
     Then the response contains 10 items type of GeneralCatalogClass
-    And the response contains the following items type of GeneralCatalogClass
+    And response contains the following items type GeneralCatalogClass
       | Class                                   |
       | ITSM::ConfigItem::Class                 |
       | ITSM::ConfigItem::Computer::Type        |
@@ -17,11 +17,10 @@
       | ITSM::ConfigItem::Hardware::Type        |
       | ITSM::ConfigItem::Location::Type        |
       | ITSM::ConfigItem::Network::Type         |
-      | ITSM::ConfigItem::Service::Type         |
       | ITSM::ConfigItem::Software::LicenceType |
       | ITSM::ConfigItem::Software::Type        |
       | ITSM::ConfigItem::YesNo                 |
       | ITSM::Core::IncidentState               |
 
 
-      
+

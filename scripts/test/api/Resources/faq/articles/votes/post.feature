@@ -9,6 +9,7 @@ Feature: POST request to the /faq/articles/:FAQArticleID/votes resource
     Given a faq article
     When I create a faq article votes
     Then the response code is 201
+    Then the response object is FAQVotePostPatchResponse
     When I delete this faq article
     Then the response code is 204
     And the response has no content

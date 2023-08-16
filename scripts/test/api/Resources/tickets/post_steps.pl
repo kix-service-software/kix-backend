@@ -80,6 +80,16 @@ Given qr/(\d+) of tickets$/, sub {
             $PriorityID = 2;
             $QueueID = 2;
         }
+        elsif ( $i>8 && $i<10 ) {
+            $Title = 'test ticket given for multible sort';
+            $PriorityID = 3;
+            $QueueID = 3;
+        }
+        elsif ( $i>10 && $i<12 ) {
+            $Title = 'test ticket given for multible sort';
+            $PriorityID = 1;
+            $QueueID = 1;
+        }
         else {
             $Title = 'test ticket for'.rand();
             $PriorityID = 3;
@@ -253,3 +263,56 @@ When qr/I create a complete ticket$/, sub {
    );
 };
 
+When qr/I create a ticket placeholder$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/tickets',
+        Token   => S->{Token},
+        Content => {
+            Ticket => {
+                Title => "test KIX_CONFIG_DefaultUsedLanguages: <KIX_CONFIG_DefaultUsedLanguages> ticket for unknown contact",
+                ContactID => 1,
+                OrganisationID => 1,
+                StateID => 4,
+                PriorityID => 3,
+                QueueID => 1,
+                TypeID => 2,
+                Articles => [
+                    {
+                        Subject => "d  fsd fds ",
+                        Body => "Calendar: <KIX_TICKET_SLACriteria_FirstResponse_Calendar>, BusinessTimeDeviaton: <KIX_TICKET_SLACriteria_FirstResponse_BusinessTimeDeviaton>, TargetTime: <KIX_TICKET_SLACriteria_FirstResponse_TargetTime>, KIX_CONFIG_Ticket::Hook: <KIX_CONFIG_Ticket::Hook>,KIX_CONFIG_PGP::Key::Password: <KIX_CONFIG_PGP::Key::Password>,KIX_CONFIG_ContactSearch::UseWildcardPrefix: <KIX_CONFIG_ContactSearch::UseWildcardPrefix>",
+                        ContentType => "text/html; charset=utf8",
+                        MimeType => "text/html",
+                        Charset => "utf8",
+                        ChannelID => 1,
+                        SenderTypeID => 1,
+                        From => 'root@nomail.org',
+                        CustomerVisible => 0,
+                        To => 'contact222@nomail.org'
+                    }
+                ]
+            }
+        }
+    );
+};
+
+Then qr/the response contains the following article placeholder$/, sub {
+    my $Object = $1;
+    my $Index = 0;
+
+    foreach my $Row ( sort keys %{S->{ResponseContent}->{Ticket}->{Articles}->[0]} ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "the placeholder \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    }
+};
+
+Then qr/the placeholder "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    if ( defined( S->{ResponseContent}->{$2}->[$3]->{$1}) ) {
+#        S->{ResponseContent}->{$2}->[$3]->{$1} =~ s/<.+?>/ /g;
+        is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
+    }
+    else{
+        is('', $4, 'Check attribute value in response');
+    }
+};

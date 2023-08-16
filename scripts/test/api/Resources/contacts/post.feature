@@ -9,7 +9,7 @@ Feature: POST request /contacts resource
     Given a organisation
     When added a contact
     Then the response code is 201
-#    Then the response object is ContactCollectionResponse
+    Then the response object is ContactPostPatchResponse
     When I delete this contact
     Then the response code is 204
     When I delete this organisation
@@ -23,25 +23,11 @@ Feature: POST request /contacts resource
     Then the response code is 409
     And the response object is Error
     And the error code is "Object.AlreadyExists"
-    And the error message is "Cannot create contact. Another contact with same email address already exists."
+    And the error message is "Cannot create contact. Another contact with email address "mamu@example.org" already exists."
     When I delete this contact
     Then the response code is 204
     When I delete this organisation
     Then the response code is 204
     And the response has no content
 
-#  Scenario: I create a contact with a login that already exists
-#    Given a organisation
-#    Then the response code is 201
-#    When added a contact
-#    Then the response code is 201
-#    When added a contact with a login that already exists
-#    Then the response code is 409
-#    And the response object is Error
-#    And the error code is "Object.AlreadyExists"
-#    And the error message is "Cannot create contact. Another contact with same login already exists."
-#    When I delete this contact
-#    Then the response code is 204
-#    When I delete this organisation
-#    Then the response code is 204
-#    And the response has no content
+

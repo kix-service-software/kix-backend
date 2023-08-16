@@ -10,7 +10,8 @@ Feature: POST request to the /watchers resource
     When I create a watcher
       | UserID |
       | 1      |
-      Then the response code is 201
+    Then the response code is 201
+    And the response object is WatcherPostResponse
     When I delete this watcher
     Then the response code is 204
     And the response has no content

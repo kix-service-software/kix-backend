@@ -8,6 +8,7 @@ Feature: POST request to the /faq/articles resource
   Scenario: create a faq article
     When I create a faq article
     Then the response code is 201
+    Then the response object is FAQArticlePostPatchResponse
     When I delete this faq article
     Then the response code is 204
     And the response has no content

@@ -9,9 +9,10 @@ Feature: PATCH request to the /tickets/:TicketID/articles/:ArticleID/flags/:Flag
     Given a ticket
     Given a article
     When I create a article flag
-      Then the response code is 201
+    Then the response code is 201
     When I update this article flag
     Then the response code is 200
+    Then the response object is TicketArticleFlagPostPatchResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content

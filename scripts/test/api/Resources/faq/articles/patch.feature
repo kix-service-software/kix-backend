@@ -9,6 +9,7 @@ Feature: PATCH request to the /faq/articles/:FAQArticleID resource
     Given a faq article
     When I update this faq article
     Then the response code is 200
+#    Then the response object is FAQArticlePostPatchResponse
     When I delete this faq article
     Then the response code is 204
     And the response has no content

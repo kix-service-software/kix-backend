@@ -8,5 +8,5 @@ Feature: GET request to the /system/communication/mailfilters resource
   Scenario: get the list of existing mailfilters
     When I query the collection of mailfilters
     Then the response code is 200
-#    And the response object is SystemAddressCollectionResponse
+    And the response object is MailFilterCollectionResponse
 

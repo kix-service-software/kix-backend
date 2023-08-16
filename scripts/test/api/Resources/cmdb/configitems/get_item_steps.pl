@@ -1,4 +1,5 @@
 use warnings;
+use strict;
 
 use Cwd;
 use lib cwd();
@@ -35,4 +36,10 @@ When qr/I get this configitem$/, sub {
    );
 };
 
+When qr/I get this configitem include images$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}
+   );
+};
 
