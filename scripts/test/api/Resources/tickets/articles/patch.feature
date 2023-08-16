@@ -10,6 +10,7 @@ Feature: PATCH request to the /tickets/:TicketID/articles/:ArticleID resource
     Given a article
     When I update this article
     Then the response code is 200
+#    Then the response object is TicketArticlePostPatchResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content

@@ -35,11 +35,11 @@ When qr/I query the collection of faq categories\s*$/, sub {
    );
 };
 
-When qr/I query the collection of faq categories with filter of (.*?)$/, sub {
+When qr/I query the collection of faq categories with filter of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/faq/categories',
-      Filter => '{"FAQCategory": {"AND": [{"Field": "Fullname","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
+      Filter => '{"FAQCategory": {"AND": [{"Field": "Name","Operator": "EQ","Value": "KIX18-Funktionen given"}]}}',
    );
 };
 

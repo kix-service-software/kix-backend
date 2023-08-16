@@ -8,9 +8,9 @@ Feature: GET request to the /tickets/:TicketID/history/:HistoryID resource
   Scenario: get an existing ticket
     Given a ticket
     Given a article
-    When I get a collection of tickethistory
+    When I get a collection of ticket history
     Then the response code is 200
-    When I get the tickethistory
+    When I get the ticket history
     Then the response code is 200
     And the attribute "History.HistoryType" is "NewTicket"
     When I delete this ticket

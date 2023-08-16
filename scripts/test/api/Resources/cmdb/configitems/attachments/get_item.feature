@@ -11,7 +11,7 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/versions/:VersionID/
     When I get the attachment with attachmentid 1
     Then the response code is 200
     And the attribute "Attachment.Filename" is "Test2.pdf"
-#    And the response object is ConfigItemAttachmentResponse
+    And the response object is ConfigItemAttachmentResponse
 
 
 

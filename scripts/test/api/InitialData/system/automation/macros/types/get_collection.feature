@@ -11,6 +11,6 @@ Feature: GET request to the /system/automation/macros/types resource
     And the response contains 3 items of type "MacroType"
     And the response contains the following items of type MacroType
       | Name            | DisplayName     |
-      | Asset           | ITSMConfigItem  |
+      | Reporting       | Reporting       |
       | Synchronisation | Synchronisation |
       | Ticket          | Ticket          |

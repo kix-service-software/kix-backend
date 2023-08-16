@@ -9,7 +9,7 @@ Feature: POST request to the /cmdb/configitems/:ConfigitemID/images resource
     Given a configitem
     When added image to a configitem
     Then the response code is 201
- #   Then the response object is ConfigItemImagePostResponse
+    Then the response object is ConfigItemImagePostResponse
     When I delete this configitem
     Then the response code is 204
     And the response has no content

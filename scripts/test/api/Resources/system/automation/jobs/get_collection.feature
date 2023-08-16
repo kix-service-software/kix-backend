@@ -8,7 +8,8 @@ Feature: GET request to the /system/automation/jobs resource
   Scenario: get the list of automation jobs
     Given 8 of automation jobs
     When I query the collection of automation jobs
-    Then the response code is 200 
+    Then the response code is 200
+#    And the response object is JobCollectionsResponse
     When delete all this automation jobs
     Then the response code is 204
     And the response has no content     

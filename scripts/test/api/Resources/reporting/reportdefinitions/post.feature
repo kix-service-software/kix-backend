@@ -8,6 +8,7 @@ Feature: POST request to the /reporting/reportdefinitions resource
   Scenario: create a reportdefinition
     When I create a reportdefinition
     Then the response code is 201
+    And the response object is ReportDefinitionPostPatchResponse
     When I delete this reportdefinition
     Then the response code is 204
 

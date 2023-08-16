@@ -87,14 +87,28 @@ When qr/I create a faq article$/, sub {
 };
 
 Given qr/(\d+) of faq articles$/, sub {
+    my $Title;
+
     for ($i=0;$i<$1;$i++){
+        if ( $i == 2 ) {
+            $Title = 'General information on how to work with KIX 18';
+        }
+        elsif ( $i == 3 ) {
+            $Title = 'Information on how to work';
+        }
+        elsif ( $i == 4 ) {
+            $Title = 'Title for FAQ Article';
+        }
+        else {
+            $Title = "Some Text".rand();
+        }
         ( S->{Response}, S->{ResponseContent} ) = _Post(
             URL     => S->{API_URL}.'/faq/articles',
             Token   => S->{Token},
             Content => {
                 FAQArticle => {
-                    Title => "Some Text".rand(),
-                    CategoryID => 3,
+                    Title => $Title,
+                    CategoryID => 1,
                     Language => "de",
                     Field1 => "ahahahbhabshab hbah bshbsha bhab hbah ",
                     Field2 => "ahahahbhabshab hbah bshbsha bhab hbah ",

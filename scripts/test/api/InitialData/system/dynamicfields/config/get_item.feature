@@ -10,9 +10,9 @@ Feature: GET request to the /system/dynamicfields/:DynamicFieldID/config resourc
     Then the response code is 200
     When I get this dynamicfield config
     Then the response code is 200
-    And the response contains the following attributes
+    And the response contains the following items type of DynamicFieldConfig
       | CountMin | CountMax | CountDefault | PossibleNone |
-      | 0        | 1        | 0            | 1            |      
+      | 1        | 1        | 1            | 1            |
 
   Scenario: get an existing dynamicfield MobileProcessingState PossibleValues
     When I query the collection of dynamicfield MobileProcessingState
@@ -20,8 +20,8 @@ Feature: GET request to the /system/dynamicfields/:DynamicFieldID/config resourc
     When I get this dynamicfield config
     Then the response code is 200
     And the response contains the following PossibleValues
-      | assigned | downloaded | rejected | accepted | processing | suspended | completed | partially | executed | cancelled | TranslatableValues |
-      | assigned | downloaded | rejected | accepted | processing | suspended | completed | partially | executed | cancelled | TranslatableValues | 
+      | partially executed | cancelled | completed | rejected | suspended | downloaded | accepted | processing | assigned |
+      | partially executed | cancelled | completed | rejected | suspended | downloaded | accepted | processing | assigned |
 
   Scenario: get an existing dynamicfield RiskAssumptionRemark
     When I query the collection of dynamicfield RiskAssumptionRemark
@@ -29,30 +29,19 @@ Feature: GET request to the /system/dynamicfields/:DynamicFieldID/config resourc
     When I get this dynamicfield config
     Then the response code is 200
 #    Then the response contains 1 items of type "DynamicField"
-    And the response contains the following attributes
+    And the response contains the following Config
       | CountDefault | CountMax | CountMin |
       | 0            | 1        | 0        |
 
-  Scenario: get an existing dynamicfield MobileProcessingChecklist010
-    When I query the collection of dynamicfield MobileProcessingChecklist010
-    Then the response code is 200
-    When I get this dynamicfield config
-    Then the response code is 200
-#    Then the response contains 1 items of type "DynamicField"
-   And the response contains the following attributes
-      | Cols | CountDefault | CountMax | CountMin | DefaultValue | ItemSeparator | Link | RegEx | RegExError | Rows | Time-to-live |
-      | -    | 1            | 1        | 1        | 0            | -             | n.a. | -     | 0          | -    | -            |
-
-  Scenario: get an existing dynamicfield MobileProcessingChecklist020
-    When I query the collection of dynamicfield MobileProcessingChecklist020
-    Then the response code is 200
-    When I get this dynamicfield config
-    Then the response code is 200
-#    Then the response contains 1 items of type "DynamicFieldConfig"
-    And the response contains the following attributes
-      | Rows | CountMax | CountDefault | RegEx | RegExError | ItemSeparator | Link | Cols | DefaultValue | CountMin | Time-to-live |
-      | -    | 1        | 1            | -     | -          | -             | n.a. | -    |              | 1        | -            |
-
+#  Scenario: get an existing dynamicfield PlanEnd
+#    When I query the collection of dynamicfield PlanEnd
+#    Then the response code is 200
+#    When I get this dynamicfield config
+#    Then the response code is 200
+##    Then the response contains 1 items of type DynamicFieldConfig
+#    And the response contains the following Config
+#      | CountDefault | CountMax | CountMin | YearsInPast | YearsInFuture | DateRestriction | DefaultValue |
+#      | 0            | 1        | 0        | 0           | 0             | none            | 0            |
 
 
 

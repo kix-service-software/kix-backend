@@ -7,9 +7,10 @@ Feature: PATCH request to the /cmdb/configitems resource
 
   Scenario: update a configitem
     Given a configitem
+    Then the response code is 201
     When I update this configitem
     Then the response code is 200
-#    And the response object is ConfigItemPostPatchResponse
+    And the response object is ConfigItemPostPatchResponse
     When I delete this configitem
     Then the response code is 204
     And the response has no content

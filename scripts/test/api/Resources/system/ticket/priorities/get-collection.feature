@@ -50,10 +50,10 @@ Feature: GET request to the /system/ticket/priorities resource
       | 1 very high |
                       
   Scenario: get the list of existing ticket priorities with sorted, limit and offset
-    When I query the collection of ticket priorities with sorted by "PriorityAddress.-NameEmailAddress:textual" limit 2 and offset 2
+    When I query the collection of ticket priorities with sorted by "PriorityAddress.-NameEmailAddress:textual" limit 2 and offset 1
     Then the response code is 200
 #    And the response object is PriorityCollectionResponse
-    And the response contains 2 items of type "Priority"    
+    And the response contains 2 items of type "Priority"
     
     
     

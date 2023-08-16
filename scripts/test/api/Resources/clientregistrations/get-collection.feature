@@ -67,7 +67,7 @@
 
   Scenario: get the list of existing clientregistration with limit and offset
     Given 8 of clientregistrations
-    When I query the collection of clientregistration with limit 2 and offset 4
+    When I query the collection of clientregistration with limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "ClientRegistration"
     When delete all this clientregistrations
@@ -76,7 +76,7 @@
 
   Scenario: get the list of existing clientregistration with sorted, limit and offset
     Given 8 of clientregistrations
-    When I query the collection of clientregistration with sorted by "ClientRegistration.-ClientID:textual" limit 2 and offset 4
+    When I query the collection of clientregistration with sorted by "ClientRegistration.-ClientID:textual" limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "ClientRegistration"
     When delete all this clientregistrations

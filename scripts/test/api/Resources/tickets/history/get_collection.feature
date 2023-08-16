@@ -8,7 +8,7 @@ Feature: GET request to the /tickets/:TicketID/history resource
   Scenario: get a collection of existing ticket history
     Given a ticket
     Given a article
-    When I get a collection of tickethistory
+    When I get a collection of ticket history
     Then the response code is 200
     When I delete this ticket
     Then the response code is 204

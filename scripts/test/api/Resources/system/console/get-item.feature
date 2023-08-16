@@ -22,6 +22,6 @@
      When I get this console command "Maint::Cache::Delete"
      Then the response code is 200
 #    And the response object is ConsoleCommandResponse
-     And the response contains the following items of type ConsoleCommand
-      | Command              | Description                         |
-      | Maint::Cache::Delete | Deletes cache items created by KIX. |
+     And the response contains the following items type of ConsoleCommand
+      | Command                                | Description                         |
+      | Console::Command::Maint::Cache::Delete | Deletes cache items created by KIX. |

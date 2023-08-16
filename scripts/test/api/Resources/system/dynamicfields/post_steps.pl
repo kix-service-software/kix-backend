@@ -74,3 +74,25 @@ When qr/I create a dynamicfield$/, sub {
    );
 };
 
+When qr/I create a dynamicfield with same name$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/system/dynamicfields',
+      Token   => S->{Token},
+      Content => {
+        DynamicField => {
+            Name           => "TestITSMDueDate2ex2",
+            Label          => "Due Date2ex2",
+            FieldType      => "DateTime",
+            ObjectType     => "Ticket",
+            InternalField  => 0,
+            ValidID => 1,
+            Config => {
+                YearsInFuture => "1",
+                DefaultValue  => "259200",
+                YearsInPast   => "9",
+                Link          => ""
+            }
+        }
+      }
+   );
+};

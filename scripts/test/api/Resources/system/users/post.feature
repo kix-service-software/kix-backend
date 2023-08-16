@@ -10,4 +10,7 @@ Feature: POST request to the /system/users resource
      Then the response code is 201
 #     Then the response object is UserPostPatchResponse
 
-
+  Scenario: added a user with roles
+     When added a user with roles
+     Then the response code is 201
+#     Then the response object is UserPostPatchResponse

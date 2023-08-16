@@ -38,7 +38,13 @@ When qr/I query the collection of console$/, sub {
 When qr/I query the collection of console with filter command "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/console',
-      Filter => '{"ConsoleCommand": {"AND": [{"Field": "Command","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
+      URL   => S->{API_URL}.'/system/console/'.$1,
+#      Filter => '{"ConsoleCommand": {"AND": [{"Field": "Command","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
    );
 };
+
+
+
+
+
+

@@ -7,6 +7,8 @@ Feature: DELETE request to the /reporting/reportdefinitions/:ReportDefinitionID 
 
   Scenario: delete this reportdefinition
     Given a reportdefinition
+    Then the response code is 201
+    Then the response content is
     When I delete this reportdefinition
     Then the response code is 204
     And the response has no content

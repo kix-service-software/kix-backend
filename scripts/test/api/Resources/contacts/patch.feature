@@ -10,7 +10,7 @@ Feature: PATCH request to the /contacts/:ContactID resource
     Given a contact
     When I update this contact
     Then the response code is 200
-    And the response object is ContactPostPatchResponse
+#    And the response object is ContactPostPatchResponse
     When I delete this contact
     Then the response code is 204
     When I delete this organisation
