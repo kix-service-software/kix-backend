@@ -73,7 +73,7 @@ sub Run {
             || $Param{Config}->{ $Ticket{State} }
             )
         {
-            $Self->{TicketObject}->StateSet(
+            $Self->{TicketObject}->TicketStateSet(
                 TicketID => $Param{Data}->{TicketID},
                 State    => $Param{Config}->{ $Ticket{Type} . ':::' . $Ticket{State} }
                     || $Param{Config}->{ $Ticket{State} },

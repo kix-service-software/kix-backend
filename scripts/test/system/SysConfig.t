@@ -20,12 +20,10 @@ use vars (qw($Self));
 my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 ########################################################################################################################################
 # OptionType handling
@@ -209,7 +207,7 @@ $Self->True(
     'OptionUpdate() - change value',
 );
 
-my %UpdatedOption = $SysConfigObject->OptionGet(
+%UpdatedOption = $SysConfigObject->OptionGet(
     Name => $Random.'Hash',
 );
 
@@ -302,7 +300,8 @@ $Self->True(
     'OptionDelete()',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

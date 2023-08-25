@@ -223,13 +223,8 @@ sub TicketSearch {
     }
 
     # create basic SQL
-    my $SQL;
-    if ( $Result eq 'COUNT' ) {
-        $SQL = 'SELECT COUNT(DISTINCT(st.id))';
-    }
-    else {
-        $SQL = 'SELECT DISTINCT st.id, st.tn';
-    }
+    my $SQL = 'SELECT DISTINCT st.id, st.tn';
+
     $SQLDef{SQLFrom}  = 'FROM ticket st';
 
     # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
@@ -318,7 +313,6 @@ sub TicketSearch {
     # database query
     my %Tickets;
     my @TicketIDs;
-    my $Count;
     my $PrepareResult = $Self->{DBObject}->Prepare(
         SQL   => $SQL,
         Limit => $Param{Limit}
@@ -329,7 +323,6 @@ sub TicketSearch {
     }
 
     while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
-        $Count = $Row[0];
         push( @TicketIDs, $Row[0] );
         $Tickets{ $Row[0] } = $Row[1];
     }
@@ -337,6 +330,7 @@ sub TicketSearch {
     # get unique if distinct id is not given because of joins
     my %Known;
     @TicketIDs = grep { !$Known{$_}++ } @TicketIDs;
+    my $Count = scalar(@TicketIDs);
 
     # return COUNT
     if ( $Result eq 'COUNT' ) {
@@ -438,6 +432,8 @@ sub _CreateAttributeSQL {
     my %SQLDef;
 
     if ( !IsArrayRefWithData($Param{SQLPartsDef}) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQLPartsDef!',
@@ -446,6 +442,8 @@ sub _CreateAttributeSQL {
     }
 
     if ( !IsHashRefWithData($Param{Search}) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No Search definition given!',
@@ -454,6 +452,8 @@ sub _CreateAttributeSQL {
     }
 
     if ( !$Param{UserID} && !$Param{UserType} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for attribute search!',
@@ -464,6 +464,8 @@ sub _CreateAttributeSQL {
     # generate SQL from attribute modules
     foreach my $BoolOperator ( keys %{$Param{Search}} ) {
         if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Search for $BoolOperator!",
@@ -491,6 +493,8 @@ sub _CreateAttributeSQL {
 
             # ignore this attribute if we don't have a module for it
             if ( !$AttributeModule ) {
+                return if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to search for attribute $Search->{Field}. Don't know how to handle it!",
@@ -504,10 +508,13 @@ sub _CreateAttributeSQL {
                 UserType     => $Param{UserType},
                 BoolOperator => $BoolOperator,
                 Search       => $Search,
-                WholeSearch  => $Param{Search}->{$BoolOperator}   # forward "whole" search, e.g. if behavior depends on other attributes
+                WholeSearch  => $Param{Search}->{$BoolOperator},   # forward "whole" search, e.g. if behavior depends on other attributes
+                Silent       => $Param{Silent} || 0
             );
 
             if ( !IsHashRefWithData($Result) ) {
+                return if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Attribute module for $Search->{Field} returned an error!",

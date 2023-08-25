@@ -20,12 +20,10 @@ my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
 my $TicketObject            = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -60,6 +58,7 @@ my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
     },
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1
 );
 
 # sanity check
@@ -80,6 +79,7 @@ my $FieldID2 = $DynamicFieldObject->DynamicFieldAdd(
     },
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1
 );
 
 # sanity check
@@ -101,6 +101,7 @@ my $FieldID3 = $DynamicFieldObject->DynamicFieldAdd(
     },
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1
 );
 
 # sanity check
@@ -116,6 +117,7 @@ my @Tests = (
         ObjectID           => $TicketID,
         UserID             => 1,
         Success            => 0,
+        Silent             => 1
     },
     {
         Name               => 'No ObjectID',
@@ -125,6 +127,7 @@ my @Tests = (
         },
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'No UserID',
@@ -133,6 +136,7 @@ my @Tests = (
         },
         ObjectID => $TicketID,
         Success  => 0,
+        Silent   => 1
     },
     {
         Name               => 'Invalid Date',
@@ -148,6 +152,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Invalid Date - No Time',
@@ -163,6 +168,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Invalid Date - Just Time',
@@ -178,6 +184,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Invalid Integer - Letter',
@@ -193,6 +200,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Invalid Integer - Numbers and Letters',
@@ -208,6 +216,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Invalid Integer - Real Number',
@@ -223,6 +232,7 @@ my @Tests = (
         ],
         UserID  => 1,
         Success => 0,
+        Silent  => 1
     },
     {
         Name               => 'Set Text Value',
@@ -248,7 +258,7 @@ my @Tests = (
         ObjectID => $TicketID,
         Value    => [
             {
-                ValueText => '',
+                ValueText => q{},
             },
         ],
         NoValue => 1,
@@ -374,6 +384,7 @@ for my $Test (@Tests) {
         ObjectID   => $Test->{ObjectID},
         UserID     => $Test->{UserID},
         Value      => $Test->{Value},
+        Silent     => $Test->{Silent} || 0
     );
     if ( !$Test->{Success} ) {
         $Self->False(
@@ -386,6 +397,7 @@ for my $Test (@Tests) {
             FieldID    => $Test->{DynamicFieldConfig}->{ID},
             ObjectType => $Test->{DynamicFieldConfig}->{ObjectType},
             ObjectID   => $Test->{ObjectID},
+            Silent     => $Test->{Silent} || 0
         );
 
         $Self->False(
@@ -405,6 +417,7 @@ for my $Test (@Tests) {
         FieldID    => $Test->{DynamicFieldConfig}->{ID},
         ObjectType => $Test->{DynamicFieldConfig}->{ObjectType},
         ObjectID   => $Test->{ObjectID},
+        Silent     => $Test->{Silent} || 0
     );
 
     if ( $Test->{NoValue} ) {
@@ -426,7 +439,7 @@ for my $Test (@Tests) {
 
         # workaround for oracle
         # oracle databases can't determine the difference between NULL and ''
-        if ( !defined $Value->[0]->{$ValueKey} || $Value->[0]->{$ValueKey} eq '' ) {
+        if ( !defined $Value->[0]->{$ValueKey} || $Value->[0]->{$ValueKey} eq q{} ) {
 
             # test falseness
             $Self->False(
@@ -476,6 +489,7 @@ for my $Test (@Tests) {
         FieldID    => $Test->{DynamicFieldConfig}->{ID},
         ObjectType => $Test->{DynamicFieldConfig}->{ObjectType},
         ObjectID   => $Test->{ObjectID},
+        Silent     => $Test->{Silent} || 0
     );
 
     $Self->False(
@@ -1021,7 +1035,8 @@ for my $TicketID (@CreatedTicketIds) {
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

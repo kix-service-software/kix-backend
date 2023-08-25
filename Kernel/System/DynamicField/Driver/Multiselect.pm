@@ -106,6 +106,8 @@ sub ValueSet {
 
     # check for valid possible values list
     if ( !$Param{DynamicFieldConfig}->{Config}->{PossibleValues} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need PossibleValues in DynamicFieldConfig!",

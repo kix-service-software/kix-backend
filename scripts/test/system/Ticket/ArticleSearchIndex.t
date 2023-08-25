@@ -14,16 +14,11 @@ use utf8;
 
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # tests for article search index modules
 for my $Module (qw(StaticDB RuntimeDB)) {
@@ -31,43 +26,41 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     # make sure that the TicketObject gets recreated for each loop.
     $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::SearchIndexModule',
-        Value => 'Ticket::ArticleSearchIndex::' . $Module,
+        Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     $Self->True(
-        $TicketObject->isa( 'Ticket::ArticleSearchIndex::' . $Module ),
+        $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module ),
         "TicketObject loaded the correct backend",
     );
 
     # create some content
-    my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'Some Ticket_Title',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'closed',
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+        Title          => 'Some Ticket_Title',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
         OrganisationID => '123465',
-        ContactID    => 'customer@example.com',
-        OwnerID      => 1,
-        UserID       => 1,
+        ContactID      => 'customer@example.com',
+        OwnerID        => 1,
+        UserID         => 1,
     );
     $Self->True(
         $TicketID,
         'TicketCreate()',
     );
 
-    my $ArticleID = $TicketObject->ArticleCreate(
-        TicketID    => $TicketID,
-        Channels    => 'note',
-        SenderType  => 'agent',
-        From        => 'Some Agent <email@example.com>',
-        To          => 'Some Customer <customer@example.com>',
-        Subject     => 'some short description',
-        Body        => 'the message text
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID       => $TicketID,
+        Channel        => 'note',
+        SenderType     => 'agent',
+        From           => 'Some Agent <email@example.com>',
+        To             => 'Some Customer <customer@example.com>',
+        Subject        => 'some short description',
+        Body           => 'the message text
 Perl modules provide a range of features to help you avoid reinventing the wheel, and can be downloaded from CPAN ( http://www.cpan.org/ ). A number of popular modules are included with the Perl distribution itself.',
         ContentType    => 'text/plain; charset=ISO-8859-15',
         HistoryType    => 'OwnerUpdate',
@@ -81,26 +74,34 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    my %TicketIDs = $TicketObject->TicketSearch(
-        Subject    => '%short%',
+    my %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Subject',
+                    Value    => '%short%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         $TicketIDs{$TicketID},
         'TicketSearch() (HASH:Subject)',
     );
 
-    $ArticleID = $TicketObject->ArticleCreate(
-        TicketID    => $TicketID,
-        Channels    => 'note',
-        SenderType  => 'agent',
-        From        => 'Some Agent <email@example.com>',
-        To          => 'Some Customer <customer@example.com>',
-        Subject     => 'Fax Agreement laalala',
-        Body        => 'the message text
+    $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID       => $TicketID,
+        Channel        => 'note',
+        SenderType     => 'agent',
+        From           => 'Some Agent <email@example.com>',
+        To             => 'Some Customer <customer@example.com>',
+        Subject        => 'Fax Agreement laalala',
+        Body           => 'the message text
 Perl modules provide a range of features to help you avoid reinventing the wheel, and can be downloaded from CPAN ( http://www.cpan.org/ ). A number of popular modules are included with the Perl distribution itself.',
         ContentType    => 'text/plain; charset=ISO-8859-15',
         HistoryType    => 'OwnerUpdate',
@@ -114,12 +115,20 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $TicketObject->TicketSearch(
-        Subject    => '%fax agreement%',
+    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Subject',
+                    Value    => '%fax agreement%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         $TicketIDs{$TicketID},
@@ -127,12 +136,20 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $TicketObject->TicketSearch(
-        Body       => '%HELP%',
+    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Body',
+                    Value    => '%HELP%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         $TicketIDs{$TicketID},
@@ -140,12 +157,20 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $TicketObject->TicketSearch(
-        Body       => '%HELP_NOT_FOUND%',
+    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Body',
+                    Value    => '%HELP_NOT_FOUND%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         !$TicketIDs{$TicketID},
@@ -154,7 +179,7 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
 
     # use full text search on ticket with Cyrillic characters
     # see bug #11791 ( http://bugs.otrs.org/show_bug.cgi?id=11791 )
-    $ArticleID = $TicketObject->ArticleCreate(
+    $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         TicketID       => $TicketID,
         Channel        => 'note',
         SenderType     => 'agent',
@@ -174,12 +199,20 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $TicketObject->TicketSearch(
-        Subject    => '%испытуемый%',
+    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Subject',
+                    Value    => '%испытуемый%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         $TicketIDs{$TicketID},
@@ -187,19 +220,27 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $TicketObject->TicketSearch(
-        Body       => '%полный%',
+    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
         Permission => 'rw',
+        Search     => {
+            'AND' => [
+                {
+                    Field    => 'Body',
+                    Value    => '%полный%',
+                    Operator => 'EQ',
+                },
+            ],
+        },
     );
     $Self->True(
         $TicketIDs{$TicketID},
         'TicketSearch() (HASH:Body)',
     );
 
-    my $Delete = $TicketObject->TicketDelete(
+    my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -265,6 +306,8 @@ my @Tests = (
         Name   => "Spanish - Stop words",
         String => 'también algún siendo arriba',
         Result => [
+            'también',
+            'algún'
         ],
     },
     {
@@ -351,14 +394,12 @@ for my $Module (qw(StaticDB)) {
         # Make sure that the TicketObject gets recreated for each loop.
         $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SearchIndexModule',
-            Value => 'Ticket::ArticleSearchIndex::' . $Module,
+            Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Ticket');
-
-        my $ListOfWords = $TicketObject->_ArticleIndexStringToWord(
+        my $ListOfWords = $Kernel::OM->Get('Ticket')->_ArticleIndexStringToWord(
             String => \$Test->{String}
         );
 
@@ -370,7 +411,8 @@ for my $Module (qw(StaticDB)) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

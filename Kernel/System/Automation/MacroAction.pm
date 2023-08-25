@@ -16,13 +16,14 @@ use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 =head1 NAME
@@ -161,10 +162,15 @@ sub MacroActionGet {
 
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Macro action with ID $Param{ID} not found!",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Macro action with ID $Param{ID} not found!",
+            );
+        }
         return;
     }
 
@@ -252,7 +258,8 @@ sub MacroActionAdd {
     my $ReferencedMacroID = $Param{Parameters}->{MacroID};
     return if !$Self->_ReferencedMacroCheck(
         MacroID           => $Param{MacroID},
-        ReferencedMacroID => $ReferencedMacroID
+        ReferencedMacroID => $ReferencedMacroID,
+        Silent            => $Param{Silent},
     );
 
     # prepare Parameters as JSON
@@ -334,10 +341,12 @@ sub MacroActionUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!",
+                );
+            }
             return;
         }
     }
@@ -354,10 +363,12 @@ sub MacroActionUpdate {
             ID => $Param{MacroID} || $Data{MacroID}
         );
         if ( !%Macro ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Macro with ID $Data{MacroID} doesn't exist!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Macro with ID $Data{MacroID} doesn't exist!"
+                );
+            }
             return;
         }
 
@@ -369,14 +380,17 @@ sub MacroActionUpdate {
         return if !$BackendObject;
 
         my $IsValid = $BackendObject->ValidateConfig(
-            Config => $Param{Parameters}
+            Config => $Param{Parameters},
+            Silent => $Param{Silent},
         );
 
         if ( !$IsValid ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "MacroAction config is invalid!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "MacroAction config is invalid!"
+                );
+            }
             return;
         }
     }
@@ -406,7 +420,8 @@ sub MacroActionUpdate {
     my $ReferencedMacroID = $Param{Parameters}->{MacroID};
     return if !$Self->_ReferencedMacroCheck(
         MacroID           => $Param{MacroID},
-        ReferencedMacroID => $ReferencedMacroID
+        ReferencedMacroID => $ReferencedMacroID,
+        Silent            => $Param{Silent},
     );
 
     # prepare Parameters as JSON
@@ -549,13 +564,19 @@ sub MacroActionDelete {
 
     # check if this macro_action exists
     my %Data = $Self->MacroActionGet(
-        ID => $Param{ID},
+        ID     => $Param{ID},
+        Silent => $Param{Silent} || 0
     );
     if ( !IsHashRefWithData(\%Data) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "An macro action with the ID $Param{ID} does not exist.",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An macro action with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -881,10 +902,12 @@ sub _ReferencedMacroCheck {
 
     if ($Param{ReferencedMacroID}) {
         if ($Param{MacroID} == $Param{ReferencedMacroID}) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Cannot use current macro ($Param{ReferencedMacroID}) as sub macro (child) of itself)!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Cannot use current macro ($Param{ReferencedMacroID}) as sub macro (child) of itself)!"
+                );
+            }
             return;
         }
         if (
@@ -892,10 +915,12 @@ sub _ReferencedMacroCheck {
                 ID => $Param{ReferencedMacroID}
             )
         ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Referenced macro does not exists!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Referenced macro does not exists!"
+                );
+            }
             return;
         }
         if (
@@ -904,10 +929,12 @@ sub _ReferencedMacroCheck {
                 IDList => [$Param{ReferencedMacroID}]
             )
         ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Cannot use parent macro ($Param{ReferencedMacroID}) as sub macro (child) of current macro ($Param{MacroID})!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Cannot use parent macro ($Param{ReferencedMacroID}) as sub macro (child) of current macro ($Param{MacroID})!"
+                );
+            }
             return;
         }
     }
@@ -1121,3 +1148,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

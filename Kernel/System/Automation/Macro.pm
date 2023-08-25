@@ -15,13 +15,14 @@ use Digest::MD5;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 =head1 NAME
@@ -208,10 +209,12 @@ sub MacroAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A macro with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A macro with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -298,10 +301,12 @@ sub MacroUpdate {
             Name => $Param{Name},
         );
         if ( $ID && $ID != $Param{ID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "A macro with the same name already exists.",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "A macro with the same name already exists.",
+                );
+            }
             return;
         }
     } else {
@@ -456,10 +461,12 @@ sub MacroDelete {
         ID => $Param{ID},
     );
     if ( !$Name ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A macro with the ID $Param{ID} does not exist.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A macro with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -468,10 +475,12 @@ sub MacroDelete {
         ID => $Param{ID}
     );
     if (!$Deletable) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Cannot delete macro, it is used/referenced in at least one object.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Cannot delete macro, it is used/referenced in at least one object.",
+            );
+        }
         return;
     }
 
@@ -1045,3 +1054,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

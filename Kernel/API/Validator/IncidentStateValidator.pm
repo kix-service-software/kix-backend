@@ -67,6 +67,7 @@ sub Validate {
     if ( $Param{Attribute} eq 'InciStateID' ) {
         my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
             ItemID => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
 
         $Found = IsHashRefWithData($ItemData) && $ItemData->{Class} eq 'ITSM::Core::IncidentState';

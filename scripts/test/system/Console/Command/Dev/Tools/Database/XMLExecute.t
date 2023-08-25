@@ -15,11 +15,6 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get command object
@@ -30,6 +25,12 @@ my ( $Result, $ExitCode );
 my $Home           = $Kernel::OM->Get('Config')->Get('Home');
 my $TableCreateXML = "$Home/scripts/test/system/Console/Command/Dev/Tools/Database/XMLExecute/TableCreate.xml";
 my $TableDropXML   = "$Home/scripts/test/system/Console/Command/Dev/Tools/Database/XMLExecute/TableDrop.xml";
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # try to execute command without any options
 $ExitCode = $CommandObject->Execute();
@@ -70,11 +71,7 @@ $Self->False(
     "SELECT after table drop",
 );
 
-# cleanup cache is done by RestoreDatabase
-
 1;
-
-
 
 =back
 

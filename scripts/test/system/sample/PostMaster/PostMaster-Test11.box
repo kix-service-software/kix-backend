@@ -7,7 +7,7 @@ Date: Fri, 21 Dec 2001 23:59:24 +0200
 From: Skywalker Attachment <skywalker@example.com>
 To: darthvader@example.com
 Subject: test 11 (no content type but, 8bit chars)
-Message-ID: <20011221002814.A3599@avro>
+Message-ID: <20011221002816.A3599@avro>
 Mime-Version: 1.0
 Content-Disposition: inline
 X-Operating-System: Linux 2.4.10-4GB i686
@@ -17,7 +17,7 @@ Lines: 11
 
 This is the 11 test.
 
-... pc va demasiado rápido ...
+... pc va demasiado rï¿½pido ...
 
 Adios ...
 

@@ -18,11 +18,6 @@ use Kernel::API::Validator::UserValidator;
 my $ValidatorObject = Kernel::API::Validator::UserValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # validate valid UserID
@@ -98,8 +93,6 @@ $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

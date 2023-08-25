@@ -20,12 +20,10 @@ my $XMLObject    = $Kernel::OM->Get('XML');
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # test XMLParse2XMLHash() with an iso-8859-1 encoded XML
 my $String = '<?xml version="1.0" encoding="iso-8859-1" ?>
@@ -595,15 +593,15 @@ if ( open( my $DATA, "<", "$Path/$File" ) ) {    ## no critic
 
     # charset test - use file form the article attachment and parse it
     my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'Some Ticket Title',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'closed',
+        Title          => 'Some Ticket Title',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
         OrganisationID => '123465',
-        ContactID    => 'customer@example.com',
-        OwnerID      => 1,
-        UserID       => 1,
+        ContactID      => 'customer@example.com',
+        OwnerID        => 1,
+        UserID         => 1,
     );
     $Self->True(
         $TicketID,
@@ -666,7 +664,8 @@ else {
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

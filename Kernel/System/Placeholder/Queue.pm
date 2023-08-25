@@ -51,7 +51,9 @@ sub _Replace {
 
     my $Tag = $Self->{Start} . 'KIX_QUEUE_';
 
-    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+    if ( $Param{Text} !~ m/$Self->{Start} KIX_(?:QUEUE_.+?|TICKET_QUEUE|QUEUE) $Self->{End}/gixms ) {
+        return $Param{Text};
+    }
 
     my %Queue;
     if ( $Param{QueueID} && $Param{QueueID} =~ m/^\d+$/ ) {

@@ -18,11 +18,6 @@ use vars (qw($Self));
 my $EventObject = $Kernel::OM->Get('Event');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my %EventList = $EventObject->EventList();
@@ -54,8 +49,6 @@ $Self->Is(
     undef,
     "EventListTicket() Article"
 );
-
-# cleanup is done by RestoreDatabase
 
 1;
 

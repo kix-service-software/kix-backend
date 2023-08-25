@@ -13,13 +13,14 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 =head1 NAME
@@ -123,8 +124,8 @@ sub ReportDefinitionGet {
         Key  => $CacheKey,
     );
     return %{$Cache} if $Cache;
-    
-    return if !$Kernel::OM->Get('DB')->Prepare( 
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT id, name, datasource, config, is_periodic, max_reports, comments, valid_id, create_time, create_by, change_time, change_by FROM report_definition WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -199,10 +200,12 @@ sub ReportDefinitionAdd {
     # check needed stuff
     for my $Needed (qw(Name DataSource UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -219,10 +222,12 @@ sub ReportDefinitionAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A report definition with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A report definition with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -231,7 +236,8 @@ sub ReportDefinitionAdd {
     if ( $Param{Config} ) {
         return if !$Self->_ValidateReportDefinition(
             DataSource => $Param{DataSource},
-            Config     => $Param{Config}
+            Config     => $Param{Config},
+            Silent     => $Param{Silent},
         );
         $Config = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Config}
@@ -246,7 +252,7 @@ sub ReportDefinitionAdd {
         SQL => 'INSERT INTO report_definition (name, datasource, config, is_periodic, max_reports, comments, valid_id, create_time, create_by, change_time, change_by) '
              . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{IsPeriodic}, \$Param{MaxReports}, 
+            \$Param{Name}, \$Param{DataSource}, \$Config, \$Param{IsPeriodic}, \$Param{MaxReports},
             \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
@@ -303,10 +309,12 @@ sub ReportDefinitionUpdate {
     # check needed stuff
     for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!",
+                );
+            }
             return;
         }
     }
@@ -324,10 +332,12 @@ sub ReportDefinitionUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A report definition with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A report definition with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -552,23 +562,35 @@ sub ReportDefinitionValidateParameters {
     # check needed stuff
     for (qw(Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     if ( exists $Param{Config}->{Parameters} && !IsArrayRefWithData($Param{Config}->{Parameters}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No parameters defined!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No parameters defined!"
+            );
+        }
         return;
     }
 
-    my %Parameters = map { $_->{Name} => $_ } @{$Param{Config}->{Parameters} || []};
+    my %Parameters = ();
+    if ( ref( $Param{Config}->{Parameters} ) eq 'ARRAY' ) {
+        for my $Entry ( @{ $Param{Config}->{Parameters} } ) {
+            next if ( ref( $Entry ) ne 'HASH' );
+            next if ( !$Entry->{Name} );
+
+            $Parameters{ $Entry->{Name} } = $Entry;
+        }
+    }
 
     # check if we have a parameter in the data source config which is not defined in the parameters config
     my $FlatConfig = $Kernel::OM->Get('Main')->Flatten(
@@ -579,29 +601,35 @@ sub ReportDefinitionValidateParameters {
         my $Parameter = $1;
 
         if ( !exists $Parameters{$Parameter} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Parameter \"$Parameter\" used but not defined!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Parameter \"$Parameter\" used but not defined!"
+                );
+            }
             return;
         }
 
         # validate parameter config
         foreach my $Required ( qw(Name DataType) ) {
             if ( !$Parameters{$Parameter}->{$Required} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Definition for parameter \"$Parameter\" invalid - \"$Required\" missing!"
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Definition for parameter \"$Parameter\" invalid - \"$Required\" missing!"
+                    );
+                }
                 return;
             }
         }
 
         if ( $Parameters{$Parameter}->{DataType} !~ /^(STRING|NUMERIC|DATE|TIME|DATETIME)$/gi ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Definition for parameter \"$Parameter\" invalid - unsupported DataType \"$Parameters{$Parameter}->{DataType}\"!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Definition for parameter \"$Parameter\" invalid - unsupported DataType \"$Parameters{$Parameter}->{DataType}\"!"
+                );
+            }
             return;
         }
     }
@@ -615,61 +643,72 @@ sub _ValidateReportDefinition {
     # check needed stuff
     for (qw(DataSource Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     my $IsValid = $Self->DataSourceValidateConfig(
         Source => $Param{DataSource},
-        Config => $Param{Config}
+        Config => $Param{Config},
+        Silent => $Param{Silent},
     );
 
     if ( !$IsValid ) {
-        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error',
-            What => 'Message',
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Report definition config for given data source is invalid! ($LogMessage)"
-        );
-        return;
-    }
-
-    foreach my $OutputFormat ( sort keys %{$Param{Config}->{OutputFormats} || {}} ) {
-        my $IsValid = $Self->OutputFormatValidateConfig(
-            Format     => $OutputFormat,
-            Config     => $Param{Config}->{OutputFormats}->{$OutputFormat} || {},
-        );
-        if ( !$IsValid ) {
+        if ( !$Param{Silent} ) {
             my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
                 What => 'Message',
             );
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Report definition config for output format \"$OutputFormat\" is invalid! ($LogMessage)"
+                Message  => "Report definition config for given data source is invalid! ($LogMessage)"
             );
+        }
+        return;
+    }
+
+    foreach my $OutputFormat ( sort keys %{$Param{Config}->{OutputFormats} || {}} ) {
+        my $IsValid = $Self->OutputFormatValidateConfig(
+            Format => $OutputFormat,
+            Config => $Param{Config}->{OutputFormats}->{$OutputFormat} || {},
+            Silent => $Param{Silent},
+        );
+        if ( !$IsValid ) {
+            if ( !$Param{Silent} ) {
+                my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                    Type => 'error',
+                    What => 'Message',
+                );
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Report definition config for output format \"$OutputFormat\" is invalid! ($LogMessage)"
+                );
+            }
             return;
         }
     }
 
     $IsValid = $Self->ReportDefinitionValidateParameters(
-        Config => $Param{Config}
+        Config => $Param{Config},
+        Silent => $Param{Silent},
     );
     if ( !$IsValid ) {
-        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error',
-            What => 'Message',
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Parameter definition config is invalid! ($LogMessage)"
-        );
+        if ( !$Param{Silent} ) {
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Parameter definition config is invalid! ($LogMessage)"
+            );
+        }
         return;
     }
 

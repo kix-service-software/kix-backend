@@ -15,10 +15,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::EventHandler);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
-    'Main',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Log
+    Main
 );
 
 =head1 NAME
@@ -744,7 +745,7 @@ sub OrganisationDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

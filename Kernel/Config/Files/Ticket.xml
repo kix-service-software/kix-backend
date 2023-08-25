@@ -528,7 +528,7 @@
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="UserFirstname">CustomerFirstname</Item>
+                <Item Key="Firstname">CustomerFirstname</Item>
             </Hash>
         </Setting>
     </ConfigItem>

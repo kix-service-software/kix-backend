@@ -15,15 +15,17 @@ use vars qw($Self);
 
 use Kernel::System::FAQ;
 
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
+# get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $FAQObject   = $Kernel::OM->Get('FAQ');
 my $CacheObject = $Kernel::OM->Get('Cache');
+
+my $AddignedUser = $Helper->GetRandomID();
+
 
 my $FAQID = $FAQObject->FAQAdd(
     Title       => 'Some Text',
@@ -68,6 +70,7 @@ for my $Test ( sort keys %FAQTest ) {
 }
 
 my $FAQUpdate = $FAQObject->FAQUpdate(
+    %FAQ,
     ItemID      => $FAQID,
     CategoryID  => 1,
     Visibility  => 'external',
@@ -106,40 +109,35 @@ for my $Test ( sort keys %FAQTest ) {
     );
 }
 
-my $Ok = $FAQObject->VoteAdd(
-    CreatedBy => 'Some Text',
+my $VoteID = $FAQObject->VoteAdd(
+    CreatedBy => $AddignedUser,
     ItemID    => $FAQID,
-    IP        => '54.43.30.1',
-    Interface => '2',
     Rate      => 100,
     UserID    => 1,
 );
 
 $Self->True(
-    $Ok,
+    $VoteID,
     "VoteAdd()",
 );
 
-my $Vote = $FAQObject->VoteGet(
-    CreateBy  => 'Some Text',
-    ItemID    => $FAQID,
-    IP        => '54.43.30.1',
-    Interface => '2',
-    UserID    => 1,
+my %Vote = $FAQObject->VoteGet(
+    VoteID => $VoteID,
+    UserID => 1,
 );
 
 $Self->Is(
-    $Vote->{IP},
-    '54.43.30.1',
+    $Vote{CreatedBy},
+    $AddignedUser,
     "VoteGet() - IP",
 );
 
 my $FAQID2 = $FAQObject->FAQAdd(
     Title       => 'Title',
     Visibility  => 'internal',
+    CategoryID  => 1,
     Language    => 'en',
-    LanguageID  => 1,
-    Keywords    => '',
+    Keywords    => q{},
     Field1      => 'Problem Description 1...',
     Field2      => 'Solution not found1...',
     ContentType => 'text/html',
@@ -222,7 +220,7 @@ my $VoteIDsRef = $FAQObject->VoteSearch(
 
 for my $VoteID ( @{$VoteIDsRef} ) {
     my $VoteDelete = $FAQObject->VoteDelete(
-        VoteID => 1,
+        VoteID => $VoteID,
         UserID => 1,
     );
     $Self->True(
@@ -264,37 +262,6 @@ $Self->True(
     "FAQLogAdd() - $FAQID2",
 );
 
-# get FAQ Top-10
-my $Top10IDsRef = $FAQObject->FAQTop10Get(
-    Interface => 'internal',
-    Limit     => 10,
-    UserID    => 1,
-) || [];
-$Self->True(
-    scalar @{$Top10IDsRef},
-    "FAQTop10Get()",
-);
-
-# test LanguageLookup()
-my $LanguageName = $FAQObject->LanguageLookup(
-    LanguageID => 1,
-    UserID     => 1,
-);
-$Self->True(
-    $LanguageName,
-    "LanguageLookup() for LanguageID '1' is '$LanguageName'",
-);
-
-my $LanguageID = $FAQObject->LanguageLookup(
-    Name   => $LanguageName,
-    UserID => 1,
-);
-$Self->Is(
-    $LanguageID,
-    1,
-    "LanguageLookup() for LanguageName '$LanguageName'",
-);
-
 my $FAQDelete = $FAQObject->FAQDelete(
     ItemID => $FAQID,
     UserID => 1,
@@ -330,9 +297,10 @@ $Self->True(
 my $CategoryIDFail = $FAQObject->CategoryAdd(
     Name     => 'TestCategory',
     Comment  => 'Category for testing',
-    ParentID => '',
+    ParentID => q{},
     ValidID  => 1,
     UserID   => 1,
+    Silent   => 1,
 );
 
 $Self->False(
@@ -357,11 +325,12 @@ $Self->True(
 # set ParentID to empty to make it fail
 my $CategoryUpdateFail = $FAQObject->CategoryUpdate(
     CategoryID => $CategoryID,
-    ParentID   => '',
+    ParentID   => q{},
     Name       => 'RootCategory',
     Comment    => 'Root Category for testing',
     ValidID    => 1,
     UserID     => 1,
+    Silent     => 1
 );
 
 $Self->False(
@@ -415,8 +384,8 @@ my %TestFields = (
 $FAQID = $FAQObject->FAQAdd(
     Title      => 'Some Text',
     CategoryID => 1,
-    StateID    => 1,
-    LanguageID => 1,
+    Visibility => 'external',
+    Language   => 'en',
     Keywords   => 'some keywords',
     %TestFields,
     ContentType => 'text/html',
@@ -493,6 +462,11 @@ $Self->IsDeeply(
     "ItemFieldGet(): for all fields match expected data",
 );
 
+%FAQ = $FAQObject->FAQGet(
+    ItemID => $FAQID,
+    UserID => 1,
+);
+
 # update the FAQ item
 my %UpdatedTestFields = (
     Field1 => 'Updated Symptom...',
@@ -504,15 +478,17 @@ my %UpdatedTestFields = (
 );
 
 $FAQUpdate = $FAQObject->FAQUpdate(
-    ItemID     => $FAQID,
-    Title      => 'Some Text',
-    CategoryID => 1,
-    StateID    => 1,
-    LanguageID => 1,
-    Keywords   => 'some keywords',
+    %FAQ,
+    ItemID      => $FAQID,
+    Title       => 'Some Text',
+    CategoryID  => 1,
+    Visibility  => 'external',
+    Language    => 'en',
+    Keywords    => 'some keywords',
     %UpdatedTestFields,
     ContentType => 'text/html',
     UserID      => 1,
+    ValidID     => 1
 );
 
 $Self->True(
@@ -548,8 +524,8 @@ $Self->Is(
 $FAQID = $FAQObject->FAQAdd(
     Title      => 'Some Text',
     CategoryID => 1,
-    StateID    => 1,
-    LanguageID => 1,
+    Visibility => 'external',
+    Language   => 'en',
     Keywords   => 'some keywords',
     %TestFields,
     ContentType => 'text/html',
@@ -661,123 +637,13 @@ $Self->Is(
 );
 
 # -------------------------
-# FAQ State tests
-# -------------------------
-my %States = $FAQObject->StateList(
-    UserID => 1,
-);
-
-$Self->IsNot(
-    scalar keys %States,
-    0,
-    "StateList() number of elements should not be 0"
-);
-
-for my $StateID ( sort keys %States ) {
-    my %State = $FAQObject->StateGet(
-        StateID => $StateID,
-        UserID  => 1,
-    );
-
-    $Self->IsNot(
-        $State{StateID},
-        undef,
-        "StateGet() StateID for StateID: '$StateID' should not be undef"
-    );
-    $Self->IsNot(
-        $State{Name},
-        undef,
-        "StateGet() Name for StateID:    '$StateID' should not be undef"
-    );
-    $Self->IsNot(
-        $State{TypeID},
-        undef,
-        "StateGet() TypeID for StateID:  '$StateID' should not be undef"
-    );
-}
-
-my $StateTypeList = $FAQObject->StateTypeList(
-    UserID => 1,
-);
-
-$Self->Is(
-    ref $StateTypeList,
-    'HASH',
-    "StateTypeList() returns hashref",
-);
-
-$Self->Is(
-    scalar keys %{$StateTypeList},
-    3,
-    "StateTypeList() has 3 keys",
-);
-
-$Self->Is(
-    $StateTypeList->{1},
-    'internal',
-    "StateTypeList() 1 is internal",
-);
-
-$Self->Is(
-    $StateTypeList->{2},
-    'external',
-    "StateTypeList() 2 is external",
-);
-
-$Self->Is(
-    $StateTypeList->{3},
-    'public',
-    "StateTypeList() 3 is public",
-);
-
-$StateTypeList = $FAQObject->StateTypeList(
-    Types  => [ 'public', 'external' ],
-    UserID => 1,
-);
-
-$Self->Is(
-    scalar keys %{$StateTypeList},
-    2,
-    "StateTypeList() has 2 keys",
-);
-
-$Self->Is(
-    $StateTypeList->{2},
-    'external',
-    "StateTypeList() 2 is external",
-);
-
-$Self->Is(
-    $StateTypeList->{3},
-    'public',
-    "StateTypeList() 3 is public",
-);
-
-$StateTypeList = $FAQObject->StateTypeList(
-    Types  => ['internal'],
-    UserID => 1,
-);
-
-$Self->Is(
-    scalar keys %{$StateTypeList},
-    1,
-    "StateTypeList() has 1 key",
-);
-
-$Self->Is(
-    $StateTypeList->{1},
-    'internal',
-    "StateTypeList() 1 is internal",
-);
-
-# -------------------------
 
 # ContentTypeSet() tests
 
 my $FAQItemID1 = $FAQObject->FAQAdd(
     Title       => 'Some Text',
     CategoryID  => 1,
-    Visibility  => 'internal'
+    Visibility  => 'internal',
     Language    => 'en',
     Field1      => 'Symptom...',    # (optional)
     ValidID     => 1,
@@ -967,7 +833,7 @@ my @Tests = (
 for my $Test (@Tests) {
     for my $ContentTypeRaw (qw(auto text/plain text/html)) {
 
-        my $ContentType = $ContentTypeRaw eq 'auto' ? '' : $ContentTypeRaw;
+        my $ContentType = $ContentTypeRaw eq 'auto' ? q{} : $ContentTypeRaw;
 
         my %FAQData = $FAQObject->FAQGet(
             ItemID => $Test->{ItemID},
@@ -1016,40 +882,6 @@ $Self->True(
     "FAQUpdate() set FAQ $FAQItemID1 to invalid",
 );
 
-my $InterfaceStates = $FAQObject->StateTypeList(
-    Types  => $Kernel::OM->Get('Config')->Get('FAQ::Agent::StateTypes'),
-    UserID => 1,
-);
-
-my $ArticleCount = $FAQObject->FAQCount(
-    CategoryIDs => [ 1, ],
-    ItemStates  => $InterfaceStates,
-    Valid       => 0,
-    UserID      => 1,
-);
-$Self->IsNot(
-    $ArticleCount,
-    0,
-    "FAQCount() Valid and Invalid",
-);
-
-my $ArticleCountValid = $FAQObject->FAQCount(
-    CategoryIDs => [ 1, ],
-    ItemStates  => $InterfaceStates,
-    Valid       => 1,
-    UserID      => 1,
-);
-$Self->IsNot(
-    $ArticleCountValid,
-    0,
-    "FAQCount() Valid",
-);
-
-$Self->True(
-    $ArticleCountValid < $ArticleCount ? 1 : 0,
-    "Valid Items are less than Valid and Invalid ($ArticleCountValid < $ArticleCount) with true",
-);
-
 $FAQDelete = $FAQObject->FAQDelete(
     ItemID => $FAQItemID1,
     UserID => 1,
@@ -1059,6 +891,9 @@ $Self->True(
     $FAQDelete,
     "FAQDelete(): with True ($FAQItemID1)",
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

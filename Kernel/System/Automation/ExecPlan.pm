@@ -13,13 +13,14 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 =head1 NAME
@@ -249,10 +250,15 @@ sub ExecPlanAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "An ExecPlan with the same name already exists.",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An ExecPlan with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -263,14 +269,20 @@ sub ExecPlanAdd {
     return if !$BackendObject;
 
     my $IsValid = $BackendObject->ValidateConfig(
-        Config => $Param{Parameters}
+        Config => $Param{Parameters},
+        Silent => $Param{Silent} || 0
     );
 
     if ( !$IsValid ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "ExecPlan config is invalid!"
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "ExecPlan config is invalid!"
+            );
+        }
         return;
     }
 
@@ -366,10 +378,15 @@ sub ExecPlanUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A ExecPlan with the same name already exists.",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A ExecPlan with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -382,14 +399,20 @@ sub ExecPlanUpdate {
         return if !$BackendObject;
 
         my $IsValid = $BackendObject->ValidateConfig(
-            Config => $Param{Parameters}
+            Config => $Param{Parameters},
+            Silent => $Param{Silent} || 0
         );
 
         if ( !$IsValid ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "ExecPlan config is invalid!"
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "ExecPlan config is invalid!"
+                );
+            }
             return;
         }
     }
@@ -533,10 +556,15 @@ sub ExecPlanDelete {
         ID => $Param{ID},
     );
     if ( !$ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "An ExecPlan with the ID $Param{ID} does not exist.",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An ExecPlan with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -544,10 +572,15 @@ sub ExecPlanDelete {
         ID => $Param{ID}
     );
     if (!$Deletable) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not delete exec plan, it is used/referenced in at least one object.",
-        );
+        if (
+            !defined $Param{Silent}
+            || !$Param{Silent}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not delete exec plan, it is used/referenced in at least one object.",
+            );
+        }
         return;
     }
 

@@ -17,10 +17,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 use vars qw(@ISA);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
 );
 
 =head1 NAME
@@ -418,8 +419,8 @@ sub WatcherDelete {
 
     if ( $Param{AllUsers} ) {
         my @Watchers = $Self->WatcherList(
-            Object => $Param{Object},
-            ObjectID   => $Param{ObjectID},
+            Object   => $Param{Object},
+            ObjectID => $Param{ObjectID},
         );
 
         return if !$Kernel::OM->Get('DB')->Do(
@@ -432,13 +433,15 @@ sub WatcherDelete {
             Type => $Self->{CacheType}
         );
 
-        foreach my $WatchUserID (@Watchers) {
+        foreach my $Watcher (@Watchers) {
+
+            my $WatchUserID = $Watcher->{WatchUserID} || $Watcher->{UserID};
 
             # check if we have a backend for this object type and execute it
             if ( $Self->{Backends}->{$Param{Object}} ) {
                 my$BackendResult = $Self->{Backends}->{$Param{Object}}->WatcherDelete(
                     %Param,
-                    WatchUserID => $WatchUserID
+                    WatchUserID => $WatchUserID,
                 );
             }
 

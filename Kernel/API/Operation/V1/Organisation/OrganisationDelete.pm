@@ -112,7 +112,7 @@ sub Run {
 
         # delete contact
         my $Success = $Kernel::OM->Get('Organisation')->OrganisationDelete(
-            ID  => $OrganisationID,
+            ID     => $OrganisationID,
             UserID => $Self->{Authorization}->{UserID}
         );
 

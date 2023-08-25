@@ -17,11 +17,6 @@ use XML::Simple;
 use Kernel::System::VariableCheck qw(:all);
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # check initial inserts
@@ -121,8 +116,6 @@ foreach my $Insert ( @{$XMLRef->{Insert}} ) {
         }
     }
 }
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

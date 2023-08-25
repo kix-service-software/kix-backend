@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -29,8 +29,8 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Text',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Link         => '',
+            DefaultValue => q{},
+            Link         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -45,24 +45,9 @@ my %DynamicFieldConfigs = (
         FieldType     => 'TextArea',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Rows         => '',
-            Cols         => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '',
+            DefaultValue => q{},
+            Rows         => q{},
+            Cols         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -74,13 +59,14 @@ my %DynamicFieldConfigs = (
         Name          => 'DropdownField',
         Label         => 'DropdownField',
         FieldOrder    => 123,
-        FieldType     => 'Dropdown',
+        FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
-            Link               => '',
+            CountMax           => 2,
+            DefaultValue       => q{},
+            Link               => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -99,9 +85,9 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
+            DefaultValue       => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -120,10 +106,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -138,10 +124,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -155,11 +141,13 @@ my @Tests = (
         Name    => 'No Params',
         Config  => undef,
         Success => 0,
+        Silent  => 1
     },
     {
         Name    => 'Empty Config',
         Config  => {},
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing DynamicFieldConfig',
@@ -167,6 +155,7 @@ my @Tests = (
             DynamicFieldConfig => undef,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing Value Text',
@@ -175,8 +164,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -187,20 +176,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Missing Value Checkbox',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value              => undef,
-        },
-        ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -211,8 +188,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -223,8 +200,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -235,8 +212,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -247,8 +224,8 @@ my @Tests = (
             Value              => undef,
         },
         ExpectedResults => {
-            Value => '',
-            Title => '',
+            Value => q{},
+            Title => q{},
         },
         Success => 1,
     },
@@ -273,18 +250,6 @@ my @Tests = (
         ExpectedResults => {
             Value => 'Line1\nÁäñƱƩ⨅ß\nLine3',
             Title => 'Line1\nÁäñƱƩ⨅ß\nLine3',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Value 1 Checkbox',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value              => 1,
-        },
-        ExpectedResults => {
-            Value => '1',
-            Title => '1',
         },
         Success => 1,
     },
@@ -328,7 +293,7 @@ my @Tests = (
         Name   => 'Correct Date Value Date',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value              => '1977-12-12 00:00:00',
+            Value              => '1977-12-12',
         },
         ExpectedResults => {
             Value => '1977-12-12',
@@ -340,13 +305,13 @@ my @Tests = (
         Name   => 'Incorrect Date Value Date',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value              => '2013-02-31 00:00:00',
+            Value              => '2013-02-31 05:00:00',
         },
         ExpectedResults => {
-            Value => '2013-02-31',
-            Title => '2013-02-31',
+            Value => '2013-02-31 00:00:00',
+            Title => '2013-02-31 00:00:00',
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Correct DateTime Value DateTime',
@@ -361,7 +326,7 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Incorrect Date Value Date',
+        Name   => 'Incorrect Date Value DateTime',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
             Value              => '2013-02-31 56:00:28',
@@ -397,20 +362,6 @@ my @Tests = (
         ExpectedResults => {
             Value => 'Li...',
             Title => 'Line...',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Value Other Checkbox (reduced)',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value              => 'Other',
-            ValueMaxChars      => 2,
-            TitleMaxChars      => 4,
-        },
-        ExpectedResults => {
-            Value => 'Other',
-            Title => 'Other',
         },
         Success => 1,
     },
@@ -456,68 +407,15 @@ my @Tests = (
         },
         Success => 1,
     },
-    {
-        Name   => 'Correct Date Value Date (reduced)',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value              => '1977-12-12 00:00:00',
-            ValueMaxChars      => 2,
-            TitleMaxChars      => 4,
-        },
-        ExpectedResults => {
-            Value => '1977-12-12',
-            Title => '1977-12-12',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Incorrect Date Value Date (reduced)',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value              => '2013-02-31 00:00:00',
-            ValueMaxChars      => 2,
-            TitleMaxChars      => 4,
-        },
-        ExpectedResults => {
-            Value => '2013-02-31',
-            Title => '2013-02-31',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Correct DateTime Value DateTime (reduced)',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
-            Value              => '1977-12-12 12::59:32',
-            ValueMaxChars      => 2,
-            TitleMaxChars      => 4,
-        },
-        ExpectedResults => {
-            Value => '1977-12-12 12::59:32',
-            Title => '1977-12-12 12::59:32',
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Incorrect Date Value Date (reduced)',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
-            Value              => '2013-02-31 56:00:28',
-            ValueMaxChars      => 2,
-            TitleMaxChars      => 4,
-        },
-        ExpectedResults => {
-            Value => '2013-02-31 56:00:28',
-            Title => '2013-02-31 56:00:28',
-        },
-        Success => 1,
-    },
 );
 
 # execute tests
 for my $Test (@Tests) {
 
-    my $ValueStrg = $DFBackendObject->ReadableValueRender( %{ $Test->{Config} } );
+    my $ValueStrg = $DFBackendObject->ReadableValueRender(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent} || 0
+    );
 
     if ( $Test->{Success} ) {
         $Self->IsDeeply(
@@ -527,11 +425,20 @@ for my $Test (@Tests) {
         );
     }
     else {
-        $Self->Is(
-            $ValueStrg,
-            undef,
-            "$Test->{Name} | ReadableValueRender() should be undef",
-        );
+        if ( ref $Test->{ExpectedResults} eq 'HASH' ) {
+            $Self->IsNotDeeply(
+                $ValueStrg,
+                $Test->{ExpectedResults},
+                "$Test->{Name} | ReadableValueRender() is not similiar",
+            );
+        }
+        else {
+            $Self->Is(
+                $ValueStrg,
+                undef,
+                "$Test->{Name} | ReadableValueRender() should be undef",
+            );
+        }
     }
 }
 

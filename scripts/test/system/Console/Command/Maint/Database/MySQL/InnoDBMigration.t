@@ -16,6 +16,12 @@ use vars (qw($Self));
 
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Database::MySQL::InnoDBMigration');
 
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
+
 my $ExitCode = $CommandObject->Execute();
 
 $Self->Is(
@@ -25,8 +31,6 @@ $Self->Is(
 );
 
 1;
-
-
 
 =back
 

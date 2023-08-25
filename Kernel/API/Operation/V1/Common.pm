@@ -444,15 +444,7 @@ sub PrepareData {
         Success => 1
     };
 
-    # check needed stuff
-    for my $Needed (qw(Data)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'PrepareData.MissingParameter',
-                Message => "$Needed parameter is missing!",
-            );
-        }
-    }
+    $Param{Data} //= {};
 
     # prepare filter
     if ( exists( $Param{Data}->{filter} ) ) {

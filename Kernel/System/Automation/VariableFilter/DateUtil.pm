@@ -39,11 +39,6 @@ sub _BOB {
 
     # TODO: get relevant ticket/sla calender?
     my $Calendar;
-    #     my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
-    #         SLAID  => $Ticket{SLAID},
-    #         UserID => 1,
-    #     );
-    #     $Calendar = $SLA{Calendar};
 
     # handle unix time
     if ($Param{Value} =~ m/^\d+$/) {
@@ -54,7 +49,8 @@ sub _BOB {
 
     my $BOB = $Kernel::OM->Get('Time')->BOB(
         String   => $Param{Value},
-        Calendar => $Calendar
+        Calendar => $Calendar,
+        Silent   => $Param{Silent},
     );
 
     return $BOB ? $BOB : $Param{Value};
@@ -65,11 +61,6 @@ sub _EOB {
 
     # TODO: get relevant ticket/sla calender?
     my $Calendar;
-    #     my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
-    #         SLAID  => $Ticket{SLAID},
-    #         UserID => 1,
-    #     );
-    #     $Calendar = $SLA{Calendar};
 
     # handle unix time
     if ($Param{Value} =~ m/^\d+$/) {
@@ -117,6 +108,7 @@ sub _Calc {
 
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{Value} . ($Param{Parameter} ? " $Param{Parameter}" : ''),
+        Silent => $Param{Silent},
     );
 
     my $Value;
@@ -144,3 +136,5 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+

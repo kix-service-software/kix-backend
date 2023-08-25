@@ -60,8 +60,8 @@ sub Run {
             return;
         }
     }
-    my %GetParam         = %{ $Param{GetParam} };
-    my $Comment          = $Param{Comment} || '';
+    my %GetParam = %{ $Param{GetParam} };
+    my $Comment  = $Param{Comment} || '';
 
     # get queue id and name
     my $QueueID = $Param{QueueID} || die "need QueueID!";
@@ -81,6 +81,12 @@ sub Run {
                 %Ticket
                 && $Ticket{QueueID} eq $QueueID
             ) {
+                my $MessageID = $GetParam{'Message-ID'};
+
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "New ticket, but message id already exists in queue ($MessageID). New ticket is skipped."
+                );
                 return ( 6, $TicketID );
             }
         }
@@ -99,7 +105,8 @@ sub Run {
     if ( $GetParam{'X-KIX-State'} ) {
 
         my $StateID = $Kernel::OM->Get('State')->StateLookup(
-            State => $GetParam{'X-KIX-State'},
+            State  => $GetParam{'X-KIX-State'},
+            Silent => 1,
         );
 
         if ($StateID) {
@@ -120,6 +127,7 @@ sub Run {
 
         my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $GetParam{'X-KIX-Priority'},
+            Silent   => 1,
         );
 
         if ($PriorityID) {
@@ -128,8 +136,7 @@ sub Run {
         else {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "Priority ".$GetParam{'X-KIX-Priority'}." does not exist, falling back to $Priority!"
+                Message  => "Priority ".$GetParam{'X-KIX-Priority'}." does not exist, falling back to $Priority!"
             );
         }
     }
@@ -139,13 +146,15 @@ sub Run {
     if ( $GetParam{'X-KIX-Type'} ) {
 
         # Check if type exists
-        $TypeID = $Kernel::OM->Get('Type')->TypeLookup( Type => $GetParam{'X-KIX-Type'} );
+        $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
+            Type   => $GetParam{'X-KIX-Type'},
+            Silent => 1,
+        );
 
         if ( !$TypeID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "Type ".$GetParam{'X-KIX-Type'}." does not exist, falling back to default type."
+                Message  => "Type ".$GetParam{'X-KIX-Type'}." does not exist, falling back to default type."
             );
         }
     }
@@ -180,16 +189,22 @@ sub Run {
 
     # if there is still no customer user found, take the senders email address
     if ( !$GetParam{'X-KIX-Contact'} ) {
-        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress};
+        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress} || '';
     }
 
     # get ticket owner
     if ( $GetParam{'X-KIX-OwnerID'} ) {
         # check if it's an existing UserID
-        my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
+        my $TmpLogin = $Kernel::OM->Get('User')->UserLookup(
             UserID => $GetParam{'X-KIX-OwnerID'},
         );
-        $GetParam{'X-KIX-OwnerID'} = $TmpOwnerID;
+
+        if ( $TmpLogin ) {
+            $GetParam{'X-KIX-OwnerID'} = $GetParam{'X-KIX-OwnerID'};
+        }
+        else {
+            $GetParam{'X-KIX-OwnerID'} = '';
+        }
     }
 
     if ( !$GetParam{'X-KIX-OwnerID'} && $GetParam{'X-KIX-Owner'} ) {
@@ -225,10 +240,12 @@ sub Run {
         $Opts{ResponsibleID} = $Param{InmailUserID};
 
         # check if is an existing UserID
-        my $TmpOwnerID = $Kernel::OM->Get('User')->UserLookup(
+        my $TmpLogin = $Kernel::OM->Get('User')->UserLookup(
             UserID => $GetParam{'X-KIX-ResponsibleID'},
         );
-        $Opts{ResponsibleID} = $TmpOwnerID || $Opts{ResponsibleID};
+        if ( $TmpLogin ) {
+            $Opts{ResponsibleID} = $GetParam{'X-KIX-ResponsibleID'};
+        }
     }
 
     if ( !$Opts{ResponsibleID} && $GetParam{'X-KIX-Responsible'} ) {
@@ -237,7 +254,11 @@ sub Run {
             UserLogin => $GetParam{'X-KIX-Responsible'},
         );
 
-        $Opts{ResponsibleID} = $TmpResponsibleID || $Opts{ResponsibleID};
+        $Opts{ResponsibleID} = $TmpResponsibleID;
+    }
+
+    if ( !$Opts{ResponsibleID}  ) {
+        $Opts{ResponsibleID} = $Param{InmailUserID};
     }
 
     # get ticket object
@@ -286,8 +307,8 @@ sub Run {
 
   # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
   # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
-  # Only one unit can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
-  # "+12d" (12 days). Note that settings like "+1d 12h" are not possible. You can specify "+36h" instead.
+  # Combinations of units can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
+  # "+12d" (12 days). "+1d +12h" (1 day and 12 hours, note that the plus has to be specified before every unit).
 
         my $TargetTimeStamp = $GetParam{'X-KIX-State-PendingTime'};
 
@@ -678,13 +699,13 @@ sub Run {
         }
     }
 
-    return $TicketID;
+    # add created ticket to ticket hash to be skipped
+    $Param{SkipTicketIDs}->{ $TicketID } = 1;
+
+    return ( 1, $TicketID );
 }
 
 1;
-
-
-
 
 =back
 

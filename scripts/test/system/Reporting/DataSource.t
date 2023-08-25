@@ -16,16 +16,7 @@ use vars (qw($Self));
 # get ReportDefinition object
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @SourceList = $ReportingObject->DataSourceList();
@@ -41,8 +32,6 @@ $Self->IsDeeply(
     ['GenericSQL'],
     'DataSourceList() - contains',
 );
-
-# cleanup is done by RestoreDatabase
 
 1;
 

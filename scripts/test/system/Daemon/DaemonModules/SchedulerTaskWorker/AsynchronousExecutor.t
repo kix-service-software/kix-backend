@@ -15,11 +15,6 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # prevent mails send
@@ -33,6 +28,7 @@ my @Tests = (
         Name   => 'Empty Config',
         Config => {},
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing TaskID',
@@ -49,6 +45,7 @@ my @Tests = (
 
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing Data',
@@ -57,6 +54,7 @@ my @Tests = (
             TaskName => 'UnitTest',
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Invalid Data',
@@ -66,6 +64,7 @@ my @Tests = (
             Data     => 1,
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Invalid Data 2',
@@ -75,6 +74,7 @@ my @Tests = (
             Data     => ['1'],
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Empty Data',
@@ -84,6 +84,7 @@ my @Tests = (
             Data     => {},
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing Function',
@@ -95,6 +96,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Params format',
@@ -108,6 +110,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Object',
@@ -124,6 +127,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Function',
@@ -140,6 +144,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Correct with parameters',
@@ -203,13 +208,15 @@ my @Tests = (
 );
 
 # get task handler objects
-my $TaskHandlerObject
-    = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
+my $TaskHandlerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor');
 
 for my $Test (@Tests) {
 
     # result task
-    my $Result = $TaskHandlerObject->Run( %{ $Test->{Config} } );
+    my $Result = $TaskHandlerObject->Run(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     $Self->Is(
         $Result || 0,
@@ -217,8 +224,6 @@ for my $Test (@Tests) {
         "$Test->{Name} execution result",
     );
 }
-
-# cleanup cache is done by RestoreDatabase.
 
 1;
 

@@ -75,7 +75,7 @@ sub Run {
         next TICKET if $CountedTime < $Row[3] * 60;
 
         $Self->Print(" Unlocking ticket id $Row[0]... ");
-        my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
+        my $Unlock = $Kernel::OM->Get('Ticket')->TicketLockSet(
             TicketID => $Row[1],
             Lock     => 'unlock',
             UserID   => 1,

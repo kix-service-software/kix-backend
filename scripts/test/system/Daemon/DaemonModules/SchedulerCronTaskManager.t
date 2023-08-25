@@ -14,11 +14,21 @@ use utf8;
 
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
+# get needed objects
+## IMPORTANT - First get Daemon::DaemonModules::SchedulerCronTaskManager object,
+## or it will not use the same config object as the test somehow
+my $TaskManagerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerCronTaskManager');
+my $CacheObject       = $Kernel::OM->Get('Cache');
+my $TaskWorkerObject  = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
+my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
+my $Helper            = $Kernel::OM->Get('UnitTest::Helper');
+my $ConfigObject      = $Kernel::OM->Get('Config');
 
-my $Home   = $ConfigObject->Get('Home');
+my $Home = $ConfigObject->Get('Home');
+
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
+
+my $SleepTime = 20;
 
 # get current daemon status
 my $PreviousDaemonStatus = `$Daemon status`;
@@ -29,40 +39,28 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
 
     my $SleepTime = 2;
 
-    # wait to get daemon fully stopped before test continues
-    print "A running Daemon was detected and need to be stopped...\n";
-    print 'Sleeping ' . $SleepTime . "s\n";
-    sleep $SleepTime;
+    do {
+        # wait to get daemon fully stopped before test continues
+        print 'Sleeping ' . $SleepTime . "s\n";
+        sleep $SleepTime;
+    } while ( `$Daemon status` =~ m{Daemon running}i );
 }
 
-# get needed objects
-my $TaskWorkerObject  = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
-my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
-my $Helper            = $Kernel::OM->Get('UnitTest::Helper');
+# Wait for slow systems
+print "Waiting at most $SleepTime s until pending tasks are executed\n";
+ACTIVESLEEP:
+for my $Seconds ( 1 .. $SleepTime ) {
+    $TaskWorkerObject->PreRun();
+    $TaskWorkerObject->Run();
+    $TaskWorkerObject->PostRun();
 
-my $RunTasks = sub {
+    my @List = $SchedulerDBObject->TaskList();
 
-    local $SIG{CHLD} = "IGNORE";
+    last ACTIVESLEEP if !scalar @List;
 
-    # wait until task is executed
-    ACTIVESLEEP:
-    for my $Sec ( 1 .. 120 ) {
-
-        # run the worker
-        $TaskWorkerObject->Run();
-        $TaskWorkerObject->_WorkerPIDsCheck();
-
-        my @List = $SchedulerDBObject->TaskList();
-
-        last ACTIVESLEEP if !scalar @List;
-
-        sleep 1;
-
-        print "Waiting $Sec secs for scheduler tasks to be executed\n";
-    }
-};
-
-$RunTasks->();
+    print "Waiting for $Seconds seconds...\n";
+    sleep 1;
+}
 
 # get original Cron settings
 my $OriginalSettings = $ConfigObject->Get('Daemon::SchedulerCronTaskManager::Task') || {};
@@ -96,10 +94,11 @@ my @Tests = (
             Name => 'NoSchedule' . $RandomID,
             Data => {
                 TaskName => 'NoSchedule' . $RandomID,
-                Module   => 'Admin::Package::List',
-                Function => 'run',
+                Module   => 'Kernel::System::Console::Command::Admin::Installation::ListPlugins',
+                Function => 'Execute',
             },
         },
+        Silent  => 1,
         TaskAdd => 0,
     },
     {
@@ -108,11 +107,12 @@ my @Tests = (
             Name => 'WrongSchedue' . $RandomID,
             Data => {
                 TaskName => 'NoSchedule' . $RandomID,
-                Module   => 'Admin::Package::List',
-                Function => 'run',
+                Module   => 'Kernel::System::Console::Command::Admin::Installation::ListPlugins',
+                Function => 'Execute',
                 Schedule => '\1 * * * *',
             },
         },
+        Silent  => 1,
         TaskAdd => 0,
     },
 
@@ -123,8 +123,9 @@ my @Tests = (
             Name => 'CronAllMinutes' . $RandomID,
             Data => {
                 TaskName => 'CronAllMinutes' . $RandomID,
-                Module   => 'Admin::Package::List',
-                Function => 'run',
+                Module   => 'Kernel::System::Console::Command::Admin::Installation::ListPlugins',
+                Function => 'Execute',
+                Params   => [ '--quiet' ],
                 Schedule => '* * * * *',
             },
         },
@@ -156,10 +157,6 @@ my @Tests = (
 
 );
 
-# get needed objects
-my $TaskManagerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerCronTaskManager');
-my $CacheObject       = $Kernel::OM->Get('Cache');
-
 TESTCASE:
 for my $Test (@Tests) {
 
@@ -179,7 +176,9 @@ for my $Test (@Tests) {
         $CronName = $Test->{CronJob}->{Name};
 
         # run the task manager
-        my $RunSuccess = $TaskManagerObject->Run();
+        my $RunSuccess = $TaskManagerObject->Run(
+            Silent => $Test->{Silent},
+        );
         $Self->True(
             $RunSuccess,
             "$Test->{Name} task manager Run() - with true (this will create the recurrent task but not execution)",
@@ -222,14 +221,19 @@ for my $Test (@Tests) {
     }
 
     # run the task manager
-    my $RunSuccess = $TaskManagerObject->Run();
+    my $RunSuccess = $TaskManagerObject->Run(
+        Silent => $Test->{Silent},
+    );
     $Self->True(
         $RunSuccess,
         "$Test->{Name} task manager Run() - with true",
     );
 
     # return the cache as it was
-    if ( $Test->{NoCache} ) {
+    if (
+        $Test->{NoCache}
+        && defined( $Cache )
+    ) {
         $CacheObject->Set(
             Type           => 'SchedulerDBRecurrentTaskExecute',
             Key            => $CronName . '::Cron',

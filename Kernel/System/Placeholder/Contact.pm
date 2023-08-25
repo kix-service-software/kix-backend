@@ -19,10 +19,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Placeholder::Base);
 
-our @ObjectDependencies = (
-    'Contact',
-    'Log',
-    'Organisation'
+our @ObjectDependencies = qw(
+    Contact
+    Log
+    Organisation
+    HTMLUtils
 );
 
 =head1 NAME

@@ -38,17 +38,15 @@ my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 $Self->Is(
     ref $SchedulerDBObject,
-    'Daemon::SchedulerDB',
+    'Kernel::System::Daemon::SchedulerDB',
     "Kernel::System::Daemon::SchedulerDB->new()",
 );
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # freeze time
 $Helper->FixedTimeSet();
@@ -62,6 +60,7 @@ my @Tests = (
         Name    => 'Empty Call',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing ExecutionTime',
@@ -74,6 +73,7 @@ my @Tests = (
             },
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Wrong ExecutionTime',
@@ -87,6 +87,7 @@ my @Tests = (
             },
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing Type',
@@ -99,6 +100,7 @@ my @Tests = (
             },
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Min Params',
@@ -149,7 +151,10 @@ my @AddedTasksIDs;
 
 TESTCASE:
 for my $Test (@Tests) {
-    my $TaskID = $SchedulerDBObject->FutureTaskAdd( %{ $Test->{Config} } );
+    my $TaskID = $SchedulerDBObject->FutureTaskAdd(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     if ( !$Test->{Success} ) {
         $Self->Is(
@@ -176,6 +181,7 @@ for my $Test (@Tests) {
         Name    => 'Empty Call',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Wrong TaskID',
@@ -183,6 +189,7 @@ for my $Test (@Tests) {
             TaskID => -1,
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Min Params',
@@ -254,7 +261,10 @@ for my $Test (@Tests) {
 
 TESTCASE:
 for my $Test (@Tests) {
-    my %Task = $SchedulerDBObject->FutureTaskGet( %{ $Test->{Config} } );
+    my %Task = $SchedulerDBObject->FutureTaskGet(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     if ( !$Test->{Success} ) {
         $Self->False(
@@ -277,6 +287,7 @@ for my $Test (@Tests) {
         Name    => 'Empty Call',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Wrong TaskID',
@@ -290,7 +301,10 @@ for my $Test (@Tests) {
 TESTCASE:
 for my $Test (@Tests) {
 
-    my $Success = $SchedulerDBObject->FutureTaskDelete( %{ $Test->{Config} } );
+    my $Success = $SchedulerDBObject->FutureTaskDelete(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     if ( !$Test->{Success} ) {
         $Self->False(
@@ -379,6 +393,7 @@ $Self->IsNot(
         Name    => 'Empty Call',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing NodeID',
@@ -386,6 +401,7 @@ $Self->IsNot(
             PID => 123,
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing PID',
@@ -393,6 +409,7 @@ $Self->IsNot(
             NodeID => 123,
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Correct Call',
@@ -406,7 +423,10 @@ $Self->IsNot(
 
 TESTCASE:
 for my $Test (@Tests) {
-    my $Success = $SchedulerDBObject->FutureTaskToExecute( %{ $Test->{Config} } );
+    my $Success = $SchedulerDBObject->FutureTaskToExecute(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     if ( !$Test->{Success} ) {
         $Self->False(
@@ -568,7 +588,8 @@ if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
     system("$Daemon start");
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

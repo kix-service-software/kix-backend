@@ -15,12 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get mail account object
 my $MailAccountObject = $Kernel::OM->Get('MailAccount');
@@ -396,6 +394,9 @@ $Self->True(
     $OAuth2ProfileDelete2,
     'ProfileDelete() for OAuth2 test profile 2',
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

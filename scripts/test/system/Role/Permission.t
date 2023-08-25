@@ -16,12 +16,10 @@ use Kernel::System::Role;
 use Kernel::System::Role::Permission qw(:all);
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get needed objects
 my $RoleObject = $Kernel::OM->Get('Role');
@@ -101,7 +99,7 @@ my @PermissionTests = (
                 Value   => Kernel::System::Role::Permission::PERMISSION_CRUD,
             },
             {
-                TypeID  => 2,
+                TypeID  => 1,
                 Target  => '/queues/1',
                 Comment => 'read permission on queue 1',
                 Value   => Kernel::System::Role::Permission::PERMISSION->{READ},
@@ -129,7 +127,7 @@ my %PermissionTypeList = $RoleObject->PermissionTypeList();
 
 $Self->Is(
     scalar(keys %PermissionTypeList),
-    3,
+    4,
     "PermissionTypeList() - returns 3 permission types"
 );
 
@@ -137,7 +135,7 @@ $Self->Is(
 
 $Self->Is(
     scalar(keys %PermissionTypeList),
-    3,
+    4,
     "PermissionTypeList(valid) - returns 3 valid permission types"
 );
 
@@ -203,8 +201,8 @@ for my $PermissionTest (@PermissionTests) {
             );
 
             $Self->Is(
-                $PermissionData{TypeID}.'::'.sprintf('%04x', $PermissionData{Value}).'::'.$PermissionData{TargetID},
-                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Value}).'::'.$Permission->{TargetID},
+                $PermissionData{TypeID}.'::'.sprintf('%04x', $PermissionData{Value}).'::'.$PermissionData{Target},
+                $Permission->{TypeID}.'::'.sprintf('%04x', $Permission->{Value}).'::'.$Permission->{Target},
                 "PermissionGet() - permission 0x".sprintf('%04x', $Permission->{Value})." on $Permission->{Target} should be assigned to role ID $RoleID"
             );
         }
@@ -276,7 +274,8 @@ for my $PermissionTest (@PermissionTests) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

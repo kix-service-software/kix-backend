@@ -990,10 +990,12 @@ sub ArticleSenderTypeLookup {
 
     # check needed stuff
     if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need SenderType or SenderTypeID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need SenderType or SenderTypeID!',
+            );
+        }
         return;
     }
 
@@ -1041,10 +1043,12 @@ sub ArticleSenderTypeLookup {
 
     # check if data exists
     if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Found no SenderType(ID) for $Key!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Found no SenderType(ID) for $Key!",
+            );
+        }
         return;
     }
 
@@ -3185,14 +3189,20 @@ sub _GetAssignedSearchParams {
     if ( IsStringWithData($MappingString) ) {
 
         my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data => $MappingString
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
         );
 
         if ( !IsHashRefWithData($Mapping) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+                );
+            }
         } elsif (
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
@@ -3249,10 +3259,15 @@ sub _GetAssignedSearchParams {
                 }
             }
         } else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+                );
+            }
         }
     }
 

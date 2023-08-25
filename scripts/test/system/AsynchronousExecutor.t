@@ -20,90 +20,64 @@ my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 my $Daemon = $Home . '/bin/kix.Daemon.pl';
 
-# get daemon status (stop if necessary)
-my $PreviousDaemonStatus = `perl $Daemon status`;
+my $SleepTime = 20;
 
-if ( !$PreviousDaemonStatus ) {
-    $Self->False(
-        1,
-        "Could not determine current daemon status!",
-    );
-    die "Could not determine current daemon status!";
-}
+# get current daemon status
+my $PreviousDaemonStatus = `$Daemon status`;
 
+# stop daemon if it was already running before this test
 if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
-    my $ResultMessage = system("perl $Daemon stop");
-}
-else {
-    $Self->True(
-        1,
-        "Daemon was already stopped.",
-    );
-}
+    `$Daemon stop`;
 
-# Wait for slow systems
-my $SleepTime = 120;
-print "Waiting at most $SleepTime s until daemon stops\n";
-ACTIVESLEEP:
-for my $Seconds ( 1 .. $SleepTime ) {
-    my $DaemonStatus = `perl $Daemon status`;
-    if ( $DaemonStatus =~ m{Daemon not running}i ) {
-        last ACTIVESLEEP;
-    }
-    print "Sleeping for $Seconds seconds...\n";
-    sleep 1;
+    my $SleepTime = 2;
+
+    do {
+        # wait to get daemon fully stopped before test continues
+        print 'Sleeping ' . $SleepTime . "s\n";
+        sleep $SleepTime;
+    } while ( `$Daemon status` =~ m{Daemon running}i );
 }
 
-my $CurrentDaemonStatus = `perl $Daemon status`;
-
-$Self->True(
-    int $CurrentDaemonStatus =~ m{Daemon not running}i,
-    "Daemon is not running",
-);
-
-if ( $CurrentDaemonStatus !~ m{Daemon not running}i ) {
-    die "Daemon could not be stopped.";
-}
-
+# prepare tests
 my @Tests = (
     {
         Name     => 'Synchronous Call',
         Function => 'Execute',
     },
     {
-        Name     => 'ASynchronous Call',
-        Function => 'ExecuteAsyc',
+        Name     => 'Asynchronous Call',
+        Function => 'ExecuteAsync',
     },
     {
-        Name     => 'ASynchronous Call With Object Name',
-        Function => 'ExecuteAsycWithObjectName',
+        Name     => 'Asynchronous Call With Object Name',
+        Function => 'ExecuteAsyncWithObjectName',
     },
 );
-
-# get worker object
-my $WorkerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
-
-# make sure there is no other pending task to be executed
-my $Success = $WorkerObject->Run();
 
 # get scheduler db object
 my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
+# get worker object
+my $WorkerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWorker');
+
 # Wait for slow systems
-$SleepTime = 120;
-print "Waiting at most $SleepTime s until tasks are executed\n";
+print "Waiting at most $SleepTime s until pending tasks are executed\n";
 ACTIVESLEEP:
 for my $Seconds ( 1 .. $SleepTime ) {
-    my @List = $SchedulerDBObject->TaskList();
-    last ACTIVESLEEP if !scalar @List;
-    print "Sleeping for $Seconds seconds...\n";
-    sleep 1;
+    $WorkerObject->PreRun();
     $WorkerObject->Run();
+    $WorkerObject->PostRun();
+
+    my @List = $SchedulerDBObject->TaskList();
+
+    last ACTIVESLEEP if !scalar @List;
+
+    print "Waiting for $Seconds seconds...\n";
+    sleep 1;
 }
 
 # get needed objects
-my $AsynchronousExecutorObject
-    = $Kernel::OM->Get('scripts::test::system::sample::AsynchronousExecutor::TestAsynchronousExecutor');
+my $AsynchronousExecutorObject = $Kernel::OM->Get('scripts::test::system::sample::AsynchronousExecutor::TestAsynchronousExecutor');
 
 my $MainObject = $Kernel::OM->Get('Main');
 
@@ -123,19 +97,21 @@ for my $Test (@Tests) {
         Success => 1,
     );
 
-    if ( $Function eq 'ExecuteAsyc' || $Function eq 'ExecuteAsycWithObjectName' ) {
-        $WorkerObject->Run();
-
+    if ( $Function eq 'ExecuteAsync' || $Function eq 'ExecuteAsyncWithObjectName' ) {
         # Wait for slow systems
-        $SleepTime = 120;
-        print "Waiting at most $SleepTime s until tasks are executed\n";
+        print "Waiting at most $SleepTime s until unittest tasks are executed\n";
         ACTIVESLEEP:
         for my $Seconds ( 1 .. $SleepTime ) {
-            my @List = $SchedulerDBObject->TaskList();
-            last ACTIVESLEEP if !scalar @List;
-            print "Sleeping for $Seconds seconds...\n";
-            sleep 1;
+            $WorkerObject->PreRun();
             $WorkerObject->Run();
+            $WorkerObject->PostRun();
+
+            my @List = $SchedulerDBObject->TaskList();
+
+            last ACTIVESLEEP if !scalar @List;
+
+            print "Waiting for $Seconds seconds...\n";
+            sleep 1;
         }
     }
 
@@ -172,7 +148,7 @@ for my $File (@FileRemember) {
 
 # start daemon if it was already running before this test
 if ( $PreviousDaemonStatus =~ m{Daemon running}i ) {
-    system("perl $Daemon start");
+    system("$Daemon start");
 }
 
 1;

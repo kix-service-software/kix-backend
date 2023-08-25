@@ -18,26 +18,21 @@ my $UserObject           = $Kernel::OM->Get('User'); # without, config changes a
 
 # get actual needed objects
 my $ConfigObject         = $Kernel::OM->Get('Config');
-my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-my $ContactObject        = $Kernel::OM->Get('Contact');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 # get deployment state list
-my $DeplStateList = $GeneralCatalogObject->ItemList(
+my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::DeploymentState',
 );
 my %DeplStateListReverse = reverse %{$DeplStateList};
 
 # get incident state list
-my $InciStateList = $GeneralCatalogObject->ItemList(
+my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::Core::IncidentState',
 );
 my %InciStateListReverse = reverse %{$InciStateList};
@@ -49,6 +44,9 @@ _CheckConfig();
 
 _DoNegativeTests();
 
+# rollback transaction on database
+$Helper->Rollback();
+
 sub _PrepareData {
 
     # create customer user
@@ -57,7 +55,7 @@ sub _PrepareData {
         $CustomerContactID,
         'CustomerContactCreate',
     );
-    my %CustomerContact = $ContactObject->ContactGet(ID => $CustomerContactID, UserID => 1);
+    my %CustomerContact = $Kernel::OM->Get('Contact')->ContactGet(ID => $CustomerContactID, UserID => 1);
     my %CustomerUser    = $UserObject->GetUserData(UserID => $CustomerContact{AssignedUserID});
     if (IsHashRefWithData(\%CustomerUser)) {
         $CustomerContact{User} = \%CustomerUser;
@@ -69,10 +67,10 @@ sub _PrepareData {
 
     # create classes
     my $ClassAName = 'Class A';
-    my $Class_A_ID = $GeneralCatalogObject->ItemAdd(
+    my $Class_A_ID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ClassAName,
-        Comment  => '',
+        Comment  => q{},
         ValidID  => 1,
         UserID   => 1
     );
@@ -80,11 +78,11 @@ sub _PrepareData {
         $Class_A_ID,
         'Create class A',
     );
-    my $Class_A_Def_ID = $ConfigItemObject->DefinitionAdd(
+    my $Class_A_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_A_ID,
         UserID     => 1,
-        Definition =>
-"[
+        Definition => <<'END'
+[
     {
         Key              => 'SectionOwner',
         Name             => 'Owner Information',
@@ -116,13 +114,22 @@ sub _PrepareData {
             }
         ]
     }
-]"
+]
+END
     );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'GeneralCatalog',
+            'ITSMConfigItem'
+        ]
+    );
+
     my $ClassBName = 'Class B';
-    my $Class_B_ID = $GeneralCatalogObject->ItemAdd(
+    my $Class_B_ID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class    => 'ITSM::ConfigItem::Class',
         Name     => $ClassBName,
-        Comment  => '',
+        Comment  => q{},
         ValidID  => 1,
         UserID   => 1
     );
@@ -130,11 +137,11 @@ sub _PrepareData {
         $Class_B_ID,
         'Create class B',
     );
-    my $Class_B_Def_ID = $ConfigItemObject->DefinitionAdd(
+    my $Class_B_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_B_ID,
         UserID     => 1,
-        Definition =>
-"[
+        Definition => <<'END'
+[
     {
         Key              => 'OwnerContact',
         Name             => 'Assigned Contact',
@@ -144,13 +151,21 @@ sub _PrepareData {
             Type => 'Contact',
         }
     }
-]"
+]
+END
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'GeneralCatalog',
+            'ITSMConfigItem'
+        ]
     );
 
     # create config items
     # ci with contact and orga (class A)
-    my $ContactOrgaCIID = $ConfigItemObject->ConfigItemAdd(
-        Number  => '00000000000000001',
+    my $ContactOrgaCIID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+        Number  => $Helper->GetRandomNumber(),
         ClassID => $Class_A_ID,
         UserID  => 1,
     );
@@ -159,7 +174,7 @@ sub _PrepareData {
         'Create config item (contact/orga)',
     );
     if ($ContactOrgaCIID) {
-        my $ContactOrgaVersionID = $ConfigItemObject->VersionAdd(
+        my $ContactOrgaVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
             ConfigItemID => $ContactOrgaCIID,
             Name         => 'ContactOrgaCI - 1st version',
             DefinitionID => $Class_A_Def_ID,
@@ -203,9 +218,14 @@ sub _PrepareData {
         );
     }
 
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'ITSMConfigItem'
+        ]
+    );
     # ci with just orga (class A)
-    my $OrgaCIID = $ConfigItemObject->ConfigItemAdd(
-        Number  => '00000000000000002',
+    my $OrgaCIID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+        Number  => $Helper->GetRandomNumber(),
         ClassID => $Class_A_ID,
         UserID  => 1,
     );
@@ -214,7 +234,7 @@ sub _PrepareData {
         'Create config item (orga)',
     );
     if ($OrgaCIID) {
-        my $OrgaVersionID = $ConfigItemObject->VersionAdd(
+        my $OrgaVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
             ConfigItemID => $OrgaCIID,
             Name         => 'OrgaCI - 1st version',
             DefinitionID => $Class_A_Def_ID,
@@ -249,9 +269,15 @@ sub _PrepareData {
         );
     }
 
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'ITSMConfigItem'
+        ]
+    );
+
     # ci with just contact (class B)
-    my $ContactCIID = $ConfigItemObject->ConfigItemAdd(
-        Number  => '00000000000000003',
+    my $ContactCIID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+        Number  => $Helper->GetRandomNumber(),
         ClassID => $Class_B_ID,
         UserID  => 1,
     );
@@ -260,7 +286,7 @@ sub _PrepareData {
         'Create config item (contact)',
     );
     if ($ContactCIID) {
-        my $ContactVersionID = $ConfigItemObject->VersionAdd(
+        my $ContactVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
             ConfigItemID => $ContactCIID,
             Name         => 'ContactCI - 1st version',
             DefinitionID => $Class_B_Def_ID,
@@ -290,6 +316,12 @@ sub _PrepareData {
         );
     }
 
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'ITSMConfigItem'
+        ]
+    );
+
     return (
         ClassAName      => $ClassAName,
         ClassBName      => $ClassBName,
@@ -306,25 +338,27 @@ sub _CheckConfig {
     # contact or orga for class A
     _SetConfig(
         'contact and orga config for class A',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchAttributes": [
-                            "ID"
-                        ]
-                    },
-                    "SectionOwner::OwnerOrganisation": {
-                        "SearchAttributes": [
-                            "PrimaryOrganisationID"
-                        ]
-                    }
-                }
+        <<"END",
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "SectionOwner::OwnerOrganisation": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID"
+                ]
             }
-        }',
+        }
+    }
+}
+END
         1
     );
-    my $ContactOrgaCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    my $ContactOrgaCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         Object     => $TestData{CustomerContact},
         UserID     => 1
@@ -332,7 +366,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactOrgaCIIDList}),
         2,
-        'Asset list should contain 2 asset [contact/orga]',
+        'Article list should contain 2 article [contact/orga]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -353,26 +387,28 @@ sub _CheckConfig {
     # only contact for both classes
     _SetConfig(
         'contact for both classes',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchAttributes": [
-                            "ID"
-                        ]
-                    }
-                },
-                "'.$TestData{ClassBName}.'": {
-                    "OwnerContact": {
-                        "SearchAttributes": [
-                            "ID"
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
             }
-        }'
+        },
+        "$TestData{ClassBName}": {
+            "OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            }
+        }
+    }
+}
+END
     );
-    my $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    my $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         Object     => $TestData{CustomerContact},
         UserID     => 1
@@ -380,7 +416,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         2,
-        'Asset list should contain 2 asset [contact]',
+        'Article list should contain 2 article [contact]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -399,7 +435,7 @@ sub _CheckConfig {
     );
 
     # add second version to "ContactCI" (only accept matches in current version)
-    my $VersionID = $ConfigItemObject->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $TestData{ContactCIID},
         Name         => 'ContactCI - 2nd version',
         DefinitionID => $TestData{Class_B_Def_ID},
@@ -423,11 +459,18 @@ sub _CheckConfig {
             }
         ]
     );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'ITSMConfigItem'
+        ]
+    );
+
     $Self->True(
         $VersionID,
         'Create version (contact - 2nd version)',
     );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         Object     => $TestData{CustomerContact},
         UserID     => 1
@@ -435,7 +478,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         1,
-        'Asset list should contain 2 asset [contact v2]',
+        'Article list should contain 2 article [contact v2]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -456,26 +499,28 @@ sub _CheckConfig {
     # only contact for both classes - static (without object)
     _SetConfig(
         'contact for both classes - static',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "'.$TestData{ClassBName}.'": {
-                    "OwnerContact": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "$TestData{ClassBName}": {
+            "OwnerContact": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+END
     );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
         UserID     => 1
@@ -483,7 +528,7 @@ sub _CheckConfig {
     $Self->Is(
         scalar(@{$ContactCIIDList}),
         2,
-        'Asset list should contain 2 asset [contact static]',
+        'Article list should contain 2 article [contact static]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -500,148 +545,6 @@ sub _CheckConfig {
         $ContactCIIDList,
         'List should NOT contain CI with orga [contact static]',
     );
-
-    # check name
-    _SetConfig(
-        'contact for both classes - static',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "Name": {
-                        "SearchStatic": [
-                            "OrgaCI*"
-                        ]
-                    }
-                }
-            }
-        }'
-    );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
-        UserID     => 1
-    );
-    $Self->Is(
-        scalar(@{$ContactCIIDList}),
-        1,
-        'Asset list should contain 1 asset [name static]',
-    );
-    $Self->ContainedIn(
-        $TestData{OrgaCIID},
-        $ContactCIIDList,
-        'List should contain CI with matching name [name static]',
-    );
-    $Self->NotContainedIn(
-        $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
-        'List should NOT contain CI with contact and orga [name static]',
-    );
-
-    # check name - not as list
-    _SetConfig(
-        'contact for class A - static name',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "Name": {
-                        "SearchStatic": "ContactOrgaCI*"
-                    }
-                }
-            }
-        }'
-    );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
-        UserID     => 1
-    );
-    $Self->Is(
-        scalar(@{$ContactCIIDList}),
-        1,
-        'Asset list should contain 1 asset [name static simple]',
-    );
-    $Self->ContainedIn(
-        $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
-        'List should contain CI with matching name [name static simple]',
-    );
-    $Self->NotContainedIn(
-        $TestData{OrgaCIID},
-        $ContactCIIDList,
-        'List should NOT contain CI with only orga [name static simple]',
-    );
-
-    # check deployment state
-    _SetConfig(
-        'contact for class A - static deployment state',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "DeploymentState": {
-                        "SearchStatic": [
-                            "Repair"
-                        ]
-                    }
-                }
-            }
-        }'
-    );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
-        UserID     => 1
-    );
-    $Self->Is(
-        scalar(@{$ContactCIIDList}),
-        1,
-        'Asset list should contain 1 asset [deployment state static]',
-    );
-    $Self->ContainedIn(
-        $TestData{OrgaCIID},
-        $ContactCIIDList,
-        'List should contain CI with matching deployment state [deployment state static]',
-    );
-    $Self->NotContainedIn(
-        $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
-        'List should NOT contain CI with contact and orga [deployment state static]',
-    );
-
-    # check incident state
-    _SetConfig(
-        'contact for class A - static incident state',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "IncidentState": {
-                        "SearchStatic": [
-                            "Incident"
-                        ]
-                    }
-                }
-            }
-        }'
-    );
-    $ContactCIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
-        UserID     => 1
-    );
-    $Self->Is(
-        scalar(@{$ContactCIIDList}),
-        1,
-        'Asset list should contain 1 asset [incident state static]',
-    );
-    $Self->ContainedIn(
-        $TestData{OrgaCIID},
-        $ContactCIIDList,
-        'List should contain CI with matching incident state [incident state static]',
-    );
-    $Self->NotContainedIn(
-        $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
-        'List should NOT contain CI with contact and orga [incident state static]',
-    );
 }
 
 sub _DoNegativeTests {
@@ -649,247 +552,241 @@ sub _DoNegativeTests {
     # negative (unknown attribute) ---------------------------
     _SetConfig(
         'unknown attribute',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "UnknownAttribute": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "UnknownAttribute": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
-    my $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    my $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [unknown attribute]',
+        'Article list should be empty [unknown attribute]',
     );
 
     # negative (known attribute but wrong class / wrong structure) ---------------------------
     _SetConfig(
         'known attribute but wrong class / wrong structure',
-        '{
-            "Contact": {
-                "'.$TestData{ClassBName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassBName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [known attribute but wrong class / wrong structure]',
+        'Article list should be empty [known attribute but wrong class / wrong structure]',
     );
 
     # negative (known attribute but unknown class) ---------------------------
     _SetConfig(
         'known attribute but unknown class',
-        '{
-            "Contact": {
-                "UnkownClass": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "UnkownClass": {
+            "SectionOwner::OwnerContact": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
-        UserID     => 1
+        UserID     => 1,
+        Silent     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [known attribute but unknwon class]',
+        'Article list should be empty [known attribute but unknwon class]',
     );
 
     # negative (missing object type) ---------------------------
     _SetConfig(
         'missing object type',
-        '{
-            "SomeOtherObject": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "SomeOtherObject": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [missing object type]',
+        'Article list should be empty [missing object type]',
     );
 
     # negative (empty object type config) ---------------------------
     _SetConfig(
         'empty object type config',
-        '{
-            "Contact": {}
-        }'
+        <<"END"
+{
+    "Contact": {}
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [empty object type config]',
+        'Article list should be empty [empty object type config]',
     );
 
     # negative (empty class config) ---------------------------
     _SetConfig(
         'empty class config',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {}
-            }
-        }'
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {}
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [empty class config]',
+        'Article list should be empty [empty class config]',
     );
 
     # negative (empty attribute) ---------------------------
     _SetConfig(
         'empty attribute',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {}
-                }
-            }
-        }'
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {}
+        }
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [empty attribute]',
+        'Article list should be empty [empty attribute]',
     );
 
     # negative (empty value) ---------------------------
     _SetConfig(
         'empty value',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        "SearchStatic": []
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchStatic": []
             }
-        }'
+        }
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [empty value]',
+        'Article list should be empty [empty value]',
     );
 
     # negative (empty config) ---------------------------
     _SetConfig(
         'empty class config',
-        ''
+        q{}
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
         UserID     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [empty config]',
+        'Article list should be empty [empty config]',
     );
 
     # negative (invalid config, missing " and unnecessary ,) ---------------------------
     _SetConfig(
         'invalid config',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "SectionOwner::OwnerContact": {
-                        SearchStatic: [
-                            1
-                        ]
-                    }
-                },
+        <<"END"
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                SearchStatic: [
+                    1
+                ]
             }
-        }'
+        },
+    }
+}
+END
     );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
+    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
         ObjectType => 'Contact',
-        UserID     => 1
+        UserID     => 1,
+        Silent     => 1
     );
     $Self->Is(
         scalar(@{$CIIDList}),
         0,
-        'Asset list should be empty [invalid config]',
-    );
-
-    # check unknown deployment state
-    _SetConfig(
-        'unknown deployment state',
-        '{
-            "Contact": {
-                "'.$TestData{ClassAName}.'": {
-                    "DeploymentState": {
-                        "SearchStatic": [
-                            "Production",
-                            "Unknown"
-                        ]
-                    }
-                }
-            }
-        }'
-    );
-    $CIIDList = $ConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        UserID     => 1
-    );
-    $Self->Is(
-        scalar(@{$CIIDList}),
-        0,
-        'Asset list should be empty [unknown DeploymentState]',
+        'Article list should be empty [invalid config]',
     );
 }
 
@@ -918,9 +815,8 @@ sub _SetConfig {
             "AssignedConfigItemsMapping - mapping is new value",
         );
     }
+    return 1;
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

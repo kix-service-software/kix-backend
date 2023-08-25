@@ -20,12 +20,10 @@ my $TimeObject   = $Kernel::OM->Get('Time');
 my $UserObject   = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 $ConfigObject->Set(
     Key   => 'CheckEmailAddresses',
@@ -41,6 +39,7 @@ for my $Try ( 1 .. 20 ) {
 
     my $UserID = $UserObject->UserLookup(
         UserLogin => $UserRand,
+        Silent    => 1,
     );
 
     last TRY if !$UserID;
@@ -384,7 +383,8 @@ $Self->True(
     'GetUserData() - OutOfOfficeMessage',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

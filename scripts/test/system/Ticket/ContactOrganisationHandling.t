@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -20,12 +20,10 @@ my $TicketObject  = $Kernel::OM->Get('Ticket');
 my $UserObject    = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # create test contacts
 my $ContactID = $Helper->TestContactCreate();
@@ -95,15 +93,17 @@ my @Tests = (
     },
     {
         # ticket should have no contact and no orga
-        Title          => 'not existent contact (ID), known orga (ID)',
-        ContactID      => 999999,
-        OrganisationID => $OrganisationID
+        Title                => 'not existent contact (ID), known orga (ID)',
+        ContactID            => 999999,
+        OrganisationID       => $OrganisationID,
+        TicketOrganisationID => $OrganisationID
     },
     {
         # ticket should have no contact and no orga
-        Title          => 'not existent contact (ID), unknown orga (no new)',
-        ContactID      => 999999,
-        OrganisationID => 'org@test.com'
+        Title                => 'not existent contact (ID), unknown orga (no new)',
+        ContactID            => 999999,
+        OrganisationID       => 'org@test.com',
+        CheckNewOrganisation => 1,
     },
     {
         # ticket should have no contact and no orga
@@ -111,8 +111,9 @@ my @Tests = (
     },
     {
         # ticket should have no contact and no orga
-        Title          => 'no contact, known orga (ID)',
-        OrganisationID => $OrganisationID
+        Title                => 'no contact, known orga (ID)',
+        OrganisationID       => $OrganisationID,
+        TicketOrganisationID => $OrganisationID
     },
     {
         # ticket should have given contact and its orga (primary)
@@ -130,15 +131,16 @@ my @Tests = (
         CheckNewOrganisation => 1,
         CheckContactOrgIDs   => 1
     },
-    {
-        # ticket should have given contact (which has no primary) and a newly created orga (by contact email) and orga should be primary of contact
-        Title          => 'known contact (email without primary), no orga',
-        ContactID      => $ContactWithoutPrimary{Email},
-        TicketContactID      => $ContactIDWithoutPrimary,
-        CheckNewOrganisation => 1,
-        CheckContactPrimary  => 1,
-        CheckContactOrgIDs   => 1
-    },
+    # ToDo:Creating contacts without an organization currently no longer creates an organization with the ContactEmail. Contacts without organization are now possible.
+    # {
+    #     # ticket should have given contact (which has no primary) and a no newly created orga (by contact email) and orga should be primary of contact
+    #     Title          => 'known contact (email without primary), no orga',
+    #     ContactID      => $ContactWithoutPrimary{Email},
+    #     TicketContactID      => $ContactIDWithoutPrimary,
+    #     CheckNewOrganisation => ,
+    #     CheckContactPrimary  => 1,
+    #     CheckContactOrgIDs   => 1
+    # },
     {
         # ticket should have given contact (which has now a primary) and known orga and orga should be added to contact (OrganisationIDs)
         Title          => 'known contact (email without primary), known orga',
@@ -148,13 +150,14 @@ my @Tests = (
         TicketOrganisationID => $OrganisationID,
         CheckContactOrgIDs   => 1
     },
+    # ToDo:Creating contacts without an organization currently no longer creates an organization with the ContactEmail. Contacts without organization are now possible.
     {
         # ticket should have a newly created contact and a newly created orga (by contact email) and orga should be primary of contact
         Title          => 'unknown contact (email), no orga',
         ContactID      => 'unknowncontact-' . $Helper->GetRandomID() . '@testcorp.com',
         CheckNewContact      => 1,
-        CheckNewOrganisation => 1,
-        CheckContactPrimary  => 1
+        CheckNewOrganisation => 0,
+        CheckContactPrimary  => 0
     },
     {
         # ticket should have a newly created contact and known orga and orga should be primary of contact
@@ -182,7 +185,7 @@ my @Tests = (
         CheckNewContact      => 1,
         CheckNewOrganisation => 1,
         CheckContactPrimary  => 1
-    }
+    },
 );
 
 my $Counter = 1;
@@ -312,6 +315,7 @@ for my $Test (@Tests) {
 
         # (else) if not given a known orga and not new orga, ticket should has no orga at all
         else {
+print STDERR Data::Dumper::Dumper($Ticket{OrganisationID});
             $Self->False(
                 $Ticket{OrganisationID},
                 "$TestPrefix Check set organisation id (undef) $TestPostfix"
@@ -336,7 +340,8 @@ for my $Test (@Tests) {
     $Counter++;
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

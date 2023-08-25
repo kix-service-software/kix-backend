@@ -25,6 +25,7 @@ use base qw(
 );
 
 our @ObjectDependencies = (
+    'ClientRegistration',
     'Config',
     'Cache',
     'DB',
@@ -451,29 +452,8 @@ sub FAQAdd {
         $Param{Number} = $ConfigObject->Get('SystemID') . rand(100);
     }
 
-    # check if approval feature is used
-    if ( $ConfigObject->Get('FAQ::ApprovalRequired') ) {
-
-        # TODO!!! rbo-190327
-        # # check permission
-        # my %Groups = reverse $Kernel::OM->Get('Group')->GroupMemberList(
-        #     UserID => $Param{UserID},
-        #     Type   => 'ro',
-        #     Result => 'HASH',
-        # );
-
-        # # get the approval group
-        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
-
-        # # set default to 0 if approved param is not given
-        # # or if user does not have the rights to approve
-        # if ( !defined $Param{Approved} || !$Groups{$ApprovalGroup} ) {
-        #     $Param{Approved} = 0;
-        # }
-    }
-
     # if approval feature is not activated, a new FAQ item is always approved
-    else {
+    if ( !$ConfigObject->Get('FAQ::ApprovalRequired') ) {
         $Param{Approved} = 1;
     }
 
@@ -688,6 +668,8 @@ sub FAQUpdate {
     # check for base64 encoded images in fields and store them
     my @AttachmentConvert;
     foreach my $Field ( qw(Field1 Field2 Field3 Field4 Field5 Field6) ) {
+        next if !$Param{$Field};
+
         $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
             DocumentRef    => \$Param{$Field},
             AttachmentsRef => \@AttachmentConvert,
@@ -740,22 +722,6 @@ sub FAQUpdate {
 
     # update approval
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{ApprovalOff} ) {
-
-        # TODO!!! rbo-190327
-        # # check permission
-        # my %Groups = reverse $Kernel::OM->Get('Group')->GroupMemberList(
-        #     UserID => $Param{UserID},
-        #     Type   => 'ro',
-        #     Result => 'HASH',
-        # );
-
-        # # get the approval group
-        # my $ApprovalGroup = $ConfigObject->Get('FAQ::ApprovalGroup');
-
-        # # set approval to 0 if user does not have the rights to approve
-        # if ( !$Groups{$ApprovalGroup} ) {
-        #     $Param{Approved} = 0;
-        # }
 
         # update the approval
         my $UpdateSuccess = $Self->_FAQApprovalUpdate(
@@ -1229,119 +1195,6 @@ sub AttachmentIndex {
     return @Index;
 }
 
-=item FAQCount()
-
-Count the number of articles for a defined category. Only valid FAQ articles will be counted.
-
-    my $ArticleCount = $FAQObject->FAQCount(
-        CategoryIDs => [1,2,3,4],
-        ItemStates =>  {
-            1 => 'internal',
-            2 => 'external',
-            3 => 'public',
-        },
-        OnlyApproved => 1,   # optional (default 0)
-        Valid        => 1,   # optional (default 0)
-        UserID       => 1,
-    );
-
-Returns:
-
-    $ArticleCount = 3;
-
-=cut
-
-sub FAQCount {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(CategoryIDs ItemStates UserID)) {
-        if ( !defined $Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-
-            return;
-        }
-    }
-
-    # set default value
-    my $Valid = $Param{Valid} ? 1 : 0;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    my $CategoryIDString = '';
-    if ( $Param{CategoryIDs} && ref $Param{CategoryIDs} eq 'ARRAY' && @{ $Param{CategoryIDs} } ) {
-
-        # integer quote the category ids
-        for my $CategoryID ( @{ $Param{CategoryIDs} } ) {
-            $DBObject->Quote( $CategoryID, 'Integer' );
-        }
-
-        my @SortedIDs = sort @{ $Param{CategoryIDs} };
-
-        # split IN statement with more than 900 elements in more statements combined with OR
-        # because Oracle doesn't support more than 1000 elements in one IN statement.
-        my @SQLStrings;
-        LOOP:
-        while ( scalar @SortedIDs ) {
-
-            my @SortedIDsPart = splice @SortedIDs, 0, 900;
-
-            my $IDString = join ',', @SortedIDsPart;
-
-            push @SQLStrings, " i.category_id IN ($IDString) ";
-        }
-
-        my $SQLString = join ' OR ', @SQLStrings;
-
-        $CategoryIDString .= 'AND ( ' . $SQLString . ' ) ';
-    }
-
-    # build valid id string
-    my $ValidIDsString;
-    if ($Valid) {
-        $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
-    }
-    else {
-        my %ValidList = $Kernel::OM->Get('Valid')->ValidList();
-        $ValidIDsString = join ', ', keys %ValidList;
-    }
-
-    my $SQL = 'SELECT COUNT(*) '
-        . 'FROM faq_item i, faq_state s '
-        . 'WHERE i.state_id = s.id '
-        . "AND i.valid_id IN ($ValidIDsString) "
-        . $CategoryIDString;
-
-    # count only approved articles
-    if ( $Param{OnlyApproved} ) {
-        $SQL .= ' AND i.approved = 1';
-    }
-
-    my $Ext = '';
-    if ( $Param{ItemStates} && ref $Param{ItemStates} eq 'HASH' && %{ $Param{ItemStates} } ) {
-        my $StatesString = join ', ', keys %{ $Param{ItemStates} };
-        $Ext .= " AND s.type_id IN ($StatesString )";
-    }
-    $Ext .= ' GROUP BY category_id';
-    $SQL .= $Ext;
-
-    return if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Limit => 200,
-    );
-
-    my $Count = 0;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Count = $Row[0];
-    }
-
-    return $Count;
-}
-
 =item FAQDelete()
 
 Delete an article.
@@ -1442,6 +1295,12 @@ sub FAQDelete {
 
     # delete history
     return if !$Self->FAQHistoryDelete(
+        ItemID => $Param{ItemID},
+        UserID => $Param{UserID},
+    );
+
+    # delete log
+    return if !$Self->FAQLogDelete(
         ItemID => $Param{ItemID},
         UserID => $Param{UserID},
     );
@@ -1984,176 +1843,50 @@ sub FAQLogAdd {
     return 1;
 }
 
-=item FAQTop10Get()
 
-Returns an array with the top 10 FAQ article ids.
+=item FAQLogDelete()
 
-    my $Top10IDsRef = $FAQObject->FAQTop10Get(
-        Interface   => 'public',
-        CategoryIDs => [ 1, 2, 3 ],  # (optional) Only show the Top-10 articles from these categories
-        Limit       => 10,           # (optional, default 10)
-        UserID      => 1,
+deletes log table
+
+    my $Success = $FAQObject->FAQLogDelete(
+        ItemID => '123456',
+        UserID => 1,
     );
 
 Returns:
 
-    $Top10IDsRef = [
-        {
-            'ItemID'    => 13,
-            'Count'     => 159,               # number of visits
-            'Interface' => 'public',
-        },
-        {
-            'ItemID'    => 6,
-            'Count'     => 78,
-            'Interface' => 'public',
-        },
-        {
-            'ItemID'    => 4,
-            'Count'     => 59,
-            'Interface' => 'internal',
-        },
-        {
-            'ItemID'    => 20,
-            'Count'     => 29,
-            'Interface' => 'public',
-        },
-        {
-            'ItemID'    => 1,
-            'Count'     => 24,
-            'Interface' => 'external',
-        },
-        {
-            'ItemID'    => 11,
-            'Count'     => 24,
-            'Interface' => 'internal',
-        },
-        {
-            'ItemID'    => 5,
-            'Count'     => 18,
-            'Interface' => 'internal',
-        },
-        {
-            'ItemID'    => 9,
-            'Count'     => 16,
-            'Interface' => 'external',
-        },
-        {
-            'ItemID'    => 2,
-            'Count'     => 14,
-            'Interface' => 'internal'
-        },
-        {
-            'ItemID'    => 14,
-            'Count'     => 6,
-            'Interface' => 'public',
-        }
-    ];
+    $Success =1;                # or undef if FAQLog could not be added
 
 =cut
 
-sub FAQTop10Get {
+sub FAQLogDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Interface UserID)) {
+    for my $Argument (qw(ItemID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
             );
 
-            return [];
+            return;
         }
     }
 
-    # build valid id string
-    my $ValidIDsString = join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet();
-
-    # prepare SQL
-    my @Bind;
-    my $SQL = 'SELECT item_id, count(item_id) as itemcount, faq_state_type.name, approved '
-        . 'FROM faq_log, faq_item, faq_state, faq_state_type '
-        . 'WHERE faq_log.item_id = faq_item.id '
-        . 'AND faq_item.state_id = faq_state.id '
-        . "AND faq_item.valid_id IN ($ValidIDsString) "
-        . 'AND faq_state.type_id = faq_state_type.id ';
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # filter just categories with at least ro permission
-    if ( $Param{CategoryIDs} && ref $Param{CategoryIDs} eq 'ARRAY' && @{ $Param{CategoryIDs} } ) {
-
-        # integer quote the category ids
-        for my $CategoryID ( @{ $Param{CategoryIDs} } ) {
-            $DBObject->Quote( $CategoryID, 'Integer' );
-        }
-
-        my @SortedIDs = sort @{ $Param{CategoryIDs} };
-
-        # split IN statement with more than 900 elements in more statements combined with OR
-        # because Oracle doesn't support more than 1000 elements in one IN statement.
-        my @SQLStrings;
-        LOOP:
-        while ( scalar @SortedIDs ) {
-
-            my @SortedIDsPart = splice @SortedIDs, 0, 900;
-
-            my $IDString = join ',', @SortedIDsPart;
-
-            push @SQLStrings, " faq_item.category_id IN ($IDString) ";
-        }
-
-        my $SQLString = join ' OR ', @SQLStrings;
-
-        $SQL .= ' AND ( ' . $SQLString . ' ) ';
-    }
-
-    # filter results for public and customer interface
-    if ( ( $Param{Interface} eq 'public' ) || ( $Param{Interface} eq 'external' ) ) {
-
-        # only show approved articles
-        $SQL .= 'AND faq_item.approved = 1 ';
-
-        # only show the public articles
-        $SQL .= "AND ( ( faq_state_type.name = 'public' AND faq_log.interface = 'public' ) ";
-
-        # customers can additionally see the external articles
-        if ( $Param{Interface} eq 'external' ) {
-            $SQL .= "OR ( faq_state_type.name = 'external' AND faq_log.interface = 'external' ) ";
-        }
-
-        $SQL .= ') ';
-    }
-
-    # filter results for defined time period
-    if ( $Param{StartDate} && $Param{EndDate} ) {
-        $SQL .= 'AND faq_log.created >= ? AND faq_log.created <= ? ';
-        push @Bind, ( \$Param{StartDate}, \$Param{EndDate} );
-    }
-
-    # complete SQL statement
-    $SQL .= 'GROUP BY item_id, faq_state_type.name, approved '
-        . 'ORDER BY itemcount DESC';
-
-    # get the top 10 article ids from database
-    return [] if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Bind,
-        Limit => $Param{Limit} || 10,
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => 'DELETE FROM faq_log WHERE item_id = ?',
+        Bind => [ \$Param{ItemID} ],
     );
 
-    my @Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        push @Result, {
-            ItemID    => $Row[0],
-            Count     => $Row[1],
-            Interface => $Row[2],
-        };
-    }
+    # push client callback event
+    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'FAQ.Article.Log',
+        ObjectID  => $Param{ItemID},
+    );
 
-    return \@Result;
+    return 1;
 }
 
 =item FAQArticleTitleClean()
@@ -2493,14 +2226,20 @@ sub _GetAssignedSearchParams {
     if ( IsStringWithData($MappingString) ) {
 
         my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data => $MappingString
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
         );
 
         if ( !IsHashRefWithData($Mapping) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+                );
+            }
         } elsif (
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
@@ -2557,10 +2296,15 @@ sub _GetAssignedSearchParams {
                 }
             }
         } else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+                );
+            }
         }
     }
 

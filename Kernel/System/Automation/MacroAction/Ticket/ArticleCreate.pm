@@ -235,10 +235,12 @@ sub ValidateConfig {
             $Param{Config}->{AccountTime} >= -86400
         );
 
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Validation of parameter \"AccountTime\" failed."
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Validation of parameter \"AccountTime\" failed."
+            );
+        }
         return;
     }
 

@@ -160,7 +160,16 @@ sub Search {
         # convert to unix time
         my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Search}->{Value},
+            Silent => 1,
         );
+        if ( !$Value ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Invalid Date '$Param{Search}->{Value}'!",
+            );
+
+            return;
+        }
 
         my %OperatorMap = (
             'EQ'  => '=',

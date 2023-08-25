@@ -16,17 +16,11 @@ use vars (qw($Self));
 # get ReportDefinition object
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # create definition
 my $DefinitionID = $ReportingObject->ReportDefinitionAdd(
@@ -215,6 +209,7 @@ $ReportID = $ReportingObject->ReportCreate(
         OutputFormats => ['PDF']
     },
     UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -259,9 +254,8 @@ $ReportID = $ReportingObject->ReportCreate(
         OutputFormats => ['CSV']
     },
     UserID => 1,
+    Silent => 1,
 );
-
-print STDERR "ReportID: $ReportID\n";
 
 $Self->False(
     $ReportID,
@@ -284,11 +278,10 @@ $Self->True(
     'ReportCreate() - with required parameter',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

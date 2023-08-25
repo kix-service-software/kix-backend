@@ -103,7 +103,7 @@ if ( !$SMIMEObject ) {
             "No such $PrivatePath!",
         );
     }
-    elsif ( !-d $Self->{PrivatePath} ) {
+    elsif ( !-d $PrivatePath ) {
         $Self->False(
             1,
             "No such $PrivatePath directory!",

@@ -386,10 +386,12 @@ sub ValidateConfig {
 
         if (%State) {
             if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Validation of parameter \"PendingTimeDiff\" failed!"
+                    );
+                }
                 return;
             }
         }

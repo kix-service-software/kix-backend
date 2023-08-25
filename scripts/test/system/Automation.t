@@ -15,17 +15,11 @@ use vars (qw($Self));
 # get Job object
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # create test job
 my $JobName  = 'job-'.$Helper->GetRandomID();
@@ -60,7 +54,9 @@ $Self->True(
 my $Result;
 
 # no parameters
-$Result = $AutomationObject->LogError();
+$Result = $AutomationObject->LogError(
+    Silent => 1,
+);
 
 $Self->False(
     $Result,
@@ -68,7 +64,10 @@ $Self->False(
 );
 
 # no UserID
-$Result = $AutomationObject->LogError(Message => 'test');
+$Result = $AutomationObject->LogError(
+    Message => 'test',
+    Silent  => 1,
+);
 
 $Self->False(
     $Result,
@@ -76,7 +75,10 @@ $Self->False(
 );
 
 # no Message
-$Result = $AutomationObject->LogError(UserID => 1);
+$Result = $AutomationObject->LogError(
+    UserID => 1,
+    Silent => 1,
+);
 
 $Self->False(
     $Result,
@@ -86,7 +88,8 @@ $Self->False(
 # with Message and UserID
 $Result = $AutomationObject->LogError(
     Message => 'test',
-    UserID => 1
+    UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->True(
@@ -100,7 +103,8 @@ $Result = $AutomationObject->LogError(
         JobID => $JobID,
     },
     Message => 'Test',
-    UserID => 1
+    UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->True(
@@ -115,7 +119,8 @@ $Result = $AutomationObject->LogError(
         MacroID => $MacroID,
     },
     Message => 'Test',
-    UserID => 1
+    UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->True(
@@ -123,7 +128,8 @@ $Self->True(
     'LogError() without Referrer (JobID+MacroID)',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

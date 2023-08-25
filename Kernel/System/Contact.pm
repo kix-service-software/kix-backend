@@ -20,14 +20,19 @@ use Data::UUID;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Organisation',
-    'DB',
-    'Log',
-    'Main',
-    'Time',
-    'User',
+our @ObjectDependencies = qw(
+    Cache
+    ClientRegistragtion
+    Config
+    Contact
+    Organisation
+    DB
+    DynamicField
+    Log
+    Main
+    Time
+    User
+    Valid
 );
 
 =head1 NAME
@@ -129,6 +134,7 @@ sub ContactAdd {
     # check needed stuff
     for (qw(Firstname Lastname)) {
         if ( !$Param{$_} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
@@ -146,6 +152,7 @@ sub ContactAdd {
                     Silent => 1
                 );
                 if ($ExistingContactID) {
+                    return if $Param{Silent};
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message  => "Cannot add contact. Email \"$Param{$MailAttr}\" ($MailAttr) already exists.",
@@ -171,6 +178,7 @@ sub ContactAdd {
         );
 
         if (!%OrgData || $OrgData{ValidID} != 1) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
@@ -189,6 +197,7 @@ sub ContactAdd {
                 ID => $OrgID,
             );
             if (!%OrgData || $OrgData{ValidID} != 1) {
+                return if $Param{Silent};
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
@@ -208,6 +217,7 @@ sub ContactAdd {
             UserID => $Param{AssignedUserID}
         );
         if (!IsHashRefWithData(\%ExistingUser)) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Cannot create contact. No user with ID $Param{AssignedUserID} exists.",
@@ -219,6 +229,7 @@ sub ContactAdd {
                 Silent => 1,
             );
             if ($ExistingContactID) {
+                return if $Param{Silent};
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Cannot create contact. User '$Param{AssignedUserID}' already has a contact.",
@@ -299,7 +310,7 @@ sub ContactAdd {
             ObjectID  => $ContactID,
         );
     }
-    else {
+    elsif( !$Param{Silent} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Cannot find new contact with email $Param{Email} (and firstname: $Param{Firstname}, lastname: $Param{Lastname})!",
@@ -445,19 +456,23 @@ sub ContactGet {
 
     # check item
     if ( $Param{ID} && !$Contact{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Contact with ID $Param{ID} not found in database!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Contact with ID $Param{ID} not found in database!",
+            );
+        }
         return;
     }
 
     # check item
     if ( $Param{UserID} && !$Contact{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'info',
-            Message  => "No contact assigned to user id $Param{UserID}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "No contact assigned to user id $Param{UserID}!",
+            );
+        }
         return;
     }
 
@@ -790,21 +805,17 @@ sub ContactUpdate {
     }
 
     # check duplicate email
-    for my $MailAttr ( qw(Email Email1 Email2 Email3 Email4 Email5) ) {
-        if ( $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
-            if ($Param{$MailAttr}) {
-                my $ExistingContactID = $Self->ContactLookup(
-                    Email  => $Param{$MailAttr},
-                    Silent => 1
-                );
-                if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Cannot update contact. Email \"$Param{$MailAttr}\" ($MailAttr) already in use by a contact.",
-                    );
-                    return;
-                }
-            }
+    if ( $Param{Email} && $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck') ) {
+        my $ExistingContactID = $Self->ContactLookup(
+            Email  => $Param{Email},
+            Silent => 1,
+        );
+        if ($ExistingContactID && $ExistingContactID != $Param{ID}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Cannot update contact. Email \"$Param{Email}\" already in use by a contact.",
+            );
+            return;
         }
     }
 

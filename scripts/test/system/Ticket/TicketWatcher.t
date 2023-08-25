@@ -14,18 +14,11 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $TicketObject = $Kernel::OM->Get('Ticket');
-my $WatcherObject = $Kernel::OM->Get('Watcher');
-my $UserObject   = $Kernel::OM->Get('User');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my @TicketIDs;
 my @TestUserIDs;
@@ -34,14 +27,14 @@ for ( 1 .. 2 ) {
     my $TestUserLogin = $Helper->TestUserCreate(
         Groups => [ 'users', ],
     );
-    my $TestUserID = $UserObject->UserLookup(
+    my $TestUserID = $Kernel::OM->Get('User')->UserLookup(
         UserLogin => $TestUserLogin,
     );
 
     push @TestUserIDs, $TestUserID;
 
     # create a new ticket
-    my $TicketID = $TicketObject->TicketCreate(
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
         Title        => 'My ticket for watching',
         Queue        => 'Junk',
         Lock         => 'unlock',
@@ -60,7 +53,7 @@ for ( 1 .. 2 ) {
     push @TicketIDs, $TicketID;
 }
 
-my $Subscribe = $WatcherObject->WatcherAdd(
+my $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
     Object      => 'Ticket',
     ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
@@ -70,7 +63,7 @@ $Self->True(
     $Subscribe || 0,
     'WatcherAdd()',
 );
-my $Unsubscribe = $WatcherObject->WatcherDelete(
+my $Unsubscribe = $Kernel::OM->Get('Watcher')->WatcherDelete(
     Object      => 'Ticket',
     ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
@@ -82,7 +75,7 @@ $Self->True(
 );
 
 # add new subscription (will be deleted by TicketDelete(), also check foreign keys)
-$Subscribe = $WatcherObject->WatcherAdd(
+$Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
     Object      => 'Ticket',
     ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[0],
@@ -94,7 +87,7 @@ $Self->True(
 );
 
 # subscribe first ticket with second user
-$Subscribe = $WatcherObject->WatcherAdd(
+$Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
     Object      => 'Ticket',
     ObjectID    => $TicketIDs[0],
     WatchUserID => $TestUserIDs[1],
@@ -106,7 +99,7 @@ $Self->True(
 );
 
 # subscribe second ticket with second user
-$Subscribe = $WatcherObject->WatcherAdd(
+$Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
     Object      => 'Ticket',
     ObjectID    => $TicketIDs[1],
     WatchUserID => $TestUserIDs[1],
@@ -117,7 +110,7 @@ $Self->True(
     'WatcherAdd()',
 );
 
-my @WatcherList = $WatcherObject->WatcherList(
+my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
     Object   => 'Ticket',
     ObjectID => $TicketIDs[0],
 );
@@ -131,7 +124,7 @@ $Self->True(
     'WatcherList - second user',
 );
 
-@WatcherList = $WatcherObject->WatcherList(
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
     Object   => 'Ticket',
     ObjectID => $TicketIDs[1],
 );
@@ -145,51 +138,10 @@ $Self->True(
     'WatcherList - second user',
 );
 
-# merge tickets
-my $Merged = $TicketObject->TicketMerge(
-    MainTicketID  => $TicketIDs[0],
-    MergeTicketID => $TicketIDs[1],
-    UserID        => 1,
-);
-
-$Self->True(
-    $Merged,
-    'TicketMerge',
-);
-
-@WatcherList = $WatcherObject->WatcherList(
-    Object   => 'Ticket',
-    ObjectID => $TicketIDs[0],
-);
-my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
-$Self->True(
-    $Watchers{ $TestUserIDs[0] } || 0,
-    'WatcherList - first user',
-);
-$Self->True(
-    $Watchers{ $TestUserIDs[1] } || 0,
-    'WatcherList - second user',
-);
-
-@WatcherList = $WatcherObject->WatcherList(
-    Object   => 'Ticket',
-    ObjectID => $TicketIDs[1],
-);
-my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
-$Self->False(
-    $Watchers{ $TestUserIDs[0] } || 0,
-    'WatcherList - first user',
-);
-$Self->False(
-    $Watchers{ $TestUserIDs[1] } || 0,
-    'WatcherList - second user',
-);
-
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

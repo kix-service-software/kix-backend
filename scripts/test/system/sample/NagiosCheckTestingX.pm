@@ -29,7 +29,7 @@
    checkname => 'KIX Checker',
 
 # Text shown in Status Information if everything is OK
-   OK_TXT    => 'enjoy   tickets:',
+   OK_TXT    => 'number of tickets:',
 
 # Text shown in Status Information if warning threshold reached
    WARN_TXT  => 'number of tickets:',
@@ -39,7 +39,6 @@
 
 );
 
-1;
 
 =back
 

@@ -17,12 +17,13 @@ package Kernel::System::MailAccount;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Log',
-    'Main',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    DB
+    Log
+    Main
+    Valid
 );
 
 =head1 NAME

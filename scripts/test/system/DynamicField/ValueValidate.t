@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -32,8 +32,8 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Text',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Link         => '',
+            DefaultValue => q{},
+            Link         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -48,8 +48,8 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Text',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Link         => '',
+            DefaultValue => q{},
+            Link         => q{},
             RegExList    => [
                 {
                     Value        => '^[0-9]+$',
@@ -74,24 +74,9 @@ my %DynamicFieldConfigs = (
         FieldType     => 'TextArea',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Rows         => '',
-            Cols         => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '',
+            DefaultValue => q{},
+            Rows         => q{},
+            Cols         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -103,13 +88,13 @@ my %DynamicFieldConfigs = (
         Name          => 'DropdownField',
         Label         => 'DropdownField',
         FieldOrder    => 123,
-        FieldType     => 'Dropdown',
+        FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
-            Link               => '',
+            DefaultValue       => q{},
+            Link               => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -128,9 +113,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
+            CountMax           => 2,
+            DefaultValue       => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -149,10 +135,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -167,10 +153,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue    => '',
-            Link            => '',
-            YearsInFuture   => '',
-            YearsInPast     => '',
+            DefaultValue    => q{},
+            Link            => q{},
+            YearsInFuture   => q{},
+            YearsInPast     => q{},
             DateRestriction => 'DisableFutureDates',
         },
         ValidID    => 1,
@@ -186,10 +172,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue    => '',
-            Link            => '',
-            YearsInFuture   => '',
-            YearsInPast     => '',
+            DefaultValue    => q{},
+            Link            => q{},
+            YearsInFuture   => q{},
+            YearsInPast     => q{},
             DateRestriction => 'DisablePastDates',
         },
         ValidID    => 1,
@@ -205,10 +191,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -223,10 +209,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue    => '',
-            Link            => '',
-            YearsInFuture   => '',
-            YearsInPast     => '',
+            DefaultValue    => q{},
+            Link            => q{},
+            YearsInFuture   => q{},
+            YearsInPast     => q{},
             DateRestriction => 'DisableFutureDates',
         },
         ValidID    => 1,
@@ -242,10 +228,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue    => '',
-            Link            => '',
-            YearsInFuture   => '',
-            YearsInPast     => '',
+            DefaultValue    => q{},
+            Link            => q{},
+            YearsInFuture   => q{},
+            YearsInPast     => q{},
             DateRestriction => 'DisablePastDates',
         },
         ValidID    => 1,
@@ -260,11 +246,13 @@ my @Tests = (
         Name    => 'No Params',
         Config  => undef,
         Success => 0,
+        Silent  => 1
     },
     {
         Name    => 'Empty Config',
         Config  => {},
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing DynamicFieldConfig',
@@ -272,6 +260,7 @@ my @Tests = (
             DynamicFieldConfig => undef,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing UserID',
@@ -279,6 +268,7 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing Value Text',
@@ -293,15 +283,6 @@ my @Tests = (
         Name   => 'Missing Value TextArea',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
-            Value              => undef,
-            UserID             => $UserID,
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Missing Value Checkbox',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
             Value              => undef,
             UserID             => $UserID,
         },
@@ -362,49 +343,44 @@ my @Tests = (
         Success => 1,
     },
     {
-        Name   => 'Value 1 Checkbox',
+        Name   => 'Correct Value Dropdown',
         Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value              => 1,
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value              => ['1'],
             UserID             => $UserID,
         },
         Success => 1,
+        Silent  => 1
     },
     {
-        Name   => 'Value Text Checkbox',
+        Name   => 'Incorrect Value Dropdown',
         Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value              => 'Text',
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value              => ['Loooooooooooong'],
             UserID             => $UserID,
         },
         Success => 0,
-    },
-    {
-        Name   => 'Long Value Dropdown',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
-            Value              => 'Looooooooooooooooooooooooooooong',
-            UserID             => $UserID,
-        },
-        Success => 1,
+        Silent  => 1
     },
     {
         Name   => 'Single Value Multiselect',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
-            Value              => 'Value1',
+            Value              => '1',
             UserID             => $UserID,
         },
         Success => 1,
+        Silent  => 1
     },
     {
         Name   => 'Multiple Values Multiselect',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
-            Value              => [ 'Value1', 'Value2' ],
+            Value              => [ '1', '2' ],
             UserID             => $UserID,
         },
         Success => 1,
+        Silent  => 1
     },
     {
         Name   => 'Correct Date Value Date',
@@ -423,6 +399,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Text Value Date',
@@ -432,6 +409,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Number Value Date',
@@ -441,6 +419,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Correct DateTime Value DateTime',
@@ -459,6 +438,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Correct Value Date Zero Hour',
@@ -513,6 +493,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Number Value DateTime',
@@ -522,6 +503,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Correct Value Date (input value)',
@@ -545,10 +527,11 @@ my @Tests = (
         Name   => 'Incorrect Value Date (search value)',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value              => '2013-01-01 12:00:00',
+            Value              => '01.01.2013 23:59:59',
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name =>
@@ -561,6 +544,7 @@ my @Tests = (
             UserID => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Correct old date for datetime field which only allow old dates (search value)',
@@ -596,6 +580,7 @@ my @Tests = (
             UserID => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Incorrect future date for date field which only allow old dates (search value)',
@@ -613,6 +598,7 @@ my @Tests = (
             UserID => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Correct old date for date field which only allow old dates (search value)',
@@ -698,6 +684,7 @@ my @Tests = (
             UserID => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Text with regular expression (numbers only) filled with numbers and text',
@@ -707,6 +694,7 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Text with regular expression (numbers only) filled with 4 numbers',
@@ -725,12 +713,16 @@ my @Tests = (
             UserID             => $UserID,
         },
         Success => 0,
+        Silent  => 1
     },
 );
 
 # execute tests
 for my $Test (@Tests) {
-    my $Success = $DFBackendObject->ValueValidate( %{ $Test->{Config} } );
+    my $Success = $DFBackendObject->ValueValidate(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent} || 0
+    );
 
     if ( $Test->{Success} ) {
         $Self->Is(

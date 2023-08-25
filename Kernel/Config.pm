@@ -30,8 +30,9 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @EXPORT = qw(Translatable);
 
-our @ObjectDependencies = (
-    'SysConfig',
+our @ObjectDependencies = qw(
+    SysConfig
+    Cache
 );
 
 =head1 NAME

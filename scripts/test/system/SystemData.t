@@ -19,12 +19,10 @@ my $MainObject       = $Kernel::OM->Get('Main');
 my $SystemDataObject = $Kernel::OM->Get('SystemData');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # add system data
 my $SystemDataNameRand0 = 'systemdata' . $Helper->GetRandomID();
@@ -220,7 +218,9 @@ $Self->IsDeeply(
     \@Array,
     'SystemDataGet() - array value',
 );
-# cleanup is done by RestoreDatabase
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

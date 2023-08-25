@@ -16,14 +16,18 @@ use vars (qw($Self));
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Organisation::Add');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 my $RandomName = $Helper->GetRandomID();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # try to execute command without any options
 my $ExitCode = $CommandObject->Execute();
@@ -43,7 +47,8 @@ $Self->Is(
     "Minimum options",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

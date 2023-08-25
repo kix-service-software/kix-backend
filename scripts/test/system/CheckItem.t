@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -69,8 +69,9 @@ my @Tests = (
         Valid => 0,
     },
     {
-        Email => '',
-        Valid => 0,
+        Email  => '',
+        Valid  => 0,
+        Silent => 1,
     },
     {
         Email => 'foo=bar@[192.1233.22.2]',
@@ -158,7 +159,10 @@ my @Tests = (
 for my $Test (@Tests) {
 
     # check address
-    my $Valid = $CheckItemObject->CheckEmail( Address => $Test->{Email} );
+    my $Valid = $CheckItemObject->CheckEmail(
+        Address => $Test->{Email},
+        Silent  => $Test->{Silent},
+    );
 
     # execute unit test
     if ( $Test->{Valid} ) {
@@ -174,6 +178,11 @@ for my $Test (@Tests) {
         );
     }
 }
+
+my $TextContent = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/CheckItem/test.txt',
+    Mode     => 'binmode'
+);
 
 # string clean tests
 @Tests = (
@@ -312,9 +321,9 @@ for my $Test (@Tests) {
         Result => 'aäöüß€z',
     },
     {
-        String => eval {'a�z'},    # iso-8859 string
+        String => eval { Encode::encode('ISO-8859-1', ${$TextContent}) },    # iso-8859 string
         Params => {},
-        Result => undef,
+        Result => eval { Encode::encode('ISO-8859-1', ${$TextContent}) },
     },
     {
         String => eval {'aúz'},    # utf-8 string

@@ -1871,8 +1871,6 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
     <Column Name="created_by" Required="true" Size="200" Type="VARCHAR" />
     <Column Name="item_id" Required="true" Type="INTEGER" />
-    <Column Name="interface" Required="false" Size="80" Type="VARCHAR" />
-    <Column Name="ip" Required="false" Size="50" Type="VARCHAR" />
     <Column Name="rate" Required="true" Type="INTEGER" />
     <Column Name="created" Required="false" Type="DATE" />
     <Index Name="faq_voting_item_id">

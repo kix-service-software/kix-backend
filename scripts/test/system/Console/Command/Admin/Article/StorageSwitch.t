@@ -88,6 +88,12 @@ $Self->True(
     'ArticleCreate()',
 );
 
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
+
 for my $Backend (qw(FS DB)) {
 
     # try to execute command without any options

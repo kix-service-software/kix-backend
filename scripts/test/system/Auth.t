@@ -15,12 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get config object
 my $ConfigObject = $Kernel::OM->Get('Config');
@@ -191,7 +189,8 @@ for my $CryptType (qw(plain crypt apr1 md5 sha1 sha2 bcrypt)) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

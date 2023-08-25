@@ -15,12 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get needed object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::Delete');
@@ -59,6 +57,12 @@ for ( 1 .. 4 ) {
     );
     push @Tickets, \%TicketHash;
 }
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -127,11 +131,10 @@ $Self->Is(
     "Maint::Ticket::Delete exit code - try to delete with wrong ticket numbers and ticket IDs.",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

@@ -56,6 +56,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
@@ -71,6 +72,7 @@ sub Run {
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
     if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID or TicketList in Data!',
@@ -404,7 +406,7 @@ sub _HandleTicket {
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, $Notification{Name},
+            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, ($Notification{Name} || '- No name -'),
         );
     }
 
@@ -908,7 +910,7 @@ sub _SendRecipientNotification {
 
 sub _GetUserIDsWithRequiredPermission {
     my ( $Self, %Param ) = @_;
-   
+
     my @BasePermissionUserIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantQueueUserIDList(
         QueueID       => $Param{Ticket}->{QueueID},
         Permission    => $Param{Permission},

@@ -178,9 +178,12 @@ sub Run {
     }
 
     # get tickets containing this message
-    my @SkipTicketIDs = $TicketObject->ArticleGetTicketIDsOfMessageID(
-        MessageID => $GetParam->{'Message-ID'},
-    );
+    my @SkipTicketIDs = qw{};
+    if( $GetParam->{'Message-ID'} ) {
+        @SkipTicketIDs = $TicketObject->ArticleGetTicketIDsOfMessageID(
+            MessageID => $GetParam->{'Message-ID'},
+        );
+    }
     my %SkipTicketIDHash = ();
     for my $TicketID ( @SkipTicketIDs ) {
         $SkipTicketIDHash{$TicketID} = 1;
@@ -356,7 +359,7 @@ sub Run {
 
                 # create new ticket
                 if ($QueueID) {
-                    my $TicketID = $Self->{NewTicketObject}->Run(
+                    my @Result = $Self->{NewTicketObject}->Run(
                         InmailUserID  => $Self->{PostmasterUserID},
                         GetParam      => $GetParam,
                         QueueID       => $QueueID,
@@ -364,12 +367,9 @@ sub Run {
                         FileIngest    => $Param{FileIngest} || 0,
                     );
 
-                    if ( !$TicketID ) {
-                        next;
+                    if ( @Result ) {
+                        push (@Return, \@Result);
                     }
-
-                    my @Ret = ( 1, $TicketID );
-                    push( @Return, \@Ret );
                 }
             }
         }
@@ -397,17 +397,16 @@ sub Run {
             if ($TQueueID) {
                 $Param{QueueID} = $TQueueID;
             }
-            my $TicketID = $Self->{NewTicketObject}->Run(
+            my @Result = $Self->{NewTicketObject}->Run(
                 InmailUserID     => $Self->{PostmasterUserID},
                 GetParam         => $GetParam,
                 QueueID          => $Param{QueueID},
-                SkipTicketIDs    => \%SkipTicketIDHash
+                SkipTicketIDs    => \%SkipTicketIDHash,
             );
 
-            return if !$TicketID;
-
-            my @Ret = ( 1, $TicketID );
-            push( @Return, \@Ret );
+            if ( @Result ) {
+                push (@Return, \@Result);
+            }
         }
     } else {
         my %Queues = $QueueObject->QueueList( Valid => 1 );
@@ -453,16 +452,16 @@ sub Run {
 
             # create new ticket
             if ($Param{QueueID}) {
-                my $TicketID = $Self->{NewTicketObject}->Run(
+                my @Result = $Self->{NewTicketObject}->Run(
                     InmailUserID     => $Self->{PostmasterUserID},
                     GetParam         => $GetParam,
                     QueueID          => $Param{QueueID},
-                    SkipTicketIDs    => \%SkipTicketIDHash
+                    SkipTicketIDs    => \%SkipTicketIDHash,
                 );
-                return if !$TicketID;
 
-                my @Ret = ( 1, $TicketID );
-                push( @Return, \@Ret );
+                if ( @Result ) {
+                    push (@Return, \@Result);
+                }
             }
         }
     }
@@ -647,8 +646,7 @@ sub GetEmailParams {
             $GetParam{'Auto-Submitted'}
             && substr( $GetParam{'Auto-Submitted'}, 0, 5 ) eq 'auto-'
         )
-        )
-    {
+    ) {
         $GetParam{'X-KIX-Loop'} = 'yes';
     }
     if ( !$GetParam{'X-Sender'} ) {
@@ -785,6 +783,12 @@ sub _HandlePossibleFollowUp {
             && ref( $Param{SkipTicketIDs} ) eq 'HASH'
             && $Param{SkipTicketIDs}->{ $Param{TicketID} }
         ) {
+            my $MessageID = $Param{GetParam}->{'Message-ID'};
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Follow up for [$Param{TicketNumber}], but message id already exists ($MessageID). Followup is skipped."
+            );
             return (6, $Param{TicketID});
         }
 
@@ -838,7 +842,7 @@ sub _HandlePossibleFollowUp {
                 );
             }
 
-            $Param{TicketID} = $Self->{NewTicketObject}->Run(
+            my @Result = $Self->{NewTicketObject}->Run(
                 InmailUserID     => $Self->{PostmasterUserID},
                 GetParam         => $Param{GetParam},
                 QueueID          => $Param{QueueID},
@@ -846,11 +850,10 @@ sub _HandlePossibleFollowUp {
                 LinkToTicketID   => $Param{TicketID},
             );
 
-            if ( !$Param{TicketID} ) {
-                return;
+            if ( @Result ) {
+                return ( 3, $Result[1] );
             }
 
-            return ( 3, $Param{TicketID} );
         }
 
         # reject follow up
@@ -889,6 +892,9 @@ sub _HandlePossibleFollowUp {
             if ( !$Run ) {
                 return;
             }
+
+            # remember created followup
+            $Param{SkipTicketIDs}->{ $Param{TicketID} } = 1;
 
             return ( 2, $Param{TicketID} );
         }

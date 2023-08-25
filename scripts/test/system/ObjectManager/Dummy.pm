@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package scripts::test::ObjectManager::Dummy;    ## no critic
+package scripts::test::system::ObjectManager::Dummy;    ## no critic
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub DESTROY {
 
     # Request this object (undeclared dependency) in the desctructor.
     #   This will create it again in the OM to test that ObjectsDiscard will still work.
-    $Kernel::OM->Get('scripts::test::ObjectManager::Dummy2');
+    $Kernel::OM->Get('scripts::test::system::ObjectManager::Dummy2');
 }
 
 1;

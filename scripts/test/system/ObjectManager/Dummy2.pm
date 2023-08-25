@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package scripts::test::ObjectManager::Dummy2;    ## no critic
+package scripts::test::system::ObjectManager::Dummy2;    ## no critic
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ sub new {
     my ( $Class, %Param ) = @_;
 
     bless \%Param, $Class;
+
 }
 
 sub Data {

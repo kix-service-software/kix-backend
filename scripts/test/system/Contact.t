@@ -23,12 +23,10 @@ my $DBObject           = $Kernel::OM->Get('DB');
 my $UserObject         = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # add three users
 $ConfigObject->Set(
@@ -604,7 +602,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

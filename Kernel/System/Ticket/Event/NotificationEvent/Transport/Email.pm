@@ -34,9 +34,7 @@ our @ObjectDependencies = (
     'WebRequest',
     'Crypt::PGP',
     'Crypt::SMIME',
-# NotificationEventX-capeIT
     'DynamicField',
-# EO NotificationEventX-capeIT
 );
 
 =head1 NAME
@@ -182,7 +180,6 @@ sub SendNotification {
         # done
         return 1;
     }
-    # EO NotificationEventX-capeIT
 
     # get the contact for the recipient user
     if ( !$Recipient{Email} && $Recipient{UserID} ) {
@@ -321,7 +318,6 @@ sub SendNotification {
             Size         => 0,
         );
     }
-    # EO NotificationEventX-capeIT
 
     # send notification
     if ( $Recipient{Type} eq 'Agent' ) {
@@ -381,16 +377,11 @@ sub SendNotification {
         $Self->{EventData} = {
             Event => 'ArticleAgentNotification',
             Data  => {
-                TicketID => $Param{TicketID},
-
-                # KIX4OTRS-capeIT
-                # out of office-substitute notification
-                RecipientID   => $Recipient{UserID},
+                TicketID      => $Param{TicketID},
+                RecipientID   => $Recipient{UserID},     # out of office-substitute notification
                 RecipientMail => $Recipient{Email},
                 Notification  => \%Notification,
                 Attachment    => $Param{Attachments},
-
-                # EO KIX4OTRS-capeIT
             },
             UserID => $Param{UserID},
         };
@@ -533,7 +524,6 @@ sub GetTransportRecipients {
         }
     }
 
-    # NotificationEventX-capeIT
     # get object
     my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 
@@ -586,7 +576,6 @@ sub GetTransportRecipients {
             push(@Recipients, \%Recipient);
         }
     }
-    # EO NotificationEventX-capeIT
 
     return @Recipients;
 }

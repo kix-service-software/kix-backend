@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 c.a.p.e. IT GmbH, https://www.cape-it.de
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -225,6 +225,7 @@ sub Auth {
                     TwoFactorToken => $Param{TwoFactorToken},
                     User           => $User,
                     UserID         => $UserID,
+                    Silent         => $Param{Silent}
                 );
                 $TwoFactorAuth = $AuthOk ? 'passed' : 'failed';
 
