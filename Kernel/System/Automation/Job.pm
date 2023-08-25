@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -156,6 +156,9 @@ sub JobGet {
             $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
+            if (!IsArrayRefWithData($Result{Filter})) {
+                $Result{Filter} = [$Result{Filter}];
+            }
         }
     }
 
@@ -186,9 +189,15 @@ adds a new job
     my $ID = $AutomationObject->JobAdd(
         Name           => 'test',
         Type           => 'Ticket',
-        Filter         => {                                         # optional
-            Queue => [ 'SomeQueue' ],
-        },
+        Filter         => [                                         # optional
+            {
+                Queue => [ 'SomeQueue' ],
+            },
+            {
+                Queue => [ 'SomeOtherQueue'],
+                Type  => [ 'SomeType' ]
+            }
+        ],
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -232,9 +241,19 @@ sub JobAdd {
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
+        if ( !IsArrayRefWithData($Param{Filter}) ) {
+            $Param{Filter} = [$Param{Filter}];
+        }
         $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
+        if ( !$Filter ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not add job, Filter is invalid.",
+            );
+            return;
+        }
     }
 
     # insert
@@ -282,9 +301,15 @@ updates a job
         ID             => 123,
         Name           => 'test'
         Type           => 'Ticket',                                 # optional
-        Filter         => {                                         # optional
-            Queue => [ 'SomeQueue' ],
-        },
+        Filter         => [                                         # optional
+            {
+                Queue => [ 'SomeQueue' ],
+            },
+            {
+                Queue => [ 'SomeOtherQueue'],
+                Type  => [ 'SomeType' ]
+            }
+        ],
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -327,6 +352,10 @@ sub JobUpdate {
     # set default value
     $Param{Comment} ||= '';
 
+    if ( $Param{Filter} && !IsArrayRefWithData($Param{Filter}) ) {
+        $Param{Filter} = [$Param{Filter}];
+    }
+
     # check if update is required
     my $ChangeRequired;
     KEY:
@@ -349,6 +378,13 @@ sub JobUpdate {
         $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
+        if ( !$Filter ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not update job, Filter is invalid.",
+            );
+            return;
+        }
     }
 
     # update Job in database

@@ -23476,6 +23476,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "Filter" : {
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array"
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -23518,6 +23522,7 @@ pre code {
             "ChangeTime",
             "CreateBy",
             "CreateTime",
+            "Filter",
             "ID",
             "Name",
             "Type",
@@ -23667,6 +23672,18 @@ pre code {
             "CreateBy": 1,
             "CreateTime": "2019-05-02 13:35:42",
             "ExecPlanIDs": [ 1,5 ],
+            "Filter": [
+                {
+                    "AND": [
+                        {
+                            "Field": "Title",
+                            "Operator": "CONTAINS",
+                            "Type": "STRING",
+                            "Value": "some title"
+                        }
+                    ]
+                }
+            ],
             "ID": 1,
             "LastExecutionTime": "",
             "MacroIDs": [],
@@ -23681,6 +23698,7 @@ pre code {
             "CreateBy": 1,
             "CreateTime": "2019-10-01 15:30:14",
             "ExecPlanIDs": [ 2 ],
+            "Filter": null,
             "ID": 2,
             "LastExecutionTime": "2019-10-01 14:00:00",
             "MacroIDs": [ 2,4 ],
@@ -23731,7 +23749,8 @@ pre code {
                }
             },
             "Filter" : {
-               "type" : "object"
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array"
             },
             "MacroIDs" : {
                "type" : "array",
@@ -23990,6 +24009,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "Filter" : {
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array"
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -24032,6 +24055,7 @@ pre code {
             "ChangeTime",
             "CreateBy",
             "CreateTime",
+            "Filter",
             "ID",
             "Name",
             "Type",
@@ -24180,6 +24204,18 @@ pre code {
         "CreateBy": 1,
         "CreateTime": "2019-05-02 13:35:42",
         "ExecPlanIDs": [ 1,5 ],
+        "Filter": [
+            {
+                "AND": [
+                    {
+                        "Field": "Title",
+                        "Operator": "CONTAINS",
+                        "Type": "STRING",
+                        "Value": "some title"
+                    }
+                ]
+            }
+        ],
         "ID": 1,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
@@ -24205,7 +24241,9 @@ pre code {
                 "Comment": "...",
                 "CreateBy": 1,
                 "CreateTime": "2019-05-02 13:40:12",
-                "ExecOrder": [ 1 ],
+                "ExecOrder": [
+                    1
+                ],
                 "ID": 1,
                 "Name": "Some Macro",
                 "Type": "Ticket",
@@ -24252,7 +24290,8 @@ pre code {
                "type" : "string"
             },
             "Filter" : {
-               "type" : "object"
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array"
             },
             "Name" : {
                "type" : "string"
