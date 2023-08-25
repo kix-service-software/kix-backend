@@ -1150,6 +1150,61 @@ my @Tests = (
         ],
         Success => 1,
     },
+    {
+        Name => 'create article - plain notification with HTML article body',
+        Data => {
+            Events             => [ 'ArticleCreate' ],
+            Recipients         => ['Customer']
+        },
+        Filter => {
+            AND => [
+                { Field => 'ChannelID', Operator => 'EQ', Value => 1 },
+                { Field => 'CustomerVisible', Operator => 'EQ', Value => 1 },
+            ]
+        },
+        Config => {
+            Event => 'ArticleCreate',
+            Data  => {
+                TicketID => $TicketID,
+                ArticleID => $ArticleID
+            },
+            Config => {},
+            UserID => 1,
+        },
+        Message => {
+            en => {
+                Subject     => 'Subject = article subject',
+                Body        => "someone wrote:
+<p>...text here...</p>
+<p>this is a URL: <a href=\"https://kixdesk.com\">https://kixdesk.com</a></p>
+<p>...and here...</p>",
+                ContentType => 'text/plain',
+            },
+            de => {
+                Subject     => 'Subject = article subject',
+                Body        => "someone wrote:
+<p>...text here...</p>
+<p>this is a URL: <a href=\"https://kixdesk.com\">https://kixdesk.com</a></p>
+<p>...and here...</p>",
+                ContentType => 'text/plain',
+            },
+        },
+        ExpectedResults => [
+            {
+                Body    => "someone wrote:=20
+
+...text here...
+
+this is a URL: https://kixdesk.com
+
+...and here...
+
+",
+                ToArray => [$Contact{Email}],
+            },
+        ],
+        Success => 1,
+    },
 );
 
 my $SetPostMasterUserID = sub {
@@ -1315,34 +1370,43 @@ for my $Test (@Tests) {
         );
     }
 
+    my $Message = $Test->{Message};
+
+    if ( !$Test->{Message} && (!$Test->{ContentType} || $Test->{ContentType} ne 'text/html') ) {
+        $Message = {
+            en => {
+                Subject     => 'JobName',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
+                ContentType => 'text/plain',
+            },
+            de => {
+                Subject     => 'JobName',
+                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
+                ContentType => 'text/plain',
+            }
+        }
+    } 
+    elsif ( !$Test->{Message} ) {
+        $Message = {
+            en => {
+                Subject     => 'JobName',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
+                ContentType => 'text/html',
+            },
+            de => {
+                Subject     => 'JobName',
+                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
+                ContentType => 'text/html',
+            },
+        }
+    }
+
     $NotificationID = $NotificationEventObject->NotificationAdd(
         Name    => "JobName$Count-$RandomID",
         Comment => 'An optional comment',
         Data    => $Test->{Data},
         Filter  => $Test->{Filter},
-        Message => (!$Test->{ContentType} || $Test->{ContentType} ne 'text/html') ? {
-            en => {
-                Subject     => 'JobName',
-                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
-                ContentType => 'text/plain',
-            },
-            de => {
-                Subject     => 'JobName',
-                Body        => 'JobName <KIX_TICKET_TicketID> <KIX_CONFIG_SendmailModule> <KIX_OWNER_Firstname>',
-                ContentType => 'text/plain',
-            },
-        } : {
-            en => {
-                Subject     => 'JobName',
-                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
-                ContentType => 'text/html',
-            },
-            de => {
-                Subject     => 'JobName',
-                Body        => 'JobName &lt;KIX_TICKET_TicketID&gt; &lt;KIX_CONFIG_SendmailModule&gt; &lt;KIX_OWNER_Firstname&gt;',
-                ContentType => 'text/html',
-            },
-        },
+        Message => $Message,
         ValidID => 1,
         UserID  => 1,
     );

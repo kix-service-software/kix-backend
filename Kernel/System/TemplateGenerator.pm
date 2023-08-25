@@ -686,7 +686,17 @@ sub _Replace {
     }egx;
 
     # return if no placeholders included
-    return $Param{Text} if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/);
+    if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/) {
+        # convert any html to ascii
+        if ( !$Param{RichText} ) {
+            $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
+                String            => $Param{Text},
+                NoURLGlossar      => 1,
+                NoForcedLinebreak => 1,
+            );
+        }
+        return $Param{Text};
+    }
 
     # TODO: move ticket specific handling
     $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
@@ -770,6 +780,15 @@ sub _Replace {
                 Ticket => \%Ticket
             );
         }
+    }
+
+    # convert any html to ascii
+    if ( !$Param{RichText} ) {
+        $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
+            String            => $Param{Text},
+            NoURLGlossar      => 1,
+            NoForcedLinebreak => 1,
+        );
     }
 
     return $Param{Text};

@@ -67,7 +67,11 @@ sub new {
 
 convert a html string to an ascii string
 
-    my $Ascii = $HTMLUtilsObject->ToAscii( String => $String );
+    my $Ascii = $HTMLUtilsObject->ToAscii( 
+        String       => $String,
+        NoURLGlossar => 0|1,            # optional, default: 0 - don't add the URL list to the end of the document
+        NoForcedLinebreak => 0|1,       # optional, default: 0
+    );
 
 =cut
 
@@ -91,7 +95,7 @@ sub ToAscii {
     # forcing line breaks every 78 chars
     my $LineLength = 78;
 
-    # find <a href=....> and replace it with [x]
+    # find <a href=....> and replace it
     my $LinkList = '';
     my $Counter  = 0;
     $Param{String} =~ s{
@@ -100,8 +104,13 @@ sub ToAscii {
     {
         my $Link = $2;
         $Counter++;
-        $LinkList .= "[$Counter] $Link\n";
-        "[$Counter]";
+        if ( !$Param{NoURLGlossar} ) {
+            $LinkList .= "[$Counter] $Link\n";
+            "[$Counter]";
+        }
+        else {
+            "";
+        }
     }egxi;
 
     # pre-process <blockquote> and <div style=\"cite\"
@@ -115,7 +124,10 @@ sub ToAscii {
             String => $2,
         );
         # force line breaking
-        if ( length $Ascii > $LineLength ) {
+        if (
+            !$Param{NoForcedLinebreak}
+            && length $Ascii > $LineLength
+        ) {
             $Ascii =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
         }
         $Ascii =~ s/^(.*?)$/> $1/gm;
@@ -132,7 +144,10 @@ sub ToAscii {
             String => $1,
         );
         # force line breaking
-        if ( length $Ascii > $LineLength ) {
+        if (
+            !$Param{NoForcedLinebreak}
+            && length $Ascii > $LineLength
+        ) {
             $Ascii =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
         }
         $Ascii =~ s/^(.*?)$/> $1/gm;
@@ -554,7 +569,10 @@ sub ToAscii {
     $Param{String} =~ s/^\s*\n\s*\n/\n/mg;
 
     # force line breaking
-    if ( length $Param{String} > $LineLength ) {
+    if (
+        !$Param{NoForcedLinebreak}
+        && length $Param{String} > $LineLength
+    ) {
         $Param{String} =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
     }
 
@@ -564,7 +582,7 @@ sub ToAscii {
     }
 
     # add extracted links
-    if ($LinkList) {
+    if ( !$Param{NoURLGlossar} && $LinkList) {
         $Param{String} .= "\n\n" . $LinkList;
     }
 
