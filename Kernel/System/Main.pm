@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1515,13 +1515,21 @@ sub GetUnique {
 
 =item GetCombinedList()
 
-returns an array of two combined lists
+returns combined array of two lists
 
     my @CombinedList = $MainObject->GetCombinedList(
         ListA => \@Array,
         ListB => \@Array,
         Union => 0|1                # Default: 0
     );
+
+    e.g.
+        ListA = [ 1, 2, 3, 4 ]
+        ListB = [ 2, 4, 5 ]
+
+        as union = [1, 2, 3, 4, 5 ]
+        as intersect = [ 2, 4 ]
+
 
 =cut
 
@@ -1530,7 +1538,7 @@ sub GetCombinedList {
 
     my %Union;
     my %Isect;
-    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
+    for my $E ( $Self->GetUnique( @{ $Param{ListA} } ), $Self->GetUnique( @{ $Param{ListB} } ) ) {
         $Union{$E}++ && $Isect{$E}++
     }
 

@@ -139,6 +139,10 @@
                },
                "readOnly" : true
             },
+            "Filter" : {
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array"
+            },
             "ID" : {
                "type" : "integer",
                "readOnly" : true
@@ -181,6 +185,7 @@
             "ChangeTime",
             "CreateBy",
             "CreateTime",
+            "Filter",
             "ID",
             "Name",
             "Type",
