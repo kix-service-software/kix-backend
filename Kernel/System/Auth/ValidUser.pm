@@ -64,25 +64,33 @@ sub Auth {
     }
 
     # get params
-    my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
+    my @Addresses = ( $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!' );
+    if ( IsArrayRefWithData($Param{RemoteAddresses}) ) {
+        @Addresses = @{ $Param{RemoteAddresses} };
+    }
+    my $AddrString = join(',', @Addresses);
 
     # check client IP whitelist if available
     if ( IsHashRefWithData($Self->{Config}->{Config}) && IsArrayRefWithData($Self->{Config}->{Config}->{RelevantClientIPs}) ) {
         my $Allowed = 0;
+
         ALLOW:
         foreach my $Allow ( @{$Self->{Config}->{Config}->{RelevantClientIPs}} ) {
-            if ( $RemoteAddr =~ /$Allow/smx ) {
-                $Allowed = 1;
-                last ALLOW;
+            foreach my $RemoteAddr ( @Addresses ) {
+                if ( $RemoteAddr =~ /$Allow/smx ) {
+                    $Allowed = 1;
+                    last ALLOW;
+                }
             }
         }
+
         # do nothing, because the client IP isn't relevant for us
         if ( !$Allowed ) {
             if ( $Self->{Debug} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message =>
-                        "Client IP does not match RelevantClientIPs config !(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                        "Client IP does not match RelevantClientIPs config !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
                 );
             }
             return;
@@ -105,7 +113,7 @@ sub Auth {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
                     Message =>
-                        "User: $Param{User} does not match RelevantUsers config !(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                        "User: $Param{User} does not match RelevantUsers config !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
                 );
             }
             return;
@@ -121,7 +129,7 @@ sub Auth {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message =>
-                "User: No $Param{User} !(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                "User: No $Param{User} !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
         );
         return;
     }
@@ -129,7 +137,7 @@ sub Auth {
     # log
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $Param{User} authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+        Message  => "User: $Param{User} authentication ok (REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
     );
 
     return $Param{User};
