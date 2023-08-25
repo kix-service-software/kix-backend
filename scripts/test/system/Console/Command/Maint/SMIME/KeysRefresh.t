@@ -17,15 +17,9 @@ use File::Copy;
 
 use vars (qw($Self));
 
-# get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $Helper = $Kernel::OM->Get('UnitTest::Helper');
-
-# get config object
+# get needed object
+my $Helper       = $Kernel::OM->Get('UnitTest::Helper');
+my $MainObject   = $Kernel::OM->Get('Main');
 my $ConfigObject = $Kernel::OM->Get('Config');
 
 # set config
@@ -124,33 +118,52 @@ if ( $PrivateDir eq $NewPrivateDir ) {
 $Success = $CreateDir->($NewPrivateDir);
 return if !$Success;
 
-# set a new certificate private key and secret files
-for my $Type (qw(Certificate PrivateKey PrivateKeyPass)) {
+my $CreateCert = sub {
+    my %Param = @_;
 
-    my $FileName = 'SMIME' . $Type . '-1.asc';
+    my %Certificate;
 
-    my $SourcePath = $Home . '/scripts/test/system/sample/SMIME/' . $FileName;
+    # set a new certificate private key and secret files
+    for my $Type (qw(Certificate PrivateKey PrivateKeyPass)) {
 
-    my $TargetPath = $NewPrivateDir;
+        my $FileName = "SMIME$Type-$Param{Number}.asc";
 
-    if ( $Type eq 'Certificate' ) {
-        $TargetPath = $NewCertDir;
+        my $SourcePath = $Home . '/scripts/test/system/sample/SMIME/' . $FileName;
+
+        my $TargetPath = $NewPrivateDir;
+
+        if ( $Type eq 'Certificate' ) {
+            my $ContentSCALARRef = $MainObject->FileRead(
+                Location => $SourcePath,
+            );
+
+            %Certificate = $CryptObject->CertificateAttributes(
+                Certificate => ${$ContentSCALARRef},
+            );
+
+            $TargetPath = $NewCertDir;
+        }
+
+        $TargetPath .= "/$Certificate{Hash}.0";
+
+        if ( $Type eq 'PrivateKeyPass' ) {
+            $TargetPath .= '.P';
+        }
+
+        my $InnerSuccess = copy( $SourcePath, $TargetPath );
+        if ( !$InnerSuccess ) {
+            $Self->True(
+                0,
+                "Could not copy file from $SourcePath to $TargetPath, can not continue!",
+            );
+        }
     }
+};
 
-    $TargetPath .= "/123.0";
-
-    if ( $Type eq 'PrivateKeyPass' ) {
-        $TargetPath .= '.P';
-    }
-
-    my $Success = copy( $SourcePath, $TargetPath );
-    if ( !$Success ) {
-        $Self->True(
-            0,
-            "Could not copy file from $SourcePath to $TargetPath, can not continue!",
-        );
-    }
-}
+# disable SMIME by default
+$CreateCert->(
+    Number => '2'
+);
 
 # helper function to set a config setting
 my $ConfigSet = sub {
@@ -246,6 +259,7 @@ my @Tests = (
                 Value => $NewPrivateDir,
             },
         ],
+        Create   => '1',
         ExitCode => 0,
     },
     {
@@ -265,6 +279,7 @@ my @Tests = (
                 Value => $NewPrivateDir,
             },
         ],
+        Create   => '1',
         ExitCode => 0,
     },
     {
@@ -288,13 +303,13 @@ my @Tests = (
                 Value => $NewPrivateDir,
             },
         ],
+        Create   => '1',
         ExitCode => 0,
     },
 );
 
 # get needed objects
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::SMIME::KeysRefresh');
-my $MainObject    = $Kernel::OM->Get('Main');
 
 # helper function to check files
 my $FileCheck = sub {
@@ -304,20 +319,18 @@ my $FileCheck = sub {
         "$NewCertDir/$Param{Hash}.0",
         "$NewPrivateDir/$Param{Hash}.0",
         "$NewPrivateDir/$Param{Hash}.0.P",
-        )
-    {
-
-        my $Success = -e $Location ? 1 : 0;
+    ) {
+        my $InnerSuccess = -e $Location ? 1 : 0;
 
         if ( $Param{TestType} eq 'True' ) {
             $Self->True(
-                $Success,
+                $InnerSuccess,
                 "$Param{TestName} file $Location exists with true",
             );
         }
         else {
             $Self->False(
-                $Success,
+                $InnerSuccess,
                 "$Param{TestName} file $Location exists with false",
             );
         }
@@ -346,9 +359,9 @@ my $FileMove = sub {
 
         move( $Move->{SourcePath}, $Move->{TargetPath} );
 
-        my $Success = -e $Move->{TargetPath} ? 1 : 0;
+        my $InnerSuccess = -e $Move->{TargetPath} ? 1 : 0;
         $Self->True(
-            $Success,
+            $InnerSuccess,
             "$Param{TestName} renamed file $Move->{SourcePath} to $Move->{TargetPath} with true",
         );
 
@@ -370,16 +383,16 @@ for my $Test (@Tests) {
 
     if ( !$Test->{ExitCode} ) {
 
-        my $CryptObject;
+        my $NewCryptObject;
         eval {
-            $CryptObject = Kernel::System::Crypt::SMIME->new();
+            $NewCryptObject = Kernel::System::Crypt::SMIME->new();
         };
 
         my $ContentSCALARRef = $MainObject->FileRead(
             Location => $Home . '/scripts/test/system/sample/SMIME/SMIMECertificate-1.asc',
         );
 
-        %CertificateAttributes = $CryptObject->CertificateAttributes(
+        %CertificateAttributes = $NewCryptObject->CertificateAttributes(
             Certificate => ${$ContentSCALARRef},
         );
 
@@ -391,6 +404,12 @@ for my $Test (@Tests) {
         );
     }
 
+    # silence console output
+    local *STDOUT;
+    local *STDERR;
+    open STDOUT, '>>', "/dev/null";
+    open STDERR, '>>', "/dev/null";
+
     my $ExitCode = $CommandObject->Execute( @{ $Test->{Options} } );
 
     $Self->Is(
@@ -400,6 +419,13 @@ for my $Test (@Tests) {
     );
 
     if ( !$ExitCode ) {
+
+
+        if ( $Test->{Create} ) {
+            $CreateCert->(
+                Number => $Test->{Create}
+            );
+        }
 
         # files with the correct hash must be in the directories
         $FileCheck->(
@@ -423,11 +449,7 @@ $Self->True(
     'Removed temporary Certificates and Private Keys root directory with true',
 );
 
-# cleanup cache is done by RestoreDatabase
-
 1;
-
-
 
 =back
 

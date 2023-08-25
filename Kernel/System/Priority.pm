@@ -13,13 +13,14 @@ package Kernel::System::Priority;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'SysConfig',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    SysConfig
+    Valid
 );
 
 =head1 NAME
@@ -359,12 +360,6 @@ sub PriorityUpdate {
         Namespace => 'Priority',
         ObjectID  => $Param{PriorityID},
     );
-
-    # check all sysconfig options
-    #return 1 if !$Param{CheckSysConfig};
-
-    # check all sysconfig options and correct them automatically if neccessary
-    #$Kernel::OM->Get('SysConfig')->ConfigItemCheckAll();
 }
 
 =item PriorityLookup()
@@ -388,10 +383,12 @@ sub PriorityLookup {
 
     # check needed stuff
     if ( !$Param{Priority} && !$Param{PriorityID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Priority or PriorityID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Priority or PriorityID!'
+            );
+        }
         return;
     }
 

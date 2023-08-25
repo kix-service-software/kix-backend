@@ -21,21 +21,19 @@ my $ReportingObject = $Kernel::OM->Get('Reporting');
 my $ValidatorObject = Kernel::API::Validator::ReportDefinitionValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $NameRandom  = $Helper->GetRandomID();
+# begin transaction on database
+$Helper->BeginWork();
+
+my $NameRandom = $Helper->GetRandomID();
 
 # add report definition
 my $ReportDefinitionID = $ReportingObject->ReportDefinitionAdd(
-    Name    => 'reportdefinition-'.$NameRandom,
-    Type    => 'GenericSQL',
-    ValidID => 1,
-    UserID  => 1,
+    Name       => 'reportdefinition-'.$NameRandom,
+    DataSource => 'GenericSQL',
+    ValidID    => 1,
+    UserID     => 1,
 );
 
 $Self->True(
@@ -84,7 +82,8 @@ $Self->False(
     'Validate() - invalid attribute',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

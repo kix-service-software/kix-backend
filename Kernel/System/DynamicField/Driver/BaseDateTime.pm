@@ -85,12 +85,15 @@ sub ValueSet {
         my @ValueDateTime;
         for my $Item (@Values) {
             my $Valid = $Self->ValueValidate(
-                Value => $Item,
-                UserID => $Param{UserID},
-                DynamicFieldConfig => $Param{DynamicFieldConfig}
+                Value              => $Item,
+                UserID             => $Param{UserID},
+                DynamicFieldConfig => $Param{DynamicFieldConfig},
+                Silent             => $Param{Silent} || 0
             );
 
             if (!$Valid) {
+                return if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The value for the field is invalid!"
@@ -106,6 +109,7 @@ sub ValueSet {
             ObjectID => $Param{ObjectID},
             Value    => \@ValueDateTime,
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent} || 0
         );
     } else {
 
@@ -114,6 +118,7 @@ sub ValueSet {
             FieldID  => $Param{DynamicFieldConfig}->{ID},
             ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent} || 0
         );
     }
 
@@ -130,7 +135,8 @@ sub ValueValidate {
         Value => {
             ValueDateTime => $Param{Value},
         },
-        UserID => $Param{UserID}
+        UserID => $Param{UserID},
+        Silent => $Param{Silent} || 0
     );
 
     if (!$Param{SearchValidation} && IsStringWithData($Param{Value}) && $DateRestriction) {
@@ -144,6 +150,8 @@ sub ValueValidate {
         my $SystemTime = $TimeObject->SystemTime();
 
         if ( $DateRestriction eq 'DisableFutureDates' && $ValueSystemTime > $SystemTime ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -152,6 +160,8 @@ sub ValueValidate {
             return;
         }
         elsif ( $DateRestriction eq 'DisablePastDates' && $ValueSystemTime < $SystemTime ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -191,10 +201,12 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Log')->Log(
-        'Priority' => 'error',
-        'Message'  => "Unsupported Operator $Param{Operator}",
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            'Priority' => 'error',
+            'Message'  => "Unsupported Operator $Param{Operator}",
+        );
+    }
 
     return;
 }

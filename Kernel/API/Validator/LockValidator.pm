@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'LockID' ) {
         $Found = $Kernel::OM->Get('Lock')->LockLookup(
             LockID => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     elsif ( $Param{Attribute} eq 'Lock' ) {
         $Found = $Kernel::OM->Get('Lock')->LockLookup(
-            Lock => $Param{Data}->{$Param{Attribute}},
+            Lock   => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     else {

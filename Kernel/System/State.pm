@@ -13,13 +13,14 @@ package Kernel::System::State;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'SysConfig',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    SysConfig
+    Valid
 );
 
 =head1 NAME
@@ -310,12 +311,6 @@ sub StateUpdate {
         ObjectID  => $Param{ID},
     );
 
-    # check all sysconfig options
-    #return 1 if !$Param{CheckSysConfig};
-
-    # check all sysconfig options and correct them automatically if neccessary
-    #$Kernel::OM->Get('SysConfig')->ConfigItemCheckAll();
-
     return 1;
 }
 
@@ -576,10 +571,12 @@ sub StateLookup {
 
     # check needed stuff
     if ( !$Param{State} && !$Param{StateID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            State   => 'error',
-            Message => 'Need State or StateID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                State   => 'error',
+                Message => 'Need State or StateID!'
+            );
+        }
         return;
     }
 

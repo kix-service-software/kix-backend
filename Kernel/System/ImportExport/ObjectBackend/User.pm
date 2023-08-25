@@ -80,81 +80,6 @@ sub new {
     return $Self;
 }
 
-=item ObjectAttributesGet()
-
-get the object attributes of an object as array/hash reference
-
-    my $Attributes = $ObjectBackend->ObjectAttributesGet(
-        UserID => 1,
-    );
-
-=cut
-
-sub ObjectAttributesGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed object
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')
-            ->Log( Priority => 'error', Message => 'Need UserID!' );
-        return;
-    }
-
-    my %Validlist = $Kernel::OM->Get('Valid')->ValidList();
-
-    my $Attributes = [
-        {
-            Key   => 'DefaultUserEmail',
-            Name  => 'Default Email',
-            Input => {
-                Type         => 'Text',
-                Required     => 0,
-                Size         => 50,
-                MaxLength    => 250,
-                ValueDefault => $Kernel::OM->Get('Config')->Get(
-                    'UserImport::DefaultEmailAddress',
-                    )
-            },
-        },
-        {
-            Key   => 'NumberOfCustomQueues',
-            Name  => 'Max. number of Custom Queues',
-            Input => {
-                Type         => 'Text',
-                Required     => 1,
-                Size         => 3,
-                MaxLength    => 3,
-                ValueDefault => '10',
-            },
-        },
-        {
-            Key   => 'NumberOfRoles',
-            Name  => 'Max. number of roles',
-            Input => {
-                Type         => 'Text',
-                Required     => 1,
-                Size         => 3,
-                MaxLength    => 3,
-                ValueDefault => '10',
-            },
-        },
-        {
-            Key   => 'DefaultValid',
-            Name  => 'Default Validity',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%Validlist,
-                Required     => 1,
-                Translation  => 1,
-                PossibleNone => 0,
-                ValueDefault => 1,
-            },
-        },
-    ];
-
-    return $Attributes;
-}
-
 =item MappingObjectAttributesGet()
 
 get the mapping attributes of an object as array/hash reference
@@ -437,7 +362,7 @@ sub ExportDataGet {
         }
 
         # get roles
-        my %Roles = $Kernel::OM->Get('User')->RolesList(
+        my %Roles = $Kernel::OM->Get('User')->RoleList(
             UserID => $CurrUser,
         );
         if (%Roles) {

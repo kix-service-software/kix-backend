@@ -18,11 +18,6 @@ use Kernel::API::Validator::ContentTypeValidator;
 my $ValidatorObject = Kernel::API::Validator::ContentTypeValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ValidData = {
@@ -75,8 +70,6 @@ $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

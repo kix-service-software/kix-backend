@@ -124,13 +124,13 @@ sub Run {
     # do critical and warning check
     for my $Type (qw(crit_treshold warn_treshold)) {
         if ( defined $Config{ 'min_' . $Type } ) {
-            if ( $Config{ 'min_' . $Type } >= $TicketCount ) {
+            if ( $Config{ 'min_' . $Type } > $TicketCount ) {
                 if ( $Type =~ /^crit_/ ) {
                     $Self->Print(
                         "$Config{checkname} CRITICAL $Config{CRIT_TXT} $TicketCount|tickets=$TicketCount;$Config{min_warn_treshold}:$Config{max_warn_treshold};$Config{min_crit_treshold}:$Config{max_crit_treshold}\n"
                     );
 
-                    $Self->ExitCodeError(2);
+                    return $Self->ExitCodeError(2);
                 }
                 elsif ( $Type =~ /^warn_/ ) {
                     $Self->Print(
@@ -142,13 +142,13 @@ sub Run {
             }
         }
         if ( defined $Config{ 'max_' . $Type } ) {
-            if ( $Config{ 'max_' . $Type } <= $TicketCount ) {
+            if ( $Config{ 'max_' . $Type } < $TicketCount ) {
                 if ( $Type =~ /^crit_/ ) {
                     $Self->Print(
                         "$Config{checkname} CRITICAL $Config{CRIT_TXT} $TicketCount|tickets=$TicketCount;$Config{min_warn_treshold}:$Config{max_warn_treshold};$Config{min_crit_treshold}:$Config{max_crit_treshold}\n"
                     );
 
-                    $Self->ExitCodeError(2);
+                    return $Self->ExitCodeError(2);
                 }
                 elsif ( $Type =~ /^warn_/ ) {
                     $Self->Print(
@@ -172,10 +172,6 @@ sub Run {
 
 1;
 
-
-
-
-
 =back
 
 =head1 TERMS AND CONDITIONS
@@ -189,3 +185,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

@@ -15,9 +15,9 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Main',
-    'ImportExport',
+our @ObjectDependencies = qw(
+    Main
+    ImportExport
 );
 
 sub Configure {
@@ -58,14 +58,20 @@ sub Run {
     my $TemplateID = $Self->GetOption('template-number');
 
     # get template data
-    my $TemplateData = $Kernel::OM->Get('ImportExport')->TemplateGet(
-        TemplateID => $TemplateID,
-        UserID     => 1,
+    my $TemplateList = $Kernel::OM->Get('ImportExport')->TemplateList(
+        UserID => 1,
     );
 
-    if ( !$TemplateData->{TemplateID} ) {
+    if ( !$TemplateList ) {
+        $Self->PrintError("No existing templates found in the system!\n");
+        $Self->PrintError("Import aborted..\n");
+        return $Self->ExitCodeError();
+    }
+
+    my %Templates = map{ $_ => 1} @{$TemplateList};
+    if ( !$Templates{$TemplateID} ) {
         $Self->PrintError("Template $TemplateID not found!.\n");
-        $Self->PrintError("Export aborted..\n");
+        $Self->PrintError("Import aborted..\n");
         return $Self->ExitCodeError();
     }
 
@@ -132,10 +138,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 

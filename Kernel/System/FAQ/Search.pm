@@ -21,7 +21,7 @@ our @ObjectDependencies = (
     'Log',
     'Time',
     'Valid',
-    'HTMLUtils'
+    'HTMLUtils',
 );
 
 =head1 NAME
@@ -58,7 +58,6 @@ search in FAQ articles
         ArticleIDs  => [ 1, 2, 3 ]                                    # (optional)
 
         # Approved
-        #    Only available in internal interface (agent interface)
         Approved    => 1,                                             # (optional) 1 or 0,
 
         # Votes
@@ -162,6 +161,8 @@ sub FAQSearch {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need UserID!",
@@ -181,6 +182,8 @@ sub FAQSearch {
         }
 
         if ( ref $Param{$Argument} ne 'ARRAY' ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Argument must be an array reference!",
@@ -217,6 +220,7 @@ sub FAQSearch {
         next ARGUMENT if !$Param{$Key};
 
         if ( !IsArrayRefWithData( $Param{$Key} ) ) {
+            return if $Param{Silent};
 
             # log error
             $Kernel::OM->Get('Log')->Log(
@@ -230,6 +234,7 @@ sub FAQSearch {
         # quote elements
         for my $Element ( @{ $Param{$Key} } ) {
             if ( !defined $DBObject->Quote( $Element, 'Integer' ) ) {
+                return if $Param{Silent};
 
                 # log error
                 $Kernel::OM->Get('Log')->Log(
@@ -246,13 +251,13 @@ sub FAQSearch {
     my %FAQDynamicFieldName2Config;
 
     # Only fetch DynamicField data if a field was requested for searching or sorting
-    my $ParamCheckString = ( join '', keys %Param ) || '';
+    my $ParamCheckString = ( join q{}, keys %Param ) || q{};
 
     if ( ref $Param{OrderBy} eq 'ARRAY' ) {
-        $ParamCheckString .= ( join '', @{ $Param{OrderBy} } );
+        $ParamCheckString .= ( join q{}, @{ $Param{OrderBy} } );
     }
     elsif ( ref $Param{OrderBy} ne 'HASH' ) {
-        $ParamCheckString .= $Param{OrderBy} || '';
+        $ParamCheckString .= $Param{OrderBy} || q{};
     }
 
     if ( $ParamCheckString =~ m/DynamicField_/smx ) {
@@ -276,8 +281,8 @@ sub FAQSearch {
             !$OrderBy
             || ( !$OrderByTable{$OrderBy} && !$ValidDynamicFieldParams{$OrderBy} )
             || $OrderBySeen{$OrderBy}
-            )
-        {
+        ) {
+            return if $Param{Silent};
 
             # found an error
             $Kernel::OM->Get('Log')->Log(
@@ -302,6 +307,8 @@ sub FAQSearch {
         next DIRECTION if $Direction eq 'Up';
         next DIRECTION if $Direction eq 'Down';
 
+        return if $Param{Silent};
+
         # found an error
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -317,7 +324,7 @@ sub FAQSearch {
         . 'LEFT JOIN faq_voting v ON v.item_id = i.id ';
 
     # extended SQL
-    my $Ext = '';
+    my $Ext = q{};
 
     # get needed objects
     my $ConfigObject = $Kernel::OM->Get('Config');
@@ -408,6 +415,7 @@ sub FAQSearch {
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.id',
             ValueList   => $Param{ArticleIDs},
+            Type        => 'Integer',
         );
 
         if ($InString && $Ext) {
@@ -422,6 +430,7 @@ sub FAQSearch {
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.language',
             ValueList   => $Param{Languages},
+            Type        => 'String',
         );
 
         if ($InString && $Ext) {
@@ -436,6 +445,7 @@ sub FAQSearch {
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.category_id',
             ValueList   => $Param{CategoryIDs},
+            Type        => 'Integer',
         );
 
         if ($InString && $Ext) {
@@ -459,6 +469,7 @@ sub FAQSearch {
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.valid_id',
             ValueList   => $Param{ValidIDs},
+            Type        => 'Integer',
         );
 
         if ($InString && $Ext) {
@@ -473,6 +484,7 @@ sub FAQSearch {
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.visibility',
             ValueList   => $Param{Visibility},
+            Type        => 'String',
         );
 
         if ($InString && $Ext) {
@@ -508,16 +520,8 @@ sub FAQSearch {
         }
     }
 
-    # show only approved FAQ articles for public and customer interface
-    if ( $Param{Interface}->{Name} eq 'public' || $Param{Interface}->{Name} eq 'external' ) {
-        if ($Ext) {
-            $Ext .= ' AND';
-        }
-        $Ext .= ' i.approved = 1';
-    }
-
-    # otherwise check if need to search for approved status
-    elsif ( defined $Param{Approved} ) {
+    # check if need to search for approved status
+    if ( defined $Param{Approved} ) {
         my $ApprovedValue = $Param{Approved} ? 1 : 0;
         if ($Ext) {
             $Ext .= ' AND';
@@ -530,12 +534,12 @@ sub FAQSearch {
         $Param{CreatedUserIDs}
         && ref $Param{CreatedUserIDs} eq 'ARRAY'
         && @{ $Param{CreatedUserIDs} }
-        )
-    {
+    ) {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.created_by',
             ValueList   => $Param{CreatedUserIDs},
+            Type        => 'Integer',
         );
 
         if ($InString && $Ext) {
@@ -549,12 +553,12 @@ sub FAQSearch {
         $Param{LastChangedUserIDs}
         && ref $Param{LastChangedUserIDs} eq 'ARRAY'
         && @{ $Param{LastChangedUserIDs} }
-        )
-    {
+    ) {
 
         my $InString = $Self->_InConditionGet(
             TableColumn => 'i.changed_by',
             ValueList   => $Param{LastChangedUserIDs},
+            Type        => 'Integer',
         );
 
         if ($InString && $Ext) {
@@ -604,8 +608,9 @@ sub FAQSearch {
         if (
             $Param{ItemCreateTimeOlderDate}
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-            )
-        {
+        ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemCreateTimeOlderDate}'!",
@@ -617,6 +622,8 @@ sub FAQSearch {
             String => $Param{ItemCreateTimeOlderDate},
         );
         if ( !$Time ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -637,8 +644,9 @@ sub FAQSearch {
         if (
             $Param{ItemCreateTimeNewerDate}
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-            )
-        {
+        ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemCreateTimeNewerDate}'!",
@@ -650,6 +658,8 @@ sub FAQSearch {
             String => $Param{ItemCreateTimeNewerDate},
         );
         if ( !$Time ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -704,8 +714,9 @@ sub FAQSearch {
         if (
             $Param{ItemChangeTimeOlderDate}
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-            )
-        {
+        ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemChangeTimeOlderDate}'!",
@@ -717,6 +728,8 @@ sub FAQSearch {
             String => $Param{ItemChangeTimeOlderDate},
         );
         if ( !$Time ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -737,8 +750,9 @@ sub FAQSearch {
         if (
             $Param{ItemChangeTimeNewerDate}
             !~ /\d\d\d\d-(\d\d|\d)-(\d\d|\d) (\d\d|\d):(\d\d|\d):(\d\d|\d)/
-            )
-        {
+        ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid time format '$Param{ItemChangeTimeNewerDate}'!",
@@ -750,6 +764,8 @@ sub FAQSearch {
             String => $Param{ItemChangeTimeNewerDate},
         );
         if ( !$Time ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -816,6 +832,8 @@ sub FAQSearch {
                     UserID             => $Param{UserID},
                 );
                 if ( !$ValidateSuccess ) {
+                    return if $Param{Silent};
+
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message =>
@@ -1047,6 +1065,8 @@ sub _InConditionGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{TableColumn} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TableColumn!",
@@ -1055,6 +1075,8 @@ sub _InConditionGet {
     }
 
     if ( !IsArrayRefWithData( $Param{ValueList} ) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ValueList!",
@@ -1062,25 +1084,37 @@ sub _InConditionGet {
         return;
     }
 
-    # sort to cache the SQL query
-    my @Sorted;
-    if ($Param{ValueList}->[0] =~ m/^\d+$/) {
-        @Sorted = sort { $a <=> $b } @{ $Param{ValueList} };
-    } else {
-        @Sorted = sort { $a cmp $b } @{ $Param{ValueList} };
+    # pre check values if not undef or empty
+    for my $Value ( @{ $Param{ValueList} } ) {
+        return if !defined $Value;
+        if (
+            $Param{Type}
+            && $Param{Type} eq 'Integer'
+            && !IsInteger($Value)
+        ) {
+            return
+        }
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    if ($Sorted[0] =~ m/^\d+$/) {
-        @Sorted = map { $DBObject->Quote( $_, 'Integer' ) } @Sorted;
+    # sort to cache the SQL query
+    my @Sorted;
+    if (
+        $Param{Type}
+        && $Param{Type} eq 'Integer'
+    ) {
+        @Sorted = sort { $a <=> $b } @{ $Param{ValueList} };
+        @Sorted = map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer', 1 ) } @Sorted;
     } else {
-        @Sorted = map { $DBObject->Quote( $_ ) } @Sorted;
-        if ($Sorted[0] !~ m/^'.+'$/) {
+        @Sorted = sort { $a cmp $b } @{ $Param{ValueList} };
+        @Sorted = map { $Kernel::OM->Get('DB')->Quote( $_, undef, 1 ) } @Sorted;
+
+        return if !defined $Sorted[0];
+
+        if ($Sorted[0] !~ m/^'.+'$/sm) {
             @Sorted = map { "'$_'" } @Sorted;
         }
     }
+
     return if scalar @Sorted != scalar @{ $Param{ValueList} };
 
     # split IN statement with more than 900 elements in more statements combined with OR

@@ -14,16 +14,17 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'CSV',
-    'Log',
-    'Main',
-    'Queue',
-    'State',
-    'Type',
-    'XML',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    CSV
+    Log
+    Main
+    Queue
+    State
+    Type
+    XML
 );
 
 =head1 NAME

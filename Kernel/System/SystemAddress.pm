@@ -13,11 +13,12 @@ package Kernel::System::SystemAddress;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'Log',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    Log
+    Valid
 );
 
 =head1 NAME

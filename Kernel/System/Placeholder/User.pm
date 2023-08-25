@@ -19,11 +19,12 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Placeholder::Base);
 
-our @ObjectDependencies = (
-    'Contact',
-    'HTMLUtils',
-    'Log',
-    'User'
+our @ObjectDependencies = qw(
+    Config
+    Contact
+    HTMLUtils
+    Log
+    User
 );
 
 =head1 NAME
@@ -119,13 +120,20 @@ sub _ReplaceUserPlaceholder {
         NoOutOfOffice => 1,
     );
 
-    # FIXME: just temporary, should be accessed via subattribut like <KIX_CURRENT_Preferences_SomePreference>
     my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
     if (IsHashRefWithData($Languages) && $User{Preferences}->{UserLanguage}) {
         $User{UserLanguage} = $Languages->{$User{Preferences}->{UserLanguage}} || $User{Preferences}->{UserLanguage};
     }
     if ($User{Preferences}->{UserLastLoginTimestamp}) {
         $User{UserLastLogin} = $User{Preferences}->{UserLastLoginTimestamp};
+    }
+    # Preference attributes are moved to root as Preferences_SomePreference.
+    # This allows preferences to be queried like with "<KIX_CURRENT_Preferences_SomePreference>"
+    if ( IsHashRefWithData($User{Preferences}) ) {
+        for my $Pref ( keys %{$User{Preferences}} ) {
+            $User{"Preferences_$Pref"} = $User{Preferences}->{$Pref};
+        }
+        delete ($User{Preferences});
     }
 
     my %ContactOfUser = $Kernel::OM->Get('Contact')->ContactGet(
@@ -157,7 +165,7 @@ sub _ReplaceUserPlaceholder {
         }
     }
 
-    return $Self->_HashGlobalReplace( $Param{Text}, join('|', @{$Param{Tags}}), %ContactOfUser, %User );
+    return $Self->_HashGlobalReplace( $Param{Text}, join(q{|}, @{$Param{Tags}}), %ContactOfUser, %User );
 }
 
 1;

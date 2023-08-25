@@ -20,12 +20,10 @@ my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 my $UserObject           = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -84,6 +82,7 @@ my $ItemData = [
             ValidID => 1,
             UserID  => 1,
         },
+        Silent => 1,
     },
 
     # this item is NOT complete and must not be added
@@ -93,6 +92,7 @@ my $ItemData = [
             ValidID => 1,
             UserID  => 1,
         },
+        Silent => 1,
     },
 
     # this item is NOT complete and must not be added
@@ -102,6 +102,7 @@ my $ItemData = [
             Name   => 'TestItem2',
             UserID => 1,
         },
+        Silent => 1,
     },
 
     # this item is NOT complete and must not be added
@@ -111,6 +112,7 @@ my $ItemData = [
             Name    => 'TestItem3',
             ValidID => 1,
         },
+        Silent => 1,
     },
 
     # this item must be inserted successfully
@@ -125,7 +127,7 @@ my $ItemData = [
             Class    => 'UnitTest::TestClass' . $ClassRand[0],
             Name     => 'TestItem4',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -151,6 +153,7 @@ my $ItemData = [
             ValidID => 1,
             UserID  => 1,
         },
+        Silent => 1
     },
 
     # this item must be inserted successfully
@@ -165,7 +168,7 @@ my $ItemData = [
             Class    => 'UnitTest::TestClass' . $ClassRand[0],
             Name     => 'TestItem5',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -189,6 +192,7 @@ my $ItemData = [
             ValidID => $UserIDs[0],
             UserID  => $UserIDs[0],
         },
+        Silent => 1
     },
 
     # the item one add-test before must be NOT updated (item update arguments NOT complete)
@@ -197,6 +201,7 @@ my $ItemData = [
             Name   => 'TestItem5UPDATE1',
             UserID => $UserIDs[0],
         },
+        Silent => 1
     },
 
     # the item one add-test before must be NOT updated (item update arguments NOT complete)
@@ -204,22 +209,23 @@ my $ItemData = [
         Update => {
             ValidID => $UserIDs[0],
         },
+        Silent => 1
     },
 
     # the item one add-test before must be updated (item update arguments are complete)
     {
         Update => {
             Name    => 'TestItem5UPDATE2',
-            ValidID => $UserIDs[0],
+            ValidID => 1,
             UserID  => $UserIDs[0],
         },
         UpdateGet => {
             Name     => 'TestItem5UPDATE2',
-            ValidID  => $UserIDs[0],
-            Comment  => '',
+            ValidID  => 1,
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => $UserIDs[0],
-        },
+        }
     },
 
     # the item one add-test before must be updated (item update arguments are complete)
@@ -232,10 +238,11 @@ my $ItemData = [
         UpdateGet => {
             Name     => 'TestItem5UPDATE3',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
+        Silent => 1
     },
 
     # this template must be inserted successfully (check string cleaner function)
@@ -261,13 +268,13 @@ my $ItemData = [
     {
         Update => {
             Name    => " \t \n \r Test Item UPDATE1 \t \n \r ",
-            ValidID => $UserIDs[0],
+            ValidID => 1,
             Comment => " \t \n \r Test Comment UPDATE1 \t \n \r ",
             UserID  => $UserIDs[0],
         },
         UpdateGet => {
             Name     => 'Test Item UPDATE1',
-            ValidID  => $UserIDs[0],
+            ValidID  => 1,
             Comment  => 'Test Comment UPDATE1',
             CreateBy => 1,
             ChangeBy => $UserIDs[0],
@@ -297,13 +304,13 @@ my $ItemData = [
     {
         Update => {
             Name    => 'Test Item Ʃ ɤ UPDATE1',
-            ValidID => $UserIDs[1],
+            ValidID => 1,
             Comment => ' Test Comment љ ђ UPDATE1 ',
             UserID  => $UserIDs[1],
         },
         UpdateGet => {
             Name     => 'Test Item Ʃ ɤ UPDATE1',
-            ValidID  => $UserIDs[1],
+            ValidID  => 1,
             Comment  => 'Test Comment љ ђ UPDATE1',
             CreateBy => 1,
             ChangeBy => $UserIDs[1],
@@ -322,13 +329,13 @@ my $ItemData = [
             Class    => 'UnitTest::TestClass' . $ClassRand[0],
             Name     => 'TestItem6',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
     },
 
-    # the item one add-test before must be updated (set functionality to '')
+    # the item one add-test before must be updated (set functionality to q{})
     {
         Update => {
             Name    => 'TestItem6UPDATE1',
@@ -338,7 +345,7 @@ my $ItemData = [
         UpdateGet => {
             Name     => 'TestItem6UPDATE1',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -367,13 +374,13 @@ my $ItemData = [
     {
         Update => {
             Name    => ' [test]%*\\ Test Item UPDATE1 [test]%*\\ ',
-            ValidID => $UserIDs[1],
+            ValidID => 1,
             Comment => ' [test]%*\\ Test Comment UPDATE1 [test]%*\\ ',
             UserID  => $UserIDs[1],
         },
         UpdateGet => {
             Name     => '[test]%*\\ Test Item UPDATE1 [test]%*\\',
-            ValidID  => $UserIDs[1],
+            ValidID  => 1,
             Comment  => '[test]%*\\ Test Comment UPDATE1 [test]%*\\',
             CreateBy => 1,
             ChangeBy => $UserIDs[1],
@@ -392,7 +399,7 @@ my $ItemData = [
             Class    => 'UnitTest::TestClass' . $ClassRand[0],
             Name     => 'TestItemPreferences',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -426,10 +433,11 @@ my $ItemData = [
     {
         Add => {
             Class   => 'UnitTest::TestClass' . $ClassRand[0],
-            Name    => '',
+            Name    => q{},
             ValidID => 1,
             UserID  => 1,
         },
+        Silent => 1
     },
 
     # this item must be added, the number zero (0) is allowed as name
@@ -444,7 +452,7 @@ my $ItemData = [
             Class    => 'UnitTest::TestClass' . $ClassRand[0],
             Name     => '0',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -455,13 +463,13 @@ my $ItemData = [
         Update => {
             Name    => '0',
             ValidID => 1,
-            Comment => '',
+            Comment => q{},
             UserID  => 1,
         },
         UpdateGet => {
             Name     => '0',
             ValidID  => 1,
-            Comment  => '',
+            Comment  => q{},
             CreateBy => 1,
             ChangeBy => 1,
         },
@@ -471,11 +479,12 @@ my $ItemData = [
     # (empty string as name is not allowed )
     {
         Update => {
-            Name    => '',
+            Name    => q{},
             ValidID => 1,
-            Comment => '',
+            Comment => q{},
             UserID  => 1,
         },
+        Silent => 1
     },
 ];
 
@@ -494,6 +503,7 @@ for my $Item ( @{$ItemData} ) {
         # add new item
         my $ItemID = $GeneralCatalogObject->ItemAdd(
             %{ $Item->{Add} },
+            Silent => $Item->{Silent} || 0
         );
 
         # check if item was added successfully or not
@@ -516,14 +526,16 @@ for my $Item ( @{$ItemData} ) {
         else {
             $Self->False(
                 $ItemID,
-                "Test $TestCount: ItemAdd()",
+                "Test $TestCount: ItemAdd() - with false",
             );
+            next;
         }
 
         # get item data to check the values after creation of item using ItemId and UserID
         my $ItemGet = $GeneralCatalogObject->ItemGet(
             ItemID => $ItemID,
             UserID => $Item->{Add}->{UserID},
+            Silent => $Item->{Silent} || 0
         );
 
         # check item data after creation of item
@@ -537,8 +549,9 @@ for my $Item ( @{$ItemData} ) {
 
         # get item data to check the values after creation of item using Class and Name
         $ItemGet = $GeneralCatalogObject->ItemGet(
-            Class => $Item->{AddGet}->{Class},
-            Name  => $Item->{AddGet}->{Name},
+            Class  => $Item->{AddGet}->{Class},
+            Name   => $Item->{AddGet}->{Name},
+            Silent => $Item->{Silent} || 0
         );
 
         # check item data after creation of item
@@ -565,6 +578,7 @@ for my $Item ( @{$ItemData} ) {
         my $UpdateSucess = $GeneralCatalogObject->ItemUpdate(
             %{ $Item->{Update} },
             ItemID => $LastAddedItemID,
+            Silent => $Item->{Silent} || 0
         );
 
         # check if item was updated successfully or not
@@ -577,7 +591,7 @@ for my $Item ( @{$ItemData} ) {
         else {
             $Self->False(
                 $UpdateSucess,
-                "Test $TestCount: ItemUpdate()",
+                "Test $TestCount: ItemUpdate() - with false",
             );
         }
 
@@ -585,6 +599,7 @@ for my $Item ( @{$ItemData} ) {
         my $ItemGet2 = $GeneralCatalogObject->ItemGet(
             ItemID => $LastAddedItemID,
             UserID => $Item->{Update}->{UserID},
+            Silent => $Item->{Silent} || 0
         );
 
         # check item data after update
@@ -606,11 +621,12 @@ for my $Item ( @{$ItemData} ) {
                 Key    => $Key,
                 Value  => $Item->{PreferencesSet}->{$Key},
                 ItemID => $LastAddedItemID,
+                Silent => $Item->{Silent} || 0
             );
 
             $Self->True(
                 $Success,
-                "Test $TestCount: PreferencesSet() - $Key",
+                "Test $TestCount: PreferencesSet() - $Key => $Item->{PreferencesSet}->{$Key}",
             );
         }
     }
@@ -619,6 +635,7 @@ for my $Item ( @{$ItemData} ) {
     if ( $Item->{PreferencesGet} ) {
         my %Preferences = $GeneralCatalogObject->GeneralCatalogPreferencesGet(
             ItemID => $LastAddedItemID,
+            Silent => $Item->{Silent} || 0
         );
 
         for my $Key ( sort keys %{ $Item->{PreferencesGet} } ) {
@@ -656,7 +673,7 @@ my @ExistingClasses = sort keys %ExistingClassesTmp;
 my %ExistingFunctionalitiesTmp;
 ITEM:
 for my $Item ( @{$ItemData} ) {
-    $Item->{UpdateGet}->{Functionality} ||= '';
+    $Item->{UpdateGet}->{Functionality} ||= q{};
     $ExistingFunctionalitiesTmp{ $Item->{UpdateGet}->{Functionality} } = 1;
 }
 my @ExistingFunctionalities = sort keys %ExistingFunctionalitiesTmp;
@@ -917,8 +934,7 @@ for my $Class (@ExistingClasses) {
         || !$NewItemList
         || ref $OldItemList ne 'HASH'
         || ref $NewItemList ne 'HASH'
-        )
-    {
+    ) {
         $Self->False(
             1,
             "Test $TestCount: ClassRename() - ItemList failed",
@@ -961,7 +977,7 @@ for my $Class (@ExistingClasses) {
 
     my $Success = $GeneralCatalogObject->ClassRename(
         ClassOld => $Class . 'RENAME1',
-        ClassNew => ' ' . $Class . "RE NA ME 2 \n \r \t ",
+        ClassNew => q{ } . $Class . "RE NA ME 2 \n \r \t ",
     );
 
     if ( !$Success ) {
@@ -982,8 +998,7 @@ for my $Class (@ExistingClasses) {
         || !$NewItemList
         || ref $OldItemList ne 'HASH'
         || ref $NewItemList ne 'HASH'
-        )
-    {
+    ) {
         $Self->False(
             1,
             "Test $TestCount: ClassRename() - ItemList failed",
@@ -1038,7 +1053,7 @@ for my $Class (@ExistingClasses) {
 $GeneralCatalogObject->ItemAdd(
     Class         => 'UnitTest::TestClass' . $ClassRand[2],
     Name          => 'Dummy',
-    Functionality => '',
+    Functionality => q{},
     ValidID       => 1,
     UserID        => 1,
 );
@@ -1048,6 +1063,7 @@ for my $Class (@ExistingClasses) {
     my $Success = $GeneralCatalogObject->ClassRename(
         ClassOld => $Class . 'RENAME2',
         ClassNew => 'UnitTest::TestClass' . $ClassRand[2],
+        Silent   => 1
     );
 
     $Self->False(
@@ -1067,7 +1083,7 @@ my $ClassName = 'UnitTest::TestClass' . $Helper->GetRandomID();
 my $ItemID = $GeneralCatalogObject->ItemAdd(
     Class         => $ClassName,
     Name          => 'Dummy',
-    Functionality => '',
+    Functionality => q{},
     ValidID       => 1,
     UserID        => 1,
 );
@@ -1103,7 +1119,8 @@ $ConfigObject->Set(
     Value => $GeneralCatalogPreferencesPermissionsOrg,
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

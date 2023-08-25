@@ -72,7 +72,7 @@ sub Run {
         }
 
         # get ticket is locked
-        return 1 if ( !$Self->{TicketObject}->LockIsTicketLocked( TicketID => $Param{Data}->{TicketID} ) );
+        return 1 if ( !$Self->{TicketObject}->TicketLockGet( TicketID => $Param{Data}->{TicketID} ) );
 
         #get ticket data...
         my %TicketData = $Self->{TicketObject}->TicketGet(
@@ -109,7 +109,7 @@ sub Run {
             if ( $TicketData{State} eq $State ) {
 
                 # unlock Ticket
-                $Self->{TicketObject}->LockSet(
+                $Self->{TicketObject}->TicketLockSet(
                     Lock               => 'unlock',
                     TicketID           => $Param{Data}->{TicketID},
                     SendNoNotification => 0,

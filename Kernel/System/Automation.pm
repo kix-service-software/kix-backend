@@ -198,7 +198,7 @@ sub LogError {
     return $Self->_Log(
         %Param,
         Priority => 'error',
-    )
+    );
 }
 
 =item _Log()
@@ -220,10 +220,12 @@ sub _Log {
     # check needed stuff
     for (qw(Message Priority UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!",
+                );
+            }
             return;
         }
     }
@@ -276,10 +278,12 @@ sub _Log {
     }
 
     # log in system log
-    $Kernel::OM->Get('Log')->Log(
-        Priority => $Param{Priority},
-        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $Reference{RunID} || '', $MacroInfo, $MacroActionInfo),
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => $Param{Priority},
+            Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $Reference{RunID} || '', $MacroInfo, $MacroActionInfo),
+        );
+    }
 
     return 1;
 }

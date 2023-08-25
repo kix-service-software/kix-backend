@@ -14,16 +14,22 @@ use utf8;
 
 use vars (qw($Self));
 
-# get ticket object
+# get needed objects
 my $TicketObject = $Kernel::OM->Get('Ticket');
+my $UserObject   = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+my $TestUserLogin = $Helper->TestUserCreate(
+    Roles => ['Ticket Agent'],
+);
+my $TestUserID = $UserObject->UserLookup(
+    UserLogin => $TestUserLogin,
+);
 
 my @TicketIDs;
 
@@ -35,7 +41,7 @@ for ( 1 .. 2 ) {
         Lock       => 'unlock',
         PriorityID => 1,
         StateID    => 1,
-        OwnerID    => 1,
+        OwnerID    => $TestUserID,
         UserID     => 1,
     );
 
@@ -158,7 +164,8 @@ for my $Test (@Tests) {
     }
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

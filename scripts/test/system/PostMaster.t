@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -16,17 +16,13 @@ use vars (qw($Self));
 
 use Kernel::System::PostMaster;
 
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase  => 1,
-        UseTmpArticleDir => 1,
-    },
-);
+# get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $MainObject   = $Kernel::OM->Get('Main');
+# begin transaction on database
+$Helper->BeginWork();
+
+$Helper->UseTmpArticleDir();
 
 my @DynamicfieldIDs;
 my @DynamicFieldUpdate;
@@ -109,7 +105,6 @@ for my $FieldName ( sort keys %NeededDynamicfields ) {
     }
 }
 
-#rbo - T2016121190001552 - renamed X-OTRS headers
 my %NeededXHeaders = (
     'X-KIX-DynamicField-TicketFreeKey1'  => 1,
     'X-KIX-DynamicField-TicketFreeText1' => 1,
@@ -141,26 +136,26 @@ my %NeededXHeaders = (
     'X-KIX-ResponsibleID'                => 1,
 );
 
-my $XHeaders          = $ConfigObject->Get('PostmasterX-Header');
+my $XHeaders          = $Kernel::OM->Get('Config')->Get('PostmasterX-Header');
 my @PostmasterXHeader = @{$XHeaders};
 HEADER:
 for my $Header ( sort keys %NeededXHeaders ) {
     next HEADER if ( grep $_ eq $Header, @PostmasterXHeader );
     push @PostmasterXHeader, $Header;
 }
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'PostmasterX-Header',
     Value => \@PostmasterXHeader
 );
 
 # disable not needed event module
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key => 'Ticket::EventModulePost###TicketDynamicFieldDefault',
 );
 
 # use different subject format
 for my $TicketSubjectConfig ( 'Right', 'Left' ) {
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::SubjectFormat',
         Value => $TicketSubjectConfig,
     );
@@ -171,21 +166,20 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
         $Kernel::OM->ObjectsDiscard( Objects => ['PostMaster::Filter'] );
         my $PostMasterFilter = $Kernel::OM->Get('PostMaster::Filter');
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::NumberGenerator',
             Value => "Kernel::System::Ticket::Number::$NumberModule",
         );
 
         # use different storage backends
         for my $StorageModule (qw(ArticleStorageDB ArticleStorageFS)) {
-            $ConfigObject->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'Ticket::StorageModule',
                 Value => "Kernel::System::Ticket::$StorageModule",
             );
 
             # Recreate Ticket object for every loop.
             $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-            $Kernel::OM->Get('Ticket');
 
             # add rand postmaster filter
             my $FilterRand1 = 'filter' . $Helper->GetRandomID();
@@ -202,7 +196,6 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     To      => 'EMAILADDRESS:darthvader@test.org',
                 },
                 Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
                     'X-KIX-Queue'        => 'Service Desk',
                     'X-KIX-TicketKey1'   => 'Key1',
                     'X-KIX-TicketValue1' => 'Text1',
@@ -218,7 +211,6 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     To      => 'EMAILADDRESS:darthvader2@test.org',
                 },
                 Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
                     'X-KIX-TicketKey2'   => 'Key2',
                     'X-KIX-TicketValue2' => 'Text2',
                 },
@@ -233,7 +225,6 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     To      => 'test.org',
                 },
                 Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
                     'X-KIX-TicketKey3'   => 'Key3',
                     'X-KIX-TicketValue3' => 'Text3',
                 },
@@ -251,7 +242,6 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     To => 1,
                 },
                 Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
                     'X-KIX-Ignore' => 'yes',
                 },
             );
@@ -265,9 +255,9 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 my $NamePrefix = "#$NumberModule $StorageModule $TicketSubjectConfig $File ";
 
                 # new ticket check
-                my $Location = $ConfigObject->Get('Home')
+                my $Location = $Kernel::OM->Get('Config')->Get('Home')
                     . "/scripts/test/system/sample/PostMaster/PostMaster-Test$File.box";
-                my $ContentRef = $MainObject->FileRead(
+                my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
                     Location => $Location,
                     Mode     => 'binmode',
                     Result   => 'ARRAY',
@@ -287,7 +277,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
                 my @Return;
 
-                $ConfigObject->Set(
+                $Kernel::OM->Get('Config')->Set(
                     Key   => 'PostmasterDefaultState',
                     Value => 'new'
                 );
@@ -329,12 +319,12 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
                 # new/clear ticket object
                 $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-                my $TicketObject = $Kernel::OM->Get('Ticket');
-                my %Ticket       = $TicketObject->TicketGet(
+
+                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Return[1],
                     DynamicFields => 1,
                 );
-                my @ArticleIDs = $TicketObject->ArticleIndex(
+                my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
                     TicketID => $Return[1],
                 );
 
@@ -390,28 +380,28 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 if ( $File == 3 ) {
 
                     # check body
-                    my %Article = $TicketObject->ArticleGet(
+                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                         ArticleID     => $ArticleIDs[0],
                         DynamicFields => 1,
                     );
-                    my $MD5 = $MainObject->MD5sum( String => $Article{Body} ) || '';
+                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
                     $Self->Is(
                         $MD5,
-                        'b50d85781d2ac10c210f99bf8142badc',
+                        'd89998aae29c79cdadd4666c294028f1',
                         $NamePrefix . ' md5 body check',
                     );
 
                     # check attachments
-                    my %Index = $TicketObject->ArticleAttachmentIndex(
+                    my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
                         ArticleID => $ArticleIDs[0],
                         UserID    => 1,
                     );
-                    my %Attachment = $TicketObject->ArticleAttachment(
+                    my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
                         ArticleID => $ArticleIDs[0],
                         FileID    => 2,
                         UserID    => 1,
                     );
-                    $MD5 = $MainObject->MD5sum( String => $Attachment{Content} ) || '';
+                    $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                     $Self->Is(
                         $MD5,
                         '4e78ae6bffb120669f50bca56965f552',
@@ -423,7 +413,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 if ( $File == 5 ) {
 
                     # check body
-                    my %Article = $TicketObject->ArticleGet(
+                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                         ArticleID     => $ArticleIDs[0],
                         DynamicFields => 1,
                     );
@@ -470,16 +460,16 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                         },
                     );
                     for my $Test (@Tests) {
-                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Value} ) {
+                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
                             $Self->IsDeeply(
-                                $Article{ $Test->{Key} },
+                                $Ticket{ $Test->{Key} },
                                 $Test->{Result},
                                 $NamePrefix . " $Test->{Key} check",
                             );
                         }
                         else {
                             $Self->Is(
-                                $Article{ $Test->{Key} },
+                                $Ticket{ $Test->{Key} },
                                 $Test->{Result},
                                 $NamePrefix . " $Test->{Key} check",
                             );
@@ -490,28 +480,28 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 if ( $File == 6 ) {
 
                     # check body
-                    my %Article = $TicketObject->ArticleGet(
+                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                         ArticleID     => $ArticleIDs[0],
                         DynamicFields => 1,
                     );
-                    my $MD5 = $MainObject->MD5sum( String => $Article{Body} ) || '';
+                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
                     $Self->Is(
                         $MD5,
-                        '2ac290235a8cad953a1837c77701c5dc',
+                        'b527ca4a8b9d69df321a04ab429b206d',
                         $NamePrefix . ' md5 body check',
                     );
 
                     # check attachments
-                    my %Index = $TicketObject->ArticleAttachmentIndex(
+                    my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
                         ArticleID => $ArticleIDs[0],
                         UserID    => 1,
                     );
-                    my %Attachment = $TicketObject->ArticleAttachment(
+                    my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
                         ArticleID => $ArticleIDs[0],
                         FileID    => 2,
                         UserID    => 1,
                     );
-                    $MD5 = $MainObject->MD5sum( String => $Attachment{Content} ) || '';
+                    $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                     $Self->Is(
                         $MD5,
                         '0596f2939525c6bd50fc2b649e40fbb6',
@@ -522,15 +512,15 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 if ( $File == 11 ) {
 
                     # check body
-                    my %Article = $TicketObject->ArticleGet(
+                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
                         ArticleID     => $ArticleIDs[0],
                         DynamicFields => 1,
                     );
-                    my $MD5 = $MainObject->MD5sum( String => $Article{Body} ) || '';
+                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
 
                     $Self->Is(
                         $MD5,
-                        '52f20c90a1f0d8cf3bd415e278992001',
+                        'aba34ca02b07ab3042817188b6a840e4',
                         $NamePrefix . ' md5 body check',
                     );
                 }
@@ -539,14 +529,23 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 @Content = ();
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $TicketObject->TicketSubjectBuild(
+                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
                             TicketNumber => $Ticket{TicketNumber},
                             Subject      => $Line,
                         );
                     }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
+                    }
                     push @Content, $Line;
                 }
-                $ConfigObject->Set(
+                $Kernel::OM->Get('Config')->Set(
                     Key   => 'PostmasterFollowUpState',
                     Value => 'new'
                 );
@@ -571,9 +570,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
                 # new/clear ticket object
                 $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Ticket');
 
-                %Ticket = $TicketObject->TicketGet(
+                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Return[1],
                     DynamicFields => 1,
                 );
@@ -582,7 +580,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     'new',
                     $NamePrefix . ' Run() - FollowUp/State check',
                 );
-                my $StateSet = $TicketObject->StateSet(
+                my $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
                     State    => 'pending reminder',
                     TicketID => $Return[1],
                     UserID   => 1,
@@ -596,10 +594,19 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 @Content = ();
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $TicketObject->TicketSubjectBuild(
+                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
                             TicketNumber => $Ticket{TicketNumber},
                             Subject      => $Line,
                         );
+                    }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
                     }
                     push @Content, $Line;
                 }
@@ -627,8 +634,17 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
                         $Line = 'Subject: '
-                            . $ConfigObject->Get('Ticket::Hook')
+                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
                             . ": $Ticket{TicketNumber}";
+                    }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
                     }
                     push @Content, $Line;
                 }
@@ -656,8 +672,17 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
                         $Line = 'Subject: '
-                            . $ConfigObject->Get('Ticket::Hook')
+                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
                             . ":$Ticket{TicketNumber}";
+                    }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
                     }
                     push @Content, $Line;
                 }
@@ -680,7 +705,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     $NamePrefix . ' Run() - FollowUp/TicketID',
                 );
 
-                $ConfigObject->Set(
+                $Kernel::OM->Get('Config')->Set(
                     Key   => 'PostmasterFollowUpState',
                     Value => 'open'
                 );
@@ -690,8 +715,17 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
                         $Line = 'Subject: '
-                            . $ConfigObject->Get('Ticket::Hook')
+                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
                             . $Ticket{TicketNumber};
+                    }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
                     }
                     push @Content, $Line;
                 }
@@ -716,9 +750,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
                 # new/clear ticket object
                 $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Ticket');
 
-                %Ticket = $TicketObject->TicketGet(
+                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Return[1],
                     DynamicFields => 1,
                 );
@@ -727,7 +760,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     'open',
                     $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpState check',
                 );
-                $StateSet = $TicketObject->StateSet(
+                $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
                     State    => 'closed',
                     TicketID => $Return[1],
                     UserID   => 1,
@@ -741,10 +774,19 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 @Content = ();
                 for my $Line (@ContentNew) {
                     if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $TicketObject->TicketSubjectBuild(
+                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
                             TicketNumber => $Ticket{TicketNumber},
                             Subject      => $Line,
                         );
+                    }
+                    if ( $Line =~ /^(Message-ID:)/i ) {
+                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                        my $Random = rand 999999;
+                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                        if (IsHashRefWithData($FQDN)) {
+                            $FQDN = $FQDN->{Backend}
+                        }
+                        $Line = "$1 <$Time.$Random\@$FQDN>";
                     }
                     push @Content, $Line;
                 }
@@ -769,20 +811,19 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
                 # new/clear ticket object
                 $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-                $TicketObject = $Kernel::OM->Get('Ticket');
 
-                %Ticket = $TicketObject->TicketGet(
+                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Return[1],
                     DynamicFields => 1,
                 );
                 $Self->Is(
                     $Ticket{State} || 0,
-                    'new',
+                    'open',
                     $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpStateClosed check',
                 );
 
                 # delete ticket
-                my $Delete = $TicketObject->TicketDelete(
+                my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
                     TicketID => $Return[1],
                     UserID   => 1,
                 );
@@ -807,7 +848,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1',
             'X-KIX-TicketValue1' => 'Text1',
@@ -816,8 +856,8 @@ my @Tests = (
         },
         Check => {
             Queue                        => 'Service Desk',
-            DynamicField_TicketFreeKey3  => 'Key3',
-            DynamicField_TicketFreeText3 => 'Text3',
+            DynamicField_TicketFreeKey3  => [ 'Key3' ],
+            DynamicField_TicketFreeText3 => [ 'Text3' ],
         },
     },
     {
@@ -826,7 +866,6 @@ my @Tests = (
             From => 'EMAILADDRESS:sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1#2',
             'X-KIX-TicketValue1' => 'Text1#2',
@@ -835,8 +874,8 @@ my @Tests = (
         },
         Check => {
             Queue                        => 'Service Desk',
-            DynamicField_TicketFreeKey1  => 'Key1#2',
-            DynamicField_TicketFreeText1 => 'Text1#2',
+            DynamicField_TicketFreeKey1  => [ 'Key1#2' ],
+            DynamicField_TicketFreeText1 => [ 'Text1#2' ],
         },
     },
     {
@@ -845,7 +884,6 @@ my @Tests = (
             From => 'EMAILADDRESS:not_this_sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey1'   => 'Key1#3',
             'X-KIX-TicketValue1' => 'Text1#3',
@@ -859,11 +897,10 @@ my @Tests = (
             From => '(\w+)@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-TicketKey4' => '[***]',
         },
         Check => {
-            DynamicField_TicketFreeKey4 => 'sender',
+            DynamicField_TicketFreeKey4 => [ 'sender' ],
         },
     },
     {
@@ -872,7 +909,6 @@ my @Tests = (
             From => 'sender([f][o][o])?@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-TicketKey5' => '[***]',
         },
         Check => {
@@ -896,11 +932,11 @@ for my $Type (qw(Config DB)) {
             );
         }
         else {
-            $ConfigObject->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                 Value => {
                     %{$Test},
-                    Module => 'PostMaster::Filter::Match',
+                    Module => 'Kernel::System::PostMaster::Filter::Match',
                 },
             );
         }
@@ -935,9 +971,8 @@ Some Content in Body
 
     # new/clear ticket object
     $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
@@ -946,16 +981,25 @@ Some Content in Body
     for my $Test (@Tests) {
         next TEST if !$Test->{Check};
         for my $Key ( sort keys %{ $Test->{Check} } ) {
-            $Self->Is(
-                $Ticket{$Key},
-                $Test->{Check}->{$Key},
-                "#Filter $Type Run('$Test->{Name}') - $Key",
-            );
+            if ( $Key =~ /^DynamicField_/ && $Test->{Check}->{$Key} ) {
+                $Self->IsDeeply(
+                    $Ticket{$Key},
+                    $Test->{Check}->{$Key},
+                    "#Filter $Type Run('$Test->{Name}') - $Key",
+                );
+            }
+            else {
+                $Self->Is(
+                    $Ticket{$Key},
+                    $Test->{Check}->{$Key},
+                    "#Filter $Type Run('$Test->{Name}') - $Key",
+                );
+            }
         }
     }
 
     # delete ticket
-    my $Delete = $TicketObject->TicketDelete(
+    my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
         TicketID => $Return[1],
         UserID   => 1,
     );
@@ -970,7 +1014,7 @@ Some Content in Body
             $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
         }
         else {
-            $ConfigObject->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                 Value => undef,
             );
@@ -993,15 +1037,14 @@ Some Content in Body
             'Envelope-To' => 'envelopeto@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-Queue'        => 'Junk',
             'X-KIX-TicketKey5'   => 'Key5#1',
             'X-KIX-TicketValue5' => 'Text5#1',
         },
         Check => {
             Queue                        => 'Junk',
-            DynamicField_TicketFreeKey5  => 'Key5#1',
-            DynamicField_TicketFreeText5 => 'Text5#1',
+            DynamicField_TicketFreeKey5  => [ 'Key5#1' ],
+            DynamicField_TicketFreeText5 => [ 'Text5#1' ],
         },
     },
     {
@@ -1017,15 +1060,14 @@ Some Content in Body
             'X-Envelope-To' => 'xenvelopeto@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-OTRS headers
             'X-KIX-Queue'        => 'Service Desk',
             'X-KIX-TicketKey6'   => 'Key6#1',
             'X-KIX-TicketValue6' => 'Text6#1',
         },
         Check => {
             Queue                        => 'Service Desk',
-            DynamicField_TicketFreeKey6  => 'Key6#1',
-            DynamicField_TicketFreeText6 => 'Text6#1',
+            DynamicField_TicketFreeKey6  => [ 'Key6#1' ],
+            DynamicField_TicketFreeText6 => [ 'Text6#1' ],
         },
     },
 );
@@ -1046,11 +1088,11 @@ for my $Test (@Tests) {
             );
         }
         else {
-            $ConfigObject->Set(
+            $Kernel::OM->Get('Config')->Set(
                 Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                 Value => {
                     %{$Test},
-                    Module => 'PostMaster::Filter::Match',
+                    Module => 'Kernel::System::PostMaster::Filter::Match',
                 },
             );
         }
@@ -1077,9 +1119,8 @@ for my $Test (@Tests) {
 
         # new/clear ticket object
         $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-        my $TicketObject = $Kernel::OM->Get('Ticket');
 
-        my %Ticket = $TicketObject->TicketGet(
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $Return[1],
             DynamicFields => 1,
         );
@@ -1088,16 +1129,25 @@ for my $Test (@Tests) {
         for my $TestCheck ($Test) {
             next TEST if !$TestCheck->{Check};
             for my $Key ( sort keys %{ $TestCheck->{Check} } ) {
-                $Self->Is(
-                    $Ticket{$Key},
-                    $TestCheck->{Check}->{$Key},
-                    "#Filter $Type Run('$TestCheck->{Name}') - $Key",
-                );
+                if ( $Key =~ /^DynamicField_/ && $Test->{Check}->{$Key} ) {
+                    $Self->IsDeeply(
+                        $Ticket{$Key},
+                        $TestCheck->{Check}->{$Key},
+                        "#Filter $Type Run('$TestCheck->{Name}') - $Key",
+                    );
+                }
+                else {
+                    $Self->Is(
+                        $Ticket{$Key},
+                        $TestCheck->{Check}->{$Key},
+                        "#Filter $Type Run('$TestCheck->{Name}') - $Key",
+                    );
+                }
             }
         }
 
         # delete ticket
-        my $Delete = $TicketObject->TicketDelete(
+        my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
             TicketID => $Return[1],
             UserID   => 1,
         );
@@ -1112,7 +1162,7 @@ for my $Test (@Tests) {
                 $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
             }
             else {
-                $ConfigObject->Set(
+                $Kernel::OM->Get('Config')->Set(
                     Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
                     Value => undef,
                 );
@@ -1148,7 +1198,9 @@ for my $DynamicFieldID (@DynamicfieldIDs) {
 }
 
 # test X-KIX-(Owner|Responsible)
-my $Login = $Helper->TestUserCreate();
+my $Login = $Helper->TestUserCreate(
+    Roles => [ 'Ticket Agent' ],
+);
 my $UserID = $Kernel::OM->Get('User')->UserLookup( UserLogin => $Login );
 
 my %OwnerResponsibleTests = (
@@ -1181,17 +1233,16 @@ my %OwnerResponsibleTests = (
 for my $Test ( sort keys %OwnerResponsibleTests ) {
 
     my $FileSuffix = $OwnerResponsibleTests{$Test}->{File};
-    my $Location   = $ConfigObject->Get('Home')
+    my $Location   = $Kernel::OM->Get('Config')->Get('Home')
         . "/scripts/test/system/sample/PostMaster/PostMaster-Test-$FileSuffix.box";
 
-    my $ContentRef = $MainObject->FileRead(
+    my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
         Location => $Location,
         Mode     => 'binmode',
         Result   => 'ARRAY',
     );
 
     for my $Line ( @{$ContentRef} ) {
-#rbo - T2016121190001552 - renamed X-OTRS headers
         $Line =~ s{ ^ (X-KIX-(?:Owner|Responsible):) .*? $ }{$1$Login}x;
         $Line =~ s{ ^ (X-KIX-(?:Owner|Responsible)ID:) .*? $ }{$1$UserID}x;
     }
@@ -1214,10 +1265,10 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
         $Test . ' Run() - NewTicket/TicketID',
     );
 
+    # new/clear ticket object
     $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 0,
     );
@@ -1231,7 +1282,8 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

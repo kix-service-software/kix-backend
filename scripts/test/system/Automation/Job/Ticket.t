@@ -18,12 +18,10 @@ my $ConfigObject     = $Kernel::OM->Get('Config');
 my $MainObject       = $Kernel::OM->Get('Main');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # no event handling for tickets
 $ConfigObject->Set(
@@ -263,6 +261,9 @@ if ($TicketID_1) {
     }
 }
 
+# rollback transaction on database
+$Helper->Rollback();
+
 sub _CreateTickets {
     my @TicketIDs;
     for my $Index (1..3) {
@@ -286,8 +287,6 @@ sub _CreateTickets {
     }
     return @TicketIDs;
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

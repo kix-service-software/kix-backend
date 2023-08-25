@@ -18,13 +18,9 @@ use Kernel::System::WebUserAgent;
 
 use Kernel::System::VariableCheck qw(:all);
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-
-my $TestNumber     = 1;
-my $TimeOut        = $ConfigObject->Get('Package::Timeout');
-my $Proxy          = $ConfigObject->Get('Package::Proxy');
-my $RepositoryRoot = $ConfigObject->Get('Package::RepositoryRoot') || [];
+my $TestNumber = 1;
+my $TimeOut    = $Kernel::OM->Get('Config')->Get('WebUserAgent::Timeout');
+my $Proxy      = $Kernel::OM->Get('Config')->Get('WebUserAgent::Proxy');
 
 my @Tests = (
     {
@@ -34,6 +30,7 @@ my @Tests = (
         Proxy       => $Proxy,
         Success     => 0,
         ErrorNumber => 400,
+        Silent      => 1,
     },
     {
         Name        => 'GET - wrong url - Test ' . $TestNumber++,
@@ -42,6 +39,7 @@ my @Tests = (
         Proxy       => $Proxy,
         Success     => 0,
         ErrorNumber => 400,
+        Silent      => 1,
     },
     {
         Name        => 'GET - invalid url - Test ' . $TestNumber++,
@@ -49,37 +47,36 @@ my @Tests = (
         Timeout     => $TimeOut,
         Proxy       => $Proxy,
         Success     => 0,
-        ErrorNumber => 500,
+        ErrorNumber => $Proxy ? 503 : 500,
+        Silent      => 1,
     },
     {
         Name        => 'GET - http - invalid proxy - Test ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL         => "http://packages.kixdesk.com/repository/debian/PublicKey",
         Timeout     => $TimeOut,
         Proxy       => 'http://NoProxy',
         Success     => 0,
         ErrorNumber => 500,
+        Silent      => 1,
     },
     {
         Name        => 'GET - http - ftp proxy - Test ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL         => "http://packages.kixdesk.com/repository/debian/PublicKey",
         Timeout     => $TimeOut,
         Proxy       => 'ftp://NoProxy',
         Success     => 0,
         ErrorNumber => 400,
+        Silent      => 1,
     },
     {
         Name    => 'GET - http - long timeout - Test ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL     => "http://packages.kixdesk.com/repository/debian/PublicKey",
-        Timeout => $TimeOut,
+        Timeout => 60,
         Proxy   => $Proxy,
         Success => 1,
     },
     {
         Name    => 'GET - http - Test ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL     => "http://packages.kixdesk.com/repository/debian/PublicKey",
         Timeout => $TimeOut,
         Proxy   => $Proxy,
@@ -87,15 +84,13 @@ my @Tests = (
     },
     {
         Name    => 'GET - https - Test ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
-        URL     => "https://www.kixdesk.com/",
+        URL     => "https://packages.kixdesk.com/repository/debian/PublicKey",
         Timeout => $TimeOut,
         Proxy   => $Proxy,
         Success => 1,
     },
     {
         Name    => 'GET - http - Header ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL     => "http://packages.kixdesk.com/repository/debian/PublicKey",
         Timeout => $TimeOut,
         Proxy   => $Proxy,
@@ -108,7 +103,6 @@ my @Tests = (
     },
     {
         Name        => 'GET - http - Credentials ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL and credentials
         URL         => "https://testit.kixdesk.com/unittest/HTTPBasicAuth/",
         Timeout     => $TimeOut,
         Proxy       => $Proxy,
@@ -122,16 +116,15 @@ my @Tests = (
     },
     {
         Name        => 'GET - http - MissingCredentials ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL
         URL         => "https://testit.kixdesk.com/unittest/HTTPBasicAuth/",
         Timeout     => $TimeOut,
         Proxy       => $Proxy,
         Success     => 0,
         ErrorNumber => 401,
+        Silent      => 1,
     },
     {
         Name        => 'GET - http - IncompleteCredentials ' . $TestNumber++,
-        #rbo - T2016121190001552 - replaced URL and credentials
         URL         => "https://testit.kixdesk.com/unittest/HTTPBasicAuth/",
         Timeout     => $TimeOut,
         Proxy       => $Proxy,
@@ -141,37 +134,15 @@ my @Tests = (
         },
         Success     => 0,
         ErrorNumber => 401,
+        Silent      => 1,
     },
 );
-
-# get repository list
-for my $URL ( @{$RepositoryRoot} ) {
-
-    my %NewEntry = (
-        Name    => 'Test ' . $TestNumber++,
-        URL     => $URL,
-        Timeout => $TimeOut,
-        Proxy   => $Proxy,
-        Success => '1',
-    );
-
-    push @Tests, \%NewEntry;
-}
-
-# my %Intervall = (
-#     1 => 3,
-#     2 => 15,
-#     3 => 60,
-#     4 => 60 * 3,
-#     5 => 60 * 6,
-# );
 
 TEST:
 for my $Test (@Tests) {
 
     TRY:
     for my $Try ( 1 .. 5 ) {
-
         my $WebUserAgentObject = Kernel::System::WebUserAgent->new(
             Timeout => $Test->{Timeout},
             Proxy   => $Test->{Proxy},
@@ -197,8 +168,6 @@ for my $Test (@Tests) {
         if ( !$Test->{Success} ) {
 
             if ( $Try < 5 && $Status eq 500 && $Test->{ErrorNumber} ne 500 ) {
-
-                #sleep $Intervall{$Try};
                 sleep 3;
 
                 next TRY;
@@ -220,8 +189,6 @@ for my $Test (@Tests) {
         else {
 
             if ( $Try < 5 && ( !$Response{Content} || !$Status || $Status ne 200 ) ) {
-
-                #sleep $Intervall{$Try};
                 sleep 3;
 
                 next TRY;

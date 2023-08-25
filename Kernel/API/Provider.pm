@@ -91,11 +91,12 @@ sub Run {
     $ENV{REQUEST_URI} = '/'.$RequestURI;
 
     if ( !$WebserviceName ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not determine WebserviceName from query string $RequestURI",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not determine WebserviceName from query string $RequestURI",
+            );
+        }
         return;    # bail out without Transport, plack will generate 500 Error
     }
 
@@ -107,23 +108,23 @@ sub Run {
     );
 
     if ( !IsHashRefWithData($Webservice) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Could not load web service configuration for web service at $RequestURI",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not load web service configuration for web service at $RequestURI",
+            );
+        }
         return;    # bail out, this will generate 500 Error
     }
 
     # Check if web service has valid state (we are explicitely using the numeric ID here to prevent additional executing time)
     if ( $Webservice->{ValidID} != 1 ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Web service '$Webservice->{Name}' is not valid and can not be loaded",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Web service '$Webservice->{Name}' is not valid and can not be loaded",
+            );
+        }
         return;    # bail out, this will generate 500 Error
     }
 
@@ -291,10 +292,12 @@ sub Run {
     #
     my $OperationModule = $Kernel::OM->GetModuleFor('API::Operation');
     if ( !$Kernel::OM->Get('Main')->Require($OperationModule) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message => "Can't load module $OperationModule",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't load module $OperationModule",
+            );
+        }
         return;    # bail out, this will generate 500 Error
     }
 

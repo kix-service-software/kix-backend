@@ -13,10 +13,11 @@ package Kernel::System::SystemData;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'Log',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    Log
 );
 
 =head1 NAME

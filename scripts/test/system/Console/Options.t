@@ -14,7 +14,9 @@ use utf8;
 
 use vars (qw($Self));
 
-my $Output = qx{"$^X" bin/kix.Console.pl Maint::Ticket::PendingCheck --quiet};
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
+
+my $Output = qx{"$^X" $Home/bin/kix.Console.pl Maint::Ticket::PendingCheck --quiet};
 
 $Self->False( scalar( $Output =~ /\S/ ), "No output with --quiet" );
 

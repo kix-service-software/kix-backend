@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,17 +15,11 @@ use vars (qw($Self));
 # get Job object
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
-#
-# Job tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $NameRandom  = $Helper->GetRandomID();
 my %JobIDByJobName = (
@@ -60,6 +54,7 @@ for my $JobName ( sort keys %JobIDByJobName ) {
         Type    => 'Ticket',
         ValidID => 1,
         UserID  => 1,
+        Silent  => 1,
     );
 
     $Self->False(
@@ -153,6 +148,7 @@ $JobID1 = $AutomationObject->JobAdd(
     Type    => 'Ticket',
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->False(
@@ -179,6 +175,7 @@ my $JobUpdateWrong = $AutomationObject->JobUpdate(
     Name    => $ChangedJobName,
     ValidID => 2,
     UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->False(
@@ -199,8 +196,9 @@ $Self->True(
 
 # delete a non existent job
 $JobDelete = $AutomationObject->JobDelete(
-    ID      => 9999,
-    UserID  => 1,
+    ID     => 9999,
+    UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -233,11 +231,17 @@ my %Job = $AutomationObject->JobGet(
 
 $Self->IsDeeply(
     $Job{Filter},
-    {
-        AND => [
-            { Field => 'Dummy', Operator => 'EQ', Value => 'this is a test' }
-        ]
-    },
+    [
+        {
+            AND => [
+                {
+                    Field    => 'Dummy',
+                    Operator => 'EQ',
+                    Value    => 'this is a test'
+                }
+            ]
+        }
+    ],
     'JobGet() for new job with filter',
 );
 
@@ -334,7 +338,8 @@ $Self->IsDeeply(
     'JobMacroList() for new job with macro assignment',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

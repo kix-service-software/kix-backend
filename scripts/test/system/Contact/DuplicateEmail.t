@@ -13,12 +13,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get customer user object
 my $ContactObject = $Kernel::OM->Get('Contact');
@@ -100,8 +98,9 @@ my $ContactID = $ContactObject->ContactAdd(
         $OrgID
     ],
     Password   => 'some_pass',
-    ValidID        => 1,
-    UserID         => 1,
+    ValidID    => 1,
+    UserID     => 1,
+    Silent     => 1,
 );
 
 $Self->False(
@@ -119,6 +118,7 @@ my $Update = $ContactObject->ContactUpdate(
     ID     => $CustomerData{ID},
     Email  => $Customer1Email,
     UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -126,7 +126,8 @@ $Self->False(
     "ContactUpdate() - not possible for duplicate email address",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

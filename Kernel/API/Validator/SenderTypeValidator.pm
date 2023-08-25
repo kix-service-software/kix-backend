@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'SenderTypeID' ) {
         $Found = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderTypeID => $Param{Data}->{$Param{Attribute}},
+            Silent       => 1,
         );
     }
     elsif ( $Param{Attribute} eq 'SenderType' ) {
         $Found = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
             SenderType => $Param{Data}->{$Param{Attribute}},
+            Silent     => 1,
         );
     }
     else {

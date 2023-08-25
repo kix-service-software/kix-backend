@@ -12,28 +12,25 @@ use utf8;
 
 use vars (qw($Self));
 
-use Kernel::System::Role;
 use Kernel::API::Validator::RoleValidator;
 
 # get validator object
 my $ValidatorObject = Kernel::API::Validator::RoleValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $RoleRandom = 'testrole' . $Helper->GetRandomID();
 
 # create role
 my $RoleID = $Kernel::OM->Get('Role')->RoleAdd(
-    Name    => $RoleRandom,
+    Name         => $RoleRandom,
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-    ValidID => 1,
-    UserID  => 1,
+    ValidID      => 1,
+    UserID       => 1,
 );
 
 # validate valid RoleID
@@ -51,7 +48,7 @@ $Self->True(
 );
 
 # validate invalid RoleID
-my $Result = $ValidatorObject->Validate(
+$Result = $ValidatorObject->Validate(
     Attribute => 'RoleID',
     Data      => {
         'RoleID' => -9999,
@@ -65,7 +62,7 @@ $Self->False(
 
 # validate valid Role
 # run test for each supported attribute
-my $Result = $ValidatorObject->Validate(
+$Result = $ValidatorObject->Validate(
     Attribute => 'Role',
     Data      => {
         'Role' => $RoleRandom,
@@ -79,7 +76,7 @@ $Self->True(
 
 # validate invalid Role
 # run test for each supported attribute
-my $Result = $ValidatorObject->Validate(
+$Result = $ValidatorObject->Validate(
     Attribute => 'Role',
     Data      => {
         'Role' => '____test____',
@@ -92,7 +89,7 @@ $Self->False(
 );
 
 # validate invalid attribute
-my $Result = $ValidatorObject->Validate(
+$Result = $ValidatorObject->Validate(
     Attribute => 'InvalidAttribute',
     Data      => {},
 );
@@ -102,7 +99,8 @@ $Self->False(
     'Validate() - invalid attribute',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

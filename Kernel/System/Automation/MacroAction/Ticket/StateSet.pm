@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -127,7 +127,7 @@ sub Run {
 
     # do nothing if the desired state is already set
     if ( $State{ID} ne $Ticket{StateID} ) {
-        $Success = $TicketObject->StateSet(
+        $Success = $TicketObject->TicketStateSet(
             TicketID => $Param{TicketID},
             StateID  => $State{ID},
             UserID   => $Param{UserID}
@@ -212,11 +212,14 @@ sub Run {
                 my $Calendar;
 
                 # get calendar from SLA
-                if ( $Ticket{SLAID} ) {
+                if (
+                    $Ticket{SLAID}
+                    && $Kernel::OM->Get('Main')->Require('SLA', Silent => 1)
+                ) {
 
                     # NOTE if "SLA by AffectedAsset", single SLAs are not
                     # evaluated but calendars assigned to "SLA by AffectedAsset"
-                    my %SLA = $Kernel::OM->Get('Kernel::System::SLA')->SLAGet(
+                    my %SLA = $Kernel::OM->Get('SLA')->SLAGet(
                         SLAID  => $Ticket{SLAID},
                         UserID => 1,
                     );
@@ -273,7 +276,7 @@ sub Run {
             }
 
             # set pending time
-            $Success = $Kernel::OM->Get('Kernel::System::Ticket')->TicketPendingTimeSet(
+            $Success = $Kernel::OM->Get('Ticket')->TicketPendingTimeSet(
                 UserID   => $Param{UserID},
                 TicketID => $Param{TicketID},
                 String   => $PendingTime,
@@ -319,10 +322,12 @@ sub ValidateConfig {
             !$Param{Config}->{PendingTimeDiff} &&
             !$Param{Config}->{PendingDateTime}
         ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Either "PendingTimeDiff" or "PendingDateTime" has to be given!'
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Either "PendingTimeDiff" or "PendingDateTime" has to be given!'
+                );
+            }
             return;
         }
     }

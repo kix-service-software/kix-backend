@@ -30,14 +30,15 @@ my @Tests = (
             Success     => 1,
             Body        => qr|^$|,
             Attachments => [],
-            }
+        }
     },
     {
         Name   => 'no body',
         Body   => undef,
         Result => {
             Success => 0,
-            }
+        },
+        Silent => 1,
     },
     {
         Name   => 'single image',
@@ -47,7 +48,7 @@ my @Tests = (
             Body        => qr|^<img alt="text" src="cid:.*?" />$|,
             Attachments => [
                 {
-                    ContentType => qr|^image/gif;|,
+                    ContentType => qr|^image/gif$|,
                 }
             ],
             }
@@ -61,10 +62,10 @@ my @Tests = (
                 qr|^123 <img alt="text" src="cid:.*?" /> 456 <img alt="text" src="cid:.*?" /> 789$|,
             Attachments => [
                 {
-                    ContentType => qr|^image/gif;|,
+                    ContentType => qr|^image/gif$|,
                 },
                 {
-                    ContentType => qr|^image/gif;|,
+                    ContentType => qr|^image/gif$|,
                 }
             ],
             }
@@ -78,7 +79,7 @@ my @Tests = (
                 qr|^123 <img alt="text" src="cid:.*?" /> 456 <img src=\"http://some.url/image.gif\" /> 789$|,
             Attachments => [
                 {
-                    ContentType => qr|^image/gif;|,
+                    ContentType => qr|^image/gif$|,
                 },
             ],
             }
@@ -93,7 +94,7 @@ my @Tests = (
                 qr|^Snipping Tool: <img alt="" src="cid:.*?"> 456$|,
             Attachments => [
                 {
-                    ContentType => qr|^image/png;|,
+                    ContentType => qr|^image/png$|,
                 },
             ],
             }
@@ -107,6 +108,7 @@ for my $Test (@Tests) {
     my $Success = $HTMLUtilsObject->EmbeddedImagesExtract(
         DocumentRef    => \$Body,
         AttachmentsRef => \@Attachments,
+        Silent         => $Test->{Silent},
     );
 
     $Self->Is(
@@ -130,7 +132,6 @@ for my $Test (@Tests) {
 
     my $Index = 0;
     for my $Attachment (@Attachments) {
-
         $Self->True(
             scalar $Attachment->{ContentType}
                 =~ ( $Test->{Result}->{Attachments}->[$Index]->{ContentType} ),

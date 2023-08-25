@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -233,7 +233,8 @@ sub ImportValuePrepare {
 
     # get item list
     my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class => $Param{Item}->{Input}->{Class} || '',
+        Class  => $Param{Item}->{Input}->{Class} || q{},
+        Silent => $Param{Silent}
     );
 
     # reverse the list
@@ -242,6 +243,7 @@ sub ImportValuePrepare {
     my $GeneralCatalogID = $Name2ID{ $Param{Value} };
 
     if ( !$GeneralCatalogID ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "General catalog lookup of'$Param{Value}' failed!",

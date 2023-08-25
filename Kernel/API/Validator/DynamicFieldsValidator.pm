@@ -65,14 +65,19 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'DynamicFields' ) {
-        my $DynamicField = $Param{Data}->{$Param{Attribute}};
+        my $DynamicFields = $Param{Data}->{$Param{Attribute}};
 
         $Found = 1;
-        if ( !IsHashRefWithData($DynamicField) ) {
+        if ( !IsArrayRef($DynamicFields) ) {
             $Found = 0;
         }
-        if ( !$DynamicField->{Name} || !exists($DynamicField->{Value}) ) {
-            $Found = 0;
+        else {
+            foreach my $DynamicField ( @{$DynamicFields} ) {
+                if ( !IsHashRefWithData($DynamicField) || !$DynamicField->{Name} || !exists($DynamicField->{Value}) ) {
+                    $Found = 0;
+                    last;
+                }
+            }
         }
     }
     else {

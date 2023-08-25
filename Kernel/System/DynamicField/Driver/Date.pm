@@ -121,8 +121,9 @@ sub ValueValidate {
 
     # check for no time in date fields
     if (
-        $Param{Value} &&
-        $Param{Value} !~ m/^\d{4}-\d{2}-\d{2}/
+        $Param{Value}
+        && $Param{Value} !~ m/^\d{4}-\d{2}-\d{2}/
+        && !$Param{Silent}
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -136,6 +137,7 @@ sub ValueValidate {
             ValueDateTime => $Param{Value}
         },
         UserID => $Param{UserID},
+        Silent => $Param{Silent} || 0
     );
 
     if (
@@ -148,6 +150,7 @@ sub ValueValidate {
 
         my $ValueSystemTime = $TimeObject->TimeStamp2SystemTime(
             String => $Param{Value},
+            Silent => $Param{Silent} || 0
         );
         my $SystemTime = $TimeObject->SystemTime();
         my ( $SystemTimePast, $SystemTimeFuture ) = $SystemTime;
@@ -158,6 +161,7 @@ sub ValueValidate {
             # calculate today system time boundaries
             my @Today = $TimeObject->SystemTime2Date(
                 SystemTime => $SystemTime,
+                Silent     => $Param{Silent} || 0
             );
             $SystemTimePast = $TimeObject->Date2SystemTime(
                 Year   => $Today[5],
@@ -166,11 +170,14 @@ sub ValueValidate {
                 Hour   => 0,
                 Minute => 0,
                 Second => 0,
+                Silent => $Param{Silent} || 0
             );
             $SystemTimeFuture = $SystemTimePast + 60 * 60 * 24 - 1;    # 23:59:59
         }
 
         if ( $DateRestriction eq 'DisableFutureDates' && $ValueSystemTime > $SystemTimeFuture ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -179,6 +186,8 @@ sub ValueValidate {
             return;
         }
         elsif ( $DateRestriction eq 'DisablePastDates' && $ValueSystemTime < $SystemTimePast ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message =>
@@ -248,17 +257,18 @@ sub SearchSQLGet {
         $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $SystemTime
         );
-
         my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
         $SQL .= $Kernel::OM->Get('DB')->Quote( $SearchTerm ) . "' ";
 
         return $SQL;
     }
 
-    $Kernel::OM->Get('Log')->Log(
-        'Priority' => 'error',
-        'Message'  => "Unsupported Operator $Param{Operator}",
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            'Priority' => 'error',
+            'Message'  => "Unsupported Operator $Param{Operator}",
+        );
+    }
 
     return;
 }

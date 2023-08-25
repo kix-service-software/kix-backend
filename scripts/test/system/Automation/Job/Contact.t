@@ -12,25 +12,20 @@ use utf8;
 
 use vars (qw($Self));
 
-# get Job object
-my $AutomationObject = $Kernel::OM->Get('Automation');
-my $ConfigObject     = $Kernel::OM->Get('Config');
-my $ContactObject    = $Kernel::OM->Get('Contact');
-my $UserObject       = $Kernel::OM->Get('User');
-my $MainObject       = $Kernel::OM->Get('Main');
+#
+# Job tests
+#
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $Contact = 'customer' . $Helper->GetRandomID();
 
 # do not check mail addresses
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
@@ -52,7 +47,7 @@ my %Contacts = (
 for my $Contact (sort keys %Contacts) {
 
     # add assigned user
-    my $UserID = $UserObject->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => 'Login_' . $Contact,
         ValidID      => 1,
         ChangeUserID => 1,
@@ -64,7 +59,7 @@ for my $Contact (sort keys %Contacts) {
     );
 
     # add contact
-    my $ContactID = $ContactObject->ContactAdd(
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
         AssignedUserID => $UserID,
         Firstname      => 'Firstname_' . $Contact,
         Lastname       => 'Lastname_' . $Contact,
@@ -207,7 +202,7 @@ my @TestData = (
 );
 
 # load job type backend module
-my $JobObject = $AutomationObject->_LoadJobTypeBackend(
+my $JobObject = $Kernel::OM->Get('Automation')->_LoadJobTypeBackend(
     Name => 'Contact',
 );
 $Self->True(
@@ -225,7 +220,7 @@ foreach my $Test ( @TestData ) {
     );
 
     # only contacts wich are created by this test
-    @ObjectIDs = $MainObject->GetCombinedList(
+    @ObjectIDs = $Kernel::OM->Get('Main')->GetCombinedList(
         ListA => \@ObjectIDs,
         ListB => [values %Contacts]
     );
@@ -237,7 +232,8 @@ foreach my $Test ( @TestData ) {
     )
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

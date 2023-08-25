@@ -207,12 +207,16 @@ sub Request {
     else {
 
         # check for Data param
-        if ( !IsArrayRefWithData( $Param{Data} ) && !IsHashRefWithData( $Param{Data} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
-            );
+        if (
+            !IsArrayRefWithData( $Param{Data} )
+            && !IsHashRefWithData( $Param{Data} )
+        ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
+                );
+            }
             return ( Status => 0 );
         }
 
@@ -221,10 +225,12 @@ sub Request {
     }
 
     if ( !$Response->is_success() ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
+            );
+        }
         return (
             Success => 0,
             Status  => $Response->status_line(),

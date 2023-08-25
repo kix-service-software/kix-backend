@@ -16,13 +16,14 @@ use base qw(
     Kernel::System::Role::User
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 # define usage context bit values
@@ -221,20 +222,24 @@ sub RoleAdd {
     # check needed stuff
     for my $Needed (qw(Name ValidID UserID UsageContext)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
 
     my %ExistingRoles = reverse $Self->RoleList( Valid => 0 );
     if ( defined $ExistingRoles{ $Param{Name} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A Role with the name \"$Param{Name}\" already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A Role with the name \"$Param{Name}\" already exists.",
+            );
+        }
         return;
     }
 
@@ -300,20 +305,24 @@ sub RoleUpdate {
     # check needed stuff
     for (qw(ID Name ValidID UsageContext UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!",
+                );
+            }
             return;
         }
     }
 
     my %ExistingRoles = reverse $Self->RoleList( Valid => 0 );
     if ( defined $ExistingRoles{ $Param{Name} } && $ExistingRoles{ $Param{Name} } != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A Role with the name \"$Param{Name}\" already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A Role with the name \"$Param{Name}\" already exists.",
+            );
+        }
         return;
     }
 

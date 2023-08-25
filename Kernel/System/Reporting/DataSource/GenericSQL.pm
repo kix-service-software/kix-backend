@@ -153,10 +153,12 @@ sub ValidateConfig {
 
     # check needed stuff
     if ( !$Param{Config} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Config!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Config!',
+            );
+        }
         return;
     }
 
@@ -165,20 +167,24 @@ sub ValidateConfig {
 
     # check the SQL config
     if ( !IsHashRefWithData($Param{Config}->{SQL}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "SQL is not a HASH ref!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SQL is not a HASH ref!",
+            );
+        }
         return;
     }
 
     foreach my $DBMS ( sort keys %{$Param{Config}->{SQL}} ) {
         # validate DBMS
         if ( $DBMS !~ /^(postgresql|mysql|any)$/g ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Given DBMS \"$DBMS\" is not supported!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Given DBMS \"$DBMS\" is not supported!",
+                );
+            }
             return;
         }
 
@@ -189,10 +195,12 @@ sub ValidateConfig {
         }
 
         if ( $SQL !~ /^SELECT\s+/i ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "SQL statement for DBMS \"$DBMS\" is not a SELECT statement!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "SQL statement for DBMS \"$DBMS\" is not a SELECT statement!",
+                );
+            }
             return;
         }
     }
@@ -201,7 +209,8 @@ sub ValidateConfig {
     # get SQL statement from config and prepare it for use
     my $SQL = $Self->_PrepareSQLStatement(
         Config                => $Param{Config},
-        UseFallbackParameters => 1                  # if we don't have defaults we want to have a valid SQL at least
+        UseFallbackParameters => 1,                  # if we don't have defaults we want to have a valid SQL at least
+        Silent                => $Param{Silent},
     );
 
     my $DBObject = $Kernel::OM->Get('DB');
@@ -211,35 +220,43 @@ sub ValidateConfig {
         SQL => $SQL
     );
     if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid SQL statement!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid SQL statement!",
+            );
+        }
         return;
     }
 
     if ( !$DBObject->GetColumnNames() ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "SQL statement does not contain a column list!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SQL statement does not contain a column list!",
+            );
+        }
         return;
     }
 
     # check output handler
     foreach my $OutputHandler ( @{$Param{Config}->{OutputHandler} || []} ) {
         if ( !IsHashRefWithData($OutputHandler) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "OutputHandler config is invalid!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "OutputHandler config is invalid!",
+                );
+            }
             return;
         }
         if ( !$OutputHandler->{Name} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "OutputHandler config is invalid - handler doesn't have a name!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "OutputHandler config is invalid - handler doesn't have a name!",
+                );
+            }
             return;
         }
 
@@ -401,10 +418,12 @@ sub _PrepareSQLStatement {
     # check needed stuff
     for (qw(Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -413,10 +432,12 @@ sub _PrepareSQLStatement {
 
     my $SQL = $Param{Config}->{SQL}->{$DBObject->{'DB::Type'}} || $Param{Config}->{SQL}->{any};
     if ( !$SQL ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No SQL statement for the current DBMS \"".$DBObject->{'DB::Type'}."\" given!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No SQL statement for the current DBMS \"".$DBObject->{'DB::Type'}."\" given!",
+            );
+        }
         return;
     }
     if ( $SQL =~ /^base64\((.*?)\)\s*$/ ) {
@@ -463,6 +484,7 @@ sub _PrepareSQLStatement {
                     # replace parameters
                     $FunctionParams{$Param} = $Self->_ReplaceParametersInString(
                         String => $FunctionParams{$Param},
+                        Silent => $Param{Silent},
                     );
                 }
                 my $Result = $Self->_ExecuteFunction(

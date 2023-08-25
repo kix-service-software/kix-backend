@@ -27,12 +27,11 @@ my $TicketObject = $Kernel::OM->Get('Ticket');
 my $QueueObject  = $Kernel::OM->Get('Queue');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 $Helper->FixedTimeSet();
 
 my $AgentAddress    = 'agent@example.com';
@@ -63,6 +62,7 @@ my @Tests = (
                                     # 3 = follow up / close -> new ticket
                                     # 4 = follow up / close -> reject
                                     # 5 = ignored (because of X-KIX-Ignore header)
+                                    # 6 = ignored (Message-ID already in system)
     },
     {
         TicketState     => 'open',
@@ -153,15 +153,15 @@ my @Tests = (
 
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'My ticket created by Agent',
-    Queue        => 'NewTestQueue',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'removed',
+    Title          => 'My ticket created by Agent',
+    Queue          => 'NewTestQueue',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'removed',
     OrganisationID => 'external@example.com',
-    ContactID    => 'external@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'external@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 $TicketID //= '';
 
@@ -226,6 +226,9 @@ Some Content in Body",
         "Check result (State=$Test->{TicketState}, FollowUpID=$Test->{QueueFollowUpID}).",
     );
 }
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

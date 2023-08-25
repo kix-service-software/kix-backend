@@ -193,10 +193,12 @@ sub ImportDataGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -205,10 +207,12 @@ sub ImportDataGet {
 
     # check source content
     if ( ref $Param{SourceContent} ne 'SCALAR' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'SourceContent must be a scalar reference',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'SourceContent must be a scalar reference',
+            );
+        }
         return;
     }
 
@@ -220,10 +224,12 @@ sub ImportDataGet {
 
     # check format data
     if ( !$FormatData || ref $FormatData ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No format data found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No format data found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -233,11 +239,12 @@ sub ImportDataGet {
 
     # check the charset
     if ( !$Charset ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No valid charset found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No valid charset found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -247,11 +254,12 @@ sub ImportDataGet {
 
     # check the separator
     if ( !$Separator ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No valid separator found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No valid separator found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -300,11 +308,13 @@ sub ImportDataGet {
     # error handling
     my ( $ParseErrorCode, $ParseErrorString ) = $ParseObject->error_diag();
     if ($ParseErrorCode) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "ImportError at line $LineCount, "
-                . "ErrorCode: $ParseErrorCode '$ParseErrorString' ",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "ImportError at line $LineCount, "
+                    . "ErrorCode: $ParseErrorCode '$ParseErrorString' ",
+            );
+        }
     }
 
     # close the in memory file handle
@@ -340,20 +350,24 @@ sub ExportDataSave {
     # check needed stuff
     for my $Argument (qw(TemplateID ExportDataRow UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
 
     # check export data row
     if ( ref $Param{ExportDataRow} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'ExportDataRow must be an array reference',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'ExportDataRow must be an array reference',
+            );
+        }
         return;
     }
 
@@ -365,10 +379,12 @@ sub ExportDataSave {
 
     # check format data
     if ( !$FormatData || ref $FormatData ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No format data found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No format data found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -378,11 +394,12 @@ sub ExportDataSave {
 
     # check the charset
     if ( !$Charset ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No valid charset found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No valid charset found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -392,11 +409,12 @@ sub ExportDataSave {
 
     # check the separator
     if ( !$Separator ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No valid separator found for the template id $Param{TemplateID}",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No valid separator found for the template id $Param{TemplateID}",
+            );
+        }
         return;
     }
 
@@ -419,11 +437,12 @@ sub ExportDataSave {
     );
 
     if ( !$ParseObject->combine( @{ $Param{ExportDataRow} } ) ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't combine the export data to a string!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't combine the export data to a string!",
+            );
+        }
         return;
     }
 

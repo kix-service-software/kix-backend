@@ -20,13 +20,14 @@ use warnings;
 use URI;
 use URI::QueryParam;
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'JSON',
-    'Log',
-    'Valid',
-    'WebUserAgent'
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    JSON
+    Log
+    Valid
+    WebUserAgent
 );
 
 =head1 NAME

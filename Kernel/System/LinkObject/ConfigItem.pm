@@ -121,46 +121,6 @@ sub LinkListWithData {
     return 1;
 }
 
-=item ObjectPermission()
-
-checks read permission for a given object and UserID.
-
-    $Permission = $LinkObject->ObjectPermission(
-        Object  => 'ConfigItem',
-        Key     => 123,
-        UserID  => 1,
-    );
-
-=cut
-
-sub ObjectPermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Object Key UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-            return;
-        }
-    }
-
-    # get config of configitem zoom frontend module
-    $Self->{Config} = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Frontend::AgentITSMConfigItemZoom');
-
-    # check for access rights
-    my $Access = $Kernel::OM->Get('ITSMConfigItem')->Permission(
-        Scope  => 'Item',
-        ItemID => $Param{Key},
-        UserID => $Param{UserID},
-        Type   => $Self->{Config}->{Permission},
-    );
-
-    return $Access;
-}
-
 =item ObjectDescriptionGet()
 
 return a hash of object descriptions

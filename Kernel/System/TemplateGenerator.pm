@@ -30,7 +30,6 @@ our @ObjectDependencies = (
     'Queue',
     'Salutation',
     'Signature',
-    'StandardTemplate',
     'SystemAddress',
     'Ticket',
     'User',
@@ -126,7 +125,7 @@ sub Sender {
 
         # get data from current agent
         if ($Param{UserID}) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
+            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Param{UserID},
             );
 
@@ -167,107 +166,6 @@ sub Sender {
     return $Sender;
 }
 
-=item Template()
-
-generate template
-
-    my $Template = $TemplateGeneratorObject->Template(
-        TemplateID => 123
-        TicketID   => 123,                  # Optional
-        Data       => $ArticleHashRef,      # Optional
-        UserID     => 123,
-    );
-
-Returns:
-
-    $Template =>  'Some text';
-
-=cut
-
-sub Template {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(TemplateID UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my %Template = $Kernel::OM->Get('StandardTemplate')->StandardTemplateGet(
-        ID => $Param{TemplateID},
-    );
-
-    # do text/plain to text/html convert
-    if (
-        $Self->{RichText}
-        && $Template{ContentType} =~ /text\/plain/i
-        && $Template{Template}
-        )
-    {
-        $Template{ContentType} = 'text/html';
-        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToHTML(
-            String => $Template{Template},
-        );
-    }
-
-    # do text/html to text/plain convert
-    if (
-        !$Self->{RichText}
-        && $Template{ContentType} =~ /text\/html/i
-        && $Template{Template}
-        )
-    {
-        $Template{ContentType} = 'text/plain';
-        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-            String => $Template{Template},
-        );
-    }
-
-    # get user language
-    my $Language;
-    if ( defined $Param{TicketID} ) {
-
-        # get ticket data
-        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-            TicketID => $Param{TicketID},
-        );
-
-        # get recipient
-        my %User = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $Ticket{ContactID},
-        );
-        $Language = $User{UserLanguage};
-    }
-
-    # if customer language is not defined, set default language
-    $Language //= $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
-
-    # replace place holder stuff
-    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT/;
-
-    my $TemplateText = $Self->_RemoveUnSupportedTag(
-        Text => $Template{Template} || '',
-        ListOfUnSupportedTag => \@ListOfUnSupportedTag,
-    );
-
-    # replace place holder stuff
-    $TemplateText = $Self->_Replace(
-        RichText => $Self->{RichText},
-        Text     => $TemplateText || '',
-        TicketID => $Param{TicketID} || '',
-        Data     => $Param{Data} || {},
-        UserID   => $Param{UserID},
-        Language => $Language,
-    );
-
-    return $TemplateText;
-}
-
 =item Attributes()
 
 generate attributes
@@ -293,6 +191,7 @@ sub Attributes {
     # check needed stuff
     for (qw(TicketID Data UserID)) {
         if ( !$Param{$_} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -518,6 +417,22 @@ sub NotificationEvent {
 
         $Notification{Body} =~ s/${Start}KIX_CUSTOMER_DATA_$Key${End}/$Param{CustomerMessageParams}->{$Key}/gi;
         $Notification{Subject} =~ s/<KIX_CUSTOMER_DATA_$Key>/$Param{CustomerMessageParams}->{$Key}{$_}/gi;
+    }
+
+    # do text/plain to text/html convert
+    if ( $Self->{RichText} && $Notification{ContentType} =~ /text\/plain/i ) {
+        $Notification{ContentType} = 'text/html';
+        $Notification{Body}        = $HTMLUtilsObject->ToHTML(
+            String => $Notification{Body},
+        );
+    }
+
+    # do text/html to text/plain convert
+    if ( !$Self->{RichText} && $Notification{ContentType} =~ /text\/html/i ) {
+        $Notification{ContentType} = 'text/plain';
+        $Notification{Body}        = $HTMLUtilsObject->ToAscii(
+            String => $Notification{Body},
+        );
     }
 
     # get notify texts

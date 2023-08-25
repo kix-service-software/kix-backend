@@ -52,6 +52,8 @@ sub Auth {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $SecretPreferencesKey = $ConfigObject->Get("AuthTwoFactorModule$Self->{Count}::SecretPreferencesKey") || '';
     if ( !$SecretPreferencesKey ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Found no configuration for SecretPreferencesKey in AuthTwoFactorModule.",
@@ -70,6 +72,8 @@ sub Auth {
             return 1;
         }
 
+        return if $Param{Silent};
+
         # otherwise login counts as failed
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -80,6 +84,8 @@ sub Auth {
 
     # if we get to here (user has preference), we need a passed token
     if ( !$Param{TwoFactorToken} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need TwoFactorToken!"

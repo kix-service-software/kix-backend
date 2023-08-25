@@ -15,14 +15,14 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::AsynchronousExecutor);
 
-our @ObjectDependencies = (
-    'Cache',
-    'ClientRegistration',
-    'Config',
-    'DB',
-    'JSON',
-    'Log',
-    'Main',
+our @ObjectDependencies = qw(
+    Cache
+    ClientRegistration
+    Config
+    DB
+    JSON
+    Log
+    Main
 );
 
 =head1 NAME
@@ -228,10 +228,12 @@ sub JobAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -342,10 +344,12 @@ sub JobUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -361,7 +365,17 @@ sub JobUpdate {
     KEY:
     for my $Key ( qw(Type Name Filter Comment IsAsynchronous ValidID) ) {
 
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if (
+            (
+                !defined( $Data{ $Key } )
+                && !defined( $Param{ $Key } )
+            )
+            || (
+                defined( $Data{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Data{ $Key } eq $Param{ $Key }
+            )
+        );
 
         $ChangeRequired = 1;
 
@@ -499,10 +513,12 @@ sub JobDelete {
         ID => $Param{ID},
     );
     if ( !$ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the ID $Param{ID} does not exist.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -881,7 +897,7 @@ sub AllUsedExecPlanIDList {
     my ( $Self, %Param ) = @_;
 
     # check cache
-    my $CacheKey = 'JobExecPlanList::' . $Param{JobID};
+    my $CacheKey = 'AllUsedExecPlanIDList';
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1389,10 +1405,12 @@ sub JobRunGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need ID!'
+            );
+        }
         return;
     }
 
@@ -1433,10 +1451,12 @@ sub JobRunGet {
 
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "JobRun with ID $Param{ID} not found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "JobRun with ID $Param{ID} not found!",
+            );
+        }
         return;
     }
 
@@ -1766,3 +1786,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

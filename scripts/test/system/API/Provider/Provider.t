@@ -12,17 +12,22 @@ use utf8;
 
 use vars (qw($Self));
 
+use CGI;
+use LWP::UserAgent;
+
 # get config object
 my $ConfigObject = $Kernel::OM->Get('Config');
 
 # get helper object
-# skip SSL certificate verification
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        SkipSSLVerify => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# skip SSL certificate verification
+$Helper->SSLVerify(
+    SkipSSLVerify => 1,
+);
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -34,37 +39,36 @@ my @Tests = (
                 DebugThreshold => 'debug',
             },
             Provider => {
-                Transport => {
-                    Type   => 'HTTP::Test',
-                    Config => {
-                        Fail => 0,
+                Operation => {
+                    'Test::User::UserSearch' => {
+                        Description           => '',
+                        NoAuthorizationNeeded => 1,
+                        Type                  => 'V1::Sessions::SessionCreate',
                     },
                 },
-                Operation => {
-                    test_operation => {
-                        Type           => 'Test::Test',
-                        MappingInbound => {
-                            Type   => 'Test',
-                            Config => {
-                                TestOption => 'ToUpper',
-                                }
-                        },
-                        MappingOutbound => {
-                            Type => 'Test',
-                        },
+                Transport => {
+                    Config => {
+                        KeepAlive             => '',
+                        MaxLength             => '52428800',
+                        RouteOperationMapping => {
+                            'Test::User::UserSearch' => {
+                                RequestMethod => [
+                                    'GET',
+                                    'POST'
+                                ],
+                                Route => '/Test'
+                            }
+                        }
                     },
                 },
             },
         },
         RequestData => {
-            A => 'A',
-            b => 'b',
+            UserLogin => 'admin',
+            UserType  => 'Agent',
+            Password  => 'Passw0rd'
         },
-        ResponseData => {
-            A => 'A',
-            b => 'B',
-        },
-        ResponseSuccess => 1,
+        ResponseStatus => 'Status: 201 Created',
     },
     {
         Name             => 'HTTP request umlaut',
@@ -73,31 +77,36 @@ my @Tests = (
                 DebugThreshold => 'debug',
             },
             Provider => {
-                Transport => {
-                    Type   => 'HTTP::Test',
-                    Config => {
-                        Fail => 0,
+                Operation => {
+                    'Test::User::UserSearch' => {
+                        Description           => '',
+                        NoAuthorizationNeeded => 1,
+                        Type                  => 'V1::Sessions::SessionCreate',
                     },
                 },
-                Operation => {
-                    test_operation => {
-                        Type           => 'Test::Test',
-                        MappingInbound => {
-                            Type => 'Test',
-                        },
+                Transport => {
+                    Config => {
+                        KeepAlive             => '',
+                        MaxLength             => '52428800',
+                        RouteOperationMapping => {
+                            'Test::User::UserSearch' => {
+                                RequestMethod => [
+                                    'GET',
+                                    'POST'
+                                ],
+                                Route => '/Test'
+                            }
+                        }
                     },
                 },
             },
         },
         RequestData => {
-            A => 'A',
-            b => 'ö',
+            UserLogin => 'admin',
+            UserType  => 'Agent',
+            Password  => 'ÄÖÜßäöü'
         },
-        ResponseData => {
-            A => 'A',
-            b => 'ö',
-        },
-        ResponseSuccess => 1,
+        ResponseStatus => 'Status: 401 Unauthorized',
     },
     {
         Name             => 'HTTP request Unicode',
@@ -106,35 +115,36 @@ my @Tests = (
                 DebugThreshold => 'debug',
             },
             Provider => {
-                Transport => {
-                    Type   => 'HTTP::Test',
-                    Config => {
-                        Fail => 0,
+                Operation => {
+                    'Test::User::UserSearch' => {
+                        Description           => '',
+                        NoAuthorizationNeeded => 1,
+                        Type                  => 'V1::Sessions::SessionCreate',
                     },
                 },
-                Operation => {
-                    test_operation => {
-                        Type           => 'Test::Test',
-                        MappingInbound => {
-                            Type => 'Test',
-                        },
+                Transport => {
+                    Config => {
+                        KeepAlive             => '',
+                        MaxLength             => '52428800',
+                        RouteOperationMapping => {
+                            'Test::User::UserSearch' => {
+                                RequestMethod => [
+                                    'GET',
+                                    'POST'
+                                ],
+                                Route => '/Test'
+                            }
+                        }
                     },
                 },
             },
         },
         RequestData => {
-            A => 'A',
-            b => '使用下列语言',
-            c => 'Языковые',
-            d => 'd',
+            UserLogin => 'Языковые',
+            UserType  => 'Agent',
+            Password  => '使用下列语言'
         },
-        ResponseData => {
-            A => 'A',
-            b => '使用下列语言',
-            c => 'Языковые',
-            d => 'd',
-        },
-        ResponseSuccess => 1,
+        ResponseStatus => 'Status: 401 Unauthorized',
     },
     {
         Name             => 'HTTP request without data',
@@ -143,28 +153,38 @@ my @Tests = (
                 DebugThreshold => 'debug',
             },
             Provider => {
-                Transport => {
-                    Type   => 'HTTP::Test',
-                    Config => {
-                        Fail => 0,
+                Operation => {
+                    'Test::User::UserSearch' => {
+                        Description           => '',
+                        NoAuthorizationNeeded => 1,
+                        Type                  => 'V1::Sessions::SessionCreate',
                     },
                 },
-                Operation => {
-                    test_operation => {
-                        Type           => 'Test::Test',
-                        MappingInbound => {
-                            Type => 'Test',
-                        },
-                        MappingOutbound => {
-                            Type => 'Test',
-                        },
+                Transport => {
+                    Config => {
+                        KeepAlive             => '',
+                        MaxLength             => '52428800',
+                        RouteOperationMapping => {
+                            'Test::User::UserSearch' => {
+                                RequestMethod => [
+                                    'GET',
+                                    'POST'
+                                ],
+                                Route => '/Test'
+                            }
+                        }
                     },
                 },
             },
         },
-        RequestData     => {},
-        ResponseData    => {},
-        ResponseSuccess => 0,
+        RequestData    => {},
+        ResponseStatus => 'Status: 400 Bad Request',
+    },
+    {
+        Name            => 'Test non existing webservice',
+        RequestData    => {},
+        ResponseStatus => '',
+        Silent         => 1,
     },
 );
 
@@ -195,13 +215,12 @@ my $CreateQueryString = sub {
 my $Host = $Helper->GetTestHTTPHostname();
 
 # create URL
-my $ScriptAlias   = $ConfigObject->Get('ScriptAlias');
-my $ApacheBaseURL = "http://$Host/${ScriptAlias}/nph-API.pl/";
+my $ApacheBaseURL = "http://$Host/";
 my $PlackBaseURL;
 if ( $ConfigObject->Get('UnitTestPlackServerPort') ) {
     $PlackBaseURL = "http://localhost:"
         . $ConfigObject->Get('UnitTestPlackServerPort')
-        . '/nph-API.pl/';
+        . '/';
 }
 
 # get objects
@@ -210,18 +229,21 @@ my $ProviderObject   = $Kernel::OM->Get('API::Provider');
 
 for my $Test (@Tests) {
 
-    # add config
-    my $WebserviceID = $WebserviceObject->WebserviceAdd(
-        Config  => $Test->{WebserviceConfig},
-        Name    => "$Test->{Name} $RandomID",
-        ValidID => 1,
-        UserID  => 1,
-    );
+    my $WebserviceID;
+    if ( $Test->{WebserviceConfig} ) {
+        # add config
+        $WebserviceID = $WebserviceObject->WebserviceAdd(
+            Config  => $Test->{WebserviceConfig},
+            Name    => "$Test->{Name} $RandomID",
+            ValidID => 1,
+            UserID  => 1,
+        );
 
-    $Self->True(
-        $WebserviceID,
-        "$Test->{Name} WebserviceAdd()",
-    );
+        $Self->True(
+            $WebserviceID,
+            "$Test->{Name} WebserviceAdd()",
+        );
+    }
 
     my $WebserviceNameEncoded = URI::Escape::uri_escape_utf8("$Test->{Name} $RandomID");
 
@@ -230,200 +252,80 @@ for my $Test (@Tests) {
     #
     for my $RequestMethod (qw(get post)) {
 
-        for my $WebserviceAccess (
-            "WebserviceID/$WebserviceID",
-            "Webservice/$WebserviceNameEncoded"
-            )
+        my $RequestData  = '';
+        my $ResponseData = '';
+
         {
+            local %ENV;
 
-            my $RequestData  = '';
-            my $ResponseData = '';
-
-            {
-                local %ENV;
-
-                if ( $RequestMethod eq 'post' ) {
-
-                    # prepare CGI environment variables
-                    $ENV{REQUEST_URI}    = "http://localhost/kix/nph-API.pl/$WebserviceAccess";
-                    $ENV{REQUEST_METHOD} = 'POST';
-                    $RequestData         = $CreateQueryString->(
-                        $Self,
-                        Data   => $Test->{RequestData},
-                        Encode => 0,
-                    );
-                    use bytes;
-                    $ENV{CONTENT_LENGTH} = length($RequestData);
-                }
-                else {    # GET
-
-                    # prepare CGI environment variables
-                    $ENV{REQUEST_URI} = "http://localhost/kix/nph-API.pl/$WebserviceAccess?"
-                        . $CreateQueryString->(
-                        $Self,
-                        Data   => $Test->{RequestData},
-                        Encode => 1,
-                        );
-                    $ENV{QUERY_STRING} = $CreateQueryString->(
-                        $Self,
-                        Data   => $Test->{RequestData},
-                        Encode => 1,
-                    );
-                    $ENV{REQUEST_METHOD} = 'GET';
-                }
-
-                $ENV{CONTENT_TYPE} = 'application/x-www-form-urlencoded; charset=utf-8;';
-
-                # redirect STDIN from String so that the transport layer will use this data
-                local *STDIN;
-                open STDIN, '<:utf8', \$RequestData;    ## no critic
-
-                # redirect STDOUT from String so that the transport layer will write there
-                local *STDOUT;
-                open STDOUT, '>:utf8', \$ResponseData;    ## no critic
-
-                # reset CGI object from previous runs
-                CGI::initialize_globals();
-                $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
-
-                $ProviderObject->Run();
-            }
-
-            if ( $Test->{ResponseSuccess} ) {
-
-                for my $Key ( sort keys %{ $Test->{ResponseData} || {} } ) {
-                    my $QueryStringPart = URI::Escape::uri_escape_utf8($Key);
-                    if ( $Test->{ResponseData}->{$Key} ) {
-                        $QueryStringPart
-                            .= '=' . URI::Escape::uri_escape_utf8( $Test->{ResponseData}->{$Key} );
-                    }
-
-                    $Self->True(
-                        index( $ResponseData, $QueryStringPart ) > -1,
-                        "$Test->{Name} $WebserviceAccess Run() HTTP $RequestMethod result data contains $QueryStringPart",
-                    );
-                }
-
-                $Self->True(
-                    index( $ResponseData, 'HTTP/1.0 200 OK' ) > -1,
-                    "$Test->{Name} $WebserviceAccess Run() HTTP $RequestMethod result success status",
+            if ( $RequestMethod eq 'post' ) {
+                # prepare CGI environment variables
+                $ENV{REQUEST_URI}    = "localhost/Webservice/$WebserviceNameEncoded/Test";
+                $ENV{REQUEST_METHOD} = 'POST';
+                $RequestData         = $Kernel::OM->Get('JSON')->Encode(
+                    Data => $Test->{RequestData}
                 );
+                $Kernel::OM->Get('Encode')->EncodeOutput( \$RequestData );
+                use bytes;
+                $ENV{CONTENT_LENGTH} = length($RequestData);
+                $ENV{CONTENT_TYPE} = 'application/json; charset=utf-8;';
             }
-            else {
-
-                # If an early error occurred, GI cannot generate a valid HTTP error response yet,
-                #   because the transport object was not yet initialized. In these cases, apache will
-                #   generate this response, but here we do not use apache.
-                if ( !$Test->{EarlyError} ) {
-                    $Self->True(
-                        index( $ResponseData, 'HTTP/1.0 500 ' ) > -1,
-                        "$Test->{Name} $WebserviceAccess Run() HTTP $RequestMethod result error status",
-                    );
-                }
-            }
-        }
-    }
-
-    #
-    # Test real HTTP request
-    #
-    for my $RequestMethod (qw(get post)) {
-
-        my @BaseURLs = ($ApacheBaseURL);
-        if ($PlackBaseURL) {
-            push @BaseURLs, $PlackBaseURL;
-        }
-
-        for my $BaseURL (@BaseURLs) {
-
-            for my $WebserviceAccess (
-                "WebserviceID/$WebserviceID",
-                "Webservice/$WebserviceNameEncoded"
-                )
-            {
-
-                my $URL = $BaseURL . $WebserviceAccess;
-                my $Response;
-                my $ResponseData;
-                my $QueryString = $CreateQueryString->(
+            else {    # GET
+                # prepare CGI environment variables
+                $ENV{REQUEST_URI} = "localhost/Webservice/$WebserviceNameEncoded/Test?" . $CreateQueryString->(
                     $Self,
                     Data   => $Test->{RequestData},
                     Encode => 1,
                 );
-
-                if ( $RequestMethod eq 'get' ) {
-                    $URL .= "?$QueryString";
-                    $Response = LWP::UserAgent->new()->$RequestMethod($URL);
-                }
-                else {    # POST
-                    $Response = LWP::UserAgent->new()->$RequestMethod( $URL, Content => $QueryString );
-                }
-                chomp( $ResponseData = $Response->decoded_content() );
-
-                if ( $Test->{ResponseSuccess} ) {
-                    for my $Key ( sort keys %{ $Test->{ResponseData} || {} } ) {
-                        my $QueryStringPart = URI::Escape::uri_escape_utf8($Key);
-                        if ( $Test->{ResponseData}->{$Key} ) {
-                            $QueryStringPart
-                                .= '='
-                                . URI::Escape::uri_escape_utf8( $Test->{ResponseData}->{$Key} );
-                        }
-
-                        $Self->True(
-                            index( $ResponseData, $QueryStringPart ) > -1,
-                            "$Test->{Name} $WebserviceAccess real HTTP $RequestMethod request (needs configured and running webserver) result data contains $QueryStringPart ($URL)",
-                        );
-                    }
-
-                    $Self->Is(
-                        $Response->code(),
-                        200,
-                        "$Test->{Name} $WebserviceAccess real HTTP $RequestMethod request (needs configured and running webserver) result success status ($URL)",
-                    );
-                }
-                else {
-                    $Self->Is(
-                        $Response->code(),
-                        500,
-                        "$Test->{Name} $WebserviceAccess real HTTP $RequestMethod request (needs configured and running webserver) result error status ($URL)",
-                    );
-                }
+                $ENV{QUERY_STRING} = $CreateQueryString->(
+                    $Self,
+                    Data   => $Test->{RequestData},
+                    Encode => 1,
+                );
+                $ENV{REQUEST_METHOD} = 'GET';
+                $ENV{CONTENT_TYPE} = 'application/x-www-form-urlencoded; charset=utf-8;';
             }
+
+
+            # redirect STDIN from String so that the transport layer will use this data
+            local *STDIN;
+            open STDIN, '<:utf8', \$RequestData;
+
+            # redirect STDOUT from String so that the transport layer will write there
+            local *STDOUT;
+            open STDOUT, '>:utf8', \$ResponseData;
+
+            # reset CGI object from previous runs
+            CGI::initialize_globals();
+            $Kernel::OM->ObjectsDiscard( Objects => ['WebRequest'] );
+
+            $ProviderObject->Run(
+                Silent => $Test->{Silent},
+            );
         }
+
+        $Self->True(
+            index( $ResponseData, $Test->{ResponseStatus} ) > -1,
+            "$Test->{Name} Webservice/$WebserviceNameEncoded Run() HTTP $RequestMethod result status is '$Test->{ResponseStatus}'",
+        );
     }
 
-    # delete webservice
-    my $Success = $WebserviceObject->WebserviceDelete(
-        ID     => $WebserviceID,
-        UserID => 1,
-    );
+    if ( $Test->{WebserviceConfig} ) {
+        # delete webservice
+        my $Success = $WebserviceObject->WebserviceDelete(
+            ID     => $WebserviceID,
+            UserID => 1,
+        );
 
-    $Self->True(
-        $Success,
-        "$Test->{Name} WebserviceDelete()",
-    );
+        $Self->True(
+            $Success,
+            "$Test->{Name} WebserviceDelete()",
+        );
+    }
 }
 
-#
-# Test non existing webservice
-#
-for my $RequestMethod (qw(get post)) {
-
-    my $URL = $ApacheBaseURL . 'undefined';
-    my $ResponseData;
-
-    my $Response = LWP::UserAgent->new()->$RequestMethod($URL);
-    chomp( $ResponseData = $Response->decoded_content() );
-
-    $Self->Is(
-        $Response->code(),
-        500,
-        "Non existing Webservice real HTTP $RequestMethod request result error status ($URL)",
-    );
-}
-
-# cleanup cache
-$Kernel::OM->Get('Cache')->CleanUp();
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

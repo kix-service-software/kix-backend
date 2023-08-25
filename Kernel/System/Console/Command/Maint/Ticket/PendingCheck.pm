@@ -94,7 +94,7 @@ sub Run {
             );
 
             # set new state
-            my $Success = $TicketObject->StateSet(
+            my $Success = $TicketObject->TicketStateSet(
                 TicketID => $TicketID,
                 State    => $NewState,
                 UserID   => 1,
@@ -113,7 +113,7 @@ sub Run {
             if ( $State{TypeName} eq 'closed' ) {
 
                 # set new ticket lock
-                $TicketObject->LockSet(
+                $TicketObject->TicketLockSet(
                     TicketID     => $TicketID,
                     Lock         => 'unlock',
                     UserID       => 1,

@@ -17,12 +17,10 @@ use vars (qw($Self));
 use Kernel::System::PostMaster;
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # This test checks if KIX correctly detects that an email must not be auto-responded to.
 my @Tests = (
@@ -166,7 +164,8 @@ for my $Test (@Tests) {
     }
 }
 
-# cleanup cache is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

@@ -19,10 +19,11 @@ use XML::Simple;
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Log',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    DB
+    Log
 );
 
 =head1 NAME
@@ -97,11 +98,9 @@ returns a list of supported SysConfig option types.
 sub OptionTypeList {
     my ( $Self, %Param ) = @_;
 
-    # get all type modules
-    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
-        Directory => $Kernel::OM->Get('Config')->Get('Home').'/Kernel/System/SysConfig/OptionType',
-        Filter    => '*.pm',
-    );
+    # get all type modules - don't use the MainObject because we will have a deep recursion due to ring deps
+    my @Files = glob $Kernel::OM->Get('Config')->Get('Home').'/Kernel/System/SysConfig/OptionType/*.pm';
+
     my @Result = map { my $Module = fileparse($_, '.pm'); $Module } grep { not m/Base\.pm/ } @Files;
 
     return @Result;
@@ -183,10 +182,12 @@ sub OptionGet {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -237,10 +238,12 @@ sub OptionGet {
 
     # no data found...
     if ( !%Data ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "SysConfig option '$Param{Name}' not found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SysConfig option '$Param{Name}' not found!",
+            );
+        }
         return;
     }
 
@@ -458,13 +461,23 @@ sub OptionUpdate {
     # check needed stuff
     for (qw(Name UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     if ( $Param{Type} && !$Self->{OptionTypes}->{$Param{Type}} ) {
-        $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Type \"$Param{Type} not supported!" );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Type \"$Param{Type} not supported!"
+            );
+        }
         return;
     }
 
@@ -541,11 +554,12 @@ sub OptionUpdate {
 
     # handle the update result...
     if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "DB update failed!",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "DB update failed!",
+            );
+        }
         return;
     }
 
@@ -722,7 +736,7 @@ sub ValueGetAll {
 
     my %Result = map {
         my $Value = defined $_->{Value} && $_->{Value} ne '' ? $_->{Value} : $_->{Default};
-        if ( $Value ) {
+        if ( $Value && $Self->{OptionTypeModules}->{$_->{Type}} ) {
             $Value = $Self->{OptionTypeModules}->{$_->{Type}}->Decode(
                 Data => $Value
             );
@@ -759,19 +773,27 @@ sub ValueSet {
     # check needed stuff
     for (qw(Name UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     my %OptionData = $Self->OptionGet(
-        Name => $Param{Name},
+        Name   => $Param{Name},
+        Silent => $Param{Silent},
     );
+    return if ( !%OptionData );
 
     my $Result = $Self->OptionUpdate(
         %OptionData,
         Value  => $Param{Value},
         UserID => $Param{UserID},
+        Silent => $Param{Silent},
     );
 
     return $Result;

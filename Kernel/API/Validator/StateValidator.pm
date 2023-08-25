@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'StateID' ) {
         $Found = $Kernel::OM->Get('State')->StateLookup(
             StateID => $Param{Data}->{$Param{Attribute}},
+            Silent  => 1,
         );
     }
     elsif ( $Param{Attribute} eq 'State' ) {
         $Found = $Kernel::OM->Get('State')->StateLookup(
-            State => $Param{Data}->{$Param{Attribute}},
+            State  => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     else {

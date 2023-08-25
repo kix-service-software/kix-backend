@@ -17,12 +17,10 @@ my $ReportingObject  = $Kernel::OM->Get('Reporting');
 my $MainObject       = $Kernel::OM->Get('Main');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my %Data = (
     Defintion_1_Name    => 'ReportDefFilter_1',
@@ -168,6 +166,9 @@ if ($ReportingID_1) {
     }
 }
 
+# rollback transaction on database
+$Helper->Rollback();
+
 sub _CreateReportingDefs {
     my @ReportDefinitionIDs;
     for my $Index (1..3) {
@@ -189,8 +190,6 @@ sub _CreateReportingDefs {
     }
     return @ReportDefinitionIDs;
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

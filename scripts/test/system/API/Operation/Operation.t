@@ -15,13 +15,12 @@ use vars (qw($Self));
 use Kernel::API::Operation;
 
 # get helper object
-# skip SSL certificate verification
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        SkipSSLVerify => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# skip SSL certificate verification
+$Helper->SSLVerify(
+    SkipSSLVerify => 1,
+);
 
 # create object with false options
 my $OperationObject;
@@ -69,12 +68,18 @@ $Self->IsNot(
 # create object
 $OperationObject = Kernel::API::Operation->new(
     WebserviceID   => 1,
-    Operation      => 'Test',
-    OperationType  => 'Test::Test',
+    Operation      => 'UserSearch',
+    OperationType  => 'V1::User::UserSearch',
+    OperationRouteMapping => {},
+    ParentMethodOperationMapping => {},
+    AvailableMethods => {},
+    RequestMethod => 'GET',
+    RequestURI    => '/system/users',
+    CurrentRoute  => '/system/users'
 );
 $Self->Is(
     ref $OperationObject,
-    'API::Operation',
+    'Kernel::API::Operation',
     'Operation::new() success',
 );
 

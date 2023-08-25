@@ -14,81 +14,64 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $UserObject   = $Kernel::OM->Get('User');
-
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
+# get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-$ConfigObject->Set(
+# begin transaction on database
+$Helper->BeginWork();
+
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
-# create non existing user login
-my $UserRandom;
-TRY:
-for my $Try ( 1 .. 20 ) {
-
-    $UserRandom = 'unittest-' . $Helper->GetRandomID();
-
-    my $UserID = $UserObject->UserLookup(
-        UserLogin => $UserRandom,
-    );
-
-    last TRY if !$UserID;
-
-    next TRY if $Try ne 20;
-
-    $Self->True(
-        0,
-        'Find non existing user login.',
-    );
-}
-
-# add user
-my $UserID = $UserObject->UserAdd(
-    UserLogin    => $UserRandom,
-    ValidID      => 1,
-    ChangeUserID => 1,
-    IsAgent      => 1,
+# create test user
+my $UserLogin = $Helper->TestUserCreate(
+    Firstname => 'John',
+    Lastname  => 'Doe',
 );
-
+my $UserID = $Kernel::OM->Get('User')->UserLookup(
+    UserLogin => $UserLogin
+);
 $Self->True(
     $UserID,
-    'UserAdd()',
+    'TestUserCreate( Firstname => \'Jon\', Lastname => \'Doe\' )',
 );
 
 my %Tests = (
     0 => "John Doe",
     1 => "Doe, John",
-    2 => "John Doe ($UserRandom)",
-    3 => "Doe, John ($UserRandom)",
-    4 => "($UserRandom) John Doe",
-    5 => "($UserRandom) Doe, John",
+    2 => "John Doe ($UserLogin)",
+    3 => "Doe, John ($UserLogin)",
+    4 => "($UserLogin) John Doe",
+    5 => "($UserLogin) Doe, John",
     6 => "Doe John",
-    7 => "Doe John ($UserRandom)",
-    8 => "($UserRandom) Doe John",
+    7 => "Doe John ($UserLogin)",
+    8 => "($UserLogin) Doe John",
 );
 
 for my $Order ( sort keys %Tests ) {
-    $ConfigObject->Set(
+    # cleanup contact cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'Contact',
+    );
+
+    # set config
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'FirstnameLastnameOrder',
         Value => $Order,
     );
+
+    # perform check
     $Self->Is(
-        $UserObject->UserName( UserID => $UserID ),
+        $Kernel::OM->Get('User')->UserName( UserID => $UserID ),
         $Tests{$Order},
         "FirstnameLastnameOrder $Order",
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

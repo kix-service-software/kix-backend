@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -16,17 +16,28 @@ use vars (qw($Self));
 # get ReportDefinition object
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# get current counts of report definitions before testing
+my %BaseList = $ReportingObject->ReportDefinitionList(
+    UserID => 1,
+);
+my $BaseCount = scalar keys %BaseList;
+my %BaseValidList = $ReportingObject->ReportDefinitionList(
+    Valid  => 1,
+    UserID => 1,
+);
+my $BaseValidCount = scalar keys %BaseValidList;
+my %BaseTypeList = $ReportingObject->ReportDefinitionList(
+    Type   => 'GenericSQL',
+    Valid  => 1,
+    UserID => 1,
+);
+my $BaseTypeCount = scalar keys %BaseTypeList;
 
 # create test definition
 my $ReportDefinitionName  = 'definition-'.$Helper->GetRandomID();
@@ -63,6 +74,7 @@ my $Success = $ReportingObject->ReportDefinitionAdd(
     DataSource => 'GenericSQL',
     ValidID    => 2,
     UserID     => 1,
+    Silent     => 1,
 );
 
 $Self->False(
@@ -76,7 +88,7 @@ my %DefinitionList = $ReportingObject->ReportDefinitionList(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    4,
+    $BaseCount+2,
     'ReportDefinitionList() - without restrictions',
 );
 
@@ -87,7 +99,7 @@ $Self->Is(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    3,
+    $BaseValidCount+1,
     'ReportDefinitionList() - only valid',
 );
 
@@ -99,12 +111,12 @@ $Self->Is(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    3,
+    $BaseTypeCount+1,
     'ReportDefinitionList() - only type "GenericSQL"',
 );
 
 $Self->Is(
-    (sort values %DefinitionList)[2],
+    (sort values %DefinitionList)[-1],
     $ReportDefinitionName.'-GenericSQL',
     'ReportDefinitionList() - only type "GenericSQL"',
 );
@@ -136,7 +148,7 @@ $Self->Is(
     'ReportDefinitionGet() - MaxReports has correct value',
 );
 
-my $Success = $ReportingObject->ReportDefinitionUpdate(
+$Success = $ReportingObject->ReportDefinitionUpdate(
     ID => $ReportDefinitionID2,
     %Definition,
     IsPeriodic => undef,
@@ -157,7 +169,7 @@ $Self->True(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    4,
+    $BaseValidCount+2,
     'ReportDefinitionList() - only valid after update',
 );
 
@@ -179,7 +191,7 @@ $Self->Is(
 
 $Self->Is(
     $Definition{IsPeriodic},
-    undef,
+    0,
     'ReportDefinitionGet() - IsPeriodic has correct value',
 );
 
@@ -191,10 +203,11 @@ $Self->Is(
 
 # update to the same name like definition 1
 $Success = $ReportingObject->ReportDefinitionUpdate(
-    ID => $ReportDefinitionID2,
     %Definition,
+    ID     => $ReportDefinitionID2,
     Name   => $ReportDefinitionName.'-GenericSQL',
     UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -203,8 +216,8 @@ $Self->False(
 );
 
 $Success = $ReportingObject->ReportDefinitionDelete(
-    ID => $ReportDefinitionID2,
-    UserID  => 1,
+    ID     => $ReportDefinitionID2,
+    UserID => 1,
 );
 
 $Self->True(
@@ -218,11 +231,9 @@ $Self->True(
 
 $Self->Is(
     scalar keys %DefinitionList,
-    3,
+    $BaseCount+1,
     'ReportDefinitionList() - without restrictions after delete',
 );
-
-
 
 my @ValidationTests = (
     {
@@ -230,6 +241,7 @@ my @ValidationTests = (
         Config => {
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid config - no output formats defined',
@@ -255,6 +267,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'valid config - valid output format defined with empty config',
@@ -301,6 +314,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid config - parameter used but not defined',
@@ -318,6 +332,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid config - parameter used but incorrectly defined - config missing',
@@ -337,6 +352,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid config - parameter used and incorrectly defined - Name missing',
@@ -358,6 +374,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid config - parameter used and incorrectly defined - DataType missing',
@@ -380,6 +397,7 @@ my @ValidationTests = (
             }
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'valid config - parameter used and correctly defined',
@@ -391,8 +409,8 @@ my @ValidationTests = (
             },
             Parameters => [
                 {
-                    Name => 'TestParameter',
-                    Label => 'Name Pattern',
+                    Name     => 'TestParameter',
+                    Label    => 'Name Pattern',
                     DataType => 'STRING'
                 }
             ],
@@ -413,6 +431,7 @@ foreach my $Test ( @ValidationTests ) {
         Config     => $Test->{Config},
         ValidID    => 1,
         UserID     => 1,
+        Silent     => $Test->{Silent},
     );
 
     if ( $Test->{Expect} ) {
@@ -429,7 +448,8 @@ foreach my $Test ( @ValidationTests ) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

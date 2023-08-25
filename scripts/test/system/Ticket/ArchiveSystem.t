@@ -14,24 +14,16 @@ use utf8;
 
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-$ConfigObject->Set(
+# begin transaction on database
+$Helper->BeginWork();
+
+$Kernel::OM->Get('Config')->Set(
     Key   => 'Ticket::ArchiveSystem',
     Value => 1,
 );
-
-# get ticket object
-my $TicketObject = $Kernel::OM->Get('Ticket');
 
 my @Tests = (
     {
@@ -58,33 +50,33 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::ArchiveSystem::RemoveSeenFlags',
         Value => $Test->{Config}->{RemoveSeenFlags},
     );
 
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::ArchiveSystem::RemoveTicketWatchers',
         Value => $Test->{Config}->{RemoveTicketWatchers},
     );
 
-    my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'Some Ticket_Title',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'closed',
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+        Title          => 'Some Ticket_Title',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
         OrganisationID => '123465',
-        ContactID    => 'customer@example.com',
-        OwnerID      => 1,
-        UserID       => 1,
+        ContactID      => 'customer@example.com',
+        OwnerID        => 1,
+        UserID         => 1,
     );
     $Self->True(
         $TicketID,
         'TicketCreate()',
     );
 
-    my $ArticleID = $TicketObject->ArticleCreate(
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         TicketID       => $TicketID,
         Channel        => 'note',
         SenderType     => 'agent',
@@ -104,7 +96,7 @@ for my $Test (@Tests) {
         'ArticleCreate()',
     );
 
-    my $ArticleID2 = $TicketObject->ArticleCreate(
+    my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
         TicketID       => $TicketID,
         Channel        => 'note',
         SenderType     => 'agent',
@@ -125,7 +117,7 @@ for my $Test (@Tests) {
     );
 
     # Seen flags are set for UserID 1 already
-    my %Flag = $TicketObject->TicketFlagGet(
+    my %Flag = $Kernel::OM->Get('Ticket')->TicketFlagGet(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -136,7 +128,8 @@ for my $Test (@Tests) {
         "$Test->{Name} - TicketFlagGet() article 1",
     );
 
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleID,
         UserID    => 1,
     );
@@ -148,7 +141,7 @@ for my $Test (@Tests) {
     );
 
     # subscribe user to ticket
-    my $Success = $Kernel::OM->Get('Watcher')->WatcherAdd(
+    my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherAdd(
         Object      => 'Ticket',
         ObjectID    => $TicketID,
         WatchUserID => 1,
@@ -156,9 +149,14 @@ for my $Test (@Tests) {
     );
 
     $Self->True(
-        $Success,
+        $WatcherID,
         "$Test->{Name} - subscribe watcher",
     );
+
+    my %Watcher = $Kernel::OM->Get('Watcher')->WatcherGet(
+        ID => $WatcherID,
+    );
+    delete( $Watcher{WatchUserID} );
 
     my @Watchers = $Kernel::OM->Get('Watcher')->WatcherList(
         ObjectType  => 'Ticket',
@@ -167,12 +165,12 @@ for my $Test (@Tests) {
 
     $Self->IsDeeply(
         \@Watchers,
-        [1],
+        [\%Watcher],
         "$Test->{Name} - get watchers",
     );
 
     # Now set the archive flag
-    $Success = $TicketObject->TicketArchiveFlagSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketArchiveFlagSet(
         TicketID    => $TicketID,
         ArchiveFlag => 'y',
         UserID      => 1,
@@ -183,7 +181,7 @@ for my $Test (@Tests) {
         "$Test->{Name} - TicketArchiveFlagSet()",
     );
 
-    my %Ticket = $TicketObject->TicketGet( TicketID => $TicketID );
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet( TicketID => $TicketID );
 
     $Self->Is(
         $Ticket{ArchiveFlag},
@@ -192,7 +190,7 @@ for my $Test (@Tests) {
     );
 
     # now check the seen flags
-    %Flag = $TicketObject->TicketFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->TicketFlagGet(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -203,7 +201,8 @@ for my $Test (@Tests) {
         "$Test->{Name} - TicketFlagGet() after archiving",
     );
 
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleID,
         UserID    => 1,
     );
@@ -214,14 +213,15 @@ for my $Test (@Tests) {
         "$Test->{Name} - ArticleFlagGet() article 1 after archiving",
     );
 
-    @Watchers = $TicketObject->TicketWatchGet(
-        TicketID => $TicketID,
-        Result   => 'ARRAY',
+
+    @Watchers = $Kernel::OM->Get('Watcher')->WatcherList(
+        ObjectType  => 'Ticket',
+        ObjectID    => $TicketID,
     );
 
-    $Self->IsDeeply(
-        \@Watchers,
-        $Test->{Config}->{RemoveTicketWatchers} ? [] : [1],
+    $Self->Is(
+        scalar( @Watchers ),
+        $Test->{Config}->{RemoveTicketWatchers} ? 0 : 1,
         "$Test->{Name} - TicketWatchGet()",
     );
 
@@ -242,12 +242,12 @@ for my $Test (@Tests) {
     );
 
     # delete pre-existing article flags which are created on TicketCreate
-    $TicketObject->ArticleFlagDelete(
+    $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleID,
         Key       => 'Seen',
         UserID    => 1,
     );
-    $TicketObject->ArticleFlagDelete(
+    $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleID2,
         Key       => 'Seen',
         UserID    => 1,
@@ -256,7 +256,8 @@ for my $Test (@Tests) {
     for my $Test (@Tests) {
 
         # Set for article 1
-        my %Flag = $TicketObject->ArticleFlagGet(
+        my %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID,
             UserID    => 1,
         );
@@ -264,7 +265,7 @@ for my $Test (@Tests) {
             $Flag{ $Test->{Key} },
             'ArticleFlagGet() article 1',
         );
-        my $Set = $TicketObject->ArticleFlagSet(
+        my $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
             ArticleID => $ArticleID,
             Key       => $Test->{Key},
             Value     => $Test->{Value},
@@ -276,7 +277,8 @@ for my $Test (@Tests) {
         );
 
         # Set for article 2
-        %Flag = $TicketObject->ArticleFlagGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID2,
             UserID    => 1,
         );
@@ -284,7 +286,7 @@ for my $Test (@Tests) {
             $Flag{ $Test->{Key} },
             'ArticleFlagGet() article 2',
         );
-        $Set = $TicketObject->ArticleFlagSet(
+        $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
             ArticleID => $ArticleID2,
             Key       => $Test->{Key},
             Value     => $Test->{Value},
@@ -294,7 +296,8 @@ for my $Test (@Tests) {
             $Set,
             'ArticleFlagSet() article 2',
         );
-        %Flag = $TicketObject->ArticleFlagGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID2,
             UserID    => 1,
         );
@@ -305,7 +308,7 @@ for my $Test (@Tests) {
         );
 
         # Get all flags of ticket
-        %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
@@ -323,7 +326,7 @@ for my $Test (@Tests) {
         );
 
         # Delete for article 1
-        my $Delete = $TicketObject->ArticleFlagDelete(
+        my $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
             ArticleID => $ArticleID,
             Key       => $Test->{Key},
             UserID    => 1,
@@ -332,7 +335,8 @@ for my $Test (@Tests) {
             $Delete,
             'ArticleFlagDelete() article 1',
         );
-        %Flag = $TicketObject->ArticleFlagGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID,
             UserID    => 1,
         );
@@ -341,7 +345,7 @@ for my $Test (@Tests) {
             'ArticleFlagGet() article 1',
         );
 
-        %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
@@ -356,7 +360,7 @@ for my $Test (@Tests) {
         );
 
         # Delete for article 2
-        $Delete = $TicketObject->ArticleFlagDelete(
+        $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
             ArticleID => $ArticleID2,
             Key       => $Test->{Key},
             UserID    => 1,
@@ -366,7 +370,7 @@ for my $Test (@Tests) {
             'ArticleFlagDelete() article 2',
         );
 
-        %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+        %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
@@ -376,10 +380,10 @@ for my $Test (@Tests) {
             'ArticleFlagsOfTicketGet() empty articles',
         );
     }
-
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

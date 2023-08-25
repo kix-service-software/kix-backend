@@ -18,12 +18,10 @@ use vars (qw($Self));
 my $PIDObject = $Kernel::OM->Get('PID');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # set fixed time
 $Helper->FixedTimeSet();
@@ -55,7 +53,9 @@ $Self->True(
     'PIDCreate() - Force',
 );
 
-my $UpdateSuccess = $PIDObject->PIDUpdate();
+my $UpdateSuccess = $PIDObject->PIDUpdate(
+    Silent => 1,
+);
 
 $Self->False(
     $UpdateSuccess,
@@ -63,7 +63,8 @@ $Self->False(
 );
 
 $UpdateSuccess = $PIDObject->PIDUpdate(
-    Name => 'NonExistentProcess' . $Helper->GetRandomID(),
+    Name   => 'NonExistentProcess' . $Helper->GetRandomID(),
+    Silent => 1,
 );
 
 $Self->False(
@@ -158,7 +159,8 @@ $Self->False(
     'PIDGet() for forced delete (PID should be deleted now)',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
