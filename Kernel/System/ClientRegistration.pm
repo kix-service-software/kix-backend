@@ -509,8 +509,8 @@ sub _NotificationSendToClient {
         ClientID => $Param{ClientID}
     );
 
-    # don't use Crypt::SSLeay but Net::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+    # don't use Crypt::SSLeay but IO::Socket::SSL instead
+    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
     if ( !$Self->{UserAgent} ) {
         my $ConfigObject       = $Kernel::OM->Get('Config');
