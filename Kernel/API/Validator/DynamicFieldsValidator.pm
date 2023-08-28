@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -65,19 +65,17 @@ sub Validate {
 
     my $Found;
     if ( $Param{Attribute} eq 'DynamicFields' ) {
-        my $DynamicFields = $Param{Data}->{$Param{Attribute}};
+        my $DynamicField = $Param{Data}->{$Param{Attribute}};
 
         $Found = 1;
-        if ( !IsArrayRef($DynamicFields) ) {
+        if ( !IsHashRefWithData($DynamicField) ) {
             $Found = 0;
         }
-        else {
-            foreach my $DynamicField ( @{$DynamicFields} ) {
-                if ( !IsHashRefWithData($DynamicField) || !$DynamicField->{Name} || !exists($DynamicField->{Value}) ) {
-                    $Found = 0;
-                    last;
-                }
-            }
+        elsif (
+            !$DynamicField->{Name}
+            || !exists($DynamicField->{Value})
+        ) {
+            $Found = 0;
         }
     }
     else {
