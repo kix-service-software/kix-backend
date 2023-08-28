@@ -186,8 +186,8 @@ sub Run {
             ColumnSeparator                 => $CurrMapping->{"ColumnSeparator"} || 'Semicolon',
             IncludeColumnHeaders            => $CurrMapping->{"IncludeColumnHeaders"} || '1',
             DefaultName                     => $CurrMapping->{"DefaultName"} || '',
-            DefaultIncidentState            => $CurrMapping->{"DefaultDeploymentStateID"} || $InciStateID,
-            DefaultDeploymentState          => $CurrMapping->{"DefaultIncidentStateID"} || $DeplStateID,
+            DefaultIncidentState            => $CurrMapping->{"DefaultIncidentStateID"} || $InciStateID,
+            DefaultDeploymentState          => $CurrMapping->{"DefaultDeploymentStateID"} || $DeplStateID,
         );
 
         # create mapping template...
