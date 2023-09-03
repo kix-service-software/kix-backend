@@ -180,6 +180,27 @@ sub LogInfo {
     )
 }
 
+=item LogNotice()
+
+Logs a notice message.
+
+Example:
+    my $Success = $Object->LogNotice(
+        Message  => '...',
+        UserID   => 123,
+    );
+
+=cut
+
+sub LogNotice {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_Log(
+        %Param,
+        Priority => 'notice',
+    )
+}
+
 =item LogError()
 
 Logs an error message.
@@ -229,6 +250,13 @@ sub _Log {
             return;
         }
     }
+
+    # check desired log level
+    my $LogObject = $Kernel::OM->Get('Log');
+    my $MinimumLogLevel = $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel') || 'error';
+    my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
+    my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
+    return 1 if $PriorityNum < $MinimumLogLevelNum;
 
     my %Reference;
     foreach my $ReferenceID ( qw(JobID RunID MacroID MacroActionID ObjectID) ) {
@@ -354,6 +382,67 @@ sub LogDelete {
     return 1;
 }
 
+=item GetLogCount()
+
+Returns the log entry count
+
+Example:
+    my $Count = $Object->GetLogCount(
+        JobID         => 123,               # optional
+        RunID         => 123,               # optional
+        MacroID       => 123,               # optional
+        MacroActionID => 123,               # optional
+        Priority      => 'error'            # optional
+    );
+
+=cut
+
+sub GetLogCount {
+    my ( $Self, %Param ) = @_;
+
+    # prepare mapping of references
+    my %ReferenceMap  = (
+        'JobID'         => 'job_id',
+        'RunID'         => 'run_id',
+        'MacroID'       => 'macro_id',
+        'MacroActionID' => 'macro_action_id',
+        'Priority'      => 'priority'
+    );
+
+    # init params
+    my $SQL  = 'SELECT count(*) FROM automation_log WHERE 1=1';
+    my @Bind = ();
+
+    # prepare reference data
+    my @WhereClauses = ();
+    for my $Reference ( qw(JobID RunID MacroID MacroActionID Priority) ) {
+        if ( $Param{ $Reference } ) {
+            my $WhereClause = $ReferenceMap{ $Reference } . ' = ?';
+
+            push( @WhereClauses, $WhereClause );
+            push( @Bind, \$Param{ $Reference } );
+        }
+    }
+
+    # prepare statement
+    $SQL .= join( ' AND ', @WhereClauses );
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    # fetch sla_id from ticket
+    return if !$DBObject->Prepare(
+        SQL => $SQL,
+        Bind => \@Bind,
+    );
+
+    my $Count = 0;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Count = $Row[0];
+    }
+
+    return $Count;
+}
 
 sub _Debug {
     my ( $Self, $Message ) = @_;
