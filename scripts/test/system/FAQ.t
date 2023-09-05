@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -21,13 +21,13 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $FAQObject   = $Kernel::OM->Get('FAQ');
 my $CacheObject = $Kernel::OM->Get('Cache');
 
-my $AddignedUser = $Helper->GetRandomID();
+my $AddignedUser  = $Helper->GetRandomID();
+my $AddignedUser2 = $Helper->GetRandomID();
 
 
-my $FAQID = $FAQObject->FAQAdd(
+my $FAQID = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title       => 'Some Text',
     CategoryID  => 1,
     Visibility  => 'internal',
@@ -44,7 +44,7 @@ $Self->IsNot(
     "FAQAdd() - 1",
 );
 
-my %FAQ = $FAQObject->FAQGet(
+my %FAQ = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID     => $FAQID,
     ItemFields => 1,
     UserID     => 1,
@@ -69,7 +69,11 @@ for my $Test ( sort keys %FAQTest ) {
     );
 }
 
-my $FAQUpdate = $FAQObject->FAQUpdate(
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['FAQ'],
+);
+
+my $FAQUpdate = $Kernel::OM->Get('FAQ')->FAQUpdate(
     %FAQ,
     ItemID      => $FAQID,
     CategoryID  => 1,
@@ -84,7 +88,7 @@ my $FAQUpdate = $FAQObject->FAQUpdate(
     ContentType => 'text/plain',
 );
 
-%FAQ = $FAQObject->FAQGet(
+%FAQ = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID     => $FAQID,
     ItemFields => 1,
     UserID     => 1,
@@ -108,31 +112,114 @@ for my $Test ( sort keys %FAQTest ) {
         "FAQGet() - $Test",
     );
 }
-
-my $VoteID = $FAQObject->VoteAdd(
-    CreatedBy => $AddignedUser,
-    ItemID    => $FAQID,
-    Rate      => 100,
-    UserID    => 1,
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['FAQ'],
 );
 
-$Self->True(
-    $VoteID,
-    "VoteAdd()",
+# voting tests
+my @TestVotes = (
+    {
+        Config => {
+            CreatedBy => $AddignedUser,
+            Rate      => 100
+        },
+        Excaption => {
+            Success => 0,
+            Search  => 0
+        },
+        Name      => 'Added Vote (100) - Missing ItemID'
+    },
+    {
+        Config => {
+            ItemID    => $FAQID,
+            Rate      => 100
+        },
+        Excaption => {
+            Success => 0,
+            Search  => 0
+        },
+        Name      => 'Added Vote (100) - Missing CreatedBy'
+    },
+    {
+        Config => {
+            CreatedBy => $AddignedUser,
+            ItemID    => $FAQID,
+            Rate      => 100
+        },
+        Excaption => {
+            Success => 1,
+            Search  => 1
+        },
+        Name      => 'Added Vote (100) - with true'
+    },
+    {
+        Config => {
+            CreatedBy => $AddignedUser,
+            ItemID    => $FAQID,
+            Rate      => 50
+        },
+        Excaption => {
+            Success => 1,
+            Search  => 1
+        },
+        Name      => 'Added Vote (50) with same creator - with true'
+    },
+    {
+        Config => {
+            CreatedBy => $AddignedUser2,
+            ItemID    => $FAQID,
+            Rate      => 80
+        },
+        Excaption => {
+            Success => 1,
+            Search  => 2
+        },
+        Name      => 'Added Vote (80) with new creator - with true'
+    },
 );
 
-my %Vote = $FAQObject->VoteGet(
-    VoteID => $VoteID,
-    UserID => 1,
-);
+my $Count = 1;
+for my $Test ( @TestVotes ) {
 
-$Self->Is(
-    $Vote{CreatedBy},
-    $AddignedUser,
-    "VoteGet() - IP",
-);
+    my $VoteID = $Kernel::OM->Get('FAQ')->VoteAdd(
+        %{$Test->{Config}},
+        UserID => 1
+    );
 
-my $FAQID2 = $FAQObject->FAQAdd(
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['FAQ'],
+    );
+
+    if ( $Test->{Excaption}->{Success} ) {
+        $Self->True(
+            $VoteID,
+            "$Count# $Test->{Name}"
+        );
+    }
+    else {
+        $Self->False(
+            $VoteID,
+            $Test->{Name}
+        );
+        $Count++;
+        next;
+    }
+
+    my $Votes = $Kernel::OM->Get('FAQ')->VoteSearch(
+        ItemID => $Test->{Config}->{ItemID},
+        UserID => 1
+    );
+
+    $Self->Is(
+        scalar(@{$Votes}),
+        $Test->{Excaption}->{Search},
+        "$Count.5# Check total votes - with true"
+    );
+
+    $Count++;
+}
+
+my $FAQID2 = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title       => 'Title',
     Visibility  => 'internal',
     CategoryID  => 1,
@@ -161,6 +248,10 @@ my @AttachmentTests = (
     },
 );
 
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['FAQ'],
+);
+
 # get main object
 my $MainObject = $Kernel::OM->Get('Main');
 
@@ -168,7 +259,7 @@ for my $AttachmentTest (@AttachmentTests) {
     my $ContentSCALARRef = $MainObject->FileRead(
         Location => $Home . '/scripts/test/system/sample/' . $AttachmentTest->{File},
     );
-    my $Add = $FAQObject->AttachmentAdd(
+    my $Add = $Kernel::OM->Get('FAQ')->AttachmentAdd(
         ItemID      => $FAQID2,
         Content     => ${$ContentSCALARRef},
         ContentType => 'text/xml',
@@ -179,11 +270,11 @@ for my $AttachmentTest (@AttachmentTests) {
         $Add,
         "AttachmentAdd() - $AttachmentTest->{File}",
     );
-    my @AttachmentIndex = $FAQObject->AttachmentIndex(
+    my @AttachmentIndex = $Kernel::OM->Get('FAQ')->AttachmentIndex(
         ItemID => $FAQID2,
         UserID => 1,
     );
-    my %File = $FAQObject->AttachmentGet(
+    my %File = $Kernel::OM->Get('FAQ')->AttachmentGet(
         ItemID => $FAQID2,
         FileID => $AttachmentIndex[0]->{FileID},
         UserID => 1,
@@ -202,7 +293,7 @@ for my $AttachmentTest (@AttachmentTests) {
         "AttachmentGet() - MD5 $AttachmentTest->{File}",
     );
 
-    my $Delete = $FAQObject->AttachmentDelete(
+    my $Delete = $Kernel::OM->Get('FAQ')->AttachmentDelete(
         ItemID => $FAQID2,
         FileID => $AttachmentIndex[0]->{FileID},
         UserID => 1,
@@ -213,13 +304,13 @@ for my $AttachmentTest (@AttachmentTests) {
     );
 }
 
-my $VoteIDsRef = $FAQObject->VoteSearch(
+my $VoteIDsRef = $Kernel::OM->Get('FAQ')->VoteSearch(
     ItemID => $FAQID,
     UserID => 1,
 );
 
 for my $VoteID ( @{$VoteIDsRef} ) {
-    my $VoteDelete = $FAQObject->VoteDelete(
+    my $VoteDelete = $Kernel::OM->Get('FAQ')->VoteDelete(
         VoteID => $VoteID,
         UserID => 1,
     );
@@ -230,7 +321,7 @@ for my $VoteID ( @{$VoteIDsRef} ) {
 }
 
 # add FAQ article to log
-my $Success = $FAQObject->FAQLogAdd(
+my $Success = $Kernel::OM->Get('FAQ')->FAQLogAdd(
     ItemID    => $FAQID,
     Interface => 'internal',
     UserID    => 1,
@@ -241,7 +332,7 @@ $Self->True(
 );
 
 # try to add same FAQ article to log again (must return false)
-$Success = $FAQObject->FAQLogAdd(
+$Success = $Kernel::OM->Get('FAQ')->FAQLogAdd(
     ItemID    => $FAQID,
     Interface => 'internal',
     UserID    => 1,
@@ -252,7 +343,7 @@ $Self->False(
 );
 
 # add another FAQ article to log
-$Success = $FAQObject->FAQLogAdd(
+$Success = $Kernel::OM->Get('FAQ')->FAQLogAdd(
     ItemID    => $FAQID2,
     Interface => 'internal',
     UserID    => 1,
@@ -262,7 +353,7 @@ $Self->True(
     "FAQLogAdd() - $FAQID2",
 );
 
-my $FAQDelete = $FAQObject->FAQDelete(
+my $FAQDelete = $Kernel::OM->Get('FAQ')->FAQDelete(
     ItemID => $FAQID,
     UserID => 1,
 );
@@ -271,7 +362,7 @@ $Self->True(
     "FAQDelete() - FAQID: $FAQID",
 );
 
-my $FAQDelete2 = $FAQObject->FAQDelete(
+my $FAQDelete2 = $Kernel::OM->Get('FAQ')->FAQDelete(
     ItemID => $FAQID2,
     UserID => 1,
 );
@@ -280,7 +371,7 @@ $Self->True(
     "FAQDelete() - FAQID: $FAQID2",
 );
 
-my $CategoryID = $FAQObject->CategoryAdd(
+my $CategoryID = $Kernel::OM->Get('FAQ')->CategoryAdd(
     Name     => 'TestCategory',
     Comment  => 'Category for testing',
     ParentID => 0,
@@ -294,7 +385,7 @@ $Self->True(
 );
 
 # set ParentID to empty to make it fail
-my $CategoryIDFail = $FAQObject->CategoryAdd(
+my $CategoryIDFail = $Kernel::OM->Get('FAQ')->CategoryAdd(
     Name     => 'TestCategory',
     Comment  => 'Category for testing',
     ParentID => q{},
@@ -308,7 +399,7 @@ $Self->False(
     "CategoryAdd() - Root Category",
 );
 
-my $CategoryUpdate = $FAQObject->CategoryUpdate(
+my $CategoryUpdate = $Kernel::OM->Get('FAQ')->CategoryUpdate(
     CategoryID => $CategoryID,
     ParentID   => 0,
     Name       => 'RootCategory',
@@ -323,7 +414,7 @@ $Self->True(
 );
 
 # set ParentID to empty to make it fail
-my $CategoryUpdateFail = $FAQObject->CategoryUpdate(
+my $CategoryUpdateFail = $Kernel::OM->Get('FAQ')->CategoryUpdate(
     CategoryID => $CategoryID,
     ParentID   => q{},
     Name       => 'RootCategory',
@@ -338,7 +429,7 @@ $Self->False(
     "CategoryUpdate() - Root Category",
 );
 
-my $ChildCategoryID = $FAQObject->CategoryAdd(
+my $ChildCategoryID = $Kernel::OM->Get('FAQ')->CategoryAdd(
     Name     => 'ChildCategory',
     Comment  => 'Child Category for testing',
     ParentID => $CategoryID,
@@ -351,7 +442,7 @@ $Self->True(
     "CategoryAdd() - Child Category",
 );
 
-my $ChildCategoryDelete = $FAQObject->CategoryDelete(
+my $ChildCategoryDelete = $Kernel::OM->Get('FAQ')->CategoryDelete(
     CategoryID => $ChildCategoryID,
     UserID     => 1,
 );
@@ -361,7 +452,7 @@ $Self->True(
     "CategoryDelete() - Child Category",
 );
 
-my $CategoryDelete = $FAQObject->CategoryDelete(
+my $CategoryDelete = $Kernel::OM->Get('FAQ')->CategoryDelete(
     CategoryID => $CategoryID,
     UserID     => 1,
 );
@@ -381,7 +472,7 @@ my %TestFields = (
     Field6 => 'Comment...',
 );
 
-$FAQID = $FAQObject->FAQAdd(
+$FAQID = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title      => 'Some Text',
     CategoryID => 1,
     Visibility => 'external',
@@ -429,7 +520,7 @@ my $CheckFields = sub {
         }
 
         # get the field
-        $ResultFields{$Field} = $FAQObject->ItemFieldGet(
+        $ResultFields{$Field} = $Kernel::OM->Get('FAQ')->ItemFieldGet(
             ItemID => $FAQID,
             Field  => $Field,
             UserID => 1,
@@ -462,7 +553,7 @@ $Self->IsDeeply(
     "ItemFieldGet(): for all fields match expected data",
 );
 
-%FAQ = $FAQObject->FAQGet(
+%FAQ = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID => $FAQID,
     UserID => 1,
 );
@@ -477,7 +568,7 @@ my %UpdatedTestFields = (
     Field6 => 'Updated Comment...',
 );
 
-$FAQUpdate = $FAQObject->FAQUpdate(
+$FAQUpdate = $Kernel::OM->Get('FAQ')->FAQUpdate(
     %FAQ,
     ItemID      => $FAQID,
     Title       => 'Some Text',
@@ -498,7 +589,7 @@ $Self->True(
 
 $CheckFields->( CompareFields => \%UpdatedTestFields );
 
-$FAQDelete = $FAQObject->FAQDelete(
+$FAQDelete = $Kernel::OM->Get('FAQ')->FAQDelete(
     ItemID => $FAQID,
     UserID => 1,
 );
@@ -521,7 +612,7 @@ $Self->Is(
 );
 
 # FAQ item cache tests
-$FAQID = $FAQObject->FAQAdd(
+$FAQID = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title      => 'Some Text',
     CategoryID => 1,
     Visibility => 'external',
@@ -553,7 +644,7 @@ $Self->Is(
 );
 
 # get FAQ no Item Fields
-my %FAQData = $FAQObject->FAQGet(
+my %FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID     => $FAQID,
     ItemFields => 0,
     UserID     => 1
@@ -595,7 +686,7 @@ $Self->Is(
 );
 
 # get FAQ with Item Fields
-%FAQData = $FAQObject->FAQGet(
+%FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID     => $FAQID,
     ItemFields => 1,
     UserID     => 1
@@ -640,7 +731,7 @@ $Self->Is(
 
 # ContentTypeSet() tests
 
-my $FAQItemID1 = $FAQObject->FAQAdd(
+my $FAQItemID1 = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title       => 'Some Text',
     CategoryID  => 1,
     Visibility  => 'internal',
@@ -835,26 +926,26 @@ for my $Test (@Tests) {
 
         my $ContentType = $ContentTypeRaw eq 'auto' ? q{} : $ContentTypeRaw;
 
-        my %FAQData = $FAQObject->FAQGet(
+        my %FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
             ItemID => $Test->{ItemID},
             UserID => 1,
         );
 
-        my $FAQUpdate = $FAQObject->FAQUpdate(
+        my $FAQUpdate = $Kernel::OM->Get('FAQ')->FAQUpdate(
             %FAQData,
             %{ $Test->{Update} },
             ItemID => $Test->{ItemID},
             UserID => 1,
         );
 
-        my $Success = $FAQObject->FAQContentTypeSet(
+        my $Success = $Kernel::OM->Get('FAQ')->FAQContentTypeSet(
             FAQItemIDs  => [ $Test->{ItemID} ],
             ContentType => $ContentType,
         );
 
         my $ExpectedResult = $ContentTypeRaw eq 'auto' ? $Test->{ExpectedResultAuto} : $ContentType;
 
-        %FAQData = $FAQObject->FAQGet(
+        %FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
             ItemID => $Test->{ItemID},
             UserID => 1,
         );
@@ -867,11 +958,11 @@ for my $Test (@Tests) {
     }
 }
 
-%FAQData = $FAQObject->FAQGet(
+%FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID => $FAQItemID1,
     UserID => 1,
 );
-$FAQUpdate = $FAQObject->FAQUpdate(
+$FAQUpdate = $Kernel::OM->Get('FAQ')->FAQUpdate(
     %FAQData,
     ItemID  => $FAQItemID1,
     ValidID => 2,
@@ -882,7 +973,7 @@ $Self->True(
     "FAQUpdate() set FAQ $FAQItemID1 to invalid",
 );
 
-$FAQDelete = $FAQObject->FAQDelete(
+$FAQDelete = $Kernel::OM->Get('FAQ')->FAQDelete(
     ItemID => $FAQItemID1,
     UserID => 1,
 );
