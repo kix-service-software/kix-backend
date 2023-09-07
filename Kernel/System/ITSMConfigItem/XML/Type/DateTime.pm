@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -183,6 +183,14 @@ sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
+    my $ValidateResult = $Self->ValidateValue(%Param);
+    if ( "$ValidateResult" ne "1" ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Value \"$Param{Value}\" is not a valid datetime!",
+        );
+        return;
+    }
     return $Param{Value};
 }
 
@@ -210,12 +218,14 @@ sub ValidateValue {
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Value,
     );
+    if (!$SystemTime) {
+        return 'not a valid datetime';
+    }
 
     # convert it back to a standard time stamp
     my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $SystemTime,
     );
-
     if (!$TimeStamp) {
         return 'not a valid datetime';
     }
