@@ -14,6 +14,8 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
+use base qw(Kernel::System::EventHandler);
+
 our @ObjectDependencies = qw(
     ClientRegistration
     Config
@@ -55,6 +57,11 @@ sub new {
 
     $Self->{CacheType} = 'ObjectIcon';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 30;   # 30 days
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'ObjectIcon::EventModulePost',
+    );
 
     return $Self;
 }
@@ -201,6 +208,17 @@ sub ObjectIconAdd {
             $ID = $Row[0];
         }
 
+        # trigger event
+        $Self->EventHandler(
+            Event => 'ObjectIconAdd',
+            Data  => {
+                ID       => $ID,
+                Object   => $Param{Object},
+                ObjectID => $Param{ObjectID},
+            },
+            UserID => $Param{UserID},
+        );
+
         # push client callback event
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
@@ -265,6 +283,17 @@ sub ObjectIconUpdate {
         # delete cache
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
+        );
+
+        # trigger event
+        $Self->EventHandler(
+            Event => 'ObjectIconUpdate',
+            Data  => {
+                ID       => $Param{ID},
+                Object   => $Param{Object},
+                ObjectID => $Param{ObjectID},
+            },
+            UserID => $Param{UserID},
         );
 
         # push client callback event
@@ -375,6 +404,11 @@ sub ObjectIconDelete {
         }
     }
 
+    # get old data before delete
+    my %OldData = $Self->ObjectIconGet(
+        ID => $Param{ID},
+    );
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -388,6 +422,17 @@ sub ObjectIconDelete {
         Type => $Self->{CacheType}
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event => 'ObjectIconDelete',
+        Data  => {
+            ID       => $Param{ID},
+            Object   => $OldData{Object},
+            ObjectID => $OldData{ObjectID},
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
@@ -398,10 +443,16 @@ sub ObjectIconDelete {
     return 1;
 }
 
+sub DESTROY {
+    my $Self = shift;
+
+    # execute all transaction events
+    $Self->EventHandlerTransaction();
+
+    return 1;
+}
+
 1;
-
-
-
 
 =back
 
