@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::FAQ::Vote;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -63,6 +65,21 @@ sub VoteAdd {
             );
 
             return;
+        }
+    }
+
+    my $VoteIDs = $Self->VoteSearch(
+        ItemID    => $Param{ItemID},
+        CreatedBy => $Param{CreatedBy},
+        UserID    => $Param{UserID}
+    );
+
+    if ( IsArrayRefWithData($VoteIDs) ) {
+        for my $VoteID ( @{$VoteIDs} ) {
+            $Self->VoteDelete(
+                VoteID => $VoteID,
+                UserID => $Param{UserID}
+            );
         }
     }
 
@@ -267,16 +284,29 @@ sub VoteSearch {
         }
     }
 
+    my $SQL      = <<'END';
+SELECT id
+FROM faq_voting
+END
+    my $SQLWhere = ' WHERE item_id = ?';
+    my @Bind;
+
+    push(@Bind, \$Param{ItemID});
+
+    if (
+        defined $Param{CreatedBy}
+        && $Param{CreatedBy}
+    ) {
+        $SQLWhere .= ' AND created_by = ?';
+        push(@Bind, \$Param{CreatedBy});
+    }
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL => <<'END',
-SELECT id
-FROM faq_voting
-WHERE item_id = ?
-END
-        Bind  => [ \$Param{ItemID} ],
+        SQL   => $SQL . $SQLWhere,
+        Bind  => \@Bind,
         Limit => $Param{Limit} // 500,
     );
 
