@@ -9371,12 +9371,12 @@ You can log in via the following URL:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ExtendedFollowUp###AllTicketStateTypesIncluded" Required="1" Valid="1">
-        <Description Translatable="1">State types of follow up tickets which will be considered. If open/pending tickets was selected and no one was found all tickets will be considered.</Description>
+        <Description Translatable="1">State types of follow up tickets which will be considered. If viewable tickets was selected and no one was found all tickets will be considered.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <Option SelectedID="1">
-                <Item Key="0">First open/pending tickets</Item>
+                <Item Key="0">First viewable tickets</Item>
                 <Item Key="1">All tickets</Item>
             </Option>
         </Setting>
