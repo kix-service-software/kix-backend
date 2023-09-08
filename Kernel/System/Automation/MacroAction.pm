@@ -897,6 +897,78 @@ sub GetAllSubMacrosOf {
     return @SubMacroIDs;
 }
 
+=item MacroActionDump()
+
+gets the "script code" of a macro action
+
+    my $Code = $AutomationObject->MacroActionDump(
+        ID => 123,       # the ID of the macro action
+    );
+
+=cut
+
+sub MacroActionDump {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %MacroAction = $Self->MacroActionGet(
+        ID => $Param{ID}
+    );
+    if ( !%MacroAction ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "MacroAction with ID $Param{ID} not found!"
+        );
+        return;
+    }
+
+    my $Script = $MacroAction{Type};
+
+    if ( $MacroAction{Comment} ) {
+        my $Comment = $MacroAction{Comment};
+        $Comment =~ s/"/\\\"/g;
+        $Script .= " --Comment \"$Comment\"";
+    }
+
+    foreach my $ResultVariable ( sort keys %{$MacroAction{ResultVariables} || {}} ) {
+        $Script .= " --Result $ResultVariable:$MacroAction{ResultVariables}->{$ResultVariable}";
+    }
+    foreach my $Parameter ( sort keys %{$MacroAction{Parameters} || {}} ) {
+        my $Value = $MacroAction{Parameters}->{$Parameter};
+        if ( IsArrayRef($Value) || IsHashRef($Value) ) {
+            $Value = $Kernel::OM->Get('JSON')->Encode(
+                Data => $Value
+            );
+        }
+        if ( $Parameter ne 'MacroID' ) {
+            $Value =~ s/"/\\\"/g;
+            $Script .= " --$Parameter \"$Value\"";
+        }
+    }
+    # dump the macro if we have a reference
+    if ( $MacroAction{Parameters}->{MacroID} ) {
+        $Script .= "\n";
+        my $MacroCode = $Self->MacroDump(
+            ID => $MacroAction{Parameters}->{MacroID},
+        );
+        foreach my $Line ( split /\n/, $MacroCode) {
+            $Script .= $Self->{DumpConfig}->{Indent}.$Line . "\n";
+        }
+    }
+
+    return $Script;
+}
+
 sub _ReferencedMacroCheck {
     my ( $Self, %Param ) = @_;
 

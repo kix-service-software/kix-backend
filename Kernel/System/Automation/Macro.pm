@@ -864,6 +864,68 @@ sub IsSubMacroOf {
     return 0;
 }
 
+=item MacroDump()
+
+gets the "script code" of a macro
+
+    my $Code = $AutomationObject->MacroDump(
+        ID => 123,       # the ID of the macro
+    );
+
+=cut
+
+sub MacroDump {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %Macro = $Self->MacroGet(
+        ID => $Param{ID}
+    );
+    if ( !%Macro ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Macro with ID $Param{ID} not found!"
+        );
+        return;
+    }
+
+    my $Name = $Macro{Name};
+    $Name =~ s/"/\\\"/g;
+    my $Script = "Macro \"$Name\"";
+
+    foreach my $Attr ( qw(Type Comment) ) {
+        next if !$Macro{$Attr};
+        my $Value = $Macro{$Attr};
+        $Value =~ s/"/\\\"/g;
+        $Script .= ' --'.$Attr.' "'.$Value.'"';
+    }
+
+    $Script .= "\n";
+
+    foreach my $MacroActionID ( @{$Macro{ExecOrder} || []} ) {
+        my $MacroActionCode = $Self->MacroActionDump(
+            ID => $MacroActionID,
+        );
+        foreach my $Line ( split /\n/, $MacroActionCode) {
+            $Script .= $Self->{DumpConfig}->{Indent} . $Line . "\n";
+        }
+    }
+
+    $Script .= "End\n";
+
+    return $Script;
+}
+
 sub _LoadMacroTypeBackend {
     my ( $Self, %Param ) = @_;
 

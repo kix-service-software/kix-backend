@@ -62,6 +62,8 @@ sub new {
 
     $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Automation::Debug') || 0;
 
+    $Self->{'DumpConfig'} = $Kernel::OM->Get('Config')->Get('Automation::DumpConfig') || { Indent => '  ' };
+
     return $Self;
 }
 
