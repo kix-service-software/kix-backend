@@ -1323,6 +1323,111 @@ sub _JobExecute {
     return 1;
 }
 
+=item JobDump()
+
+gets the "script code" of a job
+
+    my $Code = $AutomationObject->JobDump(
+        ID => 123,       # the ID of the job
+    );
+
+=cut
+
+sub JobDump {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %Job = $Self->JobGet(
+        ID => $Param{ID}
+    );
+    if ( !%Job ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Job with ID $Param{ID} not found!"
+        );
+        return;
+    }
+
+    my $Name = $Job{Name};
+    $Name =~ s/"/\\\"/g;
+    my $Script = "Job \"$Name\"";
+
+    foreach my $Attr ( qw(Type Comment) ) {
+        next if !$Job{$Attr};
+        my $Value = $Job{$Attr};
+        $Value =~ s/"/\\\"/g;
+        $Script .= ' --'.$Attr.' "'.$Value.'"';
+    }
+
+    $Script .= "\n";
+
+    # dump exec plans
+    my @ExecPlanIDs = $Self->JobExecPlanList(
+        JobID => $Param{ID}
+    );
+    foreach my $ExecPlanID ( @ExecPlanIDs ) {
+        my $ExecPlanCode = $Self->ExecPlanDump(
+            ID => $ExecPlanID,
+        );
+        foreach my $Line ( split /\n/, $ExecPlanCode) {
+            $Script .= $Self->{DumpConfig}->{Indent} . $Line . "\n";
+        }
+    }
+
+    $Script .= "\n";
+
+    # dump filter
+    if ( IsHashRefWithData($Job{Filter}) ) {
+        $Script .= $Self->{DumpConfig}->{Indent}.'Filter "';
+        foreach my $BoolOperator ( sort keys %{$Job{Filter}} ) {
+            $Script .= '(' if $BoolOperator eq 'AND';
+            my @FilterItems = @{$Job{Filter}->{$BoolOperator}};
+            while ( @FilterItems ) {
+                my $FilterItem = shift @FilterItems;
+
+                my $Operator = $FilterItem->{Operator};
+                $Operator = "!$Operator" if $FilterItem->{Not};
+                if ( IsArrayRef($FilterItem->{Value}) ) {
+                    $Script .= $FilterItem->{Field}.' '.$Operator.' ['.join(',', @{$FilterItem->{Value}})."]";
+                }
+                else {
+                    $Script .= $FilterItem->{Field}.' '.$Operator.' '.$FilterItem->{Value};
+                }
+                $Script .= ' '.$BoolOperator.' ' if @FilterItems;
+            }
+            $Script .= ')' if $BoolOperator eq 'AND';
+        }
+        $Script .= "\"\n\n";
+    }
+
+    # dump macros
+    my @MacroIDs = $Self->JobMacroList(
+        JobID => $Param{ID}
+    );
+    foreach my $MacroID ( @MacroIDs ) {
+        my $MacroCode = $Self->MacroDump(
+            ID => $MacroID,
+        );
+        foreach my $Line ( split /\n/, $MacroCode) {
+            $Script .= $Self->{DumpConfig}->{Indent} . $Line . "\n";
+        }
+    }
+
+    $Script .= "End\n";
+
+    return $Script;
+}
+
 =item JobRunList()
 
 returns a hash of all runs (ID + StateID) for a given job

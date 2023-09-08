@@ -751,6 +751,62 @@ sub ExecPlanIsDeletable {
     return 1;
 }
 
+=item ExecPlanDump()
+
+gets the "script code" of an exec plan
+
+    my $Code = $AutomationObject->ExecPlanDump(
+        ID => 123,       # the ID of the exec plan
+    );
+
+=cut
+
+sub ExecPlanDump {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %ExecPlan = $Self->ExecPlanGet(
+        ID => $Param{ID}
+    );
+    if ( !%ExecPlan ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "ExecPlan with ID $Param{ID} not found!"
+        );
+        return;
+    }
+
+    my $Name = $ExecPlan{Name};
+    $Name =~ s/"/\\\"/g;
+    my $Script = "ExecPlan \"$Name\"";
+
+    foreach my $Attr ( qw(Type Comment) ) {
+        next if !$ExecPlan{$Attr};
+        my $Value = $ExecPlan{$Attr};
+        $Value =~ s/"/\\\"/g;
+        $Script .= ' --'.$Attr.' "'.$Value.'"';
+    }
+    foreach my $Parameter ( sort keys %{$ExecPlan{Parameters} || {}} ) {
+        my $ParameterValue = $ExecPlan{Parameters}->{$Parameter};
+        if ( IsArrayRef($ParameterValue) ) {
+            $ParameterValue = join(',', @{$ParameterValue});
+        }
+        $Script .= ' --'.$Parameter.' "'.$ParameterValue.'"';
+    }
+
+    return $Script;
+}
+
 sub _LoadExecPlanTypeBackend {
     my ( $Self, %Param ) = @_;
 
