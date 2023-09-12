@@ -106,6 +106,11 @@ sub Run {
         }
     }
 
+    # delete priority cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('Priority')->{CacheType},
+    );
+
     return 1;
 }
 
