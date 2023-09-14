@@ -199,6 +199,7 @@
     <Column Name="value1" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="value2" Required="false" Size="200" Type="VARCHAR"/>
     <Column Name="value3" Required="false" Size="200" Type="VARCHAR"/>
+    <Column Name="queue_id" Required="false" Type="INTEGER"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>

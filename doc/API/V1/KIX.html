@@ -29320,7 +29320,7 @@ pre code {
                "readOnly" : true
             },
             "DispatchingBy" : {
-               "description" : "Can be either &#39;From&#39; or &#39;Queue&#39;.",
+               "description" : "Can be either &#39;PostmasterDefaultQueue&#39;, &#39;From&#39; or &#39;Queue&#39;.",
                "type" : "string",
                "readOnly" : true
             },
@@ -29436,7 +29436,7 @@ pre code {
                "type" : "string"
             },
             "DispatchingBy" : {
-               "description" : "Can be either &#39;From&#39; or &#39;Queue&#39;.",
+               "description" : "Can be either &#39;PostmasterDefaultQueue&#39;, &#39;From&#39; or &#39;Queue&#39;.",
                "type" : "string"
             },
             "Host" : {
@@ -29644,7 +29644,7 @@ pre code {
                "readOnly" : true
             },
             "DispatchingBy" : {
-               "description" : "Can be either &#39;From&#39; or &#39;Queue&#39;.",
+               "description" : "Can be either &#39;PostmasterDefaultQueue&#39;, &#39;From&#39; or &#39;Queue&#39;.",
                "type" : "string",
                "readOnly" : true
             },
@@ -29758,7 +29758,7 @@ pre code {
                "type" : "string"
             },
             "DispatchingBy" : {
-               "description" : "Can be either &#39;From&#39; or &#39;Queue&#39;.",
+               "description" : "Can be either &#39;PostmasterDefaultQueue&#39;, &#39;From&#39; or &#39;Queue&#39;.",
                "type" : "string"
             },
             "ExecFetch" : {
@@ -31613,6 +31613,7 @@ pre code {
 			"ID": 1,
 			"Name": "kix@localhost",
 			"Realname": "KIX System",
+			"QueueID": null,
 			"ValidID": 1
 		},
 		{
@@ -31624,6 +31625,7 @@ pre code {
 			"ID": 2,
 			"Name": "temp.invalid@testtest.org",
 			"Realname": "[TD-Email-002] Temporarily Invalid E-Mail address",
+			"QueueID": 1,
 			"ValidID": 3
 		}     
     ]
@@ -31830,6 +31832,7 @@ pre code {
         "ID": 1,
         "Name": "kix@localhost",
         "Realname": "KIX System",
+        "QueueID": 1,
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_communication_systemaddresses__systemaddressid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{

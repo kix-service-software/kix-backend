@@ -31,8 +31,7 @@ my $MailAccountAdd = $MailAccountObject->MailAccountAdd(
     ValidID       => 1,
     Trusted       => 0,
     IMAPFolder    => 'Foo',
-    DispatchingBy => 'Queue',              # Queue|From
-    QueueID       => 1,
+    DispatchingBy => 'PostmasterDefaultQueue',              # PostmasterDefaultQueue|From|Queue
     UserID        => 1,
 );
 
@@ -66,6 +65,14 @@ $Self->True(
     'MailAccountGet() - IMAPFolder',
 );
 $Self->True(
+    $MailAccount{DispatchingBy} eq 'PostmasterDefaultQueue',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    !defined( $MailAccount{QueueID} ),
+    'MailAccountGet() - QueueID',
+);
+$Self->True(
     !defined($MailAccount{OAuth2_ProfileID}),
     'MailAccountGet() - OAuth2_ProfileID',
 );
@@ -79,8 +86,7 @@ my $MailAccountUpdate = $MailAccountObject->MailAccountUpdate(
     ValidID       => 1,
     IMAPFolder    => 'Bar',
     Trusted       => 0,
-    DispatchingBy => 'Queue',              # Queue|From
-    QueueID       => 1,
+    DispatchingBy => 'From',              # PostmasterDefaultQueue|From|Queue
     UserID        => 1,
 );
 
@@ -114,6 +120,14 @@ $Self->True(
     'MailAccountGet() - IMAPFolder',
 );
 $Self->True(
+    $MailAccount{DispatchingBy} eq 'From',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    !defined( $MailAccount{QueueID} ),
+    'MailAccountGet() - QueueID',
+);
+$Self->True(
     !defined($MailAccount{OAuth2_ProfileID}),
     'MailAccountGet() - OAuth2_ProfileID',
 );
@@ -144,7 +158,7 @@ my $MailAccountAddIMAP = $MailAccountObject->MailAccountAdd(
     ValidID       => 1,
     Trusted       => 0,
     IMAPFolder    => 'Foo',
-    DispatchingBy => 'Queue',              # Queue|From
+    DispatchingBy => 'Queue',              # PostmasterDefaultQueue|From|Queue
     QueueID       => 1,
     UserID        => 1,
 );
@@ -179,6 +193,14 @@ $Self->True(
     'MailAccountGet() - IMAPFolder',
 );
 $Self->True(
+    $MailAccount{DispatchingBy} eq 'Queue',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    $MailAccount{QueueID} eq '1',
+    'MailAccountGet() - QueueID',
+);
+$Self->True(
     !defined($MailAccount{OAuth2_ProfileID}),
     'MailAccountGet() - OAuth2_ProfileID',
 );
@@ -191,7 +213,7 @@ my $MailAccountUpdateIMAP = $MailAccountObject->MailAccountUpdate(
     Type          => 'IMAPS',
     ValidID       => 1,
     Trusted       => 0,
-    DispatchingBy => 'Queue',               # Queue|From
+    DispatchingBy => 'Queue',               # PostmasterDefaultQueue|From|Queue
     QueueID       => 1,
     UserID        => 1,
 );
@@ -224,6 +246,14 @@ $Self->True(
 $Self->True(
     $MailAccount{IMAPFolder} eq 'INBOX',
     'MailAccountGet() - IMAPFolder fallback',
+);
+$Self->True(
+    $MailAccount{DispatchingBy} eq 'Queue',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    $MailAccount{QueueID} eq '1',
+    'MailAccountGet() - QueueID',
 );
 $Self->True(
     !defined($MailAccount{OAuth2_ProfileID}),
@@ -281,8 +311,8 @@ my $MailAccountAddOAuth2 = $MailAccountObject->MailAccountAdd(
     ValidID          => 1,
     Trusted          => 0,
     IMAPFolder       => 'Foo',
-    DispatchingBy    => 'Queue',              # Queue|From
-    QueueID          => 1,
+    DispatchingBy    => 'Queue',              # PostmasterDefaultQueue|From|Queue
+    QueueID          => 2,
     UserID           => 1,
 );
 
@@ -316,6 +346,14 @@ $Self->True(
     'MailAccountGet() - IMAPFolder',
 );
 $Self->True(
+    $MailAccount{DispatchingBy} eq 'Queue',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    $MailAccount{QueueID} = 2,
+    'MailAccountGet() - QueueID',
+);
+$Self->True(
     $MailAccount{OAuth2_ProfileID} eq $OAuth2ProfileID1,
     'MailAccountGet() - OAuth2_ProfileID',
 );
@@ -329,7 +367,7 @@ my $MailAccountUpdateOAuth2 = $MailAccountObject->MailAccountUpdate(
     Type             => 'IMAPS_OAuth2',
     ValidID          => 1,
     Trusted          => 0,
-    DispatchingBy    => 'Queue',               # Queue|From
+    DispatchingBy    => 'Queue',               # PostmasterDefaultQueue|From|Queue
     QueueID          => 1,
     UserID           => 1,
 );
@@ -362,6 +400,14 @@ $Self->True(
 $Self->True(
     $MailAccount{IMAPFolder} eq 'INBOX',
     'MailAccountGet() - IMAPFolder fallback',
+);
+$Self->True(
+    $MailAccount{DispatchingBy} eq 'Queue',
+    'MailAccountGet() - DispatchingBy',
+);
+$Self->True(
+    $MailAccount{QueueID} eq '1',
+    'MailAccountGet() - QueueID',
 );
 $Self->True(
     $MailAccount{OAuth2_ProfileID} eq $OAuth2ProfileID2,

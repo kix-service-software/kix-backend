@@ -28,9 +28,9 @@ my $SystemAddressEmail    = $Helper->GetRandomID() . '@example.com';
 my $SystemAddressRealname = "KIX-Team";
 
 my $SystemAddressID = $SystemAddressObject->SystemAddressAdd(
-    Name     => $SystemAddressEmail,
-    Realname => $SystemAddressRealname,
-    Comment  => 'some comment',
+    Name     => '1' . $SystemAddressEmail,
+    Realname => '1' . $SystemAddressRealname,
+    Comment  => 'some comment 1',
     ValidID  => 1,
     UserID   => 1,
 );
@@ -44,18 +44,23 @@ my %SystemAddress = $SystemAddressObject->SystemAddressGet( ID => $SystemAddress
 
 $Self->Is(
     $SystemAddress{Name},
-    $SystemAddressEmail,
+    '1' . $SystemAddressEmail,
     'SystemAddressGet() - Name',
 );
 $Self->Is(
     $SystemAddress{Realname},
-    $SystemAddressRealname,
+    '1' . $SystemAddressRealname,
     'SystemAddressGet() - Realname',
 );
 $Self->Is(
     $SystemAddress{Comment},
-    'some comment',
+    'some comment 1',
     'SystemAddressGet() - Comment',
+);
+$Self->Is(
+    $SystemAddress{QueueID},
+    undef,
+    'SystemAddressGet() - QueueID',
 );
 $Self->Is(
     $SystemAddress{ValidID},
@@ -63,67 +68,19 @@ $Self->Is(
     'SystemAddressGet() - ValidID',
 );
 
-# caching
-%SystemAddress = $SystemAddressObject->SystemAddressGet( ID => $SystemAddressID );
-
-$Self->Is(
-    $SystemAddress{Name},
-    $SystemAddressEmail,
-    'SystemAddressGet() - Name',
-);
-$Self->Is(
-    $SystemAddress{Realname},
-    $SystemAddressRealname,
-    'SystemAddressGet() - Realname',
-);
-$Self->Is(
-    $SystemAddress{Comment},
-    'some comment',
-    'SystemAddressGet() - Comment',
-);
-$Self->Is(
-    $SystemAddress{ValidID},
-    1,
-    'SystemAddressGet() - ValidID',
-);
-
-my %SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 0 );
-my $Hit = 0;
-for ( sort keys %SystemAddressList ) {
-    if ( $_ eq $SystemAddressID ) {
-        $Hit = 1;
-    }
-}
-$Self->True(
-    $Hit eq 1,
-    'SystemAddressList()',
-);
-
-# caching
-%SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 0 );
-$Hit = 0;
-for ( sort keys %SystemAddressList ) {
-    if ( $_ eq $SystemAddressID ) {
-        $Hit = 1;
-    }
-}
-$Self->True(
-    $Hit eq 1,
-    'SystemAddressList()',
-);
-
-
+# update system address - set queue
 my $SystemAddressUpdate = $SystemAddressObject->SystemAddressUpdate(
     ID       => $SystemAddressID,
     Name     => '2' . $SystemAddressEmail,
     Realname => '2' . $SystemAddressRealname,
-    Comment  => 'some comment 1',
-    ValidID  => 2,
+    Comment  => 'some comment 2',
+    QueueID  => 1,
+    ValidID  => 1,
     UserID   => 1,
 );
 $Self->True(
     $SystemAddressUpdate,
-    'SystemAddressUpdate()',
+    'SystemAddressUpdate() - Set Name, Realname, Comment and QueueID',
 );
 
 %SystemAddress = $SystemAddressObject->SystemAddressGet( ID => $SystemAddressID );
@@ -140,13 +97,99 @@ $Self->Is(
 );
 $Self->Is(
     $SystemAddress{Comment},
-    'some comment 1',
+    'some comment 2',
     'SystemAddressGet() - Comment',
+);
+$Self->Is(
+    $SystemAddress{QueueID},
+    1,
+    'SystemAddressGet() - QueueID',
+);
+$Self->Is(
+    $SystemAddress{ValidID},
+    1,
+    'SystemAddressGet() - ValidID',
+);
+
+my %SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 0 );
+my $Hit = 0;
+if ( $SystemAddressList{ $SystemAddressID } ) {
+    $Hit = 1;
+}
+$Self->True(
+    $Hit eq 1,
+    'SystemAddressList() - Valid => 0 (Hit)',
+);
+
+%SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 1 );
+$Hit = 0;
+if ( $SystemAddressList{ $SystemAddressID } ) {
+    $Hit = 1;
+}
+$Self->True(
+    $Hit eq 1,
+    'SystemAddressList() - Valid => 1 (Hit)',
+);
+
+$SystemAddressUpdate = $SystemAddressObject->SystemAddressUpdate(
+    ID       => $SystemAddressID,
+    Name     => '3' . $SystemAddressEmail,
+    Realname => '3' . $SystemAddressRealname,
+    Comment  => 'some comment 3',
+    ValidID  => 2,
+    UserID   => 1,
+);
+$Self->True(
+    $SystemAddressUpdate,
+    'SystemAddressUpdate() - Set Name, Realname, Comment and ValidID; Unset QueueID',
+);
+
+%SystemAddress = $SystemAddressObject->SystemAddressGet( ID => $SystemAddressID );
+
+$Self->Is(
+    $SystemAddress{Name},
+    '3' . $SystemAddressEmail,
+    'SystemAddressGet() - Name',
+);
+$Self->Is(
+    $SystemAddress{Realname},
+    '3' . $SystemAddressRealname,
+    'SystemAddressGet() - Realname',
+);
+$Self->Is(
+    $SystemAddress{Comment},
+    'some comment 3',
+    'SystemAddressGet() - Comment',
+);
+$Self->Is(
+    $SystemAddress{QueueID},
+    undef,
+    'SystemAddressGet() - QueueID',
 );
 $Self->Is(
     $SystemAddress{ValidID},
     2,
     'SystemAddressGet() - ValidID',
+);
+
+%SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 0 );
+$Hit = 0;
+if ( $SystemAddressList{ $SystemAddressID } ) {
+    $Hit = 1;
+}
+$Self->True(
+    $Hit eq 1,
+    'SystemAddressList() - Valid => 0 (Hit)',
+);
+
+%SystemAddressList = $SystemAddressObject->SystemAddressList( Valid => 1 );
+$Hit = 0;
+if ( $SystemAddressList{ $SystemAddressID } ) {
+    $Hit = 1;
+}
+$Self->True(
+    $Hit eq 0,
+    'SystemAddressList() - Valid => 1 (No Hit)',
 );
 
 # rollback transaction on database

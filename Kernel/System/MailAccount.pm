@@ -23,6 +23,7 @@ our @ObjectDependencies = qw(
     DB
     Log
     Main
+    Queue
     Valid
 );
 
@@ -72,7 +73,7 @@ adds a new mail account
         IMAPFolder    => 'Some Folder', # optional, only valid for IMAP-type accounts
         ValidID       => 1,
         Trusted       => 0,
-        DispatchingBy => 'Queue', # Queue|From
+        DispatchingBy => 'Queue', # PostmasterDefaultQueue|From|Queue
         QueueID       => 12,
         UserID        => 123,
 ### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
@@ -103,7 +104,7 @@ sub MailAccountAdd {
     }
 
     # check needed stuff
-    for (qw(Login Password Host ValidID Trusted DispatchingBy QueueID UserID)) {
+    for (qw(Login Password Host Type DispatchingBy ValidID Trusted UserID)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -112,7 +113,7 @@ sub MailAccountAdd {
             return;
         }
     }
-    for (qw(Login Password Host Type ValidID UserID)) {
+    for (qw(Login Password Host Type DispatchingBy ValidID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -126,10 +127,21 @@ sub MailAccountAdd {
     if ( $Param{DispatchingBy} eq 'From' ) {
         $Param{QueueID} = 0;
     }
+    # check if dispatching is by PostmasterDefaultQueue
+    elsif ( $Param{DispatchingBy} eq 'PostmasterDefaultQueue' ) {
+        $Param{QueueID} = -1;
+    }
     elsif ( $Param{DispatchingBy} eq 'Queue' && !$Param{QueueID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need QueueID for dispatching!"
+        );
+        return;
+    }
+    elsif ( $Param{DispatchingBy} ne 'Queue' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid value '$Param{DispatchingBy}' for DispatchingBy!"
         );
         return;
     }
@@ -255,6 +267,11 @@ sub MailAccountGet {
 
         if ( $Data{QueueID} == 0 ) {
             $Data{DispatchingBy} = 'From';
+            $Data{QueueID}       = undef;
+        }
+        elsif ( $Data{QueueID} == -1 ) {
+            $Data{DispatchingBy} = 'PostmasterDefaultQueue';
+            $Data{QueueID}       = undef;
         }
         else {
             $Data{DispatchingBy} = 'Queue';
@@ -287,7 +304,7 @@ update a new mail account
         IMAPFolder    => 'Some Folder', # optional, only valid for IMAP-type accounts
         ValidID       => 1,
         Trusted       => 0,
-        DispatchingBy => 'Queue', # Queue|From
+        DispatchingBy => 'Queue', # PostmasterDefaultQueue|From|Queue
         QueueID       => 12,
         UserID        => 123,
 ### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
@@ -318,8 +335,18 @@ sub MailAccountUpdate {
     }
 
     # check needed stuff
-    for (qw(ID Login Password Host Type ValidID Trusted DispatchingBy QueueID UserID)) {
+    for (qw(ID Login Password Host Type DispatchingBy ValidID Trusted UserID)) {
         if ( !defined $Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "$_ not defined!"
+            );
+            return;
+        }
+    }
+
+    for (qw(ID Login Password Host Type DispatchingBy ValidID UserID)) {
+        if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -332,10 +359,21 @@ sub MailAccountUpdate {
     if ( $Param{DispatchingBy} eq 'From' ) {
         $Param{QueueID} = 0;
     }
+    # check if dispatching is by PostmasterDefaultQueue
+    elsif ( $Param{DispatchingBy} eq 'PostmasterDefaultQueue' ) {
+        $Param{QueueID} = -1;
+    }
     elsif ( $Param{DispatchingBy} eq 'Queue' && !$Param{QueueID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need QueueID for dispatching!"
+        );
+        return;
+    }
+    elsif ( $Param{DispatchingBy} ne 'Queue' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid value '$Param{DispatchingBy}' for DispatchingBy!"
         );
         return;
     }
@@ -497,7 +535,7 @@ fetch emails by using backend
         Host          => 'pop3.example.com',
         Type          => 'POP3', # POP3,POP3s,IMAP,IMAPS
         Trusted       => 0,
-        DispatchingBy => 'Queue', # Queue|From
+        DispatchingBy => 'Queue', # PostmasterDefaultQueue|From|Queue
         QueueID       => 12,
         UserID        => 123,
     );
@@ -508,7 +546,7 @@ sub MailAccountFetch {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Login Password Host Type Trusted DispatchingBy QueueID UserID)) {
+    for (qw(Login Password Host Type Trusted DispatchingBy UserID)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -516,6 +554,25 @@ sub MailAccountFetch {
             );
             return;
         }
+    }
+
+    # dispatching to configured default queue
+    if ( $Param{DispatchingBy} eq 'PostmasterDefaultQueue' ) {
+        # get configured default queue name
+        my $DefaultQueueName = $Kernel::OM->Get('Config')->Get('PostmasterDefaultQueue');
+
+        # overwrite queue id parameter by lookup
+        $Param{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup(
+            Queue => $DefaultQueueName
+        );
+    }
+    # when dispatiching be queue is configured, check for given queue
+    elsif ( $Param{DispatchingBy} eq 'Queue' && !$Param{QueueID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need QueueID for dispatching!"
+        );
+        return;
     }
 
     my $PostMasterDebug = $Kernel::OM->Get('Config')->Get('PostMaster::MailAccountFetch::Debug');
