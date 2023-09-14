@@ -128,6 +128,56 @@ $Self->True(
     'LogError() without Referrer (JobID+MacroID)',
 );
 
+my $LogObject = $Kernel::OM->Get('Log');
+
+# check logging
+foreach my $MinimumLogLevel ( qw( error notice info debug) ) {
+    # set in Config
+    my $Success = $Kernel::OM->Get('Config')->Set(
+        Key   => 'Automation::MinimumLogLevel',
+        Value => $MinimumLogLevel,
+    );
+    $Self->True(
+        $Success,
+        "Set Automation::MinimumLogLevel to \"$MinimumLogLevel\"",
+    );
+
+    my $MinimumLogLevel = $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel') || 'error';
+    my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
+
+    foreach my $Priority ( qw( error notice info debug) ) {
+
+        my $LogCountBefore = $AutomationObject->GetLogCount();
+
+        my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Priority );
+
+        my $Result = $AutomationObject->_Log(
+            Message  => "logging with priority \"$Priority\" and MinLogLevel \"$MinimumLogLevel\"",
+            Priority => $Priority,
+            UserID   => 1,
+        );
+        $Self->True(
+            $Result,
+            "_Log() with priority \"$Priority\" returns 1",
+        );
+
+        my $LogCount = $AutomationObject->GetLogCount();
+
+        if ( $PriorityNum >= $MinimumLogLevelNum ) {
+            $Self->True(
+                $LogCount - $LogCountBefore,
+                "_Log() with priority \"$Priority\" created log entry",
+            );
+        }
+        else {
+            $Self->False(
+                $LogCount - $LogCountBefore,
+                "_Log() with priority \"$Priority\" created no log entry",
+            );
+        }
+    }
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 
