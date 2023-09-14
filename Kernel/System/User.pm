@@ -600,6 +600,7 @@ to search users
         ValidID         => 2                          # optional - if given "Valid" is ignored
         Valid           => 1                          # optional - if omitted, 1 is used
         UserIDs         => [1,2,3]                    # optional
+        SearchUserID    => 1                          # optional
     );
 
 Returns hash of UserID, Login pairs:
@@ -626,11 +627,12 @@ sub UserSearch {
         && !$Param{IsAgent}
         && !$Param{IsCustomer}
         && !$Param{ValidID}
-        && !IsArrayRef$Param{UserIDs}
+        && !$Param{SearchUserID}
+        && !IsArrayRef$Param{UserIDs}        
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID - else use UserList!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID or SearchUserID - else use UserList!',
         );
         return;
     }
@@ -644,7 +646,8 @@ sub UserSearch {
         . ( $Param{Valid} || '' ) . '::'
         . ( $Param{ValidID} || '' ) . '::'
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
-        . ( $Param{Limit} || '' );
+        . ( $Param{Limit} || '' )
+        . ( $Param{SearchUserID} || '');
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -715,6 +718,11 @@ sub UserSearch {
 
     if ( IsArrayRefWithData($Param{UserIDs}) ) {
         push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
+    }
+
+    if ( $Param{SearchUserID} ) {
+        push(@Where, "u.id = ?");
+        push(@Bind, \$Param{SearchUserID});
     }
 
     if (@Where) {
