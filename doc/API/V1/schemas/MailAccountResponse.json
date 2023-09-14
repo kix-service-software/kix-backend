@@ -39,7 +39,7 @@
                "readOnly" : true
             },
             "DispatchingBy" : {
-               "description" : "Can be either 'From' or 'Queue'.",
+               "description" : "Can be either 'PostmasterDefaultQueue', 'From' or 'Queue'.",
                "type" : "string",
                "readOnly" : true
             },

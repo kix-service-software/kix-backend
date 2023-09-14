@@ -72,15 +72,12 @@ sub GetQueueID {
 
         next EMAIL if !$Address;
 
+        $Address =~ s/("|')//g;
+
         # lookup queue id if recipiend address
-        my $SystemAddressID = $SystemAddressObject->SystemAddressLookup(
-            Name => $Address,
+        $QueueID = $SystemAddressObject->SystemAddressQueueID(
+            Address => $Address,
         );
-        if ( $SystemAddressID ) {
-            $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
-                SystemAddressID => $SystemAddressID
-            );
-        }
 
         # debug
         if ( $Self->{Debug} > 1 ) {
@@ -122,23 +119,18 @@ sub GetTrustedQueueID {
     if ( $Self->{Debug} > 0 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
-            Message =>
-                "There exists a X-KIX-Queue header: $GetParam{'X-KIX-Queue'} (MessageID:$GetParam{'Message-ID'})!",
+            Message => "There exists a X-KIX-Queue header: $GetParam{'X-KIX-Queue'} (MessageID:$GetParam{'Message-ID'})!",
         );
     }
 
     # get dest queue
     return $Kernel::OM->Get('Queue')->QueueLookup(
-        Queue => $GetParam{'X-KIX-Queue'},
+        Queue  => $GetParam{'X-KIX-Queue'},
+        Silent => 1,
     );
-
-    return;
 }
 
 1;
-
-
-
 
 =back
 

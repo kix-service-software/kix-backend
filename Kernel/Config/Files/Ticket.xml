@@ -2337,6 +2337,7 @@
                 <Item>X-KIX-FollowUp-DynamicField-WorkOrder</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
                 <Item>X-KIX-Subject</Item>
+                <Item>X-KIX-StrictFollowUpIgnore</Item>
             </Array>
         </Setting>
     </ConfigItem>
