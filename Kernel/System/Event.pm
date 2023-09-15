@@ -13,6 +13,8 @@ package Kernel::System::Event;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DynamicField',
@@ -99,10 +101,6 @@ sub EventList {
 }
 
 1;
-
-
-
-
 
 =back
 

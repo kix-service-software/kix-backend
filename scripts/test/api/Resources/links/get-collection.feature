@@ -8,6 +8,6 @@
   Scenario: get the list of existing links
     When I query the collection of links
     Then the response code is 200
-#    And the response object is LinkCollectionResponse
+    And the response object is LinkCollectionResponse
 
 

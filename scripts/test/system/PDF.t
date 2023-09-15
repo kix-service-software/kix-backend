@@ -19,11 +19,6 @@ my $MainObject = $Kernel::OM->Get('Main');
 my $PDFObject  = $Kernel::OM->Get('PDF');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # create a pdf document
@@ -2953,8 +2948,6 @@ $Self->True(
     $CharsetTest3Ok,
     "CharsetTest3()",
 );
-
-# cleanup cache is done by RestoreDatabase
 
 1;
 

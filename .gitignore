@@ -1,2 +1,3 @@
 var/run/service.pid
 /.project
+/.idea

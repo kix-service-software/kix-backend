@@ -9,6 +9,7 @@
     Given a contact 
     When I query the collection of contacts 
     Then the response code is 200
+#    And the response object is ContactCollectionResponse
 
   Scenario: get the list of existing contacts with filter
     Given a organisation
@@ -28,7 +29,7 @@
   Scenario: get the list of existing contacts with filter and
     Given 6 of organisations
     Given 4 of contact with diffrent organisation
-    When I query the collection of contacts 
+    When I query the collection of contacts
     When I query the collection of contacts with filter of Firstname "Tom" and Lastname "Meier"
     Then the response code is 200
     And the response contains the following items of type Contact
@@ -100,7 +101,7 @@
     Given 8 of organisations
     Given 8 of contact with diffrent organisation
     When I query the collection of contacts
-    When I query the collection of contacts with sorted by "Contact.-Firstname:textual" limit 2 and offset 4 
+    When I query the collection of contacts with sorted by "Contact.-Firstname:textual" limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "Contact"
     When delete all this contacts

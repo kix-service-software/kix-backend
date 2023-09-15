@@ -18,11 +18,6 @@ use Kernel::API::Validator::MimeTypeValidator;
 my $ValidatorObject = Kernel::API::Validator::MimeTypeValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ValidData = {
@@ -65,8 +60,6 @@ $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

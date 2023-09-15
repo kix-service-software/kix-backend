@@ -142,7 +142,7 @@ sub Run {
             && !$TicketStateWorkflow->{ $TicketData{Type}.':::'.$TicketData{State} }
             )
         {
-            $Self->{TicketObject}->StateSet(
+            $Self->{TicketObject}->TicketStateSet(
                 State    => $ForceDefaultState->{ $TicketData{Type} },
                 TicketID => $TicketData{TicketID},
                 UserID   => $Self->{UserID} || 1,
@@ -178,7 +178,7 @@ sub Run {
 
             if ($CurrentStateIsNotValid) {
 
-                $Self->{TicketObject}->StateSet(
+                $Self->{TicketObject}->TicketStateSet(
                     State    => $DefaultState->{ $TicketData{Type} },
                     TicketID => $TicketData{TicketID},
                     UserID   => $Self->{UserID} || 1,

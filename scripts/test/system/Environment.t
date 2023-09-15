@@ -19,7 +19,7 @@ my $EnvironmentObject = $Kernel::OM->Get('Environment');
 
 my %OSInfo = $EnvironmentObject->OSInfoGet();
 
-for my $Attribute (qw(Hostname OS OSName User)) {
+for my $Attribute (qw(Hostname OS OSName Distribution Path POSIX)) {
     $Self->True(
         $OSInfo{$Attribute},
         "OSInfoGet - returned $Attribute",

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -84,28 +84,6 @@ sub Run {
     my $UserList;
     my %UserSearch;
 
-    my @AllowedUserIDs;
-
-    if ( $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue' ) {
-        @AllowedUserIDs = $Self->_GetUserIDsWithRequiredPermission(
-            RequiredPermission => $Param{Data}->{requiredPermission}
-        );
-
-        $Self->AddCacheKeyExtension(
-            Extension => ['requiredPermission']
-        );
-
-        # we don't have any allowed users
-        if ( !@AllowedUserIDs ) {
-            return $Self->_Success(
-                User => [],
-            );
-        }        
-
-        $UserSearch{AND} //= [];
-        push @{$UserSearch{AND}}, { Field => 'UserIDs', Operator => 'IN', Value => \@AllowedUserIDs };
-    }
-
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
@@ -115,6 +93,14 @@ sub Run {
                 }
             }
         }
+    }
+
+    my $CheckForBasePermissions = $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue';
+
+    my $Limit = $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'};
+    # if we have to check for base permission we can not limit the db search.
+    if ( $CheckForBasePermissions ) {
+        $Limit = 0;
     }
 
     # prepare search if given
@@ -132,7 +118,7 @@ sub Run {
                     if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
                         %SearchResult = $Self->_GetPreferenceSearchResult(
                             SearchItem  => $SearchItem,
-                            SearchLimit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                            SearchLimit => $Limit,
                         );
                     } else {
                         my %SearchParam = $Self->_GetSearchParam(
@@ -142,7 +128,7 @@ sub Run {
                         if ( !%SearchResult && %SearchParam ) {
                             %SearchResult = $Kernel::OM->Get('User')->UserSearch(
                                 %SearchParam,
-                                Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                                Limit => $Limit,
                                 Valid => 0
                             );
                         }
@@ -185,11 +171,11 @@ sub Run {
                         );
                     }
                 }
-
+                
                 if (%SearchParam) {
                     %SearchTypeResult = $Kernel::OM->Get('User')->UserSearch(
                         %SearchParam,
-                        Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                        Limit => $Limit,
                         Valid => 0
                     );
                 }
@@ -211,14 +197,36 @@ sub Run {
         # perform User search without any search params
         $UserList = { $Kernel::OM->Get('User')->UserList(
             Type  => 'Short',
-            Limit => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+            Limit => $Limit,
             Valid => 0
         ) };
-    }
+    }    
 
     my @UserIDs = sort keys %{$UserList};
 
     if ( @UserIDs ) {
+
+        my @AllowedUserIDs = @UserIDs;
+
+        if ( $CheckForBasePermissions ) {
+            @AllowedUserIDs = $Self->_GetUserIDsWithRequiredPermission(
+                RequiredPermission  => $Param{Data}->{requiredPermission},
+                Limit               => $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'},
+                UserIDs             => \@UserIDs
+            );
+
+            $Self->AddCacheKeyExtension(
+                Extension => ['requiredPermission']
+            );
+
+            # we don't have any allowed users
+            if ( !@AllowedUserIDs ) {
+                return $Self->_Success(
+                    User => [],
+                );
+            }        
+        }
+
         # get already prepared user data from UserGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::User::UserGet',
@@ -360,10 +368,18 @@ sub _GetUserIDsWithRequiredPermission {
 
     my @AllowedUserIDs;
 
-    PERMISSION:
-    foreach my $Permission (@Permissions) {
-        USERID:
-        foreach my $UserID (@UserIDs) {            
+    my @UserIDsWithBasePermissions = ();
+    my %UserIDsHash                = map { $_ => 1 } @UserIDs;
+    for my $UserID ( @{ $Param{UserIDs} } ) {
+        if ( $UserIDsHash{ $UserID } ) {
+            push( @UserIDsWithBasePermissions, $UserID );
+        }
+    }
+    
+    USERID:
+    foreach my $UserID (@UserIDsWithBasePermissions) {      
+        PERMISSION:
+        foreach my $Permission (@Permissions) {      
 
             # check resource permission
             my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
@@ -385,10 +401,14 @@ sub _GetUserIDsWithRequiredPermission {
             if ( IsArrayRefWithData($Result) && $Param{RequiredPermission}->{ObjectID}) {                
                 my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
                 next USERID if !$AllowedQueueIDs{$Param{RequiredPermission}->{ObjectID}};
-            } 
+            }                         
+        }
 
-            # ok, accept this user
-            push @AllowedUserIDs, $UserID;
+        # ok, accept this user
+        push @AllowedUserIDs, $UserID;
+
+        if ( $Param{Limit} && scalar(@AllowedUserIDs) eq $Param{Limit} ) {
+            last USERID;
         }
     }
 

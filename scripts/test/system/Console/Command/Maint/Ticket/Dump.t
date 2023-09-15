@@ -15,15 +15,19 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get command object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::Dump');
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -68,7 +72,8 @@ $Self->True(
     "Title found",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

@@ -132,7 +132,7 @@ sub RunOperation {
         }
 
         # check the necessary permission of the parent object if needed
-        if ( IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
+        if ( !$Param{IgnoreParentPermissions} && IsHashRefWithData($Self->{ParentMethodOperationMapping}) && $Self->{ParentMethodOperationMapping}->{$ParentCheckMethod} ) {
 
             # get the config of the parent operation to determine the primary object ID attribute
             my $OperationConfig = $Kernel::OM->Get('Config')->Get('API::Operation::Module')->{$Self->{ParentMethodOperationMapping}->{$ParentCheckMethod}};
@@ -444,15 +444,7 @@ sub PrepareData {
         Success => 1
     };
 
-    # check needed stuff
-    for my $Needed (qw(Data)) {
-        if ( !$Param{$Needed} ) {
-            return $Self->_Error(
-                Code    => 'PrepareData.MissingParameter',
-                Message => "$Needed parameter is missing!",
-            );
-        }
-    }
+    $Param{Data} //= {};
 
     # prepare filter
     if ( exists( $Param{Data}->{filter} ) ) {
@@ -1540,8 +1532,9 @@ sub ExecOperation {
             %{$Param{Data} || {}},
             %AdditionalData
         },
-        IgnorePermissions   => $Param{IgnorePermissions},
-        PermissionCheckOnly => $Param{PermissionCheckOnly},
+        IgnorePermissions           => $Param{IgnorePermissions},
+        IgnoreParentPermissions     => $Param{IgnoreParentPermissions},
+        PermissionCheckOnly         => $Param{PermissionCheckOnly},
     );
 
     # check result and add cachetype if neccessary

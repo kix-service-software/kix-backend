@@ -112,8 +112,7 @@ sub ValueValidate {
         !$Param{SearchValidation}
         && IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{RegExList} )
         && IsStringWithData( $Param{Value} )
-        )
-    {
+    ) {
         # check regular expressions
         my @RegExList = @{ $Param{DynamicFieldConfig}->{Config}->{RegExList} };
 
@@ -121,13 +120,15 @@ sub ValueValidate {
         for my $RegEx (@RegExList) {
 
             if ( $Param{Value} !~ $RegEx->{Value} ) {
+                $Success = undef;
+                last if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "The value '$Param{Value}' is not matching /"
                         . $RegEx->{Value} . "/ ("
                         . $RegEx->{ErrorMessage} . ")!",
                 );
-                $Success = undef;
                 last REGEXENTRY;
             }
         }
@@ -174,11 +175,12 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Log')->Log(
-        'Priority' => 'error',
-        'Message'  => "Unsupported Operator $Param{Operator}",
-    );
-
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            'Priority' => 'error',
+            'Message'  => "Unsupported Operator $Param{Operator}",
+        );
+    }
     return;
 }
 

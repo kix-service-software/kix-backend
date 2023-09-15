@@ -15,14 +15,15 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'Main',
-    'Time',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    Main
+    Time
+    Valid
 );
 
 =head1 NAME
@@ -88,10 +89,12 @@ sub SystemMaintenanceAdd {
     # check needed stuff
     for my $Key (qw(StartDate StopDate Comment ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!",
+                );
+            }
             return;
         }
     }
@@ -307,10 +310,12 @@ sub SystemMaintenanceUpdate {
     # check needed stuff
     for my $Key (qw(ID StartDate StopDate Comment ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!",
+                );
+            }
             return;
         }
     }

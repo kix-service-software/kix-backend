@@ -48,7 +48,7 @@ Then qr/the response contains (\d+) items type of GeneralCatalogClass$/, sub {
    my $Anzahl = @GeneralCatalogClass;
 };
 
-Then qr/the response contains the following items type of GeneralCatalogClass$/, sub {
+Then qr/response contains the following items type GeneralCatalogClass$/, sub {
     my $Object = "GeneralCatalogClass";
     my $Index = 0;
     my $Attribute = 'Class';

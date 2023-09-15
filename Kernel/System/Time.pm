@@ -21,10 +21,10 @@ use Date::Pcalc qw(Add_Delta_YMDHMS);
 
 use Kernel::System::VariableCheck qw( :all );
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Cache
+    Log
 );
 
 =head1 NAME
@@ -171,6 +171,8 @@ sub SystemTime2Date {
 
     # check needed stuff
     if ( !defined $Param{SystemTime} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SystemTime!',
@@ -228,10 +230,12 @@ sub TimeStamp2SystemTime {
 
     # check needed stuff
     if ( !$Param{String} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need String!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need String!',
+            );
+        }
         return;
     }
 
@@ -247,7 +251,9 @@ sub TimeStamp2SystemTime {
     }
     else {
         # we have to use NOW as TimeStamp
-        $TimeStamp = $Self->CurrentTimestamp();
+        $TimeStamp = $Self->CurrentTimestamp(
+            Silent => $Param{Silent} || 0
+        );
     }
 
     # match iso date format
@@ -259,6 +265,7 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6,
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -271,6 +278,7 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6,
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -283,6 +291,7 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6 || '00',
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -290,8 +299,7 @@ sub TimeStamp2SystemTime {
     elsif (
         $TimeStamp
         =~ /(\d{4})-(\d{1,2})-(\d{1,2})T(\d{1,2}):(\d{1,2}):(\d{1,2})(\+|\-)((\d{1,2}):(\d{1,2}))/i
-        )
-    {
+    ) {
         $SystemTime = $Self->Date2SystemTime(
             Year   => $1,
             Month  => $2,
@@ -299,6 +307,7 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6,
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -306,8 +315,7 @@ sub TimeStamp2SystemTime {
     elsif (
         $TimeStamp
         =~ /((...),\s+|)(\d{1,2})\s(...)\s(\d{4})\s(\d{1,2}):(\d{1,2}):(\d{1,2})\s((\+|\-)(\d{2})(\d{2})|...)/
-        )
-    {
+    ) {
         my $DiffTime = 0;
         if ( $10 && $10 eq '+' ) {
 
@@ -334,6 +342,7 @@ sub TimeStamp2SystemTime {
             Hour   => $6,
             Minute => $7,
             Second => $8,
+            Silent => $Param{Silent} || 0
         ) + $DiffTime + $Self->{TimeSecDiff};
     }
     # match yyyy-mm-ddThh:mm:ssZ
@@ -345,12 +354,14 @@ sub TimeStamp2SystemTime {
             Hour   => $4,
             Minute => $5,
             Second => $6,
+            Silent => $Param{Silent} || 0
         );
     }
     # match hh:mm:ss (time TODAY)
-    elsif ($TimeStamp =~ /(\d{1,2}):(\d{1,2}):(\d{1,2})/) {
+    elsif ($TimeStamp =~ /(^\d{1,2}):(\d{1,2}):(\d{1,2})$/) {
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $Self->SystemTime2Date(
-            SystemTime => $Self->SystemTime()
+            SystemTime => $Self->SystemTime(),
+            Silent     => $Param{Silent} || 0
         );
         $SystemTime = $Self->Date2SystemTime(
             Year   => $Year,
@@ -359,6 +370,7 @@ sub TimeStamp2SystemTime {
             Hour   => $1,
             Minute => $2,
             Second => $3,
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -369,10 +381,12 @@ sub TimeStamp2SystemTime {
 
     # return error
     if ( !defined $SystemTime ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid Date '$Param{String}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Date '$Param{String}'!",
+            );
+        }
         return;
     }
 
@@ -382,10 +396,12 @@ sub TimeStamp2SystemTime {
         CALC:
         foreach my $Calc ( @Parts ) {
             if ( $Calc !~ /^([+-])(\d+)([YMwdhms])?$/ ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid timestamp calculation '$Calc'!",
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Invalid timestamp calculation '$Calc'!",
+                    );
+                }
                 next CALC;
             }
             my ( $Operator, $Diff, $Unit ) = ( $1, $2, $3 );
@@ -396,7 +412,8 @@ sub TimeStamp2SystemTime {
 
         # add the relatives to the current timestamp
         my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $Self->SystemTime2Date(
-            SystemTime => $SystemTime
+            SystemTime => $SystemTime,
+            Silent     => $Param{Silent} || 0
         );
         ($Year,$Month,$Day, $Hour,$Min,$Sec) = Add_Delta_YMDHMS(
             $Year,$Month,$Day,$Hour,$Min,$Sec,
@@ -409,6 +426,7 @@ sub TimeStamp2SystemTime {
             Hour   => $Hour,
             Minute => $Min,
             Second => $Sec,
+            Silent => $Param{Silent} || 0
         );
     }
 
@@ -438,6 +456,8 @@ sub Date2SystemTime {
     # check needed stuff
     for (qw(Year Month Day Hour Minute Second)) {
         if ( !defined $Param{$_} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
@@ -453,6 +473,8 @@ sub Date2SystemTime {
     };
 
     if ( !defined $SystemTime ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
@@ -1024,6 +1046,9 @@ sub DestinationTime {
             Calendar         => $Param{Calendar} || '',
         );
     }
+    if ( !%TimeWorking ) {
+        return $DestinationTime - $TZOffset;
+    }
 
     my %LDay = (
         1 => 'Mon',
@@ -1373,11 +1398,16 @@ sub BOB {
         print STDERR "  IN: $Param{String}\n";
     }
 
+    # get system time
+    my $SystemTime = $Self->TimeStamp2SystemTime(
+        String => $Param{String},
+        Silent => $Param{Silent},
+    );
+    return if ( !$SystemTime );
+
     # get date parts
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Self->SystemTime2Date(
-        SystemTime => $Self->TimeStamp2SystemTime(
-            String => $Param{String}
-        )
+        SystemTime => $SystemTime,
     );
     return if (!$Year);
 
@@ -1727,3 +1757,5 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+

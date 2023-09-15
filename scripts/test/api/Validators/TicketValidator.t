@@ -18,12 +18,10 @@ use Kernel::API::Validator::TicketValidator;
 my $ValidatorObject = Kernel::API::Validator::TicketValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title           => 'Testticket Unittest',
@@ -90,7 +88,8 @@ $Self->False(
     'Validate() - invalid attribute',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

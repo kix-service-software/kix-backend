@@ -16,60 +16,33 @@ use DateTime::TimeZone;
 
 use vars (qw($Self));
 
-# get needed objects
-## IMPORTANT - First get time object,
-## or it will not use the same config object as the test somehow
-my $TimeObject   = $Kernel::OM->Get('Time');
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set time zone to get correct references
 $ENV{TZ} = 'Europe/Berlin';
 
-$ConfigObject->Set(
-    Key   => 'TimeZone::Calendar9',
-    Value => 'Atlantic/Azores',
-);
-
-# get DaylightSaving
-my $TimeZoneObject = DateTime::TimeZone->new(
-    name => $ConfigObject->Get( 'TimeZone::Calendar9' )
-);
-my $Calendar9_DST = $TimeZoneObject->is_dst_for_datetime(DateTime->now);
-
-$ConfigObject->Set(
-    Key   => 'TimeZone::Calendar8',
-    Value => 'Europe/Berlin',
-);
-
-$TimeZoneObject = DateTime::TimeZone->new(
-    name => $ConfigObject->Get( 'TimeZone::Calendar8' )
-);
-my $Calendar8_DST = $TimeZoneObject->is_dst_for_datetime(DateTime->now);
-
-my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => '2005-10-20T10:00:00Z' );
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-20T10:00:00Z' );
 $Self->Is(
     $SystemTime,
     1129795200,
     'TimeStamp2SystemTime()',
 );
 
-$SystemTime = $TimeObject->TimeStamp2SystemTime( String => '2005-10-20T10:00:00+00:00' );
+$SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-20T10:00:00+00:00' );
 $Self->Is(
     $SystemTime,
     1129795200,
     'TimeStamp2SystemTime()',
 );
 
-$SystemTime = $TimeObject->TimeStamp2SystemTime( String => '20-10-2005 10:00:00' );
+$SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '20-10-2005 10:00:00' );
 $Self->Is(
     $SystemTime,
     1129795200,
     'TimeStamp2SystemTime()',
 );
 
-$SystemTime = $TimeObject->TimeStamp2SystemTime( String => '2005-10-20 10:00:00' );
+$SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-20 10:00:00' );
 $Self->Is(
     $SystemTime,
     1129795200,
@@ -77,14 +50,14 @@ $Self->Is(
 );
 
 my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) =
-    $TimeObject->SystemTime2Date( SystemTime => $SystemTime );
+    $Kernel::OM->Get('Time')->SystemTime2Date( SystemTime => $SystemTime );
 $Self->Is(
     "$Year-$Month-$Day $Hour:$Min:$Sec",
     '2005-10-20 10:00:00',
     'SystemTime2Date()',
 );
 
-my $SystemTimeUnix = $TimeObject->Date2SystemTime(
+my $SystemTimeUnix = $Kernel::OM->Get('Time')->Date2SystemTime(
     Year   => 2005,
     Month  => 10,
     Day    => 20,
@@ -98,83 +71,83 @@ $Self->Is(
     'Date2SystemTime()',
 );
 
-my $SystemTime2  = $TimeObject->TimeStamp2SystemTime( String => '2005-10-21 10:00:00' );
-my $SystemTime3  = $TimeObject->TimeStamp2SystemTime( String => '2005-10-24 10:00:00' );
-my $SystemTime4  = $TimeObject->TimeStamp2SystemTime( String => '2005-10-27 10:00:00' );
-my $SystemTime5  = $TimeObject->TimeStamp2SystemTime( String => '2005-11-03 10:00:00' );
-my $SystemTime6  = $TimeObject->TimeStamp2SystemTime( String => '2005-12-21 10:00:00' );
-my $SystemTime7  = $TimeObject->TimeStamp2SystemTime( String => '2005-12-31 10:00:00' );
-my $SystemTime8  = $TimeObject->TimeStamp2SystemTime( String => '2003-12-21 10:00:00' );
-my $SystemTime9  = $TimeObject->TimeStamp2SystemTime( String => '2003-12-31 10:00:00' );
-my $SystemTime10 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
-my $SystemTime11 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-24 10:00:00' );
-my $SystemTime12 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
-my $SystemTime13 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-25 13:00:00' );
-my $SystemTime14 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
-my $SystemTime15 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-30 13:00:00' );
-my $SystemTime16 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-24 11:44:12' );
-my $SystemTime17 = $TimeObject->TimeStamp2SystemTime( String => '2005-10-24 16:13:31' );
-my $SystemTime18 = $TimeObject->TimeStamp2SystemTime( String => '2006-12-05 22:57:34' );
-my $SystemTime19 = $TimeObject->TimeStamp2SystemTime( String => '2006-12-06 10:25:34' );
-my $SystemTime20 = $TimeObject->TimeStamp2SystemTime( String => '2006-12-06 07:50:00' );
-my $SystemTime21 = $TimeObject->TimeStamp2SystemTime( String => '2006-12-07 08:54:00' );
-my $SystemTime22 = $TimeObject->TimeStamp2SystemTime( String => '2007-03-12 11:56:01' );
-my $SystemTime23 = $TimeObject->TimeStamp2SystemTime( String => '2007-03-12 13:56:01' );
-my $SystemTime24 = $TimeObject->TimeStamp2SystemTime( String => '2010-01-28 22:00:02' );
-my $SystemTime25 = $TimeObject->TimeStamp2SystemTime( String => '2010-01-28 22:01:02' );
-my $WorkingTime  = $TimeObject->WorkingTime(
+my $SystemTime2  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-21 10:00:00' );
+my $SystemTime3  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-24 10:00:00' );
+my $SystemTime4  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-27 10:00:00' );
+my $SystemTime5  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-11-03 10:00:00' );
+my $SystemTime6  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-12-21 10:00:00' );
+my $SystemTime7  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-12-31 10:00:00' );
+my $SystemTime8  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2003-12-21 10:00:00' );
+my $SystemTime9  = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2003-12-31 10:00:00' );
+my $SystemTime10 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
+my $SystemTime11 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-24 10:00:00' );
+my $SystemTime12 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
+my $SystemTime13 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-25 13:00:00' );
+my $SystemTime14 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-23 10:00:00' );
+my $SystemTime15 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-30 13:00:00' );
+my $SystemTime16 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-24 11:44:12' );
+my $SystemTime17 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2005-10-24 16:13:31' );
+my $SystemTime18 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2006-12-05 22:57:34' );
+my $SystemTime19 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2006-12-06 10:25:34' );
+my $SystemTime20 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2006-12-06 07:50:00' );
+my $SystemTime21 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2006-12-07 08:54:00' );
+my $SystemTime22 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2007-03-12 11:56:01' );
+my $SystemTime23 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2007-03-12 13:56:01' );
+my $SystemTime24 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2010-01-28 22:00:02' );
+my $SystemTime25 = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => '2010-01-28 22:01:02' );
+my $WorkingTime  = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime,
     StopTime  => $SystemTime2,
 );
-my $WorkingTime2 = $TimeObject->WorkingTime(
+my $WorkingTime2 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime,
     StopTime  => $SystemTime3,
 );
-my $WorkingTime3 = $TimeObject->WorkingTime(
+my $WorkingTime3 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime,
     StopTime  => $SystemTime4,
 );
-my $WorkingTime4 = $TimeObject->WorkingTime(
+my $WorkingTime4 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime,
     StopTime  => $SystemTime5,
 );
-my $WorkingTime5 = $TimeObject->WorkingTime(
+my $WorkingTime5 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime6,
     StopTime  => $SystemTime7,
 );
-my $WorkingTime6 = $TimeObject->WorkingTime(
+my $WorkingTime6 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime8,
     StopTime  => $SystemTime9,
 );
-my $WorkingTime7 = $TimeObject->WorkingTime(
+my $WorkingTime7 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime10,
     StopTime  => $SystemTime11,
 );
-my $WorkingTime8 = $TimeObject->WorkingTime(
+my $WorkingTime8 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime12,
     StopTime  => $SystemTime13,
 );
-my $WorkingTime9 = $TimeObject->WorkingTime(
+my $WorkingTime9 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime14,
     StopTime  => $SystemTime15,
 );
-my $WorkingTime10 = $TimeObject->WorkingTime(
+my $WorkingTime10 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime16,
     StopTime  => $SystemTime17,
 );
-my $WorkingTime11 = $TimeObject->WorkingTime(
+my $WorkingTime11 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime18,
     StopTime  => $SystemTime19,
 );
-my $WorkingTime12 = $TimeObject->WorkingTime(
+my $WorkingTime12 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime20,
     StopTime  => $SystemTime21,
 );
-my $WorkingTime13 = $TimeObject->WorkingTime(
+my $WorkingTime13 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime22,
     StopTime  => $SystemTime23,
 );
-my $WorkingTime14 = $TimeObject->WorkingTime(
+my $WorkingTime14 = $Kernel::OM->Get('Time')->WorkingTime(
     StartTime => $SystemTime24,
     StopTime  => $SystemTime25,
 );
@@ -257,6 +230,16 @@ $Self->Is(
     $WorkingTime14,
     0,
     'WorkingHours - Mon-Mon',
+);
+
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TimeZone::Calendar9',
+    Value => 'Atlantic/Azores',
+);
+
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TimeZone::Calendar8',
+    Value => 'Europe/Berlin',
 );
 
 # DestinationTime tests
@@ -445,7 +428,7 @@ my @DestinationTime = (
         Calendar        => 9,
         StartTimeSystem => '',
         Diff            => 60 * 1,
-        EndTime         => $Calendar9_DST ? '2013-03-18 08:01:00' : '2013-03-18 09:01:00',    # Monday
+        EndTime         => '2013-03-18 10:01:00',    # Monday
         EndTimeSystem   => '',
     },
     {
@@ -454,7 +437,7 @@ my @DestinationTime = (
         Calendar        => 8,
         StartTimeSystem => '',
         Diff            => 60 * 1,
-        EndTime         => $Calendar8_DST ? '2013-03-18 06:01:00' : '2013-03-18 07:01:00',    # Monday
+        EndTime         => '2013-03-18 08:01:00',    # Monday
         EndTimeSystem   => '',
     },
     {
@@ -487,7 +470,7 @@ my @DestinationTime = (
 for my $Test (@DestinationTime) {
 
     # get system time
-    my $SystemTimeDestination = $TimeObject->TimeStamp2SystemTime( String => $Test->{StartTime} );
+    my $SystemTimeDestination = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $Test->{StartTime} );
 
     # check system time
     if ( $Test->{StartTimeSystem} ) {
@@ -499,7 +482,7 @@ for my $Test (@DestinationTime) {
     }
 
     # get system destination time based on calendar settings
-    my $DestinationTime = $TimeObject->DestinationTime(
+    my $DestinationTime = $Kernel::OM->Get('Time')->DestinationTime(
         StartTime => $SystemTimeDestination,
         Time      => $Test->{Diff},
         Calendar  => $Test->{Calendar},
@@ -516,7 +499,7 @@ for my $Test (@DestinationTime) {
 
     # check time stamp destination time
     my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) =
-        $TimeObject->SystemTime2Date( SystemTime => $DestinationTime );
+        $Kernel::OM->Get('Time')->SystemTime2Date( SystemTime => $DestinationTime );
     $Self->Is(
         "$Year-$Month-$Day $Hour:$Min:$Sec",
         $Test->{EndTime},
@@ -556,43 +539,60 @@ my @WorkingTimeDestinationTimeRoundtrip = (
 );
 
 # modify calendar 7 -- 24/7
-my $WorkingHoursFull = [ '0' .. '23' ];
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeWorkingHours::Calendar7',
     Value => {
-        map { $_ => $WorkingHoursFull, } qw( Mon Tue Wed Thu Fri Sat Sun ),
+        Mon => '00:00-24:00',
+        Tue => '00:00-24:00',
+        Wed => '00:00-24:00',
+        Thu => '00:00-24:00',
+        Fri => '00:00-24:00',
+        Sat => '00:00-24:00',
+        Sun => '00:00-24:00'
     },
+);
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TimeVacationDaysModules::Calendar7',
+    Value => {},
+);
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TimeVacationDays::Calendar7',
+    Value => {},
+);
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TimeVacationDaysOneTime::Calendar7',
+    Value => {},
 );
 
 for my $Test (@WorkingTimeDestinationTimeRoundtrip) {
     my $BaseDate   = $Test->{BaseDate};
-    my $BaseTime   = $TimeObject->TimeStamp2SystemTime( String => $BaseDate );
+    my $BaseTime   = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $BaseDate );
     my $DaysBefore = $Test->{DaysBefore};
     my $DaysAfter  = $Test->{DaysAfter};
     for my $Run ( 1 .. 40 ) {
 
         # Use random start/stop dates around base date
         my $StartTime = $BaseTime - int( rand( $DaysBefore * 24 * 60 * 60 ) );
-        my $StartDate = $TimeObject->SystemTime2TimeStamp( SystemTime => $StartTime );
+        my $StartDate = $Kernel::OM->Get('Time')->SystemTime2TimeStamp( SystemTime => $StartTime );
         my $StopTime  = $BaseTime + int( rand( $DaysAfter * 24 * 60 * 60 ) );
-        my $StopDate  = $TimeObject->SystemTime2TimeStamp( SystemTime => $StopTime );
+        my $StopDate  = $Kernel::OM->Get('Time')->SystemTime2TimeStamp( SystemTime => $StopTime );
 
-        my $WorkingTime = $TimeObject->WorkingTime(
+        my $WorkingTime = $Kernel::OM->Get('Time')->WorkingTime(
             StartTime => $StartTime,
             StopTime  => $StopTime,
             Calendar  => $Test->{Calendar},
         );
-        my $DestinationTime = $TimeObject->DestinationTime(
+        my $DestinationTime = $Kernel::OM->Get('Time')->DestinationTime(
             StartTime => $StartTime,
             Time      => $WorkingTime,
             Calendar  => $Test->{Calendar},
         );
-        my $WorkingTime2 = $TimeObject->WorkingTime(    # re-check
+        my $WorkingTime2 = $Kernel::OM->Get('Time')->WorkingTime(    # re-check
             StartTime => $StartTime,
             StopTime  => $DestinationTime,
             Calendar  => $Test->{Calendar},
         );
-        my $DestinationDate = $TimeObject->SystemTime2TimeStamp( SystemTime => $DestinationTime );
+        my $DestinationDate = $Kernel::OM->Get('Time')->SystemTime2TimeStamp( SystemTime => $DestinationTime );
         my $WH              = int( $WorkingTime / 3600 );
         my $WM              = int( ( $WorkingTime - $WH * 3600 ) / 60 );
         my $WS              = $WorkingTime - $WH * 3600 - $WM * 60;
@@ -862,7 +862,7 @@ my @VacationDays = (
 );
 
 for my $Test (@VacationDays) {
-    my $Vacation = $TimeObject->VacationCheck(
+    my $Vacation = $Kernel::OM->Get('Time')->VacationCheck(
         Year     => $Test->{Year},
         Month    => $Test->{Month},
         Day      => $Test->{Day},
@@ -877,21 +877,21 @@ for my $Test (@VacationDays) {
 }
 
 # disable all vacations on calendar 1
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeVacationDays::Calendar1',
     Value => undef,
 );
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeVacationDaysOneTime::Calendar1',
     Value => undef,
 );
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeVacationDaysModules::Calendar1',
     Value => undef,
 );
 
 for my $Test (@VacationDays) {
-    my $Vacation = $TimeObject->VacationCheck(
+    my $Vacation = $Kernel::OM->Get('Time')->VacationCheck(
         Year     => $Test->{Year},
         Month    => $Test->{Month},
         Day      => $Test->{Day},
@@ -946,13 +946,13 @@ my @Tests = (
 # the following tests implies a conversion to 'Date' in the middle, so tests for 'Date' are not
 # needed
 for my $Test (@Tests) {
-    my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => $Test->{TimeStamp} );
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $Test->{TimeStamp} );
     $Self->Is(
         $SystemTime,
         $Test->{SystemTime},
         " $Test->{Name} TimeStamp2SystemTime()",
     );
-    my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
+    my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Test->{SystemTime},
     );
     $Self->Is(
@@ -1067,12 +1067,12 @@ $ENV{TZ} = 'UTC';
 for my $Test (@Tests) {
     if ( $Test->{FixedTimeSet} ) {
         $Helper->FixedTimeSet(
-            $TimeObject->TimeStamp2SystemTime( String => $Test->{FixedTimeSet} ),
+            $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $Test->{FixedTimeSet} ),
         );
     }
 
-    my $SystemTime = $TimeObject->TimeStamp2SystemTime( String => $Test->{TimeStamp});
-    my $Result = $TimeObject->TimeStamp2SystemTime( String => $Test->{Result} );
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $Test->{TimeStamp});
+    my $Result = $Kernel::OM->Get('Time')->TimeStamp2SystemTime( String => $Test->{Result} );
     $Self->Is(
         $SystemTime,
         $Result,
@@ -1081,8 +1081,6 @@ for my $Test (@Tests) {
 }
 
 1;
-
-
 
 =back
 

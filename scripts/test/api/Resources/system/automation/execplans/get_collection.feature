@@ -9,7 +9,8 @@ Feature: GET request to the /system/automation/execplans resource
     Given a automation execplan
     Then the response code is 201
     When I query the collection of automation execplans
-    Then the response code is 200 
+    Then the response code is 200
+#    And the response object is ExecPlanCollectionResponse
     When I delete this automation execplan
     Then the response code is 204
     And the response has no content   

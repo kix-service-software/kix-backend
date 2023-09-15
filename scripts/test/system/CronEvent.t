@@ -23,13 +23,16 @@ my $SystemTime = $TimeObject->SystemTime();
 my @Tests = (
     {
         Name    => 'No Params',
-        Config  => {},
+        Config  => {
+            Silent => 1,
+        },
         Success => 0,
     },
     {
         Name   => 'No Schedule',
         Config => {
             StartTimeStamp => '2015-12-12 00:00:00',
+            Silent         => 1,
         },
         Success => 0,
     },
@@ -37,6 +40,7 @@ my @Tests = (
         Name   => 'Invalid Schedule minute (greater)',
         Config => {
             Schedule => '60 * * * * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -44,6 +48,7 @@ my @Tests = (
         Name   => 'Invalid Schedule minute (lower)',
         Config => {
             Schedule => '-1 * * * * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -51,6 +56,7 @@ my @Tests = (
         Name   => 'Invalid Schedule hour (greater)',
         Config => {
             Schedule => '* 24 * * * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -58,6 +64,7 @@ my @Tests = (
         Name   => 'Invalid Schedule hour (lower)',
         Config => {
             Schedule => '* -1 * * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -65,6 +72,7 @@ my @Tests = (
         Name   => 'Invalid Schedule day of month (greater)',
         Config => {
             Schedule => '* * 32 * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -72,6 +80,7 @@ my @Tests = (
         Name   => 'Invalid Schedule day of month (lower)',
         Config => {
             Schedule => '* * 0 * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -79,6 +88,7 @@ my @Tests = (
         Name   => 'Invalid Schedule month (greater)',
         Config => {
             Schedule => '* * * 13 *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -86,6 +96,7 @@ my @Tests = (
         Name   => 'Invalid Schedule month (lower)',
         Config => {
             Schedule => '* * * 0 *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -93,6 +104,7 @@ my @Tests = (
         Name   => 'Invalid Schedule day of week (greater)',
         Config => {
             Schedule => '* * * * 8',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -100,6 +112,7 @@ my @Tests = (
         Name   => 'Invalid Schedule day of week (lower)',
         Config => {
             Schedule => '* * * * -1',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -225,6 +238,7 @@ my @Tests = (
         Config => {
             Schedule       => '2 2 31 4 *',
             StartTimeStamp => '2015-01-01 00:00:00',
+            Silent         => 1,
         },
         Success => 0,
     },
@@ -233,6 +247,7 @@ my @Tests = (
         Config => {
             Schedule       => '2 2 30 2 *',
             StartTimeStamp => '2015-01-01 00:00:00',
+            Silent         => 1,
         },
         Success => 0,
     },
@@ -284,13 +299,16 @@ for my $Test (@Tests) {
 @Tests = (
     {
         Name    => 'No Params',
-        Config  => {},
+        Config  => {
+            Silent => 1,
+        },
         Success => 0,
     },
     {
         Name   => 'No Schedule',
         Config => {
             StartTimeStamp => '2015-03-05 00:00:00',
+            Silent         => 1,
         },
         Success => 0,
     },
@@ -299,6 +317,7 @@ for my $Test (@Tests) {
         Config => {
             Schedule       => '*/2 * * * *',
             StartTimeStamp => '2015-03-05 00:00:00',
+            Silent         => 1,
 
         },
         Success => 0,
@@ -309,6 +328,7 @@ for my $Test (@Tests) {
             Schedule       => '*/2 * * * *',
             StartTimeStamp => '2015-03-05 00:00:01',
             StopTimeStamp  => '2015-03-05 00:00:00',
+            Silent         => 1,
         },
         Success => 0,
     },
@@ -429,13 +449,16 @@ for my $Test (@Tests) {
 @Tests = (
     {
         Name    => 'No Params',
-        Config  => {},
+        Config  => {
+            Silent => 1,
+        },
         Success => 0,
     },
     {
         Name   => 'No Schedule',
         Config => {
             StartDate => '2015-12-12 00:00:00',
+            Silent    => 1,
         },
         Success => 0,
     },
@@ -443,6 +466,7 @@ for my $Test (@Tests) {
         Name   => 'Invalid Schedule minute (greater)',
         Config => {
             Schedule => '60 * * * * *',
+            Silent   => 1,
         },
         Success => 0,
     },
@@ -596,278 +620,7 @@ for my $Test (@Tests) {
     }
 }
 
-# GenericAgentSchedule2CronTab() tests
-@Tests = (
-    {
-        Name    => 'Empty Config',
-        Config  => {},
-        Success => 0,
-    },
-    {
-        Name   => 'Missing ScheduleMinutes',
-        Config => {
-            ScheduleHours => [20],
-            ScheduleDays  => [7],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Missing ScheduleHours',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Missing ScheduleDays',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleMinutes format',
-        Config => {
-            ScheduleMinutes => '05',
-            ScheduleHours   => [20],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleHours format',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => '20',
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleDays format',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-            ScheduleDays    => '6',
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Empty ScheduleMinutes',
-        Config => {
-            ScheduleMinutes => [],
-            ScheduleHours   => [20],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Empty ScheduleHours',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Empty ScheduleDays',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-            ScheduleDays    => [],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleMinutes data',
-        Config => {
-            ScheduleMinutes => ['a'],
-            ScheduleHours   => [20],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleHours data',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => ['a'],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleDays data',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-            ScheduleDays    => ['a'],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleMinutes lower limit',
-        Config => {
-            ScheduleMinutes => [-1],
-            ScheduleHours   => [20],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleHours lower limit',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [-1],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleDays lower limit',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-            ScheduleDays    => [-1],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleMinutes upper limit',
-        Config => {
-            ScheduleMinutes => [60],
-            ScheduleHours   => [20],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleHours upper limit',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [60],
-            ScheduleDays    => [6],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Wrong ScheduleDays upper limit',
-        Config => {
-            ScheduleMinutes => [5],
-            ScheduleHours   => [20],
-            ScheduleDays    => [7],
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Each hour on minute 20',
-        Config => {
-            ScheduleMinutes => [20],
-            ScheduleHours   => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 ],
-            ScheduleDays => [ 0, 1, 2, 3, 4, 5, 6 ]
-        },
-        ExpectedValue => '20 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * 1,2,3,4,5,6,7',
-        Success       => 1,
-    },
-    {
-        Name   => '1-10 minutes On hour 13',
-        Config => {
-            ScheduleMinutes => [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
-            ScheduleHours   => [13],
-            ScheduleDays => [ 0, 1, 2, 3, 4, 5, 6 ]
-        },
-        ExpectedValue => '1,2,3,4,5,6,7,8,9,10 13 * * 1,2,3,4,5,6,7',
-        Success       => 1,
-    },
-    {
-        Name   => '20 - 30 minutes from 9 to 11 each Sunday',
-        Config => {
-            ScheduleMinutes => [ 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 ],
-            ScheduleHours   => [ 9,  10, 11 ],
-            ScheduleDays    => [0],
-        },
-        ExpectedValue => '20,21,22,23,24,25,26,27,28,29,30 9,10,11 * * 7',
-        Success       => 1,
-    },
-    {
-        Name   => '40 to 35 minutes at 11 pm each Monday',
-        Config => {
-            ScheduleMinutes => [ 40, 41, 42, 43, 44, 45 ],
-            ScheduleHours   => [23],
-            ScheduleDays    => [1],
-        },
-        ExpectedValue => '40,41,42,43,44,45 23 * * 1',
-        Success       => 1,
-    },
-    {
-        Name   => 'On minute 51 at 1 and 2 pm each Saturday',
-        Config => {
-            ScheduleMinutes => [51],
-            ScheduleHours   => [ 13, 14 ],
-            ScheduleDays    => [6],
-        },
-        ExpectedValue => '51 13,14 * * 6',
-        Success       => 1,
-    },
-    {
-        Name   => 'Only Wednesday at 7pm o\'clock',
-        Config => {
-            ScheduleMinutes => [0],
-            ScheduleHours   => [19],
-            ScheduleDays    => [3],
-        },
-        ExpectedValue => '0 19 * * 3',
-        Success       => 1,
-    },
-    {
-        Name   => 'Only Tuesdays and Fridays at 10:30, 10:45 and 20:30, 20:45',
-        Config => {
-            ScheduleMinutes => [ 30, 45 ],
-            ScheduleHours   => [ 10, 20 ],
-            ScheduleDays    => [ 2,  5 ],
-        },
-        ExpectedValue => '30,45 10,20 * * 2,5',
-        Success       => 1,
-    },
-);
-
-TESTCASE:
-for my $Test (@Tests) {
-
-    my $Schedule = $CronEventObject->GenericAgentSchedule2CronTab( %{ $Test->{Config} } );
-
-    if ( !$Test->{Success} ) {
-        $Self->Is(
-            $Schedule,
-            undef,
-            "$Test->{Name} GenericAgentSchedule2CronTab() - result should be undef",
-        );
-
-        next TESTCASE;
-    }
-
-    $Self->Is(
-        $Schedule,
-        $Test->{ExpectedValue},
-        "$Test->{Name} GenericAgentSchedule2CronTab() - result",
-    );
-
-    my $EventSystemTime = $CronEventObject->NextEventGet(
-        Schedule => $Schedule,
-    );
-    $Self->IsNot(
-        $EventSystemTime,
-        undef,
-        "$Test->{Name} GenericAgentSchedule2CronTab() - next event should not be undef",
-    );
-
-}
 1;
-
-
 
 =back
 

@@ -9,4 +9,16 @@
     When I query the collection of generalcatalog classes
     Then the response code is 200
     And the response object is GeneralCatalogClassCollectionResponse
+    Then items of "GeneralCatalogClass"
+      | GeneralCatalogClass                     |
+      | ITSM::ConfigItem::Class                 |
+      | ITSM::ConfigItem::Computer::Type        |
+      | ITSM::ConfigItem::DeploymentState       |
+      | ITSM::ConfigItem::Hardware::Type        |
+      | ITSM::ConfigItem::Location::Type        |
+      | ITSM::ConfigItem::Network::Type         |
+      | ITSM::ConfigItem::Software::LicenceType |
+      | ITSM::ConfigItem::Software::Type        |
+      | ITSM::ConfigItem::YesNo                 |
+      | ITSM::Core::IncidentState               |
 

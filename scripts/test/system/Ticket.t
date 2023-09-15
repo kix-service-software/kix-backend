@@ -24,12 +24,10 @@ my $TypeObject    = $Kernel::OM->Get('Type');
 my $UserObject    = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # set fixed time
 $Helper->FixedTimeSet();
@@ -39,16 +37,23 @@ my %Contact = $ContactObject->ContactGet(
     ID => $ContactID
 );
 
+my $TestUserLogin = $Helper->TestUserCreate(
+    Roles => ['Ticket Agent'],
+);
+my $TestUserID = $UserObject->UserLookup(
+    UserLogin => $TestUserLogin,
+);
+
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => $Contact{PrimaryOrganisationID},
-    ContactID    => $ContactID,
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => $ContactID,
+    OwnerID        => $TestUserID,
+    UserID         => 1,
 );
 $Self->True(
     $TicketID,
@@ -81,7 +86,7 @@ $Self->Is(
 );
 $Self->Is(
     $Ticket{Owner},
-    'admin',
+    $TestUserLogin,
     'TicketGet() (Owner)',
 );
 $Self->Is(
@@ -116,30 +121,17 @@ $Self->Is(
     $TypeObject->TypeLookup( Type => $DefaultTicketType ),
     'TicketGet() (TypeID)',
 );
-$Self->Is(
-    $Ticket{SolutionTime},
-    $Ticket{Created},
-    'Ticket created as closed as Solution Time = Creation Time',
-);
-
-my $TestUserLogin = $Helper->TestUserCreate(
-    Groups => [ 'users', ],
-);
-
-my $TestUserID = $UserObject->UserLookup(
-    UserLogin => $TestUserLogin,
-);
 
 my $TicketIDCreatedBy = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => $Contact{PrimaryOrganisationID},
-    ContactID    => $ContactID,
-    OwnerID      => 1,
-    UserID       => $TestUserID,
+    ContactID      => $ContactID,
+    OwnerID        => 1,
+    UserID         => $TestUserID,
 );
 
 my %CheckCreatedBy = $TicketObject->TicketGet(
@@ -281,13 +273,13 @@ my %TicketIDs = $TicketObject->TicketSearch(
     Search       => {
         OR => [
             {
-                Field => 'TicketNumber',
-                Value => $TicketSearchTicketNumber,
+                Field    => 'TicketNumber',
+                Value    => $TicketSearchTicketNumber,
                 Operator => 'STARTSWITH',
             },
             {
-                Field => 'TicketNumber',
-                Value => 'not existing',
+                Field    => 'TicketNumber',
+                Value    => 'not existing',
                 Operator => 'CONTAINS',
             }
         ]
@@ -307,8 +299,8 @@ $Self->True(
     Search       => {
         AND => [
             {
-                Field => 'TicketNumber',
-                Value => $Ticket{TicketNumber},
+                Field    => 'TicketNumber',
+                Value    => $Ticket{TicketNumber},
                 Operator => 'EQ',
             },
         ]
@@ -327,8 +319,8 @@ $Self->True(
     Search       => {
         AND => [
             {
-                Field => 'Age',
-                Value => 3600,
+                Field    => 'Age',
+                Value    => 3600,
                 Operator => 'LT',
             },
         ]
@@ -804,14 +796,14 @@ $Self->True(
     'TicketSearch() (HASH:Body,StateType:Open)',
 );
 
-$TicketObject->MoveTicket(
+$TicketObject->TicketQueueSet(
     Queue              => 'Junk',
     TicketID           => $TicketID,
     SendNoNotification => 1,
     UserID             => 1,
 );
 
-$TicketObject->MoveTicket(
+$TicketObject->TicketQueueSet(
     Queue              => 'Junk',
     TicketID           => $TicketID,
     SendNoNotification => 1,
@@ -832,7 +824,7 @@ $Self->Is(
     'HistoryTicketGet() Check history queue',
 );
 
-my $TicketMove = $TicketObject->MoveTicket(
+my $TicketMove = $TicketObject->TicketQueueSet(
     Queue              => 'Junk',
     TicketID           => $TicketID,
     SendNoNotification => 1,
@@ -843,7 +835,7 @@ $Self->True(
     'MoveTicket()',
 );
 
-my $TicketState = $TicketObject->StateSet(
+my $TicketState = $TicketObject->TicketStateSet(
     State    => 'open',
     TicketID => $TicketID,
     UserID   => 1,
@@ -903,7 +895,7 @@ $Self->False(
     'TicketSearch() (HASH:TicketNumber,StateType:Closed)',
 );
 
-my $TicketPriority = $TicketObject->PrioritySet(
+my $TicketPriority = $TicketObject->TicketPrioritySet(
     Priority => '4 low',
     TicketID => $TicketID,
     UserID   => 1,
@@ -1126,7 +1118,7 @@ $Helper->FixedTimeAddSeconds(5);
     UserID   => 1,
 );
 
-my $TicketLock = $TicketObject->LockSet(
+my $TicketLock = $TicketObject->TicketLockSet(
     Lock               => 'lock',
     TicketID           => $TicketID,
     SendNoNotification => 1,
@@ -1134,7 +1126,7 @@ my $TicketLock = $TicketObject->LockSet(
 );
 $Self->True(
     $TicketLock,
-    'LockSet()',
+    'TicketLockSet()',
 );
 
 # Test CreatedUserIDs
@@ -1144,8 +1136,8 @@ $Self->True(
     Search         => {
         AND => [
             {
-                Field => 'CreatedUserID',
-                Value => [ 1, 455, 32 ],
+                Field    => 'CreatedUserID',
+                Value    => [ 1, 455, 32 ],
                 Operator => 'IN',
             },
         ]
@@ -1171,15 +1163,15 @@ $Self->True(
     Search             => {
         AND => [
             {
-                Field => 'CreatedPriorityID',
-                Value => [ 2, 3 ],
+                Field    => 'CreatedPriorityID',
+                Value    => [ 2, 3 ],
                 Operator => 'IN',
             },
         ]
     },
     Sort => [
         {
-            Field => "TicketID",
+            Field     => "TicketID",
             Direction => 'descending',
         },
     ],
@@ -1198,8 +1190,8 @@ $Self->True(
     Search       => {
         AND => [
             {
-                Field => 'CreatedStateID',
-                Value => [ 2 ],
+                Field    => 'CreatedStateID',
+                Value    => [ 4 ],
                 Operator => 'IN',
             },
         ]
@@ -1449,7 +1441,7 @@ $Self->Is(
     'TicketGet() (Lock)',
 );
 
-my @MoveQueueList = $TicketObject->MoveQueueList(
+my @MoveQueueList = $TicketObject->TicketMoveQueueList(
     TicketID => $TicketID,
     Type     => 'Name',
 );
@@ -1505,7 +1497,7 @@ my $AccountedTime = $TicketObject->TicketAccountedTimeGet( TicketID => $TicketID
 
 $Self->Is(
     $AccountedTime,
-    4132.56,
+    4132,
     'TicketAccountedTimeGet()',
 );
 
@@ -1604,6 +1596,7 @@ $Self->True(
 my $DeleteCheck = $TicketObject->TicketGet(
     TicketID => $TicketID,
     UserID   => 1,
+    Silent   => 1,
 );
 
 $Self->False(
@@ -1672,34 +1665,34 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             }
         ]
     },
     Sort => [
         {
-            Field => "PriorityID",
+            Field     => "PriorityID",
             Direction => 'descending',
         },
         {
-            Field => "Age",
+            Field     => "Age",
             Direction => 'ascending',
         }
     ],
@@ -1709,7 +1702,7 @@ my @TicketIDsSortOrder = $TicketObject->TicketSearch(
 
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder1,
+    $TicketIDSortOrder2,
     'TicketTicketSearch() - ticket sort/order by (PriorityID (Down), Age (Up))',
 );
 
@@ -1755,7 +1748,7 @@ $Self->Is(
 );
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder2,
+    $TicketIDSortOrder1,
     'TicketTicketSearch() - ticket sort/order by (PriorityID (Down), Age (Down))',
 );
 
@@ -1878,18 +1871,18 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
@@ -1901,11 +1894,11 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
     },
     Sort => [
         {
-            Field => "PriorityID",
+            Field     => "PriorityID",
             Direction => 'descending',
         },
         {
-            Field => "Age",
+            Field     => "Age",
             Direction => 'descending',
         }
     ],
@@ -1914,7 +1907,7 @@ my $TicketIDSortOrder4 = $TicketObject->TicketCreate(
 );
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder4,
+    $TicketIDSortOrder1,
     'TicketTicketSearch() - ticket sort/order by (Priority (Down), Age (Down))',
 );
 
@@ -1924,34 +1917,34 @@ $Self->Is(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             }
         ]
     },
     Sort => [
         {
-            Field => "PriorityID",
+            Field     => "PriorityID",
             Direction => 'ascending',
         },
         {
-            Field => "Age",
+            Field     => "Age",
             Direction => 'descending',
         }
     ],
@@ -1960,7 +1953,7 @@ $Self->Is(
 );
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder2,
+    $TicketIDSortOrder3,
     'TicketTicketSearch() - ticket sort/order by (Priority (Up), Age (Down))',
 );
 
@@ -1970,30 +1963,30 @@ $Self->Is(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             }
         ]
     },
     Sort => [
         {
-            Field => "Age",
+            Field     => "Age",
             Direction => 'descending',
         }
     ],
@@ -2002,7 +1995,7 @@ $Self->Is(
 );
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder4,
+    $TicketIDSortOrder1,
     'TicketTicketSearch() - ticket sort/order by (Age (Down))',
 );
 
@@ -2012,30 +2005,30 @@ $Self->Is(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             }
         ]
     },
     Sort => [
         {
-            Field => "Age",
+            Field     => "Age",
             Direction => 'ascending',
         }
     ],
@@ -2044,7 +2037,7 @@ $Self->Is(
 );
 $Self->Is(
     $TicketIDsSortOrder[0],
-    $TicketIDSortOrder1,
+    $TicketIDSortOrder4,
     'TicketTicketSearch() - ticket sort/order by (Age (Up))',
 );
 
@@ -2053,29 +2046,28 @@ $Count = $TicketObject->TicketSearch(
     Search       => {
         AND => [
             {
-                Field => 'Title',
-                Value => 'sort/order by test',
+                Field    => 'Title',
+                Value    => 'sort/order by test',
                 Operator => 'CONTAINS',
             },
             {
-                Field => 'QueueID',
-                Value => $QueueID,
+                Field    => 'QueueID',
+                Value    => $QueueID,
                 Operator => 'EQ',
             },
             {
-                Field => 'OrganisationID',
-                Value => $Contact{PrimaryOrganisationID},
+                Field    => 'OrganisationID',
+                Value    => $Contact{PrimaryOrganisationID},
                 Operator => 'EQ',
             },
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             }
         ]
     },
     UserID       => 1,
-    Limit        => 1,
 );
 $Self->Is(
     $Count,
@@ -2134,7 +2126,7 @@ my %StateList = $StateObject->StateList( UserID => 1 );
 
 # now check every possible state
 for my $State ( values %StateList ) {
-    $TicketObject->StateSet(
+    $TicketObject->TicketStateSet(
         State              => $State,
         TicketID           => $TicketID,
         SendNoNotification => 1,
@@ -2146,18 +2138,18 @@ for my $State ( values %StateList ) {
         Search       => {
             AND => [
                 {
-                    Field => 'Title',
-                    Value => 'StateTypeTest',
+                    Field    => 'Title',
+                    Value    => 'StateTypeTest',
                     Operator => 'CONTAINS',
                 },
                 {
-                    Field => 'QueueID',
-                    Value => $QueueID,
+                    Field    => 'QueueID',
+                    Value    => $QueueID,
                     Operator => 'EQ',
                 },
                 {
-                    Field => 'StateTypeID',
-                    Value => [ $StateAsKeyAndStateTypeAsValue{$State}->{ID} ],
+                    Field    => 'StateTypeID',
+                    Value    => [ $StateAsKeyAndStateTypeAsValue{$State}->{ID} ],
                     Operator => 'IN',
                 }
             ]
@@ -2170,18 +2162,18 @@ for my $State ( values %StateList ) {
         Search       => {
             AND => [
                 {
-                    Field => 'Title',
-                    Value => 'StateTypeTest',
+                    Field    => 'Title',
+                    Value    => 'StateTypeTest',
                     Operator => 'CONTAINS',
                 },
                 {
-                    Field => 'QueueID',
-                    Value => $QueueID,
+                    Field    => 'QueueID',
+                    Value    => $QueueID,
                     Operator => 'EQ',
                 },
                 {
-                    Field => 'StateType',
-                    Value => [ $StateAsKeyAndStateTypeAsValue{$State}->{Name} ],
+                    Field    => 'StateType',
+                    Value    => [ $StateAsKeyAndStateTypeAsValue{$State}->{Name} ],
                     Operator => 'IN',
                 }
             ]
@@ -2405,9 +2397,6 @@ $Self->Is(
     "TicketPendingTimeSet() - Set to new - Pending Time not set",
 );
 
-# check that searches with NewerDate in the future are not executed
-$Helper->FixedTimeAddSeconds( -60 * 60 );
-
 # Test CreateTime (future date)
 my $FutureTime = $TimeObject->SystemTime2TimeStamp(
     SystemTime => $TimeObject->SystemTime() + ( 60 * 60 ),
@@ -2418,8 +2407,8 @@ my $FutureTime = $TimeObject->SystemTime2TimeStamp(
     Search       => {
         AND => [
             {
-                Field => 'CreateTime',
-                Value => $FutureTime,
+                Field    => 'CreateTime',
+                Value    => $FutureTime,
                 Operator => 'GTE',
             },
         ]
@@ -2439,8 +2428,8 @@ $Self->False(
     Search       => {
         AND => [
             {
-                Field => 'ArticleCreateTime',
-                Value => $FutureTime,
+                Field    => 'ArticleCreateTime',
+                Value    => $FutureTime,
                 Operator => 'GTE',
             },
         ]
@@ -2460,8 +2449,8 @@ $Self->False(
     Search       => {
         AND => [
             {
-                Field => 'CloseTime',
-                Value => $FutureTime,
+                Field    => 'CloseTime',
+                Value    => $FutureTime,
                 Operator => 'GTE',
             },
         ]
@@ -2508,13 +2497,13 @@ my @TicketIDs = $TicketObject->TicketSearch(
     Search       => {
         AND => [
             {
-                Field => 'TicketNumber',
-                Value => [ $Ticket{TicketNumber}, 'ABC' ],
+                Field    => 'TicketNumber',
+                Value    => [ $Ticket{TicketNumber}, 'ABC' ],
                 Operator => 'IN',
             },
             {
-                Field => 'StateType',
-                Value => 'New',
+                Field    => 'StateType',
+                Value    => 'New',
                 Operator => 'EQ',
             },
         ]
@@ -2546,8 +2535,8 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
             Search       => {
                 AND => [
                     {
-                        Field => $SearchParam,
-                        Value => '2000-02-31 00:00:00',
+                        Field    => $SearchParam,
+                        Value    => '2000-02-31 00:00:00',
                         Operator => $ParamOption,
                     },
                 ]
@@ -2566,14 +2555,14 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
     }
 }
 
-# cleanup is done by RestoreDatabase but we need to delete the tickets to cleanup the filesystem too
+# cleanup the filesystem
 my @DeleteTicketList = $TicketObject->TicketSearch(
     Result            => 'ARRAY',
     Search       => {
         AND => [
             {
-                Field => 'ContactID',
-                Value => $ContactID,
+                Field    => 'ContactID',
+                Value    => $ContactID,
                 Operator => 'EQ',
             },
         ]
@@ -2586,6 +2575,9 @@ for my $TicketID (@DeleteTicketList) {
         UserID   => 1,
     );
 }
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

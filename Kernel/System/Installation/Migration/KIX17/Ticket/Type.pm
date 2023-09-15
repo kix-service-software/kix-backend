@@ -103,6 +103,11 @@ sub Run {
         }
     }
 
+    # delete type cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('Type')->{CacheType},
+    );
+
     return 1;
 }
 

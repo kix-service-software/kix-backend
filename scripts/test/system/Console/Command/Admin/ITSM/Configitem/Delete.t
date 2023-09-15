@@ -17,12 +17,16 @@ use vars (qw($Self));
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::ITSM::Configitem::Delete');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -118,6 +122,9 @@ for ( 1 .. 10 ) {
             "Version $Count for config item $ConfigItemID is created - $ConfigItemName",
         );
 
+        # discard config item object to process events
+        $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
         # change the date into past for the first 20 versions
         next COUNT if $Count > 10;
 
@@ -141,6 +148,9 @@ for ( 1 .. 10 ) {
         "Exit code: Options --all-older-than-days-versions 1",
     );
 
+    # discard config item object to process events
+    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
     # get the list of remaining versions of this config item
     my $VersionList = $ConfigItemObject->VersionList(
         ConfigItemID => $ConfigItemID,
@@ -162,6 +172,9 @@ for ( 1 .. 10 ) {
         "Exit code: Options --all-but-keep-last-versions 30",
     );
 
+    # discard config item object to process events
+    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
     # get the list of remaining versions of this config item
     $VersionList = $ConfigItemObject->VersionList(
         ConfigItemID => $ConfigItemID,
@@ -182,6 +195,9 @@ for ( 1 .. 10 ) {
         0,
         "Exit code: Options --all-old-versions",
     );
+
+    # discard config item object to process events
+    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
 
     # get the list of remaining versions of this config item
     $VersionList = $ConfigItemObject->VersionList(
@@ -205,6 +221,9 @@ $Self->Is(
     "Exit code: Options --class $RandomClass --deployment-state' Planned",
 );
 
+# discard config item object to process events
+$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
 # check command with configitem-number options
 $ExitCode = $CommandObject->Execute(
     '--configitem-number', $ConfigItemNumbers[0], '--configitem-number',
@@ -217,6 +236,9 @@ $Self->Is(
     "Exit code: Options --configitem-number",
 );
 
+# discard config item object to process events
+$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
 # check command with class options ($RandomClass class)
 # three config Items of ten created in test were deleted with the previous commands
 # with the next command other seven will be deleted
@@ -228,7 +250,11 @@ $Self->Is(
     "Exit code: Option --class $RandomClass",
 );
 
-# cleanup is done by RestoreDatabase
+# discard config item object to process events
+$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
@@ -247,3 +273,5 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+

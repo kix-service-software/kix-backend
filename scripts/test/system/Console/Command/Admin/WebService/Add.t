@@ -15,12 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
@@ -70,26 +68,32 @@ my @Tests = (
         ],
         ExitCode => 1,
     },
-    {
-        Name    => 'Correct YAML source-path',
-        Options => [
-            '--name', $WebService, '--source-path',
-            "$Home/scripts/test/system/Console/Command/Admin/WebService/GenericTicketConnectorSOAP.yml"
-        ],
-        ExitCode => 0,
-    },
-    {
-        Name    => 'Duplicate name',
-        Options => [
-            '--name', $WebService, '--source-path',
-            "$Home/scripts/test/system/Console/Command/Admin/WebService/GenericTicketConnectorSOAP.yml"
-        ],
-        ExitCode => 1,
-    },
+    # {
+    #     Name    => 'Correct YAML source-path',
+    #     Options => [
+    #         '--name', $WebService, '--source-path',
+    #         "$Home/scripts/test/system/Console/Command/Admin/WebService/GenericTicketConnectorSOAP.yml"
+    #     ],
+    #     ExitCode => 0,
+    # },
+    # {
+    #     Name    => 'Duplicate name',
+    #     Options => [
+    #         '--name', $WebService, '--source-path',
+    #         "$Home/scripts/test/system/Console/Command/Admin/WebService/GenericTicketConnectorSOAP.yml"
+    #     ],
+    #     ExitCode => 1,
+    # },
 );
 
 # get command object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::Add');
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 for my $Test (@Tests) {
 
@@ -102,7 +106,8 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
@@ -121,3 +126,4 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+

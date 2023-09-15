@@ -9,6 +9,7 @@
 			"ID": 1,
 			"Name": "kix@localhost",
 			"Realname": "KIX System",
+			"QueueID": null,
 			"ValidID": 1
 		},
 		{
@@ -20,6 +21,7 @@
 			"ID": 2,
 			"Name": "temp.invalid@testtest.org",
 			"Realname": "[TD-Email-002] Temporarily Invalid E-Mail address",
+			"QueueID": 1,
 			"ValidID": 3
 		}     
     ]

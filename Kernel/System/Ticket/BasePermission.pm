@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,7 +13,7 @@ package Kernel::System::Ticket::BasePermission;
 use strict;
 use warnings;
 
-use Kernel::System::Role::Permission;
+use Kernel::System::Role::Permission qw(:all);
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -63,6 +63,46 @@ sub BasePermissionValidate {
     );
 }
 
+=item BasePermissionRelevantQueueUserIDList()
+    determines user ids for given base permissions.
+
+    my @UserIDs = $QueueObject->BasePermissionRelevantQueueUserIDList(
+        QueueID       => 2,
+        Permission    => '...',
+        IsAgent       => 0|1,
+        Strict        => 0|1            # Default: 0, only the given permission, no combined ones (example: READ + Strict = READONLY)
+    );
+=cut
+
+sub BasePermissionRelevantQueueUserIDList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    foreach my $Key ( qw(Permission QueueID) ) {
+        if ( !$Param{$Key} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Key!"
+            );
+            return;
+        }
+    }
+
+    my $Value = 0;
+    PERMISSION:
+    foreach my $Permission ( split(/,/, $Param{Permission}) ) {
+        $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
+    }
+
+    my @UserIDs = $Kernel::OM->Get('Role')->BasePermissionAgentList(
+        Target    => $Param{QueueID},
+        Value     => $Value,
+        Strict    => $Param{Strict}
+    );
+
+    return @UserIDs;
+}
+
 =item BasePermissionRelevantObjectIDList()
 
 validate a given base permission.
@@ -90,7 +130,6 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     my $Value = 0;
-    PERMISSION:
     foreach my $Permission ( split(/,/, $Param{Permission}) ) {
         $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
     }
@@ -136,7 +175,7 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     return if !@QueueIDs;
-    
+
     return \@QueueIDs;
 }
 

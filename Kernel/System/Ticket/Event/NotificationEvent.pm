@@ -56,6 +56,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
@@ -71,6 +72,7 @@ sub Run {
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
     if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID or TicketList in Data!',
@@ -355,7 +357,6 @@ sub _HandleTicket {
                     # No UserID means it's not a mapped customer.
                     next BUNDLE if !$Bundle->{Recipient}->{UserID};
                 }
-
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
                     Notification          => $Bundle->{Notification},
@@ -405,7 +406,7 @@ sub _HandleTicket {
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, $Notification{Name},
+            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, ($Notification{Name} || '- No name -'),
         );
     }
 
@@ -619,7 +620,7 @@ sub _RecipientsGet {
                 }
 
                 # get language and send recipient
-                $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
+                $Recipient{UserLanguage} = $ConfigObject->Get('DefaultLanguage') || 'en';
 
                 if ( $Ticket{ContactID} ) {
 
@@ -630,9 +631,12 @@ sub _RecipientsGet {
                     # join Recipient data with Contact data
                     %Recipient = ( %Recipient, %Contact );
 
-                    # get user language
-                    if ( $Contact{Language} ) {
-                        $Recipient{Language} = $Contact{Language};
+                    # set recipient language
+                    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+                        UserID => $Contact{AssignedUserID}
+                    );
+                    if ( $Language ) {
+                        $Recipient{UserLanguage} = $Language;
                     }
 
                     $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
@@ -721,8 +725,15 @@ sub _RecipientsGet {
         my %User = $UserObject->GetUserData(
             UserID => $UserID,
             Valid  => 1,
+
         );
         next RECIPIENT if !%User;
+
+        # set recipient language
+        my $Language = $UserObject->GetUserLanguage(UserID => $UserID);
+        if ( $Language ) {
+            $User{UserLanguage} = $Language;
+        }
 
         # check if the notification needs to be sent just one time per day
         if (
@@ -802,7 +813,6 @@ sub _RecipientsGet {
             );
         }
         next RECIPIENT if !$Granted;
-
         # skip PostMasterUserID
         my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
         next RECIPIENT if $User{UserID} == $PostmasterUserID;
@@ -901,23 +911,18 @@ sub _SendRecipientNotification {
 sub _GetUserIDsWithRequiredPermission {
     my ( $Self, %Param ) = @_;
 
-    # check each valid user if he has requested permission on /tickets
-    my @UserIDs;
-    my %UserList;
-    if ( IsHashRef($Self->{Cache}->{UserList}) ) {
-        %UserList = %{$Self->{Cache}->{UserList}};
-    }
-    else {
-        %UserList = $Kernel::OM->Get('User')->UserList(
-            Valid => 1,
-            Short => 1,
-        );
-        $Self->{Cache}->{UserList} = \%UserList;
-    }
+    my @BasePermissionUserIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantQueueUserIDList(
+        QueueID       => $Param{Ticket}->{QueueID},
+        Permission    => $Param{Permission},
+        Strict        => $Param{Strict}
+    );
+
     my $Resource = '/tickets/' . $Param{Ticket}->{TicketID};
 
+    my @UserIDs = ();
+
     USERID:
-    foreach my $UserID ( sort keys %UserList ) {
+    foreach my $UserID (@BasePermissionUserIDs) {
         my @Permissions = split(/, ?/, $Param{Permission});
 
         PERMISSION:
@@ -925,8 +930,7 @@ sub _GetUserIDsWithRequiredPermission {
             my $Granted;
             if ( exists $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission} ) {
                 $Granted = $Self->{Cache}->{UserPermission}->{$UserID}->{$Resource}->{$Permission};
-            }
-            else {
+            } else {
                 $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
                     UserID              => $UserID,
                     Target              => $Resource,
@@ -937,20 +941,6 @@ sub _GetUserIDsWithRequiredPermission {
             }
 
             next USERID if !$Granted;
-        }
-
-        # check base permission
-        my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
-            UserID       => $UserID,
-            UsageContext => 'Agent',
-            Permission   => $Param{Permission},
-            Strict       => $Param{Strict}
-        );
-        next USERID if !$Result;
-
-        if ( IsArrayRefWithData($Result) ) {
-            my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
-            next USERID if !$AllowedQueueIDs{$Param{Ticket}->{QueueID}};
         }
 
         push @UserIDs, $UserID;

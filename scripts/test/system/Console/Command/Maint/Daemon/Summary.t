@@ -15,11 +15,6 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # prepare the environment
@@ -87,6 +82,12 @@ my @Tests = (
 
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Daemon::Summary');
 
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
+
 for my $Test (@Tests) {
 
     my $ExitCode = $CommandObject->Execute( @{ $Test->{Params} } );
@@ -98,11 +99,7 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup cache is done by RestoreDatabase
-
 1;
-
-
 
 =back
 

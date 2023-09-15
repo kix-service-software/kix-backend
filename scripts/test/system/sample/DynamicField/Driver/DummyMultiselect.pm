@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package scripts::test::sample::DynamicField::Driver::DummyMultiselect;
+package scripts::test::system::sample::DynamicField::Driver::DummyMultiselect;
 
 use strict;
 use warnings;

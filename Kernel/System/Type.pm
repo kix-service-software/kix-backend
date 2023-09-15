@@ -13,13 +13,14 @@ package Kernel::System::Type;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'SysConfig',
-    'Cache',
-    'DB',
-    'Log',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    SysConfig
+    Cache
+    DB
+    Log
+    Valid
 );
 
 =head1 NAME
@@ -78,20 +79,24 @@ sub TypeAdd {
     # check needed stuff
     for (qw(Name ValidID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     # check if a type with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A type with name '$Param{Name}' already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A type with name '$Param{Name}' already exists!"
+            );
+        }
         return;
     }
 
@@ -268,10 +273,12 @@ sub TypeUpdate {
     # check needed stuff
     for (qw(ID Name ValidID UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -282,12 +289,13 @@ sub TypeUpdate {
             Name => $Param{Name},
             ID   => $Param{ID}
         )
-        )
-    {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A type with name '$Param{Name}' already exists!"
-        );
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A type with name '$Param{Name}' already exists!"
+            );
+        }
         return;
     }
 
@@ -299,12 +307,13 @@ sub TypeUpdate {
     if (
         $Kernel::OM->Get('Config')->Get('Ticket::Type::Default') eq $Type{Name}
         && $Param{ValidID} != 1
-        )
-    {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The ticket type is set as a default ticket type, so it cannot be set to invalid!"
-        );
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The ticket type is set as a default ticket type, so it cannot be set to invalid!"
+            );
+        }
         return;
     }
 
@@ -325,7 +334,7 @@ sub TypeUpdate {
     {
 
         # update default ticket type SySConfig item
-        $Kernel::OM->Get('SysConfig')->ConfigItemUpdate(
+        $Kernel::OM->Get('SysConfig')->ValueSet(
             Valid => 1,
             Key   => 'Ticket::Type::Default',
             Value => $Param{Name}
@@ -436,10 +445,12 @@ sub TypeLookup {
 
     # check needed stuff
     if ( !$Param{Type} && !$Param{TypeID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Type or TypeID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Type or TypeID!',
+            );
+        }
         return;
     }
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,12 +15,11 @@ use vars (qw($Self));
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Contact::Add');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper     = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 my $RandomName = $Helper->GetRandomID();
 
 $Kernel::OM->Get('Config')->Set(
@@ -28,14 +27,27 @@ $Kernel::OM->Get('Config')->Set(
     Value => 0,
 );
 
+my $OrgaName   = $Helper->GetRandomID();
+my $OrgeNumber = $Helper->GetRandomID();
+
 # create test organisation
 my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $Helper->GetRandomID(),
-    Name    => $Helper->GetRandomID(),
+    Number  => $OrgeNumber,
+    Name    => $OrgaName,
     ValidID => 1,
     UserID  => 1,
 );
 
+$Self->True(
+    $OrgID,
+    "Added Organisation",
+);
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # try to execute command without any options
 my $ExitCode = $CommandObject->Execute();
@@ -47,9 +59,9 @@ $Self->Is(
 
 # provide minimum options
 $ExitCode = $CommandObject->Execute(
-    '--user-name', $RandomName, '--first-name', 'Test',
+    '--user-login', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-organisation-id', $OrgID, 'Test',
+    '--primary-organisation', $OrgaName,
 );
 $Self->Is(
     $ExitCode,
@@ -59,9 +71,9 @@ $Self->Is(
 
 # provide minimum options
 $ExitCode = $CommandObject->Execute(
-    '--user-name', $RandomName, '--first-name', 'Test',
+    '--user-login', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-organisation-id', 'Test',
+    '--primary-organisation', $OrgaName,
 );
 $Self->Is(
     $ExitCode,
@@ -69,11 +81,10 @@ $Self->Is(
     "Minimum options (contact already exists)",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

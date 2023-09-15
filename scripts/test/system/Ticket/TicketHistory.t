@@ -14,19 +14,11 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $TicketObject = $Kernel::OM->Get('Ticket');
-my $QueueObject  = $Kernel::OM->Get('Queue');
-my $TypeObject   = $Kernel::OM->Get('Type');
-my $StateObject  = $Kernel::OM->Get('State');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 $Kernel::OM->Get('Cache')->CleanUp();
 
@@ -41,7 +33,7 @@ my @Tests = (
                     PriorityID   => '3',
                     State        => 'new',
                     CustomerID   => '1',
-                    Contact => 'customer@example.com',
+                    Contact      => 'customer@example.com',
                     OwnerID      => 1,
                     UserID       => 1,
                 },
@@ -95,16 +87,6 @@ my @Tests = (
                     },
                     {
                         CreateBy    => 1,
-                        HistoryType => 'CustomerUpdate',
-                        Queue       => 'Junk',
-                        OwnerID     => 1,
-                        PriorityID  => 3,
-                        State       => 'new',
-                        HistoryType => 'CustomerUpdate',
-                        Type        => 'Unclassified',
-                    },
-                    {
-                        CreateBy    => 1,
                         HistoryType => 'OwnerUpdate',
                         Queue       => 'Junk',
                         OwnerID     => 1,
@@ -139,7 +121,7 @@ my @Tests = (
                     PriorityID           => '3',
                     State                => 'new',
                     CustomerID           => '1',
-                    Contact         => 'customer@example.com',
+                    Contact              => 'customer@example.com',
                     OwnerID              => 1,
                     UserID               => 1,
                     DynamicFieldBug10856 => 'TestValue',
@@ -168,7 +150,7 @@ my @Tests = (
                     PriorityID           => '3',
                     State                => 'new',
                     CustomerID           => '1',
-                    Contact         => 'customer@example.com',
+                    Contact              => 'customer@example.com',
                     OwnerID              => 1,
                     UserID               => 1,
                     DynamicFieldBug10856 => 'TestValue',
@@ -197,7 +179,7 @@ for my $Test (@Tests) {
         for my $CreateData ( @{ $Test->{CreateData} } ) {
 
             if ( $CreateData->{TicketCreate} ) {
-                $HistoryCreateTicketID = $TicketObject->TicketCreate(
+                $HistoryCreateTicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
                     %{ $CreateData->{TicketCreate} },
                 );
                 $Self->True(
@@ -211,7 +193,7 @@ for my $Test (@Tests) {
             }
 
             if ( $CreateData->{ArticleCreate} ) {
-                my $HistoryCreateArticleID = $TicketObject->ArticleCreate(
+                my $HistoryCreateArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
                     TicketID => $HistoryCreateTicketID,
                     %{ $CreateData->{ArticleCreate} },
                 );
@@ -225,7 +207,7 @@ for my $Test (@Tests) {
             }
 
             if ( $CreateData->{HistoryAdd} ) {
-                my $Success = $TicketObject->HistoryAdd(
+                my $Success = $Kernel::OM->Get('Ticket')->HistoryAdd(
                     %{ $CreateData->{HistoryAdd} },
                     TicketID => $HistoryCreateTicketID,
                 );
@@ -237,7 +219,7 @@ for my $Test (@Tests) {
             }
 
             if ( $CreateData->{TicketCreate} ) {
-                my %ComputedTicketState = $TicketObject->HistoryTicketGet(
+                my %ComputedTicketState = $Kernel::OM->Get('Ticket')->HistoryTicketGet(
                     StopDay   => 1,
                     StopMonth => 1,
                     StopYear  => 1990,
@@ -249,7 +231,7 @@ for my $Test (@Tests) {
                     "HistoryTicketGet() - state before ticket was created",
                 );
 
-                my %ComputedTicketStateCached = $TicketObject->HistoryTicketGet(
+                my %ComputedTicketStateCached = $Kernel::OM->Get('Ticket')->HistoryTicketGet(
                     StopDay   => 1,
                     StopMonth => 1,
                     StopYear  => 1990,
@@ -262,7 +244,7 @@ for my $Test (@Tests) {
                     "HistoryTicketGet() - cached ticket data before ticket was created",
                 );
 
-                %ComputedTicketState = $TicketObject->HistoryTicketGet(
+                %ComputedTicketState = $Kernel::OM->Get('Ticket')->HistoryTicketGet(
                     StopDay   => 1,
                     StopMonth => 1,
                     StopYear  => 2990,
@@ -278,7 +260,7 @@ for my $Test (@Tests) {
                     );
                 }
 
-                %ComputedTicketStateCached = $TicketObject->HistoryTicketGet(
+                %ComputedTicketStateCached = $Kernel::OM->Get('Ticket')->HistoryTicketGet(
                     StopDay   => 1,
                     StopMonth => 1,
                     StopYear  => 2990,
@@ -304,7 +286,7 @@ for my $Test (@Tests) {
             next REFERENCEDATA if !$ReferenceData->{HistoryGet};
             my @ReferenceResults = @{ $ReferenceData->{HistoryGet} };
 
-            my @HistoryGet = $TicketObject->HistoryGet(
+            my @HistoryGet = $Kernel::OM->Get('Ticket')->HistoryGet(
                 UserID   => 1,
                 TicketID => $HistoryCreateTicketID,
             );
@@ -325,14 +307,14 @@ for my $Test (@Tests) {
             next REFERENCEDATA if !@HistoryGet;
 
             for my $ResultCount ( 0 .. ( ( scalar @ReferenceResults ) - 1 ) ) {
-
                 my $Result = $ReferenceData->{HistoryGet}->[$ResultCount];
+
                 RESULTENTRY:
                 for my $ResultEntry ( sort keys %{$Result} ) {
                     next RESULTENTRY if !$Result->{$ResultEntry};
 
                     if ( $ResultEntry eq 'Queue' ) {
-                        my $HistoryQueueID = $QueueObject->QueueLookup(
+                        my $HistoryQueueID = $Kernel::OM->Get('Queue')->QueueLookup(
                             Queue => $Result->{$ResultEntry},
                         );
 
@@ -341,7 +323,7 @@ for my $Test (@Tests) {
                     }
 
                     if ( $ResultEntry eq 'State' ) {
-                        my %HistoryState = $StateObject->StateGet(
+                        my %HistoryState = $Kernel::OM->Get('State')->StateGet(
                             Name => $Result->{$ResultEntry},
                         );
                         $ResultEntry = 'StateID';
@@ -349,7 +331,7 @@ for my $Test (@Tests) {
                     }
 
                     if ( $ResultEntry eq 'HistoryType' ) {
-                        my $HistoryTypeID = $TicketObject->HistoryTypeLookup(
+                        my $HistoryTypeID = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
                             Type => $Result->{$ResultEntry},
                         );
                         $ResultEntry = 'HistoryTypeID';
@@ -357,7 +339,7 @@ for my $Test (@Tests) {
                     }
 
                     if ( $ResultEntry eq 'Type' ) {
-                        my $TypeID = $TypeObject->TypeLookup(
+                        my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
                             Type => $Result->{$ResultEntry},
                         );
                         $ResultEntry = 'TypeID';
@@ -375,7 +357,8 @@ for my $Test (@Tests) {
     }
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

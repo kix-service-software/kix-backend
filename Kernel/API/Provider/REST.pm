@@ -401,8 +401,11 @@ sub ProcessRequest {
 
     # convert char-set if necessary
     my $ContentCharset;
-    if ( $ENV{'CONTENT_TYPE'} =~ m{ \A .* charset= ["']? ( [^"']+ ) ["']? \z }xmsi ) {
-        $ContentCharset = $1;
+    if ( $ENV{'CONTENT_TYPE'} =~ /charset=/i ) {
+        $ContentCharset = $ENV{'CONTENT_TYPE'};
+        $ContentCharset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+        $ContentCharset =~ s/"|'//g;
+        $ContentCharset =~ s/(.+?);.*/$1/g;
     }
     if ( $ContentCharset && $ContentCharset !~ m{ \A utf [-]? 8 \z }xmsi ) {
         $Content = $EncodeObject->Convert2CharsetInternal(

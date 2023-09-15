@@ -37,7 +37,6 @@ sub _Post {
     }
 
     my $Response = $ua->request($req);
-#print STDERR Dumper($Response);
     my $DecRes = decode_json($Response->decoded_content);
     
     foreach my $Key (keys %{$DecRes}){
@@ -67,7 +66,7 @@ sub _Patch {
     }
 
     my $Response = $ua->request($req);
-#print STDERR Dumper($Response);   
+  
     return ($Response, decode_json($Response->decoded_content));
 }
 
@@ -80,7 +79,7 @@ sub _Delete {
     $req->header('Content-Type' => 'application/json'); 
 
     my $Response = $ua->request($req);
-#print STDERR Dumper($Response);
+
     return ($Response);
 }
 

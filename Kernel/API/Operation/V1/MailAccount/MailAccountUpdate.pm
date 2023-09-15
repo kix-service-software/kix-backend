@@ -77,8 +77,9 @@ sub ParameterDefinition {
         'MailAccount::DispatchingBy' => {
             RequiresValueIfUsed => 1,
             OneOf               => [
-                'Queue',
-                'From'
+                'PostmasterDefaultQueue',
+                'From',
+                'Queue'
             ]
         },
         'MailAccount::Trusted' => {
@@ -112,7 +113,7 @@ perform MailAccountUpdate Operation. This will return the updated TypeID.
                 IMAPFolder    => 'Some Folder',     # optional, only valid for IMAP-type accounts
                 ValidID       => 1,                 # optional
                 Trusted       => 0,                 # optional
-                DispatchingBy => 'Queue',           # Queue|From
+                DispatchingBy => 'Queue',           # PostmasterDefaultQueue|From|Queue
                 QueueID       => 12,                # optional, requuired if DispatchingBy is "Queue"
                 Comment       => '...',             # optional
             },

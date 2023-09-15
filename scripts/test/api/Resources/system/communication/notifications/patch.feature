@@ -9,6 +9,7 @@ Feature: PATCH request to the /system/communication/notifications/:NotificationI
     Given a notification
     When I update this notification
     Then the response code is 200
+    Then the response object is NotificationPostPatchResponse
     When I delete this notification
     Then the response code is 204
     And the response has no content

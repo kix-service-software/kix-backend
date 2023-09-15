@@ -15,10 +15,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::EventHandler);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
-    'Main',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Log
+    Main
 );
 
 =head1 NAME
@@ -509,8 +510,9 @@ sub OrganisationUpdate {
     $Self->EventHandler(
         Event => 'OrganisationUpdate',
         Data  => {
-            NewData       => \%Param,
-            OldData       => \%Organisation,
+            ID      => $Param{ID},
+            NewData => \%Param,
+            OldData => \%Organisation,
         },
         UserID => $Param{UserID},
     );
@@ -743,7 +745,7 @@ sub OrganisationDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -785,6 +787,15 @@ sub OrganisationDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'OrganisationDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

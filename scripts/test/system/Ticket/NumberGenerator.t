@@ -15,6 +15,9 @@ use utf8;
 use vars (qw($Self));
 
 # get needed object
+## IMPORTANT - First get ticket object,
+## or it will not use the same config object as the test somehow
+my $TicketObject = $Kernel::OM->Get('Ticket');
 my $ConfigObject = $Kernel::OM->Get('Config');
 
 # check all number generators
@@ -35,12 +38,13 @@ for my $Backend (qw(AutoIncrement Date DateChecksum Random)) {
             Value => $TicketSubjectFormat,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Ticket');
+        $TicketObject = $Kernel::OM->Get('Ticket');
 
-        $Self->True(
+        my $Success = $Self->True(
             $TicketObject->isa( 'Kernel::System::Ticket::Number::' . $Backend ),
             "TicketObject loaded the correct backend",
         );
+        next if ( !$Success );
 
         for my $TicketHook ( 'Ticket#', 'Tickétø#', 'Reg$Ex*Special+Chars' ) {
 

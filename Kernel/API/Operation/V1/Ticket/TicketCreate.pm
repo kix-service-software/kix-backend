@@ -409,8 +409,9 @@ sub _TicketCreate {
         foreach my $Article ( @{ $Ticket->{Articles} } ) {
 
             my $Result = $Self->ExecOperation(
-                OperationType => 'V1::Ticket::ArticleCreate',
-                Data          => {
+                OperationType           => 'V1::Ticket::ArticleCreate',
+                IgnoreParentPermissions => 1,
+                Data                    => {
                     TicketID               => $TicketID,
                     Article                => $Article
                 }

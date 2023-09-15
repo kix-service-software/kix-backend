@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -34,7 +34,7 @@ my %DynamicFieldConfigs = (
         ObjectType    => 'Ticket',
         Config        => {
             DefaultValue => 'Default',
-            Link         => '',
+            Link         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -50,23 +50,8 @@ my %DynamicFieldConfigs = (
         ObjectType    => 'Ticket',
         Config        => {
             DefaultValue => "Multi\nLine",
-            Rows         => '',
-            Cols         => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '1',
+            Rows         => q{},
+            Cols         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -78,13 +63,13 @@ my %DynamicFieldConfigs = (
         Name          => 'DropdownField',
         Label         => 'DropdownField',
         FieldOrder    => 123,
-        FieldType     => 'Dropdown',
+        FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
             DefaultValue       => 2,
-            Link               => '',
+            Link               => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -103,9 +88,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
+            CountMax           => 2,
             DefaultValue       => 2,
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -125,7 +111,7 @@ my %DynamicFieldConfigs = (
         ObjectType    => 'Ticket',
         Config        => {
             DefaultValue  => '2013-08-21 16:45:00',
-            Link          => '',
+            Link          => q{},
             YearsInFuture => '5',
             YearsInPast   => '5',
         },
@@ -143,7 +129,7 @@ my %DynamicFieldConfigs = (
         ObjectType    => 'Ticket',
         Config        => {
             DefaultValue  => '2013-08-21 00:00:00',
-            Link          => '',
+            Link          => q{},
             YearsInFuture => '5',
             YearsInPast   => '5',
         },
@@ -159,12 +145,14 @@ my @Tests = (
         Name    => 'No Params',
         Config  => undef,
         Success => 0,
+        Silent  => 1
     },
 
     {
         Name    => 'Empty Config',
         Config  => {},
         Success => 0,
+        Silent  => 1
     },
     {
         Name   => 'Missing DynamicFieldConfig',
@@ -172,6 +160,7 @@ my @Tests = (
             DynamicFieldConfig => undef,
         },
         Success => 0,
+        Silent  => 1
     },
 
     # Dynamic Field Text
@@ -180,18 +169,18 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Text: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Text: Both undefs',
@@ -206,8 +195,8 @@ my @Tests = (
         Name   => 'Text: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -263,18 +252,18 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'TextArea: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'TextArea: Both undefs',
@@ -289,8 +278,8 @@ my @Tests = (
         Name   => 'TextArea: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -358,107 +347,24 @@ my @Tests = (
         Success => 0,
     },
 
-    # Dynamic Field Checkbox
-    {
-        Name   => 'Checkbox: Value1 undef, Value2 empty',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => undef,
-            Value2             => '',
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Value1 empty, Value2 undef',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => '',
-            Value2             => undef,
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Value1 undef, Value2 0',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => undef,
-            Value2             => 0,
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Checkbox: Value1 0, Value2 undef',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => 0,
-            Value2             => undef,
-        },
-        Success => 1,
-    },
-    {
-        Name   => 'Checkbox: Both undefs',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => undef,
-            Value2             => undef,
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Both empty',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => '',
-            Value2             => '',
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Both equals 0',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => 0,
-            Value2             => 0,
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Both equals 1',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => 1,
-            Value2             => 1,
-        },
-        Success => 0,
-    },
-    {
-        Name   => 'Checkbox: Different',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            Value1             => 0,
-            Value2             => 1,
-        },
-        Success => 1,
-    },
-
-    # Dynamic Field Dropdown
+    # Dynamic Field Dropdown (Multiselect as single selection)
     {
         Name   => 'Dropdown: Value1 undef, Value2 empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Dropdown: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Dropdown: Both undefs',
@@ -473,8 +379,8 @@ my @Tests = (
         Name   => 'Dropdown: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -530,7 +436,7 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
         Success => 1,
     },
@@ -538,7 +444,7 @@ my @Tests = (
         Name   => 'Multiselect: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
         Success => 1,
@@ -574,8 +480,8 @@ my @Tests = (
         Name   => 'Multiselect: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -703,18 +609,18 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'DateTime: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'DateTime: Both undefs',
@@ -729,8 +635,8 @@ my @Tests = (
         Name   => 'DateTime: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -760,18 +666,18 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
             Value1             => undef,
-            Value2             => '',
+            Value2             => q{},
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Date: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value1             => '',
+            Value1             => q{},
             Value2             => undef,
         },
-        Success => 0,
+        Success => 1,
     },
     {
         Name   => 'Date: Both undefs',
@@ -786,8 +692,8 @@ my @Tests = (
         Name   => 'Date: Both empty',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
-            Value1             => '',
-            Value2             => '',
+            Value1             => q{},
+            Value2             => q{},
         },
         Success => 0,
     },
@@ -816,7 +722,10 @@ my @Tests = (
 # execute tests
 for my $Test (@Tests) {
 
-    my $Result = $DFBackendObject->ValueIsDifferent( %{ $Test->{Config} } );
+    my $Result = $DFBackendObject->ValueIsDifferent(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent} || 0
+    );
 
     if ( $Test->{Success} ) {
         $Self->True(

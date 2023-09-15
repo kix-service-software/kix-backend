@@ -258,8 +258,8 @@ You should be able to continue reading these lessons, however.
 <SCRIPT SRC=http://ha.ckers.org/xss.js?<B>
 </center>;\'',
         Result => {
-            Output => '<center>
-/center>',
+            Output => '\'<center>
+/center>;\'',
             Replace => 1,
         },
         Name => 'Safety - script tag'

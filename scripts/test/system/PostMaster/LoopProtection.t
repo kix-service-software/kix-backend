@@ -14,16 +14,14 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Config');
-my $LoopProtectionObject = $Kernel::OM->Get('PostMaster::LoopProtection');
-
 # define needed variable
 my $RandomID = $Kernel::OM->Get('UnitTest::Helper')->GetRandomID();
 
 for my $Module (qw(DB FS)) {
 
-    $ConfigObject->Set(
+    $Kernel::OM->ObjectsDiscard();
+
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LoopProtectionModule',
         Value => "Kernel::System::PostMaster::LoopProtection::$Module",
     );
@@ -31,7 +29,7 @@ for my $Module (qw(DB FS)) {
     # get rand sender address
     my $UserRand1 = 'example-user' . $RandomID . '@example.com';
 
-    my $Check = $LoopProtectionObject->Check( To => $UserRand1 );
+    my $Check = $Kernel::OM->Get('PostMaster::LoopProtection')->Check( To => $UserRand1 );
 
     $Self->True(
         $Check || 0,
@@ -39,14 +37,19 @@ for my $Module (qw(DB FS)) {
     );
 
     for ( 1 .. 42 ) {
-        my $SendEmail = $LoopProtectionObject->SendEmail( To => $UserRand1 );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'LoopProtectionModule',
+            Value => "Kernel::System::PostMaster::LoopProtection::$Module",
+        );
+
+        my $SendEmail = $Kernel::OM->Get('PostMaster::LoopProtection')->SendEmail( To => $UserRand1 );
         $Self->True(
             $SendEmail || 0,
             "#$Module - SendEmail() - #$_ ",
         );
     }
 
-    $Check = $LoopProtectionObject->Check( To => $UserRand1 );
+    $Check = $Kernel::OM->Get('PostMaster::LoopProtection')->Check( To => $UserRand1 );
 
     $Self->False(
         $Check || 0,

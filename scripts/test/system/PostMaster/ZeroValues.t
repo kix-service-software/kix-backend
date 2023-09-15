@@ -16,16 +16,11 @@ use vars (qw($Self));
 
 use Kernel::System::PostMaster;
 
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
+# get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $MainObject   = $Kernel::OM->Get('Main');
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -58,7 +53,7 @@ my %NeededXHeaders = (
     "X-KIX-FollowUp-$FieldName" => 1,
 );
 
-my $XHeaders          = $ConfigObject->Get('PostmasterX-Header');
+my $XHeaders          = $Kernel::OM->Get('Config')->Get('PostmasterX-Header');
 my @PostmasterXHeader = @{$XHeaders};
 
 HEADER:
@@ -66,11 +61,6 @@ for my $Header ( sort keys %NeededXHeaders ) {
     next HEADER if ( grep $_ eq $Header, @PostmasterXHeader );
     push @PostmasterXHeader, $Header;
 }
-
-$ConfigObject->Set(
-    Key   => 'PostmasterX-Header',
-    Value => \@PostmasterXHeader
-);
 
 # filter test
 my @Tests = (
@@ -88,7 +78,7 @@ The IP address: 192.168.0.1
         ",
         Return => 1,    # it's a new ticket
         Check  => {
-            "DynamicField_$FieldName" => 1,
+            "DynamicField_$FieldName" => [ 1 ],
         },
     },
     {
@@ -105,7 +95,7 @@ The IP address: 192.168.0.1
         ",
         Return => 2,    # it's a followup
         Check  => {
-            "DynamicField_$FieldName" => 0,
+            "DynamicField_$FieldName" => [ 0 ],
         },
     },
     {
@@ -122,7 +112,7 @@ The IP address: 192.168.0.1
         ",
         Return => 1,    # it's a new ticket
         Check  => {
-            "DynamicField_$FieldName" => 0,
+            "DynamicField_$FieldName" => [ 0 ],
         },
     },
 
@@ -145,6 +135,11 @@ for my $Test (@Tests) {
             Email   => \$Email,
         );
 
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'PostmasterX-Header',
+            Value => \@PostmasterXHeader
+        );
+
         @Return = $PostMasterObject->Run();
         @Return = @{ $Return[0] || [] };
     }
@@ -160,15 +155,14 @@ for my $Test (@Tests) {
 
     # new/clear ticket object
     $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-    my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
 
     for my $Key ( sort keys %{ $Test->{Check} } ) {
-        $Self->Is(
+        $Self->IsDeeply(
             $Ticket{$Key},
             $Test->{Check}->{$Key},
             "Run('$Test->{Name}') - $Key",
@@ -181,7 +175,8 @@ for my $Test (@Tests) {
     $Index++;
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

@@ -15,12 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get needed objects
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::PendingCheck');
@@ -60,6 +58,12 @@ my $SystemTime = $TimeObject->TimeStamp2SystemTime(
 
 # set the fixed time
 $Helper->FixedTimeSet($SystemTime);
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -105,11 +109,10 @@ $Self->Is(
     "Ticket pending auto closed time reached",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

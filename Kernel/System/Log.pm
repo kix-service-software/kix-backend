@@ -324,6 +324,23 @@ sub GetLog {
     return $String;
 }
 
+=item GetNumericLogLevel()
+
+jet the numeric log level
+
+    my $LogLevelNum = $LogObject->GetNumericLogLevel(
+        Priority => 'error'
+    );
+
+=cut
+
+sub GetNumericLogLevel {
+    my ( $Self, %Param ) = @_;
+
+    return $LogLevel{$Param{Priority}};
+}
+
+
 =item CleanUp()
 
 to clean up the logs and tmp log data from shared memory (ipc)

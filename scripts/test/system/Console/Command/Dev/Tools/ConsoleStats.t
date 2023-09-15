@@ -16,6 +16,12 @@ use vars (qw($Self));
 
 my $CommandObject = $Kernel::OM->Get('Console::Command::Dev::Tools::ConsoleStats');
 
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
+
 my $ExitCode = $CommandObject->Execute();
 
 # just check exit code
@@ -26,8 +32,6 @@ $Self->Is(
 );
 
 1;
-
-
 
 =back
 

@@ -30,7 +30,6 @@ our @ObjectDependencies = (
     'Queue',
     'Salutation',
     'Signature',
-    'StandardTemplate',
     'SystemAddress',
     'Ticket',
     'User',
@@ -126,7 +125,7 @@ sub Sender {
 
         # get data from current agent
         if ($Param{UserID}) {
-            my %ContactData = $Self->{ContactObject}->ContactGet(
+            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Param{UserID},
             );
 
@@ -167,107 +166,6 @@ sub Sender {
     return $Sender;
 }
 
-=item Template()
-
-generate template
-
-    my $Template = $TemplateGeneratorObject->Template(
-        TemplateID => 123
-        TicketID   => 123,                  # Optional
-        Data       => $ArticleHashRef,      # Optional
-        UserID     => 123,
-    );
-
-Returns:
-
-    $Template =>  'Some text';
-
-=cut
-
-sub Template {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(TemplateID UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my %Template = $Kernel::OM->Get('StandardTemplate')->StandardTemplateGet(
-        ID => $Param{TemplateID},
-    );
-
-    # do text/plain to text/html convert
-    if (
-        $Self->{RichText}
-        && $Template{ContentType} =~ /text\/plain/i
-        && $Template{Template}
-        )
-    {
-        $Template{ContentType} = 'text/html';
-        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToHTML(
-            String => $Template{Template},
-        );
-    }
-
-    # do text/html to text/plain convert
-    if (
-        !$Self->{RichText}
-        && $Template{ContentType} =~ /text\/html/i
-        && $Template{Template}
-        )
-    {
-        $Template{ContentType} = 'text/plain';
-        $Template{Template}    = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-            String => $Template{Template},
-        );
-    }
-
-    # get user language
-    my $Language;
-    if ( defined $Param{TicketID} ) {
-
-        # get ticket data
-        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-            TicketID => $Param{TicketID},
-        );
-
-        # get recipient
-        my %User = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $Ticket{ContactID},
-        );
-        $Language = $User{UserLanguage};
-    }
-
-    # if customer language is not defined, set default language
-    $Language //= $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
-
-    # replace place holder stuff
-    my @ListOfUnSupportedTag = qw/KIX_AGENT_SUBJECT KIX_AGENT_BODY KIX_CUSTOMER_BODY KIX_CUSTOMER_SUBJECT/;
-
-    my $TemplateText = $Self->_RemoveUnSupportedTag(
-        Text => $Template{Template} || '',
-        ListOfUnSupportedTag => \@ListOfUnSupportedTag,
-    );
-
-    # replace place holder stuff
-    $TemplateText = $Self->_Replace(
-        RichText => $Self->{RichText},
-        Text     => $TemplateText || '',
-        TicketID => $Param{TicketID} || '',
-        Data     => $Param{Data} || {},
-        UserID   => $Param{UserID},
-        Language => $Language,
-    );
-
-    return $TemplateText;
-}
-
 =item Attributes()
 
 generate attributes
@@ -293,6 +191,7 @@ sub Attributes {
     # check needed stuff
     for (qw(TicketID Data UserID)) {
         if ( !$Param{$_} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -332,6 +231,7 @@ replace all KIX placeholders in the notification body and subject
 
     my %NotificationEvent = $TemplateGeneratorObject->NotificationEvent(
         TicketID              => 123,
+        ArticleID             => 123,                       # optional
         Recipient             => $UserDataHashRef,          # Agent or Customer data get result
         Notification          => $NotificationDataHashRef,
         CustomerMessageParams => $ArticleHashRef,           # optional
@@ -519,6 +419,22 @@ sub NotificationEvent {
         $Notification{Subject} =~ s/<KIX_CUSTOMER_DATA_$Key>/$Param{CustomerMessageParams}->{$Key}{$_}/gi;
     }
 
+    # do text/plain to text/html convert
+    if ( $Self->{RichText} && $Notification{ContentType} =~ /text\/plain/i ) {
+        $Notification{ContentType} = 'text/html';
+        $Notification{Body}        = $HTMLUtilsObject->ToHTML(
+            String => $Notification{Body},
+        );
+    }
+
+    # do text/html to text/plain convert
+    if ( !$Self->{RichText} && $Notification{ContentType} =~ /text\/html/i ) {
+        $Notification{ContentType} = 'text/plain';
+        $Notification{Body}        = $HTMLUtilsObject->ToAscii(
+            String => $Notification{Body},
+        );
+    }
+
     # get notify texts
     for my $Text (qw(Subject Body)) {
         if ( !$Notification{$Text} ) {
@@ -534,6 +450,7 @@ sub NotificationEvent {
         Data      => $Param{CustomerMessageParams},
         DataAgent => \%ArticleAgent,
         TicketID  => $Param{TicketID},
+        ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
 
@@ -549,6 +466,7 @@ sub NotificationEvent {
         Data      => $Param{CustomerMessageParams},
         DataAgent => \%ArticleAgent,
         TicketID  => $Param{TicketID},
+        ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
 
@@ -683,7 +601,17 @@ sub _Replace {
     }egx;
 
     # return if no placeholders included
-    return $Param{Text} if $Param{Text} !~ m/(<|&lt;)KIX_.+/g;
+    if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/) {
+        # convert any html to ascii
+        if ( !$Param{RichText} ) {
+            $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
+                String            => $Param{Text},
+                NoURLGlossar      => 1,
+                NoForcedLinebreak => 1,
+            );
+        }
+        return $Param{Text};
+    }
 
     # TODO: move ticket specific handling
     $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
@@ -742,7 +670,12 @@ sub _Replace {
     # get and execute placeholder modules
     my $PlaceholderModules = $Kernel::OM->Get('Config')->Get('Placeholder::Module');
     if (IsHashRefWithData($PlaceholderModules)) {
+        MODULE:
         for my $Module (sort keys %{$PlaceholderModules}) {
+
+            # stop if every placeholder is replaced
+            last MODULE if ($Param{Text} !~ m/(<|&lt;)KIX_.+/);
+
             next if !IsHashRefWithData($PlaceholderModules->{$Module}) || !$PlaceholderModules->{$Module}->{Module};
 
             if ( !$Kernel::OM->Get('Main')->Require($PlaceholderModules->{$Module}->{Module}) ) {
@@ -762,6 +695,15 @@ sub _Replace {
                 Ticket => \%Ticket
             );
         }
+    }
+
+    # convert any html to ascii
+    if ( !$Param{RichText} ) {
+        $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
+            String            => $Param{Text},
+            NoURLGlossar      => 1,
+            NoForcedLinebreak => 1,
+        );
     }
 
     return $Param{Text};

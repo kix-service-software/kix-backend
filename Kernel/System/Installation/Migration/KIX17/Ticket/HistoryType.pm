@@ -100,6 +100,11 @@ sub Run {
         }
     }
 
+    # delete ticket cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('Ticket')->{CacheType},
+    );
+
     return 1;
 }
 

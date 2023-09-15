@@ -17,9 +17,8 @@ use Kernel::Language;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log'
+our @ObjectDependencies = qw(
+    Log
 );
 
 =head1 NAME
@@ -98,7 +97,7 @@ sub _HashGlobalReplace {
     my ( $Self, $Text, $Tag, %H ) = @_;
 
     # Generate one single matching string for all keys to save performance.
-    my $Keys = join '|', map {quotemeta} grep { defined $H{$_} } keys %H;
+    my $Keys = join( q{|}, map {quotemeta} grep { defined $H{$_} } keys %H);
 
     # Add all keys also as lowercase to be able to match case insensitive,
     #   e. g. <KIX_CUSTOMER_From> and <KIX_CUSTOMER_FROM>.

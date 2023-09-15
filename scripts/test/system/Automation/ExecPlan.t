@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,17 +15,11 @@ use vars (qw($Self));
 # get ExecPlan object
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
-#
-# ExecPlan tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $NameRandom  = $Helper->GetRandomID();
 my %ExecPlanIDByExecPlanName = (
@@ -66,6 +60,7 @@ for my $ExecPlanName ( sort keys %ExecPlanIDByExecPlanName ) {
         },
         ValidID => 1,
         UserID  => 1,
+        Silent  => 1
     );
 
     $Self->False(
@@ -125,16 +120,25 @@ my %ExecPlan = $AutomationObject->ExecPlanGet(
     ID => $ExecPlanIDToChange
 );
 
-my $ExecPlanUpdateResult = $AutomationObject->ExecPlanUpdate(
+$AutomationObject->ExecPlanUpdate(
     ID      => $ExecPlanIDToChange,
     %ExecPlan,
     Name    => $ChangedExecPlanName,
     UserID  => 1,
 );
 
+my $ExecPlanUpdateResult = $AutomationObject->ExecPlanLookup(
+    Name => $ChangedExecPlanName,
+);
+
 $Self->True(
     $ExecPlanUpdateResult,
     'ExecPlanUpdate() for changing name of execution plan ' . $ExecPlanNameToChange . ' to ' . $ChangedExecPlanName,
+);
+
+# fetches current data of the ExecPlan with new name
+%ExecPlan = $AutomationObject->ExecPlanGet(
+    ID => $ExecPlanIDToChange
 );
 
 # update parameters of a single ExecPlan
@@ -148,16 +152,12 @@ $ExecPlanUpdateResult = $AutomationObject->ExecPlanUpdate(
     UserID  => 1,
 );
 
-$Self->True(
-    $ExecPlanUpdateResult,
+my %ExecPlanChanged = $AutomationObject->ExecPlanGet( ID => $ExecPlanIDToChange );
+
+$Self->IsNotDeeply(
+    \%ExecPlan,
+    \%ExecPlanChanged,
     'ExecPlanUpdate() for changing parameters of execution plan.',
-);
-
-%ExecPlan = $AutomationObject->ExecPlanGet( ID => $ExecPlanIDToChange );
-
-$Self->True(
-    $ExecPlan{Parameters},
-    'ExecPlanGet() for execution plan with parameters.',
 );
 
 $ExecPlanIDByExecPlanName{$ChangedExecPlanName} = $ExecPlanIDToChange;
@@ -169,11 +169,12 @@ my $ExecPlanID1 = $AutomationObject->ExecPlanAdd(
     Type    => 'TimeBased',
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1
 );
 
 $Self->False(
     $ExecPlanID1,
-    'ExecPlanAdd() for new execution plan ' . $ExecPlanNameToChange,
+    'ExecPlanAdd() for new execution plan ' . $ExecPlanNameToChange . ' without config',
 );
 
 if ($ExecPlanID1) {
@@ -189,6 +190,7 @@ $ExecPlanID1 = $AutomationObject->ExecPlanAdd(
     },
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1
 );
 
 $Self->False(
@@ -207,7 +209,7 @@ my $ExecPlanID2   = $AutomationObject->ExecPlanAdd(
     UserID  => 1,
 );
 
-$Self->False(
+$Self->True(
     $ExecPlanID2,
     'ExecPlanAdd() add the second test execution plan ' . $ExecPlanName2,
 );
@@ -218,6 +220,7 @@ my $ExecPlanUpdateWrong = $AutomationObject->ExecPlanUpdate(
     Name    => $ChangedExecPlanName,
     ValidID => 2,
     UserID  => 1,
+    Silent  => 1
 );
 
 $Self->False(
@@ -240,6 +243,7 @@ $Self->True(
 $ExecPlanDelete = $AutomationObject->ExecPlanDelete(
     ID      => 9999,
     UserID  => 1,
+    Silent  => 1
 );
 
 $Self->False(
@@ -247,7 +251,8 @@ $Self->False(
     'ExecPlanDelete() delete non existent execplan',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

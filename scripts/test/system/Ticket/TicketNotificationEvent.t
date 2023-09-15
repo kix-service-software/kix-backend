@@ -14,20 +14,14 @@ use utf8;
 
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 # force rich text editor
-my $Success = $ConfigObject->Set(
+my $Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'Frontend::RichText',
     Value => 1,
 );
@@ -37,13 +31,23 @@ $Self->True(
 );
 
 # use DoNotSendEmail email backend
-$Success = $ConfigObject->Set(
+$Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
     Value => 'Kernel::System::Email::DoNotSendEmail',
 );
 $Self->True(
     $Success,
     'Set DoNotSendEmail backend with true',
+);
+
+# send notifications without daemon
+$Success = $Kernel::OM->Get('Config')->Set(
+    Key   => 'TicketNotification::SendAsynchronously',
+    Value => '0',
+);
+$Self->True(
+    $Success,
+    'Set TicketNotification::SendAsynchronously with false',
 );
 
 # create a new user for current test
@@ -68,20 +72,17 @@ my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $ContactID,
 );
 
-# get ticket object
-my $TicketObject = $Kernel::OM->Get('Ticket');
-
 # create ticket
-my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Ticket One Title',
-    QueueID      => 1,
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'new',
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Ticket One Title',
+    QueueID        => 1,
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
     OrganisationID => 'example.com',
     ContactID      => $ContactData{Email},
-    OwnerID      => $UserID,
-    UserID       => $UserID,
+    OwnerID        => $UserID,
+    UserID         => $UserID,
 );
 
 # sanity check
@@ -91,7 +92,7 @@ $Self->True(
 );
 
 # get ticket number
-my $TicketNumber = $TicketObject->TicketNumberLookup(
+my $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
     TicketID => $TicketID,
     UserID   => $UserID,
 );
@@ -101,7 +102,7 @@ $Self->True(
     "TicketNumberLookup() successful for Ticket# $TicketNumber",
 );
 
-my $ArticleID = $TicketObject->ArticleCreate(
+my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID       => $TicketID,
     Channel        => 'note',
     CustomerVisible => 1,
@@ -123,16 +124,16 @@ $Self->True(
     "ArticleCreate() successful for Article ID $ArticleID",
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
-
 # create add note notification
-my $NotificationID = $NotificationEventObject->NotificationAdd(
+my $NotificationID = $Kernel::OM->Get('NotificationEvent')->NotificationAdd(
     Name => 'Customer notification',
     Data => {
-        Events     => ['ArticleCreate'],
-        Recipients => ['Customer'],
-        Transports => ['Email'],
+        Events             => ['ArticleCreate'],
+        Recipients         => ['Customer'],
+        Transports         => ['Email'],
+        CreateArticle      => ['1'],
+        Channel            => ['email'],
+        VisibleForCustomer => ['1'],
     },
     Message => {
         en => {
@@ -156,7 +157,7 @@ $Self->IsNot(
     'NotificationAdd() should not be undef',
 );
 
-my $Result = $EventNotificationEventObject->Run(
+my $Result = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent')->Run(
     Event => 'ArticleCreate',
     Data  => {
         TicketID => $TicketID,
@@ -171,7 +172,7 @@ $Self->True(
 );
 
 # get ticket article IDs
-my @ArticleIDs = $TicketObject->ArticleIndex(
+my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
     TicketID => $TicketID,
 );
 
@@ -182,7 +183,7 @@ $Self->Is(
 );
 
 # get last article
-my %Article = $TicketObject->ArticleGet(
+my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
     ArticleID => $ArticleIDs[-1],    # last
     UserID    => $UserID,
 );
@@ -195,12 +196,12 @@ $Self->Is(
 
 $Self->Is(
     $Article{Subject},
-    '[' . $ConfigObject->Get('Ticket::Hook') . $TicketNumber . '] Test external note',
+    'Test external note [' . $Kernel::OM->Get('Config')->Get('Ticket::Hook') . $TicketNumber . ']' ,
     'ArticleGet() subject contains notification subject',
 );
 
 # delete notification event
-my $NotificationDelete = $NotificationEventObject->NotificationDelete(
+my $NotificationDelete = $Kernel::OM->Get('NotificationEvent')->NotificationDelete(
     ID     => $NotificationID,
     UserID => 1,
 );
@@ -211,10 +212,8 @@ $Self->True(
     "NotificationDelete() successful for Notification ID $NotificationID",
 );
 
-# cleanup
-
 # delete the ticket
-my $TicketDelete = $TicketObject->TicketDelete(
+my $TicketDelete = $Kernel::OM->Get('Ticket')->TicketDelete(
     TicketID => $TicketID,
     UserID   => $UserID,
 );
@@ -225,7 +224,8 @@ $Self->True(
     "TicketDelete() successful for Ticket ID $TicketID",
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

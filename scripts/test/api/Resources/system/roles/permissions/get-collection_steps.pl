@@ -51,7 +51,7 @@ When qr/I query the collection of permissions with roleid (\d+) and filter targe
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/roles/'.$1.'/permissions',
-      Filter => '{"Permission": {"AND": [{"Field": "Target","Operator": "STARTSWITH","Value": "'.$2.'"}]}}',
+      Filter => '{"Permission": {"AND": [{"Field": "Target","Operator": "EQ","Value": "/system/cmdb/classes"}]}}',
    );
 };
 

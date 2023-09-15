@@ -17,9 +17,10 @@ use Scalar::Util;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'FAQ',
-    'Log',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    FAQ
+    Log
 );
 
 =head1 NAME
@@ -114,7 +115,7 @@ sub PostValueSet {
             FieldName => $Param{DynamicFieldConfig}->{Name},
             Value     => $Param{Value},
             OldValue  => $Param{OldValue},
-            ItemID    => $Param{ObjectID},
+            ContactID => $Param{ObjectID},
             UserID    => $Param{UserID},
         },
         UserID => $Param{UserID},

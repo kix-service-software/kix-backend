@@ -14,19 +14,11 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $LinkObject   = $Kernel::OM->Get('LinkObject');
-my $MainObject   = $Kernel::OM->Get('Main');
-my $UserObject   = $Kernel::OM->Get('User');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # ------------------------------------------------------------ #
 # make preparations
@@ -38,7 +30,7 @@ my @UserIDs;
 for my $Counter ( 1 .. 2 ) {
 
     # create new users for the tests
-    my $UserID = $UserObject->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => 'LinkObject-' . $Counter . $Helper->GetRandomID(),
         ValidID      => 1,
         ChangeUserID => 1,
@@ -55,21 +47,21 @@ for my $Counter ( 1 .. 100 ) {
 }
 
 # read ticket backend file
-my $TicketBackendContent = $MainObject->FileRead(
-    Location => $ConfigObject->Get('Home')
+my $BackendContent = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Kernel::OM->Get('Config')->Get('Home')
         . '/scripts/test/system/sample/LinkObject/LinkBackendDummy.pm',
     Result => 'SCALAR',
 );
 
 # get location of the backend modules
-my $BackendLocation = $ConfigObject->Get('Home') . '/Kernel/System/LinkObject/';
+my $BackendLocation = $Kernel::OM->Get('Config')->Get('Home') . '/Kernel/System/LinkObject/';
 
 # create needed random object names
 my @ObjectNames;
 for my $Counter ( 1 .. 100 ) {
 
     # copy the content
-    my $Content = ${$TicketBackendContent};
+    my $Content = ${$BackendContent};
 
     # generate name
     my $Name = 'UnitTestObject' . $Helper->GetRandomNumber();
@@ -78,23 +70,26 @@ for my $Counter ( 1 .. 100 ) {
     $Content =~ s{ Dummy }{$Name}xmsg;
 
     # create the backend file
-    $MainObject->FileWrite(
+    $Kernel::OM->Get('Main')->FileWrite(
         Directory => $BackendLocation,
         Filename  => $Name . '.pm',
         Content   => \$Content,
     );
 
+    # add text backend to object mapping
+    $Kernel::OM->{ObjectMap}->{ 'LinkObject::' . $Name } = 'Kernel::System::LinkObject::' . $Name;
+
     push @ObjectNames, $Name;
 }
 
 # save original LinkObject::Type settings
-my %TypesOrg = %{ $ConfigObject->Get('LinkObject::Type') };
+my %TypesOrg = %{ $Kernel::OM->Get('Config')->Get('LinkObject::Type') };
 
 # save original LinkObject::TypeGroup settings
-my %TypeGroupsOrg = %{ $ConfigObject->Get('LinkObject::TypeGroup') };
+my %TypeGroupsOrg = %{ $Kernel::OM->Get('Config')->Get('LinkObject::TypeGroup') };
 
 # save original LinkObject::PossibleLink settings
-my %PossibleLinksOrg = %{ $ConfigObject->Get('LinkObject::PossibleLink') };
+my %PossibleLinksOrg = %{ $Kernel::OM->Get('Config')->Get('LinkObject::PossibleLink') };
 
 my $TestCount = 1;
 
@@ -109,6 +104,7 @@ my $TypeData = [
         SourceData => {
             TypeGet => {
                 UserID => 1,
+                Silent => 1,
             },
         },
     },
@@ -118,6 +114,7 @@ my $TypeData = [
         SourceData => {
             TypeGet => {
                 Name => 'Dummy',
+                Silent => 1,
             },
         },
     },
@@ -128,6 +125,7 @@ my $TypeData = [
             TypeGet => {
                 Name   => $TypeNames[0],
                 UserID => 1,
+                Silent => 1,
             },
         },
         ReferenceData => {
@@ -149,6 +147,7 @@ my $TypeData = [
             TypeGet => {
                 Name   => $TypeNames[3],
                 UserID => 1,
+                Silent => 1,
             },
         },
         ReferenceData => {
@@ -170,6 +169,7 @@ my $TypeData = [
             TypeGet => {
                 Name   => $TypeNames[4],
                 UserID => 1,
+                Silent => 1,
             },
         },
         ReferenceData => {
@@ -408,7 +408,7 @@ for my $Test ( @{$TypeData} ) {
     if ( $Source->{ConfigSet} && $Source->{ConfigSet}->{Name} ) {
 
         # get original option
-        my $ConfiguredOptions = $ConfigObject->Get('LinkObject::Type');
+        my $ConfiguredOptions = $Kernel::OM->Get('Config')->Get('LinkObject::Type');
 
         # add new option
         $ConfiguredOptions->{ $Source->{ConfigSet}->{Name} } = {
@@ -417,7 +417,7 @@ for my $Test ( @{$TypeData} ) {
         };
 
         # add new type
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'LinkObject::Type',
             Value => $ConfiguredOptions,
         );
@@ -425,23 +425,24 @@ for my $Test ( @{$TypeData} ) {
     else {
 
         # get original option
-        my $ConfiguredOptions = $ConfigObject->Get('LinkObject::Type');
+        my $ConfiguredOptions = $Kernel::OM->Get('Config')->Get('LinkObject::Type');
 
         # delete option
         $Source->{TypeGet}->{Name} ||= '';
         delete $ConfiguredOptions->{ $Source->{TypeGet}->{Name} };
 
         # add new type
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'LinkObject::Type',
             Value => $ConfiguredOptions,
         );
     }
 
     # lookup type id
-    my $TypeID = $LinkObject->TypeLookup(
+    my $TypeID = $Kernel::OM->Get('LinkObject')->TypeLookup(
         Name   => $Source->{TypeGet}->{Name},
         UserID => $Source->{TypeGet}->{UserID},
+        Silent => $Source->{TypeGet}->{Silent},
     );
 
     if ( $Test->{ReferenceData}->{TypeLookup} ) {
@@ -451,7 +452,7 @@ for my $Test ( @{$TypeData} ) {
             "Test $TestCount: TypeLookup() - return valid type id '$TypeID' for type name '$Source->{TypeGet}{Name}'",
         );
 
-        my $TypeName = $LinkObject->TypeLookup(
+        my $TypeName = $Kernel::OM->Get('LinkObject')->TypeLookup(
             TypeID => $TypeID,
             UserID => 1,
         );
@@ -471,9 +472,10 @@ for my $Test ( @{$TypeData} ) {
     }
 
     # get type data
-    my %TypeGet = $LinkObject->TypeGet(
+    my %TypeGet = $Kernel::OM->Get('LinkObject')->TypeGet(
         TypeID => $TypeID,
         UserID => $Source->{TypeGet}->{UserID},
+        Silent => $Source->{TypeGet}->{Silent},
     );
 
     if ( $Test->{ReferenceData}->{TypeGet} ) {
@@ -496,7 +498,7 @@ for my $Test ( @{$TypeData} ) {
         }
 
         # get type list
-        my %TypeList = $LinkObject->TypeList(
+        my %TypeList = $Kernel::OM->Get('LinkObject')->TypeList(
             UserID => 1,
         );
 
@@ -550,70 +552,10 @@ continue {
 }
 
 # restore original LinkObject::Type settings
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'LinkObject::Type',
     Value => \%TypesOrg,
 );
-
-# ------------------------------------------------------------ #
-# run state list tests
-# ------------------------------------------------------------ #
-
-for my $Valid ( 0 .. 1 ) {
-
-    # get state list
-    my %StateList = $LinkObject->StateList(
-        Valid  => $Valid,
-        UserID => 1,
-    );
-
-    my $StateCheck = %StateList ? 1 : 0;
-
-    # check if state list exists
-    $Self->True(
-        $StateCheck,
-        "Test $TestCount: StateList() - valid check",
-    );
-
-    # check all state ids
-    for my $StateID ( sort keys %StateList ) {
-
-        # check if value is valid
-        $Self->True(
-            $StateList{$StateID},
-            "Test $TestCount: StateList() - valid items check - $StateID => $StateList{$StateID}",
-        );
-
-        # lookup the state name
-        my $LookupName = $LinkObject->StateLookup(
-            StateID => $StateID,
-            UserID  => 1,
-        );
-
-        # check the lookup name
-        $Self->Is(
-            $LookupName,
-            $StateList{$StateID},
-            "Test $TestCount: StateLookup() - lookup the name",
-        );
-
-        # lookup the state id
-        my $LookupStateID = $LinkObject->StateLookup(
-            Name   => $StateList{$StateID},
-            UserID => 1,
-        );
-
-        # check the lookup state id
-        $Self->Is(
-            $LookupStateID,
-            $StateID,
-            "Test $TestCount: StateLookup() - lookup the state id",
-        );
-    }
-}
-continue {
-    $TestCount++;
-}
 
 # ------------------------------------------------------------ #
 # define object lookup tests
@@ -630,6 +572,7 @@ my $ObjectData = [
     # invalid source name is given (check return false)
     {
         SourceName => $ObjectNames[1] . ' Test ',
+        Silent     => 1,
     },
 
     # this object must be inserted successfully (check string trim function)
@@ -647,6 +590,7 @@ my $ObjectData = [
     # invalid source name is given (check return false)
     {
         SourceName => " \n \t \r ",
+        Silent     => 1,
     },
 
     # this type must be inserted successfully (Unicode checks)
@@ -658,6 +602,7 @@ my $ObjectData = [
     # invalid source name is given (check return false)
     {
         SourceName => ' Ϭ ϯ Λ ' . $ObjectNames[4] . ' Ϩ ϴ Γ ',
+        Silent     => 1,
     },
 ];
 
@@ -677,9 +622,10 @@ for my $Test ( @{$ObjectData} ) {
     }
 
     # lookup the object id
-    my $ObjectID = $LinkObject->ObjectLookup(
+    my $ObjectID = $Kernel::OM->Get('LinkObject')->ObjectLookup(
         Name   => $Test->{SourceName},
         UserID => 1,
+        Silent => $Test->{Silent},
     );
 
     if ( !$Test->{ReferenceName} ) {
@@ -698,7 +644,7 @@ for my $Test ( @{$ObjectData} ) {
     next OBJECTTEST if !$ObjectID;
 
     # lookup the name
-    my $LookupName = $LinkObject->ObjectLookup(
+    my $LookupName = $Kernel::OM->Get('LinkObject')->ObjectLookup(
         ObjectID => $ObjectID,
         UserID   => 1,
     );
@@ -711,7 +657,7 @@ for my $Test ( @{$ObjectData} ) {
     );
 
     # lookup the object id a second time
-    my $ObjectID2 = $LinkObject->ObjectLookup(
+    my $ObjectID2 = $Kernel::OM->Get('LinkObject')->ObjectLookup(
         Name   => $Test->{SourceName},
         UserID => 1,
     );
@@ -742,7 +688,7 @@ continue {
     }
 
     # add new types to config
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::Type',
         Value => $Settings,
     );
@@ -797,7 +743,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::PossibleLink',
         Value => $PossibleLinksConfig,
     );
@@ -826,8 +772,9 @@ my %PossibleLinksReference = (
 # run possible links tests
 # ------------------------------------------------------------ #
 
-my %PossibleLinkList = $LinkObject->PossibleLinkList(
+my %PossibleLinkList = $Kernel::OM->Get('LinkObject')->PossibleLinkList(
     UserID => 1,
+    Silent => 1,
 );
 
 # check setting data
@@ -948,7 +895,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::PossibleLink',
         Value => $PossibleLinksConfig,
     );
@@ -961,6 +908,7 @@ my $PossibleObjectsReference = [
         SourceData => {
             UserID => 1,
         },
+        Silent => 1,
     },
 
     # PossibleObjectsList() needs a UserID argument (check return false)
@@ -968,6 +916,7 @@ my $PossibleObjectsReference = [
         SourceData => {
             Object => 'Ticket',
         },
+        Silent => 1,
     },
 
     # try to get PossibleObjectsList for an Object with no valid type (check return false)
@@ -976,6 +925,7 @@ my $PossibleObjectsReference = [
             Object => $ObjectNames[31],
             UserID => 1,
         },
+        Silent => 1,
     },
 
     # this test must return the correct number of entries
@@ -1066,8 +1016,9 @@ for my $Test ( @{$PossibleObjectsReference} ) {
     }
 
     # get possible objects list
-    my %PossibleObjectsList = $LinkObject->PossibleObjectsList(
+    my %PossibleObjectsList = $Kernel::OM->Get('LinkObject')->PossibleObjectsList(
         %{ $Test->{SourceData} },
+        Silent => $Test->{Silent},
     );
 
     # check if ReferenceData is present
@@ -1202,7 +1153,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::PossibleLink',
         Value => $PossibleLinksConfig,
     );
@@ -1216,6 +1167,7 @@ my $PossibleTypesReference = [
             Object2 => 'Ticket',
             UserID  => 1,
         },
+        Silent => 1,
     },
 
     # PossibleTypesList() needs a Object2 argument (check return false)
@@ -1224,6 +1176,7 @@ my $PossibleTypesReference = [
             Object1 => 'Ticket',
             UserID  => 1,
         },
+        Silent => 1,
     },
 
     # PossibleTypesList() needs a UserID argument (check return false)
@@ -1232,6 +1185,7 @@ my $PossibleTypesReference = [
             Object1 => 'Ticket',
             Object2 => 'Ticket',
         },
+        Silent => 1,
     },
 
     # try to get PossibleTypesList for an Object with no valid type (check return false)
@@ -1240,6 +1194,7 @@ my $PossibleTypesReference = [
             Object => $ObjectNames[31],
             UserID => 1,
         },
+        Silent => 1,
     },
 
     # this test must return the correct number of entries
@@ -1338,8 +1293,9 @@ for my $Test ( @{$PossibleTypesReference} ) {
     }
 
     # get possible objects list
-    my %PossibleTypesList = $LinkObject->PossibleTypesList(
+    my %PossibleTypesList = $Kernel::OM->Get('LinkObject')->PossibleTypesList(
         %{ $Test->{SourceData} },
+        Silent => $Test->{Silent},
     );
 
     # check if ReferenceData is present
@@ -1389,7 +1345,7 @@ continue {
     }
 
     # add new types to config
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::Type',
         Value => $Settings,
     );
@@ -1432,7 +1388,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::TypeGroup',
         Value => $TypeGroupConfig,
     );
@@ -1464,8 +1420,9 @@ my %TypeGroupReference = (
 # ------------------------------------------------------------ #
 
 # get type group list
-my %TypeGroupList = $LinkObject->TypeGroupList(
+my %TypeGroupList = $Kernel::OM->Get('LinkObject')->TypeGroupList(
     UserID => 1,
+    Silent => 1,
 );
 
 # check if the type group list has same number of entries as the reference list
@@ -1531,7 +1488,7 @@ continue {
     }
 
     # add new types to config
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::Type',
         Value => $Settings,
     );
@@ -1560,7 +1517,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::TypeGroup',
         Value => $TypeGroupConfig,
     );
@@ -1670,7 +1627,7 @@ for my $Test ( @{$PossibleTypeReference} ) {
         next TEST;
     }
 
-    my $Result = $LinkObject->PossibleType(
+    my $Result = $Kernel::OM->Get('LinkObject')->PossibleType(
         %{ $Test->{SourceData} },
         UserID => 1,
     );
@@ -1718,7 +1675,7 @@ continue {
     }
 
     # add new types to config
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::Type',
         Value => $Settings,
     );
@@ -1812,7 +1769,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::PossibleLink',
         Value => $PossibleLinksConfig,
     );
@@ -1841,7 +1798,7 @@ continue {
     };
 
     # create above config settings for later tests
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'LinkObject::TypeGroup',
         Value => $TypeGroupConfig,
     );
@@ -1851,7 +1808,7 @@ continue {
 # build ObjectID hash for later tests
 my %ObjectID;
 for my $Object (@ObjectNames) {
-    $ObjectID{$Object} = $LinkObject->ObjectLookup(
+    $ObjectID{$Object} = $Kernel::OM->Get('LinkObject')->ObjectLookup(
         Name   => $Object,
         UserID => 1,
     );
@@ -1865,14 +1822,14 @@ my $LinkData = [
             {
                 Action       => 'LinkAdd',
                 SourceObject => '',
-                SourceKey    => 321,
-                TargetObject => 'FAQ',
-                TargetKey    => '5',
-                Type         => 'ParentChild',
-                State        => 'Valid',
+                SourceKey    => '1',
+                TargetObject => $ObjectNames[1],
+                TargetKey    => '2',
+                Type         => $TypeNames[1],
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # LinkAdd() needs a SourceKey argument (check return false)
@@ -1880,15 +1837,15 @@ my $LinkData = [
         SourceData => [
             {
                 Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
+                SourceObject => $ObjectNames[1],
                 SourceKey    => '',
-                TargetObject => 'FAQ',
-                TargetKey    => '5',
-                Type         => 'ParentChild',
-                State        => 'Valid',
+                TargetObject => $ObjectNames[1],
+                TargetKey    => '2',
+                Type         => $TypeNames[1],
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # LinkAdd() needs a TargetObject argument (check return false)
@@ -1896,15 +1853,15 @@ my $LinkData = [
         SourceData => [
             {
                 Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
-                SourceKey    => '321',
+                SourceObject => $ObjectNames[1],
+                SourceKey    => '1',
                 TargetObject => '',
-                TargetKey    => '5',
-                Type         => 'ParentChild',
-                State        => 'Valid',
+                TargetKey    => '2',
+                Type         => $TypeNames[1],
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # LinkAdd() needs a TargetKey argument (check return false)
@@ -1912,15 +1869,15 @@ my $LinkData = [
         SourceData => [
             {
                 Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
-                SourceKey    => '321',
-                TargetObject => 'FAQ',
+                SourceObject => $ObjectNames[1],
+                SourceKey    => '1',
+                TargetObject => $ObjectNames[1],
                 TargetKey    => '',
-                Type         => 'ParentChild',
-                State        => 'Valid',
+                Type         => $TypeNames[1],
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # LinkAdd() needs a Type argument (check return false)
@@ -1928,31 +1885,15 @@ my $LinkData = [
         SourceData => [
             {
                 Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
-                SourceKey    => '321',
-                TargetObject => 'FAQ',
-                TargetKey    => '5',
+                SourceObject => $ObjectNames[1],
+                SourceKey    => '1',
+                TargetObject => $ObjectNames[1],
+                TargetKey    => '2',
                 Type         => undef,
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
-    },
-
-    # LinkAdd() needs a State argument (check return false)
-    {
-        SourceData => [
-            {
-                Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
-                SourceKey    => '321',
-                TargetObject => 'FAQ',
-                TargetKey    => '5',
-                Type         => 'ParentChild',
-                State        => undef,
-                UserID       => 1,
-            },
-        ],
+        Silent => 1,
     },
 
     # LinkAdd() needs a UserID argument (check return false)
@@ -1960,15 +1901,15 @@ my $LinkData = [
         SourceData => [
             {
                 Action       => 'LinkAdd',
-                SourceObject => 'Ticket',
-                SourceKey    => '321',
-                TargetObject => 'FAQ',
-                TargetKey    => '5',
-                Type         => 'ParentChild',
-                State        => 'Valid',
+                SourceObject => $ObjectNames[1],
+                SourceKey    => '1',
+                TargetObject => $ObjectNames[1],
+                TargetKey    => '2',
+                Type         => $TypeNames[1],
                 UserID       => undef,
             },
         ],
+        Silent => 1,
     },
 
     # add a link where source and target are the same object (check return false)
@@ -1981,10 +1922,10 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '1',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # no possible link type can be found for the two objects (check return false)
@@ -1997,10 +1938,10 @@ my $LinkData = [
                 TargetObject => $ObjectNames[78],
                 TargetKey    => '11',
                 Type         => 'Normal',
-                State        => 'Dummy',
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # add a link
@@ -2013,7 +1954,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '2',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2022,7 +1962,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '1',
                 Type   => $TypeNames[1],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2037,7 +1976,7 @@ my $LinkData = [
         },
     },
 
-    # add the same link again with same State (check return true)
+    # add the same link again (check return true)
     {
         SourceData => [
             {
@@ -2047,7 +1986,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '2',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2056,7 +1994,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '1',
                 Type   => $TypeNames[1],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2069,22 +2006,6 @@ my $LinkData = [
                 },
             },
         },
-    },
-
-    # add the same link again with different State (check return false)
-    {
-        SourceData => [
-            {
-                Action       => 'LinkAdd',
-                SourceObject => $ObjectNames[1],
-                SourceKey    => '1',
-                TargetObject => $ObjectNames[1],
-                TargetKey    => '2',
-                Type         => $TypeNames[1],
-                State        => 'Temporary',
-                UserID       => 1,
-            },
-        ],
     },
 
     # try to add a link where no possible link is defined (check return false)
@@ -2097,10 +2018,10 @@ my $LinkData = [
                 TargetObject => $ObjectNames[3],
                 TargetKey    => '2',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # add a pointed link
@@ -2113,7 +2034,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '222',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2122,7 +2042,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '111',
                 Type   => $TypeNames[60],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2149,7 +2068,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '231',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2161,7 +2079,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '221',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2173,7 +2090,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '201',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2185,7 +2101,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '102',
                 Type         => $TypeNames[50],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2197,7 +2112,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '103',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2209,7 +2123,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '101',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2221,7 +2134,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '101',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2233,7 +2145,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '101',
                 Type         => $TypeNames[30],
-                State        => 'Valid',
                 UserID       => 1,
             },
 
@@ -2245,7 +2156,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[5],
                 TargetKey    => '103',
                 Type         => $TypeNames[30],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2254,7 +2164,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => 101,
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2306,7 +2215,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '3000',
                 Type         => $TypeNames[49],
-                State        => 'Valid',
                 UserID       => 1,
             },
             {
@@ -2316,7 +2224,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '3000',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2325,7 +2232,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '2000',
                 Type   => $TypeNames[60],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2350,7 +2256,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '350',
                 Type         => $TypeNames[49],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2359,7 +2264,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '250',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2384,10 +2288,10 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '350',
                 Type         => $TypeNames[99],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # add a link
@@ -2400,7 +2304,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '400',
                 Type         => $TypeNames[48],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2409,7 +2312,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '400',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2434,10 +2336,10 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '400',
                 Type         => $TypeNames[98],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
+        Silent => 1,
     },
 
     # add an unpointed link
@@ -2450,7 +2352,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '666',
                 Type         => $TypeNames[48],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2459,7 +2360,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '555',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2484,7 +2384,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '654',
                 Type         => $TypeNames[48],
-                State        => 'Valid',
                 UserID       => 1,
             },
             {
@@ -2494,7 +2393,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[2],
                 TargetKey    => '655',
                 Type         => $TypeNames[49],
-                State        => 'Valid',
                 UserID       => 1,
             },
             {
@@ -2504,7 +2402,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '321',
                 Type         => $TypeNames[60],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2513,7 +2410,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '321',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2549,7 +2445,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[1],
                 TargetKey    => '103',
                 Type         => $TypeNames[1],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2558,7 +2453,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => 'DB01::101',
                 Type   => $TypeNames[1],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2584,7 +2478,6 @@ my $LinkData = [
                 Object2 => $ObjectNames[2],
                 Key2    => '655',
                 Type    => $TypeNames[49],
-                State   => 'Valid',
                 UserID  => 1,
             },
         ],
@@ -2593,7 +2486,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => '321',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
@@ -2623,7 +2515,6 @@ my $LinkData = [
                 Object2 => $ObjectNames[1],
                 Key2    => '103',
                 Type    => $TypeNames[1],
-                State   => 'Valid',
                 UserID  => 1,
             },
 
@@ -2633,7 +2524,6 @@ my $LinkData = [
                 Object => $ObjectNames[1],
                 Key    => 'DB01::101',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {},
@@ -2650,7 +2540,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[42],
                 TargetKey    => '4200',
                 Type         => $TypeNames[6],
-                State        => 'Valid',
                 UserID       => 1,
             },
             {
@@ -2660,7 +2549,6 @@ my $LinkData = [
                 TargetObject => $ObjectNames[42],
                 TargetKey    => '4200',
                 Type         => $TypeNames[7],
-                State        => 'Valid',
                 UserID       => 1,
             },
         ],
@@ -2669,19 +2557,18 @@ my $LinkData = [
                 Object => $ObjectNames[41],
                 Key    => '4100',
                 Type   => '',
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
                 $ObjectNames[42] => {
                     $TypeNames[6] => {
-                        Target => {
-                            4100 => 1,
+                        Source => {
+                            4200 => 1,
                         },
                     },
                     $TypeNames[7] => {
-                        Target => {
-                            4100 => 1,
+                        Source => {
+                            4200 => 1,
                         },
                     },
                 },
@@ -2699,7 +2586,6 @@ my $LinkData = [
                 Object2 => $ObjectNames[42],
                 Key2    => '4200',
                 Type    => $TypeNames[6],
-                State   => 'Valid',
                 UserID  => 1,
             },
         ],
@@ -2708,14 +2594,13 @@ my $LinkData = [
                 Object => $ObjectNames[41],
                 Key    => '4100',
                 Type   => $TypeNames[7],
-                State  => 'Valid',
                 UserID => 1,
             },
             LinkListReference => {
                 $ObjectNames[42] => {
                     $TypeNames[7] => {
-                        Target => {
-                            4100 => 1,
+                        Source => {
+                            4200 => 1,
                         },
                     },
                 },
@@ -2756,14 +2641,15 @@ for my $Test ( @{$LinkData} ) {
         # add link
         my $ActionResult;
         if ( $SourceData->{Action} eq 'LinkAdd' ) {
-            $ActionResult = $LinkObject->LinkAdd(
+            $ActionResult = $Kernel::OM->Get('LinkObject')->LinkAdd(
                 %{$SourceData},
+                Silent => $Test->{Silent},
             );
         }
 
         # delete link
         elsif ( $SourceData->{Action} eq 'LinkDelete' ) {
-            $ActionResult = $LinkObject->LinkDelete(
+            $ActionResult = $Kernel::OM->Get('LinkObject')->LinkDelete(
                 %{$SourceData}
             );
         }
@@ -2810,11 +2696,10 @@ for my $Test ( @{$LinkData} ) {
     }
 
     # get all links for ReferenceData
-    my $Links = $LinkObject->LinkList(
+    my $Links = $Kernel::OM->Get('LinkObject')->LinkList(
         Object => $ReferenceData->{LinkList}->{Object},
         Key    => $ReferenceData->{LinkList}->{Key},
         Type   => $ReferenceData->{LinkList}->{Type},
-        State  => $ReferenceData->{LinkList}->{State},
         UserID => $ReferenceData->{LinkList}->{UserID},
     );
 
@@ -2883,7 +2768,7 @@ continue {
 }
 
 $Self->True(
-    $LinkObject->LinkDeleteAll(
+    $Kernel::OM->Get('LinkObject')->LinkDeleteAll(
         Object => $ObjectNames[1],
         Key    => '321',
         UserID => 1,
@@ -2925,16 +2810,6 @@ my @Tests = (
     },
 );
 
-for my $Test (@Tests) {
-    my $Result = $LinkObject->ObjectPermission( %{$Test} );
-
-    $Self->Is(
-        $Result,
-        $Test->{Result},
-        "ObjectPermission - " . $Test->{Name},
-    );
-}
-
 # ------------------------------------------------------------ #
 # clean up link tests
 # ------------------------------------------------------------ #
@@ -2943,14 +2818,15 @@ for my $Test (@Tests) {
 for my $Name (@ObjectNames) {
 
     # delete the backend file
-    $MainObject->FileDelete(
+    $Kernel::OM->Get('Main')->FileDelete(
         Directory       => $BackendLocation,
         Filename        => $Name . '.pm',
         DisableWarnings => 1,
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

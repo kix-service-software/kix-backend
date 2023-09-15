@@ -30,7 +30,7 @@ my @Tests = (
     {
         Name   => 'SELECT with all columns',
         Data   => 'SELECT * FROM roles',
-        Result => [qw(id name comments usage_context valid_id create_time create_by change_time change_by)],
+        Result => [qw(id name comments valid_id usage_context create_time create_by change_time change_by)],
     },
 );
 

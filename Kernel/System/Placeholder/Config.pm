@@ -47,16 +47,30 @@ sub _Replace {
     }
 
     my $Tag = $Self->{Start} . 'KIX_CONFIG_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
     $Param{Text} =~ s{$Tag(.+?)$Self->{End}}{
         my $Replace = '';
+        my $FullKey = $1;
         my $Key = $1;
+        if ($FullKey =~ /(.+?)_.+/) {
+            $Key = $1;
+        }
 
         my $Exists = $SysConfigObject->Exists(
             Name => $Key
         );
-
+        if (
+            !$Exists
+            && $Key ne $FullKey
+        ) {
+            $Exists = $SysConfigObject->Exists(
+                Name => $FullKey
+            );
+        }
         if ($Exists) {
             my %ConfigDefinition = $SysConfigObject->OptionGet(
                 Name => $Key,
@@ -74,19 +88,19 @@ sub _Replace {
                 )
             ) {
                 $Replace = $Self->_GetReplaceValue(
-                    Key             => $Key,
+                    Key             => $FullKey,
                     ReplaceNotFound => $Param{ReplaceNotFound}
                 );
             }
             else {
                 $Replace = $Param{UserID} == 1 ?
-                    $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound})
+                    $Replace = $Self->_GetReplaceValue(Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound})
                     : $Param{ReplaceNotFound};
             }
         }
 
         if ( !$Exists && $Param{UserID} == 1 ) {
-            $Replace = $Self->_GetReplaceValue(Key => $Key, ReplaceNotFound => $Param{ReplaceNotFound});
+            $Replace = $Self->_GetReplaceValue(Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound});
         }
 
         $Replace;

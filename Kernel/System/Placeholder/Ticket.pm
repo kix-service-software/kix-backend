@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -20,7 +20,6 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Placeholder::Base);
 
 our @ObjectDependencies = (
-    'Config',
     'Log',
     'Queue'
 );
@@ -49,18 +48,10 @@ sub _Replace {
         }
     }
 
-    my %Queue;
-    if ( $Param{QueueID} ) {
-        %Queue = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $Param{QueueID},
-        );
-    }
-
-    if ( IsHashRefWithData(\%Queue) ) {
-        $Param{Text} =~ s/$Self->{Start} KIX_TICKET_QUEUE $Self->{End}/$Queue{Name}/gixms;
-    }
-
     my $Tag = $Self->{Start} . 'KIX_TICKET_';
+
+    return $Param{Text} if ($Param{Text} !~ m/$Tag/);
+
     if ( IsHashRefWithData($Param{Ticket}) ) {
 
         # add (simple) ID
@@ -68,7 +59,6 @@ sub _Replace {
 
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_ID $Self->{End}/$Param{Ticket}->{TicketID}/gixms;
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
-        $Param{Text} =~ s/$Self->{Start} KIX_QUEUE $Self->{End}/$Param{Ticket}->{Queue}/gixms;
 
         if ( !$Param{Ticket}->{AccountedTime} && $Param{Text} =~ m/AccountedTime/) {
             $Param{Ticket}->{AccountedTime} = $Kernel::OM->Get('Ticket')->TicketAccountedTimeGet(

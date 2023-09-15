@@ -8,6 +8,7 @@ Feature: POST request to the /system/communication/notifications resource
   Scenario: create a notification
     When I create a notification
     Then the response code is 201
+    Then the response object is NotificationPostPatchResponse
     When I delete this notification
     Then the response code is 204
 

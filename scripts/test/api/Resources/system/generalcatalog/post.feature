@@ -12,3 +12,9 @@ Feature: POST request to the /system/generalcatalog resource
     When I delete this generalcatalog item
     Then the response code is 204
 
+  Scenario: create a generalcatalog without class
+    When I create a generalcatalog item without class
+    Then the response code is 400
+    And the response object is Error
+    And the error code is "BadRequest"
+    And the error message is "Required parameter GeneralCatalogItem::Name is missing or undefined!"

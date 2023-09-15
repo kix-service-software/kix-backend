@@ -15,14 +15,18 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Ticket::ArchiveCleanup');
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute();
 
@@ -33,11 +37,10 @@ $Self->Is(
     "Maint::Ticket::ArchiveCleanup exit code",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

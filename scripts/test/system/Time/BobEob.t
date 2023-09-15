@@ -16,56 +16,8 @@ use Time::Local;
 
 use vars (qw($Self));
 
-# init contact object for config changes
-my $ContactObject = $Kernel::OM->Get('Contact');
-
-my $CacheObject = $Kernel::OM->Get('Cache');
-
 my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
-# disable default Vacation days
-$ConfigObject->Set(
-    Key   => 'TimeVacationDays',
-    Value => {},
-);
-$ConfigObject->Set(
-    Key   => 'TimeVacationDays::Calendar1',
-    Value => {},
-);
-
-# set time zone to local (use server TZ)
-$ConfigObject->Set(
-    Key   => 'TimeZone',
-    Value => 'local',
-);
-$ConfigObject->Set(
-    Key   => 'TimeWorkingHours',
-    Value => {
-        Mon => '08:00-16:00',
-        Tue => '08:00-16:00',
-        Wed => '08:00-16:00',
-        Thu => '08:00-16:00',
-        Fri => '08:00-16:00',
-        Sat => '08:00-16:00',
-        Sun => '08:00-16:00'
-    }
-);
-$ConfigObject->Set(
-    Key   => 'TimeWorkingHours::Calendar1',
-    Value => {
-        Mon => '10:00-18:00',
-        Tue => '10:00-18:00',
-        Wed => '10:00-18:00',
-        Thu => '10:00-18:00',
-        Fri => '10:00-18:00',
-        Sat => '10:00-18:00',
-        Sun => '10:00-18:00'
-    }
-);
-$CacheObject->CleanUp();
 my @Tests = (
     # BOB
     {
@@ -164,28 +116,6 @@ my @Tests = (
 );
 _DoTests();
 
-# without weekend
-$ConfigObject->Set(
-    Key   => 'TimeWorkingHours',
-    Value => {
-        Mon => '08:00-16:00',
-        Tue => '08:00-16:00',
-        Wed => '08:00-16:00',
-        Thu => '08:00-16:00',
-        Fri => '08:00-16:00',
-    }
-);
-$ConfigObject->Set(
-    Key   => 'TimeWorkingHours::Calendar1',
-    Value => {
-        Mon => '10:00-18:00',
-        Tue => '10:00-18:00',
-        Wed => '10:00-18:00',
-        Thu => '10:00-18:00',
-        Fri => '10:00-18:00',
-    }
-);
-$CacheObject->CleanUp();
 @Tests = (
     # BOB
     {
@@ -194,6 +124,7 @@ $CacheObject->CleanUp();
         StopTimeStamp  => '2023-03-27 08:00:00',
         ServerTZ       => 'UTC',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: Europe/Berlin (8-16 Mon-Fri)',
@@ -201,6 +132,7 @@ $CacheObject->CleanUp();
         StopTimeStamp  => '2023-03-27 08:00:00',
         ServerTZ       => 'Europe/Berlin',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     # EOB
     {
@@ -209,6 +141,7 @@ $CacheObject->CleanUp();
         StopTimeStamp  => '2023-03-27 16:00:00',
         ServerTZ       => 'UTC',
         Type           => 'EOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: Europe/Berlin (8-16 Mon-Fri)',
@@ -216,6 +149,7 @@ $CacheObject->CleanUp();
         StopTimeStamp  => '2023-03-27 16:00:00',
         ServerTZ       => 'Europe/Berlin',
         Type           => 'EOB',
+        WorkingTime    => '8/5',
     },
     # BOB with calendar
     {
@@ -225,6 +159,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'UTC',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: UTC ## Calendar: Europe/Berlin (10-18 Mon-Fri)',
@@ -233,6 +168,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'UTC',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: Europe/Berlin ## Calendar: Europe/Berlin (10-18 Mon-Fri)',
@@ -241,6 +177,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'Europe/Berlin',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: America/New_York ## Calendar: Europe/Berlin (10-18 Mon-Fri)',
@@ -249,6 +186,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'America/New_York',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'BOB',
+        WorkingTime    => '8/5',
     },
     # EOB with calendar
     {
@@ -258,6 +196,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'UTC',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'EOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: Europe/Berlin ## Calendar: Europe/Berlin (10-18 Mon-Fri)',
@@ -266,6 +205,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'Europe/Berlin',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'EOB',
+        WorkingTime    => '8/5',
     },
     {
         Name           => 'Server: America/New_York ## Calendar: Europe/Berlin (10-18 Mon-Fri)',
@@ -274,6 +214,7 @@ $CacheObject->CleanUp();
         ServerTZ       => 'America/New_York',
         CalendarTZ     => 'Europe/Berlin',
         Type           => 'EOB',
+        WorkingTime    => '8/5',
     },
 );
 _DoTests();
@@ -284,17 +225,111 @@ sub _DoTests {
         # set the server time zone
         local $ENV{TZ} = $Test->{ServerTZ} || 'UTC';
 
-        $ConfigObject->Set(
-            Key   => 'TimeZone::Calendar1',
-            Value => $Test->{CalendarTZ} || 'local',
-        );
-
         $Kernel::OM->ObjectsDiscard(
             Objects => ['Time'],
         );
 
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Time');
+        # needed to make config changes work
+        $Kernel::OM->Get('Time')->VacationCheck(
+            Year     => '2004',
+            Month    => '1',
+            Day      => '1',
+            Calendar => q{},
+        );
+
+        if ( defined $Test->{CalendarTZ} ) {
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TimeZone::Calendar1',
+                Value => $Test->{CalendarTZ},
+            );
+        }
+
+        # disable default Vacation days
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDaysModules',
+            Value => {},
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDays',
+            Value => [],
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDaysOneTime',
+            Value => {},
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDaysModules::Calendar1',
+            Value => {},
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDays::Calendar1',
+            Value => [],
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeVacationDaysOneTime::Calendar1',
+            Value => {},
+        );
+
+        # set time zone to local (use server TZ)
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'TimeZone',
+            Value => 'local',
+        );
+
+        $Test->{WorkingTime} ||= '8/7';
+        if ( $Test->{WorkingTime} eq '8/7' ) {
+            # server UTC tests (8-16) - 8h per day
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TimeWorkingHours',
+                Value => {
+                    Mon => '08:00-16:00',
+                    Tue => '08:00-16:00',
+                    Wed => '08:00-16:00',
+                    Thu => '08:00-16:00',
+                    Fri => '08:00-16:00',
+                    Sat => '08:00-16:00',
+                    Sun => '08:00-16:00',
+                }
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TimeWorkingHours::Calendar1',
+                Value => {
+                    Mon => '10:00-18:00',
+                    Tue => '10:00-18:00',
+                    Wed => '10:00-18:00',
+                    Thu => '10:00-18:00',
+                    Fri => '10:00-18:00',
+                    Sat => '10:00-18:00',
+                    Sun => '10:00-18:00',
+                }
+            );
+        }
+        elsif ( $Test->{WorkingTime} eq '8/5' ) {
+            # server UTC tests (8-16) - 8h per day without weekend
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TimeWorkingHours',
+                Value => {
+                    Mon => '08:00-16:00',
+                    Tue => '08:00-16:00',
+                    Wed => '08:00-16:00',
+                    Thu => '08:00-16:00',
+                    Fri => '08:00-16:00',
+                }
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TimeWorkingHours::Calendar1',
+                Value => {
+                    Mon => '10:00-18:00',
+                    Tue => '10:00-18:00',
+                    Wed => '10:00-18:00',
+                    Thu => '10:00-18:00',
+                    Fri => '10:00-18:00',
+                }
+            );
+        }
+
+        # remove cache (TimeWorkingHours preparations: TimeObject->_GetTimeWorking)
+        $Kernel::OM->Get('Cache')->CleanUp();
 
         # Convert timestamp to system time and set it.
         $Test->{StartTimeStamp} =~ m/(\d{4})-(\d{1,2})-(\d{1,2})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/;
@@ -307,14 +342,12 @@ sub _DoTests {
             $FixedTimeStart,
         );
 
-        my $Result = $Test->{Type} eq 'BOB' ? $TimeObject->BOB(
+        my $Result = $Test->{Type} eq 'BOB' ? $Kernel::OM->Get('Time')->BOB(
             String   => $Test->{StartTimeStamp},
             Calendar => $Test->{CalendarTZ} ? 1 : undef,
-            Debug    => 1
-        ) : $TimeObject->EOB(
+        ) : $Kernel::OM->Get('Time')->EOB(
             String   => $Test->{StartTimeStamp},
             Calendar => $Test->{CalendarTZ} ? 1 : undef,
-            Debug    => 1
         );
 
         $Self->Is(

@@ -528,7 +528,7 @@
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="UserFirstname">CustomerFirstname</Item>
+                <Item Key="Firstname">CustomerFirstname</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2337,6 +2337,7 @@
                 <Item>X-KIX-FollowUp-DynamicField-WorkOrder</Item>
                 <Item>X-KIX-BodyDecrypted</Item>
                 <Item>X-KIX-Subject</Item>
+                <Item>X-KIX-StrictFollowUpIgnore</Item>
             </Array>
         </Setting>
     </ConfigItem>
@@ -3363,22 +3364,6 @@ Thanks for your help!
     </ConfigItem>
 
     <!-- ticket placeholder module registrations -->
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###005-Common" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for configuration placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::Common</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###010-Config" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for configuration placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::Config</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Placeholder::Module###100-User" Required="0" Valid="1">
         <Description Translatable="1">Module registration for user attribute placeholders such as owner, responsible or current user.</Description>
         <Setting>
@@ -3387,11 +3372,11 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###150-DynamicField" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for dynamic field attribute placeholders.</Description>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###150-Organisation" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for organisation attribute placeholders.</Description>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::DynamicField</Item>
+                <Item Key="Module">Kernel::System::Placeholder::Organisation</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3411,6 +3396,14 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###400-Queue" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for queue attribute placeholders.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Placeholder::Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Placeholder::Module###500-Ticket" Required="0" Valid="1">
         <Description Translatable="1">Module registration for ticket attribute placeholders.</Description>
         <Setting>
@@ -3424,14 +3417,6 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Placeholder::Recipient</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Placeholder::Module###700-ConfigItem" Required="0" Valid="1">
-        <Description Translatable="1">Module registration for notification config item placeholders.</Description>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Placeholder::ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>

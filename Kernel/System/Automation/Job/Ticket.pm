@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -40,10 +40,10 @@ Handles ticket based jobs.
 
 =item Run()
 
-Run this job module. Returns 1 if the job was executed successful.
+Run this job module. Returns the list of TicketIDs to run this job on.
 
 Example:
-    my $Result = $Object->Run(
+    my @TicketIDs = $Object->Run(
         Filter => {}         # optional, filter for objects
         Data   => {},        # optional, contains the relevant data given by an event or otherwise
         UserID => 123,
@@ -51,50 +51,54 @@ Example:
 
 =cut
 
-sub Run {
+sub _Run {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for (qw(UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
-            return;
-        }
-    }
+    my $Filters = $Param{Filter};
 
-    my $Filter =  $Param{Filter};
-
-    # create or extend the filter with the ArticleID or TicketID
+    # extend the filter with the ArticleID or TicketID
     if ( IsHashRefWithData($Param{Data}) && $Param{Data}->{ArticleID} ) {
         # add ArticleID to filter
-        $Filter //= {};
-        $Filter->{AND} //= [];
-        push @{$Filter->{AND}}, {
-            Field    => 'ArticleID',
-            Operator => 'EQ',
-            Value    => $Param{Data}->{ArticleID}
-        };
+        $Filters = $Self->_ExtendFilter(
+            Filters => $Filters,
+            Extend  => {
+                Field    => 'ArticleID',
+                Operator => 'EQ',
+                Value    => $Param{Data}->{ArticleID}
+            }
+        );
     }
     elsif ( IsHashRefWithData($Param{Data}) && $Param{Data}->{TicketID} ) {
         # add TicketID to filter
-        $Filter //= {};
-        $Filter->{AND} //= [];
-        push @{$Filter->{AND}}, {
-            Field    => 'TicketID',
-            Operator => 'EQ',
-            Value    => $Param{Data}->{TicketID}
-        };
+        $Filters = $Self->_ExtendFilter(
+            Filters => $Filters,
+            Extend  => {
+                Field    => 'TicketID',
+                Operator => 'EQ',
+                Value    => $Param{Data}->{TicketID}
+            }
+        )
     }
 
+    my @TicketIDs;
+
     # do the search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result => 'ARRAY',
-        Search => $Filter,
-        UserID => 1,
-    );
+    if (IsArrayRefWithData($Filters)) {
+        for my $Search ( @{$Filters} ) {
+            my @TicketIDsPart = $Kernel::OM->Get('Ticket')->TicketSearch(
+                Result => 'ARRAY',
+                Search => $Search,
+                UserID => 1
+            );
+            push(@TicketIDs, @TicketIDsPart);
+        }
+        @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
+    } else {
+        @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+            Result => 'ARRAY',
+            UserID => 1
+        );
+    }
 
     return @TicketIDs;
 }

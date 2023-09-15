@@ -9,6 +9,7 @@ Feature: GET request to the /tickets resource
     Given 8 of tickets
     When I query the collection of tickets
     Then the response code is 200
+#    Then the response object is TicketCollectionResponse
     When delete all this tickets
     Then the response code is 204
     And the response has no content
@@ -57,7 +58,17 @@ Feature: GET request to the /tickets resource
     Then the response code is 204
     And the response has no content       
     When I query the collection of tickets
-    
+
+  Scenario: get the list of existing tickets with multiplesort (prio and queue)
+    Given 20 of tickets
+    When I query the collection of tickets with multiplesort by "Ticket.PriorityID:numeric,Ticket.QueueID:numeric"
+    Then the response code is 200
+    Then the response content is
+#    And the response contains 35 items of type "Ticket"
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
+
   Scenario: get the list of existing tickets searchlimit
     Given 80 of tickets
     When I query the collection of tickets 55 searchlimit
@@ -76,7 +87,7 @@ Feature: GET request to the /tickets resource
     Then the response code is 204
     And the response has no content
     
-    
+
     
     
      

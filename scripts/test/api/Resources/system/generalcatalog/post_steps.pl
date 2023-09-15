@@ -54,3 +54,15 @@ When qr/I create a generalcatalog item$/, sub {
    );
 };
 
+When qr/I create a generalcatalog item without class$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/generalcatalog',
+        Token   => S->{Token},
+        Content => {
+            GeneralCatalogItem => {
+                Class => ,
+                Name => rand(2)."Tablet"
+            }
+        }
+    );
+};

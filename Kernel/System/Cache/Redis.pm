@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,6 +81,9 @@ sub Set {
         utf8::encode($Value);
         $Value = '__b64raw::'.MIME::Base64::encode_base64( $Value );
     }
+    else {
+        utf8::encode($Value);
+    }
 
     if ( $TTL > 0 ) {
         $Self->_RedisCall('hset', $Self->{CachePrefix}.$Param{Type}, $PreparedKey, $Value);
@@ -109,7 +112,11 @@ sub Get {
 
     my $Value = $Self->_RedisCall('hget', $Self->{CachePrefix}.$Param{Type}, $PreparedKey);
 
-    return $Value if !$Value || index($Value, '__b64') != 0;
+    return $Value if ( !$Value );
+    if ( index($Value, '__b64') != 0 ) {
+        utf8::decode($Value);
+        return $Value;
+    }
 
     # restore Value
     my $Result;
@@ -329,6 +336,11 @@ sub _PrepareRedisKey {
 
     if ($Param{Raw}) {
         return $Param{Key};
+    }
+
+    if ( !utf8::downgrade($Param{Key}, 1) ) {
+        utf8::encode($Param{Key});
+        $Param{Key} = MIME::Base64::encode_base64( $Param{Key} );
     }
 
     my $SourceKey = $Param{Key};

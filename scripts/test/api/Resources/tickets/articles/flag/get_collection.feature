@@ -10,6 +10,7 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/flags resourc
     Given a article
     When I query the article flags collection
     Then the response code is 200
+    Then the response object is TicketArticleFlagCollectionResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content

@@ -18,12 +18,10 @@ use vars (qw($Self));
 my $StateObject = $Kernel::OM->Get('State');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # add state
 my $StateName = 'state' . $Helper->GetRandomID();
@@ -134,7 +132,8 @@ $Self->True(
     "StateGetStatesByType() does not contain the state 'open'",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

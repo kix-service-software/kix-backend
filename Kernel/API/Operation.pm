@@ -15,6 +15,7 @@ use File::Basename;
 use Storable;
 
 use Kernel::API::Validator;
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
 
@@ -221,6 +222,13 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my $StartTime = Time::HiRes::time();
+
+    if ( exists $Param{Data} && !IsHashRef($Param{Data}) ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Invalid Data!"
+        );
+    }
 
     if ( !$Param{PermissionCheckOnly} ) {
 

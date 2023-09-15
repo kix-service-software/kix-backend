@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -14,21 +14,11 @@ use utf8;
 
 use vars qw($Self);
 
-# get needed objects
-my $DBObject             = $Kernel::OM->Get('DB');
-my $ConfigObject         = $Kernel::OM->Get('Config');
-my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-my $LinkObject           = $Kernel::OM->Get('LinkObject');
-my $UserObject           = $Kernel::OM->Get('User');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -44,7 +34,7 @@ my @UserIDs;
     for my $Counter ( 1 .. 3 ) {
 
         # create new users for the tests
-        my $UserID = $UserObject->UserAdd(
+        my $UserID = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => 'UnitTest-ITSMConfigItem-' . $Counter . $RandomID,
             ValidID      => 1,
             ChangeUserID => 1,
@@ -62,7 +52,7 @@ my $GeneralCatalogClass = 'UnitTest' . $RandomID;
 for my $Name (qw(Test1 Test2 Test3 Test4)) {
 
     # add a new item
-    my $ItemID = $GeneralCatalogObject->ItemAdd(
+    my $ItemID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class   => $GeneralCatalogClass,
         Name    => $Name,
         ValidID => 1,
@@ -83,11 +73,11 @@ for my $Name (qw(Test1 Test2 Test3 Test4)) {
 my @ConfigItemDefinitions;
 $ConfigItemDefinitions[0] = " [
     {
-        Key        => 'Customer1',
-        Name       => 'Customer 1',
+        Key        => 'Contact1',
+        Name       => 'Contact 1',
         Searchable => 1,
         Input      => {
-            Type => 'Customer',
+            Type => 'Contact',
         },
     },
     {
@@ -120,14 +110,6 @@ $ConfigItemDefinitions[0] = " [
         Input      => {
             Type  => 'GeneralCatalog',
             Class => '$GeneralCatalogClass',
-        },
-    },
-    {
-        Key        => 'Integer1',
-        Name       => 'Integer 1',
-        Searchable => 1,
-        Input      => {
-            Type => 'Integer',
         },
     },
     {
@@ -243,11 +225,11 @@ $ConfigItemDefinitions[1] = " [
 # define the third test definition (especially for search tests with XMLData)
 $ConfigItemDefinitions[2] = " [
     {
-        Key        => 'Customer1',
-        Name       => 'Customer 1',
+        Key        => 'Contact1',
+        Name       => 'Contact 1',
         Searchable => 1,
         Input      => {
-            Type => 'Customer',
+            Type => 'Contact',
         },
     },
     {
@@ -271,11 +253,11 @@ $ConfigItemDefinitions[2] = " [
 # define the fourth test definition (only for search tests)
 $ConfigItemDefinitions[3] = " [
     {
-        Key        => 'Customer1',
-        Name       => 'Customer 1',
+        Key        => 'Contact1',
+        Name       => 'Contact 1',
         Searchable => 1,
         Input      => {
-            Type => 'Customer',
+            Type => 'Contact',
         },
     },
 ] ";
@@ -290,7 +272,7 @@ for my $Definition (@ConfigItemDefinitions) {
     my $ClassName = 'UnitTest' . $Helper->GetRandomID();
 
     # add an unittest config item class
-    my $ClassID = $GeneralCatalogObject->ItemAdd(
+    my $ClassID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
         Class   => 'ITSM::ConfigItem::Class',
         Name    => $ClassName,
         ValidID => 1,
@@ -310,7 +292,7 @@ for my $Definition (@ConfigItemDefinitions) {
     push @ConfigItemClasses,  $ClassName;
 
     # add a definition to the class
-    my $DefinitionID = $ConfigItemObject->DefinitionAdd(
+    my $DefinitionID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $ClassID,
         Definition => $Definition,
         UserID     => 1,
@@ -331,7 +313,7 @@ for my $Definition (@ConfigItemDefinitions) {
 # test DefinitionList for those simple cases
 my $Counter = 0;
 for my $ClassID (@ConfigItemClassIDs) {
-    my $DefinitionListRef = $ConfigItemObject->DefinitionList(
+    my $DefinitionListRef = $Kernel::OM->Get('ITSMConfigItem')->DefinitionList(
         ClassID => $ClassID,
     );
 
@@ -359,25 +341,25 @@ for ( 1 .. 100 ) {
 }
 
 # get class list
-my $ClassList = $GeneralCatalogObject->ItemList(
+my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::Class',
 );
 my %ClassListReverse = reverse %{$ClassList};
 
 # get deployment state list
-my $DeplStateList = $GeneralCatalogObject->ItemList(
+my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::DeploymentState',
 );
 my %DeplStateListReverse = reverse %{$DeplStateList};
 
 # get incident state list
-my $InciStateList = $GeneralCatalogObject->ItemList(
+my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::Core::IncidentState',
 );
 my %InciStateListReverse = reverse %{$InciStateList};
 
 # get general catalog test list
-my $GeneralCatalogList = $GeneralCatalogObject->ItemList(
+my $GeneralCatalogList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => $GeneralCatalogClass,
 );
 my %GeneralCatalogListReverse = reverse %{$GeneralCatalogList};
@@ -1121,10 +1103,10 @@ my $ConfigItemTests = [
                             Version => [
                                 undef,
                                 {
-                                    Customer1 => [
+                                    Contact1 => [
                                         undef,
                                         {
-                                            Content => 'dummy_customer_for_unitest',
+                                            Content => 'dummy_contact_for_unitest',
                                         },
                                     ],
                                     Date1 => [
@@ -1186,11 +1168,11 @@ my $ConfigItemTests = [
                             'Version' => [
                                 undef,
                                 {
-                                    'Customer1' => [
+                                    'Contact1' => [
                                         undef,
                                         {
-                                            'Content' => 'dummy_customer_for_unitest',
-                                            'TagKey'  => '[1]{\'Version\'}[1]{\'Customer1\'}[1]',
+                                            'Content' => 'dummy_contact_for_unitest',
+                                            'TagKey'  => '[1]{\'Version\'}[1]{\'Contact1\'}[1]',
                                         },
                                     ],
                                     'Date1' => [
@@ -1374,7 +1356,7 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'DefinitionUpdate',
                     HistoryTypeID => 8,
-                    Comment       => $ConfigItemDefinitionIDs[0],
+                    Comment       => 'Definition des ConfigItems aktualisiert (ID=' . $ConfigItemDefinitionIDs[0] . ')',
                     CreateBy      => 1,
                 },
                 {
@@ -1386,13 +1368,13 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => $InciStateListReverse{Operational} . '%%',
+                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Operational} . '; alt=)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => $DeplStateListReverse{Planned} . '%%',
+                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Planned} . '; alt=)',
                     CreateBy      => 1,
                 },
                 {
@@ -1403,23 +1385,20 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'NameUpdate',
                     HistoryTypeID => 5,
-                    Comment =>
-                        'UnitTest - HistoryTest Version 2%%UnitTest - HistoryTest',
-                    CreateBy => 1,
+                    Comment       => 'Name geändert (neu=UnitTest - HistoryTest Version 2; alt=UnitTest - HistoryTest)',
+                    CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => $InciStateListReverse{Incident} . '%%'
-                        . $InciStateListReverse{Operational},
-                    CreateBy => 1,
+                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Incident} . '; alt=' . $InciStateListReverse{Operational} . ')',
+                    CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => $DeplStateListReverse{Maintenance} . '%%'
-                        . $DeplStateListReverse{Planned},
-                    CreateBy => 1,
+                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Maintenance} . '; alt=' . $DeplStateListReverse{Planned} . ')',
+                    CreateBy      => 1,
                 },
             ],
         },
@@ -1673,8 +1652,9 @@ for my $Test ( @{$ConfigItemTests} ) {
     if ( $SourceData->{ConfigItemAdd} ) {
 
         # add the new config item
-        $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
+        $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
             %{ $SourceData->{ConfigItemAdd} },
+            Silent => 1,
         );
 
         if ($ConfigItemID) {
@@ -1712,8 +1692,9 @@ for my $Test ( @{$ConfigItemTests} ) {
             }
 
             # add a new version
-            my $VersionID = $ConfigItemObject->VersionAdd(
+            my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
                 %{$Version},
+                Silent => 1,
             );
 
             if ($VersionID) {
@@ -1727,8 +1708,9 @@ for my $Test ( @{$ConfigItemTests} ) {
     if ( $Test->{ReferenceData} && $Test->{ReferenceData}->{ConfigItemGet} ) {
 
         # get the config item data
-        $ConfigItemData = $ConfigItemObject->ConfigItemGet(
+        $ConfigItemData = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
             ConfigItemID => $ConfigItemID,
+            Silent       => 1,
         );
 
         if ( !$ConfigItemData ) {
@@ -1795,7 +1777,7 @@ for my $Test ( @{$ConfigItemTests} ) {
     for my $VersionID (@VersionIDs) {
 
         # get this version
-        my $VersionData = $ConfigItemObject->VersionGet(
+        my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
             VersionID  => $VersionID,
             XMLDataGet => 1,
         );
@@ -1857,9 +1839,9 @@ for my $Test ( @{$ConfigItemTests} ) {
         $Test->{ReferenceData}
         && $Test->{ReferenceData}->{HistoryGet}
         && @{ $Test->{ReferenceData}->{HistoryGet} }
-        )
-    {
-        my $CompleteHistory = $ConfigItemObject->HistoryGet(
+    ) {
+
+        my $CompleteHistory = $Kernel::OM->Get('ITSMConfigItem')->HistoryGet(
             ConfigItemID => $ConfigItemID,
         );
 
@@ -1870,7 +1852,8 @@ for my $Test ( @{$ConfigItemTests} ) {
             "Test $TestCount: nr of history entries",
         );
 
-        CHECKNR: for my $CheckNr ( 0 .. $#{$CompleteHistory} ) {
+        CHECKNR:
+        for my $CheckNr ( 0 .. $#{$CompleteHistory} ) {
             my $Check = $Test->{ReferenceData}->{HistoryGet}->[$CheckNr];
             my $Data  = $CompleteHistory->[$CheckNr];
 
@@ -1880,13 +1863,18 @@ for my $Test ( @{$ConfigItemTests} ) {
 
                 # check history data
                 $Self->Is(
-                    $Check->{$Key},
                     $Data->{$Key},
+                    $Check->{$Key},
                     "Test $TestCount: $Key",
                 );
             }
         }
     }
+
+    # process event queue
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
+    );
 }
 continue {
     $TestCount++;
@@ -1898,27 +1886,33 @@ continue {
 
 {
 
-    my $CI1 = $ConfigItemObject->ConfigItemLookup(
+    my $CI1 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemNumber => $ConfigItemNumbers[72],
     );
 
-    my $CI2 = $ConfigItemObject->ConfigItemLookup(
+    my $CI2 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemNumber => $ConfigItemNumbers[73],
     );
 
     # link the CI with a CI
-    my $LinkResult = $LinkObject->LinkAdd(
-        SourceObject => 'ITSMConfigItem',
+    my $LinkResult = $Kernel::OM->Get('LinkObject')->LinkAdd(
+        SourceObject => 'ConfigItem',
         SourceKey    => $CI1,
-        TargetObject => 'ITSMConfigItem',
+        TargetObject => 'ConfigItem',
         TargetKey    => $CI2,
         Type         => 'DependsOn',
         State        => 'Valid',
         UserID       => 1,
     );
 
+    # check if version could be added
+    $Self->True(
+        $LinkResult,
+        "Test $TestCount: LinkAdd() for $CI1 and $CI2 - Link as 'DependsOn'",
+    );
+
     # update incident state of CI1
-    my $VersionID = $ConfigItemObject->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $CI1,
         Name         => 'UnitTest - Bugfix4377 - CI-A',
         DefinitionID => $ConfigItemDefinitionIDs[0],
@@ -1934,7 +1928,7 @@ continue {
     );
 
     # get the latest version for CI1
-    my $VersionRef = $ConfigItemObject->VersionGet(
+    my $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI1,
     );
 
@@ -1946,19 +1940,19 @@ continue {
     );
 
     # get the latest version for CI2
-    $VersionRef = $ConfigItemObject->VersionGet(
+    $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI2,
     );
 
-    # check if incident state of CI2 is 'Warning'
+    # check if incident state of CI2 is 'Operational', since ITSM::Core::IncidentLinkTypeDirection is 'Source'
     $Self->Is(
         $VersionRef->{CurInciState},
-        'Warning',
+        'Operational',
         "Test $TestCount: Current incident state of CI $CI2",
     );
 
     # update incident state of CI2 to 'Incident'
-    $VersionID = $ConfigItemObject->VersionAdd(
+    $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $CI2,
         Name         => 'UnitTest - Bugfix4377 - CI-B',
         DefinitionID => $ConfigItemDefinitionIDs[0],
@@ -1974,7 +1968,7 @@ continue {
     );
 
     # get the latest version for CI2
-    $VersionRef = $ConfigItemObject->VersionGet(
+    $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI2,
     );
 
@@ -1986,7 +1980,7 @@ continue {
     );
 
     # update incident state of CI1 to 'Operational'
-    $VersionID = $ConfigItemObject->VersionAdd(
+    $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $CI1,
         Name         => 'UnitTest - Bugfix4377 - CI-A',
         DefinitionID => $ConfigItemDefinitionIDs[0],
@@ -2002,11 +1996,11 @@ continue {
     );
 
     # get the latest version for CI1
-    $VersionRef = $ConfigItemObject->VersionGet(
+    $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI1,
     );
 
-    # check if incident state of CI1 is 'Warning' (because of linked CI2 in state 'incident')
+    # check if incident state of CI1 is 'Warning'
     $Self->Is(
         $VersionRef->{CurInciState},
         'Warning',
@@ -2014,7 +2008,7 @@ continue {
     );
 
     # update incident state of CI2 to 'Operational'
-    $VersionID = $ConfigItemObject->VersionAdd(
+    $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $CI2,
         Name         => 'UnitTest - Bugfix4377 - CI-B',
         DefinitionID => $ConfigItemDefinitionIDs[0],
@@ -2030,7 +2024,7 @@ continue {
     );
 
     # get the latest version for CI1
-    $VersionRef = $ConfigItemObject->VersionGet(
+    $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI1,
     );
 
@@ -2042,7 +2036,7 @@ continue {
     );
 
     # get the latest version for CI2
-    $VersionRef = $ConfigItemObject->VersionGet(
+    $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI2,
     );
 
@@ -2063,12 +2057,12 @@ continue {
 
 {
 
-    my $CI1 = $ConfigItemObject->ConfigItemLookup(
+    my $CI1 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemNumber => $ConfigItemNumbers[72],
     );
 
     # add a version, set incident state to incident
-    my $VersionID = $ConfigItemObject->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $CI1,
         Name         => 'UnitTest - Bugfix10356',
         DefinitionID => $ConfigItemDefinitionIDs[0],
@@ -2084,7 +2078,7 @@ continue {
     );
 
     # get the latest version for CI1
-    my $VersionRef = $ConfigItemObject->VersionGet(
+    my $VersionRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $CI1,
     );
 
@@ -2096,7 +2090,7 @@ continue {
     );
 
     # delete the last version
-    my $VersionDeleteSuccess = $ConfigItemObject->VersionDelete(
+    my $VersionDeleteSuccess = $Kernel::OM->Get('ITSMConfigItem')->VersionDelete(
         VersionID => $VersionRef->{VersionID},
         UserID    => 1,
     );
@@ -2108,7 +2102,7 @@ continue {
     );
 
     # get the history
-    my $HistoryRef = $ConfigItemObject->HistoryGet(
+    my $HistoryRef = $Kernel::OM->Get('ITSMConfigItem')->HistoryGet(
         ConfigItemID => $CI1,
     );
 
@@ -2138,10 +2132,10 @@ my @SearchTests = (
             ClassIDs => [ $ConfigItemClassIDs[2], $ConfigItemClassIDs[3] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2149,7 +2143,7 @@ my @SearchTests = (
     {
         Function   => [ 'ConfigItemSearchExtended', 'ConfigItemSearch' ],
         SearchData => {
-            Number => $ConfigItemNumbers[50],
+            Number  => $ConfigItemNumbers[50],
         },
         ReferenceData => [
             $ConfigItemNumbers[50],
@@ -2160,7 +2154,7 @@ my @SearchTests = (
     {
         Function   => [ 'ConfigItemSearchExtended', 'ConfigItemSearch' ],
         SearchData => {
-            Number => '*' . $ConfigItemNumbers[50] . '*',
+            Number  => '*' . $ConfigItemNumbers[50] . '*',
         },
         ReferenceData => [
             $ConfigItemNumbers[50],
@@ -2185,9 +2179,9 @@ my @SearchTests = (
             DeplStateIDs => [ $DeplStateListReverse{Production} ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2214,10 +2208,10 @@ my @SearchTests = (
             ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2241,9 +2235,9 @@ my @SearchTests = (
             InciStateIDs => [ $InciStateListReverse{Incident} ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
             $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2258,10 +2252,10 @@ my @SearchTests = (
             ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2289,10 +2283,10 @@ my @SearchTests = (
             Limit    => 100,
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2304,9 +2298,9 @@ my @SearchTests = (
             Limit    => 3,
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[60],
             $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
         ],
     },
 
@@ -2318,8 +2312,8 @@ my @SearchTests = (
             Limit    => 2,
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
         ],
     },
 
@@ -2331,7 +2325,7 @@ my @SearchTests = (
             Limit    => 1,
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
+            $ConfigItemNumbers[60],
         ],
     },
 
@@ -2343,10 +2337,10 @@ my @SearchTests = (
             Limit    => 0,
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[51],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[51],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2357,8 +2351,8 @@ my @SearchTests = (
             CreateBy => [ $UserIDs[2] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
             $ConfigItemNumbers[52],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2370,9 +2364,9 @@ my @SearchTests = (
             CreateBy => [ $UserIDs[1],            $UserIDs[2] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
-            $ConfigItemNumbers[52],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[52],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2383,8 +2377,8 @@ my @SearchTests = (
             ChangeBy => [ $UserIDs[2] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
             $ConfigItemNumbers[52],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2406,8 +2400,8 @@ my @SearchTests = (
             ChangeBy => [ $UserIDs[1] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[51],
             $ConfigItemNumbers[60],
+            $ConfigItemNumbers[51],
         ],
     },
 
@@ -2419,8 +2413,8 @@ my @SearchTests = (
             ChangeBy => [ $UserIDs[2] ],
         },
         ReferenceData => [
-            $ConfigItemNumbers[50],
             $ConfigItemNumbers[52],
+            $ConfigItemNumbers[50],
         ],
     },
 
@@ -2778,7 +2772,7 @@ my @SearchTests = (
         ],
     },
 
-    # test ConfigItemSearchExtended() with 'What' (Customer1)
+    # test ConfigItemSearchExtended() with 'What' (Contact1)
     {
         Function   => ['ConfigItemSearchExtended'],
         SearchData => {
@@ -2786,7 +2780,7 @@ my @SearchTests = (
             ChangeBy => [ $UserIDs[2] ],
             What     => [
                 {
-                    "[1]{'Version'}[1]{'Customer1'}[1]{'Content'}" => 'dummy_customer_for_unitest',
+                    "[1]{'Version'}[1]{'Contact1'}[1]{'Content'}" => 'dummy_contact_for_unitest',
                 },
             ],
 
@@ -2830,14 +2824,14 @@ my @SearchTests = (
         ],
     },
 
-    # test ConfigItemSearchExtended() with 'What' (Customer1, Date1, DateTime1)
+    # test ConfigItemSearchExtended() with 'What' (Contact1, Date1, DateTime1)
     {
         Function   => ['ConfigItemSearchExtended'],
         SearchData => {
             ClassIDs => \@ConfigItemClassIDs,
             What     => [
                 {
-                    "[1]{'Version'}[1]{'Customer1'}[1]{'Content'}" => 'dummy_customer_for_unitest',
+                    "[1]{'Version'}[1]{'Contact1'}[1]{'Content'}" => 'dummy_contact_for_unitest',
                 },
                 {
                     "[1]{'Version'}[1]{'Date1'}[1]{'Content'}" => '2010-02-12',
@@ -3207,7 +3201,7 @@ for my $Test (@SearchTests) {
     for my $Function ( @{ $Test->{Function} } ) {
 
         # start search
-        my $ConfigItemList = $ConfigItemObject->$Function(
+        my $ConfigItemList = $Kernel::OM->Get('ITSMConfigItem')->$Function(
             %{ $Test->{SearchData} },
         );
 
@@ -3242,7 +3236,7 @@ for my $Test (@SearchTests) {
         for my $Number ( @{ $Test->{ReferenceData} } ) {
 
             # find id of the item
-            $DBObject->Prepare(
+            $Kernel::OM->Get('DB')->Prepare(
                 SQL => "SELECT id FROM configitem WHERE "
                     . "configitem_number = '$Number' "
                     . "ORDER BY id DESC",
@@ -3251,7 +3245,7 @@ for my $Test (@SearchTests) {
 
             # fetch the result
             my $ConfigItemID;
-            while ( my @Row = $DBObject->FetchrowArray() ) {
+            while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
                 $ConfigItemID = $Row[0];
             }
 
@@ -3277,7 +3271,7 @@ continue {
 my $AttachmentTestConfigItemID = $ConfigItemIDs[0];
 
 # verify that initially no attachment exists
-my @AttachmentList = $ConfigItemObject->ConfigItemAttachmentList(
+my @AttachmentList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentList(
     ConfigItemID => $AttachmentTestConfigItemID,
 );
 
@@ -3305,7 +3299,7 @@ for my $TestFile (@TestFileList) {
 
     $FileCount++;
 
-    my $AddOk = $ConfigItemObject->ConfigItemAttachmentAdd(
+    my $AddOk = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentAdd(
         %{$TestFile},
         ConfigItemID => $AttachmentTestConfigItemID,
         UserID       => 1,
@@ -3315,7 +3309,7 @@ for my $TestFile (@TestFileList) {
         "Attachment $FileCount: attachment added",
     );
 
-    my @AttachmentList = $ConfigItemObject->ConfigItemAttachmentList(
+    my @AttachmentList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentList(
         ConfigItemID => $AttachmentTestConfigItemID,
         UserID       => 1,
     );
@@ -3333,7 +3327,7 @@ for my $TestFile (@TestFileList) {
     );
 
     # get the attachment
-    my $Attachment = $ConfigItemObject->ConfigItemAttachmentGet(
+    my $Attachment = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentGet(
         ConfigItemID => $AttachmentTestConfigItemID,
         Filename     => $TestFile->{Filename},
     );
@@ -3352,7 +3346,7 @@ for my $TestFile (@TestFileList) {
     }
 
     # check existence of attachment
-    my $AttachmentExists = $ConfigItemObject->ConfigItemAttachmentExists(
+    my $AttachmentExists = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentExists(
         ConfigItemID => $AttachmentTestConfigItemID,
         Filename     => $TestFile->{Filename},
         UserID       => 1,
@@ -3371,7 +3365,7 @@ for my $TestFile (@TestFileList) {
 
     $FileCount++;
 
-    my $DeleteOk = $ConfigItemObject->ConfigItemAttachmentDelete(
+    my $DeleteOk = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentDelete(
         ConfigItemID => $AttachmentTestConfigItemID,
         Filename     => $TestFile->{Filename},
         UserID       => 1,
@@ -3381,7 +3375,7 @@ for my $TestFile (@TestFileList) {
         "Attachment $FileCount: attachment deleted",
     );
 
-    my @AttachmentList = $ConfigItemObject->ConfigItemAttachmentList(
+    my @AttachmentList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentList(
         ConfigItemID => $AttachmentTestConfigItemID,
         UserID       => 1,
     );
@@ -3392,7 +3386,7 @@ for my $TestFile (@TestFileList) {
         "Attachment $FileCount: number of attachments after deletion",
     );
 
-    my $AttachmentExists = $ConfigItemObject->ConfigItemAttachmentExists(
+    my $AttachmentExists = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAttachmentExists(
         Filename     => $TestFile->{Filename},
         ConfigItemID => $AttachmentTestConfigItemID,
         UserID       => 1,
@@ -3406,7 +3400,7 @@ for my $TestFile (@TestFileList) {
 # check config item delete
 my $DeleteTestCount = 1;
 for my $ConfigItemID (@ConfigItemIDs) {
-    my $DeleteOk = $ConfigItemObject->ConfigItemDelete(
+    my $DeleteOk = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemDelete(
         ConfigItemID => $ConfigItemID,
         UserID       => 1,
     );
@@ -3416,10 +3410,11 @@ for my $ConfigItemID (@ConfigItemIDs) {
     );
 
     # double check if config item is really deleted
-    my $ConfigItemData = $ConfigItemObject->ConfigItemGet(
+    my $ConfigItemData = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
         ConfigItemID => $ConfigItemID,
         UserID       => 1,
         Cache        => 0,
+        Silent       => 1,
     );
     $Self->False(
         $ConfigItemData->{ConfigItemID},
@@ -3427,9 +3422,15 @@ for my $ConfigItemID (@ConfigItemIDs) {
     );
 
     $DeleteTestCount++;
+
+    # process event queue
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
+    );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

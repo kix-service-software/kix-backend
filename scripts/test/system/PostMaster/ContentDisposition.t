@@ -22,13 +22,9 @@ my $MainObject   = $Kernel::OM->Get('Main');
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase  => 1,
-        UseTmpArticleDir => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+$Helper->UseTmpArticleDir();
 
 my @Tests = (
     {
@@ -137,7 +133,8 @@ my @Tests = (
     },
 );
 
-my @AddedTicketIDs;
+# begin transaction on database
+$Helper->BeginWork();
 
 for my $Test (@Tests) {
 
@@ -157,25 +154,29 @@ for my $Test (@Tests) {
             Result   => 'ARRAY',
         );
 
+        my @Return;
         my $TicketID;
         {
             my $PostMasterObject = Kernel::System::PostMaster->new(
                 Email => $ContentRef,
             );
 
-            my @Return = $PostMasterObject->Run();
+            @Return = $PostMasterObject->Run();
             @Return = @{ $Return[0] || [] };
 
             $TicketID = $Return[1];
         }
 
+        $Self->Is(
+            $Return[0] || 0,
+            1,
+            "$Test->{Name} | $Backend - Postmaster NewTicket",
+        );
+
         $Self->True(
             $TicketID,
             "$Test->{Name} | $Backend - Ticket created $TicketID",
         );
-
-        # remember added tickets
-        push @AddedTicketIDs, $TicketID;
 
         my @ArticleIDs = $TicketObject->ArticleIndex( TicketID => $TicketID );
         $Self->True(
@@ -204,10 +205,26 @@ for my $Test (@Tests) {
                 "$Test->{Name} | $Backend - Attachment",
             );
         }
+
+        # delete ticket
+        my $Success = $TicketObject->TicketDelete(
+            TicketID => $TicketID,
+            UserID   => 1,
+        );
+        $Self->True(
+            $Success,
+            "$Test->{Name} | Ticket deleted",
+        );
+
+        # new/clear ticket object
+        $Kernel::OM->ObjectsDiscard(
+            Objects => ['Ticket'],
+        );
     }
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

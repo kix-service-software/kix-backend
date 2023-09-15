@@ -9,7 +9,7 @@ Feature: PATCH request to the /system/communication/mailfilters/:MailFilterID re
     Given a mailfilter
     When I update this mailfilter
     Then the response code is 200
-#    And the response object is SystemAddressPostPatchResponse
+    And the response object is MailFilterPostPatchResponse
     When I delete this mailfilter
     Then the response code is 204
 

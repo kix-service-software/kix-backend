@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -54,110 +54,121 @@ sub _Replace {
     # replace article placeholders
     my $Tag = $Self->{Start} . 'KIX_ARTICLE_';
 
-    # TODO: keep old placeholder syntax for backward compatibility
+    # FIXME: keep old placeholder syntax for backward compatibility
     my $OldTag = $Self->{Start} . 'KIX_ARTICLE_DATA_';
 
-    $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
-    if ( $Param{ArticleID} ) {
-        my %Article = $Self->{TicketObject}->ArticleGet(
-            ArticleID => $Param{ArticleID},
-        );
+    if ($Param{Text} =~ m/$Tag/ || $Param{Text} =~ m/$OldTag/) {
+        $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
+        $Param{ArticleID} ||= IsHashRefWithData($Param{DataAgent}) ? $Param{DataAgent}->{ArticleID} : undef;
+        if ( $Param{ArticleID} ) {
+            my %Article = $Self->{TicketObject}->ArticleGet(
+                ArticleID => $Param{ArticleID},
+            );
 
-        $Param{Text} = $Self->_ReplaceArticlePlaceholders(
-            %Param,
-            Tag     => $Tag,
-            Article => \%Article
-        );
+            $Param{Text} = $Self->_ReplaceArticlePlaceholders(
+                %Param,
+                Tag     => "(?:$Tag|$OldTag)",
+                Article => \%Article
+            );
 
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$Tag|$OldTag", %Article );
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$Tag|$OldTag", %Article );
+        }
+
+        # cleanup
+        $Param{Text} =~ s/(?:$Tag|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
 
-    # cleanup
-    $Param{Text} =~ s/(?:$Tag|$OldTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
-
-    # replcae first article placeholders
+    # replace first article placeholders
     $Tag = $Self->{Start} . 'KIX_FIRST_';
-    if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
-        my %Article = $Self->{TicketObject}->ArticleFirstArticle(
-            TicketID => $Param{TicketID},
-        );
+    if ($Param{Text} =~ m/$Tag/) {
+        if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
+            my %Article = $Self->{TicketObject}->ArticleFirstArticle(
+                TicketID => $Param{TicketID},
+            );
 
-        $Param{Text} = $Self->_ReplaceArticlePlaceholders(
-            %Param,
-            Tag     => $Tag,
-            Article => \%Article
-        );
+            $Param{Text} = $Self->_ReplaceArticlePlaceholders(
+                %Param,
+                Tag     => $Tag,
+                Article => \%Article
+            );
 
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Article );
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Article );
+        }
+
+        # cleanup all not needed <KIX_FIRST_ tags
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
     }
-
-    # cleanup all not needed <KIX_FIRST_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/-/gi;
 
     # replace last article placeholders
     $Tag = $Self->{Start} . 'KIX_LAST_';
-    if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
-        my %Article = $Self->{TicketObject}->ArticleLastArticle(
-            TicketID => $Param{TicketID},
-        );
+    if ($Param{Text} =~ m/$Tag/) {
+        if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
+            my %Article = $Self->{TicketObject}->ArticleLastArticle(
+                TicketID => $Param{TicketID},
+            );
 
-        $Param{Text} = $Self->_ReplaceArticlePlaceholders(
-            %Param,
-            Tag     => $Tag,
-            Article => \%Article
-        );
+            $Param{Text} = $Self->_ReplaceArticlePlaceholders(
+                %Param,
+                Tag     => $Tag,
+                Article => \%Article
+            );
 
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Article );
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Article );
+        }
+
+        # cleanup all not needed <KIX_LAST_ tags
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
-
-    # cleanup all not needed <KIX_LAST_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # place last agent article placeholders
     $Tag = $Self->{Start} . 'KIX_AGENT_';
-    if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
-        my @ArticleIDs = $Self->{TicketObject}->ArticleIndex(
-            SenderType => 'agent',
-            TicketID   => $Param{TicketID}
-        );
-        my %Article = @ArticleIDs ? $Self->{TicketObject}->ArticleGet(
-            ArticleID     => $ArticleIDs[-1]
-        ) : ();
+    if ($Param{Text} =~ m/$Tag/) {
+        if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
+            my @ArticleIDs = $Self->{TicketObject}->ArticleIndex(
+                SenderType => 'agent',
+                TicketID   => $Param{TicketID}
+            );
+            my %Article = @ArticleIDs ? $Self->{TicketObject}->ArticleGet(
+                ArticleID     => $ArticleIDs[-1]
+            ) : ();
 
-        $Param{Text} = $Self->_ReplaceArticlePlaceholders(
-            %Param,
-            Tag     => $Tag,
-            Article => \%Article
-        );
+            $Param{Text} = $Self->_ReplaceArticlePlaceholders(
+                %Param,
+                Tag     => $Tag,
+                Article => \%Article
+            );
+        }
+
+        # cleanup all not needed <KIX_AGENT_ tags
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
-
-    # cleanup all not needed <KIX_AGENT_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     # replace last external article placeholders
     $Tag = $Self->{Start} . 'KIX_CUSTOMER_';
-    if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
-        my @ArticleIDs = $Self->{TicketObject}->ArticleIndex(
-            SenderType      => 'external',
-            CustomerVisible => 1,
-            TicketID        => $Param{TicketID}
-        );
-        my %Article = @ArticleIDs ? $Self->{TicketObject}->ArticleGet(
-            ArticleID     => $ArticleIDs[-1]
-        ) : ();
+    if ($Param{Text} =~ m/$Tag/) {
+        if ( $Param{TicketID} && $Param{Text} =~ /$Tag.+$Self->{End}/i ) {
+            my @ArticleIDs = $Self->{TicketObject}->ArticleIndex(
+                SenderType      => 'external',
+                CustomerVisible => 1,
+                TicketID        => $Param{TicketID}
+            );
+            my %Article = @ArticleIDs ? $Self->{TicketObject}->ArticleGet(
+                ArticleID     => $ArticleIDs[-1]
+            ) : ();
 
-        $Param{Text} = $Self->_ReplaceArticlePlaceholders(
-            %Param,
-            Tag     => $Tag,
-            Article => \%Article
-        );
+            $Param{Text} = $Self->_ReplaceArticlePlaceholders(
+                %Param,
+                Tag     => $Tag,
+                Article => \%Article
+            );
+        }
+
+        # cleanup all not needed <KIX_CUSTOMER_ tags
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
-
-    # cleanup all not needed <KIX_CUSTOMER_ tags
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     return $Param{Text};
 }
@@ -284,7 +295,7 @@ sub _GetBodyRichtext {
 
         if ($BodyRichtext && scalar @InlineAttachments) {
             for my $Attachment ( @InlineAttachments ) {
-                my $Content = MIME::Base64::encode_base64( $Attachment->{Content} );
+                my $Content = MIME::Base64::encode_base64( $Attachment->{Content}, '' );
 
                 my $ContentType = $Attachment->{ContentType};
                 $ContentType =~ s/"/\'/g;

@@ -15,10 +15,7 @@ use utf8;
 use vars qw($Self);
 
 # get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Config');
-my $UserObject         = $Kernel::OM->Get('User');
-my $ImportExportObject = $Kernel::OM->Get('ImportExport');
-my $Helper             = $Kernel::OM->Get('UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # ------------------------------------------------------------ #
 # make preparations
@@ -30,7 +27,7 @@ my @UserIDs;
     for my $Counter ( 1 .. 2 ) {
 
         # create new users for the tests
-        my $UserID = $UserObject->UserAdd(
+        my $UserID = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => 'UnitTest-ImportExport-' . $Counter . $Helper->GetRandomID(),
             ValidID      => 1,
             ChangeUserID => 1,
@@ -58,12 +55,12 @@ push @ObjectName, 'UnitTest' . $Helper->GetRandomID();
 my @FormatName = ('CSV');
 
 # get original template list for later checks (all elements)
-my $TemplateList1All = $ImportExportObject->TemplateList(
+my $TemplateList1All = $Kernel::OM->Get('ImportExport')->TemplateList(
     UserID => 1,
 );
 
 # get original template list for later checks (all elements)
-my $TemplateList1Object = $ImportExportObject->TemplateList(
+my $TemplateList1Object = $Kernel::OM->Get('ImportExport')->TemplateList(
     Object => $ObjectName[0],
     UserID => 1,
 );
@@ -81,6 +78,7 @@ my $ItemData = [
             Name    => $TemplateName[0],
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
 
@@ -91,6 +89,7 @@ my $ItemData = [
             Name    => $TemplateName[0],
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
 
@@ -101,6 +100,7 @@ my $ItemData = [
             Format  => $FormatName[0],
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
 
@@ -111,6 +111,7 @@ my $ItemData = [
             Format => $FormatName[0],
             Name   => $TemplateName[0],
             UserID => 1,
+            Silent  => 1,
         },
     },
 
@@ -121,6 +122,7 @@ my $ItemData = [
             Format  => $FormatName[0],
             Name    => $TemplateName[0],
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -152,6 +154,7 @@ my $ItemData = [
             Name    => $TemplateName[0],
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
 
@@ -181,6 +184,7 @@ my $ItemData = [
         Update => {
             ValidID => 2,
             UserID  => $UserIDs[0],
+            Silent  => 1,
         },
     },
 
@@ -189,6 +193,7 @@ my $ItemData = [
         Update => {
             Name   => $TemplateName[1] . 'UPDATE1',
             UserID => $UserIDs[0],
+            Silent => 1,
         },
     },
 
@@ -197,6 +202,7 @@ my $ItemData = [
         Update => {
             Name    => $TemplateName[1] . 'UPDATE2',
             ValidID => 2,
+            Silent  => 1,
         },
     },
 
@@ -307,7 +313,9 @@ for my $Item ( @{$ItemData} ) {
     if ( $Item->{Add} ) {
 
         # add new template
-        my $TemplateID = $ImportExportObject->TemplateAdd( %{ $Item->{Add} } );
+        my $TemplateID = $Kernel::OM->Get('ImportExport')->TemplateAdd(
+            %{ $Item->{Add} },
+        );
 
         if ($TemplateID) {
             push @AddedTemplateIDs, $TemplateID;
@@ -328,7 +336,7 @@ for my $Item ( @{$ItemData} ) {
     if ( $Item->{AddGet} ) {
 
         # get template data to check the values after template was added
-        my $TemplateGet = $ImportExportObject->TemplateGet(
+        my $TemplateGet = $Kernel::OM->Get('ImportExport')->TemplateGet(
             TemplateID => $AddedTemplateIDs[-1],
             UserID     => $Item->{Add}->{UserID} || 1,
         );
@@ -355,7 +363,7 @@ for my $Item ( @{$ItemData} ) {
         }
 
         # update the template
-        my $UpdateSucess = $ImportExportObject->TemplateUpdate(
+        my $UpdateSucess = $Kernel::OM->Get('ImportExport')->TemplateUpdate(
             %{ $Item->{Update} },
             TemplateID => $AddedTemplateIDs[-1],
         );
@@ -378,7 +386,7 @@ for my $Item ( @{$ItemData} ) {
     if ( $Item->{UpdateGet} ) {
 
         # get template data to check the values after the update
-        my $TemplateGet = $ImportExportObject->TemplateGet(
+        my $TemplateGet = $Kernel::OM->Get('ImportExport')->TemplateGet(
             TemplateID => $AddedTemplateIDs[-1],
             UserID     => $Item->{Update}->{UserID} || 1,
         );
@@ -428,7 +436,7 @@ $TestCount++;
 # ------------------------------------------------------------ #
 
 # get template list with all elements
-my $TemplateList2 = $ImportExportObject->TemplateList(
+my $TemplateList2 = $Kernel::OM->Get('ImportExport')->TemplateList(
     UserID => 1,
 );
 
@@ -453,13 +461,13 @@ $TestCount++;
 # ------------------------------------------------------------ #
 
 # get template list with all elements
-my $TemplateDelete1List1 = $ImportExportObject->TemplateList(
+my $TemplateDelete1List1 = $Kernel::OM->Get('ImportExport')->TemplateList(
     Object => $ObjectName[0],
     UserID => 1,
 );
 
 # add a test template
-my $TemplateDeleteID = $ImportExportObject->TemplateAdd(
+my $TemplateDeleteID = $Kernel::OM->Get('ImportExport')->TemplateAdd(
     Object  => $ObjectName[0],
     Format  => $FormatName[0],
     Name    => $TemplateName[4],
@@ -468,7 +476,7 @@ my $TemplateDeleteID = $ImportExportObject->TemplateAdd(
 );
 
 # get template list with all elements
-my $TemplateDelete1List2 = $ImportExportObject->TemplateList(
+my $TemplateDelete1List2 = $Kernel::OM->Get('ImportExport')->TemplateList(
     Object => $ObjectName[0],
     UserID => 1,
 );
@@ -480,7 +488,7 @@ $Self->True(
 );
 
 # delete the new template
-my $TemplateDelete1 = $ImportExportObject->TemplateDelete(
+my $TemplateDelete1 = $Kernel::OM->Get('ImportExport')->TemplateDelete(
     TemplateID => $TemplateDeleteID,
     UserID     => 1,
 );
@@ -492,7 +500,7 @@ $Self->True(
 );
 
 # get template list with all elements
-my $TemplateDelete1List3 = $ImportExportObject->TemplateList(
+my $TemplateDelete1List3 = $Kernel::OM->Get('ImportExport')->TemplateList(
     Object => $ObjectName[0],
     UserID => 1,
 );
@@ -512,7 +520,7 @@ $TestCount++;
 for my $TemplateID (@AddedTemplateIDs) {
 
     # delete the template
-    my $Success = $ImportExportObject->TemplateDelete(
+    my $Success = $Kernel::OM->Get('ImportExport')->TemplateDelete(
         TemplateID => $TemplateID,
         UserID     => 1,
     );
@@ -543,17 +551,16 @@ my $ObjectList1TestList = {
 };
 
 # get original object list
-my $ObjectListOrg =
-    $ConfigObject->Get('ImportExport::ObjectBackendRegistration');
+my $ObjectListOrg = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
 
 # set test list
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ImportExport::ObjectBackendRegistration',
     Value => $ObjectList1TestList,
 );
 
 # get object list
-my $ObjectList1 = $ImportExportObject->ObjectList();
+my $ObjectList1 = $Kernel::OM->Get('ImportExport')->ObjectList();
 
 # list must be a hash reference
 $Self->True(
@@ -580,7 +587,7 @@ $Self->True(
 );
 
 # restore original object list
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ImportExport::ObjectBackendRegistration',
     Value => $ObjectListOrg,
 );
@@ -605,16 +612,16 @@ my $FormatList1TestList = {
 
 # get original format list
 my $FormatListOrg =
-    $ConfigObject->Get('ImportExport::FormatBackendRegistration');
+    $Kernel::OM->Get('Config')->Get('ImportExport::FormatBackendRegistration');
 
 # set test list
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ImportExport::FormatBackendRegistration',
     Value => $FormatList1TestList,
 );
 
 # get format list
-my $FormatList1 = $ImportExportObject->FormatList();
+my $FormatList1 = $Kernel::OM->Get('ImportExport')->FormatList();
 
 # list must be a hash reference
 $Self->True(
@@ -641,7 +648,7 @@ $Self->True(
 );
 
 # restore original format list
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ImportExport::FormatBackendRegistration',
     Value => $FormatListOrg,
 );

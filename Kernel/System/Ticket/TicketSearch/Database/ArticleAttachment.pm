@@ -85,17 +85,19 @@ sub Search {
         return;
     }
 
+    my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
+    if ( $StorageModule !~ /::ArticleStorageDB$/ ) {
+        # we can only search article attachments if they are stored in the DB
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "Attachments cannot be searched if articles are not stored in the database!",
+        );
+
+        return;
+    }
+
     # check if we have to add a join
     if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
-        my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
-        if ( $StorageModule !~ /::StorageDB$/ ) {
-            # we can only search article attachments if they are stored in the DB
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Attachments cannot be searched if articles are not stored in the database!",
-            );
-            return;
-        }
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN article art_for_att_left ON st.id = art_for_att_left.ticket_id' );
             push( @SQLJoin, 'RIGHT OUTER JOIN article art_for_att_right ON st.id = art_for_att_right.ticket_id' );
@@ -153,10 +155,10 @@ sub Search {
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'art_for_att_left.customer_visible = 1)' );
-            push( @SQLWhere, 'art_for_att_right.customer_visible = 1)' );
+            push( @SQLWhere, 'art_for_att_left.customer_visible = 1' );
+            push( @SQLWhere, 'art_for_att_right.customer_visible = 1' );
         } else {
-            push( @SQLWhere, 'art_for_att.customer_visible = 1)' );
+            push( @SQLWhere, 'art_for_att.customer_visible = 1' );
         }
     }
 

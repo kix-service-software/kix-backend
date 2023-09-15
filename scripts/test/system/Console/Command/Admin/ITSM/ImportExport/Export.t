@@ -21,12 +21,16 @@ my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # test command without --template-number option
 my $ExitCode = $CommandObject->Execute();
@@ -216,7 +220,8 @@ $Self->True(
     "Test directory deleted - $DestinationPath",
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

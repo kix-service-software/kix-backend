@@ -50,7 +50,7 @@ sub Run {
     for (@Tickets) {
         my @Row = @{$_};
         $Self->Print(" Unlocking ticket id $Row[0]... ");
-        my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
+        my $Unlock = $Kernel::OM->Get('Ticket')->TicketLockSet(
             TicketID => $Row[1],
             Lock     => 'unlock',
             UserID   => 1,

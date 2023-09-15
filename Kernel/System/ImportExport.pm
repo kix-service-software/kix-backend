@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -17,10 +17,15 @@ use MIME::Base64;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
+    'ClientRegistration',
+    'Cache',
     'Config',
     'CheckItem',
     'DB',
     'Log',
+    'Time',
+    'Encode',
+    'Daemon::SchedulerDB',
 );
 
 =head1 NAME
@@ -104,7 +109,7 @@ sub TemplateList {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
-    $DBObject->Prepare(
+    return if !$DBObject->Prepare(
         SQL  => $SQL,
         Bind => \@BIND,
     );
@@ -169,7 +174,7 @@ sub TemplateGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
-    $DBObject->Prepare(
+    return if !$DBObject->Prepare(
         SQL => 'SELECT id, imexport_object, imexport_format, name, valid_id, comments, '
             . 'create_time, create_by, change_time, change_by FROM imexport_template WHERE id = ?',
         Bind  => [ \$Param{TemplateID} ],
@@ -228,10 +233,12 @@ sub TemplateAdd {
     # check needed stuff
     for my $Argument (qw(Object Format Name ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $LogObject->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -277,11 +284,13 @@ sub TemplateAdd {
 
     # abort insert of new template, if template name already exists
     if ($NoAdd) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message =>
-                "Can't add new template! Template with same name already exists in this object.",
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message =>
+                    "Can't add new template! Template with same name already exists in this object.",
+            );
+        }
         return;
     }
 
@@ -348,10 +357,12 @@ sub TemplateUpdate {
     # check needed stuff
     for my $Argument (qw(TemplateID Name ValidID UserID)) {
         if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $LogObject->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -385,10 +396,12 @@ sub TemplateUpdate {
     }
 
     if ( !$Object ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Can't update template because it hasn't been found!",
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Can't update template because it hasn't been found!",
+            );
+        }
         return;
     }
 
@@ -408,11 +421,12 @@ sub TemplateUpdate {
     }
 
     if ( !$Update ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message =>
-                "Can't update template! Template with same name already exists in this object.",
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Can't update template! Template with same name already exists in this object.",
+            );
+        }
         return;
     }
 
@@ -578,66 +592,6 @@ sub ObjectList {
     }
 
     return $ObjectList;
-}
-
-=item ObjectAttributesGet()
-
-get the attributes of an object backend as array/hash reference
-
-    my $Attributes = $ImportExportObject->ObjectAttributesGet(
-        TemplateID => 123,
-        UserID     => 1,
-    );
-
-=cut
-
-sub ObjectAttributesGet {
-    my ( $Self, %Param ) = @_;
-
-    # get log object
-    my $LogObject = $Kernel::OM->Get('Log');
-
-    # check needed stuff
-    for my $Argument (qw(TemplateID UserID)) {
-        if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-            return;
-        }
-    }
-
-    # get template data
-    my $TemplateData = $Self->TemplateGet(
-        TemplateID => $Param{TemplateID},
-        UserID     => $Param{UserID},
-    );
-
-    # check template data
-    if ( !$TemplateData || !$TemplateData->{Object} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Template with ID $Param{TemplateID} is incomplete!",
-        );
-        return;
-    }
-
-    my $ModuleList = $Kernel::OM->Get('Config')->Get('ImportExport::ObjectBackendRegistration');
-
-    # load backend
-    my $Backend = $Kernel::OM->Get(
-        $ModuleList->{$TemplateData->{Object}}->{Module}
-    );
-
-    return if !$Backend;
-
-    # get an attribute list of the object
-    my $Attributes = $Backend->ObjectAttributesGet(
-        UserID => $Param{UserID},
-    );
-
-    return $Attributes;
 }
 
 =item ObjectDataGet()
@@ -851,10 +805,12 @@ sub FormatAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $LogObject->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -867,10 +823,12 @@ sub FormatAttributesGet {
 
     # check template data
     if ( !$TemplateData || !$TemplateData->{Format} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Template with ID $Param{TemplateID} is incomplete!",
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Template with ID $Param{TemplateID} is incomplete!",
+            );
+        }
         return;
     }
 
@@ -920,7 +878,7 @@ sub FormatDataGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
-    $DBObject->Prepare(
+    return if !$DBObject->Prepare(
         SQL  => 'SELECT data_key, data_value FROM imexport_format WHERE template_id = ?',
         Bind => [ \$Param{TemplateID} ],
     );
@@ -986,7 +944,7 @@ sub FormatDataSave {
         next DATAKEY if !defined $DataValue;
 
         # insert one row
-        $Kernel::OM->Get('DB')->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'INSERT INTO imexport_format '
                 . '(template_id, data_key, data_value) VALUES (?, ?, ?)',
             Bind => [ \$Param{TemplateID}, \$DataKey, \$DataValue ],
@@ -1127,7 +1085,7 @@ sub MappingAdd {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # find maximum position
-    $DBObject->Prepare(
+    return if !$DBObject->Prepare(
         SQL   => 'SELECT max(position) FROM imexport_mapping WHERE template_id = ?',
         Bind  => [ \$Param{TemplateID} ],
         Limit => 1,
@@ -1216,7 +1174,7 @@ sub MappingDelete {
         );
 
         # delete one mapping row
-        $DBObject->Do(
+        return if !$DBObject->Do(
             SQL  => 'DELETE FROM imexport_mapping WHERE id = ?',
             Bind => [ \$Param{MappingID} ],
         );
@@ -1298,7 +1256,7 @@ sub MappingUp {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # ask database
-    $DBObject->Prepare(
+    return if !$DBObject->Prepare(
         SQL  => 'SELECT position FROM imexport_mapping WHERE id = ?',
         Bind => [ \$Param{MappingID} ],
     );
@@ -1454,6 +1412,8 @@ sub MappingObjectAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
+            return if $Param{Silent};
+
             $LogObject->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
@@ -1466,10 +1426,13 @@ sub MappingObjectAttributesGet {
     my $TemplateData = $Self->TemplateGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
+        Silent     => $Param{Silent}
     );
 
     # check template data
     if ( !$TemplateData || !$TemplateData->{Object} ) {
+        return if $Param{Silent};
+
         $LogObject->Log(
             Priority => 'error',
             Message  => "Template with ID $Param{TemplateID} is incomplete!",
@@ -1490,6 +1453,7 @@ sub MappingObjectAttributesGet {
     my $Attributes = $Backend->MappingObjectAttributesGet(
         TemplateID => $Param{TemplateID},
         UserID     => $Param{UserID},
+        Silent     => $Param{Silent}
     );
 
     return $Attributes;
@@ -1679,10 +1643,12 @@ sub MappingFormatAttributesGet {
     # check needed stuff
     for my $Argument (qw(TemplateID UserID)) {
         if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $LogObject->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -1695,10 +1661,12 @@ sub MappingFormatAttributesGet {
 
     # check template data
     if ( !$TemplateData || !$TemplateData->{Format} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Template with ID $Param{TemplateID} is incomplete!",
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => "Template with ID $Param{TemplateID} is incomplete!",
+            );
+        }
         return;
     }
 

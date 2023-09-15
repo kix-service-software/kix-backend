@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,12 +15,8 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+$Helper->BeginWork();
 
 # get needed objects
 my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
@@ -32,15 +28,15 @@ my $RandomID = $Helper->GetRandomNumber();
 
 # create a ticket
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'new',
-    CustomerID   => '123465',
-    Contact => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    Title          => 'Some Ticket Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
+    OrganisationID => '123465',
+    Contact        => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 
 # sanity check
@@ -96,7 +92,7 @@ $Self->True(
 
 $Self->Is(
     ref $BackendObject,
-    'DynamicField::Backend',
+    'Kernel::System::DynamicField::Backend',
     'Backend object was created successfuly',
 );
 
@@ -121,6 +117,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
     {
         Name               => 'No ObjectID',
@@ -132,6 +129,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
     {
         Name               => 'Invalid DynamicFieldConfig',
@@ -140,6 +138,7 @@ my @Tests = (
         UserID             => 1,
         Success            => 0,
         ShouldGet          => 0,
+        Silent             => 1
     },
     {
         Name               => 'No ID',
@@ -151,6 +150,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
     {
         Name               => 'No UserID',
@@ -163,6 +163,7 @@ my @Tests = (
         ObjectID  => $TicketID,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
     {
         Name               => 'Non Existing Backend',
@@ -177,38 +178,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
-    },
-
-    {
-        Name               => 'Dropdown - No PossibleValues',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Dropdown',
-        },
-        ObjectID  => $TicketID,
-        Value     => 'a text',
-        UserID    => 1,
-        Success   => 0,
-        ShouldGet => 0,
-    },
-    {
-        Name               => 'Dropdown - Invalid PossibleValues',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Dropdown',
-            Config     => {
-                PossibleValues => '',
-                }
-        },
-        ObjectID  => $TicketID,
-        Value     => 'a text',
-        UserID    => 1,
-        Success   => 0,
-        ShouldGet => 0,
+        Silent    => 1
     },
 
     {
@@ -224,6 +194,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
     {
         Name               => 'Multiselect - Invalid PossibleValues',
@@ -233,14 +204,15 @@ my @Tests = (
             ObjectType => 'Ticket',
             FieldType  => 'Multiselect',
             Config     => {
-                PossibleValues => '',
-                }
+                PossibleValues => q{},
+            }
         },
         ObjectID  => $TicketID,
         Value     => 'a text',
         UserID    => 1,
         Success   => 0,
         ShouldGet => 0,
+        Silent    => 1
     },
 
     {
@@ -252,7 +224,7 @@ my @Tests = (
             FieldType  => 'Text',
         },
         ObjectID  => $TicketID,
-        Value     => 'a text',
+        Value     => ['a text'],
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -266,7 +238,7 @@ my @Tests = (
             FieldType  => 'Text',
         },
         ObjectID  => $TicketID,
-        Value     => '',
+        Value     => q{},
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -280,7 +252,7 @@ my @Tests = (
             FieldType  => 'Text',
         },
         ObjectID  => $TicketID,
-        Value     => 'äöüßÄÖÜ€ис',
+        Value     => ['äöüßÄÖÜ€ис'],
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -294,7 +266,7 @@ my @Tests = (
             FieldType  => 'TextArea',
         },
         ObjectID  => $TicketID,
-        Value     => 'a text',
+        Value     => ['a text'],
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -308,7 +280,7 @@ my @Tests = (
             FieldType  => 'TextArea',
         },
         ObjectID  => $TicketID,
-        Value     => '',
+        Value     => q{},
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -322,7 +294,7 @@ my @Tests = (
             FieldType  => 'TextArea',
         },
         ObjectID  => $TicketID,
-        Value     => 'äöüßÄÖÜ€ис',
+        Value     => ['äöüßÄÖÜ€ис'],
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -336,51 +308,7 @@ my @Tests = (
             FieldType  => 'DateTime',
         },
         ObjectID  => $TicketID,
-        Value     => '2011-01-01 01:01:01',
-        UserID    => 1,
-        Success   => 1,
-        ShouldGet => 1,
-    },
-
-    # options validation are now just on the frontend then this test should be successful
-    {
-        Name               => 'Dropdown - Invalid Option',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Dropdown',
-            Config     => {
-                PossibleValues => {
-                    Key1 => 'Value1',
-                    Key2 => 'Value2',
-                    Key3 => 'Value3',
-                },
-            },
-        },
-        ObjectID  => $TicketID,
-        Value     => 'Key4',
-        UserID    => 1,
-        Success   => 1,
-        ShouldGet => 1,
-    },
-    {
-        Name               => 'Dropdown - Invalid Option',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Dropdown',
-            Config     => {
-                PossibleValues => {
-                    Key1 => 'Value1',
-                    Key2 => 'Value2',
-                    Key3 => 'Value3',
-                },
-            },
-        },
-        ObjectID  => $TicketID,
-        Value     => 'Key3',
+        Value     => ['2011-01-01 01:01:01'],
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
@@ -407,11 +335,12 @@ my @Tests = (
             'Key4'
         ],
         UserID    => 1,
-        Success   => 1,
+        Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
-        Name               => 'Multiselect - Invalid Option',
+        Name               => 'Multiselect - Valid Option',
         DynamicFieldConfig => {
             ID         => $FieldID,
             Name       => "dynamicfieldtest$RandomID",
@@ -432,6 +361,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
+        Silent    => 0
     },
     {
         Name               => 'Multiselect - multiple values',
@@ -441,6 +371,7 @@ my @Tests = (
             ObjectType => 'Ticket',
             FieldType  => 'Multiselect',
             Config     => {
+                CountMax       => 2,
                 PossibleValues => {
                     Key1 => 'Value1',
                     Key2 => 'Value2',
@@ -458,91 +389,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
-    },
-
-    {
-        Name               => 'Checkbox - Invalid Option (Negative)',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => -1,
-        UserID    => 1,
-        Success   => 0,
-        ShouldGet => 0,
-    },
-    {
-        Name               => 'Checkbox - Invalid Option (Letter)',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => 'a',
-        UserID    => 1,
-        Success   => 0,
-        ShouldGet => 0,
-    },
-    {
-        Name               => 'Checkbox - Invalid Option (Non Binary)',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => 5,
-        UserID    => 1,
-        Success   => 0,
-        ShouldGet => 0,
-    },
-    {
-        Name               => 'Set Checkbox Value (1) ',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => 1,
-        UserID    => 1,
-        Success   => 1,
-        ShouldGet => 1,
-    },
-    {
-        Name               => 'Set Checkbox Value (0) ',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => 0,
-        UserID    => 1,
-        Success   => 1,
-        ShouldGet => 1,
-    },
-    {
-        Name               => 'Set Checkbox Value (Null) ',
-        DynamicFieldConfig => {
-            ID         => $FieldID,
-            Name       => "dynamicfieldtest$RandomID",
-            ObjectType => 'Ticket',
-            FieldType  => 'Checkbox',
-        },
-        ObjectID  => $TicketID,
-        Value     => undef,
-        UserID    => 1,
-        Success   => 1,
-        ShouldGet => 1,
+        Silent    => 0
     },
     {
         Name               => 'Set DateTime Value - invalid date',
@@ -557,6 +404,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set DateTime Value - wrong data',
@@ -571,6 +419,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set DateTime Value - no data',
@@ -585,6 +434,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set Date Value - invalid date',
@@ -599,6 +449,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set Date Value - invalid time',
@@ -613,6 +464,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set Date Value - wrong data',
@@ -627,6 +479,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 0,
         ShouldGet => 1,
+        Silent    => 1
     },
     {
         Name               => 'Set Date Value - no data',
@@ -641,6 +494,7 @@ my @Tests = (
         UserID    => 1,
         Success   => 1,
         ShouldGet => 1,
+        Silent    => 1
     },
 
 );
@@ -652,6 +506,7 @@ for my $Test (@Tests) {
         ObjectID           => $Test->{ObjectID},
         Value              => $Test->{Value},
         UserID             => $Test->{UserID},
+        Silent             => $Test->{Silent} || 0
     );
 
     if ( !$Test->{Success} ) {
@@ -664,11 +519,24 @@ for my $Test (@Tests) {
         my $Value = $BackendObject->ValueGet(
             DynamicFieldConfig => $Test->{DynamicFieldConfig},
             ObjectID           => $Test->{ObjectID},
+            Silent             => $Test->{Silent} || 0
         );
 
         # fix Value if it's an array ref
-        if ( defined $Value && ref $Value eq 'ARRAY' ) {
-            $Value = join ',', @{$Value};
+        if (
+            defined $Value
+            && ref $Value eq 'ARRAY'
+        ) {
+            if (
+                IsArrayRefWithData($Value)
+                && scalar @{$Value} == 1
+                && !$Value->[0]
+            ) {
+                $Value = q{};
+            }
+            else {
+                $Value = join( q{,} , @{$Value});
+            }
         }
 
         # compare data
@@ -687,7 +555,6 @@ for my $Test (@Tests) {
                 "ValueGet() after unsuccessful ValueSet() - (Test $Test->{Name}) - Value undef",
             );
         }
-
     }
     else {
         $Self->True(
@@ -699,11 +566,15 @@ for my $Test (@Tests) {
         my $Value = $BackendObject->ValueGet(
             DynamicFieldConfig => $Test->{DynamicFieldConfig},
             ObjectID           => $Test->{ObjectID},
+            Silent             => $Test->{Silent} || 0
         );
 
         # workaround for oracle
         # oracle databases can't determine the difference between NULL and ''
-        if ( !defined $Value || $Value eq '' ) {
+        if (
+            !defined $Value
+            || $Value eq q{}
+        ) {
 
             # test falseness
             $Self->False(
@@ -802,7 +673,7 @@ my %TicketValueDeleteData = $TicketObject->TicketGet(
 );
 
 $Self->Is(
-    $TicketValueDeleteData{ 'DynamicField_' . $DynamicFieldName },
+    $TicketValueDeleteData{ 'DynamicField_' . $DynamicFieldName }->[0],
     $Value,
     "Should have value '$Value' set.",
 );
@@ -837,7 +708,7 @@ my $ReturnValue1 = $BackendObject->ValueGet(
 );
 
 $Self->Is(
-    $ReturnValue1,
+    $ReturnValue1->[0],
     $Value,
     'TicketDelete() DF value correctly set',
 );
@@ -877,11 +748,10 @@ $Self->True(
     "AllValuesDelete() successful for Field ID $FieldID",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

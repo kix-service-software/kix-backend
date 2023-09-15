@@ -9,6 +9,7 @@
     Given a mailaccount
     When I query the collection of mailaccounts 
     Then the response code is 200
+#    Then the response object is MailAccountCollectionResponse
     When I delete this mailaccount
     Then the response code is 204
     And the response has no content

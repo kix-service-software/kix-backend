@@ -8,6 +8,7 @@
   Scenario: get the list of existing notifications
     When I query the collection of notifications
     Then the response code is 200
+    Then the response object is NotificationCollectionResponse
 
   Scenario: get the list of existing notifications filtered
     When I query the collection of notifications with filter of "Responsible Assignment"
@@ -31,10 +32,11 @@
   Scenario: get the list of existing notifications with sorted
     When I query the collection of notifications sorted by "Notification.-Name:textual"
     Then the response code is 200
-    And the response contains 11 items of type "Notification"
+    And the response contains 12 items of type "Notification"
     And the response contains the following items of type Notification
       | Name                                     |
       | Customer - New Ticket Receipt            |
+      | Customer - Follow Up Rejection           |
       | Agent - Ticket Move Notification         |
       | Agent - Responsible Assignment           |
       | Agent - Reminder (if unlocked)           |
@@ -53,11 +55,11 @@
     And the response contains the following items of type Notification
       | Name                             |
       | Customer - New Ticket Receipt    |
+      | Customer - Follow Up Rejection   |
       | Agent - Ticket Move Notification |
       | Agent - Responsible Assignment   |
-      | Agent - Reminder (if unlocked)   |
 
   Scenario: get the list of existing notifications with offset
     When I query the collection of notifications with offset of 4
     Then the response code is 200
-    And the response contains 7 items of type "Notification"
+    And the response contains 8 items of type "Notification"

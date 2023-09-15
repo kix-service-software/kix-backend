@@ -14,18 +14,11 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $UserObject   = $Kernel::OM->Get('User');
-my $TicketObject = $Kernel::OM->Get('Ticket');
-my $TimeObject   = $Kernel::OM->Get('Time');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 $Kernel::OM->Get('Config')->Set(
     Key   => 'Ticket::UnlockOnAway',
@@ -33,28 +26,41 @@ $Kernel::OM->Get('Config')->Set(
 );
 
 my $TestUserLogin = $Helper->TestUserCreate(
-    Groups => [ 'users', ],
+    Roles => [ 'Ticket Agent' ],
 );
 
-my $TestUserID = $UserObject->UserLookup(
+my $TestUserID = $Kernel::OM->Get('User')->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
-my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'lock',
-    Priority     => '3 normal',
-    State        => 'closed',
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'lock',
+    Priority       => '3 normal',
+    State          => 'open',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => $TestUserID,
-    UserID       => 1,
+    ContactID      => 'customer@example.com',
+    OwnerID        => $TestUserID,
+    UserID         => 1,
+);
+$Self->True(
+    $TicketID,
+    'Could create ticket'
 );
 
-$Self->True( $TicketID, 'Could create ticket' );
+my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+    TicketID => $TicketID,
+    UserID   => 1
+);
 
-$TicketObject->ArticleCreate(
+$Self->Is(
+    $Ticket{Lock},
+    'lock',
+    'Ticket is locked',
+);
+
+my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID       => $TicketID,
     Channel        => 'note',
     SenderType     => 'agent',
@@ -67,7 +73,12 @@ $TicketObject->ArticleCreate(
     NoAgentNotify  => 1,
     UnlockOnAway   => 1,
 );
-my %Ticket = $TicketObject->TicketGet(
+$Self->True(
+    $ArticleID,
+    'Could create article'
+);
+
+%Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
     TicketID => $TicketID,
     UserID   => 1
 );
@@ -77,14 +88,14 @@ $Self->Is(
     'lock',
     'Ticket still locked (UnlockOnAway)',
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOffice',
     Value  => 1,
 );
 
-my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-    SystemTime => $TimeObject->SystemTime(),
+my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+    SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
 );
 
 # Special case for leap years. There is no Feb 29 in the next and previous years in this case.
@@ -92,38 +103,38 @@ if ( $Month == 2 && $Day == 29 ) {
     $Day--;
 }
 
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeStartYear',
     Value  => $Year - 1,
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeEndYear',
     Value  => $Year + 1,
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeStartMonth',
     Value  => $Month,
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeEndMonth',
     Value  => $Month,
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeStartDay',
     Value  => $Day,
 );
-$UserObject->SetPreferences(
+$Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
     Key    => 'OutOfOfficeEndDay',
     Value  => $Day,
 );
 
-$TicketObject->ArticleCreate(
+$Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID       => $TicketID,
     Channel        => 'note',
     SenderType     => 'agent',
@@ -136,7 +147,7 @@ $TicketObject->ArticleCreate(
     NoAgentNotify  => 1,
     UnlockOnAway   => 1,
 );
-%Ticket = $TicketObject->TicketGet(
+%Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
     TicketID => $TicketID,
     UserID   => 1
 );
@@ -147,7 +158,8 @@ $Self->Is(
     'Ticket now unlocked (UnlockOnAway)',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

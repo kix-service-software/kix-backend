@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package scripts::test::sample::DynamicField::Driver::DummyText;
+package scripts::test::system::sample::DynamicField::Driver::DummyText;
 
 use strict;
 use warnings;

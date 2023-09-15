@@ -158,11 +158,12 @@ sub Run {
     # create version
     if ( IsHashRefWithData($ConfigItem->{Version}) ) {
         my $Result = $Self->ExecOperation(
-            OperationType => 'V1::CMDB::ConfigItemVersionCreate',
-            Data          => {
+            OperationType           => 'V1::CMDB::ConfigItemVersionCreate',
+            IgnoreParentPermissions => 1,
+            Data                    => {
                 ConfigItemID           => $ConfigItemID,
                 ConfigItemVersion      => $ConfigItem->{Version},
-                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+                RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}                
             }
         );
         if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
