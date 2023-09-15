@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-6-28 09:47+0000\n"
+"POT-Creation-Date: 2023-9-15 07:22+0000\n"
 "PO-Revision-Date: 2023-06-13 09:20+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -239,6 +239,10 @@ msgstr ""
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
 msgstr "Abgelaufen"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "FAQ Admin"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Editor"
@@ -586,6 +590,10 @@ msgstr "Test/QS"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "TextArea"
 msgstr "Texteingabe"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Textmodule Admin"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "The import is running."
@@ -967,30 +975,6 @@ msgstr "Di"
 #. Perl Module: Kernel/Language.pm
 msgid "Wed"
 msgstr "Mi"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "d"
-msgstr "d"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "day(s)"
-msgstr "Tag(e)"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "h"
-msgstr "h"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "hour(s)"
-msgstr "Stunde(n)"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "m"
-msgstr "m"
-
-#. Perl Module: Kernel/Output/HTML/Layout.pm
-msgid "minute(s)"
-msgstr "Minute(n)"
 
 #. Perl Module: Kernel/Output/PDF/Statistics.pm
 msgid "No matches found."
@@ -1747,33 +1731,9 @@ msgstr "Setzt den Typ eines Tickets."
 msgid "The name of the type to be set."
 msgstr "Der Name des Typs, der gesetzt wird."
 
-#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
-msgid "Configuration Options Reference"
-msgstr "Verweis auf Konfigurationsoptionen"
-
-#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
-msgid "Default value"
-msgstr "Vorgabewert"
-
-#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
-msgid "This setting can not be changed."
-msgstr "Diese Einstellung kann nicht geändert werden."
-
-#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
-msgid "This setting can not be deactivated."
-msgstr "Diese Einstellung kann nicht deaktiviert werden."
-
-#. Perl Module: Kernel/System/Console/Command/Dev/Tools/Config2Docbook.pm
-msgid "This setting is not active by default."
-msgstr "Diese Einstellung ist als Vorgabe inaktiv."
-
 #. Perl Module: Kernel/System/DynamicField/Driver/Table.pm
 msgid "%s rows"
 msgstr "%s Zeilen"
-
-#. Perl Module: Kernel/System/FwdLinkedObjectData.pm
-msgid "Location Information"
-msgstr "Standortinformation"
 
 #. Perl Module: Kernel/System/ITSMConfigItem/History.pm
 msgid "CIHistory::"
@@ -2116,6 +2076,14 @@ msgid ""
 "permissions"
 msgstr ""
 
+#. Perl Module: update/build-1759.pl
+msgid "allows to create, edit, delete FAQ categories"
+msgstr ""
+
+#. Perl Module: update/build-1759.pl
+msgid "allows to create, edit, delete text modules"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
 msgstr "API-Modulregistrierung für die Operationsschicht."
@@ -2349,6 +2317,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "List of state types which can be used in the public interface."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/FAQ.xml
+msgid "Module registration for FAQ attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
@@ -2761,18 +2733,7 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines BCC-Mailaddress for ExternalSupplierForwarding-Submissions - useful "
-"for debugging, does not provide separate encryption forr bcc-receipient."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines CI-attributes for CI-Classes which are not forwarded."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines PGP-Keys for mail addresses which are not registered in the key."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2835,17 +2796,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Defines channel which are forwarded if added to tickets in Fwd-Queues (note-"
-"report will NOT be considered!)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines contact attributes which should not be shown in forwarded documents."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "Defines if CSV-mappings are re-created on next package reinstallation or "
 "upgrade if already existent."
 msgstr ""
@@ -2858,10 +2808,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines if the generated message should be visible for the customer."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines if the new FAQ-article is linked with the source ticket."
 msgstr ""
 
@@ -2870,18 +2816,6 @@ msgid ""
 "Defines if the previously valid token should be accepted for authentication. "
 "This is slightly less secure but gives users 30 seconds more time to enter "
 "their one-time password."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines mapping of KIX queues to be fax-forwarded and corresponding fax-"
-"numbers."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines mapping of KIX queues to be forwarded and corresponding email-"
-"addresses."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2939,16 +2873,6 @@ msgid ""
 "Defines the body text for notification mails sent to agents, with token "
 "about new requested password (after using this link the new password will be "
 "sent)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the channel for generated message."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the classes of linked object which are relevant to be forwarded "
-"(included)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3053,6 +2977,10 @@ msgid ""
 "Defines the fetchmail.rc to be used. The rc file will be generated in /tmp. "
 "The local mailbox user must be \"kix\". Use /usr/local/bin/procmail.sh as "
 "the MDA."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the filter that processes text in order to highlight URLs."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3883,6 +3811,14 @@ msgid "Maximum Number of a calendar shown in a dropdown."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Module registration for configuration placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Module registration for dynamic field attribute placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Module to decrypt PGP-encrypted mails before any other processing."
 msgstr ""
 
@@ -4159,6 +4095,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"Set minimum loglevel for the automation layer. If you select 'error', just "
+"errors are logged. With 'debug' you get all logging messages."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "Set minimum loglevel. If you select 'error', just errors are logged. With "
 "'debug' you get all logging messages."
 msgstr ""
@@ -4391,7 +4333,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"State types of follow up tickets which will be considered. If open/pending "
+"State types of follow up tickets which will be considered. If viewable "
 "tickets was selected and no one was found all tickets will be considered."
 msgstr ""
 
@@ -4609,10 +4551,6 @@ msgid "Weekly"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Workflowmodule which forwards the ticket (1st article) and related CIs."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "You have the possibility to be ask every time which print module you want to "
 "take or to fix the using of one special print module."
@@ -4809,6 +4747,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Incident State Type."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Module registration for notification config item placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -5577,23 +5519,19 @@ msgid "Module registration for article attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module registration for configuration placeholders."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for contact attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module registration for dynamic field attribute placeholders."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module registration for notification config item placeholders."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for notification recipient placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for organisation attribute placeholders."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Module registration for queue attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6109,6 +6047,58 @@ msgid "Building"
 msgstr "Gebäude"
 
 #. manual entry from templates.pot.manual
+msgid "CIHistory::AttachmentAdd"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::AttachmentDelete"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::ConfigItemCreate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::ConfigItemDelete"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::DefinitionUpdate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::DeploymentStateUpdate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::IncidentStateUpdate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::LinkAdd"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::LinkDelete"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::NameUpdate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::ValueUpdate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::VersionCreate"
+msgstr ""
+
+#. manual entry from templates.pot.manual
+msgid "CIHistory::VersionDelete"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Cannot create or update item, because it already exists."
 msgstr "Das Item kann nicht angelegt werden, da es bereits existiert."
 
@@ -6161,6 +6151,10 @@ msgstr "Land"
 #. manual entry from templates.pot.manual
 msgid "CreateTime"
 msgstr "Erstellzeit"
+
+#. manual entry from templates.pot.manual
+msgid "Customer No. / Type"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Dark mode"
@@ -6448,6 +6442,10 @@ msgid "ZIP"
 msgstr "PLZ"
 
 #. manual entry from templates.pot.manual
+msgid "ZIP, City, Country"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "accepted"
 msgstr "Entgegengenommen"
 
@@ -6510,6 +6508,42 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "d"
+#~ msgstr "d"
+
+#~ msgid "day(s)"
+#~ msgstr "Tag(e)"
+
+#~ msgid "h"
+#~ msgstr "h"
+
+#~ msgid "hour(s)"
+#~ msgstr "Stunde(n)"
+
+#~ msgid "m"
+#~ msgstr "m"
+
+#~ msgid "minute(s)"
+#~ msgstr "Minute(n)"
+
+#~ msgid "Configuration Options Reference"
+#~ msgstr "Verweis auf Konfigurationsoptionen"
+
+#~ msgid "Default value"
+#~ msgstr "Vorgabewert"
+
+#~ msgid "This setting can not be changed."
+#~ msgstr "Diese Einstellung kann nicht geändert werden."
+
+#~ msgid "This setting can not be deactivated."
+#~ msgstr "Diese Einstellung kann nicht deaktiviert werden."
+
+#~ msgid "This setting is not active by default."
+#~ msgstr "Diese Einstellung ist als Vorgabe inaktiv."
+
+#~ msgid "Location Information"
+#~ msgstr "Standortinformation"
 
 #~ msgid "DF Type not yet supported!"
 #~ msgstr "DF Typ nicht unterstützt!"
