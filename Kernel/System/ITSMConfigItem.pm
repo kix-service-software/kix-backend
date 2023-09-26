@@ -1545,13 +1545,13 @@ sub ConfigItemSearch {
         InciStateIDs  => 'cur_inci_state_id',
         CreateBy      => 'create_by',
         ChangeBy      => 'change_by',
-        ConfigItemIDs => 'id'
+        ConfigItemIDs => 'id',
     );
 
     ARRAYPARAM:
     for my $ArrayParam ( sort keys %ArrayParams ) {
 
-        next ARRAYPARAM if !$Param{$ArrayParam};
+        next ARRAYPARAM if !defined $Param{$ArrayParam};
 
         if ( ref $Param{$ArrayParam} ne 'ARRAY' ) {
             $Kernel::OM->Get('Log')->Log(
@@ -1561,17 +1561,16 @@ sub ConfigItemSearch {
             return;
         }
 
-        next ARRAYPARAM if !@{ $Param{$ArrayParam} };
+        return [] if !IsArrayRefWithData($Param{$ArrayParam});
 
         # quote as integer
         for my $OneParam ( @{ $Param{$ArrayParam} } ) {
             $OneParam = $Kernel::OM->Get('DB')->Quote( $OneParam, 'Integer' );
+            return if ( !defined $OneParam );
         }
 
         # create string
         my $InString = join q{, }, @{ $Param{$ArrayParam} };
-
-        next ARRAYPARAM if !$InString;
 
         push @SQLWhere, "$ArrayParams{ $ArrayParam } IN ($InString)";
     }
@@ -1629,7 +1628,7 @@ sub ConfigItemSearch {
         $SQL .= join ', ', @SQLOrderBy;
         $SQL .= ' ';
     }
-
+print STDERR Data::Dumper::Dumper($SQL);
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,

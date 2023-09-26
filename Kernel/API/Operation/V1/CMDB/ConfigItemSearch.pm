@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Self->SetDefaultSort(
-        ConfigItem => [ 
+        ConfigItem => [
             { Field => 'Name' },
             { Field => 'Number' },
         ]
@@ -232,17 +232,23 @@ sub Run {
                 if (!$SkipAndSearch) {
 
                     # use ids of customer and result from OR search if given
-                    # check for undef "refs" to prevent implicit undef to array-ref conversion (see below "!defiend")
-                    my @KnownIDs = ( @{ $ConfigItemList || [] }, @{ $CustomerCIIDList || [] } );
+                    my $KnownIDs = undef;
+                    if ( IsArrayRef($ConfigItemList) ) {
+                        $KnownIDs = $ConfigItemList;
+                    }
+                    elsif ( IsArrayRef($CustomerCIIDList) ) {
+                        $KnownIDs = $CustomerCIIDList;
+                    }
 
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
                         UserID        => $Self->{Authorization}->{UserID},
                         Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-                        ConfigItemIDs => \@KnownIDs,
+                        ConfigItemIDs => $KnownIDs,
                         %Sorting
                     );
+
                     @SearchTypeResult = @{$SearchResult};
                 }
             }
