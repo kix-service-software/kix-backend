@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -168,7 +168,7 @@ sub GetBasePermissionObjectIDs {
     );
     return if !$QueueIDs;
     return 1 if !IsArrayRef($QueueIDs);
-
+    
     return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
 }
 
@@ -274,13 +274,6 @@ sub _CheckTicket {
         }
     }
 
-    if ($Ticket->{PendingTime} && $Ticket->{PendingTime} =~ m/^(\d+)-/ && 2200 < $1) {
-        return $Self->_Error(
-            Code    => 'BadRequest',
-            Message => "Parameter PendingTime: years greater than 2200 are not possible!"
-        );
-    }
-
     # if everything is OK then return Success
     return $Self->_Success();
 }
@@ -351,7 +344,7 @@ sub _CheckArticle {
                     $Article->{$Attribute} = [ $Article->{$Attribute} ];
                 }
                 for my $UserID ( @{ $Article->{$Attribute} } ) {
-                    my $UserLogin = $Kernel::OM->Get('User')->UserLookup(
+                    my $UserLogin = $Kernel::OM->Get('User')->UserLookup( 
                         UserID => $UserID,
                         Silent => 1,
                     );
