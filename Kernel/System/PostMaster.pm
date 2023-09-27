@@ -202,6 +202,10 @@ sub Run {
 
         JOB:
         for my $Job ( sort keys %Jobs ) {
+            next JOB if (
+                ref( $Jobs{ $Job } ) ne 'HASH'
+                || !$Jobs{$Job}->{Module}
+            );
 
             return if !$MainObject->Require( $Jobs{$Job}->{Module} );
 
