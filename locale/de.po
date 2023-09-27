@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-9-27 08:01+0000\n"
-"PO-Revision-Date: 2023-06-13 09:20+0000\n"
+"PO-Revision-Date: 2023-09-27 11:49+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -6154,7 +6154,7 @@ msgstr "Erstellzeit"
 
 #. manual entry from templates.pot.manual
 msgid "Customer No. / Type"
-msgstr ""
+msgstr "Kundennummer / Typ"
 
 #. manual entry from templates.pot.manual
 msgid "Dark mode"
