@@ -616,10 +616,11 @@ sub PermissionUpdate {
 returns array of all PermissionIDs for a role
 
     my @PermissionIDs = $RoleObject->PermissionList(
-        RoleID  => 1,                                    # optional, ignored if RoleIDs is given
-        RoleIDs => [1,2,3],                              # optional
-        Types   => ['Resource', 'Base::Ticket'],         # optional
-        Target  => '...'                                 # optional
+        RoleID       => 1,                                    # optional, ignored if RoleIDs is given
+        RoleIDs      => [1,2,3],                              # optional
+        Types        => ['Resource', 'Base::Ticket'],         # optional
+        Target       => '...'                                 # optional
+        UsageContext => 'Customer'                            # optional, or 'Agent'
     );
 
 the result looks like
@@ -638,7 +639,7 @@ sub PermissionList {
     my @RoleIDs = $Param{RoleIDs} ? $Param{RoleIDs} : $Param{RoleID} ? ( $Param{RoleID} ) : ();
 
     # create cache key
-    my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
+    my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'') . '::' . ($Param{UsageContext}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -647,9 +648,14 @@ sub PermissionList {
     );
     return @{$Cache} if $Cache;
 
-    my $SQL = 'SELECT rp.id FROM role_permission rp, permission_type pt WHERE pt.id = rp.type_id';
+    my $SQL = 'SELECT rp.id FROM role_permission rp, permission_type pt, roles r WHERE pt.id = rp.type_id AND r.id = rp.role_id';
 
     my @Bind;
+
+    if( $Param{UsageContext} ) {
+        $SQL .= ' AND r.usage_context IN (?, 3)';
+        push @Bind, \Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})};
+    }
 
     if ( @RoleIDs ) {
         $SQL .= ' AND rp.role_id IN (' . join( ', ', map {'?'} @RoleIDs ) . ')';
