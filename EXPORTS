@@ -218,7 +218,6 @@ PerfLog                                                                       = 
 PID                                                                           = Kernel::System::PID
 PostMaster                                                                    = Kernel::System::PostMaster
 PostMaster::Filter                                                            = Kernel::System::PostMaster::Filter
-PostMaster::LoopProtection                                                    = Kernel::System::PostMaster::LoopProtection
 PreEventHandler                                                               = Kernel::System::PreEventHandler
 Priority                                                                      = Kernel::System::Priority
 Queue                                                                         = Kernel::System::Queue

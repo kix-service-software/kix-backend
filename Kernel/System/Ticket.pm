@@ -43,7 +43,6 @@ our @ObjectDependencies = (
     'Lock',
     'Log',
     'Main',
-    'PostMaster::LoopProtection',
     'Priority',
     'Queue',
     'State',
