@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -161,51 +161,18 @@ sub Sync {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $ContactObject = $Kernel::OM->Get('Contact');
     my $OrganisationObject = $Kernel::OM->Get('Organisation');
-
-    my $ContactID;
-
-    # get current user id
-    my $UserID = $UserObject->UserLookup(
-        UserLogin => $Param{User},
-        Silent    => 1,
-    );
-
-    if ( !$UserID ) {
-        # create user
-        $UserID = $UserObject->UserAdd(
-            UserLogin    => $Param{User},
-            ValidID      => 1,
-            ChangeUserID => 1,
-        );
-        if ( !$UserID ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Can't create user \"$Param{User}\" ($UserDN) in RDBMS!",
-            );
-
-            # take down session
-            $LDAP->unbind();
-            return;
-        }
-
-        $Kernel::OM->Get('Log')->Log(
-            LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
-            Priority  => 'notice',
-            Message   => "Local user for ldap user \"$Param{User}\" ($UserDN) created in RDBMS.",
-        );
-    }
-
-    # variable to store role permissions from ldap
-    my %RolesFromLDAP;
-
-    # get RoleObject
     my $RoleObject = $Kernel::OM->Get('Role');
 
     # get system roles and create lookup
     my %SystemRoles = $RoleObject->RoleList(Valid => 1);
     my %SystemRolesByName = reverse %SystemRoles;
 
-    my %UserContextFromLDAP;
+    my $UserID = $UserObject->UserLookup(
+        UserLogin => $Param{User},
+        Silent    => 1,
+    );
+
+    my $ContactID;
 
     # sync contact from ldap
     my %SyncContact;
@@ -307,9 +274,8 @@ sub Sync {
         if ( IsHashRefWithData(\%SyncContact) ) {
             # set fallback org id if necessary
             $SyncContact{PrimaryOrganisationID} = $SyncContact{PrimaryOrganisationID} || $Self->{UnknownOrgIDFallback} || 1;
-            my %ContactData;
-            # lookup the contact
 
+            # lookup the contact
             if ( $SyncContact{Email} && $Self->{EmailUniqueCheck} ) {
                 $ContactID = $ContactObject->ContactLookup(
                     Email  => $SyncContact{Email},
@@ -323,12 +289,16 @@ sub Sync {
                 );
             }
 
-            %ContactData = $ContactObject->ContactGet(
-                ID => $ContactID,
+            my %ContactData = $ContactObject->ContactGet(
+                ID     => $ContactID,
+                Silent => 1,
             );
 
-            # check if the contact is assigned to another user
-            if ( $ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID ) {
+            # if the UserLogin was changed, we cannot find the user by UserLogin. We had to look the user up by email.
+            # this only works with enabled EmailUniqueCheck!
+            $UserID = $SyncContact{UserLogin} && !$UserID && $ContactData{AssignedUserID} ? $ContactData{AssignedUserID} : $UserID;
+
+            if ($ContactData{AssignedUserID} && $UserID && $ContactData{AssignedUserID} != $UserID) {
                 $Kernel::OM->Get('Log')->Log(
                     LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
                     Priority  => 'error',
@@ -366,10 +336,6 @@ sub Sync {
             else {
                 # update existing contact
 
-                # get user data
-                %ContactData = $ContactObject->ContactGet(
-                    UserID => $UserID,
-                );
                 $ContactID = $ContactData{ID};
 
                 # check for changes on contact
@@ -444,6 +410,7 @@ sub Sync {
     }
 
     # GroupDN based role sync...
+    my %RolesFromLDAP;
     if ( IsHashRefWithData($Self->{GroupDNBasedRoleSync}) ) {
 
         # read and remember roles from ldap
@@ -573,7 +540,7 @@ sub Sync {
         }
     }
 
-
+    my %UserContextFromLDAP;
     # GroupDN based usage context sync...
     if ( IsHashRefWithData($Self->{GroupDNBasedUsageContextSync}) ) {
 
@@ -661,19 +628,49 @@ sub Sync {
         }
     }
 
-    # set user context in DB
-    my %User = $UserObject->GetUserData(
-        UserID => $UserID
-    );
+    if (!$UserID) {
+        # create user
+        $UserID = $UserObject->UserAdd(
+            UserLogin    => $Param{User},
+            ValidID      => 1,
+            ChangeUserID => 1,
+        );
+        if (!$UserID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't create user \"$Param{User}\" ($UserDN) in RDBMS!",
+            );
+
+            # take down session
+            $LDAP->unbind();
+            return;
+        }
+
+        $Kernel::OM->Get('Log')->Log(
+            LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+            Priority  => 'notice',
+            Message   => "Local user for ldap user \"$Param{User}\" ($UserDN) created in RDBMS.",
+        );
+    }
 
     # IsCustomer/IsAgent in UserSyncMap always overwrites all other context modifications
-    $UserContextFromLDAP{IsCustomer} = $SyncContact{IsCustomer} if ( exists($SyncContact{IsCustomer}) );
-    $UserContextFromLDAP{IsAgent} = $SyncContact{IsAgent} if ( exists($SyncContact{IsAgent}) );
+    $UserContextFromLDAP{IsCustomer} = $SyncContact{IsCustomer} if (exists($SyncContact{IsCustomer}));
+    $UserContextFromLDAP{IsAgent} = $SyncContact{IsAgent} if (exists($SyncContact{IsAgent}));
+
+    # set user context in DB
+    my %User = $UserObject->GetUserData(
+        UserID => $UserID,
+        Silent => 1
+    );
 
     if ( %User ) {
 
     # remove UserPw to avoid overwrite
     $User{UserPw} = undef if defined $User{UserPw};
+
+    # set UserLogin from LDAP
+    # (at this point, user was either successfully identified by email or newly created )
+    $User{UserLogin} = $SyncContact{UserLogin}  ? $SyncContact{UserLogin} : $User{UserLogin};
 
         my $Success = $UserObject->UserUpdate(
             %User,
