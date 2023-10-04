@@ -17,26 +17,23 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get needed objects
-my $ConfigObject           = $Kernel::OM->Get('Config');
-my $StandardTemplateObject = $Kernel::OM->Get('StandardTemplate');
-my $QueueObject            = $Kernel::OM->Get('Queue');
+my $ConfigObject = $Kernel::OM->Get('Config');
+my $QueueObject  = $Kernel::OM->Get('Queue');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $QueueRand = 'Some::Queue' . $Helper->GetRandomID();
 my $QueueID   = $QueueObject->QueueAdd(
-    Name                => $QueueRand,
-    ValidID             => 1,
-    GroupID             => 1,
-    SystemAddressID     => 1,
-    UserID              => 1,
-    Comment             => 'Some Comment',
+    Name            => $QueueRand,
+    ValidID         => 1,
+    GroupID         => 1,
+    SystemAddressID => 1,
+    UserID          => 1,
+    Comment         => 'Some Comment',
 );
 
 $Self->True(
@@ -49,12 +46,13 @@ my @IDs;
 push( @IDs, $QueueID );
 
 my $QueueIDWrong = $QueueObject->QueueAdd(
-    Name                => $QueueRand,
-    ValidID             => 1,
-    GroupID             => 1,
-    SystemAddressID     => 1,
-    UserID              => 1,
-    Comment             => 'Some Comment',
+    Name            => $QueueRand,
+    ValidID         => 1,
+    GroupID         => 1,
+    SystemAddressID => 1,
+    UserID          => 1,
+    Comment         => 'Some Comment',
+    Silent          => 1,
 );
 
 $Self->False(
@@ -98,19 +96,19 @@ $Self->True(
 # a real scenario from AdminQueue.pm
 # for more information see 3139
 my $QueueUpdate2 = $QueueObject->QueueUpdate(
-    QueueID             => $QueueID,
-    Name                => $QueueRand . "2",
-    ValidID             => 1,
-    GroupID             => 1,
-    Calendar            => '',
-    SystemAddressID     => 1,
-    FollowUpID          => 1,
-    UserID              => 1,
-    Comment             => 'Some Comment2',
-    DefaultSignKey      => '',
-    UnlockTimeOut       => '',
-    FollowUpLock        => 1,
-    ParentQueueID       => '',
+    QueueID         => $QueueID,
+    Name            => $QueueRand . "2",
+    ValidID         => 1,
+    GroupID         => 1,
+    Calendar        => '',
+    SystemAddressID => 1,
+    FollowUpID      => 1,
+    UserID          => 1,
+    Comment         => 'Some Comment2',
+    DefaultSignKey  => '',
+    UnlockTimeOut   => '',
+    FollowUpLock    => 1,
+    ParentQueueID   => '',
 );
 
 $Self->True(
@@ -120,15 +118,15 @@ $Self->True(
 
 my $QueueUpdate1Name = $QueueRand . '1',;
 my $QueueUpdate1     = $QueueObject->QueueUpdate(
-    QueueID             => $QueueID,
-    Name                => $QueueUpdate1Name,
-    ValidID             => 2,
-    GroupID             => 1,
-    Calendar            => '1',
-    SystemAddressID     => 1,
-    FollowUpID          => 1,
-    UserID              => 1,
-    Comment             => 'Some Comment1',
+    QueueID         => $QueueID,
+    Name            => $QueueUpdate1Name,
+    ValidID         => 2,
+    GroupID         => 1,
+    Calendar        => '1',
+    SystemAddressID => 1,
+    FollowUpID      => 1,
+    UserID          => 1,
+    Comment         => 'Some Comment1',
 );
 
 $Self->True(
@@ -199,6 +197,7 @@ $QueueIDWrong = $QueueObject->QueueAdd(
     SystemAddressID => 1,
     UserID          => 1,
     Comment         => 'Some Comment',
+    Silent          => 1,
 );
 
 $Self->False(
@@ -216,6 +215,7 @@ my $QueueUpdateExist = $QueueObject->QueueUpdate(
     FollowUpID      => 1,
     UserID          => 1,
     Comment         => 'Some Comment1',
+    Silent          => 1,
 );
 
 $Self->False(
@@ -233,6 +233,7 @@ $QueueUpdateExist = $QueueObject->QueueUpdate(
     FollowUpID      => 1,
     UserID          => 1,
     Comment         => 'Some Comment1',
+    Silent          => 1,
 );
 
 $Self->False(
@@ -342,7 +343,10 @@ $Self->Is(
 );
 
 # lookup the queue id for $QueueRand, this should be undef, because this queue was renamed meanwhile!
-$LookupQueueID = $QueueObject->QueueLookup( Queue => $QueueRand );
+$LookupQueueID = $QueueObject->QueueLookup(
+    Queue  => $QueueRand,
+    Silent => 1,
+);
 
 $Self->Is(
     $LookupQueueID,
@@ -383,7 +387,8 @@ $Self->True(
     'QueueLookup() by Name',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

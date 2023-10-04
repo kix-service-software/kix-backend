@@ -18,11 +18,6 @@ use vars (qw($Self));
 my $LockObject = $Kernel::OM->Get('Lock');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @Names = sort $LockObject->LockViewableLock(
@@ -50,12 +45,16 @@ my @Tests = (
         Name   => 'Lookup - unlock_not_extsits',
         Input  => 'unlock_not_exists',
         Result => 0,
+        Silent => 1,
     },
 );
 
 for my $Test (@Tests) {
 
-    my $LockID = $LockObject->LockLookup( Lock => $Test->{Input} );
+    my $LockID = $LockObject->LockLookup(
+        Lock   => $Test->{Input},
+        Silent => $Test->{Silent},
+    );
 
     if ( $Test->{Result} ) {
 
@@ -73,8 +72,6 @@ for my $Test (@Tests) {
         $Self->False( $LockID, $Test->{Name} );
     }
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

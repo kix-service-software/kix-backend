@@ -894,11 +894,12 @@ sub FutureTaskAdd {
     # check needed stuff
     for my $Key (qw(ExecutionTime Type Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!",
+                );
+            }
             return;
         }
     }
@@ -906,14 +907,16 @@ sub FutureTaskAdd {
     # check valid ExecutionTime
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{ExecutionTime},
+        Silent => $Param{Silent},
     );
 
     if ( !$SystemTime ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "ExecutionTime is invalid!",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "ExecutionTime is invalid!",
+            );
+        }
         return;
     }
 
@@ -947,20 +950,16 @@ sub FutureTaskAdd {
     $Kernel::OM->Get('Encode')->EncodeOutput($Data);
     $Data = encode_base64($Data);
 
-    # get needed objects
-    my $DBObject   = $Kernel::OM->Get('DB');
-    my $TimeObject = $Kernel::OM->Get('Time');
-
     my $Identifier;
     TRY:
     for my $Try ( 1 .. 10 ) {
 
         # calculate a task identifier
-        $Identifier = $TimeObject->SystemTime() . int rand 1000000;
+        $Identifier = $Kernel::OM->Get('Time')->SystemTime() . int rand 1000000;
 
         # insert the future task (initially locked with lock_key = 1 so it will not be taken by any
         #    moved into worker task list at this moment)
-        last TRY if $DBObject->Do(
+        last TRY if $Kernel::OM->Get('DB')->Do(
             SQL => '
                 INSERT INTO scheduler_future_task
                     (ident, execution_time, name, task_type, task_data, attempts, lock_key, create_time)
@@ -978,19 +977,19 @@ sub FutureTaskAdd {
     }
 
     # get task id
-    $DBObject->Prepare(
+    $Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id FROM scheduler_future_task WHERE ident = ?',
         Bind => [ \$Identifier ],
     );
 
     # fetch the task id
     my $TaskID;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $TaskID = $Row[0];
     }
 
     # unlock the task, for now on the task can be moved to the worker task list
-    $DBObject->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL => '
             UPDATE scheduler_future_task
             SET lock_key = 0
@@ -1038,10 +1037,12 @@ sub FutureTaskGet {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TaskID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need TaskID!',
+            );
+        }
         return;
     }
 
@@ -1070,12 +1071,13 @@ sub FutureTaskGet {
         my $DataParam = $StorableObject->Deserialize( Data => $DecodedData );
 
         if ( !$DataParam ) {
-
-            # error log
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
-            );
+            if ( !$Param{Silent} ) {
+                # error log
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
+                );
+            }
 
             # remove damaged future task
             $Self->FutureTaskDelete(
@@ -1116,10 +1118,12 @@ sub FutureTaskDelete {
 
     # check needed stuff
     if ( !$Param{TaskID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TaskID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need TaskID!',
+            );
+        }
         return;
     }
 
@@ -1221,11 +1225,12 @@ sub FutureTaskToExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!",
+                );
+            }
             return;
         }
     }
@@ -1278,12 +1283,13 @@ sub FutureTaskToExecute {
         my $DataParam = $StorableObject->Deserialize( Data => $DecodedData );
 
         if ( !$DataParam ) {
-
-            # error log
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
-            );
+            if ( !$Param{Silent} ) {
+                # error log
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Future task data is not in a correct storable format! TaskID: ' . $Param{TaskID},
+                );
+            }
 
             # remove damaged future task
             $Self->FutureTaskDelete(
@@ -1432,6 +1438,7 @@ sub CronTaskToExecute {
         # calculate last cron time
         my $PreviousEventTimestamp = $CronEventObject->PreviousEventGet(
             Schedule => $JobConfig->{Schedule},
+            Silent   => $Param{Silent},
         );
 
         next CRONJOBKEY if !$PreviousEventTimestamp;
@@ -1782,11 +1789,12 @@ sub RecurrentTaskExecute {
     # check needed stuff
     for my $Key (qw(NodeID PID TaskName TaskType PreviousEventTimestamp Data)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!",
+                );
+            }
             return;
         }
     }
@@ -1967,11 +1975,13 @@ sub RecurrentTaskExecute {
 
     return 1 if $TaskID;
 
-    # error handling
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'error',
-        Message  => "Could not create new scheduler recurrent task $Param{TaskName}!",
-    );
+    if ( !$Param{Silent} ) {
+        # error handling
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Could not create new scheduler recurrent task $Param{TaskName}!",
+        );
+    }
 
     return;
 }

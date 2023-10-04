@@ -39,7 +39,7 @@ When qr/I query the collection of clientregistration with filter of "(.*?)"$/, s
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/clientregistrations',
-      Filter => '{"ClientRegistration": {"AND": [{"Field": "ClientID","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
+      Filter => '{"ClientRegistration": {"AND": [{"Field": "ClientID","Operator": "EQ","Value": "'.$1.'"}]}}',
    );
 };
 

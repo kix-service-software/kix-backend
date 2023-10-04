@@ -13,182 +13,99 @@ use warnings;
 
 use utf8;
 
+use Kernel::System::Role::Permission;
+
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $Success = $ConfigObject->Set(
+# begin transaction on database
+$Helper->BeginWork();
+
+# get a random id
+my $RandomID = $Helper->GetRandomID();
+
+my $Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'Frontend::RichText',
     Value => 1,
 );
-
 $Self->True(
     $Success,
     "Enable RichText",
 );
 
 # use Test email backend
-$Success = $ConfigObject->Set(
+$Success = $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
-    Value => 'Email::Test',
+    Value => 'Kernel::System::Email::Test',
 );
-
 $Self->True(
     $Success,
     "Set Email Test backend with true",
 );
 
-my $TestEmailObject = $Kernel::OM->Get('Email::Test');
-
-$Success = $TestEmailObject->CleanUp();
-
-$Self->True(
-    $Success,
-    'Initial cleanup',
+# disable asynchron notification
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'TicketNotification::SendAsynchronously',
+    Value => 0,
 );
 
-$Self->IsDeeply(
-    $TestEmailObject->EmailsGet(),
-    [],
-    'Test backend empty after initial cleanup',
+# create role with WRITE on tickets
+my $TicketWriteRoleID = $Helper->TestRoleCreate(
+    Name        => "ticket_write_$RandomID",
+    Permissions => {
+        Resource => [
+            {
+                Target => '/tickets',
+                Value  => Kernel::System::Role::Permission::PERMISSION->{WRITE},
+            },
+        ],
+        'Base::Ticket' => [
+            {
+                Target => '1',
+                Value  => Kernel::System::Role::Permission::PERMISSION->{WRITE},
+            },
+        ],
+    }
 );
-
-# get user object
-my $UserObject = $Kernel::OM->Get('User');
-
-my @UserIDs;
-
-# create a new users
-for ( 1 .. 4 ) {
-
-    my $UserLogin = $Helper->TestUserCreate(
-        Groups => ['users'],
-    );
-
-    my %UserData = $UserObject->GetUserData(
-        User => $UserLogin,
-    );
-
-    my $UserID = $UserData{UserID};
-
-    push @UserIDs, $UserID;
-}
-
-# get a random id
-my $RandomID = $Helper->GetRandomID();
-
-# get group object
-my $GroupObject = $Kernel::OM->Get('Group');
-
-# add group
-my $GID = $GroupObject->GroupAdd(
-    Name    => "example-group$RandomID",
-    Comment => 'comment describing the group',
-    ValidID => 1,
-    UserID  => 1,
+# create a new user for current test
+my $UserLogin = $Helper->TestUserCreate(
+    Roles => ["ticket_write_$RandomID"],
 );
-
-$Self->IsNot(
-    $GID,
-    undef,
-    "GroupAdd() should not be undef",
+my %UserData = $Kernel::OM->Get('User')->GetUserData(
+    User => $UserLogin,
 );
-
-# add role
-my $RoleID = $GroupObject->RoleAdd(
-    Name    => "example-role$RandomID",
-    Comment => 'comment describing the role',
-    ValidID => 1,
-    UserID  => 1,
-);
-
-$Self->IsNot(
-    $RoleID,
-    undef,
-    "RoleAdd() should not be undef",
-);
-
-for my $UserID (@UserIDs) {
-
-    # add users to groups
-    $Success = $GroupObject->PermissionGroupUserAdd(
-        GID        => $GID,
-        UID        => $UserID,
-        Permission => {
-            ro        => 1,
-            move_into => 1,
-            create    => 1,
-            owner     => 1,
-            priority  => 1,
-            rw        => 1,
-        },
-        UserID => 1,
-    );
-
-    $Self->True(
-        $Success,
-        "Added User ID $UserID to Group ID $GID",
-    );
-
-    # add user to role
-    $Success = $GroupObject->PermissionRoleUserAdd(
-        RID    => $RoleID,
-        UID    => $UserID,
-        Active => 1,
-        UserID => 1,
-    );
-
-    $Self->True(
-        $Success,
-        "Added User ID $UserID to Role ID $RoleID",
-    );
-}
-
-# get queue object
-my $QueueObject = $Kernel::OM->Get('Queue');
+my $UserID = $UserData{UserID};
 
 # get queue data
-my %Queue = $QueueObject->QueueGet(
+my %Queue = $Kernel::OM->Get('Queue')->QueueGet(
     ID => 1,
 );
 
 # set queue to special group
-$Success = $QueueObject->QueueUpdate(
+$Success = $Kernel::OM->Get('Queue')->QueueUpdate(
     QueueID => 1,
     %Queue,
-    GroupID => $GID,
     UserID  => 1,
 );
 
 $Self->True(
     $Success,
-    "Set Queue ID 1 to Group ID $GID",
+    "Set Queue ID 1 to Group ID ",
 );
 
-# get ticket object
-my $TicketObject = $Kernel::OM->Get('Ticket');
-
 # create ticket
-my $TicketID = $TicketObject->TicketCreate(
-    Title         => 'Ticket One Title',
-    QueueID       => 1,
-    Lock          => 'unlock',
-    Priority      => '3 normal',
-    State         => 'new',
-    CustomerID    => 'example.com',
-    Contact  => 'customerOne@example.com',
-    OwnerID       => $UserIDs[0],
-    ResponsibleID => $UserIDs[1],
-    UserID        => $UserIDs[2],
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Ticket One Title',
+    QueueID        => 1,
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
+    OrganisationID => 'example.com',
+    OwnerID        => $UserID,
+    ResponsibleID  => $UserID,
+    UserID         => 1,
 );
 
 # sanity check
@@ -197,11 +114,8 @@ $Self->True(
     "TicketCreate() successful for Ticket ID $TicketID",
 );
 
-# get dynamic field object
-my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
-
 # create a dynamic field
-my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
+my $FieldID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
     Name       => "DFT1$RandomID",
     Label      => 'Description',
     FieldOrder => 9991,
@@ -213,6 +127,24 @@ my $FieldID = $DynamicFieldObject->DynamicFieldAdd(
     ValidID => 1,
     UserID  => 1,
     Reorder => 0,
+);
+
+# Make sure that ticket events are handled
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'Ticket' ],
+);
+
+my $TestEmailObject = $Kernel::OM->Get('Email::Test');
+
+$Success = $TestEmailObject->CleanUp();
+$Self->True(
+    $Success,
+    'Initial cleanup',
+);
+$Self->IsDeeply(
+    $TestEmailObject->EmailsGet(),
+    [],
+    'Test backend empty after initial cleanup',
 );
 
 # define params for sending as CustomerMessageParams
@@ -228,15 +160,14 @@ my @Tests = (
     {
         Name => 'Single RecipientAgent',
         Data => {
-            Events => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
-
-            # RecipientAgents => [$UserID],
+            Events          => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            RecipientAgents => [$UserID],
+            Transports      => ['Email'],
         },
         Config => {
             Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
             Data  => {
                 TicketID              => $TicketID,
-                Recipients            => \@UserIDs,
                 CustomerMessageParams => $CustomerMessageParams,
             },
             Config => {},
@@ -251,18 +182,12 @@ my @Tests = (
 
 );
 
-my $NotificationEventObject      = $Kernel::OM->Get('NotificationEvent');
-my $EventNotificationEventObject = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent');
-
 my $Count = 0;
 my $NotificationID;
 TEST:
 for my $Test (@Tests) {
 
-    # add transport setting
-    $Test->{Data}->{Transports} = ['Email'];
-
-    $NotificationID = $NotificationEventObject->NotificationAdd(
+    $NotificationID = $Kernel::OM->Get('NotificationEvent')->NotificationAdd(
         Name    => "JobName$Count-$RandomID",
         Comment => 'An optional comment',
         Data    => $Test->{Data},
@@ -289,7 +214,12 @@ for my $Test (@Tests) {
         "$Test->{Name} - NotificationAdd() should not be undef",
     );
 
-    my $Result = $EventNotificationEventObject->Run( %{ $Test->{Config} } );
+    # Make sure that the NotificationEvent-Handler gets recreated for each loop.
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'Kernel::System::Ticket::Event::NotificationEvent' ],
+    );
+
+    my $Result = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent')->Run( %{ $Test->{Config} } );
 
     if ( !$Test->{Success} ) {
         $Self->False(
@@ -310,7 +240,6 @@ for my $Test (@Tests) {
 
     # remove not needed data
     for my $Email ( @{$Emails} ) {
-
         my $Counter = 0;
         my %Result;
         for my $Header ( split '\n', ${ $Email->{Body} } ) {
@@ -339,7 +268,7 @@ for my $Test (@Tests) {
 continue {
 
     # delete notification event
-    my $NotificationDelete = $NotificationEventObject->NotificationDelete(
+    my $NotificationDelete = $Kernel::OM->Get('NotificationEvent')->NotificationDelete(
         ID     => $NotificationID,
         UserID => 1,
     );
@@ -364,7 +293,8 @@ $Self->IsDeeply(
     "CustomerMessageParams didn't grow after sending emails.",
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

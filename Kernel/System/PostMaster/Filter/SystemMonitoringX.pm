@@ -567,7 +567,7 @@ sub _TicketCreate {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message  => "Multiple assets for SysMon host <"
-                            .$Self->{Host}
+                            .$Self->{SysMonXHost}
                             . "> found, using first item only!",
                     );
                 }

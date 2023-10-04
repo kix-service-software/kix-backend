@@ -36,8 +36,7 @@ When qr/I update this automation job$/, sub {
         Job => {
             Comment => "some comment update",
             Name => "new job".rand(),
-            Type => "Ticket",
-            ValidID => 1
+            Exec => 1
         }
       }
    );

@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'QueueID' ) {
         $Found = $Kernel::OM->Get('Queue')->QueueLookup(
             QueueID => $Param{Data}->{$Param{Attribute}},
+            Silent  => 1,
         );
     }
     elsif ( $Param{Attribute} eq 'Queue' ) {
         $Found = $Kernel::OM->Get('Queue')->QueueLookup(
-            Queue => $Param{Data}->{$Param{Attribute}},
+            Queue  => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     else {

@@ -10,6 +10,7 @@ Feature: PATCH request to the /system/automation/macros/:MacroID resource
     Then the response code is 201
     When I update this automation macro
     Then the response code is 200
+    And the response object is MacroPostPatchResponse
     When I delete this automation macro
     Then the response code is 204
 

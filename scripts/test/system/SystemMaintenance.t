@@ -22,12 +22,10 @@ my $SystemMaintenanceObject = $Kernel::OM->Get('SystemMaintenance');
 my $TimeObject              = $Kernel::OM->Get('Time');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # initialize variables
 my $RandomID = $Helper->GetRandomID();
@@ -39,6 +37,9 @@ my @Tests = (
     {
         Name       => 'Test ' . $Index++ . ' - Without any data',
         SuccessAdd => 0,
+        Add        => {
+            Silent => 1,
+        },
     },
     {
         Name       => 'Test ' . $Index++ . ' - Without StartDate',
@@ -51,6 +52,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -64,6 +66,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -77,6 +80,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -90,6 +94,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -104,6 +109,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -117,6 +123,7 @@ my @Tests = (
             ShowLoginMessage => 1,
             NotifyMessage    => 'The notification text.',
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -130,6 +137,7 @@ my @Tests = (
             ShowLoginMessage => 1,
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
+            Silent           => 1,
         },
     },
 
@@ -145,6 +153,7 @@ my @Tests = (
             NotifyMessage    => 'The notification text.',
             ValidID          => 1,
             UserID           => $UserID,
+            Silent           => 1,
         },
     },
     {
@@ -210,9 +219,13 @@ TEST:
 for my $Test (@Tests) {
 
     for my $Date (qw(StartDate StopDate)) {
-        my $ConvertionResult = $TimeObject->TimeStamp2SystemTime(
-            String => $Test->{Add}->{$Date},
-        );
+        my $ConvertionResult;
+        if ( $Test->{Add}->{$Date} ) {
+            $ConvertionResult = $TimeObject->TimeStamp2SystemTime(
+                String => $Test->{Add}->{$Date},
+                Silent => 1,
+            );
+        }
         $Test->{Add}->{$Date} = $ConvertionResult || $Test->{Add}->{$Date};
     }
 
@@ -306,10 +319,16 @@ for my $Test (@Tests) {
     }
 
     # modify boolean
-    if ( $Test->{Update}->{ShowLoginMessage} eq '1' ) {
+    if (
+        defined( $Test->{Update}->{ShowLoginMessage} )
+        && $Test->{Update}->{ShowLoginMessage} eq '1'
+    ) {
         $Test->{Update}->{ShowLoginMessage} = '0';
     }
-    elsif ( $Test->{Update}->{ShowLoginMessage} eq '0' ) {
+    elsif (
+        defined( $Test->{Update}->{ShowLoginMessage} )
+        && $Test->{Update}->{ShowLoginMessage} eq '0'
+    ) {
         $Test->{Update}->{ShowLoginMessage} = '1';
     }
 
@@ -555,7 +574,8 @@ for my $Test (@Tests) {
 
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

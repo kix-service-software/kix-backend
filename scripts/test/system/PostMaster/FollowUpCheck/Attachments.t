@@ -16,30 +16,12 @@ use vars (qw($Self));
 
 use Kernel::System::PostMaster;
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-$ConfigObject->Set(
-    Key   => 'CheckEmailAddresses',
-    Value => 0,
-);
-$ConfigObject->Set(
-    Key   => 'PostMaster::CheckFollowUpModule',
-    Value => {
-        '0400-Attachments' => {
-            Module => 'PostMaster::FollowUpCheck::Attachments',
-            }
-        }
-);
-
-my $TicketObject = $Kernel::OM->Get('Ticket');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 $Helper->FixedTimeSet();
 
 my $AgentAddress    = 'agent@example.com';
@@ -47,16 +29,16 @@ my $CustomerAddress = 'external@example.com';
 my $InternalAddress = 'internal@example.com';
 
 # create a new ticket
-my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'My ticket created by Agent A',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'open',
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'My ticket created by Agent A',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'open',
     OrganisationID => '123465',
-    ContactID    => 'external@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'external@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 
 $Self->True(
@@ -64,12 +46,12 @@ $Self->True(
     "TicketCreate()",
 );
 
-my %Ticket = $TicketObject->TicketGet(
+my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
     TicketID => $TicketID,
     UserID   => 1,
 );
 
-my $Subject = $TicketObject->TicketSubjectBuild(
+my $Subject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
     TicketNumber => $Ticket{TicketNumber},
     Subject      => 'test',
 );
@@ -167,6 +149,7 @@ EOF
 Content-Type: multipart/alternative; boundary="Apple-Mail=_BA4B97EF-C2DC-42FB-BF6F-A71DBDC93F10"
 Subject: test multipart/mixed HTML
 Date: Fri, 9 Sep 2016 09:03:57 +0200
+From: "Max Mustermann" <max.mustermann\@kixdesk.com>
 To: test\@home.com
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 X-Mailer: Apple Mail (2.3124)
@@ -219,6 +202,7 @@ EOF
 Content-Type: multipart/alternative; boundary="Apple-Mail=_BA4B97EF-C2DC-42FB-BF6F-A71DBDC93F10"
 Subject: test multipart/mixed HTML
 Date: Fri, 9 Sep 2016 09:03:57 +0200
+From: "Max Mustermann" <max.mustermann\@kixdesk.com>
 To: test\@home.com
 Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
 X-Mailer: Apple Mail (2.3124)
@@ -272,14 +256,24 @@ for my $Test (@Tests) {
     {
         my $PostMasterObject = Kernel::System::PostMaster->new(
             Email => \$Test->{Email},
-            Debug => 2,
+        );
+
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'CheckEmailAddresses',
+            Value => 0,
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'PostMaster::CheckFollowUpModule',
+            Value => {
+                '0400-Attachments' => {
+                    Module => 'Kernel::System::PostMaster::FollowUpCheck::Attachments',
+                }
+            }
         );
 
         @Return = $PostMasterObject->Run();
         @Return = @{ $Return[0] || [] };
     }
-
-    @Return = @{ $Return[0] || [] };
 
     $Self->Is(
         $Return[0] || 0,
@@ -292,7 +286,8 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

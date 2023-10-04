@@ -14,18 +14,11 @@ use utf8;
 
 use vars qw($Self);
 
-# get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Config');
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -47,7 +40,7 @@ my $SecondClassName = 'UnitTestClass2' . $RandomID;
 my $NamePrefix = 'UnitTestName' . $RandomID;
 
 # add both unittest config item classes
-my $FirstClassID = $GeneralCatalogObject->ItemAdd(
+my $FirstClassID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
     Class   => 'ITSM::ConfigItem::Class',
     Name    => $FirstClassName,
     ValidID => 1,
@@ -66,7 +59,7 @@ if ( !$FirstClassID ) {
 push @ConfigItemClassIDs, $FirstClassID;
 push @ConfigItemClasses,  $FirstClassName;
 
-my $SecondClassID = $GeneralCatalogObject->ItemAdd(
+my $SecondClassID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
     Class   => 'ITSM::ConfigItem::Class',
     Name    => $SecondClassName,
     ValidID => 1,
@@ -87,7 +80,7 @@ push @ConfigItemClasses,  $SecondClassName;
 
 # add an empty definition to the class. the definition doesn't need any elements, as we're only
 # testing the name which isn't part of the definition, but of the config item itself
-my $FirstDefinitionID = $ConfigItemObject->DefinitionAdd(
+my $FirstDefinitionID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
     ClassID    => $FirstClassID,
     Definition => "[]",
     UserID     => 1,
@@ -104,7 +97,7 @@ if ( !$FirstDefinitionID ) {
 
 push @ConfigItemDefinitionIDs, $FirstDefinitionID;
 
-my $SecondDefinitionID = $ConfigItemObject->DefinitionAdd(
+my $SecondDefinitionID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
     ClassID    => $SecondClassID,
     Definition => "[]",
     UserID     => 1,
@@ -124,7 +117,7 @@ push @ConfigItemDefinitionIDs, $SecondDefinitionID;
 my @ConfigItemIDs;
 
 # add a configitem to each class
-my $FirstConfigItemID = $ConfigItemObject->ConfigItemAdd(
+my $FirstConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     ClassID => $FirstClassID,
     UserID  => 1,
 );
@@ -138,7 +131,7 @@ if ( !$FirstConfigItemID ) {
 
 push @ConfigItemIDs, $FirstConfigItemID;
 
-my $SecondConfigItemID = $ConfigItemObject->ConfigItemAdd(
+my $SecondConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     ClassID => $SecondClassID,
     UserID  => 1,
 );
@@ -153,7 +146,7 @@ if ( !$SecondConfigItemID ) {
 push @ConfigItemIDs, $SecondConfigItemID;
 
 # create a 3rd configitem in the 2nd class
-my $ThirdConfigItemID = $ConfigItemObject->ConfigItemAdd(
+my $ThirdConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     ClassID => $SecondClassID,
     UserID  => 1,
 );
@@ -168,25 +161,29 @@ if ( !$ThirdConfigItemID ) {
 push @ConfigItemIDs, $ThirdConfigItemID;
 
 # get deployment state list
-my $DeplStateList = $GeneralCatalogObject->ItemList(
+my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::DeploymentState',
 );
 my %DeplStateListReverse = reverse %{$DeplStateList};
 
 # get incident state list
-my $InciStateList = $GeneralCatalogObject->ItemList(
+my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::Core::IncidentState',
 );
 my %InciStateListReverse = reverse %{$InciStateList};
 
 # set a name for each configitem
-my $FirstInitialVersionID = $ConfigItemObject->VersionAdd(
+my $FirstInitialVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $FirstConfigItemID,
     Name         => $NamePrefix . 'First#001',
     DefinitionID => $FirstDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 if ( !$FirstInitialVersionID ) {
@@ -196,13 +193,17 @@ if ( !$FirstInitialVersionID ) {
     );
 }
 
-my $SecondInitialVersionID = $ConfigItemObject->VersionAdd(
+my $SecondInitialVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $SecondConfigItemID,
     Name         => $NamePrefix . 'Second#001',
     DefinitionID => $SecondDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 if ( !$SecondInitialVersionID ) {
@@ -212,13 +213,17 @@ if ( !$SecondInitialVersionID ) {
     );
 }
 
-my $ThirdInitialVersionID = $ConfigItemObject->VersionAdd(
+my $ThirdInitialVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $ThirdConfigItemID,
     Name         => $NamePrefix . 'Second#002',
     DefinitionID => $SecondDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 if ( !$ThirdInitialVersionID ) {
@@ -233,19 +238,19 @@ if ( !$ThirdInitialVersionID ) {
 # ------------------------------------------------------------ #
 
 # read the original setting for the setting EnableUniquenessCheck
-my $OrigEnableSetting = $ConfigObject->Get('UniqueCIName::EnableUniquenessCheck');
+my $OrigEnableSetting = $Kernel::OM->Get('Config')->Get('UniqueCIName::EnableUniquenessCheck');
 
 # enable the uniqueness check
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'UniqueCIName::EnableUniquenessCheck',
     Value => 1,
 );
 
 # read the original setting for the scope of the uniqueness check
-my $OrigScope = $ConfigObject->Get('UniqueCIName::UniquenessCheckScope');
+my $OrigScope = $Kernel::OM->Get('Config')->Get('UniqueCIName::UniquenessCheckScope');
 
 # make sure, the scope for the uniqueness check is set to 'global'
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'UniqueCIName::UniquenessCheckScope',
     Value => 'global',
 );
@@ -253,13 +258,18 @@ $ConfigObject->Set(
 my $RenameSuccess;
 
 # try to give the 1st configitem the same name as the 2nd one
-$RenameSuccess = $ConfigItemObject->VersionAdd(
+$RenameSuccess = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $FirstConfigItemID,
     Name         => $NamePrefix . 'Second#001',
     DefinitionID => $FirstDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+    Silent       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 $Self->False(
@@ -268,13 +278,18 @@ $Self->False(
 );
 
 # try to give the 2nd configitem the same name as the 3rd one
-$RenameSuccess = $ConfigItemObject->VersionAdd(
+$RenameSuccess = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $SecondConfigItemID,
     Name         => $NamePrefix . 'Second#002',
     DefinitionID => $FirstDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+    Silent       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 $Self->False(
@@ -283,13 +298,13 @@ $Self->False(
 );
 
 # set the scope for the uniqueness check to 'class'
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'UniqueCIName::UniquenessCheckScope',
     Value => 'class',
 );
 
 # try to rename First#001 again to Second#001 which should work now, due to the different class
-$RenameSuccess = $ConfigItemObject->VersionAdd(
+$RenameSuccess = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $FirstConfigItemID,
     Name         => $NamePrefix . 'Second#001',
     DefinitionID => $FirstDefinitionID,
@@ -298,19 +313,28 @@ $RenameSuccess = $ConfigItemObject->VersionAdd(
     UserID       => 1,
 );
 
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
+);
+
 $Self->True(
     $RenameSuccess,
     "Scope => class: Renaming First#001 to already existing Second#001 succeeded"
 );
 
 # trying now to create a duplicate name within a class
-$RenameSuccess = $ConfigItemObject->VersionAdd(
+$RenameSuccess = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
     ConfigItemID => $SecondConfigItemID,
     Name         => $NamePrefix . 'Second#002',
     DefinitionID => $SecondDefinitionID,
     DeplStateID  => $DeplStateListReverse{Production},
     InciStateID  => $InciStateListReverse{Operational},
     UserID       => 1,
+    Silent       => 1,
+);
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [ 'ITSMConfigItem' ],
 );
 
 $Self->False(
@@ -319,22 +343,21 @@ $Self->False(
 );
 
 # reset the enabled setting for the uniqueness check to its original value
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'UniqueCIName::EnableUniquenessCheck',
     Value => $OrigEnableSetting,
 );
 
 # reset the scope for the uniqueness check to its original value
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'UniqueCIName::UniquenessCheckScope',
     Value => $OrigScope,
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

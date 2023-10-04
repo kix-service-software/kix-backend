@@ -56,7 +56,7 @@ Feature: GET request to the /cmdb/configitems resource
     
   Scenario: get the list of existing configitems with limit and offset
     Given 8 of configitems
-    When I query the cmdb collection of configitems with limit 2 and offset 4
+    When I query the cmdb collection of configitems with limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "ConfigItem"
     When delete all of configitems
@@ -89,6 +89,19 @@ Feature: GET request to the /cmdb/configitems resource
     When delete all of configitems
     Then the response code is 204
     And the response has no content
- 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     

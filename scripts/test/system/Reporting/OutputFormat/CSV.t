@@ -16,16 +16,7 @@ use vars (qw($Self));
 # get ReportDefinition object
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @ConfigTests = (
@@ -52,6 +43,7 @@ my @ConfigTests = (
             Columns => 'abc'
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid Separator',
@@ -59,6 +51,7 @@ my @ConfigTests = (
             Separator => ''
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid Quote',
@@ -66,6 +59,7 @@ my @ConfigTests = (
             Quote => ''
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid language',
@@ -73,6 +67,7 @@ my @ConfigTests = (
             TranslateColumnNames => 'cn'
         },
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'valid Config - only columns',
@@ -98,7 +93,8 @@ foreach my $Test ( @ConfigTests ) {
     # wrong config
     my $Result = $ReportingObject->OutputFormatValidateConfig(
         Format => 'CSV',
-        Config => $Test->{Config}
+        Config => $Test->{Config},
+        Silent => $Test->{Silent},
     );
 
     if ( ! ref $Test->{Expect} ) {
@@ -390,8 +386,6 @@ foreach my $Test ( @DataTests ) {
         'GenerateOutput() - content '.$Test->{Test},
     );
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

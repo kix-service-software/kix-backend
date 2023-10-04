@@ -19,6 +19,7 @@ my @Tests = (
         Name    => 'Simple string',
         Data    => 'Teststring <tag> äß@ø " \\" \' \'\'',
         Success => 0,
+        Silent  => 1,
     },
     {
         Name    => 'Simple string reference',
@@ -87,9 +88,18 @@ my $StorableObject = $Kernel::OM->Get('Storable');
 
 for my $Test (@Tests) {
 
-    my $StorableString = $StorableObject->Serialize( Data => $Test->{Data} );
-    my $StorableData = $StorableObject->Deserialize( Data => $StorableString );
-    my $StorableClone = $StorableObject->Clone( Data => $Test->{Data} );
+    my $StorableString = $StorableObject->Serialize(
+        Data   => $Test->{Data},
+        Silent => $Test->{Silent},
+    );
+    my $StorableData   = $StorableObject->Deserialize(
+        Data   => $StorableString,
+        Silent => $Test->{Silent},
+    );
+    my $StorableClone  = $StorableObject->Clone(
+        Data   => $Test->{Data},
+        Silent => $Test->{Silent},
+    );
 
     if ( $Test->{Success} ) {
         $Self->IsDeeply(
@@ -122,12 +132,16 @@ for my $Test (@Tests) {
         Data => {
             Test => 1,
         },
+        Silent => 1,
     },
 );
 
 for my $Test (@Tests) {
 
-    my $StorableData = $StorableObject->Deserialize( Data => $Test->{Data} );
+    my $StorableData = $StorableObject->Deserialize(
+        Data   => $Test->{Data},
+        Silent => $Test->{Silent},
+    );
 
     $Self->Is(
         $StorableData,

@@ -8,6 +8,26 @@ Feature: POST request to the /tickets resource
   Scenario: create a ticket
     When I create a ticket
     Then the response code is 201
+    Then the response object is TicketPostPatchResponse
+    When I delete this ticket
+    Then the response code is 204
+
+  Scenario: create a ticket no validate
+    When I create a complete ticket
+    Then the response code is 400
+    And the response object is Error
+    And the error code is "Validator.Failed"
+    And the error message is "Validation of attribute ContactID failed!"
+
+  Scenario: create a ticket do not changed placeholder
+    When I create a ticket placeholder
+    Then the response code is 201
+    Then the response object is TicketPostPatchResponse
+    When I get this ticket with include article
+    Then the response code is 200
+    And the response contains the following article attributes
+      | # Body                                                                                                                                                  |
+      | Calendar: , BusinessTimeDeviaton: , TargetTime: , KIX_CONFIG_Ticket::Hook:,KIX_CONFIG_PGP::Key::Password: ,KIX_CONFIG_ContactSearch::UseWildcardPrefix: |
     When I delete this ticket
     Then the response code is 204
 

@@ -116,6 +116,7 @@ sub Run {
         Comment  => $SystemAddress->{Comment} || '',
         ValidID  => $SystemAddress->{ValidID} || 1,
         Realname => $SystemAddress->{Realname},
+        QueueID  => $SystemAddress->{QueueID},
         UserID   => $Self->{Authorization}->{UserID},
     );
 

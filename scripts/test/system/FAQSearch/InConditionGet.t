@@ -14,52 +14,93 @@ use utf8;
 
 use vars (qw($Self));
 
-# get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $Helper = $Kernel::OM->Get('UnitTest::Helper');
-
 my @Tests = (
     {
         Name   => 'No array',
         Params => {
             TableColumn => 'test.table',
-            IDRef       => 1,
+            ValueList   => 1,
+            Silent      => 1
         },
         Result => undef,
     },
     {
-        Name   => 'Single Integer',
+        Name   => 'Single value  (Integer)',
         Params => {
             TableColumn => 'test.table',
-            IDRef       => [1],
+            ValueList   => [1],
+            Type        => 'Integer'
         },
         Result => ' (  test.table IN (1)  ) ',
     },
     {
-        Name   => 'Sorted values',
+        Name   => 'Single integer value without type',
         Params => {
             TableColumn => 'test.table',
-            IDRef       => [ 2, 1, -1, 0 ],
+            ValueList   => [1],
+        },
+        Result => ' (  test.table IN (\'1\')  ) ',
+    },
+    {
+        Name   => 'Single value (String)',
+        Params => {
+            TableColumn => 'test.table',
+            ValueList   => [ 'de' ],
+            Type        => 'String'
+        },
+        Result => ' (  test.table IN (\'de\')  ) ',
+    },
+    {
+        Name   => 'Sorted values (Integer)',
+        Params => {
+            TableColumn => 'test.table',
+            ValueList   => [ 2, 1, -1, 0 ],
+            Type        => 'Integer'
         },
         Result => ' (  test.table IN (-1, 0, 1, 2)  ) ',
     },
     {
-        Name   => 'Invalid value',
+        Name   => 'Sorted values (String)',
         Params => {
             TableColumn => 'test.table',
-            IDRef       => [1.1],
+            ValueList   => [ 'external', 'de'  ],
+            Type        => 'String'
+        },
+        Result => ' (  test.table IN (\'de\', \'external\')  ) ',
+    },
+    {
+        Name   => 'Invalid value (Integer)',
+        Params => {
+            TableColumn => 'test.table',
+            ValueList   => [q{}],
+            Type        => 'Integer'
         },
         Result => undef,
     },
     {
-        Name   => 'Mix of valid and invalid values',
+        Name   => 'Invalid value (String)',
         Params => {
             TableColumn => 'test.table',
-            IDRef       => [ 1, 1.1 ],
+            ValueList   => [undef],
+            Type        => 'String'
+        },
+        Result => undef,
+    },
+    {
+        Name   => 'Mix of valid and invalid values (Integer)',
+        Params => {
+            TableColumn => 'test.table',
+            ValueList   => [ 1, 1.1 ],
+            Type        => 'Integer'
+        },
+        Result => undef,
+    },
+    {
+        Name   => 'Mix of valid and invalid values (String)',
+        Params => {
+            TableColumn => 'test.table',
+            ValueList   => [ 'de', undef ],
+            Type        => 'String'
         },
         Result => undef,
     },
@@ -76,11 +117,7 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup is done by RestoreDatabase.
-
 1;
-
-
 
 =back
 

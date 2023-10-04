@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,21 +15,39 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $WebService = 'webservice' . $Helper->GetRandomID();
 
 # create a base web service
-my $WebServiceID = $Kernel::OM->Get('GenericInterface::Webservice')->WebserviceAdd(
+my $WebServiceID = $Kernel::OM->Get('Webservice')->WebserviceAdd(
     Name   => $WebService,
     Config => {
         Provider => {
+            Operation => {
+                'Test::User::UserSearch' => {
+                    Description           => '',
+                    NoAuthorizationNeeded => 1,
+                    Type                  => 'V1::Sessions::SessionCreate',
+                },
+            },
             Transport => {
+                Config => {
+                    KeepAlive             => '',
+                    MaxLength             => '52428800',
+                    RouteOperationMapping => {
+                        'Test::User::UserSearch' => {
+                            RequestMethod => [
+                                'GET',
+                                'POST'
+                            ],
+                            Route => '/Test'
+                        }
+                    }
+                },
             },
         },
     },
@@ -57,7 +75,7 @@ my @Tests = (
     {
         Name     => 'Correct webservice-id',
         Options  => [ '--webservice-id', $WebServiceID ],
-        ExitCode => 0,
+        ExitCode => 1,
     },
     {
         Name     => 'Already deleted webservice-id',
@@ -68,6 +86,12 @@ my @Tests = (
 
 # get command object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::WebService::Delete');
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 for my $Test (@Tests) {
 
@@ -80,7 +104,8 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup cache is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

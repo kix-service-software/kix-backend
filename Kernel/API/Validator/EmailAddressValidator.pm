@@ -65,7 +65,11 @@ sub Validate {
     my $FailedMail = '';
     if ($Param{Attribute} =~ /^(From|Cc|Bcc|To|Email)$/g) {
         for my $Email ( Email::Address::XS->parse( $Param{Data}->{$Param{Attribute}} ) ) {
-            if ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
+            if ( !$Email->is_valid() ) {
+                $FailedMail = $Param{Data}->{$Param{Attribute}};
+                last;
+            }
+            elsif ( !$Kernel::OM->Get('CheckItem')->CheckEmail( Address => $Email->address() ) ) {
                 $FailedMail = $Email->address();
                 last;
             }
@@ -77,6 +81,7 @@ sub Validate {
             Message => "EmailAddressValidator: cannot validate attribute $Param{Attribute}!",
         );
     }
+
 
     if ( $FailedMail ) {
         return $Self->_Error(

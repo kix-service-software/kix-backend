@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,8 +10,7 @@
 [% RenderBlockStart("CSS") %]
 <style  type="text/css">
     .[% Data.ID %] {
-        white-space: nowrap;
-        overflow: hidden;
+
         padding: 0.3em;
         display: block;
 [% IF Data.Style.Height %]
@@ -30,8 +29,7 @@
 [% END %]
     }
     .[% Data.ID %] > p {
-        overflow: hidden;
-        white-space: pre-line;
+        display:inline;
         padding: 1px 0 0 0;
     }
     .[% Data.ID %] > img {

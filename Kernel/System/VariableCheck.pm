@@ -25,8 +25,6 @@ our %EXPORT_TAGS = (    ## no critic
         'IsHashRef',
         'IsHashRefWithData',
         'IsInteger',
-        'IsIPv4Address',
-        'IsIPv6Address',
         'IsMD5Sum',
         'IsNotEqual',
         'IsNumber',
@@ -89,10 +87,6 @@ The functions can be grouped as follows:
 =head2 Special data format checks
 
 =over 4
-
-=item * L</IsIPv4Address()>
-
-=item * L</IsIPv6Address()>
 
 =item * L</IsMD5Sum()>
 
@@ -321,41 +315,6 @@ sub IsPositiveInteger {
     return if $TestData !~ m{ \A [1-9] \d* \z }xms;
 
     return 1;
-}
-
-=item IsIPv4Address()
-
-test supplied data to determine if it is a valid IPv4 address (syntax check only)
-
-returns 1 if data matches criteria or undef otherwise
-
-    my $Result = IsIPv4Address(
-        '192.168.0.1', # data to be tested
-    );
-
-=cut
-
-sub IsIPv4Address {
-    my $TestData = $_[0];
-    return is_ipv4($TestData);
-}
-
-=item IsIPv6Address()
-
-test supplied data to determine if it is a valid IPv6 address (syntax check only)
-shorthand notation and mixed IPv6/IPv4 notation allowed
-
-returns 1 if data matches criteria or undef otherwise
-
-    my $Result = IsIPv6Address(
-        '0000:1111:2222:3333:4444:5555:6666:7777', # data to be tested
-    );
-
-=cut
-
-sub IsIPv6Address {
-    my $TestData = $_[0];
-    return is_ipv6($TestData);
 }
 
 =item IsMD5Sum()

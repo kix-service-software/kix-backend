@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -23,8 +23,11 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 $Self->True( $Kernel::OM, 'Could build object manager' );
 
-# get config object
+# get needed object
+my $MainObject   = $Kernel::OM->Get('Main');
 my $ConfigObject = $Kernel::OM->Get('Config');
+
+my $Home = $ConfigObject->Get('Home');
 
 my $SkipCryptSMIME;
 if ( !$ConfigObject->Get('SMIME') ) {
@@ -36,36 +39,25 @@ if ( !$ConfigObject->Get('PGP') ) {
     $SkipCryptPGP = 1;
 }
 
-my $SkipChat;
-if ( !$ConfigObject->Get('ChatEngine::Active') ) {
-    $SkipChat = 1;
+my %SkipModules;
+if ( !$MainObject->Require('SLA', Silent => 1) ) {
+    $SkipModules{SLA} = {
+        $Home. "/Kernel/System/Automation/MacroAction/Ticket/StateSet.pm" => 1
+    };
 }
-
-my $SkipCalendar;
-if ( !$Kernel::OM->Get('Main')->Require( 'Calendar', Silent => 1 ) ) {
-    $SkipCalendar = 1;
+if ( !$MainObject->Require('DFAttachment', Silent => 1) ) {
+    $SkipModules{DFAttachment} = {
+        $Home. "/Kernel/System/Ticket/Event/NotificationEvent/Transport/Email.pm" => 1
+    };
 }
-
-my $SkipTeam;
-if ( !$Kernel::OM->Get('Main')->Require( 'Calendar::Team', Silent => 1 ) ) {
-    $SkipTeam = 1;
-}
-
-my $Home = $ConfigObject->Get('Home');
-
-# get main object
-my $MainObject = $Kernel::OM->Get('Main');
 
 my %OperationChecked;
-
 my @DirectoriesToSearch = (
     '/bin',
-    '/Custom/Kernel/Output',
-    '/Custom/Kernel/System',
-    '/Kernel/GenericInterface',
+    '/Kernel/API',
     '/Kernel/Output',
     '/Kernel/System',
-    '/var/packagesetup'
+    '/var/packagesetup',
 );
 
 for my $Directory ( sort @DirectoriesToSearch ) {
@@ -77,6 +69,7 @@ for my $Directory ( sort @DirectoriesToSearch ) {
 
     LOCATION:
     for my $Location (@FilesInDirectory) {
+
         my $ContentSCALARRef = $MainObject->FileRead(
             Location => $Location,
         );
@@ -93,10 +86,8 @@ for my $Directory ( sort @DirectoriesToSearch ) {
         #    $2 will contain Get
         OPERATION:
         while (
-            ${$ContentSCALARRef}
-            =~ m{ \$Kernel::OM \s* -> \s* Get\( \s* '([^']+)'\) \s* -> \s* ([a-zA-Z1-9]+)\( }msxg
-            )
-        {
+            ${$ContentSCALARRef} =~ m{ \$Kernel::OM \s* -> \s* Get\( \s* '([^']+)'\) \s* -> \s* ([a-zA-Z1-9]+)\( }msxg
+        ) {
 
             # skip if the function for the object was already checked before
             next OPERATION if $OperationChecked{"$1->$2()"};
@@ -104,12 +95,7 @@ for my $Directory ( sort @DirectoriesToSearch ) {
             # skip crypt object if it is not configured
             next OPERATION if $1 eq 'Crypt::SMIME'          && $SkipCryptSMIME;
             next OPERATION if $1 eq 'Crypt::PGP'            && $SkipCryptPGP;
-            next OPERATION if $1 eq 'Chat'                  && $SkipChat;
-            next OPERATION if $1 eq 'ChatChannel'           && $SkipChat;
-            next OPERATION if $1 eq 'VideoChat'             && $SkipChat;
-            next OPERATION if $1 eq 'Calendar'              && $SkipCalendar;
-            next OPERATION if $1 eq 'Calendar::Appointment' && $SkipCalendar;
-            next OPERATION if $1 eq 'Calendar::Team'        && $SkipTeam;
+            next OPERATION if $SkipModules{$1}->{$Location};
 
             # load object
             my $Object = $Kernel::OM->Get("$1");
@@ -131,7 +117,6 @@ for my $Directory ( sort @DirectoriesToSearch ) {
 $Kernel::OM->Get('Cache')->CleanUp();
 
 1;
-
 
 
 =back

@@ -18,12 +18,16 @@ use vars (qw($Self));
 my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::ITSM::Configitem::ListDuplicates');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $HelperObject = $Kernel::OM->Get('UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # check command without any options
 my $ExitCode = $CommandObject->Execute();
@@ -35,7 +39,7 @@ $Self->Is(
 );
 
 # check command with --class options (invalid class)
-my $RandomClass = 'NonExistingClass' . $HelperObject->GetRandomID();
+my $RandomClass = 'NonExistingClass' . $Helper->GetRandomID();
 $ExitCode = $CommandObject->Execute( '--class', $RandomClass );
 
 $Self->Is(
@@ -80,7 +84,7 @@ my $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
 );
 push @ConfigItemID, $ConfigItemID;
 
-my $ConfigItemName = 'TestConfigItem' . $HelperObject->GetRandomID();
+my $ConfigItemName = 'TestConfigItem' . $Helper->GetRandomID();
 my $VersionID      = $ConfigItemObject->VersionAdd(
     Name         => $ConfigItemName,
     DefinitionID => 1,
@@ -139,7 +143,7 @@ $Self->Is(
 );
 
 # check command with --scope options (invalid scope)
-my $RandomScope = 'scope' . $HelperObject->GetRandomID();
+my $RandomScope = 'scope' . $Helper->GetRandomID();
 $ExitCode = $CommandObject->Execute( '--scope', $RandomScope );
 
 $Self->Is(
@@ -175,7 +179,8 @@ $Self->Is(
     "Option 'scope' (all-states) ",
 );
 
-# cleanup is done by RestoreDatabse
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

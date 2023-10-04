@@ -16,12 +16,10 @@ use vars (qw($Self));
 my $FilterObject = $Kernel::OM->Get('PostMaster::Filter');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # general tests for Filter
 my @Tests = (
@@ -146,7 +144,7 @@ for my $Test (@Tests) {
     ) || next TEST;
 
     # test get by name
-    my %ResultGet = $FilterObject->FilterGet(
+    %ResultGet = $FilterObject->FilterGet(
         Name   => $Test->{Filter}->{Name},
         UserID => 1
     );
@@ -271,11 +269,13 @@ my $UpdateID = $FilterObject->FilterUpdate(
     %{ $Tests[1]->{Filter} },
     ID     => [ keys %NewFilters ]->[1],
     Name   => '',
-    UserID => 1
+    UserID => 1,
+    Silent => 1,
 );
 $Self->False( $UpdateID, 'Update with invalid name' );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 sub _inList {
     my ( $Self, %Param ) = @_;

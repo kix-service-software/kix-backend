@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -23,16 +23,19 @@ use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'CheckItem',
-    'DB',
-    'Encode',
-    'Log',
-    'Main',
-    'Time',
-    'Valid',
+our @ObjectDependencies = qw(
+    Config
+    Cache
+    Contact
+    CheckItem
+    ClientRegistration
+    DB
+    Encode
+    Log
+    Main
+    Role
+    Time
+    Valid
 );
 
 =head1 NAME
@@ -299,8 +302,8 @@ sub GetUserData {
                     = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
             }
 
-# Reduce CacheTTL to one hour for users that are out of office to make sure the cache expires timely
-#   even if there is no update action.
+            # Reduce CacheTTL to one hour for users that are out of office to make sure the cache expires timely
+            #   even if there is no update action.
             $CacheTTL = 60 * 60 * 1;
         }
     }
@@ -520,18 +523,15 @@ sub UserUpdate {
             UserLogin => $Param{UserLogin},
             UserID    => $Param{UserID}
         )
-        )
-    {
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "A user with username '$Param{UserLogin}' already exists!"
         );
         return;
     }
-    $Param{IsAgent}
-        = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
-    $Param{IsCustomer}
-        = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) )
+    $Param{IsAgent}    = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
+    $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) )
         ? $Param{IsCustomer}
         : 0;
 
@@ -620,7 +620,12 @@ sub UserSearch {
 
     # check needed stuff
     if (
-        !$Param{Search} && !$Param{UserLogin} && !$Param{UserLoginEquals} && !$Param{IsAgent} && !$Param{IsCustomer} && !$Param{ValidID}
+        !$Param{Search}
+        && !$Param{UserLogin}
+        && !$Param{UserLoginEquals}
+        && !$Param{IsAgent}
+        && !$Param{IsCustomer}
+        && !$Param{ValidID}
         && !IsArrayRef$Param{UserIDs}
     ) {
         $Kernel::OM->Get('Log')->Log(
@@ -630,8 +635,7 @@ sub UserSearch {
         return;
     }
 
-    my $CacheKey
-        = 'UserSearch::'
+    my $CacheKey = 'UserSearch::'
         . ( $Param{Search} || '' ) . '::'
         . ( $Param{UserLogin} || '' ) . '::'
         . ( $Param{UserLoginEquals} || '' ) . '::'
@@ -1038,10 +1042,16 @@ get user name
 sub UserName {
     my ( $Self, %Param ) = @_;
 
-    my %User = $Self->GetUserData(%Param);
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(%Param);
+    return if ( !$ContactID );
 
-    return if !%User;
-    return $User{Login};
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        ID            => $ContactID,
+        DynamicFields => 0,
+    );
+    return if ( !%Contact );
+
+    return $Contact{Fullname};
 }
 
 =item UserList()
@@ -1223,8 +1233,7 @@ sub PermissionList {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # check cache
-    my $CacheKey
-        = 'PermissionList::'
+    my $CacheKey = 'PermissionList::'
         . ( $Param{UserID} || '' ) . '::'
         . ( $Param{RoleID} || '' ) . '::'
         . ( $Param{UsageContext} || '' ) . '::'

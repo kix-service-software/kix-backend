@@ -29,17 +29,19 @@ use Digest::MD5 qw(md5_hex);
 
 use vars qw(@ISA);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Cache',
-    'GeneralCatalog',
-    'LinkObject',
-    'Log',
-    'Main',
-    'User',
-    'VirtualFS',
-    'XML',
+our @ObjectDependencies = qw(
+    Config
+    Cache
+    ClientRegistration
+    DB
+    GeneralCatalog
+    ITSMConfigItem
+    JSON
+    LinkObject
+    Log
+    Main
+    Time
+    VirtualFS
 );
 
 =head1 NAME
@@ -390,10 +392,12 @@ sub ConfigItemGet {
 
     # check config item
     if ( !$ConfigItem{ConfigItemID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such ConfigItemID ($Param{ConfigItemID})!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No such ConfigItemID ($Param{ConfigItemID})!",
+            );
+        }
         return;
     }
 
@@ -451,10 +455,12 @@ sub ConfigItemAdd {
     # check needed stuff
     for my $Argument (qw(ClassID UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -469,15 +475,15 @@ sub ConfigItemAdd {
 
     # check the class id
     if ( !$ClassList->{ $Param{ClassID} } ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No valid class id given!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'No valid class id given!',
+            );
+        }
         return;
     }
 
-    # KIX4OTRS-capeIT
     # trigger ConfigItemCreate
     my $Result = $Self->PreEventHandler(
         Event => 'ConfigItemCreate',
@@ -500,7 +506,6 @@ sub ConfigItemAdd {
             $Param{$ResultKey} = $Result->{$ResultKey};
         }
     }
-    # EO KIX4OTRS-capeIT
 
     # create config item number
     if ( $Param{Number} ) {
@@ -511,10 +516,12 @@ sub ConfigItemAdd {
         );
 
         if ($Exists) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Config item number already exists!',
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Config item number already exists!',
+                );
+            }
             return;
         }
     }
@@ -1407,7 +1414,6 @@ sub ConfigItemSearch {
         ChangeBy     => 'change_by',
     );
 
-    # KIX4OTRS-capeIT
     # do default sort if item not used
     my $Match = 0;
     for my $OrderBy ( @{ $Param{OrderBy} } ) {
@@ -1417,8 +1423,6 @@ sub ConfigItemSearch {
     if ( !$Match ) {
         @{ $Param{OrderBy} } = ('Number');
     }
-
-    # EO KIX4OTRS-capeIT
 
     # check if OrderBy contains only unique valid values
     my %OrderBySeen;
@@ -1541,13 +1545,13 @@ sub ConfigItemSearch {
         InciStateIDs  => 'cur_inci_state_id',
         CreateBy      => 'create_by',
         ChangeBy      => 'change_by',
-        ConfigItemIDs => 'id'
+        ConfigItemIDs => 'id',
     );
 
     ARRAYPARAM:
     for my $ArrayParam ( sort keys %ArrayParams ) {
 
-        next ARRAYPARAM if !$Param{$ArrayParam};
+        next ARRAYPARAM if !defined $Param{$ArrayParam};
 
         if ( ref $Param{$ArrayParam} ne 'ARRAY' ) {
             $Kernel::OM->Get('Log')->Log(
@@ -1557,17 +1561,16 @@ sub ConfigItemSearch {
             return;
         }
 
-        next ARRAYPARAM if !@{ $Param{$ArrayParam} };
+        return [] if !IsArrayRefWithData($Param{$ArrayParam});
 
         # quote as integer
         for my $OneParam ( @{ $Param{$ArrayParam} } ) {
             $OneParam = $Kernel::OM->Get('DB')->Quote( $OneParam, 'Integer' );
+            return if ( !defined $OneParam );
         }
 
         # create string
         my $InString = join q{, }, @{ $Param{$ArrayParam} };
-
-        next ARRAYPARAM if !$InString;
 
         push @SQLWhere, "$ArrayParams{ $ArrayParam } IN ($InString)";
     }
@@ -1625,7 +1628,7 @@ sub ConfigItemSearch {
         $SQL .= join ', ', @SQLOrderBy;
         $SQL .= ' ';
     }
-
+print STDERR Data::Dumper::Dumper($SQL);
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
@@ -2027,20 +2030,20 @@ sub RecalculateCurrentIncidentState {
             $NewIncidentState->{InciStateID}   = $ConfigItem->{CurInciStateID};
         }
 
+        # check the current incident state type is in 'incident'
+        # then we do not want to change it to warning
+        next CONFIGITEMID if (
+            $NewIncidentState->{InciStateType}
+            && $NewIncidentState->{InciStateType} eq 'incident'
+        );
+
         my $CurInciStateID;
         if ( $InciStateType eq 'warning' ) {
 
-            # check the current incident state type is in 'incident'
-            # then we do not want to change it to warning
-            next CONFIGITEMID if $NewIncidentState->{InciStateType} eq 'incident';
-
             $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{warning};
         }
-        elsif ( $InciStateType eq 'operational' ) {
-            $CurInciStateID = $NewIncidentState->{InciStateID};
-        }
-        elsif ( $InciStateType eq 'incident' ) {
-            $CurInciStateID = $NewIncidentState->{InciStateID};
+        else {
+            $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{operational};
         }
 
         $NewConfigItemIncidentState{$ConfigItemID}->{State} = $Self->{IncidentStateList}->{$CurInciStateID};
@@ -2712,14 +2715,20 @@ sub GetAssignedConfigItemsForObject {
     if ( IsStringWithData($MappingString) ) {
 
         my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data => $MappingString
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
         );
 
         if ( !IsHashRefWithData($Mapping) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
+                );
+            }
         } elsif ( IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) ) {
 
             CICLASS:
@@ -2728,8 +2737,9 @@ sub GetAssignedConfigItemsForObject {
 
                 # get class
                 my $ClassItemRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-                    Class => 'ITSM::ConfigItem::Class',
-                    Name  => $CIClass,
+                    Class  => 'ITSM::ConfigItem::Class',
+                    Name   => $CIClass,
+                    Silent => $Param{Silent} || 0
                 );
 
                 next CICLASS if ( !IsHashRefWithData($ClassItemRef) || !$ClassItemRef->{ItemID} );
@@ -2740,10 +2750,15 @@ sub GetAssignedConfigItemsForObject {
                 );
 
                 if ( !$XMLDefinition->{DefinitionID} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "No Definition definied for class $CIClass!",
-                    );
+                    if (
+                        !defined $Param{Silent}
+                        || !$Param{Silent}
+                    ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "No Definition definied for class $CIClass!",
+                        );
+                    }
                     next CICLASS;
                 }
 
@@ -2850,10 +2865,15 @@ sub GetAssignedConfigItemsForObject {
                 }
             }
         } else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "'$Param{ObjectType}' not contained in 'AssignedConfigItemsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "'$Param{ObjectType}' not contained in 'AssignedConfigItemsMapping'."
+                );
+            }
         }
     }
 
@@ -3038,6 +3058,7 @@ sub UpdateCounters {
     # check for needed stuff
     for ( qw(UserID) ) {
         if ( !$Param{$_} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -3051,10 +3072,12 @@ sub UpdateCounters {
         Class => 'ITSM::ConfigItem::Class'
     );
     if ( !IsHashRefWithData($ClassList) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No configitem classes found!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No configitem classes found!"
+            );
+        }
         return;
     }
 
@@ -3064,6 +3087,7 @@ sub UpdateCounters {
         CLASS:
         foreach my $Class ( @{$Param{Classes}} ) {
             if ( !$ClassListReverse{$Class} ) {
+                next CLASS if $Param{Silent};
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "No ClassID for class \"$Class\" found!"
@@ -3082,6 +3106,7 @@ sub UpdateCounters {
         Class => 'ITSM::ConfigItem::DeploymentState'
     );
     if ( !IsHashRefWithData($DeplStateList) ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No deployment states found!"
@@ -3114,6 +3139,7 @@ sub UpdateCounters {
         Class => 'ITSM::Core::IncidentState'
     );
     if ( !IsHashRefWithData($InciStateList) ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No incident states found!"
@@ -3135,6 +3161,7 @@ sub UpdateCounters {
             SQL => "DELETE FROM configitem_counter WHERE counter <> 'AutoIncrement' AND class_id = $ClassID"
         );
         if ( !$Success ) {
+            next CLASSID if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to remove counters for ClassID $ClassID!"
@@ -3176,6 +3203,7 @@ sub UpdateCounters {
                 Value   => $Counters{$Counter},
             );
             if ( !$Success ) {
+                next CLASSID if $Param{Silent};
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to update counter \"$Counter\" for ClassID $ClassID!"
@@ -3368,7 +3396,7 @@ sub _FindInciConfigItems {
 
             # Direction must ALWAYS be 'Both' here as we need to include
             # all linked CIs that could influence this one!
-            Direction => $Param{IncidentLinkTypeDirection}->{$LinkType}, #'Both',
+            Direction => 'Both',
 
             UserID => 1,
         );
@@ -3449,14 +3477,13 @@ sub _FindWarnConfigItems {
         }
     }
 
-# ignore already scanned ids (infinite loop protection)
-# it is ok that a config item is investigated as many times as there are configured link types * number of incident config iteems
+    # ignore already scanned ids (infinite loop protection)
+    # it is ok that a config item is investigated as many times as there are configured link types * number of incident config iteems
     if (
         $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
         && $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} }->{FindWarn}->{$Param{LinkType}}
         >= $IncidentCount
-        )
-    {
+    ) {
         return;
     }
 
@@ -3536,3 +3563,6 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+
+

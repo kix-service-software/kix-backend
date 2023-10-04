@@ -10,3 +10,13 @@
     Then the response code is 200
 #    And the response object is ObjectIconCollectionResponse
 
+  Scenario: get the list of existing objecticons with filter (+)
+    When I query the collection of objecticons with filter
+    Then the response code is 200
+    And the response contains 1 items of type "ObjectIcon"
+    And the response contains the following items of type ObjectIcon
+      | Object   | ContentType   |
+      | MIMEType | image/svg+xml |
+
+
+

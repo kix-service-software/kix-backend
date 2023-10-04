@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -29,12 +29,10 @@ my $DynamicFieldObject   = $Kernel::OM->Get('DynamicField');
 my $DFBackendObject      = $Kernel::OM->Get('DynamicField::Backend');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get deployment state list
 my $DeplStateList = $GeneralCatalogObject->ItemList(
@@ -48,33 +46,8 @@ my $InciStateList = $GeneralCatalogObject->ItemList(
 );
 my %InciStateListReverse = reverse %{$InciStateList};
 
-#####################
-# create classes
-my $ClassAName = 'AutoLinkA';
-my $ClassAID = $GeneralCatalogObject->ItemAdd(
-    Class    => 'ITSM::ConfigItem::Class',
-    Name     => $ClassAName,
-    Comment  => '',
-    ValidID  => 1,
-    UserID   => 1
-);
-$Self->True(
-    $ClassAID,
-    'Create class ' . $ClassAName,
-);
-my $ClassBName = 'AutoLinkB';
-my $ClassBID = $GeneralCatalogObject->ItemAdd(
-    Class    => 'ITSM::ConfigItem::Class',
-    Name     => $ClassBName,
-    Comment  => '',
-    ValidID  => 1,
-    UserID   => 1
-);
-$Self->True(
-    $ClassBID,
-    'Create class ' . $ClassBName,
-);
-my $DefString = "[
+my $DefString = <<'END';
+[
     {
         Key          => 'SectionHost',
         Name         => 'Host',
@@ -109,7 +82,22 @@ my $DefString = "[
             }
         ]
     }
-]";
+]
+END
+
+my $ClassAName = 'AutoLink' . $Helper->GetRandomNumber();
+my $ClassAID = $GeneralCatalogObject->ItemAdd(
+    Class    => 'ITSM::ConfigItem::Class',
+    Name     => $ClassAName,
+    Comment  => q{},
+    ValidID  => 1,
+    UserID   => 1
+);
+$Self->True(
+    $ClassAID,
+    'Create class ' . $ClassAName,
+);
+
 my $ClassADefID = $ConfigItemObject->DefinitionAdd(
     ClassID    => $ClassAID,
     UserID     => 1,
@@ -119,6 +107,27 @@ $Self->True(
     $ClassADefID,
     'Create class definition of ' . $ClassAName,
 );
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'GeneralCatalog',
+        'ITSMConfigItem'
+    ]
+);
+
+my $ClassBName = 'AutoLink' . $Helper->GetRandomNumber();
+my $ClassBID = $GeneralCatalogObject->ItemAdd(
+    Class    => 'ITSM::ConfigItem::Class',
+    Name     => $ClassBName,
+    Comment  => q{},
+    ValidID  => 1,
+    UserID   => 1
+);
+$Self->True(
+    $ClassBID,
+    'Create class ' . $ClassBName,
+);
+
 my $ClassBDefID = $ConfigItemObject->DefinitionAdd(
     ClassID    => $ClassBID,
     UserID     => 1,
@@ -129,6 +138,13 @@ $Self->True(
     'Create class definition of ' . $ClassBName,
 );
 
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'GeneralCatalog',
+        'ITSMConfigItem'
+    ]
+);
+
 my $FQDNValue = 'some.fqdn.com';
 my $IPValue   = '1.2.3.4';
 my $IPValue2  = '5.6.7.8';
@@ -137,14 +153,16 @@ my $IPValue2  = '5.6.7.8';
 # create config items
 # item for value from body - should be found
 my $ConfigItemAID = $ConfigItemObject->ConfigItemAdd(
-    Number  => '00000000000000001',
+    Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
 );
+
 $Self->True(
     $ConfigItemAID,
     'Create config item A',
 );
+
 if ($ConfigItemAID) {
     my $ConfigItemAVersionID = $ConfigItemObject->VersionAdd(
         ConfigItemID => $ConfigItemAID,
@@ -183,9 +201,16 @@ if ($ConfigItemAID) {
         'Create version A',
     );
 }
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
 # item for value from DF - should be found
 my $ConfigItemBID = $ConfigItemObject->ConfigItemAdd(
-    Number  => '00000000000000002',
+    Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
 );
@@ -228,9 +253,16 @@ if ($ConfigItemBID) {
         'Create version B',
     );
 }
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
 # item for value from DF but not matching value - should NOT be found
 my $ConfigItemCID = $ConfigItemObject->ConfigItemAdd(
-    Number  => '00000000000000003',
+    Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
 );
@@ -273,9 +305,16 @@ if ($ConfigItemCID) {
         'Create version C',
     );
 }
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
 # item for value from DF with matching value but not used class - should NOT be found
 my $ConfigItemDID = $ConfigItemObject->ConfigItemAdd(
-    Number  => '00000000000000004',
+    Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassBID,
     UserID  => 1,
 );
@@ -318,6 +357,12 @@ if ($ConfigItemDID) {
         'Create version D',
     );
 }
+
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
 
 #####################
 # set relevant configs
@@ -382,7 +427,7 @@ my @NewTicketMail = (
     'Address: 192.168.10.9' . "\n",
     "\n",
     'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' . "\n",
-    "\n"
+    "\n",
 );
 $ConfigObject->Set(
     Key   => 'PostmasterDefaultState',
@@ -399,10 +444,12 @@ $Self->Is(
     'New ticket created',
 );
 if ($Return[0] == 1) {
+
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
+
     # check if asset A is set by body text ("Host:")
     $Self->True(
         IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
@@ -421,10 +468,12 @@ if ($Return[0] == 1) {
     my $AddressDynamicField = $DynamicFieldObject->DynamicFieldGet(
         Name => 'SysMonXAddress',
     );
+
     $Self->True(
         IsHashRefWithData($AddressDynamicField) || 0,
         'Get DF "SysMonXAddress"',
     );
+
     if (IsHashRefWithData($AddressDynamicField)) {
         my $Success = $DFBackendObject->ValueSet(
             DynamicFieldConfig => $AddressDynamicField,
@@ -432,20 +481,24 @@ if ($Return[0] == 1) {
             Value              => [$IPValue],
             UserID             => 1,
         );
+
         $Self->True(
             $Success || 0,
             'Set DF "SysMonXAddress" value',
         );
+
         if ($Success) {
             %Ticket = $TicketObject->TicketGet(
                 TicketID      => $Return[1],
                 DynamicFields => 1,
             );
+
             # check if assets (A and B) are set
             $Self->True(
                 IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
                 "Ticket has affected assets (2nd check)",
             );
+
             if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
                 $Self->Is(
                     scalar @{ $Ticket{DynamicField_AffectedAsset} },
@@ -489,15 +542,18 @@ if ($Return[0] == 1) {
         HistoryComment   => 'Some comment!',
         UserID           => 1,
     );
+
     %Ticket = $TicketObject->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
+
     # check if asset C is NOT set by body text ("Address:" - FirstArticleOnly is active)
     $Self->True(
         IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
         "Ticket has affected assets (3rd check)",
     );
+
     if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
         $Self->Is(
             scalar @{ $Ticket{DynamicField_AffectedAsset} },
@@ -520,12 +576,15 @@ if ($Return[0] == 1) {
             'Ticket has NOT config item C',
         );
     }
+
     # repeat but with inactive FirstArticleOnly
+
     my $EventConfig = $ConfigObject->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
     $Self->True(
         IsHashRefWithData($EventConfig) || 0,
         "Event-Config 500-TicketAutoLinkConfigItem is a hash ref",
     );
+
     if ( IsHashRefWithData($EventConfig) ) {
         $ConfigObject->Set(
             Key   => 'Ticket::EventModulePost###500-TicketAutoLinkConfigItem',
@@ -534,11 +593,13 @@ if ($Return[0] == 1) {
                 FirstArticleOnly => 0
             }
         );
+
         $EventConfig = $ConfigObject->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
         $Self->True(
             IsHashRefWithData($EventConfig) || 0,
             "Event-Config 500-TicketAutoLinkConfigItem is a hash ref (2nd)",
         );
+
         if (IsHashRefWithData($EventConfig)) {
             $Self->Is(
                 $EventConfig->{FirstArticleOnly},
@@ -546,6 +607,7 @@ if ($Return[0] == 1) {
                 "Event-Config param FirstArticleOnly has new value (inactive)",
             );
         }
+
         $ArticleID = $TicketObject->ArticleCreate(
             TicketID         => $Return[1],
             Channel          => 'note',
@@ -558,15 +620,18 @@ if ($Return[0] == 1) {
             HistoryComment   => 'Some comment!',
             UserID           => 1,
         );
+
         %Ticket = $TicketObject->TicketGet(
             TicketID      => $Return[1],
             DynamicFields => 1,
         );
+
         # check if asset C is NOT set by body text ("Address:" - FirstArticleOnly is active)
         $Self->True(
             IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
             "Ticket has affected assets (4th check)",
         );
+
         if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
             $Self->Is(
                 scalar @{ $Ticket{DynamicField_AffectedAsset} },
@@ -592,7 +657,8 @@ if ($Return[0] == 1) {
     }
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

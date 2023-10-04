@@ -255,20 +255,24 @@ sub PIDUpdate {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Name'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Name'
+            );
+        }
         return;
     }
 
     my %PID = $Self->PIDGet( Name => $Param{Name} );
 
     if ( !%PID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Cannot get PID'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Cannot get PID'
+            );
+        }
         return;
     }
 

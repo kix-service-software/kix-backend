@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -13,9 +13,9 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    "PrintHTMLToPDF",
-    "Main"
+our @ObjectDependencies = qw(
+    HTMLToPDF
+    Main
 );
 
 use Kernel::System::VariableCheck qw(:all);
@@ -95,6 +95,99 @@ sub Configure {
         ValueRegex  => qr/.*/smx,
     );
 
+    $Self->AdditionalHelp(
+        $Self->_HelpInstraction()
+    );
+    return;
+}
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
+    my $MainObject  = $Kernel::OM->Get('Main');
+
+    $Self->Print("<yellow>Checking ...</yellow>\n");
+
+    my %Keys = (
+        IDKey     => $Self->GetOption('id')     || q{},
+        NumberKey => $Self->GetOption('number') || q{}
+    );
+    my $Filename  = $Self->GetOption('filename')  || q{};
+    my $Directory = $Self->GetOption('directory') || '/tmp/';
+    my $Object    = $Self->GetOption('name')      || q{};
+    my $UserID    = $Self->GetOption('user_id')   || '1';
+    my $Filter    = $Self->GetOption('filter')    || q{};
+    my $Allow     = $Self->GetOption('allow')     || q{};
+    my $Ignore    = $Self->GetOption('ignore')    || q{};
+    my $Expands   = $Self->GetOption('expands')   || q{};
+
+    if ( !$Object ) {
+        $Self->Print("<red>No object is given!</red>\n");
+        return $Self->ExitCodeOk();
+    }
+
+    my %Data = $PrintObject->TemplateGet(
+        Name   => $Object,
+        UserID => $UserID
+    );
+
+    if ( !%Data ) {
+        $Self->Print("<red>Object '$Object' doesn't exists!</red>\n");
+        return $Self->ExitCodeOk();
+    }
+
+    my $Backend = $Kernel::OM->Get("Kernel::System::HTMLToPDF::Object::$Data{Object}");
+
+    my %CheckDatas;
+    for my $Key ( qw(IDKey NumberKey) ) {
+        if ( $Backend->{$Key} ) {
+            $CheckDatas{$Backend->{$Key}} = $Keys{$Key};
+        }
+    }
+
+    my $Success = $Backend->CheckParams(
+        %CheckDatas
+    );
+
+    if (
+        IsHashRefWithData($Success)
+        && $Success->{error}
+    ) {
+        $Self->Print("<red>$Success->{error}</red>\n");
+        return $Self->ExitCodeOk();
+    }
+
+    $Self->Print("<yellow>Generate PDF...</yellow>\n");
+    my %Result = $PrintObject->Convert(
+        %CheckDatas,
+        Name     => $Object,
+        Filename => $Filename,
+        UserID   => $UserID,
+        Filters  => $Filter,
+        Allows   => $Allow,
+        Ignores  => $Ignore,
+        Expands  => $Expands
+    );
+
+    if ( %Result ) {
+        $MainObject->FileWrite(
+            Directory  => $Directory,
+            Filename   => $Result{Filename},
+            Content    => \$Result{Content},
+            Mode       => 'binmode',
+            Type       => 'Local',
+            Permission => '640',
+        );
+        $Self->Print("File stored at \"$Directory$Result{Filename}\"\n");
+    }
+
+    $Self->Print("<green>Done.</green>\n");
+    return $Self->ExitCodeOk();
+}
+
+sub _HelpInstraction {
+    my ($Self, %Param) = @_;
 
     my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
     my %List        = $PrintObject->TemplateDataList(
@@ -182,96 +275,7 @@ Warning: Ignore and Allow cannot be used together in a table.
 
 END
 
-    $Self->AdditionalHelp(
-        $Strg
-    );
-
-    return;
-}
-
-sub Run {
-    my ( $Self, %Param ) = @_;
-
-    my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
-    my $MainObject  = $Kernel::OM->Get('Main');
-
-    $Self->Print("<yellow>Checking ...</yellow>\n");
-
-    my %Keys = (
-        IDKey     => $Self->GetOption('id')     || q{},
-        NumberKey => $Self->GetOption('number') || q{}
-    );
-    my $Filename  = $Self->GetOption('filename')  || q{};
-    my $Directory = $Self->GetOption('directory') || '/tmp/';
-    my $Object    = $Self->GetOption('name')      || q{};
-    my $UserID    = $Self->GetOption('user_id')   || '1';
-    my $Filter    = $Self->GetOption('filter')    || q{};
-    my $Allow     = $Self->GetOption('allow')     || q{};
-    my $Ignore    = $Self->GetOption('ignore')    || q{};
-    my $Expands   = $Self->GetOption('expands')   || q{};
-
-    if ( !$Object ) {
-        $Self->Print("<red>No object is given!</red>\n");
-        return $Self->ExitCodeOk();
-    }
-
-    my %Data = $PrintObject->TemplateGet(
-        Name   => $Object,
-        UserID => $UserID
-    );
-
-    if ( !%Data ) {
-        $Self->Print("<red>Object '$Object' doesn't exists!</red>\n");
-        return $Self->ExitCodeOk();
-    }
-
-    my $Backend = $Kernel::OM->Get("Kernel::System::HTMLToPDF::Object::$Data{Object}");
-
-    my %CheckDatas;
-    for my $Key ( qw(IDKey NumberKey) ) {
-        if ( $Backend->{$Key} ) {
-            $CheckDatas{$Backend->{$Key}} = $Keys{$Key};
-        }
-    }
-
-    my $Success = $Backend->CheckParams(
-        %CheckDatas
-    );
-
-    if (
-        IsHashRefWithData($Success)
-        && $Success->{error}
-    ) {
-        $Self->Print("<red>$Success->{error}</red>\n");
-        return $Self->ExitCodeOk();
-    }
-
-    $Self->Print("<yellow>Generate PDF...</yellow>\n");
-    my %Result = $PrintObject->Convert(
-        %CheckDatas,
-        Name     => $Object,
-        Filename => $Filename,
-        UserID   => $UserID,
-        Filters  => $Filter,
-        Allows   => $Allow,
-        Ignores  => $Ignore,
-        Expands  => $Expands
-    );
-
-    if ( %Result ) {
-        $MainObject->FileWrite(
-            Directory  => $Directory,
-            Filename   => $Result{Filename},
-            Content    => \$Result{Content},
-            Mode       => 'binmode',
-            Type       => 'Local',
-            Permission => '640',
-        );
-        $Self->Print("File stored at \"$Directory$Result{Filename}\"\n");
-    }
-
-    $Self->Print("<green>Done.</green>\n");
-    return $Self->ExitCodeOk();
+    return $Strg;
 }
 
 1;

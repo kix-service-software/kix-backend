@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,12 +15,10 @@ use vars (qw($Self));
 my $TimeObject = $Kernel::OM->Get('Time');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get module
 if ( !$Kernel::OM->Get('Main')->Require('Kernel::System::Automation::VariableFilter::DateUtil') ) {
@@ -105,7 +103,8 @@ if (!$Handler{'DateUtil.BOB'}) {
     # use wrong value
     my $BOBWrong = $Handler{'DateUtil.BOB'}->(
         {},
-        Value => 'wrong string'
+        Value  => 'wrong string',
+        Silent => 1,
     );
     $Self->Is(
         $BOBWrong,
@@ -218,8 +217,9 @@ if (!$Handler{'DateUtil.Calc'}) {
     );
     my $NewDateUnix = $Handler{'DateUtil.Calc'}->(
         {},
-        Value => $TestDateUnix,
-        Parameter => '+1d -2h +15m'
+        Value     => $TestDateUnix,
+        Parameter => '+1d -2h +15m',
+        Silent    => 1,
     );
     $Self->Is(
         $NewDateUnix,
@@ -229,8 +229,9 @@ if (!$Handler{'DateUtil.Calc'}) {
     # wrong parameter (missing + on 1d)
     my $NewDateMissing = $Handler{'DateUtil.Calc'}->(
         {},
-        Value => $TestDate,
-        Parameter => '1d -2h +15m'
+        Value     => $TestDate,
+        Parameter => '1d -2h +15m',
+        Silent    => 1,
     );
     $Self->Is(
         $NewDateMissing,
@@ -240,10 +241,10 @@ if (!$Handler{'DateUtil.Calc'}) {
 }
 
 # check if filter is used in macro execution
-my $ExecuteTestDate = '2022-04-20 12:00:00';
-my $FilterDoneCheck = $TimeObject->TimeStamp2SystemTime( String => $TimeObject->BOB( String => $ExecuteTestDate) );
+my $ExecuteTestDate  = '2022-04-20 12:00:00';
+my $FilterDoneCheck  = $TimeObject->TimeStamp2SystemTime( String => $TimeObject->BOB( String => $ExecuteTestDate) );
 my $AutomationObject = $Kernel::OM->Get('Automation');
-my $MacroID = $AutomationObject->MacroAdd(
+my $MacroID          = $AutomationObject->MacroAdd(
     Name    => 'test-macro-for-filter-check',
     Type    => 'Ticket',
     ValidID => 1,
@@ -323,7 +324,9 @@ $Self->Is(
     $ExecuteTestDate,
     "Result of 3nd action should be input value",
 );
-# cleanup is done by RestoreDatabase
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
@@ -340,3 +343,6 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+
+
+

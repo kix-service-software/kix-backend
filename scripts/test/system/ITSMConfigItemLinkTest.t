@@ -14,19 +14,11 @@ use utf8;
 
 use vars qw($Self);
 
-# get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Config');
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
-my $LinkObject           = $Kernel::OM->Get('LinkObject');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -46,12 +38,12 @@ my $CheckExpectedResults = sub {
     # check the results
     for my $Object ( sort keys %ExpectedIncidentStates ) {
 
-        if ( $Object eq 'ITSMConfigItem' ) {
+        if ( $Object eq 'ConfigItem' ) {
 
             for my $NameSuffix ( sort keys %{ $ExpectedIncidentStates{$Object} } ) {
 
                 # get config item data
-                my $ConfigItem = $ConfigItemObject->ConfigItemGet(
+                my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
                     ConfigItemID => $ObjectNameSuffix2ID{$Object}->{$NameSuffix},
                 );
 
@@ -69,25 +61,25 @@ my $CheckExpectedResults = sub {
 };
 
 # get class list
-my $ClassList = $GeneralCatalogObject->ItemList(
+my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::Class',
 );
 my %ClassListReverse = reverse %{$ClassList};
 
 # get deployment state list
-my $DeplStateList = $GeneralCatalogObject->ItemList(
+my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::DeploymentState',
 );
 my %DeplStateListReverse = reverse %{$DeplStateList};
 
 # get incident state list
-my $InciStateList = $GeneralCatalogObject->ItemList(
+my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::Core::IncidentState',
 );
 my %InciStateListReverse = reverse %{$InciStateList};
 
 # get definition for 'Hardware' class
-my $DefinitionRef = $ConfigItemObject->DefinitionGet(
+my $DefinitionRef = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
     ClassID => $ClassListReverse{Hardware},
 );
 
@@ -97,7 +89,7 @@ my %ObjectNameSuffix2ID;
 for my $NameSuffix ( 1 .. 7, qw(A B C D E F G) ) {
 
     # add a configitem
-    my $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
         ClassID => $ClassListReverse{Hardware},
         UserID  => 1,
     );
@@ -108,12 +100,12 @@ for my $NameSuffix ( 1 .. 7, qw(A B C D E F G) ) {
     );
 
     # remember the config item id
-    $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix} = $ConfigItemID;
+    $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix} = $ConfigItemID;
 
     push @ConfigItemIDs, $ConfigItemID;
 
     # set a name for each configitem
-    my $VersionID = $ConfigItemObject->VersionAdd(
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $ConfigItemID,
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
@@ -138,6 +130,10 @@ for my $NameSuffix ( 1 .. 7, qw(A B C D E F G) ) {
         UserID => 1,
     );
 
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
+    );
+
     $Self->True(
         $VersionID,
         "Added a version for the configitem id $ConfigItemID",
@@ -145,10 +141,10 @@ for my $NameSuffix ( 1 .. 7, qw(A B C D E F G) ) {
 }
 
 # read the original setting for IncidentLinkTypeDirection
-my $OrigIncidentLinkTypeDirectionSetting = $ConfigObject->Get('ITSM::Core::IncidentLinkTypeDirection');
+my $OrigIncidentLinkTypeDirectionSetting = $Kernel::OM->Get('Config')->Get('ITSM::Core::IncidentLinkTypeDirection');
 
 # set new config for IncidentLinkTypeDirection
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ITSM::Core::IncidentLinkTypeDirection',
     Value => {
         DependsOn => 'Source',
@@ -162,11 +158,11 @@ $ConfigObject->Set(
 #
 #
 #
-#                     6                         Service 1
-#                     |                             ^
-#                     |                             |
-#                     |                             |
-#                     v                             |
+#                     6
+#                     |
+#                     |
+#                     |
+#                     v
 #         C <******** 5 ------> 4 ------> 3 ------> 1 *********> A *******> F **********> G
 #         *           ^                   |                      ^          ^
 #         *           |                   |                      *          *
@@ -178,17 +174,10 @@ $ConfigObject->Set(
 #         *           |                   |         *            *          *
 #         v           |                   |         v            *          *
 #         D ********> 7                   +-------> 2 ************          E
-#                                                   ^
-#                                                   |
-#                                                   |
-#                                                   |
-#                                                Service 2
-#
-#
 #
 #
 #  Explanation:
-#               1 .. 7 and A .. G are ITSMConfigItems
+#               1 .. 7 and A .. G are ConfigItems
 #
 #               DependsOn Links are shown as ----->
 #               Includes  Links are shown as *****>
@@ -198,60 +187,52 @@ $ConfigObject->Set(
 # define the links between CIs and Services
 my %Links = (
     DependsOn => {
-        ITSMConfigItem => {
+        ConfigItem => {
             '7' => {
-                ITSMConfigItem => ['5'],
+                ConfigItem => ['5'],
             },
             '6' => {
-                ITSMConfigItem => ['5'],
+                ConfigItem => ['5'],
             },
             '5' => {
-                ITSMConfigItem => ['4'],
+                ConfigItem => ['4'],
             },
             '4' => {
-                ITSMConfigItem => ['3'],
+                ConfigItem => ['3'],
             },
             '3' => {
-                ITSMConfigItem => [ '1', '2' ],
+                ConfigItem => [ '1', '2' ],
             },
-            '1' => {
-                Service => ['1'],
-            },
-        },
-        Service => {
-            '2' => {
-                ITSMConfigItem => ['2'],
-                }
         },
     },
     Includes => {
-        ITSMConfigItem => {
+        ConfigItem => {
             '5' => {
-                ITSMConfigItem => ['C'],
+                ConfigItem => ['C'],
             },
             'C' => {
-                ITSMConfigItem => ['D'],
+                ConfigItem => ['D'],
             },
             'D' => {
-                ITSMConfigItem => ['7'],
+                ConfigItem => ['7'],
             },
             'B' => {
-                ITSMConfigItem => ['2'],
+                ConfigItem => ['2'],
             },
             '2' => {
-                ITSMConfigItem => ['A'],
+                ConfigItem => ['A'],
             },
             '1' => {
-                ITSMConfigItem => ['A'],
+                ConfigItem => ['A'],
             },
             'A' => {
-                ITSMConfigItem => ['F'],
+                ConfigItem => ['F'],
             },
             'F' => {
-                ITSMConfigItem => ['G'],
+                ConfigItem => ['G'],
             },
             'E' => {
-                ITSMConfigItem => ['F'],
+                ConfigItem => ['F'],
             },
         },
     },
@@ -269,7 +250,7 @@ for my $LinkType ( sort keys %Links ) {
                 {
 
                     # add the links
-                    my $Success = $LinkObject->LinkAdd(
+                    my $Success = $Kernel::OM->Get('LinkObject')->LinkAdd(
                         SourceObject => $SourceObject,
                         SourceKey    => $ObjectNameSuffix2ID{$SourceObject}->{$SourceKey},
                         TargetObject => $TargetObject,
@@ -299,13 +280,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Incident';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -315,7 +300,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Warning',
                 '2' => 'Warning',
                 '3' => 'Warning',
@@ -330,10 +315,6 @@ for my $LinkType ( sort keys %Links ) {
                 'E' => 'Operational',
                 'F' => 'Operational',
                 'G' => 'Operational',
-            },
-            Service => {
-                '1' => 'Warning',
-                '2' => 'Operational',
             },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
@@ -351,13 +332,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Operational';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -367,7 +352,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Operational',
                 '2' => 'Operational',
                 '3' => 'Operational',
@@ -382,10 +367,6 @@ for my $LinkType ( sort keys %Links ) {
                 'E' => 'Operational',
                 'F' => 'Operational',
                 'G' => 'Operational',
-            },
-            Service => {
-                '1' => 'Operational',
-                '2' => 'Operational',
             },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
@@ -403,13 +384,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Incident';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -419,7 +404,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Incident',
                 '2' => 'Operational',
                 '3' => 'Operational',
@@ -434,10 +419,6 @@ for my $LinkType ( sort keys %Links ) {
                 'E' => 'Operational',
                 'F' => 'Warning',
                 'G' => 'Warning',
-            },
-            Service => {
-                '1' => 'Incident',
-                '2' => 'Operational',
             },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
@@ -455,13 +436,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Incident';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -471,7 +456,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Incident',
                 '2' => 'Warning',
                 '3' => 'Warning',
@@ -486,10 +471,6 @@ for my $LinkType ( sort keys %Links ) {
                 'E' => 'Operational',
                 'F' => 'Warning',
                 'G' => 'Warning',
-            },
-            Service => {
-                '1' => 'Incident',
-                '2' => 'Operational',
             },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
@@ -507,13 +488,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Operational';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -523,7 +508,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Warning',
                 '2' => 'Warning',
                 '3' => 'Warning',
@@ -538,10 +523,6 @@ for my $LinkType ( sort keys %Links ) {
                 'E' => 'Operational',
                 'F' => 'Operational',
                 'G' => 'Operational',
-            },
-            Service => {
-                '1' => 'Warning',
-                '2' => 'Operational',
             },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
@@ -559,13 +540,17 @@ for my $LinkType ( sort keys %Links ) {
     my $IncidentState = 'Operational';
 
     # change incident state
-    my $VersionID = $ConfigItemObject->VersionAdd(
-        ConfigItemID => $ObjectNameSuffix2ID{ITSMConfigItem}->{$NameSuffix},
+    my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ObjectNameSuffix2ID{ConfigItem}->{$NameSuffix},
         Name         => $ConfigItemName . '_Hardware_' . $NameSuffix,
         DefinitionID => $DefinitionRef->{DefinitionID},
         DeplStateID  => $DeplStateListReverse{Production},
         InciStateID  => $InciStateListReverse{$IncidentState},
         UserID       => 1,
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [ 'ITSMConfigItem' ],
     );
 
     $Self->True(
@@ -575,7 +560,7 @@ for my $LinkType ( sort keys %Links ) {
 
     $CheckExpectedResults->(
         ExpectedIncidentStates => {
-            ITSMConfigItem => {
+            ConfigItem => {
                 '1' => 'Operational',
                 '2' => 'Operational',
                 '3' => 'Operational',
@@ -591,10 +576,6 @@ for my $LinkType ( sort keys %Links ) {
                 'F' => 'Operational',
                 'G' => 'Operational',
             },
-            Service => {
-                '1' => 'Operational',
-                '2' => 'Operational',
-            },
         },
         ObjectNameSuffix2ID => \%ObjectNameSuffix2ID,
     );
@@ -602,12 +583,13 @@ for my $LinkType ( sort keys %Links ) {
 }
 
 # reset the enabled setting for IncidentLinkTypeDirection to its original value
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ITSM::Core::IncidentLinkTypeDirection',
     Value => $OrigIncidentLinkTypeDirectionSetting,
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

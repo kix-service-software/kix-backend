@@ -8,7 +8,8 @@
   Scenario: get the list of existing faq article history
     Given a faq article
     When I query the collection of faq article history
-        Then the response code is 200
+    Then the response code is 200
+    Then the response object is FAQHistoryCollectionResponse
     When I delete this faq article
     Then the response code is 204
     And the response has no content

@@ -106,6 +106,7 @@ sub Run {
     return if !$Self->{SchedulerDBObject}->CronTaskToExecute(
         NodeID => $Self->{NodeID},
         PID    => $$,
+        Silent => $Param{Silent},
     );
 
     return 1;

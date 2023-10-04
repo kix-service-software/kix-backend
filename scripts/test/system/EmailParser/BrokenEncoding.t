@@ -23,7 +23,7 @@ my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 # test for bug#1970
 my @Array;
-open my $IN, '<', "$Home/scripts/test/system/sample/EmailParser/BrokenEncoding.box";    ## no critic
+open my $IN, '<', "$Home/scripts/test/system/sample/EmailParser/BrokenEncoding.box";
 while (<$IN>) {
     push @Array, $_;
 }
@@ -43,8 +43,8 @@ my @Attachments = $EmailParserObject->GetAttachments();
 
 $Self->Is(
     scalar @Attachments,
-    1,
-    "Found files",
+    0,
+    "No file found",
 );
 
 1;

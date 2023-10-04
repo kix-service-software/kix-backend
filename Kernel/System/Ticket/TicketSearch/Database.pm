@@ -430,6 +430,8 @@ sub _CreateAttributeSQL {
     my %SQLDef;
 
     if ( !IsArrayRefWithData($Param{SQLPartsDef}) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQLPartsDef!',
@@ -438,6 +440,8 @@ sub _CreateAttributeSQL {
     }
 
     if ( !IsHashRefWithData($Param{Search}) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No Search definition given!',
@@ -446,6 +450,8 @@ sub _CreateAttributeSQL {
     }
 
     if ( !$Param{UserID} && !$Param{UserType} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for attribute search!',
@@ -456,6 +462,8 @@ sub _CreateAttributeSQL {
     # generate SQL from attribute modules
     foreach my $BoolOperator ( keys %{$Param{Search}} ) {
         if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Search for $BoolOperator!",
@@ -483,6 +491,8 @@ sub _CreateAttributeSQL {
 
             # ignore this attribute if we don't have a module for it
             if ( !$AttributeModule ) {
+                return if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unable to search for attribute $Search->{Field}. Don't know how to handle it!",
@@ -496,10 +506,13 @@ sub _CreateAttributeSQL {
                 UserType     => $Param{UserType},
                 BoolOperator => $BoolOperator,
                 Search       => $Search,
-                WholeSearch  => $Param{Search}->{$BoolOperator}   # forward "whole" search, e.g. if behavior depends on other attributes
+                WholeSearch  => $Param{Search}->{$BoolOperator},   # forward "whole" search, e.g. if behavior depends on other attributes
+                Silent       => $Param{Silent} || 0
             );
 
             if ( !IsHashRefWithData($Result) ) {
+                return if $Param{Silent};
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Attribute module for $Search->{Field} returned an error!",

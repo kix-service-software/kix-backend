@@ -20,12 +20,10 @@ use Kernel::System::VariableCheck qw(:all);
 my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $RandomID = $Helper->GetRandomID();
 
@@ -75,6 +73,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -93,6 +92,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -112,6 +112,7 @@ my @Tests = (
                 ]
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -143,6 +144,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -174,6 +176,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -205,6 +208,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -230,6 +234,7 @@ my @Tests = (
                     ContentType => 'text/plain',
                 },
             },
+            Silent  => 1,
         },
     },
 
@@ -293,6 +298,7 @@ my @Tests = (
                 },
             },
             ValidID => 1,
+            Silent  => 1,
         },
     },
 
@@ -1036,7 +1042,8 @@ for my $NotificationType ( sort keys %NotificationIDs ) {
     }
 }
 
-# cleanup cache is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

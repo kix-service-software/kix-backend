@@ -25,8 +25,8 @@ $ConfigObject->Set(
 # create directory for certificates and private keys
 my $CertPath    = $ConfigObject->Get('Home') . "/var/tmp/certs";
 my $PrivatePath = $ConfigObject->Get('Home') . "/var/tmp/private";
-mkpath( [$CertPath],    0, 0770 );    ## no critic
-mkpath( [$PrivatePath], 0, 0770 );    ## no critic
+mkpath( [$CertPath],    0, 0770 );
+mkpath( [$PrivatePath], 0, 0770 );
 
 # set SMIME paths
 $ConfigObject->Set(
@@ -103,7 +103,7 @@ if ( !$SMIMEObject ) {
             "No such $PrivatePath!",
         );
     }
-    elsif ( !-d $Self->{PrivatePath} ) {
+    elsif ( !-d $PrivatePath ) {
         $Self->False(
             1,
             "No such $PrivatePath directory!",
@@ -159,3 +159,4 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+

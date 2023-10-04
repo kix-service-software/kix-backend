@@ -17,11 +17,6 @@ use vars (qw($Self));
 use File::Basename qw();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
@@ -49,8 +44,6 @@ for ( 1 .. 2 ) {
         'Template is considered UTF8',
     );
 }
-
-# cleanup cache is done by RestoreDatabase
 
 1;
 

@@ -49,7 +49,7 @@ When qr/I query the collection of faq articles (\d+) searchlimit object\s*$/, su
    );
 };
 
-When qr/I query the collection of faq articles with filter of (.*?)$/, sub {
+When qr/I query the collection of faq articles with filter of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/faq/articles',

@@ -178,9 +178,12 @@ sub Run {
     }
 
     # get tickets containing this message
-    my @SkipTicketIDs = $TicketObject->ArticleGetTicketIDsOfMessageID(
-        MessageID => $GetParam->{'Message-ID'},
-    );
+    my @SkipTicketIDs = qw{};
+    if( $GetParam->{'Message-ID'} ) {
+        @SkipTicketIDs = $TicketObject->ArticleGetTicketIDsOfMessageID(
+            MessageID => $GetParam->{'Message-ID'},
+        );
+    }
     my %SkipTicketIDHash = ();
     for my $TicketID ( @SkipTicketIDs ) {
         $SkipTicketIDHash{$TicketID} = 1;
@@ -269,7 +272,20 @@ sub Run {
     # check if follow up (again, with new GetParam)
     %FollowUps = $Self->CheckFollowUp( GetParam => $GetParam );
 
-    if ( $ConfigObject->Get('PostMaster::StrictFollowUp') ) {
+    if (
+        $Param{Queue}
+        && !$Param{QueueID}
+    ) {
+        # queue lookup if queue name is given
+        $Param{QueueID} = $QueueObject->QueueLookup(
+            Queue => $Param{Queue},
+        );
+    }
+
+    if (
+        $ConfigObject->Get('PostMaster::StrictFollowUp')
+        && !$GetParam->{'X-KIX-StrictFollowUpIgnore'}
+    ) {
         # get recipients
         my $Recipient = '';
         for my $Key (qw(Resent-To Envelope-To To Cc Bcc Delivered-To X-Original-To)) {
@@ -292,37 +308,64 @@ sub Run {
                 Email => $EmailAddress
             );
             next if ( !$MailAddress );
+
+            $MailAddress =~ s/("|')//g;
+
             $EmailsHash{$MailAddress} = '1';
         }
 
         # check addresses
-        my %SystemAddressList = $SystemAddressObject->SystemAddressList();
         EMAIL:
-        for my $Address ( keys( %EmailsHash ) ) {
+        for my $Address ( sort( keys( %EmailsHash ) ) ) {
             next EMAIL if !$Address;
 
-            # get system address ID
-            my $SystemAddressID = '';
-            for my $ID ( keys( %SystemAddressList ) ) {
-                $SystemAddressID = $ID if ( lc( $Address ) eq lc( $SystemAddressList{$ID} ) );
-            }
+            # lookup if address is known system address
+            my $SystemAddressID = $SystemAddressObject->SystemAddressLookup(
+                Name => $Address,
+            );
+
+            # get queues for possible follow up
             my %Queues;
-            my $QueueID = $Param{QueueID};
-            if ($SystemAddressID) {
+            if ( $SystemAddressID ) {
                 # get all queues that have this address as sender
                 %Queues = $QueueObject->GetQueuesForEmailAddress(
                     AddressID => $SystemAddressID
                 );
+            }
 
+            # determine queue for new ticket
+            my $QueueID;
+            if ( $SystemAddressID ) {
                 $QueueID = $SystemAddressObject->SystemAddressQueueID(
                     Address => $Address,
                 );
             }
-            else {
-                # get PostmasterDefaultQueue, cause a FollowUp Ticket can also be in this Queue
+            # not a system address, or system address has no queue => use provided queue
+            if (
+                !$QueueID
+                && $Param{QueueID}
+            ) {
+                $QueueID = $Param{QueueID};
+            }
+             # no provided queue, or queue by system address. fallback to default queue
+            elsif ( !$QueueID ) {
                 my $QueueName = $ConfigObject->Get('PostmasterDefaultQueue');
-                $QueueID = $QueueObject->QueueLookup( Queue => $QueueName );
-                if ($QueueID) {
+                $QueueID = $QueueObject->QueueLookup(
+                    Queue => $QueueName
+                ) || 1;
+            }
+
+            # ensure that queue for new ticket is part of possible followup queues 
+            if (
+                $QueueID
+                && !$Queues{ $QueueID }
+            ) {
+                # lookup queue name
+                my $QueueName = $QueueObject->QueueLookup(
+                    QueueID => $QueueID
+                );
+
+                if ( $QueueName ) {
                     $Queues{$QueueID} = $QueueName;
                 }
             }
@@ -356,7 +399,7 @@ sub Run {
 
                 # create new ticket
                 if ($QueueID) {
-                    my $TicketID = $Self->{NewTicketObject}->Run(
+                    my @Result = $Self->{NewTicketObject}->Run(
                         InmailUserID  => $Self->{PostmasterUserID},
                         GetParam      => $GetParam,
                         QueueID       => $QueueID,
@@ -364,26 +407,15 @@ sub Run {
                         FileIngest    => $Param{FileIngest} || 0,
                     );
 
-                    if ( !$TicketID ) {
-                        next;
+                    if ( @Result ) {
+                        push (@Return, \@Result);
                     }
-
-                    my @Ret = ( 1, $TicketID );
-                    push( @Return, \@Ret );
                 }
             }
         }
 
         # create ticket in PostmasterDefaultQueue no new ticket created, no follow up added
         if ( !scalar(@Return) ) {
-
-            if ( $Param{Queue} && !$Param{QueueID} ) {
-
-                # queue lookup if queue name is given
-                $Param{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup(
-                    Queue => $Param{Queue},
-                );
-            }
 
             # get queue if of From: and To:
             if ( !$Param{QueueID} ) {
@@ -397,17 +429,16 @@ sub Run {
             if ($TQueueID) {
                 $Param{QueueID} = $TQueueID;
             }
-            my $TicketID = $Self->{NewTicketObject}->Run(
+            my @Result = $Self->{NewTicketObject}->Run(
                 InmailUserID     => $Self->{PostmasterUserID},
                 GetParam         => $GetParam,
                 QueueID          => $Param{QueueID},
-                SkipTicketIDs    => \%SkipTicketIDHash
+                SkipTicketIDs    => \%SkipTicketIDHash,
             );
 
-            return if !$TicketID;
-
-            my @Ret = ( 1, $TicketID );
-            push( @Return, \@Ret );
+            if ( @Result ) {
+                push (@Return, \@Result);
+            }
         }
     } else {
         my %Queues = $QueueObject->QueueList( Valid => 1 );
@@ -430,14 +461,6 @@ sub Run {
         # create ticket in PostmasterDefaultQueue no new ticket created, no follow up added
         if ( !scalar(@Return) ) {
 
-            if ( $Param{Queue} && !$Param{QueueID} ) {
-
-                # queue lookup if queue name is given
-                $Param{QueueID} = $Kernel::OM->Get('Queue')->QueueLookup(
-                    Queue => $Param{Queue},
-                );
-            }
-
             # get queue if of From: and To:
             if ( !$Param{QueueID} ) {
                 $Param{QueueID} = $Self->{DestQueueObject}->GetQueueID( Params => $GetParam );
@@ -453,16 +476,16 @@ sub Run {
 
             # create new ticket
             if ($Param{QueueID}) {
-                my $TicketID = $Self->{NewTicketObject}->Run(
+                my @Result = $Self->{NewTicketObject}->Run(
                     InmailUserID     => $Self->{PostmasterUserID},
                     GetParam         => $GetParam,
                     QueueID          => $Param{QueueID},
-                    SkipTicketIDs    => \%SkipTicketIDHash
+                    SkipTicketIDs    => \%SkipTicketIDHash,
                 );
-                return if !$TicketID;
 
-                my @Ret = ( 1, $TicketID );
-                push( @Return, \@Ret );
+                if ( @Result ) {
+                    push (@Return, \@Result);
+                }
             }
         }
     }
@@ -647,8 +670,7 @@ sub GetEmailParams {
             $GetParam{'Auto-Submitted'}
             && substr( $GetParam{'Auto-Submitted'}, 0, 5 ) eq 'auto-'
         )
-        )
-    {
+    ) {
         $GetParam{'X-KIX-Loop'} = 'yes';
     }
     if ( !$GetParam{'X-Sender'} ) {
@@ -785,6 +807,12 @@ sub _HandlePossibleFollowUp {
             && ref( $Param{SkipTicketIDs} ) eq 'HASH'
             && $Param{SkipTicketIDs}->{ $Param{TicketID} }
         ) {
+            my $MessageID = $Param{GetParam}->{'Message-ID'};
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Follow up for [$Param{TicketNumber}], but message id already exists ($MessageID). Followup is skipped."
+            );
             return (6, $Param{TicketID});
         }
 
@@ -838,7 +866,7 @@ sub _HandlePossibleFollowUp {
                 );
             }
 
-            $Param{TicketID} = $Self->{NewTicketObject}->Run(
+            my @Result = $Self->{NewTicketObject}->Run(
                 InmailUserID     => $Self->{PostmasterUserID},
                 GetParam         => $Param{GetParam},
                 QueueID          => $Param{QueueID},
@@ -846,11 +874,10 @@ sub _HandlePossibleFollowUp {
                 LinkToTicketID   => $Param{TicketID},
             );
 
-            if ( !$Param{TicketID} ) {
-                return;
+            if ( @Result ) {
+                return ( 3, $Result[1] );
             }
 
-            return ( 3, $Param{TicketID} );
         }
 
         # reject follow up
@@ -890,6 +917,9 @@ sub _HandlePossibleFollowUp {
                 return;
             }
 
+            # remember created followup
+            $Param{SkipTicketIDs}->{ $Param{TicketID} } = 1;
+
             return ( 2, $Param{TicketID} );
         }
     }
@@ -898,7 +928,6 @@ sub _HandlePossibleFollowUp {
 }
 
 1;
-
 
 =back
 

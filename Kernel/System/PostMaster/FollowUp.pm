@@ -167,7 +167,7 @@ sub Run {
             # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
             # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
             # Only one unit can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
-            # "+12d" (12 days). Note that settings like "+1d 12h" are not possible. You can specify "+36h" instead.
+            # "+12d" (12 days). "+1d +12h" (1 day and 12 hours, note that the plus has to be specified before every unit).
 
             my $TargetTimeStamp = $GetParam{'X-KIX-FollowUp-State-PendingTime'};
 
@@ -458,13 +458,13 @@ sub Run {
     if ( $GetParam{'X-KIX-FollowUp-Channel'} ) {
         # check if it's an existing Channel
         my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
-            Name => $GetParam{'X-KIX-FollowUp-Channel'},
+            Name   => $GetParam{'X-KIX-FollowUp-Channel'},
+            Silent => 1,
         );
         if ( !$ChannelID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "Channel ".$GetParam{'X-KIX-FollowUp-Channel'}." does not exist, falling back to 'email'."
+                Message  => "Channel ".$GetParam{'X-KIX-FollowUp-Channel'}." does not exist, falling back to 'email'."
             );
             $GetParam{'X-KIX-FollowUp-Channel'} = undef;
         }
@@ -476,12 +476,12 @@ sub Run {
         # check if it's an existing SenderType
         my $SenderTypeID = $TicketObject->ArticleSenderTypeLookup(
             SenderType => $GetParam{'X-KIX-FollowUp-SenderType'},
+            Silent     => 1,
         );
         if ( !$SenderTypeID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "SenderType ".$GetParam{'X-KIX-FollowUp-SenderType'}." does not exist, falling back to 'external'."
+                Message  => "SenderType ".$GetParam{'X-KIX-FollowUp-SenderType'}." does not exist, falling back to 'external'."
             );
             $GetParam{'X-KIX-FollowUp-SenderType'} = 'external';
         }
@@ -649,9 +649,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 

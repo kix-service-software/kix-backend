@@ -100,7 +100,16 @@ sub _Replace {
             }
         }
 
-        $Self->_prepareVersion(LanguageObject => $LanguageObject, Version => $Version);
+        # prepare version if needed else set it empty
+        if (IsHashRefWithData($Version)) {
+            my $TopLevelAttributes = $Self->_GetTopLevelAttributes(Version => $Version) || [];
+            my $CheckList = join('|',@{$TopLevelAttributes});
+            if ($CheckList && $Param{Text} =~ m/$Tag(?:$CheckList)/) {
+                $Self->_PrepareVersion(LanguageObject => $LanguageObject, Version => $Version);
+            } else {
+                $Version = {};
+            }
+        }
 
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Version }, %{ $ConfigItem } );
@@ -112,7 +121,22 @@ sub _Replace {
     return $Param{Text};
 }
 
-sub _prepareVersion {
+sub _GetTopLevelAttributes {
+    my ( $Self, %Param ) = @_;
+
+    return if (
+        !IsHashRefWithData( $Param{Version} ) &&
+        !IsHashRefWithData( $Param{Version}->{XMLDefinition} )
+    );
+
+    my @Attributes;
+    for my $Item ( @{ $Param{Version}->{XMLDefinition} } ) {
+        push(@Attributes, $Item->{Key})
+    }
+    return \@Attributes;
+}
+
+sub _PrepareVersion {
     my ( $Self, %Param ) = @_;
 
     if (
@@ -129,7 +153,7 @@ sub _prepareVersion {
         # <..._AttributeName_0_Value> like above
         # <..._AttributeName_0_Key> first value (_1 = second value)
         # for sub attributes: ..._ParentAttribute_0_SubAttribute_0_Value
-        $Self->_prepareData(
+        $Self->_PrepareData(
             LanguageObject => $Param{LanguageObject},
             Version        => $Param{Version},
             XMLData        => $Param{Version}->{XMLData}->[1]->{Version}->[1],
@@ -141,7 +165,7 @@ sub _prepareVersion {
     delete $Param{Version}->{XMLDefinition};
 }
 
-sub _prepareData {
+sub _PrepareData {
     my ( $Self, %Param ) = @_;
 
     return if (
@@ -187,7 +211,7 @@ sub _prepareData {
             next COUNTER if !$Item->{Sub};
 
             # recurse if subsection available...
-            $Self->_prepareData(
+            $Self->_PrepareData(
                 LanguageObject => $Param{LanguageObject},
                 Version        => $Param{Version},
                 Parent         => $AttributeCounter . '_',

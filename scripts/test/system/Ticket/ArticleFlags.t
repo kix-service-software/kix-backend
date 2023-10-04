@@ -14,27 +14,22 @@ use utf8;
 
 use vars (qw($Self));
 
-# get ticket object
-my $TicketObject = $Kernel::OM->Get('Ticket');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+# begin transaction on database
+$Helper->BeginWork();
+
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 $Self->True(
     $TicketID,
@@ -44,9 +39,9 @@ $Self->True(
 my @ArticleIDs;
 
 for my $Item ( 0 .. 1 ) {
-    my $ArticleID = $TicketObject->ArticleCreate(
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         TicketID       => $TicketID,
-        Channels       => 'note',
+        Channel        => 'note',
         SenderType     => 'agent',
         From           => 'Some Agent <email@example.com>',
         To             => 'Some Customer <customer-a@example.com>',
@@ -84,12 +79,12 @@ my @Tests = (
 );
 
 # delete pre-existing article flags which are created on TicketCreate
-$TicketObject->ArticleFlagDelete(
+$Kernel::OM->Get('Ticket')->ArticleFlagDelete(
     ArticleID => $ArticleIDs[0],
     Key       => 'Seen',
     UserID    => 1,
 );
-$TicketObject->ArticleFlagDelete(
+$Kernel::OM->Get('Ticket')->ArticleFlagDelete(
     ArticleID => $ArticleIDs[1],
     Key       => 'Seen',
     UserID    => 1,
@@ -98,7 +93,8 @@ $TicketObject->ArticleFlagDelete(
 for my $Test (@Tests) {
 
     # set for article 1
-    my %Flag = $TicketObject->ArticleFlagGet(
+    my %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[0],
         UserID    => 1,
     );
@@ -106,7 +102,7 @@ for my $Test (@Tests) {
         $Flag{ $Test->{Key} },
         'ArticleFlagGet() article 1',
     );
-    my $Set = $TicketObject->ArticleFlagSet(
+    my $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
         ArticleID => $ArticleIDs[0],
         Key       => $Test->{Key},
         Value     => $Test->{Value},
@@ -118,7 +114,8 @@ for my $Test (@Tests) {
     );
 
     # set for article 2
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[1],
         UserID    => 1,
     );
@@ -126,7 +123,7 @@ for my $Test (@Tests) {
         $Flag{ $Test->{Key} },
         'ArticleFlagGet() article 2',
     );
-    $Set = $TicketObject->ArticleFlagSet(
+    $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
         ArticleID => $ArticleIDs[1],
         Key       => $Test->{Key},
         Value     => $Test->{Value},
@@ -136,7 +133,8 @@ for my $Test (@Tests) {
         $Set,
         'ArticleFlagSet() article 2',
     );
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[1],
         UserID    => 1,
     );
@@ -147,7 +145,7 @@ for my $Test (@Tests) {
     );
 
     # get all flags of ticket
-    %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -165,7 +163,7 @@ for my $Test (@Tests) {
     );
 
     # delete for article 1
-    my $Delete = $TicketObject->ArticleFlagDelete(
+    my $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleIDs[0],
         Key       => $Test->{Key},
         UserID    => 1,
@@ -174,7 +172,8 @@ for my $Test (@Tests) {
         $Delete,
         'ArticleFlagDelete() article 1',
     );
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[0],
         UserID    => 1,
     );
@@ -183,7 +182,7 @@ for my $Test (@Tests) {
         'ArticleFlagGet() article 1',
     );
 
-    %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -198,7 +197,7 @@ for my $Test (@Tests) {
     );
 
     # delete for article 2
-    $Delete = $TicketObject->ArticleFlagDelete(
+    $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleIDs[1],
         Key       => $Test->{Key},
         UserID    => 1,
@@ -208,7 +207,7 @@ for my $Test (@Tests) {
         'ArticleFlagDelete() article 2',
     );
 
-    %Flag = $TicketObject->ArticleFlagsOfTicketGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagsOfTicketGet(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -219,7 +218,7 @@ for my $Test (@Tests) {
     );
 
     # test ArticleFlagsDelete for AllUsers
-    $Set = $TicketObject->ArticleFlagSet(
+    $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
         ArticleID => $ArticleIDs[0],
         Key       => $Test->{Key},
         Value     => $Test->{Value},
@@ -229,7 +228,8 @@ for my $Test (@Tests) {
         $Set,
         'ArticleFlagSet() article 1',
     );
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[0],
         UserID    => 1,
     );
@@ -238,7 +238,7 @@ for my $Test (@Tests) {
         $Test->{Value},
         'ArticleFlagGet() article 1',
     );
-    $Delete = $TicketObject->ArticleFlagDelete(
+    $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleIDs[0],
         Key       => $Test->{Key},
         AllUsers  => 1,
@@ -247,7 +247,8 @@ for my $Test (@Tests) {
         $Delete,
         'ArticleFlagDelete() article 1 for AllUsers',
     );
-    %Flag = $TicketObject->ArticleFlagGet(
+    %Flag = $Kernel::OM->Get('Ticket')->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[0],
         UserID    => 1,
     );
@@ -263,7 +264,7 @@ for my $Test (@Tests) {
 my @SearchTestFlagsSet = qw( f1 f2 f3 );
 
 for my $Flag (@SearchTestFlagsSet) {
-    my $Set = $TicketObject->ArticleFlagSet(
+    my $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
         ArticleID => $ArticleIDs[0],
         Key       => $Flag,
         Value     => 42,
@@ -279,20 +280,44 @@ for my $Flag (@SearchTestFlagsSet) {
 my @FlagSearchTests = (
     {
         Search => {
-            ArticleFlag => {
-                f1 => 42,
-                f2 => 42,
-            },
+            AND => [
+                {
+                    Field => 'ArticleFlag',
+                    Value => [
+                        {
+                            Flag  => 'f1',
+                            Value => '42',
+                        },
+                        {
+                            Flag  => 'f2',
+                            Value => '42',
+                        },
+                    ],
+                    Operator => 'EQ',
+                },
+            ],
         },
         Expected => 1,
         Name     => "Can find ticket when searching for two article flags",
     },
     {
         Search => {
-            ArticleFlag => {
-                f1 => 42,
-                f2 => 1,
-            },
+            AND => [
+                {
+                    Field => 'ArticleFlag',
+                    Value => [
+                        {
+                            Flag  => 'f1',
+                            Value => '42',
+                        },
+                        {
+                            Flag  => 'f2',
+                            Value => '1',
+                        },
+                    ],
+                    Operator => 'EQ',
+                },
+            ],
         },
         Expected => 0,
         Name     => "Wrong flag value leads to no match",
@@ -300,11 +325,11 @@ my @FlagSearchTests = (
 );
 
 for my $Test (@FlagSearchTests) {
-    my $Found = $TicketObject->TicketSearch(
+    my $Found = $Kernel::OM->Get('Ticket')->TicketSearch(
         TicketID => $TicketID,
         Result   => 'COUNT',
         UserID   => 1,
-        %{ $Test->{Search} },
+        Search   => $Test->{Search},
     );
 
     $Self->Is(
@@ -314,7 +339,8 @@ for my $Test (@FlagSearchTests) {
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

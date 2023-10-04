@@ -17,25 +17,20 @@ use vars (qw($Self));
 local $ENV{TZ} = 'UTC';
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 0,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
+# begin transaction on database
+$Helper->BeginWork();
 
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeZone',
     Value => 0,
 );
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeZoneUser',
     Value => 0,
 );
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TimeZoneUserBrowserAutoOffset',
     Value => 0,
 );
@@ -43,70 +38,17 @@ $ConfigObject->Set(
 # set fixed time to have predetermined verifiable results
 $Helper->FixedTimeSet(0);
 
-# get time object
-my $TimeObject = $Kernel::OM->Get('Time');
-
-# configure auth backend to db
-$ConfigObject->Set(
-    Key   => 'AuthBackend',
-    Value => 'DB',
-);
-
-# no additional auth backends
-for my $Count ( 1 .. 10 ) {
-
-    $ConfigObject->Set(
-        Key   => "AuthBackend$Count",
-        Value => '',
-    );
-}
-
 # disable email checks to create new user
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
-my $UserRand     = 'example-user' . $Helper->GetRandomID();
-my $TestCustomerID = 'example-customer' . $Helper->GetRandomID();
+my $TestAgent = $Helper->TestUserCreate();
 
-my $UserObject = $Kernel::OM->Get('User');
-my $ContactObject = $Kernel::OM->Get('Contact');
-
-# add test agent and contact
-my $TestAgentID = $UserObject->UserAdd(
-    UserLogin    => $UserRand,
-    ValidID      => 1,
-    ChangeUserID => 1,
-    IsAgent      => 1,
-) || die "Could not create test agent";
-
-my $TestAgentContactID = $ContactObject->ContactAdd(
-    Firstname      => 'Firstname Test1',
-    Lastname       => 'Lastname Test1',
-    Email          => $UserRand . '@example.com',
-    AssignedUserID => $TestAgentID,
-    ValidID        => 1,
-    UserID         => 1,
-) || die "Could not create test agent contact";
-
-
-# add test custoemr and contact
-my $TestCustomerID = $UserObject->UserAdd(
-    UserLogin    => $TestCustomerID,
-    ValidID      => 1,
-    ChangeUserID => 1,
-    IsCustomer   => 1,
-) || die "Could not create test customer";
-
-my $TestCustomerContactID = $ContactObject->ContactAdd(
-    Source         => 'Contact',
-    Firstname      => 'Firstname Test',
-    Lastname       => 'Lastname Test',
-    AssignedUserID => $TestCustomerID,
-    ValidID        => 1,
-    UserID         => 1,
-) || die "Could not create test customer contact";
+my $UserID = $Kernel::OM->Get('User')->UserLookup(
+    UserLogin => $TestAgent
+);
 
 # configure two factor auth backend
 my %CurrentConfig = (
@@ -114,31 +56,21 @@ my %CurrentConfig = (
     'AllowEmptySecret'     => 0,
     'AllowPreviousToken'   => 0,
     'TimeZone'             => 0,
-    'Secret'               => '',
+    'Secret'               => q{},
     'Time'                 => 0,
 );
+
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'AuthTwoFactorModule10',
+    Value => 'Kernel::System::Auth::TwoFactor::GoogleAuthenticator',
+);
+
 for my $ConfigKey ( sort keys %CurrentConfig ) {
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'AuthTwoFactorModule10::' . $ConfigKey,
         Value => $CurrentConfig{$ConfigKey},
     );
-    $ConfigObject->Set(
-        Key   => 'Contact::AuthTwoFactorModule10::' . $ConfigKey,
-        Value => $CurrentConfig{$ConfigKey},
-    );
 }
-
-# create Google authenticator object
-$Kernel::OM->ObjectParamAdd(
-    'Auth::TwoFactor::GoogleAuthenticator' => {
-        Count => 10,
-    },
-    'ContactAuth::TwoFactor::GoogleAuthenticator' => {
-        Count => 10,
-    },
-);
-my $AuthTwoFactorObject         = $Kernel::OM->Get('Auth::TwoFactor::GoogleAuthenticator');
-my $ContactAuthTwoFactorObject = $Kernel::OM->Get('ContactAuth::TwoFactor::GoogleAuthenticator');
 
 my @Tests = (
     {
@@ -146,10 +78,11 @@ my @Tests = (
         ExpectedAuthResult => undef,
         Secret             => undef,
         AllowEmptySecret   => 0,
+        Silent             => 1
     },
     {
         Name               => 'No secret, AllowEmptySecret = 1',
-        ExpectedAuthResult => 1,
+        ExpectedAuthResult => $TestAgent,
         Secret             => undef,
         AllowEmptySecret   => 1,
     },
@@ -161,7 +94,7 @@ my @Tests = (
     },
     {
         Name               => 'Valid token',
-        ExpectedAuthResult => 1,
+        ExpectedAuthResult => $TestAgent,
         Secret             => 'UNITTESTUNITTEST',
         TwoFactorToken     => '761321',
     },
@@ -181,7 +114,7 @@ my @Tests = (
     },
     {
         Name               => 'Previous token, AllowPreviousToken = 1',
-        ExpectedAuthResult => 1,
+        ExpectedAuthResult => $TestAgent,
         Secret             => 'UNITTESTUNITTEST',
         TwoFactorToken     => '761321',
         AllowPreviousToken => 1,
@@ -189,7 +122,7 @@ my @Tests = (
     },
     {
         Name               => 'New valid token',
-        ExpectedAuthResult => 1,
+        ExpectedAuthResult => $TestAgent,
         Secret             => 'UNITTESTUNITTEST',
         TwoFactorToken     => '002639',
         FixedTimeSet       => 30,
@@ -204,7 +137,7 @@ my @Tests = (
     },
     {
         Name               => 'Valid token for different time zone',
-        ExpectedAuthResult => 1,
+        ExpectedAuthResult => $TestAgent,
         Secret             => 'UNITTESTUNITTEST',
         TwoFactorToken     => '281099',
         FixedTimeSet       => 0,
@@ -214,85 +147,96 @@ my @Tests = (
 
 for my $Test (@Tests) {
 
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Auth']
+    );
+
     # update secret if necessary
-    if ( ( $Test->{Secret} || '' ) ne $CurrentConfig{Secret} && !$Test->{KeepOldSecret} ) {
-        $CurrentConfig{Secret} = $Test->{Secret} || '';
-        $UserObject->SetPreferences(
+    if (
+        (
+            $Test->{Secret}
+            || q{}
+        ) ne $CurrentConfig{Secret}
+        && !$Test->{KeepOldSecret}
+    ) {
+        $CurrentConfig{Secret} = $Test->{Secret} || q{};
+        $Kernel::OM->Get('User')->SetPreferences(
             Key    => 'UnitTestUserGoogleAuthenticatorSecretKey',
             Value  => $CurrentConfig{Secret},
-            UserID => $TestAgentID,
-        );
-        $ContactObject->SetPreferences(
-            Key       => 'UnitTestUserGoogleAuthenticatorSecretKey',
-            Value     => $CurrentConfig{Secret},
-            ContactID => $TestCustomerID,
+            UserID => $UserID,
         );
     }
 
     # update time zone if necessary
-    if ( ( $Test->{TimeZone} || '0' ) ne $CurrentConfig{TimeZone} ) {
+    if (
+        (
+            $Test->{TimeZone}
+            || '0'
+        ) ne $CurrentConfig{TimeZone}
+    ) {
         $CurrentConfig{TimeZone} = $Test->{TimeZone} || '0';
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'TimeZone',
             Value => $CurrentConfig{TimeZone},
         );
+        my $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
+
+        $Kernel::OM->Get('DB')->{dbh} = undef;
 
         # a different timezone config requires a new time object
         $Kernel::OM->ObjectsDiscard(
             Objects => ['Time'],
         );
+        $Kernel::OM->Get('DB')->{dbh} = $DatabaseHandle;
     }
 
     # update config if necessary
     CONFIGKEY:
-    for my $ConfigKey (qw(AllowEmptySecret AllowPreviousToken)) {
-        next CONFIGKEY if ( $Test->{$ConfigKey} || '' ) eq $CurrentConfig{$ConfigKey};
-        $CurrentConfig{$ConfigKey} = $Test->{$ConfigKey} || '';
-        $ConfigObject->Set(
+    for my $ConfigKey (
+        qw(
+            AllowEmptySecret AllowPreviousToken
+        )
+    ) {
+        next CONFIGKEY if ( $Test->{$ConfigKey} || q{} ) eq $CurrentConfig{$ConfigKey};
+
+        $CurrentConfig{$ConfigKey} = $Test->{$ConfigKey} || q{};
+
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'AuthTwoFactorModule10::' . $ConfigKey,
-            Value => $CurrentConfig{$ConfigKey},
-        );
-        $ConfigObject->Set(
-            Key   => 'Contact::AuthTwoFactorModule10::' . $ConfigKey,
             Value => $CurrentConfig{$ConfigKey},
         );
     }
 
     # update time if necessary
-    if ( ( $Test->{FixedTimeSet} || 0 ) ne $CurrentConfig{Time} ) {
+    if (
+        (
+            $Test->{FixedTimeSet}
+            || 0
+        ) ne $CurrentConfig{Time}
+    ) {
         $CurrentConfig{Time} = $Test->{FixedTimeSet} || 0;
         $Helper->FixedTimeSet( $CurrentConfig{Time} );
     }
 
     # test agent auth
-    my $AuthResult = $AuthTwoFactorObject->Auth(
-        User           => $UserRand,
-        UserID         => $TestAgentID,
+    my $AuthResult = $Kernel::OM->Get('Auth')->Auth(
+        User           => $TestAgent,
+        UsageContext   => 'Agent',
+        Pw             => $TestAgent,
         TwoFactorToken => $Test->{TwoFactorToken},
+        Silent         => $Test->{Silent} || 0
     );
     $Self->Is(
         $AuthResult,
         $Test->{ExpectedAuthResult},
-        $Test->{Name} . ' (agent)',
-    );
-
-    # test customer auth
-    my $ContactAuthResult = $ContactAuthTwoFactorObject->Auth(
-        User           => $TestCustomerID,
-        TwoFactorToken => $Test->{TwoFactorToken},
-    );
-    $Self->Is(
-        $ContactAuthResult,
-        $Test->{ExpectedAuthResult},
-        $Test->{Name} . ' (customer)',
+        $Test->{Name},
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

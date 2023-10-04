@@ -28,7 +28,7 @@ require '_StepsLib.pl';
 
 # feature specific steps
 
-When qr/I get this configitem history$/, sub {
+When qr/I get this configitem history 1$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/cmdb/configitems/'.S->{ConfigItemID}.'/history/'.S->{ResponseContent}->{ConfigItemHistory}->[0]->{HistoryEntryID}

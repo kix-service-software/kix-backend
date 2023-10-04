@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,19 +15,19 @@ use warnings;
 
 use File::Path qw(rmtree);
 
-use Kernel::System::SysConfig;
-
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Cache',
-    'Contact',
-    'Role',
-    'Main',
-    'UnitTest',
-    'User',
+our @ObjectDependencies = qw(
+    Config
+    DB
+    Cache
+    Contact
+    Role
+    Main
+    UnitTest
+    User
+    Organisation
+    SysConfig
 );
 
 =head1 NAME
@@ -44,16 +44,7 @@ construct a helper object.
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new(
-        'UnitTest::Helper' => {
-            RestoreDatabase            => 1,        # runs the test in a transaction,
-                                                    # and roll it back in the destructor
-                                                    #
-                                                    # NOTE: Rollback does not work for
-                                                    # changes in the database layout. If you
-                                                    # want to do this in your tests, you cannot
-                                                    # use this option and must handle the rollback
-                                                    # yourself.
-        },
+        'UnitTest::Helper' => {},
     );
     my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -69,34 +60,6 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{UnitTestObject} = $Kernel::OM->Get('UnitTest');
-
-    # remove any leftover configuration changes from aborted previous runs
-    $Self->ConfigSettingCleanup();
-
-    # set environment variable to skip SSL certificate verification if needed
-    if ( $Param{SkipSSLVerify} ) {
-
-        # remember original value
-        $Self->{PERL_LWP_SSL_VERIFY_HOSTNAME} = $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME};
-
-        # set environment value to 0
-        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
-
-        $Self->{RestoreSSLVerify} = 1;
-        $Self->{UnitTestObject}->True( 1, 'Skipping SSL certificates verification' );
-    }
-
-    # switch article dir to a temporary one to avoid collisions
-    if ( $Param{UseTmpArticleDir} ) {
-        $Self->UseTmpArticleDir();
-    }
-
-    if ( $Param{RestoreDatabase} ) {
-        $Self->{RestoreDatabase} = 1;
-        my $StartedTransaction = $Self->BeginWork();
-        $Self->{UnitTestObject}->True( $StartedTransaction, 'Started database transaction.' );
-
-    }
 
     # disable debugging
     foreach my $Type ( qw(Permission Cache) ) {
@@ -163,8 +126,10 @@ be set to invalid automatically during the destructor. Returns
 the login name of the new user, the password is the same.
 
     my $TestUserLogin = $Helper->TestUserCreate(
-        Roles => ['admin', 'users'],            # optional, list of roles to add this user to
-        Language => 'de'                        # optional, defaults to 'en' if not set
+        Firstname => 'Max',                      # optional, uses random login if not given
+        Lastname  => 'Mustermann',               # optional, uses random login if not given
+        Roles     => ['admin', 'users'],         # optional, list of roles to add this user to
+        Language  => 'de'                        # optional, defaults to 'en' if not set
     );
 
 =cut
@@ -186,6 +151,9 @@ sub TestUserCreate {
 
         $TestUserLogin = $Self->GetRandomID();
 
+        my $TestFirstname = $Param{Firstname} || $TestUserLogin;
+        my $TestLastname  = $Param{Lastname}  || $TestUserLogin;
+
         $TestUserID = $Kernel::OM->Get('User')->UserAdd(
             UserLogin    => $TestUserLogin,
             UserPw       => $TestUserLogin,
@@ -203,8 +171,8 @@ sub TestUserCreate {
 
         $TestUserContactID =  $Kernel::OM->Get('Contact')->ContactAdd(
             AssignedUserID        => $TestUserID,
-            Firstname             => $TestUserLogin,
-            Lastname              => $TestUserLogin,
+            Firstname             => $TestFirstname,
+            Lastname              => $TestLastname,
             Email                 => $TestUserLogin . '@localunittest.com',
             PrimaryOrganisationID => $OrgID,
             OrganisationIDs       => [ $OrgID ],
@@ -215,8 +183,8 @@ sub TestUserCreate {
         last COUNT if $TestUserID;
     }
 
-    die 'Could not create test user login' if !$TestUserLogin;
-    die 'Could not create test user'       if !$TestUserID;
+    die 'Could not create test user login'   if !$TestUserLogin;
+    die 'Could not create test user'         if !$TestUserID;
     die 'Could not create test user contact' if !$TestUserContactID;
 
     # Remember UserID of the test user to later set it to invalid
@@ -329,6 +297,25 @@ sub TestContactCreate {
     # rkaiser - T#2017020290001194 - changed customer user to contact
     $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, UserID $TestContactUserID)");
 
+    # Add user to roles
+    ROLE_NAME:
+    for my $RoleName ( @{ $Param{Roles} || [] } ) {
+
+        # get role object
+        my $RoleObject = $Kernel::OM->Get('Role');
+
+        my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
+        die "Cannot find role $RoleName" if ( !$RoleID );
+
+        $RoleObject->RoleUserAdd(
+            AssignUserID => $TestContactUserID,
+            RoleID       => $RoleID,
+            UserID       => 1,
+        ) || die "Could not add test contact $TestContactLogin to role $RoleName";
+
+        $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
+    }
+
     # set customer user language
     my $UserLanguage = $Param{Language} || 'en';
     $Kernel::OM->Get('Contact')->SetPreferences(
@@ -415,9 +402,49 @@ Starts a database transaction (in order to isolate the test from the static data
 
 sub BeginWork {
     my ( $Self, %Param ) = @_;
-    my $DBObject = $Kernel::OM->Get('DB');
-    $DBObject->Connect();
-    return $DBObject->{dbh}->begin_work();
+
+    if ( !$Self->{RollbackDB} ) {
+        my $DBObject = $Kernel::OM->Get('DB');
+        $DBObject->Connect();
+
+        return if ( !$DBObject->{dbh}->begin_work() );
+
+        $Self->{RollbackDB} = 1;
+    }
+
+    return 1;
+}
+
+sub SSLVerify {
+    my ( $Self, %Param ) = @_;
+
+    # set environment variable to skip SSL certificate verification if needed
+    if (
+        $Param{SkipSSLVerify}
+        && !$Self->{RestoreSSLVerify}
+    ) {
+
+        # remember original value
+        $Self->{PERL_LWP_SSL_VERIFY_HOSTNAME} = $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME};
+
+        # set environment value to 0
+        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
+        $Self->{RestoreSSLVerify} = 1;
+        $Self->{UnitTestObject}->True( 1, 'Skipping SSL certificates verification' );
+    }
+
+    # restore environment variable to skip SSL certificate verification if needed
+    if ( $Param{RestoreSSLVerify} ) {
+
+        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = $Self->{PERL_LWP_SSL_VERIFY_HOSTNAME};
+
+        $Self->{RestoreSSLVerify} = 0;
+
+        $Self->{UnitTestObject}->True( 1, 'Restored SSL certificates verification' );
+    }
+
+    return 1;
 }
 
 =item Rollback()
@@ -430,10 +457,40 @@ Rolls back the current database transaction.
 
 sub Rollback {
     my ( $Self, %Param ) = @_;
+
+    # reset time freeze
+    $Self->FixedTimeUnset();
+
+    $Kernel::OM->Get('Cache')->CleanUp();
+
+    if ( $Self->{SysConfigChanged} ) {
+        $Kernel::OM->Get('SysConfig')->CleanUp();
+        $Kernel::OM->Get('SysConfig')->Rebuild();
+        $Self->{SysConfigChanged} = 0;
+    }
+
+    # cleanup temporary article directory
+    if (
+        $Self->{TmpArticleDir}
+        && -d $Self->{TmpArticleDir}
+    ) {
+        File::Path::rmtree( $Self->{TmpArticleDir} );
+    }
+
+    if ( $Self->{RestoreSSLVerify} ) {
+        $Self->SSLVerify(
+            RestoreSSLVerify => 1
+        );
+    }
+
     my $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
 
     # if there is no database handle, there's nothing to rollback
-    if ($DatabaseHandle) {
+    if (
+        $Self->{RollbackDB}
+        && $DatabaseHandle
+    ) {
+        $Self->{RollbackDB} = 0;
         return $DatabaseHandle->rollback();
     }
     return 1;
@@ -493,25 +550,6 @@ sub FixedTimeSet {
 
     $FixedTime = $TimeToSave // CORE::time();
 
-    # This is needed to reload objects that directly use the time functions
-    #   to get a hold of the overrides.
-    my @Objects = (
-        'Kernel::System::Time',
-        'Kernel::System::Cache::FileStorable',
-        'Kernel::System::PID',
-    );
-
-    for my $Object (@Objects) {
-        my $FilePath = $Object;
-        $FilePath =~ s{::}{/}xmsg;
-        $FilePath .= '.pm';
-        if ( $INC{$FilePath} ) {
-            no warnings 'redefine';
-            delete $INC{$FilePath};
-            $Kernel::OM->Get('Main')->Require($Object);
-        }
-    }
-
     return $FixedTime;
 }
 
@@ -563,129 +601,22 @@ BEGIN {
         }
         return CORE::gmtime($Time);
     };
-}
 
-sub DESTROY {
-    my $Self = shift;
+    # This is needed to reload objects that directly use the time functions
+    #   to get a hold of the overrides.
+    my @Objects = (
+        'Kernel::System::Time',
+        'Kernel::System::Cache::FileStorable'
+    );
 
-    # reset time freeze
-    FixedTimeUnset();
-
-    # restore system configuration if needed
-    if ( $Self->{SysConfigBackup} ) {
-        $Self->{SysConfigObject}->Upload( Content => $Self->{SysConfigBackup} );
-        $Self->{UnitTestObject}->True( 1, 'Restored the system configuration' );
-    }
-
-    # remove any configuration changes
-    $Self->ConfigSettingCleanup();
-
-    # restore environment variable to skip SSL certificate verification if needed
-    if ( $Self->{RestoreSSLVerify} ) {
-
-        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = $Self->{PERL_LWP_SSL_VERIFY_HOSTNAME};
-
-        $Self->{RestoreSSLVerify} = 0;
-
-        $Self->{UnitTestObject}->True( 1, 'Restored SSL certificates verification' );
-    }
-
-    # restore database, clean caches
-    if ( $Self->{RestoreDatabase} ) {
-        my $RollbackSuccess = $Self->Rollback();
-        $Kernel::OM->Get('Cache')->CleanUp();
-        $Self->{UnitTestObject}->True( $RollbackSuccess, 'Rolled back all database changes and cleaned up the cache.' );
-    }
-
-    # disable email checks to create new user
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    local $ConfigObject->{Config}->{CheckEmailAddresses} = 0;
-
-    # cleanup temporary article directory
-    if ( $Self->{TmpArticleDir} && -d $Self->{TmpArticleDir} ) {
-        File::Path::rmtree( $Self->{TmpArticleDir} );
-    }
-
-    # invalidate test users
-    if ( ref $Self->{TestUsers} eq 'ARRAY' && @{ $Self->{TestUsers} } ) {
-        TESTUSERS:
-        for my $TestUser ( @{ $Self->{TestUsers} } ) {
-
-            my %User = $Kernel::OM->Get('User')->GetUserData(
-                UserID => $TestUser,
-            );
-
-            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                UserID => $TestUser,
-            );
-
-            if ( !$User{UserID} ) {
-
-                # if no such user exists, there is no need to set it to invalid;
-                # happens when the test user is created inside a transaction
-                # that is later rolled back.
-                next TESTUSERS;
-            }
-
-            # make test user invalid
-            my $Success = $Kernel::OM->Get('User')->UserUpdate(
-                %User,
-                ValidID      => 2,
-                ChangeUserID => 1,
-            );
-
-            $Self->{UnitTestObject}->True( $Success, "Set test user $TestUser to invalid" );
-
-            $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
-                %Contact,
-                ValidID      => 2,
-                ChangeUserID => 1,
-            );
-
-            $Self->{UnitTestObject}->True( $Success, "Set test contact $Contact{ID} for user $TestUser to invalid" );
-
-            # disable assigned organisation
-            my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
-                ID => $Contact{PrimaryOrganisationID}
-            );
-            $Success = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
-                %Organisation,
-                ID      => $Contact{PrimaryOrganisationID},
-                ValidID => 2,
-                UserID  => 1,
-            );
-
-            $Self->{UnitTestObject}->True(
-                $Success, "Set test organisation $Contact{PrimaryOrganisationID} to invalid"
-            );
-        }
-    }
-
-    # invalidate test roles
-    if ( ref $Self->{TestRoles} eq 'ARRAY' && @{ $Self->{TestRoles} } ) {
-        TESTROLES:
-        for my $TestRole ( @{ $Self->{TestRoles} } ) {
-
-            my %Role = $Kernel::OM->Get('Role')->RoleGet(
-                ID => $TestRole,
-            );
-
-            if ( !$Role{ID} ) {
-
-                # if no such role exists, there is no need to set it to invalid;
-                # happens when the test role is created inside a transaction
-                # that is later rolled back.
-                next TESTROLES;
-            }
-
-            # make test role invalid
-            my $Success = $Kernel::OM->Get('Role')->RoleUpdate(
-                %Role,
-                ValidID      => 2,
-                ChangeUserID => 1,
-            );
-
-            $Self->{UnitTestObject}->True( $Success, "Set test role $TestRole to invalid" );
+    for my $Object (@Objects) {
+        my $FilePath = $Object;
+        $FilePath =~ s{::}{/}xmsg;
+        $FilePath .= '.pm';
+        if ( $INC{$FilePath} ) {
+            no warnings 'redefine';
+            delete $INC{$FilePath};
+            $Kernel::OM->Get('Main')->Require($Object);
         }
     }
 }
@@ -721,6 +652,7 @@ sub ConfigSettingChange {
         Name   => $Key,
         Value  => $Valid ? $Value : undef,
         UserID => 1,
+        Silent => $Param{Silent},
     );
 
     # set in Config
@@ -729,17 +661,7 @@ sub ConfigSettingChange {
         Value => $Valid ? $Value : undef,
     );
 
-    return 1;
-}
-
-=item ConfigSettingCleanup()
-
-remove all config setting changes from ConfigSettingChange();
-
-=cut
-
-sub ConfigSettingCleanup {
-    my ( $Self, %Param ) = @_;
+    $Self->{SysConfigChanged} = 1;
 
     return 1;
 }
@@ -775,31 +697,6 @@ sub UseTmpArticleDir {
 
     return 1;
 }
-
-=item StartWebserver()
-
-mock a webserver
-
-=cut
-
-# sub StartWebserver {
-#     my ( $Self, %Param ) = @_;
-
-#     use Test::Fake::HTTPD;
-
-#     my $httpd = Test::Fake::HTTPD->new(
-#         timeout     => 5,
-#         daemon_args => { },
-#     );
-
-#     $httpd->run(sub {
-#         my $req = shift;
-#         print STDERR Data::Dumper::Dumper($req);
-#         [ 200, [ 'Content-Type', 'text/plain' ], [ 'Mock HTTP server' ] ];
-#     });
-
-#     return $httpd;
-# }
 
 =item CombineLists()
 

@@ -8,7 +8,7 @@ Feature: POST request to the /system/cmdb/classes resource
   Scenario: create a configitem class
     When I create a configitem class
     Then the response code is 201
-#    Then the response object is ConfigItemClassPostPatchResponse
+    Then the response object is ConfigItemClassPostPatchResponse
     When I delete this configitem class
     Then the response code is 204
 

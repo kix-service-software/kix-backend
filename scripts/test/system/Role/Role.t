@@ -17,17 +17,11 @@ use vars (qw($Self));
 # get role object
 my $RoleObject = $Kernel::OM->Get('Role');
 
-#
-# Role tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $NameRandom  = $Helper->GetRandomID();
 my %RoleIDByRoleName = (
@@ -39,10 +33,10 @@ my %RoleIDByRoleName = (
 # try to add roles
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleObject->RoleAdd(
-        Name    => $RoleName,
+        Name         => $RoleName,
         UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-        ValidID => 1,
-        UserID  => 1,
+        ValidID      => 1,
+        UserID       => 1,
     );
 
     $Self->True(
@@ -58,10 +52,11 @@ for my $RoleName ( sort keys %RoleIDByRoleName ) {
 # try to add already added roles
 for my $RoleName ( sort keys %RoleIDByRoleName ) {
     my $RoleID = $RoleObject->RoleAdd(
-        Name    => $RoleName,
+        Name         => $RoleName,
         UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-        ValidID => 1,
-        UserID  => 1,
+        ValidID      => 1,
+        UserID       => 1,
+        Silent       => 1,
     );
 
     $Self->False(
@@ -129,10 +124,11 @@ my $ChangedRoleName  = $RoleNameToChange . '-changed';
 my $RoleIDToChange   = $RoleIDByRoleName{$RoleNameToChange};
 
 my $RoleUpdateResult = $RoleObject->RoleUpdate(
-    ID      => $RoleIDToChange,
-    Name    => $ChangedRoleName,
-    ValidID => 1,
-    UserID  => 1,
+    ID           => $RoleIDToChange,
+    Name         => $ChangedRoleName,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+    ValidID      => 1,
+    UserID       => 1,
 );
 
 $Self->True(
@@ -145,10 +141,10 @@ delete $RoleIDByRoleName{$RoleNameToChange};
 
 # try to add role with previous name
 my $RoleID1 = $RoleObject->RoleAdd(
-    Name    => $RoleNameToChange,
+    Name         => $RoleNameToChange,
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-    ValidID => 1,
-    UserID  => 1,
+    ValidID      => 1,
+    UserID       => 1,
 );
 
 $Self->True(
@@ -162,10 +158,11 @@ if ($RoleID1) {
 
 # try to add role with changed name
 $RoleID1 = $RoleObject->RoleAdd(
-    Name    => $ChangedRoleName,
+    Name         => $ChangedRoleName,
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-    ValidID => 1,
-    UserID  => 1,
+    ValidID      => 1,
+    UserID       => 1,
+    Silent       => 1,
 );
 
 $Self->False(
@@ -175,10 +172,10 @@ $Self->False(
 
 my $RoleName2 = $ChangedRoleName . 'update';
 my $RoleID2   = $RoleObject->RoleAdd(
-    Name    => $RoleName2,
+    Name         => $RoleName2,
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
-    ValidID => 1,
-    UserID  => 1,
+    ValidID      => 1,
+    UserID       => 1,
 );
 
 $Self->True(
@@ -188,10 +185,12 @@ $Self->True(
 
 # try to update role with existing name
 my $RoleUpdateWrong = $RoleObject->RoleUpdate(
-    ID      => $RoleID2,
-    Name    => $ChangedRoleName,
-    ValidID => 2,
-    UserID  => 1,
+    ID           => $RoleID2,
+    Name         => $ChangedRoleName,
+    UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+    ValidID      => 2,
+    UserID       => 1,
+    Silent       => 1,
 );
 
 $Self->False(
@@ -199,7 +198,8 @@ $Self->False(
     'RoleUpdate() update role with existing name ' . $ChangedRoleName,
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

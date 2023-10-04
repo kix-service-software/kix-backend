@@ -7,5 +7,4 @@ Feature: GET request to the /reporting/datasources resource
 
   Scenario: get the list of existing datasources
     When I query the datasources collection
-#Then the response content
     Then the response code is 200

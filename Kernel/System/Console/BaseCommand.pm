@@ -18,12 +18,7 @@ use Term::ANSIColor();
 use IO::Interactive();
 use Encode::Locale();
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'Encode',
-    'Main',
-);
+our @ObjectDependencies = ();
 
 our $SuppressANSI = 0;
 

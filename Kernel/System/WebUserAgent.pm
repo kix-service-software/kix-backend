@@ -144,8 +144,8 @@ sub Request {
 
     my $Response;
 
-    # don't use Crypt::SSLeay but Net::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+    # don't use Crypt::SSLeay but IO::Socket::SSL instead
+    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
     # init agent
     my $UserAgent = LWP::UserAgent->new();
@@ -207,12 +207,16 @@ sub Request {
     else {
 
         # check for Data param
-        if ( !IsArrayRefWithData( $Param{Data} ) && !IsHashRefWithData( $Param{Data} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
-            );
+        if (
+            !IsArrayRefWithData( $Param{Data} )
+            && !IsHashRefWithData( $Param{Data} )
+        ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'WebUserAgent POST: Need Data param containing a hashref or arrayref with data.',
+                );
+            }
             return ( Status => 0 );
         }
 
@@ -221,10 +225,12 @@ sub Request {
     }
 
     if ( !$Response->is_success() ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't perform $Param{Type} on $Param{URL}: " . $Response->status_line(),
+            );
+        }
         return (
             Success => 0,
             Status  => $Response->status_line(),

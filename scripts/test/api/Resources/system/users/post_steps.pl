@@ -123,3 +123,25 @@ When qr/added a user$/, sub {
       }
    );
 };
+
+When qr/added a user with roles$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/system/users',
+      Token   => S->{Token},
+      Content => {
+        User => {
+            UserLogin => "jdoe_roleid",
+            UserPw => "secret2".rand(),
+            IsAgent => 1,
+            IsCustomer => 0,
+            RoleIDs => [
+                3,5,8
+            ],
+            ValidID => 1
+        }
+      }
+   );
+};
+
+
+

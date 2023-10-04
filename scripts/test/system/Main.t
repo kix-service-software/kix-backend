@@ -292,7 +292,8 @@ $Self->True(
 );
 
 my $FileMTimeNonexisting = $MainObject->FileGetMTime(
-    Location => $Home . '/Kernel/some.nonexisting.file',
+    Location        => $Home . '/Kernel/some.nonexisting.file',
+    DisableWarnings => 1,
 );
 
 $Self->False(
@@ -521,6 +522,7 @@ for my $Directory ( $DirectoryWithFiles, $SubDirA, $SubDirB, ) {
         Directory => 'THIS',
         Filter    => '*',
         Results   => [],
+        Silent    => 1,
     },
 );
 
@@ -539,6 +541,7 @@ for my $Test (@Tests) {
         Directory => $Test->{Directory},
         Filter    => $Test->{Filter},
         Recursive => $Test->{Recursive},
+        Silent    => $Test->{Silent},
     );
 
     # Mac OS will store all filenames as NFD internally.

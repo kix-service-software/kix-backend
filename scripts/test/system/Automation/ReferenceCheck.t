@@ -17,12 +17,10 @@ use Kernel::System::VariableCheck qw(:all);
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my %TestMacros = ();
 
@@ -128,7 +126,8 @@ $Self->False(
     'IsMacroDeletable() - 4 should not be deletable, because 5 references it',
 );
 my $MacroDelete4 = $AutomationObject->MacroDelete(
-    ID => $TestMacros{'test-macro-4'}
+    ID     => $TestMacros{'test-macro-4'},
+    Silent => 1,
 );
 $Self->False(
     $MacroDelete4,
@@ -276,8 +275,9 @@ $Self->True(
 );
 # set ignore param
 $AutomationObject->{IgnoreMacroIDsForDelete} = [$IgnoreMacroID];
-my $IsIgnoreMacroDeletable = $AutomationObject->MacroIsDeletable(
-    ID => $IgnoreMacroID
+$IsIgnoreMacroDeletable = $AutomationObject->MacroIsDeletable(
+    ID     => $IgnoreMacroID,
+    Silent => 1,
 );
 $Self->False(
     $IsIgnoreMacroDeletable,
@@ -370,7 +370,8 @@ for my $MacroNumber ( 1..2 ) {
 # reference to unknown
 _AddMacroAction(
     MacroID    => $TestMacros{'test-macro-1'},
-    RefMacroID => 999999
+    RefMacroID => 999999,
+    Silent     => 1,
 );
 my %MacroActionsOf1 = $AutomationObject->MacroActionList(
     MacroID => $TestMacros{'test-macro-1'}
@@ -382,7 +383,8 @@ $Self->True(
 # reference to itself
 _AddMacroAction(
     MacroID    => $TestMacros{'test-macro-1'},
-    RefMacroID => $TestMacros{'test-macro-1'}
+    RefMacroID => $TestMacros{'test-macro-1'},
+    Silent     => 1,
 );
 %MacroActionsOf1 = $AutomationObject->MacroActionList(
     MacroID => $TestMacros{'test-macro-1'}
@@ -394,7 +396,7 @@ $Self->True(
 # reference to parent
 _AddMacroAction(
     MacroID    => $TestMacros{'test-macro-1'},
-    RefMacroID => $TestMacros{'test-macro-2'}
+    RefMacroID => $TestMacros{'test-macro-2'},
 );
 %MacroActionsOf1 = $AutomationObject->MacroActionList(
     MacroID => $TestMacros{'test-macro-1'}
@@ -405,7 +407,8 @@ $Self->True(
 );
 _AddMacroAction(
     MacroID    => $TestMacros{'test-macro-2'},
-    RefMacroID => $TestMacros{'test-macro-1'}
+    RefMacroID => $TestMacros{'test-macro-1'},
+    Silent     => 1,
 );
 my %MacroActionsOf2 = $AutomationObject->MacroActionList(
     MacroID => $TestMacros{'test-macro-2'}
@@ -502,7 +505,7 @@ for my $Number ( 1..2 ) {
         );
 
         # reference exec plan
-        my $Result = $AutomationObject->JobExecPlanAdd(
+        $Result = $AutomationObject->JobExecPlanAdd(
             JobID      => $ID,
             ExecPlanID => $JobExecPlanID,
             UserID     => 1
@@ -591,15 +594,19 @@ sub _AddMacroAction {
     my ( %Param ) = @_;
 
     my $MacroActionID = $AutomationObject->MacroActionAdd(
-        MacroID => $Param{MacroID},
-        Type    => 'ExecuteMacro',
+        MacroID    => $Param{MacroID},
+        Type       => 'ExecuteMacro',
         Parameters => { MacroID => $Param{RefMacroID} },
-        ValidID => 1,
-        UserID  => 1,
+        ValidID    => 1,
+        UserID     => 1,
+        Silent     => $Param{Silent},
     );
+
+    return $MacroActionID;
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
@@ -616,3 +623,11 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+
+=cut
+
+
+=cut
+
+=cut
+

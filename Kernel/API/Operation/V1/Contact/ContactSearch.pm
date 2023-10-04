@@ -123,7 +123,7 @@ sub Run {
                         Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
                     );
 
-                    @SearchTypeResult = $Self->_GetCombinedList(
+                    @SearchTypeResult = $Kernel::OM->Get('Main')->GetCombinedList(
                         ListA => \@SearchTypeResult,
                         ListB => [ keys %SearchResult ],
                         Union => 1
@@ -148,7 +148,7 @@ sub Run {
 
                 # combine both results (OR and AND)
                 # remove all IDs from type result that we don't have in this search
-                @ContactList = $Self->_GetCombinedList(
+                @ContactList = $Kernel::OM->Get('Main')->GetCombinedList(
                     ListA => \@SearchTypeResult,
                     ListB => \@ContactList
                 );
@@ -194,18 +194,6 @@ sub Run {
     return $Self->_Success(
         Contact => [],
     );
-}
-
-sub _GetCombinedList {
-    my ( $Self, %Param ) = @_;
-
-    my %Union;
-    my %Isect;
-    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
-        $Union{$E}++ && $Isect{$E}++
-    }
-
-    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 1;

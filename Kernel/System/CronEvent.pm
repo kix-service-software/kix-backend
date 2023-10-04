@@ -74,11 +74,12 @@ sub NextEventGet {
 
     # check needed params
     if ( !$Param{Schedule} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Schedule!",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Schedule!",
+            );
+        }
         return;
     }
 
@@ -93,6 +94,7 @@ sub NextEventGet {
     my $CronObject = $Self->_Init(
         Schedule  => $Param{Schedule},
         StartTime => $StartTime,
+        Silent    => $Param{Silent},
     );
 
     return if !$CronObject;
@@ -134,11 +136,12 @@ sub NextEventList {
     # check needed params
     for my $Needed (qw(Schedule StopTime)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!",
+                );
+            }
             return;
         }
     }
@@ -151,11 +154,12 @@ sub NextEventList {
     return if !$StartTime;
 
     if ( $StartTime > $Param{StopTime} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "StartTime must be lower than or equals to StopTime",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "StartTime must be lower than or equals to StopTime",
+            );
+        }
         return;
     }
 
@@ -163,6 +167,7 @@ sub NextEventList {
     my $CronObject = $Self->_Init(
         Schedule  => $Param{Schedule},
         StartTime => $StartTime,
+        Silent    => $Param{Silent},
     );
 
     return if !$CronObject;
@@ -215,11 +220,12 @@ sub PreviousEventGet {
 
     # check needed params
     if ( !$Param{Schedule} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Schedule!",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Schedule!",
+            );
+        }
         return;
     }
 
@@ -234,6 +240,7 @@ sub PreviousEventGet {
     my $CronObject = $Self->_Init(
         Schedule  => $Param{Schedule},
         StartTime => $StartTime,
+        Silent    => $Param{Silent},
     );
 
     return if !$CronObject;
@@ -274,11 +281,12 @@ sub _Init {
     # check needed params
     for my $Needed (qw(Schedule StartTime)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!",
+                );
+            }
             return;
         }
     }
@@ -293,11 +301,12 @@ sub _Init {
         my $LastDayOfMonth = $MonthLastDay[ $Month - 1 ];
 
         if ( $DayMonth > $LastDayOfMonth ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Schedule: $Param{Schedule} is invalid",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Schedule: $Param{Schedule} is invalid",
+                );
+            }
             return;
         }
     }
@@ -313,19 +322,23 @@ sub _Init {
 
     # error handling
     if ($@) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Schedule: $Param{Schedule} is invalid:",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Schedule: $Param{Schedule} is invalid:",
+            );
+        }
         return;
     }
 
     # check cron object
     if ( !$CronObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not create new Schedule::Cron::Events object!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not create new Schedule::Cron::Events object!",
+            );
+        }
         return;
     }
 
@@ -335,10 +348,6 @@ sub _Init {
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

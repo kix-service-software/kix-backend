@@ -14,6 +14,12 @@ use utf8;
 
 use vars (qw($Self));
 
+# get helper object
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 # get needed objects
 my $DBObject   = $Kernel::OM->Get('DB');
 my $MainObject = $Kernel::OM->Get('Main');
@@ -122,6 +128,9 @@ $Self->True(
     $DBObject->Do( SQL => 'DROP TABLE test_md5_conversion' ) || 0,
     "Do() DROP TABLE",
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

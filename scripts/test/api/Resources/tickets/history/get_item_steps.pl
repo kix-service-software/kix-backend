@@ -28,7 +28,7 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I get the tickethistory\s*$/, sub {
+When qr/I get the ticket history\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/tickets/'.S->{TicketID}.'/history/'.S->{ResponseContent}->{History}->[0]->{HistoryID},

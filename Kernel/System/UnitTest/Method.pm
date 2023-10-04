@@ -526,6 +526,13 @@ sub _DataDiff {
                     );
                     next COUNT;
                 }
+                elsif ( ref $A[$Count] eq 'SCALAR' && ref $B[$Count] eq 'SCALAR' ) {
+                    return 1 if $Self->_DataDiff(
+                        Data1 => ${ $A[$Count] },
+                        Data2 => ${ $A[$Count] }
+                    );
+                    next COUNT;
+                }
                 return 1;
             }
         }

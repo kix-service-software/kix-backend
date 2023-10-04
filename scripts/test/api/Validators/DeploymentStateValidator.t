@@ -18,11 +18,6 @@ use Kernel::API::Validator::DeploymentStateValidator;
 my $ValidatorObject = Kernel::API::Validator::DeploymentStateValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ItemData = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
@@ -35,7 +30,7 @@ my $ValidData = {
 };
 
 my $InvalidData = {
-    DeplStateID => '99999999999999999'
+    DeplStateID => '9999'
 };
 
 # validate valid DeplStateID
@@ -70,8 +65,6 @@ $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

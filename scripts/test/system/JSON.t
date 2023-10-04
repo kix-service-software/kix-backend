@@ -23,6 +23,7 @@ my @Tests = (
         Input  => undef,
         Result => undef,
         Name   => 'JSON - undef test',
+        Silent => 1,
     },
     {
         Input  => '',
@@ -93,6 +94,7 @@ for my $Test (@Tests) {
     my $JSON = $JSONObject->Encode(
         Data     => $Test->{Input},
         SortKeys => 1,
+        Silent   => $Test->{Silent},
     );
 
     $Self->Is(
@@ -107,11 +109,13 @@ for my $Test (@Tests) {
         Result      => undef,
         InputDecode => undef,
         Name        => 'JSON - undef test',
+        Silent      => 1,
     },
     {
         Result      => undef,
         InputDecode => '" bla blubb',
         Name        => 'JSON - malformed data test',
+        Silent      => 1,
     },
     {
         Result      => 'Some Text',
@@ -156,15 +160,15 @@ for my $Test (@Tests) {
         Name => 'JSON - complex structure'
     },
     {
-        Result => 1,
+        Result => {'Test' => 1},
         InputDecode =>
-            'true',
+            '{"Test":true}',
         Name => 'JSON - booleans'
     },
     {
-        Result => undef,
+        Result => {'Test' => 0},
         InputDecode =>
-            'false',
+            '{"Test":false}',
         Name => 'JSON - booleans2'
     },
     {
@@ -211,14 +215,24 @@ for my $Test (@Tests) {
 for my $Test (@Tests) {
 
     my $JSON = $JSONObject->Decode(
-        Data => $Test->{InputDecode},
+        Data   => $Test->{InputDecode},
+        Silent => $Test->{Silent},
     );
 
-    $Self->IsDeeply(
-        scalar $JSON,
-        scalar $Test->{Result},
-        $Test->{Name},
-    );
+    if ( defined( $Test->{Result} ) ) {
+        $Self->IsDeeply(
+            $JSON,
+            $Test->{Result},
+            $Test->{Name},
+        );
+    }
+    else {
+        $Self->Is(
+            $JSON,
+            $Test->{Result},
+            $Test->{Name},
+        );
+    }
 }
 
 1;

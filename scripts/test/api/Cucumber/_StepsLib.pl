@@ -95,10 +95,9 @@ Then qr/the response object is (.*?)$/, sub {
 
   my $Validator = JSON::Validator->new();
   $Validator->schema($$Schema);
-
   my @Result = $Validator->validate(S->{ResponseContent});
   use Data::Dumper;
-  is(@Result, 0, 'validate response object '.Dumper(\@Result));
+ is(@Result, 0, 'validate response object '.Dumper(\@Result));
 };
 
 Then qr/the response has no content/, sub {
@@ -120,17 +119,25 @@ Then qr/the attribute "(.*?)" is "(.*?)"$/, sub {
   is($FlatContent->{$Attribute}, $Value, 'Check attribute value in response');
 };
 
-Then qr/the attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
-  is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
-};
-
 Then qr/the response contains (\d+) items of type "(.*?)"$/, sub {
-  is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
-  my $Anzahl = @{S->{ResponseContent}->{$2}};
+   is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
+   my $Anzahl = @{S->{ResponseContent}->{$2}};
 };
 
 Then qr/the (.*?) header is set/, sub {
   isnt(S->{Response}->header($1), '', $1.' header is set');
+};
+
+#===============================Vergleich============================
+Then qr/the attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+
+  if ( defined( S->{ResponseContent}->{$2}->[$3]->{$1}) ) {
+      S->{ResponseContent}->{$2}->[$3]->{$1}   =~ s/^\s+|\s+$//g;
+      is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
+  }
+  else{
+   is('', $4, 'Check attribute value in response');
+  }
 };
 
 Then qr/the response contains the following items of type (.*?)$/, sub {
@@ -139,31 +146,107 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-            if (!defined($Row->{$Attribute})) {
-                $Row->{$Attribute} = '-';
                 C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
-            }
         }
         $Index++
     }
 };
 
+#=======================no hash array=======================
+Then qr/the response contains the following items type of (.*?)$/, sub {
+    my $Object = $1;
+    my $Index = 0;
+
+    foreach my $Row ( @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    }
+};
+
+Then qr/attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+};
+
+#=======================only array=======================
+Then qr/the response contains the following items type (.*?)$/, sub {
+    my $Object = $1;
+    my $Index = 0;
+
+    foreach my $Row ( @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "this attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    }
+};
+
+
+Then qr/this attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+
+    is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+};
+
+#========================filter================================
+# compare filters
+Then qr/the initial Filter "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+   $JSONString = $Kernel::OM->Get('JSON')->Encode(
+       Data     => S->{ResponseContent}->{ObjectAction}->[$3]->{Filter}->[0],
+       SortKeys => $Param{DoNotSortAttributes} ? 0 : 1
+   );
+   is($JSONString, $4, 'Check attribute value in response');
+};
+
+Then qr/the response contains the following items Filter$/, sub {
+   my $Object = "Filter";
+   my $Index = 0;
+
+   foreach my $Row ( sort @{ C->data } ) {
+      foreach my $Attribute ( keys %{$Row}) {
+         C->dispatch( 'Then', "the initial Filter \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+      }
+      $Index++
+   };
+};
+
+
 #=======================work=================================
+
 Then qr/the response content is$/, sub {
 	print STDERR Dumper(S->{ResponseContent});
-    #print STDERR Dumper(S->{Response});
-
 };
+
+Then qr/the response content is def$/, sub {
+    print STDERR Dumper(S->{ResponseContent}->{ConfigItemClassDefinition}->[0]->{Definition});
+};
+
 Then qr/the response content$/, sub {
-	#print STDERR Dumper(S->{ResponseContent});
     print STDERR Dumper(S->{Response});
 };
+
 #=============================================================
 
 Then qr/the response content history is$/, sub {
     S->{HistoryEntryID} = S->{ResponseContent}->{ConfigItemHistoryItem}->[0]->{HistoryEntryID};
-#    print STDERR "HistoryEntryIDxxx".Dumper(S->{HistoryEntryID});
 };
+
+#===================remove tags================================
+
+Then qr/remove tags$/, sub {
+  if ( defined( S->{ResponseContent}->{Article}->[0]) ) {
+      S->{ResponseContent}->{Article}->[0]->{To} =~ s/\<//;
+      S->{ResponseContent}->{Article}->[0]->{To} =~ s/\>//;
+      S->{ResponseContent}->{Article}->[0]->{From} =~ s/\<//;
+      S->{ResponseContent}->{Article}->[0]->{From} =~ s/\>//;
+      if ( S->{ResponseContent}->{Article}->[0]->{MessageID} ) {
+          S->{ResponseContent}->{Article}->[0]->{MessageID} =~ s/\<//;
+          S->{ResponseContent}->{Article}->[0]->{MessageID} =~ s/\>//;
+      }     
+  }
+  
+};
+
 
 1;
 

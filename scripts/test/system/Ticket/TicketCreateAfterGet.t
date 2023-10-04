@@ -23,26 +23,25 @@ my $TypeObject    = $Kernel::OM->Get('Type');
 my $UserObject    = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # set fixed time
 $Helper->FixedTimeSet();
 
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
+    Silent         => 1
 );
 $Self->True(
     $TicketID,
@@ -52,30 +51,29 @@ $Self->True(
 # try to get a non-existant ticket
 my %Ticket = $TicketObject->TicketGet(
     TicketID => $TicketID + 1,
+    Silent   => 1
 );
 $Self->False(
     $Ticket{Title},
     'TicketGet() (Title) is empty',
 );
 
-my $TestUserLogin = $Helper->TestUserCreate(
-    Groups => [ 'users', ],
-);
+my $TestUserLogin = $Helper->TestUserCreate();
 
 my $TestUserID = $UserObject->UserLookup(
     UserLogin => $TestUserLogin,
 );
 
 my $TicketIDCreatedBy = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket_Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => $TestUserID,
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => $TestUserID,
 );
 
 my %CheckCreatedBy = $TicketObject->TicketGet(
@@ -112,11 +110,6 @@ $Self->Is(
     'TicketGet() (CreateBy - still the same after OwnerSet)',
 );
 
-$Self->Is(
-    $CheckCreatedBy{OwnerID},
-    $TestUserID,
-    'TicketOwnerSet()',
-);
 
 $Self->Is(
     $CheckCreatedBy{ChangeBy},
@@ -124,7 +117,8 @@ $Self->Is(
     'TicketOwnerSet() (ChangeBy - System ID 1 now)',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

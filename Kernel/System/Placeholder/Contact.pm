@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -19,10 +19,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Placeholder::Base);
 
-our @ObjectDependencies = (
-    'Contact',
-    'Log',
-    'Organisation',
+our @ObjectDependencies = qw(
+    Contact
+    Log
+    Organisation
+    HTMLUtils
 );
 
 =head1 NAME
@@ -52,93 +53,52 @@ sub _Replace {
     # replace contact placeholders
     my $Tag = $Self->{Start} . 'KIX_CONTACT_';
 
-    my %Contact;
-    if ( $Param{Ticket}->{ContactID} || $Param{Data}->{ContactID} ) {
-
-        my $ContactID = $Param{Data}->{ContactID} || $Param{Ticket}->{ContactID};
-
-        %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            ID => $ContactID,
-        );
-        if (IsHashRefWithData(\%Contact)) {
-            $Contact{Login} = $Contact{AssignedUserID} ? $Kernel::OM->Get('User')->UserLookup(
-                UserID => $Contact{AssignedUserID},
-            ) : '',
+    if ($Param{Text} =~ m/$Tag/) {
+        if (!$Param{Data}->{ContactID} && $Param{ObjectType} eq 'Contact' && $Param{ObjectID}) {
+            $Param{Data}->{ContactID} = $Param{ObjectID};
         }
 
-        # HTML quoting of content
-        if ( $Param{RichText} ) {
-            for my $Attribute ( keys %Contact ) {
-                next if !$Contact{$Attribute};
-                $Contact{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
-                    String => $Contact{$Attribute},
-                );
+        my %Contact;
+        if ( $Param{Data}->{ContactID} || $Param{Ticket}->{ContactID} ) {
+
+            my $ContactID = $Param{Data}->{ContactID} || $Param{Ticket}->{ContactID};
+
+            %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                ID => $ContactID,
+            );
+            if (IsHashRefWithData(\%Contact)) {
+                $Contact{Login} = $Contact{AssignedUserID} ? $Kernel::OM->Get('User')->UserLookup(
+                    UserID => $Contact{AssignedUserID},
+                ) : '',
             }
-        }
 
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Contact );
-    }
-
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
-
-    # TODO: should have its own module - currently for CUSTOMERDATA placeholder and its cleanup
-    # replace organisation placeholder
-    $Tag = $Self->{Start} . 'KIX_ORG_';
-
-    my %Organisation;
-    if ( $Param{Ticket}->{OrganisationID} || $Param{Data}->{OrganisationID} ) {
-
-        my $OrganisationID = $Param{Data}->{OrganisationID} || $Param{Ticket}->{OrganisationID};
-
-        %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
-            ID => $OrganisationID,
-        );
-
-        # HTML quoting of content
-        if ( $Param{RichText} ) {
-            for my $Attribute ( keys %Organisation ) {
-                next if !$Organisation{$Attribute};
-                $Organisation{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
-                    String => $Organisation{$Attribute},
-                );
+            # HTML quoting of content
+            if ( $Param{RichText} ) {
+                for my $Attribute ( keys %Contact ) {
+                    next if !$Contact{$Attribute};
+                    $Contact{$Attribute} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+                        String => $Contact{$Attribute},
+                    );
+                }
             }
+
+            if ($Contact{PrimaryOrganisationID}) {
+                my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                    ID => $Contact{PrimaryOrganisationID}
+                );
+                if (%Organisation) {
+                    $Contact{PrimaryOrganisation} = $Organisation{Name};
+                    $Contact{PrimaryOrganisationNumber} = $Organisation{Number};
+                }
+            }
+
+            # replace it
+            $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Contact );
         }
 
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %Organisation );
+        # cleanup
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
     }
-
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
-
-    # TODO: deprecated - keep old placeholders for backward compatibility until refactoring
-    # get customer data and replace it with <KIX_CUSTOMER_DATA_...
-    my $CustomerTag    = $Self->{Start} . 'KIX_CUSTOMERDATA_';
-    my $OldCustomerTag = $Self->{Start} . 'KIX_CUSTOMER_DATA_';
-
-    if (IsHashRefWithData(\%Contact)) {
-        for my $Attribute ( keys %Contact ) {
-            next if !$Contact{$Attribute};
-            $Contact{'User' . $Attribute} = $Contact{$Attribute};
-        }
-
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$CustomerTag|$OldCustomerTag", %Contact );
-    }
-    if (IsHashRefWithData(\%Organisation)) {
-        for my $Attribute ( keys %Organisation ) {
-            next if !$Organisation{$Attribute};
-            $Organisation{'CustomerCompany' . $Attribute} = $Organisation{$Attribute};
-        }
-
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, "$CustomerTag|$OldCustomerTag", %Organisation );
-    }
-
-    # cleanup
-    $Param{Text} =~ s/(?:$CustomerTag|$OldCustomerTag).+?$Self->{End}/$Param{ReplaceNotFound}/gi;
 
     return $Param{Text};
 }

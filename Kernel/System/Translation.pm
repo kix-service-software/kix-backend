@@ -16,10 +16,11 @@ use Digest::MD5 qw(md5_hex);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Log',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    DB
+    Log
 );
 
 our $DisableWarnings = 0;
@@ -306,10 +307,12 @@ sub PatternAdd {
     # check needed stuff
     for (qw(Value UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -319,10 +322,12 @@ sub PatternAdd {
         Value => $Param{Value}
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "An identical pattern already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An identical pattern already exists!"
+            );
+        }
         return;
     }
 
@@ -385,10 +390,12 @@ sub PatternUpdate {
     # check needed stuff
     for (qw(ID Value UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -398,10 +405,12 @@ sub PatternUpdate {
         Value => $Param{Value}
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "An identical Pattern already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An identical Pattern already exists!"
+            );
+        }
         return;
     }
 
@@ -503,10 +512,12 @@ sub TranslationLanguageAdd {
     # check needed stuff
     for (qw(PatternID Value Language UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -518,10 +529,12 @@ sub TranslationLanguageAdd {
         ID => $Param{PatternID},
     );
     if ( !%Pattern ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "PatternID $Param{PatternID} doesn't exist!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "PatternID $Param{PatternID} doesn't exist!"
+            );
+        }
         return;
     }
 
@@ -531,10 +544,12 @@ sub TranslationLanguageAdd {
         Language  => $Param{Language},
     );
     if ( %TranslationLanguage ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "This translation language already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "This translation language already exists!"
+            );
+        }
         return;
     }
 
@@ -778,10 +793,12 @@ sub TranslationLanguageUpdate {
     # check needed stuff
     for (qw(PatternID Language UserID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -792,10 +809,12 @@ sub TranslationLanguageUpdate {
         Language  => $Param{Language}
     );
     if ( !%Translation ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Translation language $Param{Language} doesn't exist for given pattern!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Translation language $Param{Language} doesn't exist for given pattern!"
+            );
+        }
         return;
     }
 

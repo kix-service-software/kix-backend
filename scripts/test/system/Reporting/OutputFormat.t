@@ -16,16 +16,7 @@ use vars (qw($Self));
 # get ReportDefinition object
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Backends = $Kernel::OM->Get('Config')->Get('Reporting::OutputFormat');
@@ -43,8 +34,6 @@ $Self->IsDeeply(
     [ sort keys %{$Backends} ],
     'OutputFormatList() - contains',
 );
-
-# cleanup is done by RestoreDatabase
 
 1;
 

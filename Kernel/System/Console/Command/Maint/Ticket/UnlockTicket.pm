@@ -50,7 +50,7 @@ sub Run {
         return $Self->ExitCodeError();
     }
 
-    my $Unlock = $Kernel::OM->Get('Ticket')->LockSet(
+    my $Unlock = $Kernel::OM->Get('Ticket')->TicketLockSet(
         TicketID => $TicketID,
         Lock     => 'unlock',
         UserID   => 1,

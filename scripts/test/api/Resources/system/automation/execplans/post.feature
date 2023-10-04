@@ -8,6 +8,7 @@ Feature: POST request to the /system/automation/execplans resource
   Scenario: create a automation execplan
     When I create a automation execplan 
     Then the response code is 201
+    And the response object is ExecPlanPostPatchResponse
     When I delete this automation execplan
     Then the response code is 204
 

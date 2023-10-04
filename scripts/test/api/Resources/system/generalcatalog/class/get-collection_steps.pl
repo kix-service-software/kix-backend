@@ -30,10 +30,25 @@ require '_StepsLib.pl';
 
 When qr/I query the collection of generalcatalog classes\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/system/generalcatalog/classes',
+       Token => S->{Token},
+       URL   => S->{API_URL} . '/system/generalcatalog/classes',
+       Sort  =>  "ConfigItemClass.Name",
    );
 };
 
+Then qr/items of "(.*?)"$/, sub {
+   my $Object = $1;
+   my $Index = 0;
 
+   foreach my $Row ( @{ C->data } ) {
+      foreach my $Attribute (keys %{$Row}) {
+         C->dispatch( 'Then', "the generalcatalogclasses \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+      }
+      $Index++
+   }
+};
+
+Then qr/the generalcatalogclasses "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+   is(S->{ResponseContent}->{$2}->[$3], $4, 'Check attribute value in response');
+};
 

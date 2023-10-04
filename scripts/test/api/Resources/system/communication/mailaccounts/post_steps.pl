@@ -105,3 +105,23 @@ When qr/I create a mailaccount$/, sub {
    );
 };
 
+When qr/I create a mailaccount failed type$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/communication/mailaccounts',
+        Token   => S->{Token},
+        Content => {
+            MailAccount => {
+                Login => "mail".rand(),
+                Password => "SomePassword".rand(),
+                Host => "pop3.example.com",
+                Type => "XXX",
+                IMAPFolder => "Some Folder",
+                Trusted => 0,
+                DispatchingBy => "Queue",
+                QueueID => 2,
+                Comment => "Test MailAccount",
+                ValidID => 1
+            }
+        }
+    );
+};

@@ -10,6 +10,7 @@ Feature: POST request to the /system/automation/macros/:MacroID/actions resource
     Then the response code is 201
     When I create a automation macro action 
     Then the response code is 201
+    And the response object is MacroActionPostPatchResponse
     When I delete this automation macro action
     Then the response code is 204
     When I delete this automation macro

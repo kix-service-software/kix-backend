@@ -9,7 +9,8 @@ Feature: GET request to the /system/automation/execplans/types resource
     Given a automation execplan
     Then the response code is 201
     When I query the collection of automation execplan types
-    Then the response code is 200 
+    Then the response code is 200
+    And the response object is ExecPlanTypeCollectionResponse
     When I delete this automation execplan
     Then the response code is 204
     And the response has no content   

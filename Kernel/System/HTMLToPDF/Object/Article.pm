@@ -100,14 +100,15 @@ sub DataGet {
             StripPlainBodyAsAttachment => 1,
         );
 
-        # html quoting
-        $Article{Body} = $LayoutObject->Ascii2Html(
-            NewLine => $ConfigObject->Get('DefaultViewNewLine'),
-            Text    => $Article{Body},
-            VMax    => $ConfigObject->Get('DefaultViewLines') || 5000,
-        );
-
         if ($Article{AttachmentIDOfHTMLBody}) {
+
+            # html quoting
+            $Article{Body} = $LayoutObject->Ascii2Html(
+                NewLine => $ConfigObject->Get('DefaultViewNewLine'),
+                Text    => $Article{Body},
+                VMax    => $ConfigObject->Get('DefaultViewLines') || 5000,
+            );
+
             my %AttachmentHTML = $TicketObject->ArticleAttachment(
                 ArticleID => $Article{ArticleID},
                 FileID    => $Article{AttachmentIDOfHTMLBody},
@@ -195,6 +196,12 @@ sub DataGet {
 
             # strip head, body and meta elements
             $Article{Body} = $Body;
+        }
+        else {
+            # convert plain to html
+            $Article{Body} = $Kernel::OM->Get('HTMLUtils')->ToHTML(
+                String => $Article{Body}
+            );
         }
     }
     else {

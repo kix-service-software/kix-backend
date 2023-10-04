@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,33 +15,27 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $RandomID = $Helper->GetRandomID();
 
 # create template generator after the dynamic field are created as it gathers all DF in the
 # constructor
-my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
 my $TestContactID = $Helper->TestContactCreate(
     Language => 'en',
 );
 
-my $ContactObject = $Kernel::OM->Get('User');
-
-my %TestContact = $ContactObject->ContactGet(
+my %TestContact = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $TestContactID,
 );
 
@@ -49,9 +43,7 @@ my %TestContact = $ContactObject->ContactGet(
 my $SystemAddressEmail    = $Helper->GetRandomID() . '@example.com';
 my $SystemAddressRealname = "KIX-Team";
 
-my $SystemAddressObject = $Kernel::OM->Get('SystemAddress');
-
-my $SystemAddressID = $SystemAddressObject->SystemAddressAdd(
+my $SystemAddressID = $Kernel::OM->Get('SystemAddress')->SystemAddressAdd(
     Name     => $SystemAddressEmail,
     Realname => $SystemAddressRealname,
     Comment  => 'some comment',
@@ -59,7 +51,9 @@ my $SystemAddressID = $SystemAddressObject->SystemAddressAdd(
     ValidID  => 1,
     UserID   => 1,
 );
-my %SystemAddressData = $SystemAddressObject->SystemAddressGet( ID => $SystemAddressID );
+my %SystemAddressData = $Kernel::OM->Get('SystemAddress')->SystemAddressGet(
+    ID => $SystemAddressID
+);
 
 my $QueueRand = $Helper->GetRandomID();
 my $QueueID   = $Kernel::OM->Get('Queue')->QueueAdd(
@@ -110,28 +104,34 @@ my @Tests = (
 
 for my $Test (@Tests) {
 
-    $SystemAddressObject->SystemAddressUpdate(
+    $Kernel::OM->Get('SystemAddress')->SystemAddressUpdate(
         %SystemAddressData,
         Realname => $Test->{SystemAddressName},
         UserID   => 1,
     );
-    $ContactObject->ContactUpdate(
+    $Kernel::OM->Get('Contact')->ContactUpdate(
         %TestContact,
         Firstname => $Test->{AgentFirstname},
         Lastname  => $Test->{AgentLastname},
-        ChangeUserID  => 1,
+        UserID    => 1,
     );
 
-    for my $DefineEmailFrom (qw(SystemAddressName AgentNameSystemAddressName AgentName)) {
+    for my $DefineEmailFrom (
+        qw(
+            SystemAddressName
+            AgentNameSystemAddressName
+            AgentName
+        )
+    ) {
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::DefineEmailFrom',
             Value => $DefineEmailFrom,
         );
 
-        my $Result = $TemplateGeneratorObject->Sender(
+        my $Result = $Kernel::OM->Get('TemplateGenerator')->Sender(
             QueueID => $QueueID,
-            UserID  => $TestContact{UserID}
+            UserID  => $TestContact{AssignedUserID}
         );
 
         $Self->Is(
@@ -142,11 +142,10 @@ for my $Test (@Tests) {
     }
 }
 
-# Cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

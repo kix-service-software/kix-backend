@@ -98,22 +98,24 @@ sub _CheckTaskParams {
 
     for my $Needed (qw(TaskID Data)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed! - Task: $Param{TaskName}",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed! - Task: " . ( $Param{TaskName} || 'undefined' ),
+                );
+            }
             return;
         }
     }
 
     # Check data.
     if ( ref $Param{Data} ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Got no valid Data! - Task: $Param{TaskName}",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Got no valid Data! - Task: $Param{TaskName}",
+            );
+        }
         return;
     }
 
@@ -122,11 +124,12 @@ sub _CheckTaskParams {
 
         for my $Needed ( @{ $Param{NeededDataAttributes} } ) {
             if ( !$Param{Data}->{$Needed} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need Data->$Needed! - Task: $Param{TaskName}",
-                );
-
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Need Data->$Needed! - Task: $Param{TaskName}",
+                    );
+                }
                 return;
             }
         }
@@ -136,11 +139,12 @@ sub _CheckTaskParams {
     if ( $Param{DataParamsRef} ) {
 
         if ( $Param{Data}->{Params} && ref $Param{Data}->{Params} ne uc $Param{DataParamsRef} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Data->Params is invalid, reference is not $Param{DataParamsRef}! - Task: $Param{TaskName}",
-            );
-
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Data->Params is invalid, reference is not $Param{DataParamsRef}! - Task: $Param{TaskName}",
+                );
+            }
             return;
         }
     }

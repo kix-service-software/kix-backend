@@ -18,12 +18,10 @@ my $DBObject     = $Kernel::OM->Get('DB');
 my $XMLObject    = $Kernel::OM->Get('XML');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $Data         = $ConfigObject->Get('Organisation');
 my $DefaultValue = $Data->{Params}->{Table};
@@ -179,7 +177,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス' ) {
     if ( $Key eq '1' ) {
         # delete the first organisation
         my $Success = $OrganisationObject->OrganisationDelete(
-            ID => $OrganisationID,
+            ID     => $OrganisationID,
+            UserID => 1,
         );
 
         $Self->True(
@@ -199,7 +198,7 @@ $Self->True(
 );
 
 %OrganisationSearch = $OrganisationObject->OrganisationSearch(
-    Search => 'Example',
+    Search => 'Example*',
     Valid  => 0,
 );
 
@@ -218,11 +217,10 @@ $Self->False(
     "OrganisationSearch() with Search",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

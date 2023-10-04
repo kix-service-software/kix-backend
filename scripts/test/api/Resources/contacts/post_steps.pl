@@ -157,7 +157,7 @@ When qr/added a contact$/, sub {
             Lastname => "Mustermann",
             Login => "mamu",
             OrganisationIDs => [
-                  S->{OrganisationID}
+                S->{OrganisationID}
             ],
             PrimaryOrganisationID => S->{OrganisationID}
          }

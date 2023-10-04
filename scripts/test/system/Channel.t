@@ -16,11 +16,6 @@ use vars (qw($Self));
 my $ChannelObject = $Kernel::OM->Get('Channel');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # get existing channel by using the id
@@ -33,7 +28,9 @@ $Self->Is(
 );
 
 # get non-existent channel by using the id
-%ChannelData = $ChannelObject->ChannelGet( ID => 9999 );
+%ChannelData = $ChannelObject->ChannelGet(
+    ID => 9999,
+);
 
 $Self->Is(
     $ChannelData{ID},
@@ -42,7 +39,9 @@ $Self->Is(
 );
 
 # lookup existent channel using ID
-my $ChannelNameExists = $ChannelObject->ChannelLookup( ID => 1 );
+my $ChannelNameExists = $ChannelObject->ChannelLookup(
+    ID => 1,
+);
 
 $Self->Is(
     $ChannelNameExists,
@@ -51,7 +50,10 @@ $Self->Is(
 );
 
 # lookup non-existent channel using name
-my $ChannelNameNotExists = $ChannelObject->ChannelLookup( ID => 9999 );
+my $ChannelNameNotExists = $ChannelObject->ChannelLookup(
+    ID     => 9999,
+    Silent => 1,
+);
 
 $Self->False(
     $ChannelNameNotExists,
@@ -68,7 +70,10 @@ $Self->Is(
 );
 
 # lookup non-existent channel using name
-my $ChannelIDNotExists = $ChannelObject->ChannelLookup( Name => 'note#invalid' );
+my $ChannelIDNotExists = $ChannelObject->ChannelLookup(
+    Name   => 'note#invalid',
+    Silent => 1,
+);
 
 $Self->False(
     $ChannelIDNotExists,
@@ -81,8 +86,6 @@ $Self->True(
     exists $ChannelList{1} && $ChannelList{1} eq 'note',
     'ChannelList() contains the channel note with ID 1',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

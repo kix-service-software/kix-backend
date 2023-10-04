@@ -28,8 +28,8 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Text',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Link         => '',
+            DefaultValue => q{},
+            Link         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -44,24 +44,9 @@ my %DynamicFieldConfigs = (
         FieldType     => 'TextArea',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Rows         => '',
-            Cols         => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '',
+            DefaultValue => q{},
+            Rows         => q{},
+            Cols         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -73,13 +58,13 @@ my %DynamicFieldConfigs = (
         Name          => 'DropdownField',
         Label         => 'DropdownField',
         FieldOrder    => 123,
-        FieldType     => 'Dropdown',
+        FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
-            Link               => '',
-            PossibleNone       => '',
-            TranslatableValues => '',
+            DefaultValue       => q{},
+            Link               => q{},
+            PossibleNone       => q{},
+            TranslatableValues => q{},
             PossibleValues     => {
                 A => 'A',
                 B => 'B',
@@ -98,9 +83,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
-            PossibleNone       => '',
-            TranslatableValues => '',
+            CountMax           => 2,
+            DefaultValue       => q{},
+            PossibleNone       => q{},
+            TranslatableValues => q{},
             PossibleValues     => {
                 A => 'A',
                 B => 'B',
@@ -119,10 +105,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -137,10 +123,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -154,17 +140,21 @@ my @Tests = (
         Name    => 'No Params',
         Config  => undef,
         Success => 0,
+        Silent  => 1,
     },
     {
         Name    => 'Empty Config',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
-        Name   => 'Missing DynamicFieldConfig',
-        Config => {
+        Name    => 'Missing DynamicFieldConfig',
+        Config  => {
             DynamicFieldConfig => undef,
         },
+        Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'DynamicField Text',
@@ -178,6 +168,7 @@ my @Tests = (
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
+        Success => 1,
     },
     {
         Name   => 'DynamicField Text Area',
@@ -191,19 +182,7 @@ my @Tests = (
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
-    },
-    {
-        Name   => 'DynamicField Checkbox',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-        },
-        ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 1,
-            'IsFilterable'                 => 1,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
-        },
+        Success => 1,
     },
     {
         Name   => 'DynamicField Dropdown',
@@ -212,14 +191,15 @@ my @Tests = (
         },
         ExpectedResults => {
             'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 1,
-            'IsFilterable'                 => 1,
+            'IsSortable'                   => 0,
+            'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
+        Success => 1,
     },
     {
-        Name   => 'DynamicField Miltiselect',
+        Name   => 'DynamicField Multiselect',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
         },
@@ -230,6 +210,7 @@ my @Tests = (
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
+        Success => 1,
     },
     {
         Name   => 'DynamicField DateTime',
@@ -237,12 +218,13 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 0,
+            'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
             'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
+        Success => 1,
     },
     {
         Name   => 'DynamicField Date',
@@ -250,12 +232,13 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 0,
+            'IsNotificationEventCondition' => 1,
             'IsSortable'                   => 1,
             'IsFilterable'                 => 0,
             'IsStatsCondition'             => 1,
             'IsCustomerInterfaceCapable'   => 1,
         },
+        Success => 1,
     },
 );
 
@@ -266,11 +249,15 @@ for my $Test (@Tests) {
     BEHAVIOR:
     for my $Behavior (
         qw(
+<<<<<<< HEAD
+            IsNotificationEventCondition IsSortable IsFiltrable IsStatsCondition
+            IsCustomerInterfaceCapable NotExisting
+=======
         IsNotificationEventCondition IsSortable IsFilterable IsStatsCondition
         IsCustomerInterfaceCapable NotExisting
+>>>>>>> 65dc58204845e03edf0370aecf437a7fd799650b
         )
-        )
-    {
+    ) {
 
         # to store the config (also for each behavior)
         my %Config;
@@ -284,7 +271,10 @@ for my $Test (@Tests) {
         }
 
         # call HasBehavior for each test for each known behavior
-        my $Success = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(%Config);
+        my $Success = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+            %Config,
+            Silent => $Test->{Silent},
+        );
 
         # if the test is a success then check the expected results with true
         if ($Success) {
@@ -296,7 +286,7 @@ for my $Test (@Tests) {
 
         # otherwise if there is a DynamicField config check the expected results with false
         else {
-            if ( IsHashRefWithData( $Test->{Config}->{DynamicFieldConfig} ) ) {
+            if ( $Test->{Success} ) {
                 $Self->False(
                     $Test->{ExpectedResults}->{$Behavior},
                     "$Test->{Name} HasBehavior() for $Behavior executed with False",
