@@ -212,6 +212,7 @@ NotificationEvent                                                             = 
 OAuth2                                                                        = Kernel::System::OAuth2
 ObjectIcon                                                                    = Kernel::System::ObjectIcon
 ObjectManager                                                                 = Kernel::System::ObjectManager
+ObjectSearch                                                                  = Kernel::System::ObjectSearch
 Organisation                                                                  = Kernel::System::Organisation
 PDF                                                                           = Kernel::System::PDF
 PerfLog                                                                       = Kernel::System::PerfLog

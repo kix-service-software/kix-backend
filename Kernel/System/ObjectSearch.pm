@@ -1,37 +1,59 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Ticket::TicketSearch;
+package Kernel::System::ObjectSearch;
 
 use strict;
 use warnings;
 
-our $ObjectManagerDisabled = 1;
+our @ObjectDependencies = qw(
+    Config
+    Main
+    Log
+);
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch - ticket search lib
+Kernel::System::ObjectSearch - object search lib
 
 =head1 SYNOPSIS
 
-All ticket search functions.
+All object search functions.
 
 =over 4
 
 =cut
 
-=item TicketSearch()
+=item new()
+
+create an object. Do not use it directly, instead use:
+
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
+
+=cut
+
+sub new {
+    my ( $Type, %Param ) = @_;
+
+    # allocate new hash for object
+    my $Self = {};
+    bless( $Self, $Type );
+
+    return $Self;
+}
+
+=item Search()
 
 To find tickets in your system.
 
-    my @TicketIDs = $TicketObject->TicketSearch(
+    my @ObjectIDs = $SearchObject->Search(
         # result (required)
         Result => 'ARRAY' || 'HASH' || 'COUNT',
 
@@ -78,11 +100,11 @@ Returns:
 
 Result: 'ARRAY'
 
-    @TicketIDs = ( 1, 2, 3 );
+    @ObjectIDs = ( 1, 2, 3 );
 
 Result: 'HASH'
 
-    %TicketIDs = (
+    %ObjectIDs = (
         1 => '2010102700001',
         2 => '2010102700002',
         3 => '2010102700003',
@@ -90,26 +112,50 @@ Result: 'HASH'
 
 Result: 'COUNT'
 
-    $TicketIDs = 123;
+    $ObjectIDs = 123;
 
 =cut
 
-sub TicketSearch {
+sub Search {
     my ( $Self, %Param ) = @_;
 
-    return $Kernel::OM->Get('ObjectSearch')->Search(
+    if ( !$Self->{SearchBackendObject} ) {
+        my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
+
+        # if the backend require failed we will exit
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require search backend!",
+            );
+            return;
+        }
+        my $BackendObject = $Backend->new(
+            %{$Self},
+            ObjectType => $Param{ObjectType}
+        );
+
+        # if the backend constructor failed we will exit
+        if ( ref $BackendObject ne $Backend ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create search backend object!",
+            );
+            return;
+        }
+
+        $Self->{SearchBackendObject} = $BackendObject;
+    }
+
+    # execute ticket search in backend
+    return $Self->{SearchBackendObject}->Search(
         %Param,
-        ObjectType => 'Ticket'
     );
 }
 
 1;
 
 =end Internal:
-
-
-
-
 
 =back
 

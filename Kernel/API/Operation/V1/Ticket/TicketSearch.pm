@@ -100,7 +100,7 @@ sub Run {
         Limit    => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
         Sort     => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
         UserType => $Self->{Authorization}->{UserType},
-        UserID   => $Self->{Authorization}->{UserID}
+        UserID   => $Self->{Authorization}->{UserID},
     );
 
    if ( @TicketIndex ) {
