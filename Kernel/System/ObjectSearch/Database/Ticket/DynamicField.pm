@@ -20,6 +20,8 @@ use base qw(
 our @ObjectDependencies = (
     'Config',
     'Log',
+    'DynamicField',
+    'DynamicField::Backend',
 );
 
 =head1 NAME
@@ -168,9 +170,21 @@ sub Search {
 
     if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, "LEFT JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+LEFT JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
+    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         } else {
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+INNER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
+    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         }
     }
     elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
@@ -182,13 +196,27 @@ sub Search {
                 $Self->{ModuleData}->{ArticleTableJoined} = 1;
             }
             # FIXME: maybe LEFT JOIN necessary?
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON ((CAST(artdfjoin_left.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) OR (CAST(artdfjoin_right.id AS char(255)) = CAST($JoinTable.object_id AS char(255))) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+INNER JOIN dynamic_field_value $JoinTable ON (
+    artdfjoin_left.id = $JoinTable.object_id
+        OR artdfjoin_right.id = $JoinTable.object_id
+    ) AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         } else {
             if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
                 $Self->{ModuleData}->{ArticleTableJoined} = 1;
             }
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+INNER JOIN dynamic_field_value $JoinTable ON artdfjoin.id) = $JoinTable.object_id
+    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         }
     }
 
@@ -212,7 +240,7 @@ sub Search {
                     . $ValueItem
                     . "' on field '"
                     . $DFName
-                    . "'!",
+                    . q{'!},
             );
             return;
         }
@@ -291,14 +319,26 @@ sub Sort {
     if ( !$JoinTable ) {
         $JoinTable = "dfvsort$Count";
         if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
-            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+LEFT OUTER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
+    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         }
         elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
             if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
                 $Self->{ModuleData}->{ArticleTableJoined} = 1;
             }
-            push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
+            push(
+                @SQLJoin,
+                <<"END"
+LEFT OUTER JOIN dynamic_field_value $JoinTable ON artdfjoin.id =$JoinTable.object_id
+    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+END
+            );
         }
     }
 
