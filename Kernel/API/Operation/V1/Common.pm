@@ -3487,7 +3487,7 @@ sub _ReplaceVariablesInPermission {
             }
 
             # add roles
-            my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
+            my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
                 UserID => $Self->{Authorization}->{UserID},
                 Valid  => 1,
             );
