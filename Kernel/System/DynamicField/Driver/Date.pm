@@ -128,8 +128,9 @@ sub ValueValidate {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "The value for the field Date is invalid!\n"
-                . "The date have to be something like \"YYYY-MM-DD\"",
+                . "The date has to be something like \"YYYY-MM-DD\"",
         );
+        return
     }
 
     my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueValidate(
@@ -141,7 +142,8 @@ sub ValueValidate {
     );
 
     if (
-        !$Param{SearchValidation}
+        $Success
+        && !$Param{SearchValidation}
         && $DateRestriction
     ) {
 
