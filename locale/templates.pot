@@ -4535,10 +4535,6 @@ msgid "Parameters of the example queue attribute Comment2."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Path for the log file (it only applies if \"FS\" was selected for LoopProtectionModule and it is mandatory)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Performs ticket update actions after state update - currently limited to state update."
 msgstr ""
 

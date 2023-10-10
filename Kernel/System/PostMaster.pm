@@ -659,20 +659,6 @@ sub GetEmailParams {
     if ( $GetParam{'Reply-To'} ) {
         $GetParam{'ReplyTo'} = $GetParam{'Reply-To'};
     }
-    if (
-#rbo - T2016121190001552 - renamed X-KIX headers
-        $GetParam{'Mailing-List'}
-        || $GetParam{'Precedence'}
-        || $GetParam{'X-Loop'}
-        || $GetParam{'X-No-Loop'}
-        || $GetParam{'X-KIX-Loop'}
-        || (
-            $GetParam{'Auto-Submitted'}
-            && substr( $GetParam{'Auto-Submitted'}, 0, 5 ) eq 'auto-'
-        )
-    ) {
-        $GetParam{'X-KIX-Loop'} = 'yes';
-    }
     if ( !$GetParam{'X-Sender'} ) {
 
         # get sender email
