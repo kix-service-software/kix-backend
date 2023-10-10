@@ -553,7 +553,7 @@ sub PrepareData {
                 $Direction = 'descending';
             }
 
-            if ( !IsArrayRefWithData( $Self->{Sorter}->{$Object} ) ) {
+            if ( !IsArrayRefWithData( $Self->{Sort}->{$Object} ) ) {
                 $Self->{Sort}->{$Object} = [];
             }
             push @{ $Self->{Sort}->{$Object} }, {
