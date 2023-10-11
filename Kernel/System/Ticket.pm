@@ -325,6 +325,13 @@ sub TicketCreate {
             $Param{Type} = $DefaultTicketType;
         }
         else {
+            if ( $DefaultTicketType ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default type \"$DefaultTicketType\" in config setting Ticket::Type::Default!",
+                );
+            }
+
             $Param{TypeID} = 1;
         }
     }
@@ -359,6 +366,13 @@ sub TicketCreate {
             $Param{Queue} = $DefaultTicketQueue;
         }
         else {
+            if ( $DefaultTicketQueue ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default queue \"$DefaultTicketQueue\" in config setting Ticket::Queue::Default!",
+                );
+            }
+
             $Param{QueueID} = 1;
         }
     }
@@ -393,6 +407,12 @@ sub TicketCreate {
             $Param{State} = $DefaultTicketState;
         }
         else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
             $Param{StateID} = 1;
         }
     }
@@ -445,6 +465,12 @@ sub TicketCreate {
             $Param{Priority} = $DefaultTicketPriority;
         }
         else {
+            if ( $DefaultTicketPriority ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default priority \"$DefaultTicketPriority\" in config setting Ticket::Priority::Default!",
+                );
+            }
             $Param{PriorityID} = 1;
         }
     }
