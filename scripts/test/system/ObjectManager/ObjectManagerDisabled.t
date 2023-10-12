@@ -13,11 +13,11 @@ use warnings;
 use vars (qw($Self));
 
 $Self->True(
-    $Kernel::OM->Get('scripts::test::ObjectManager::Dummy'),
+    $Kernel::OM->Get('scripts::test::system::ObjectManager::Dummy'),
     "Can load custom object",
 );
 
-my $NonexistingObject = eval { $Kernel::OM->Get('scripts::test::ObjectManager::Disabled') };
+my $NonexistingObject = eval { $Kernel::OM->Get('scripts::test::system::ObjectManager::Disabled') };
 $Self->True(
     $@,
     "Fetching an object that cannot be loaded via OM causes an exception",

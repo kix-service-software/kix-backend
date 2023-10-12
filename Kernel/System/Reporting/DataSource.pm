@@ -122,16 +122,19 @@ sub DataSourceValidateConfig {
     # check needed stuff
     for (qw(Source Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
 
     my $Backend = $Self->_LoadDataSourceBackend(
-        Name => $Param{Source},
+        Name   => $Param{Source},
+        Silent => $Param{Silent},
     );
     return if !$Backend;
 
@@ -139,7 +142,8 @@ sub DataSourceValidateConfig {
     $Backend->{Config} = $Param{Config};
 
     return $Backend->ValidateConfig(
-        Config => $Param{Config}->{DataSource}
+        Config => $Param{Config}->{DataSource},
+        Silent => $Param{Silent},
     );
 }
 
@@ -161,10 +165,12 @@ sub DataSourceGetProperties {
     # check needed stuff
     for (qw(Source Config)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -179,7 +185,8 @@ sub DataSourceGetProperties {
 
     # validate the given config at first
     my $IsValid =  $Backend->ValidateConfig(
-        Config => $Param{Config}->{DataSource}
+        Config => $Param{Config}->{DataSource},
+        Silent => $Param{Silent},
     );
     return if !$IsValid;
 
@@ -253,10 +260,12 @@ sub _LoadDataSourceBackend {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -269,29 +278,40 @@ sub _LoadDataSourceBackend {
         my $Backends = $Kernel::OM->Get('Config')->Get('Reporting::DataSource');
 
         if ( !IsHashRefWithData($Backends) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No datasource backend modules found!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No datasource backend modules found!",
+                );
+            }
             return;
         }
 
         my $Backend = $Backends->{$Param{Name}}->{Module};
 
-        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to require $Backend!"
-            );
+        if (
+            !$Kernel::OM->Get('Main')->Require(
+                $Backend,
+                Silent => $Param{Silent},
+            )
+        ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to require $Backend!"
+                );
+            }
             return;
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create instance of $Backend!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to create instance of $Backend!"
+                );
+            }
             return;
         }
 

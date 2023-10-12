@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -62,10 +62,10 @@ sub _Replace {
             # replace als simple placeholder <KIX_NOW>
             $Param{Text} =~ s/$Tag$Self->{End}/$Now/gi;
         }
-    }
 
-    # cleanup
-    $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+        # cleanup
+        $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
+    }
 
     return $Param{Text};
 }

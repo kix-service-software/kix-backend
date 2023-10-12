@@ -64,44 +64,6 @@ my @Tests = (
                         },
                     },
                 },
-                Requester => {
-                    Transport => {
-                        Type   => 'HTTP::SOAP',
-                        Config => {
-                            NameSpace  => '',
-                            SOAPAction => '',
-                            Encoding   => '',
-                            Endpoint   => '',
-                        },
-                    },
-                    Invokers => {
-                        Invoker1 => {
-                            Mapping => {
-                                Inbound => {
-                                    1 => 2,
-                                    2 => 4,
-                                },
-                                Outbound => {
-                                    1 => 2,
-                                    2 => 5,
-                                },
-                            },
-                        },
-                        Invoker2 => {
-                            Mapping => {
-                                Inbound => {
-                                    1 => 2,
-                                    2 => 4,
-                                },
-                                Outbound => {
-                                    1 => 2,
-                                    2 => 5,
-                                },
-                            },
-                            Type => 'Test::Test',
-                        },
-                    },
-                },
             },
             ValidID => 1,
             UserID  => 1,
@@ -159,31 +121,6 @@ my @Tests = (
                         },
                     },
                 },
-                Requester => {
-                    Transport => {
-                        Type   => 'HTTP::REST',
-                        Config => {
-                            NameSpace => '',
-                            Encoding  => '',
-                            Endpoint  => '',
-                        },
-                    },
-                    Invokers => {
-                        Invoker1 => {
-                            Mapping => {
-                                Inbound => {
-                                    1 => 2,
-                                    2 => 4,
-                                },
-                                Outbound => {
-                                    1 => 2,
-                                    2 => 5,
-                                },
-                            },
-                            Type => 'Test::Test',
-                        },
-                    },
-                },
             },
             ValidID => 2,
             UserID  => 1,
@@ -198,11 +135,13 @@ my @Tests = (
             Config  => {},
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
         Update => {
             Config  => { 1 => 1 },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -224,16 +163,6 @@ my @Tests = (
                         Type => '',
                     },
                 },
-                Requester => {
-                    Transport => {
-                        Type   => 'HTTP::REST',
-                        Config => {
-                            NameSpace => '',
-                            Encoding  => '',
-                            Endpoint  => '',
-                        },
-                    },
-                },
             },
             ValidID => 2,
             UserID  => 1,
@@ -242,6 +171,7 @@ my @Tests = (
             Config  => undef,
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
 
@@ -264,24 +194,16 @@ my @Tests = (
                         Type => '',
                     },
                 },
-                Requester => {
-                    Transport => {
-                        Type   => 'HTTP::REST',
-                        Config => {
-                            NameSpace => '',
-                            Encoding  => '',
-                            Endpoint  => '',
-                        },
-                    },
-                },
             },
             ValidID => 2,
             UserID  => 1,
+            Silent  => 1,
         },
         Update => {
             Config  => undef,
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -293,6 +215,7 @@ my @Tests = (
             Config  => undef,
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -304,6 +227,7 @@ my @Tests = (
             Config  => 'Something',
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -318,6 +242,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -334,6 +259,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -350,6 +276,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -366,6 +293,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -382,6 +310,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -400,6 +329,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -418,6 +348,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -436,6 +367,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -481,6 +413,7 @@ my @Tests = (
             Config  => 'string',
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -506,6 +439,7 @@ my @Tests = (
             Config  => {},
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -534,6 +468,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -562,6 +497,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -592,6 +528,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
+            Silent  => 1,
         },
     },
     {
@@ -622,218 +559,7 @@ my @Tests = (
             },
             ValidID => 1,
             UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 22 - Invalid Config Update (missing Requester)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Requester => undef,
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 22 - Invalid Config Update (string Requester)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                        }
-                },
-                Requester => 'String',
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 23 - Invalid Config Update (empty Requester)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                        }
-                },
-                Requester => {},
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 24 - Invalid Config Update (missing Requester Transport)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                        }
-                },
-                Requester => {
-                    Transport => undef,
-                    Other     => 1,
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 25 - Invalid Config Update (string Requester Transport)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                        }
-                },
-                Requester => {
-                    Transport => 'string',
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-    },
-    {
-        Name          => 'test 26 - Invalid Config Update (empty Requester Transport)',
-        SuccessAdd    => 1,
-        SuccessUpdate => 0,
-        HistoryCount  => 1,
-        Add           => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                    },
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
-        },
-        Update => {
-            Config => {
-                Debugger => {
-                    DebugThreshold => 'debug',
-                },
-                Provider => {
-                    Transport => {
-                        Type => 'HTTP::Test'
-                        }
-                },
-                Requester => {
-                    Transport => {},
-                },
-            },
-            ValidID => 1,
-            UserID  => 1,
+            Silent  => 1,
         },
     },
 );
@@ -844,8 +570,8 @@ for my $Test (@Tests) {
 
     # add config
     my $WebserviceID = $WebserviceObject->WebserviceAdd(
+        %{ $Test->{Add} },
         Name => $Test->{Name} . ' ' . $RandomID,
-        %{ $Test->{Add} }
     );
     if ( !$Test->{SuccessAdd} ) {
         $Self->False(
@@ -929,9 +655,9 @@ for my $Test (@Tests) {
         $Test->{Update} = $Test->{Add};
     }
     my $Success = $WebserviceObject->WebserviceUpdate(
+        %{ $Test->{Update} },
         ID   => $WebserviceID,
         Name => $Test->{Name} . ' ' . $RandomID,
-        %{ $Test->{Update} }
     );
     if ( !$Test->{SuccessUpdate} ) {
         $Self->False(

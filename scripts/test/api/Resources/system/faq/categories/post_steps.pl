@@ -37,7 +37,7 @@ Given qr/a faq category$/, sub {
                 Comment => 'TestComment',
                 ParentID => undef,
                 ValidID => 1,
-                Name => 'KIX18-Funktionen'.rand(),
+                Name => 'KIX18-Funktionen given',
                 Fullname => 'KIX18-Funktionen',
             }
       }

@@ -42,7 +42,7 @@ $Self->Is(
 
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'From' ),
-    'Skywalker Attachment <skywalker@test.org>',
+    '"Skywalker Attachment" <skywalker@test.org>',
     "#1 GetParam(WHAT => 'From')",
 );
 
@@ -72,7 +72,7 @@ $Self->Is(
 
 $Self->Is(
     $Addresses[3],
-    'Juergen "quoted name" Weber <juergen.qeber@air.com>',
+    '"Juergen quoted name Weber" <juergen.qeber@air.com>',
     "#2 SplitAddressLine() with quoted name",
 );
 
@@ -151,6 +151,10 @@ while (<$IN>) {
 }
 close($IN);
 
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'PostmasterAutoHTML2Text',
+    Value => '1',
+);
 $EmailParserObject = Kernel::System::EmailParser->new(
     Email => \@Array,
 );
@@ -161,13 +165,13 @@ $Self->Is(
 );
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'From' ),
-    'Hans BÄKOSchönland <me@bogen.net>',
+    '"Hans BÄKOSchönland" <me@bogen.net>',
     "#4 From()",
 );
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'To' ),
-    'Namedyński (hans@example.com)',
-    "#4 To()",
+    '',
+    "#4 To() - invalid address",
 );
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'Subject' ),
@@ -232,7 +236,7 @@ $Self->Is(
 $MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
-    '0596f2939525c6bd50fc2b649e40fbb6',
+    'd2288c4aa6a50bc41a0e9b8820495922',
     "#5 md5 check",
 );
 $Self->Is(
@@ -460,7 +464,7 @@ $Self->Is(
 $MD5 = $MainObject->MD5sum( String => $EmailParserObject->GetMessageBody() ) || '';
 $Self->Is(
     $MD5,
-    '7ddc731e5a3e76cd27d4b1e0628468b1',
+    '3736b87e4cf0844cac97132d6732af81',
     "#10 md5 body check",
 );
 
@@ -468,7 +472,7 @@ $Self->Is(
 $MD5 = $MainObject->MD5sum( String => $Attachments[0]->{Content} ) || '';
 $Self->Is(
     $MD5,
-    '7ddc731e5a3e76cd27d4b1e0628468b1',
+    '3736b87e4cf0844cac97132d6732af81',
     "#10 md5 check",
 );
 
@@ -545,7 +549,7 @@ $Self->Is(
 );
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'Cc' ),
-    '張雅惠 <support2@example.com>, "문화연대" <support3@example.com>',
+    '張雅惠 <support2@example.com>, 문화연대 <support3@example.com>',
     "#12 GetParam(WHAT => 'Cc')",
 );
 
@@ -708,7 +712,7 @@ $Self->Is(
 $MD5 = $MainObject->MD5sum( String => $Attachments[1]->{Content} ) || '';
 $Self->Is(
     $MD5,
-    'e86c2c15e59fc1e1695f890ff102b06c',
+    '60beb25166278cb2382c09c0c188626d',
     "#15 md5 check",
 );
 $Self->Is(
@@ -856,7 +860,7 @@ $EmailParserObject = Kernel::System::EmailParser->new(
 
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'To' ),
-    'Евгений Васильев Новоподзалупинский <xxzzyy@gmail.com>',
+    '"Евгений Васильев Новоподзалупинский" <xxzzyy@gmail.com>',
     "#21 GetParam(WHAT => 'To' Multiline encode quote printable)",
 );
 $Self->Is(
@@ -879,7 +883,7 @@ $EmailParserObject = Kernel::System::EmailParser->new(
 
 $Self->Is(
     $EmailParserObject->GetParam( WHAT => 'To' ),
-    'QBQB Евгений Васильев Новоподзалупинский <xxzzyy@gmail.com>',
+    '"QBQB Евгений Васильев Новоподзалупинский" <xxzzyy@gmail.com>',
     "#22 GetParam(WHAT => 'To' Multiline encode)",
 );
 $Self->Is(

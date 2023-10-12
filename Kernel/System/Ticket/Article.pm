@@ -389,7 +389,7 @@ sub ArticleCreate {
 
     # check if this is the first article (for notifications)
     my @Index = $Self->ArticleIndex( TicketID => $Param{TicketID} );
-    my $FirstArticle = scalar @Index ? 0 : 1;
+    my $IsFirstArticle = scalar @Index ? 0 : 1;
 
     # calculate MD5 of Message ID
     if ( $Param{MessageID} ) {
@@ -459,6 +459,13 @@ sub ArticleCreate {
     return if !$DBObject->Do(
         SQL  => 'UPDATE article SET a_message_id = ? WHERE id = ?',
         Bind => [ \$Param{MessageID}, \$ArticleID ],
+    );
+
+    # update change time of ticket
+    return if !$DBObject->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$Param{TicketID} ],
     );
 
     # check for base64 encoded images in html body and upload them
@@ -641,12 +648,7 @@ sub ArticleCreate {
         }
 
         # send agent notification on ticket create
-        if (
-            $FirstArticle &&
-            $Param{HistoryType}
-            =~ /^(EmailAgent|EmailCustomer|SystemRequest)$/i
-            )
-        {
+        if ( $IsFirstArticle && ( $Param{HistoryType} =~ /^(EmailCustomer|SystemRequest)$/i || $Param{SenderType} ne 'system') ) {
             # trigger notification event
             $Self->EventHandler(
                 Event => 'NotificationNewTicket',
@@ -988,10 +990,12 @@ sub ArticleSenderTypeLookup {
 
     # check needed stuff
     if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need SenderType or SenderTypeID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need SenderType or SenderTypeID!',
+            );
+        }
         return;
     }
 
@@ -1039,10 +1043,12 @@ sub ArticleSenderTypeLookup {
 
     # check if data exists
     if ( !$Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Found no SenderType(ID) for $Key!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Found no SenderType(ID) for $Key!",
+            );
+        }
         return;
     }
 
@@ -2278,7 +2284,7 @@ sub ArticleFlagSet {
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key}.'::'.$Param{UserID},
         );
     }
 
@@ -3183,14 +3189,20 @@ sub _GetAssignedSearchParams {
     if ( IsStringWithData($MappingString) ) {
 
         my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data => $MappingString
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
         );
 
         if ( !IsHashRefWithData($Mapping) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+                );
+            }
         } elsif (
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
             IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
@@ -3247,10 +3259,15 @@ sub _GetAssignedSearchParams {
                 }
             }
         } else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'info',
-                Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
-            );
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+                );
+            }
         }
     }
 

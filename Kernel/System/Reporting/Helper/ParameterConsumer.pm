@@ -56,9 +56,12 @@ sub _ReplaceParametersInString {
 
     # replace parameters
     foreach my $Parameter ( $Self->_GetParameterDefinitionList() ) {
+        next if ( !$Parameter->{Name} );
+
         my $ParameterValue = $Self->_GetParameterValue(
-            Parameter => $Parameter->{Name}
-        );        
+            Parameter => $Parameter->{Name},
+            Silent    => $Param{Silent},
+        );
 
         if ( !$ParameterValue ) {
             # try to use a configured fallback
@@ -67,7 +70,10 @@ sub _ReplaceParametersInString {
                 next;
             }
 
-            if ( $Param{UseEmpty} ) {
+            if (
+                $Param{UseEmpty}
+                && $Parameter->{DataType}
+            ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
                 $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx ;
             }
@@ -164,10 +170,12 @@ sub _GetParameterValue {
     # check needed stuff
     for (qw(Parameter)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!",
+                );
+            }
             return;
         }
     }

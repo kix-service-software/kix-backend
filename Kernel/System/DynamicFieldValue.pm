@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,12 +15,13 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'Time',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    Time
 );
 
 =head1 NAME
@@ -86,6 +87,8 @@ sub ValueSet {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID Value)) {
         if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
@@ -95,8 +98,12 @@ sub ValueSet {
     }
 
     # return if no Value was provided
-    if ( ref $Param{Value} ne 'ARRAY' || !$Param{Value}->[0] )
-    {
+    if (
+        ref $Param{Value} ne 'ARRAY'
+        || !$Param{Value}->[0]
+    ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Param{Value}!"
@@ -122,8 +129,7 @@ sub ValueSet {
             )
             && !defined $Param{Value}->[$Counter]->{ValueInt}
             && !defined $Param{Value}->[$Counter]->{ValueDateTime}
-            )
-        {
+        ) {
             last VALUE;
         }
 
@@ -134,17 +140,26 @@ sub ValueSet {
         );
 
         # data validation
-        return if !$Self->ValueValidate( Value => \%Value );
+        return if !$Self->ValueValidate(
+            Value  => \%Value,
+            Silent => $Param{Silent} || 0
+        );
 
         # data conversions
 
         # set ValueDateTime column to NULL
-        if ( exists $Value{ValueDateTime} && !$Value{ValueDateTime} ) {
+        if (
+            exists $Value{ValueDateTime}
+            && !$Value{ValueDateTime}
+        ) {
             $Value{ValueDateTime} = undef;
         }
 
         # set Int Zero
-        if ( defined $Value{ValueInt} && !$Value{ValueInt} ) {
+        if (
+            defined $Value{ValueInt}
+            && !$Value{ValueInt}
+        ) {
             $Value{ValueInt} = '0';
         }
 
@@ -157,6 +172,7 @@ sub ValueSet {
         FieldID  => $Param{FieldID},
         ObjectID => $Param{ObjectID},
         UserID   => $Param{UserID},
+        Silent   => $Param{Silent} || 0
     );
 
     # get database object
@@ -217,6 +233,8 @@ sub ValueGet {
     # check needed stuff
     for my $Needed (qw(FieldID ObjectID)) {
         if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
@@ -425,12 +443,22 @@ sub ValueValidate {
     if ( $Value{ValueDateTime} ) {
 
         if (
-            $Value{ValueDateTime} !~ m/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ &&
+            $Value{ValueDateTime} !~ m/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/ &&
             $Value{ValueDateTime} !~ m/[+-]\d+[YMwdhms]/
         ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid DateTime string \"$Value{ValueDateTime}\"!"
+            );
+            return;
+        }
+
+        if ($Value{ValueDateTime} =~ m/^(\d+)-/ && 2200 < $1) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Years greater than 2200 are not possible!"
             );
             return;
         }
@@ -441,6 +469,7 @@ sub ValueValidate {
         # convert the DateTime value to system time to check errors
         my $SystemTime = $TimeObject->TimeStamp2SystemTime(
             String => $Value{ValueDateTime},
+            Silent => $Param{Silent} || 0
         );
 
         return if !defined $SystemTime;
@@ -448,6 +477,7 @@ sub ValueValidate {
         # convert back to time stamp to check errors
         my $TimeStamp = $TimeObject->SystemTime2TimeStamp(
             SystemTime => $SystemTime,
+            Silent     => $Param{Silent} || 0
         );
 
         return if !$TimeStamp;
@@ -457,6 +487,8 @@ sub ValueValidate {
     if ( $Value{ValueInt} ) {
 
         if ( $Value{ValueInt} !~ m{\A  -? \d+ \z}smx ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Invalid Integer '$Value{ValueInt}'!"

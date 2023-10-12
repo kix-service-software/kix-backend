@@ -11,7 +11,8 @@ Feature: GET request to the /system/automation/macros/:MacroID/actions resource
     Given a automation macro action
     Then the response code is 201
     When I query the collection of automation macro actions
-    Then the response code is 200 
+    Then the response code is 200
+#    And the response object is MacroActionCollectionResponse
     When I delete this automation macro action
     Then the response code is 204
     And the response has no content     

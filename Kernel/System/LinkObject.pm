@@ -13,15 +13,16 @@ package Kernel::System::LinkObject;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'CheckItem',
-    'DB',
-    'Log',
-    'Main',
-    'Time',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    CheckItem
+    DB
+    Log
+    Main
+    Time
+    Valid
 );
 
 =head1 NAME
@@ -84,16 +85,20 @@ sub PossibleTypesList {
     # check needed stuff
     for my $Argument (qw(Object1 Object2)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
 
     # get possible link list
-    my %PossibleLinkList = $Self->PossibleLinkList();
+    my %PossibleLinkList = $Self->PossibleLinkList(
+        Silent => 1,
+    );
 
     # remove not needed entries
     POSSIBLELINK:
@@ -162,16 +167,20 @@ sub PossibleObjectsList {
     # check needed stuff
     for my $Argument (qw(Object)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
 
     # get possible link list
-    my %PossibleLinkList = $Self->PossibleLinkList();
+    my %PossibleLinkList = $Self->PossibleLinkList(
+        Silent => 1,
+    );
 
     # investigate the possible object list
     my %PossibleObjectsList;
@@ -250,12 +259,13 @@ sub PossibleLinkList {
 
             next ARGUMENT if $Value && $Value !~ m{ :: }xms && $Value !~ m{ \s }xms;
 
-            # log the error
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    "The $Argument '$Value' is invalid in SysConfig (LinkObject::PossibleLink)!",
-            );
+            if ( !$Param{Silent} ) {
+                # log the error
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message => "The $Argument '$Value' is invalid in SysConfig (LinkObject::PossibleLink)!",
+                );
+            }
 
             # remove entry from list if it is invalid
             delete $PossibleLinkList{$PossibleLink};
@@ -322,11 +332,13 @@ sub PossibleLinkList {
 
         next POSSIBLELINK if $TypeList{$Type};
 
-        # log the error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The LinkType '$Type' is invalid in SysConfig (LinkObject::PossibleLink)!",
-        );
+        if ( !$Param{Silent} ) {
+            # log the error
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The LinkType '$Type' is invalid in SysConfig (LinkObject::PossibleLink)!",
+            );
+        }
 
         # remove entry from list if type doesn't exist
         delete $PossibleLinkList{$PossibleLink};
@@ -356,20 +368,24 @@ sub LinkAdd {
     # check needed stuff
     for my $Argument (qw(SourceObject SourceKey TargetObject TargetKey Type UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
 
     # check if source and target are the same object
     if ( $Param{SourceObject} eq $Param{TargetObject} && $Param{SourceKey} eq $Param{TargetKey} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Impossible to link object with itself!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Impossible to link object with itself!',
+            );
+        }
         return;
     }
 
@@ -384,11 +400,12 @@ sub LinkAdd {
 
         next OBJECT if $Param{ $Object . 'ID' };
 
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid $Object is given!",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid $Object is given!",
+            );
+        }
         return;
     }
 
@@ -400,11 +417,12 @@ sub LinkAdd {
 
     # check if wanted link type is possible
     if ( !$PossibleTypesList{ $Param{Type} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Not possible to create a '$Param{Type}' link between $Param{SourceObject} and $Param{TargetObject}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Not possible to create a '$Param{Type}' link between $Param{SourceObject} and $Param{TargetObject}!",
+            );
+        }
         return;
     }
 
@@ -420,7 +438,7 @@ sub LinkAdd {
     # check if link already exists in database
     return if !$DBObject->Prepare(
         SQL => '
-            SELECT source_object_id, source_key
+            SELECT id, source_object_id, source_key
             FROM link_relation
             WHERE (
                     ( source_object_id = ? AND source_key = ?
@@ -443,8 +461,9 @@ sub LinkAdd {
     # fetch the result
     my %Existing;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Existing{SourceObjectID} = $Row[0];
-        $Existing{SourceKey}      = $Row[1];
+        $Existing{LinkID}         = $Row[0];
+        $Existing{SourceObjectID} = $Row[1];
+        $Existing{SourceKey}      = $Row[2];
     }
 
     # link exists already
@@ -455,15 +474,19 @@ sub LinkAdd {
             TypeID => $TypeID,
         );
 
-        return if !$TypeData{Pointed};
-        return if $Existing{SourceObjectID} eq $Param{SourceObjectID}
-            && $Existing{SourceKey} eq $Param{SourceKey};
-
-        # log error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Link already exists between these two objects in opposite direction!',
+        return $Existing{LinkID} if !$TypeData{Pointed};
+        return $Existing{LinkID} if (
+            $Existing{SourceObjectID} eq $Param{SourceObjectID}
+            && $Existing{SourceKey} eq $Param{SourceKey}
         );
+
+        if ( !$Param{Silent} ) {
+            # log error
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Link already exists between these two objects in opposite direction!',
+            );
+        }
         return;
     }
 
@@ -499,10 +522,12 @@ sub LinkAdd {
             next TYPE if $TypeGroupCheck;
 
             # existing link type is in a type group with the new link
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Another Link already exists within the same type group!',
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Another Link already exists within the same type group!',
+                );
+            }
 
             return;
         }
@@ -1354,8 +1379,8 @@ sub LinkCount {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    my $SQL = 'SELECT count(*) FROM link_relation lr, link_object lo 
-        WHERE (lr.source_object_id = lo.id AND lo.name = ? AND lr.source_key = ?) 
+    my $SQL = 'SELECT count(*) FROM link_relation lr, link_object lo
+        WHERE (lr.source_object_id = lo.id AND lo.name = ? AND lr.source_key = ?)
            OR (lr.target_object_id = lo.id AND lo.name = ? AND lr.target_key = ?)';
 
     # get links where the given object is the source
@@ -1764,11 +1789,16 @@ sub ObjectLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{ObjectID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ObjectID or Name!',
-        );
+    if (
+        !$Param{ObjectID}
+        && !$Param{Name}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need ObjectID or Name!',
+            );
+        }
         return;
     }
 
@@ -1803,10 +1833,12 @@ sub ObjectLookup {
 
         # check the name
         if ( !$Name ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Link object id '$Param{ObjectID}' not found in the database!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Link object id '$Param{ObjectID}' not found in the database!",
+                );
+            }
             return;
         }
 
@@ -1863,10 +1895,12 @@ sub ObjectLookup {
 
             # check if name is valid
             if ( !$Param{Name} || $Param{Name} =~ m{ :: }xms || $Param{Name} =~ m{ \s }xms ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid object name '$Param{Name}' is given!",
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Invalid object name '$Param{Name}' is given!",
+                    );
+                }
                 return;
             }
 
@@ -1913,25 +1947,31 @@ sub TypeLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{TypeID} && !$Param{Name} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TypeID or Name!',
-        );
+    if (
+        !$Param{TypeID}
+        && !$Param{Name}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need TypeID or Name!',
+            );
+        }
         return;
     }
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need UserID!'
+            );
+        }
         return;
     }
 
     if ( $Param{TypeID} ) {
-
         # check cache
         my $CacheKey = 'TypeLookup::TypeID::' . $Param{TypeID};
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
@@ -1958,10 +1998,12 @@ sub TypeLookup {
 
         # check the name
         if ( !$Name ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Link type id '$Param{TypeID}' not found in the database!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Link type id '$Param{TypeID}' not found in the database!",
+                );
+            }
             return;
         }
 
@@ -2036,10 +2078,12 @@ sub TypeLookup {
 
         # check the type id
         if ( !$TypeID ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Link type '$Param{Name}' not found in the database!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Link type '$Param{Name}' not found in the database!",
+                );
+            }
             return;
         }
 
@@ -2082,10 +2126,12 @@ sub TypeGet {
     # check needed stuff
     for my $Argument (qw(TypeID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
             return;
         }
     }
@@ -2127,10 +2173,12 @@ sub TypeGet {
 
     # check the config
     if ( !$ConfiguredTypes->{ $Type{Name} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Linktype '$Type{Name}' does not exist!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Linktype '$Type{Name}' does not exist!",
+            );
+        }
         return;
     }
 
@@ -2152,11 +2200,12 @@ sub TypeGet {
 
         next ARGUMENT if $Type{$Argument};
 
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "The $Argument '$Type{$Argument}' is invalid in SysConfig (LinkObject::Type)!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The $Argument '$Type{$Argument}' is invalid in SysConfig (LinkObject::Type)!",
+            );
+        }
         return;
     }
 
@@ -2286,12 +2335,14 @@ sub TypeGroupList {
 
             next TYPE if $Type && $Type !~ m{ :: }xms && $Type !~ m{ \s }xms;
 
-            # log the error
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    "The Argument '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
-            );
+            if ( !$Param{Silent} ) {
+                # log the error
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message =>
+                        "The Argument '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
+                );
+            }
 
             # remove entry from list if it is invalid
             delete $TypeGroupList{$TypeGroup};
@@ -2316,12 +2367,14 @@ sub TypeGroupList {
 
             next TYPE if $TypeList{$Type};
 
-            # log the error
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message =>
-                    "The LinkType '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
-            );
+            if ( !$Param{Silent} ) {
+                # log the error
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message =>
+                        "The LinkType '$Type' is invalid in SysConfig (LinkObject::TypeGroup)!",
+                );
+            }
 
             # remove entry from list if type doesn't exist
             delete $TypeGroupList{$TypeGroup};
@@ -2372,43 +2425,6 @@ sub PossibleType {
     }
 
     return 1;
-}
-
-=item ObjectPermission()
-
-checks read permission for a given object and UserID.
-
-    $Permission = $LinkObject->ObjectPermission(
-        Object  => 'Ticket',
-        Key     => 123,
-        UserID  => 1,
-    );
-
-=cut
-
-sub ObjectPermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Object Key UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-            return;
-        }
-    }
-
-    # get backend object
-    my $BackendObject = $Kernel::OM->Get( 'LinkObject::' . $Param{Object} );
-
-    return   if !$BackendObject;
-    return 1 if !$BackendObject->can('ObjectPermission');
-
-    return $BackendObject->ObjectPermission(
-        %Param,
-    );
 }
 
 =item ObjectDescriptionGet()

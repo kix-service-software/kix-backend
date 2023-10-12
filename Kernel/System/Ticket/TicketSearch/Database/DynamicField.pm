@@ -80,6 +80,8 @@ sub Search {
 
     # check params
     if ( !$Param{Search} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Search!",
@@ -98,9 +100,11 @@ sub Search {
         'IN'         => 'Like',
         'CONTAINS'   => 'Like',
         'STARTSWITH' => 'StartsWith',
-        'ENDSWITH'   => 'EndsWith'
+        'ENDSWITH'   => 'EndsWith',
     );
     if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Unsupported Operator $Param{Search}->{Operator}!",
@@ -134,6 +138,8 @@ sub Search {
     my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
 
     if ( !IsHashRefWithData($DynamicFieldConfig) ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
@@ -194,8 +200,11 @@ sub Search {
             Value              => $ValueItem,
             SearchValidation   => 1,
             UserID             => 1,
+            Silent             => $Param{Silent} || 0
         );
         if ( !$ValidateSuccess ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  =>
@@ -214,6 +223,7 @@ sub Search {
             TableAlias         => $JoinTable,
             Operator           => $OperatorMap{$Param{Search}->{Operator}},
             SearchTerm         => $ValueItem,
+            Silent             => $Param{Silent} || 0
         );
 
         if ( $DynamicFieldSQL ) {
@@ -284,6 +294,10 @@ sub Sort {
             push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(st.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
         }
         elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
+            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+                push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
+                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+            }
             push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $JoinTable ON (CAST(artdfjoin.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
         }
     }

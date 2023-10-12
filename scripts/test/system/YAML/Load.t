@@ -22,6 +22,7 @@ my @Tests = (
         Input  => undef,
         Result => undef,
         Name   => 'YAML - undef test',
+        Silent => 1,
     },
     {
         Input  => '',
@@ -90,14 +91,23 @@ my @Tests = (
 for my $Test (@Tests) {
 
     my $YAML = $YAMLObject->Dump(
-        Data => $Test->{Input},
+        Data   => $Test->{Input},
+        Silent => $Test->{Silent},
     );
 
-    $Self->IsDeeply(
-        $YAML,
-        $Test->{Result},
-        $Test->{Name},
-    );
+    if ( defined( $Test->{Result} ) ) {
+        $Self->IsDeeply(
+            $YAML,
+            $Test->{Result},
+            $Test->{Name},
+        );
+    }
+    else {
+        $Self->False(
+            $YAML,
+            $Test->{Name},
+        );
+    }
 }
 
 @Tests = (
@@ -105,11 +115,13 @@ for my $Test (@Tests) {
         Result    => undef,
         InputLoad => undef,
         Name      => 'YAML - undef test',
+        Silent    => 1,
     },
     {
         Result    => undef,
         InputLoad => "--- Key: malformed\n - 1\n",
         Name      => 'YAML - malformed data test',
+        Silent    => 1,
     },
     {
         Result    => 'Some Text',
@@ -172,14 +184,23 @@ for my $Test (@Tests) {
 
 for my $Test (@Tests) {
     my $Perl = $YAMLObject->Load(
-        Data => $Test->{InputLoad},
+        Data   => $Test->{InputLoad},
+        Silent => $Test->{Silent},
     );
 
-    $Self->IsDeeply(
-        scalar $Perl,
-        scalar $Test->{Result},
-        $Test->{Name},
-    );
+    if ( defined( $Test->{Result} ) ) {
+        $Self->IsDeeply(
+            $Perl,
+            $Test->{Result},
+            $Test->{Name},
+        );
+    }
+    else {
+        $Self->False(
+            $Perl,
+            $Test->{Name},
+        );
+    }
 }
 
 1;

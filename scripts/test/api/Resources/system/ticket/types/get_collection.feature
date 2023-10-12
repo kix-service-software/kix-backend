@@ -48,11 +48,8 @@ Feature: GET request to the /system/ticket/types resource
     And the response contains 1 items of type "TicketType"
     And the response contains the following items of type TicketType
       | Name            |
-      | Incident        |
-    And the response contains 1 items of type "TicketType"
-    And the response contains the following items of type TicketType
-      | Name            |
-      | Incident        |
+      | Service Request |
+
 
 
 

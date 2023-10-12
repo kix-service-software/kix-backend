@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} eq 'ValidID' ) {
         $Found = $Kernel::OM->Get('Valid')->ValidLookup(
             ValidID => $Param{Data}->{$Param{Attribute}},
+            Silent  => 1,
         );
     }
     elsif ( $Param{Attribute} eq 'Valid' ) {
         $Found = $Kernel::OM->Get('Valid')->ValidLookup(
-            Valid => $Param{Data}->{$Param{Attribute}},
+            Valid  => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     else {

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -476,7 +476,7 @@ sub _CheckValue {
     if ( $Self->{AttributeTypeModules}->{$Param{Input}->{Type}}->can('ValidateValue') ) {
         my $ValidateResult = $Self->{AttributeTypeModules}->{$Param{Input}->{Type}}->ValidateValue(%Param);
 
-        if ( $ValidateResult != 1 ) {
+        if ( "$ValidateResult" ne "1" ) {
             return $Self->_Error(
                 Code    => "BadRequest",
                 Message => "Parameter Version::Data::$Parent$ItemKey has an invalid value ($ValidateResult)!",

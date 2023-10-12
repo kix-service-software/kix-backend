@@ -65,11 +65,13 @@ sub Validate {
     if ( $Param{Attribute} =~ /^(OwnerID|ResponsibleID|UserID)$/g ) {
         $Found = $Kernel::OM->Get('User')->UserLookup(
             UserID => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
     }
     elsif ( $Param{Attribute} =~ /^(Owner|Responsible)$/g ) {
         $Found = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $Param{Data}->{$Param{Attribute}},
+            Silent    => 1,
         );
     }
     else {

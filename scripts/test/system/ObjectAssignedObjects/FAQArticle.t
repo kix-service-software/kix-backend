@@ -23,12 +23,10 @@ my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 my $DFBackendObject    = $Kernel::OM->Get('DynamicField::Backend');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # prepare test data
 my %TestData = _PrepareData();
@@ -45,12 +43,15 @@ _CheckTitleConfig();
 
 _DoNegativeTests();
 
+# rollback transaction on database
+$Helper->Rollback();
+
 sub _PrepareData {
 
     # create categories
     my $FAQCategoryID_A = $FAQObject->CategoryAdd(
         Name     => 'Category A',
-        Comment  => '',
+        Comment  => q{},
         ParentID => 0,
         ValidID  => 1,
         UserID   => 1,
@@ -61,7 +62,7 @@ sub _PrepareData {
     );
     my $FAQCategoryID_B = $FAQObject->CategoryAdd(
         Name     => 'Category B',
-        Comment  => '',
+        Comment  => q{},
         ParentID => 0,
         ValidID  => 1,
         UserID   => 1,
@@ -158,17 +159,19 @@ sub _CheckCustomerVisibleConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END",
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }',
+        }
+    }
+}
+END
         1
     );
 
@@ -218,17 +221,19 @@ sub _CheckCustomerVisibleConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 0',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            0
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    0
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get not visible faq articles
@@ -257,17 +262,19 @@ sub _CheckCustomerVisibleConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1 OR 0',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            0, 1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    0, 1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get not visible faq articles
@@ -293,23 +300,27 @@ sub _CheckCustomerVisibleConfig {
         $AllArticleIDList,
         'List should contain not visible articles (visible = 0 OR 1)',
     );
+
+    return 1;
 }
 
 sub _CheckCategoryConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CategoryID": {
-                        "SearchStatic": [
-                            '.$TestData{CategoryAID}.'
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CategoryID": {
+                "SearchStatic": [
+                    $TestData{CategoryAID}
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get relevant category faq articles
@@ -338,17 +349,19 @@ sub _CheckCategoryConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 0',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CategoryID": {
-                        "SearchStatic": [
-                            '.$TestData{CategoryAID}.', '.$TestData{CategoryBID}.'
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CategoryID": {
+                "SearchStatic": [
+                    $TestData{CategoryAID},$TestData{CategoryBID}
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get relevant categories faq articles
@@ -374,23 +387,27 @@ sub _CheckCategoryConfig {
         $CategoryAAndBArticleList,
         'List should contain articles of category B (category A OR B)',
     );
+
+    return 1;
 }
 
 sub _CheckLanguageConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "Language": {
-                        "SearchStatic": [
-                            "en"
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "Language": {
+                "SearchStatic": [
+                    "en"
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get english faq articles
@@ -419,21 +436,23 @@ sub _CheckLanguageConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "Language": {
-                        "SearchStatic": [
-                            "en", "de"
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "Language": {
+                "SearchStatic": [
+                    "en", "de"
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get english and german faq articles
-    my $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
         UserID       => 1,
 
@@ -475,23 +494,27 @@ sub _CheckLanguageConfig {
         $EnglishArticleIDList,
         'List should contain german articles (english and german, without ids)',
     );
+
+    return 1;
 }
 
 sub _CheckDynamicFieldConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "DynamicField_'.$TestData{DFName}.'": {
-                        "SearchStatic": [
-                            "'.$TestData{DFValue}.'"
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "DynamicField_$TestData{DFName}": {
+                "SearchStatic": [
+                    "$TestData{DFValue}"
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get faq articles
@@ -509,23 +532,27 @@ sub _CheckDynamicFieldConfig {
         $DFRelevantArticleIDList,
         'List should contain df relevant articles',
     );
+
+    return 1;
 }
 
 sub _CheckTitleConfig {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "Title": {
-                        "SearchStatic": [
-                            "'.$TestData{Title}.'"
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "Title": {
+                "SearchStatic": [
+                    "$TestData{Title}"
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
 
     # get faq articles
@@ -543,6 +570,8 @@ sub _CheckTitleConfig {
         $TitleArticleIDList,
         'List should contain articles (title)',
     );
+
+    return 1;
 }
 
 sub _DoNegativeTests {
@@ -550,17 +579,19 @@ sub _DoNegativeTests {
     # negative (unknown attribute) ---------------------------
     _SetConfig(
         'unknown attribute',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "OwnerID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "OwnerID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
     my $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -575,17 +606,19 @@ sub _DoNegativeTests {
     # negative (missing faq article config) ---------------------------
     _SetConfig(
         'negative (missing faq article config)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -600,11 +633,13 @@ sub _DoNegativeTests {
     # negative (empty faq config) ---------------------------
     _SetConfig(
         'negative (empty faq config)',
-        '{
-            "Contact": {
-                "FAQArticle": {}
-            }
-        }'
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {}
+    }
+}
+END
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -619,13 +654,15 @@ sub _DoNegativeTests {
     # negative (empty attribute) ---------------------------
     _SetConfig(
         'negative (empty value)',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {}
-                }
-            }
-        }'
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {}
+        }
+    }
+}
+END
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -640,15 +677,17 @@ sub _DoNegativeTests {
     # negative (empty value) ---------------------------
     _SetConfig(
         'negative (empty value)',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": []
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": []
             }
-        }'
+        }
+    }
+}
+END
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -663,7 +702,7 @@ sub _DoNegativeTests {
     # negative (empty config) ---------------------------
     _SetConfig(
         'negative (empty config)',
-        ''
+        q{}
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
@@ -678,27 +717,32 @@ sub _DoNegativeTests {
     # negative (invalid config, missing " and unnecessary ,) ---------------------------
     _SetConfig(
         'negative (invalid config)',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        SearchStatic: [
-                            1
-                        ]
-                    }
-                },
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                SearchStatic: [
+                    1
+                ]
             }
-        }'
+        },
+    }
+}
+END
     );
     $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
         ObjectType   => 'Contact',
-        UserID       => 1
+        UserID       => 1,
+        Silent       => 1
     );
     $Self->Is(
         scalar(@{$ArticleIDList}),
         0,
         'Article list should be empty (invalid config)',
     );
+
+    return 1;
 }
 
 sub _SetConfig {
@@ -726,9 +770,9 @@ sub _SetConfig {
             "AssignedObjectsMapping - mapping is new value",
         );
     }
-}
 
-# cleanup is done by RestoreDatabase
+    return 1;
+}
 
 1;
 

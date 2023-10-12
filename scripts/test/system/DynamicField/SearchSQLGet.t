@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -34,8 +34,8 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Text',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Link         => '',
+            DefaultValue => q{},
+            Link         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -50,24 +50,9 @@ my %DynamicFieldConfigs = (
         FieldType     => 'TextArea',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue => '',
-            Rows         => '',
-            Cols         => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '',
+            DefaultValue => q{},
+            Rows         => q{},
+            Cols         => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -79,13 +64,13 @@ my %DynamicFieldConfigs = (
         Name          => 'DropdownField',
         Label         => 'DropdownField',
         FieldOrder    => 123,
-        FieldType     => 'Dropdown',
+        FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
-            Link               => '',
+            DefaultValue       => q{},
+            Link               => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -104,9 +89,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue       => '',
+            CountMax           => 2,
+            DefaultValue       => q{},
             PossibleNone       => 1,
-            TranslatableValues => '',
+            TranslatableValues => q{},
             PossibleValues     => {
                 1 => 'A',
                 2 => 'B',
@@ -125,10 +111,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'DateTime',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -143,10 +129,10 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Date',
         ObjectType    => 'Ticket',
         Config        => {
-            DefaultValue  => '',
-            Link          => '',
-            YearsInFuture => '',
-            YearsInPast   => '',
+            DefaultValue  => q{},
+            Link          => q{},
+            YearsInFuture => q{},
+            YearsInPast   => q{},
         },
         ValidID    => 1,
         CreateTime => '2011-02-08 15:08:00',
@@ -159,16 +145,19 @@ my @Tests = (
     {
         Name   => 'No Params',
         Config => undef,
+        Silent => 1,
     },
     {
         Name   => 'Empty Config',
         Config => {},
+        Silent => 1,
     },
     {
         Name   => 'Missing DynamicFieldConfig',
         Config => {
             DynamicFieldConfig => undef,
         },
+        Silent => 1,
     },
     {
         Name   => 'Missing TableAlias',
@@ -176,6 +165,7 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
             TableAlias         => undef,
         },
+        Silent => 1,
     },
     {
         Name   => 'Missing Operator',
@@ -184,6 +174,7 @@ my @Tests = (
             TableAlias         => 'dfv',
             Operator           => undef,
         },
+        Silent => 1,
     },
     {
         Name   => 'Missing SearchTerm',
@@ -193,6 +184,7 @@ my @Tests = (
             Operator           => 'Equals',
             SearchTerm         => undef,
         },
+        Silent => 1,
     },
     {
         Name   => 'Wrong Operator',
@@ -202,6 +194,7 @@ my @Tests = (
             Operator           => 'Equal',
             SearchTerm         => 'Foo',
         },
+        Silent => 1,
     },
     {
         Name   => 'Text',
@@ -212,7 +205,7 @@ my @Tests = (
                 Equals            => 'Foo',
                 GreaterThan       => 'Foo',
                 GreaterThanEquals => 'Foo',
-                Like              => 'Foo*',
+                Like              => '*Foo*', # was Foo* before, but in the BaseText is fixed %<sometext>%
                 SmallerThan       => 'Foo',
                 SmallerThanEquals => 'Foo',
             },
@@ -237,7 +230,7 @@ my @Tests = (
                 Equals            => 'Foo',
                 GreaterThan       => 'Foo',
                 GreaterThanEquals => 'Foo',
-                Like              => 'Foo*',
+                Like              => '*Foo*', # was Foo* before, but in the BaseText is fixed %<sometext>%
                 SmallerThan       => 'Foo',
                 SmallerThanEquals => 'Foo',
             },
@@ -251,52 +244,6 @@ my @Tests = (
             },
             SmallerThan       => " dfv.value_text < 'Foo' ",
             SmallerThanEquals => " dfv.value_text <= 'Foo' ",
-        },
-    },
-    {
-        Name   => 'Checkbox Wrong Data',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            TableAlias         => 'dfv',
-            TestOperators      => {
-                Equals            => 'Foo',
-                GreaterThan       => 'Foo',
-                GreaterThanEquals => 'Foo',
-                Like              => 'Foo*',
-                SmallerThan       => 'Foo',
-                SmallerThanEquals => 'Foo',
-            },
-        },
-        ExpectedResult => {
-            Equals            => undef,
-            GreaterThan       => undef,
-            GreaterThanEquals => undef,
-            Like              => undef,
-            SmallerThan       => undef,
-            SmallerThanEquals => undef,
-        },
-    },
-    {
-        Name   => 'Checkbox',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Checkbox},
-            TableAlias         => 'dfv',
-            TestOperators      => {
-                Equals            => 123,
-                GreaterThan       => 123,
-                GreaterThanEquals => 123,
-                Like              => 123,
-                SmallerThan       => 123,
-                SmallerThanEquals => 123,
-            },
-        },
-        ExpectedResult => {
-            Equals            => " dfv.value_int = 123 ",
-            GreaterThan       => undef,
-            GreaterThanEquals => undef,
-            Like              => undef,
-            SmallerThan       => undef,
-            SmallerThanEquals => undef,
         },
     },
     {
@@ -355,22 +302,23 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
             TableAlias         => 'dfv',
             TestOperators      => {
-                Equals            => 'Foo',
-                GreaterThan       => 'Foo',
-                GreaterThanEquals => 'Foo',
-                Like              => 'Foo*',
-                SmallerThan       => 'Foo',
-                SmallerThanEquals => 'Foo',
+                Equals            => '2023-01-01 00:00:00',
+                GreaterThan       => '2023-01-01 00:00:00',
+                GreaterThanEquals => '2023-01-01 00:00:00',
+                Like              => '2023-01-01 00:00:00',
+                SmallerThan       => '2023-01-01 00:00:00',
+                SmallerThanEquals => '2023-01-01 00:00:00',
             },
         },
         ExpectedResult => {
-            Equals            => " dfv.value_date = 'Foo' ",
-            GreaterThan       => " dfv.value_date > 'Foo' ",
-            GreaterThanEquals => " dfv.value_date >= 'Foo' ",
+            Equals            => " dfv.value_date = '2023-01-01 00:00:00' ",
+            GreaterThan       => " dfv.value_date > '2023-01-01 00:00:00' ",
+            GreaterThanEquals => " dfv.value_date >= '2023-01-01 00:00:00' ",
             Like              => undef,
-            SmallerThan       => " dfv.value_date < 'Foo' ",
-            SmallerThanEquals => " dfv.value_date <= 'Foo' ",
+            SmallerThan       => " dfv.value_date < '2023-01-01 00:00:00' ",
+            SmallerThanEquals => " dfv.value_date <= '2023-01-01 00:00:00' ",
         },
+        Silent => 1,
     },
     {
         Name   => 'Date',
@@ -378,22 +326,23 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
             TableAlias         => 'dfv',
             TestOperators      => {
-                Equals            => 'Foo',
-                GreaterThan       => 'Foo',
-                GreaterThanEquals => 'Foo',
-                Like              => 'Foo*',
-                SmallerThan       => 'Foo',
-                SmallerThanEquals => 'Foo',
+                Equals            => '2023-01-01',
+                GreaterThan       => '2023-01-01',
+                GreaterThanEquals => '2023-01-01',
+                Like              => '2023-01-01',
+                SmallerThan       => '2023-01-01',
+                SmallerThanEquals => '2023-01-01',
             },
         },
         ExpectedResult => {
-            Equals            => " dfv.value_date = 'Foo' ",
-            GreaterThan       => " dfv.value_date > 'Foo' ",
-            GreaterThanEquals => " dfv.value_date >= 'Foo' ",
+            Equals            => " dfv.value_date = '2023-01-01 00:00:00' ",
+            GreaterThan       => " dfv.value_date > '2023-01-01 00:00:00' ",
+            GreaterThanEquals => " dfv.value_date >= '2023-01-01 00:00:00' ",
             Like              => undef,
-            SmallerThan       => " dfv.value_date < 'Foo' ",
-            SmallerThanEquals => " dfv.value_date <= 'Foo' ",
+            SmallerThan       => " dfv.value_date < '2023-01-01 00:00:00' ",
+            SmallerThanEquals => " dfv.value_date <= '2023-01-01 00:00:00' ",
         },
+        Silent => 1,
     },
 );
 
@@ -403,9 +352,11 @@ for my $Test (@Tests) {
     if (
         !IsHashRefWithData( $Test->{Config} )
         || !IsHashRefWithData( $Test->{Config}->{TestOperators} )
-        )
-    {
-        my $Result = $DFBackendObject->SearchSQLGet( %{ $Test->{Config} } );
+    ) {
+        my $Result = $DFBackendObject->SearchSQLGet(
+            %{ $Test->{Config} },
+            Silent => $Test->{Silent} || 0
+        );
 
         $Self->Is(
             $Result,
@@ -424,7 +375,10 @@ for my $Test (@Tests) {
             );
 
             # execute the operation
-            my $Result = $DFBackendObject->SearchSQLGet(%Config);
+            my $Result = $DFBackendObject->SearchSQLGet(
+                %Config,
+                Silent => $Test->{Silent} || 0
+            );
 
             if ( $Operator ne 'Like' || !defined $Test->{ExpectedResult}->{'Like'} ) {
                 $Self->Is(

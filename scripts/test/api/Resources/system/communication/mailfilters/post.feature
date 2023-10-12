@@ -8,7 +8,7 @@ Feature: POST request to the /system/communication/mailfilters resource
   Scenario: create a mailfilter
     When I create a mailfilter
     Then the response code is 201
-#    Then the response object is SystemAddressPostPatchResponse
+    Then the response object is MailFilterPostPatchResponse
     When I delete this mailfilter
     Then the response code is 204
 

@@ -8,7 +8,7 @@ Feature: POST request to the /cmdb/configitems resource
   Scenario: create a configitem
     When I create a configitem
     Then the response code is 201
-#    Then the response object is ConfigItemPostPatchResponse
+    Then the response object is ConfigItemPostPatchResponse
     When I delete this configitem
     Then the response code is 204
     And the response has no content

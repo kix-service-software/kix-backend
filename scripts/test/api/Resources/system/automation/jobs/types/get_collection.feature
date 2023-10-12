@@ -9,7 +9,8 @@ Feature: GET request to the /system/automation/jobs/types resource
     Given a automation job
     Then the response code is 201
     When I query the collection of automation job types
-    Then the response code is 200 
+    Then the response code is 200
+#    And the response object is JobTypeCollectionsResponse
     When I delete this automation job
     Then the response code is 204
     And the response has no content     

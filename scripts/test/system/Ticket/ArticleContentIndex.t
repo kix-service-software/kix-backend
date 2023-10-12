@@ -18,23 +18,21 @@ use vars (qw($Self));
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 my $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some test ticket for ArticleContentIndex',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some test ticket for ArticleContentIndex',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 $Self->True(
     $TicketID,
@@ -72,9 +70,9 @@ for my $Number ( 1 .. 15 ) {
 }
 
 my @ArticleBox = $TicketObject->ArticleContentIndex(
-    TicketID          => $TicketID,
-    DynamicFieldields => 0,
-    UserID            => 1,
+    TicketID      => $TicketID,
+    DynamicFields => 0,
+    UserID        => 1,
 );
 
 $Self->Is(
@@ -84,10 +82,10 @@ $Self->Is(
 );
 
 @ArticleBox = $TicketObject->ArticleContentIndex(
-    TicketID          => $TicketID,
-    DynamicFieldields => 0,
-    UserID            => 1,
-    Limit             => 10,
+    TicketID      => $TicketID,
+    DynamicFields => 0,
+    UserID        => 1,
+    Limit         => 10,
 );
 
 $Self->Is(
@@ -102,18 +100,38 @@ $Self->Is(
     "First article on first page",
 );
 
+$Self->Is(
+    $ArticleBox[0]{Subject},
+    "Test article 1",
+    "First article on first page",
+);
+
 @ArticleBox = $TicketObject->ArticleContentIndex(
-    TicketID          => $TicketID,
-    DynamicFieldields => 0,
-    UserID            => 1,
-    Page              => 2,
-    Limit             => 10,
+    TicketID      => $TicketID,
+    DynamicFields => 0,
+    UserID        => 1,
+    Page          => 1,
+    Limit         => 10,
+);
+
+$Self->Is(
+    scalar(@ArticleBox),
+    10,
+    "ArticleContentIndex with Limit => 10, Page => 1 fetches 10 articles",
+);
+
+@ArticleBox = $TicketObject->ArticleContentIndex(
+    TicketID      => $TicketID,
+    DynamicFields => 0,
+    UserID        => 1,
+    Page          => 2,
+    Limit         => 10,
 );
 
 $Self->Is(
     scalar(@ArticleBox),
     5,
-    "ArticleContentIndex with Limit => 10, Page => 1 fetches the rest",
+    "ArticleContentIndex with Limit => 10, Page => 2 fetches the rest",
 );
 
 $Self->Is(
@@ -141,30 +159,30 @@ $Self->Is(
 # Test filter
 #
 @ArticleBox = $TicketObject->ArticleContentIndex(
-    TicketID          => $TicketID,
-    DynamicFieldields => 0,
-    UserID            => 1,
-    ChannelID     => [ @ChannelIDs[ 0, 1 ] ],
+    TicketID      => $TicketID,
+    DynamicFields => 0,
+    UserID        => 1,
+    ChannelID     => [ $ChannelIDs[ 0 ] ],
 );
 
 $Self->Is(
     scalar(@ArticleBox),
-    6,
+    7,
     'Filtering by ChannelID',
 );
 
 $Self->Is(
     $TicketObject->ArticleCount(
         TicketID  => $TicketID,
-        ChannelID => [ @ChannelIDs[ 0, 1 ] ],
+        ChannelID => [ $ChannelIDs[ 0 ] ],
     ),
-    6,
+    7,
     'ArticleCount is consistent with ArticleContentIndex (ChannelID)',
 );
 
 @ArticleBox = $TicketObject->ArticleContentIndex(
     TicketID            => $TicketID,
-    DynamicFieldields   => 0,
+    DynamicFields       => 0,
     UserID              => 1,
     ArticleSenderTypeID => [ $SenderTypeIDs[0] ],
 );
@@ -184,7 +202,8 @@ $Self->Is(
     'ArticleCount is consistent with ArticleContentIndex (ArticleSenderTypeID)',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

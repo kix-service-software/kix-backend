@@ -110,16 +110,16 @@ my @Tests = (
     },
     {
         Name     => 'Translate() with parameters',
-        Template => '[% Translate("Customer %s added", "Testkunde") %]',
-        Result   => 'Kunde Testkunde hinzugefügt',
+        Template => '[% Translate("%s rows", "42") %]',
+        Result   => '42 Zeilen',
     },
     {
         Name => 'Translate() filter with parameters',
         Data => {
-            Text => 'Customer %s added',
+            Text => '%s rows',
         },
-        Template => '[% Data.Text | Translate("Testkunde") %]',
-        Result   => 'Kunde Testkunde hinzugefügt',
+        Template => '[% Data.Text | Translate("42") %]',
+        Result   => '42 Zeilen',
     },
     {
         Name => 'Localize() TimeLong',
@@ -127,7 +127,7 @@ my @Tests = (
             DateTime => '2000-01-01 00:00:00',
         },
         Template => '[% Data.DateTime | Localize("TimeLong") %]',
-        Result   => '01.01.2000 00:00:00',
+        Result   => '01.01.2000, 00:00:00',
     },
     {
         Name => 'Localize() TimeShort',
@@ -135,7 +135,7 @@ my @Tests = (
             DateTime => '2000-01-01 00:00:00',
         },
         Template => '[% Data.DateTime | Localize("TimeShort") %]',
-        Result   => '01.01.2000 00:00',
+        Result   => '01.01.2000, 00:00',
     },
     {
         Name => 'Localize() Date',

@@ -21,15 +21,15 @@ use base qw(
     Kernel::System::BasePermissionHandler
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'Main',
-    'StandardTemplate',
-    'SysConfig',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    Main
+    SysConfig
+    Valid
 );
 
 =head1 NAME
@@ -352,10 +352,12 @@ sub QueueLookup {
 
     # check needed stuff
     if ( !$Param{Queue} && !$Param{QueueID} && !$Param{SystemAddressID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Queue or QueueID or SystemAddressID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Queue or QueueID or SystemAddressID!'
+            );
+        }
         return;
     }
 
@@ -442,10 +444,12 @@ sub QueueAdd {
 
     for (qw(Name SystemAddressID ValidID UserID FollowUpID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -456,19 +460,23 @@ sub QueueAdd {
 
     # check queue name
     if ( $Param{Name} =~ /::$/i ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid Queue name '$Param{Name}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Queue name '$Param{Name}'!",
+            );
+        }
         return;
     }
 
     # check if a queue with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A queue with name '$Param{Name}' already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A queue with name '$Param{Name}' already exists!"
+            );
+        }
         return;
     }
 
@@ -747,15 +755,14 @@ sub QueueUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (
-        qw(QueueID Name ValidID SystemAddressID UserID FollowUpID)
-        )
-    {
+    for (qw(QueueID Name ValidID SystemAddressID UserID FollowUpID)) {
         if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
@@ -782,10 +789,12 @@ sub QueueUpdate {
 
     # check queue name
     if ( $Param{Name} =~ /::$/i ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid Queue name '$Param{Name}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Queue name '$Param{Name}'!",
+            );
+        }
         return;
     }
 
@@ -799,12 +808,13 @@ sub QueueUpdate {
             ID   => $Param{QueueID},
             Name => $Param{Name}
         )
-        )
-    {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A queue with name '$Param{Name}' already exists!"
-        );
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A queue with name '$Param{Name}' already exists!"
+            );
+        }
         return;
     }
 
@@ -882,12 +892,6 @@ sub QueueUpdate {
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},
     );
-
-    # check all SysConfig options
-    #return 1 if !$Param{CheckSysConfig};
-
-    # check all SysConfig options and correct them automatically if necessary
-    #$Kernel::OM->Get('SysConfig')->ConfigItemCheckAll();
 
     return 1;
 }

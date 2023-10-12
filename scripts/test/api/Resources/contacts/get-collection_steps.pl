@@ -39,7 +39,7 @@ When qr/I query the collection of contacts with filter of "(.*?)"$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/contacts',
-      Filter => '{"Contact": {"AND": [{"Field": "Email","Operator": "STARTSWITH","Value": "'.$1.'"}]}}',
+      Filter => '{"Contact": {"AND": [{"Field": "Email","Operator": "EQ","Value": "'.$1.'"}]}}',
    );
 };
 
@@ -47,7 +47,7 @@ When qr/I query the collection of contacts with filter of Firstname "(.*?)" and 
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/contacts',
-      Filter => '{"Contact": {"AND": [{"Field": "Firstname","Operator": "STARTSWITH","Value": "'.$1.'"},{"Field": "Lastname","Operator": "STARTSWITH","Value": "'.$2.'"}]}}',
+      Filter => '{"Contact": {"AND": [{"Field": "Firstname","Operator": "EQ","Value": "'.$1.'"},{"Field": "Lastname","Operator": "EQ","Value": "'.$2.'"}]}}',
    );
 };
 

@@ -16,19 +16,14 @@ use vars (qw($Self));
 
 use Kernel::System::EmailParser;
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 # do not really send emails
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
     Value => 'Kernel::System::Email::DoNotSendEmail',
 );
@@ -152,15 +147,16 @@ for my $Encoding ( '', qw(base64 quoted-printable 8bit) ) {
         my $Name = "#$Count.$CountSub $Encoding $Test->{Name}";
 
         # set forcing of encoding
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'SendmailEncodingForce',
             Value => $Encoding,
         );
 
-        $Kernel::OM->ObjectsDiscard( Objects => ['Email'] );
-        my $EmailObject = $Kernel::OM->Get('Email');
+        $Kernel::OM->ObjectsDiscard(
+            Objects => ['Email']
+        );
 
-        my ( $Header, $Body ) = $EmailObject->Send(
+        my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
             %{ $Test->{Data} },
         );
 
@@ -225,11 +221,10 @@ for my $Encoding ( '', qw(base64 quoted-printable 8bit) ) {
     }
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

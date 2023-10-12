@@ -17,10 +17,11 @@ use Scalar::Util;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'DB',
-    'Log',
-    'Ticket',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    DB
+    Log
+    Ticket
 );
 
 =head1 NAME

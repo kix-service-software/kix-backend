@@ -13,13 +13,14 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    User
+    Valid
 );
 
 # just for convenience
@@ -418,19 +419,23 @@ sub PermissionAdd {
     # check needed stuff
     for my $Needed (qw(RoleID TypeID Target UserID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
 
     if ( !defined $Param{Value} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Value!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Value!"
+            );
+        }
         return;
     }
 
@@ -443,18 +448,22 @@ sub PermissionAdd {
         Target => $Param{Target}
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A permission with the same type and target already exists for this role.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A permission with the same type and target already exists for this role.",
+            );
+        }
         return;
     }
 
     if ( !$Self->ValidatePermission(%Param) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The permission target is invalid.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The permission target is invalid.",
+            );
+        }
         return;
     }
 
@@ -607,10 +616,11 @@ sub PermissionUpdate {
 returns array of all PermissionIDs for a role
 
     my @PermissionIDs = $RoleObject->PermissionList(
-        RoleID  => 1,                                    # optional, ignored if RoleIDs is given
-        RoleIDs => [1,2,3],                              # optional
-        Types   => ['Resource', 'Base::Ticket'],         # optional
-        Target  => '...'                                 # optional
+        RoleID       => 1,                                    # optional, ignored if RoleIDs is given
+        RoleIDs      => [1,2,3],                              # optional
+        Types        => ['Resource', 'Base::Ticket'],         # optional
+        Target       => '...'                                 # optional
+        UsageContext => 'Customer'                            # optional, or 'Agent'
     );
 
 the result looks like
@@ -629,7 +639,7 @@ sub PermissionList {
     my @RoleIDs = $Param{RoleIDs} ? $Param{RoleIDs} : $Param{RoleID} ? ( $Param{RoleID} ) : ();
 
     # create cache key
-    my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'');
+    my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'') . '::' . ($Param{UsageContext}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -638,9 +648,14 @@ sub PermissionList {
     );
     return @{$Cache} if $Cache;
 
-    my $SQL = 'SELECT rp.id FROM role_permission rp, permission_type pt WHERE pt.id = rp.type_id';
+    my $SQL = 'SELECT rp.id FROM role_permission rp, permission_type pt, roles r WHERE pt.id = rp.type_id AND r.id = rp.role_id';
 
     my @Bind;
+
+    if( $Param{UsageContext} ) {
+        $SQL .= ' AND r.usage_context IN (?, 3)';
+        push @Bind, \Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})};
+    }
 
     if ( @RoleIDs ) {
         $SQL .= ' AND rp.role_id IN (' . join( ', ', map {'?'} @RoleIDs ) . ')';

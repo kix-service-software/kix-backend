@@ -171,7 +171,7 @@ sub Run {
                         );
                     }
                 }
-                
+
                 if (%SearchParam) {
                     %SearchTypeResult = $Kernel::OM->Get('User')->UserSearch(
                         %SearchParam,
@@ -200,7 +200,7 @@ sub Run {
             Limit => $Limit,
             Valid => 0
         ) };
-    }    
+    }
 
     my @UserIDs = sort keys %{$UserList};
 
@@ -224,7 +224,9 @@ sub Run {
                 return $Self->_Success(
                     User => [],
                 );
-            }        
+            }
+            # else use returned ids as new result
+            @UserIDs = @AllowedUserIDs;
         }
 
         # get already prepared user data from UserGet operation
@@ -354,8 +356,9 @@ sub _GetUserIDsWithRequiredPermission {
 
     # get all users with base permissions for the given QueueID
     my @BasePermissions = $RoleObject->PermissionListGet(
-        Types  => ['Base::Ticket'],
-        Target => $Param{RequiredPermission}->{ObjectID}
+        Types           => ['Base::Ticket'],
+        Target          => $Param{RequiredPermission}->{ObjectID},
+        UsageContext    => $Self->{Authorization}->{UserType}
     );
     my %BaseRoleIDs = map { $_->{RoleID} => 1 } @BasePermissions;
 
@@ -375,11 +378,11 @@ sub _GetUserIDsWithRequiredPermission {
             push( @UserIDsWithBasePermissions, $UserID );
         }
     }
-    
+
     USERID:
-    foreach my $UserID (@UserIDsWithBasePermissions) {      
+    foreach my $UserID (@UserIDsWithBasePermissions) {
         PERMISSION:
-        foreach my $Permission (@Permissions) {      
+        foreach my $Permission (@Permissions) {
 
             # check resource permission
             my ($Granted) = $Kernel::OM->Get('User')->CheckResourcePermission(
@@ -387,7 +390,7 @@ sub _GetUserIDsWithRequiredPermission {
                 Target              => '/tickets',
                 RequestedPermission => $Permission,
                 UsageContext        => $Self->{Authorization}->{UserType}
-            );            
+            );
             next USERID if !$Granted;
 
             # check base permission
@@ -395,13 +398,13 @@ sub _GetUserIDsWithRequiredPermission {
                 UserID       => $UserID,
                 UsageContext => $Self->{Authorization}->{UserType},
                 Permission   => $Param{RequiredPermission}->{Permission},
-            );            
+            );
             next USERID if !$Result;
 
-            if ( IsArrayRefWithData($Result) && $Param{RequiredPermission}->{ObjectID}) {                
+            if ( IsArrayRefWithData($Result) && $Param{RequiredPermission}->{ObjectID}) {
                 my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
                 next USERID if !$AllowedQueueIDs{$Param{RequiredPermission}->{ObjectID}};
-            }                         
+            }
         }
 
         # ok, accept this user

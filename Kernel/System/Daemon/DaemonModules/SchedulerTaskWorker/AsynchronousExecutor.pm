@@ -97,21 +97,23 @@ sub Run {
         $LocalObject = $Kernel::OM->Get( $Param{Data}->{Object} );
     };
     if ( !$LocalObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not create a new object $Param{Data}->{Object}! - Task: $Param{TaskName}",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not create a new object $Param{Data}->{Object}! - Task: $Param{TaskName}",
+            );
+        }
         return;
     }
 
     # Check if the module provide the required function().
     if ( !$LocalObject->can( $Param{Data}->{Function} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "$Param{Data}->{Object} does not provide $Param{Data}->{Function}()! - Task: $Param{TaskName}",
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "$Param{Data}->{Object} does not provide $Param{Data}->{Function}()! - Task: $Param{TaskName}",
+            );
+        }
         return;
     }
 

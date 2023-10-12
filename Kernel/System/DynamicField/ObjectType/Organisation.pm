@@ -17,9 +17,11 @@ use Scalar::Util;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'FAQ',
-    'Log',
+our @ObjectDependencies = qw(
+    Cache
+    ClientRegistration
+    Organisation
+    Log
 );
 
 =head1 NAME
@@ -111,11 +113,11 @@ sub PostValueSet {
     $Kernel::OM->Get('Organisation')->EventHandler(
         Event => 'OrganisationDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName => $Param{DynamicFieldConfig}->{Name},
-            Value     => $Param{Value},
-            OldValue  => $Param{OldValue},
-            ItemID    => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            FieldName      => $Param{DynamicFieldConfig}->{Name},
+            Value          => $Param{Value},
+            OldValue       => $Param{OldValue},
+            OrganisationID => $Param{ObjectID},
+            UserID         => $Param{UserID},
         },
         UserID => $Param{UserID},
     );

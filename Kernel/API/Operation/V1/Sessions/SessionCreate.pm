@@ -98,12 +98,20 @@ sub Run {
     my $PostPw = $Param{Data}->{Password} || '';
 
     if ( defined $Param{Data}->{UserType} ) {
+
+        my $CGIObject       = CGI->new;
+        my @RemoteAddresses = ();
+        if ( $CGIObject->http('HTTP_X_FORWARDED_FOR') ) {
+            @RemoteAddresses = split(/",\s{0,1}"/, $CGIObject->http('HTTP_X_FORWARDED_FOR'));
+        }
+
         # check submitted data
         $User = $Kernel::OM->Get('Auth')->Auth(
-            User           => $Param{Data}->{UserLogin} || '',
-            UsageContext   => $Param{Data}->{UserType},
-            Pw             => $PostPw,
-            NegotiateToken => $Param{Data}->{NegotiateToken},
+            User            => $Param{Data}->{UserLogin} || '',
+            UsageContext    => $Param{Data}->{UserType},
+            Pw              => $PostPw,
+            NegotiateToken  => $Param{Data}->{NegotiateToken},
+            RemoteAddresses => \@RemoteAddresses
         );
         if ( $User ) {
             $UserID = $Kernel::OM->Get('User')->UserLookup(

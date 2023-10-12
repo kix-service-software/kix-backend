@@ -30,6 +30,7 @@ use Kernel::System::EmailParser;
 use vars qw(@ISA);
 
 our @ObjectDependencies = (
+    'ClientRegistration',
     'Config',
     'Cache',
     'Contact',
@@ -104,38 +105,34 @@ sub new {
         Config => 'Ticket::EventModulePost',
     );
 
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $MainObject   = $Kernel::OM->Get('Main');
-
     # load ticket number generator
-    my $GeneratorModule = $ConfigObject->Get('Ticket::NumberGenerator')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('Ticket::NumberGenerator')
         || 'Kernel::System::Ticket::Number::AutoIncrement';
-    if ( !$MainObject->RequireBaseClass($GeneratorModule) ) {
+    if ( !$Kernel::OM->Get('Main')->RequireBaseClass($GeneratorModule) ) {
         die "Can't load ticket number generator backend module $GeneratorModule! $@";
     }
 
     # load article storage module
-    my $StorageModule = $ConfigObject->Get('Ticket::StorageModule')
+    my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule')
         || 'Kernel::System::Ticket::ArticleStorageDB';
-    if ( !$MainObject->RequireBaseClass($StorageModule) ) {
+    if ( !$Kernel::OM->Get('Main')->RequireBaseClass($StorageModule) ) {
         die "Can't load ticket storage backend module $StorageModule! $@";
     }
 
     # do we need to check all backends, or just one?
     $Self->{CheckAllBackends} =
-        $ConfigObject->Get('Ticket::StorageModule::CheckAllBackends')
+        $Kernel::OM->Get('Config')->Get('Ticket::StorageModule::CheckAllBackends')
         // 0;
 
     # load article search index module
-    my $SearchIndexModule = $ConfigObject->Get('Ticket::SearchIndexModule')
+    my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule')
         || 'Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB';
-    if ( !$MainObject->RequireBaseClass($SearchIndexModule) ) {
+    if ( !$Kernel::OM->Get('Main')->RequireBaseClass($SearchIndexModule) ) {
         die "Can't load ticket search index backend module $SearchIndexModule! $@";
     }
 
     # load ticket extension modules
-    my $CustomModule = $ConfigObject->Get('Ticket::CustomModule');
+    my $CustomModule = $Kernel::OM->Get('Config')->Get('Ticket::CustomModule');
     if ($CustomModule) {
 
         my %ModuleList;
@@ -152,7 +149,7 @@ sub new {
             my $Module = $ModuleList{$ModuleKey};
 
             next MODULEKEY if !$Module;
-            next MODULEKEY if !$MainObject->RequireBaseClass($Module);
+            next MODULEKEY if !$Kernel::OM->Get('Main')->RequireBaseClass($Module);
         }
     }
 
@@ -497,8 +494,7 @@ sub TicketCreate {
     # check given organisation id
     my $ExistingOrganisationID;
 
-    # FIXME: remove ContactID check with KIX2018-6884
-    if ( $Param{OrganisationID} && $Param{ContactID} ) {
+    if ( $Param{OrganisationID} ) {
         if ($Param{OrganisationID} =~ /^\d+$/) {
             my $FoundOrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                 ID     => $Param{OrganisationID},
@@ -574,7 +570,8 @@ sub TicketCreate {
             }
         } else {
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                ID => $Param{ContactID},
+                ID     => $Param{ContactID},
+                Silent => 1,
             );
             if (IsHashRefWithData(\%ContactData)) {
 
@@ -592,10 +589,6 @@ sub TicketCreate {
     # make sure it's undef and no empty string, so that the result is a NULL value in the DB
     if ( !$Param{ContactID} ) {
         $Param{ContactID} = undef;
-
-        # FIXME: if no contact, than no organisation (maybe remove this with KIX2018-6884)
-        $ExistingOrganisationID = undef;
-        $Param{OrganisationID}  = undef;
     }
 
     # create organisation if it doesn't exist
@@ -2719,10 +2712,11 @@ sub TicketPendingTimeSet {
             $Time = $TimeObject->TimeStamp2SystemTime(
                 String => $Param{String},
             );
-            ( $Param{Sec}, $Param{Minute}, $Param{Hour}, $Param{Day}, $Param{Month}, $Param{Year} )
-                = $TimeObject->SystemTime2Date(
-                SystemTime => $Time,
+            if ( $Time ) {
+                ( $Param{Sec}, $Param{Minute}, $Param{Hour}, $Param{Day}, $Param{Month}, $Param{Year} ) = $TimeObject->SystemTime2Date(
+                    SystemTime => $Time,
                 );
+            }
         }
         elsif ( $Param{Diff} ) {
             $Time = $TimeObject->SystemTime() + ( $Param{Diff} * 60 );
@@ -3083,8 +3077,7 @@ sub TicketArchiveFlagSet {
 
         if (
             $ConfigObject->Get('Ticket::ArchiveSystem::RemoveTicketWatchers')
-            )
-        {
+        ) {
             $Kernel::OM->Get('Watcher')->WatcherDelete(
                 Object   => 'Ticket',
                 ObjectID => $Param{TicketID},
@@ -3251,7 +3244,7 @@ sub TicketStateSet {
     }
 
     # permission check
-    my %StateList = $Self->StateList(%Param);
+    my %StateList = $Self->TicketStateList(%Param);
     if ( !$StateList{ $State{ID} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
@@ -4116,7 +4109,7 @@ sub TicketPrioritySet {
     }
 
     # permission check
-    my %PriorityList = $Self->PriorityList(%Param);
+    my %PriorityList = $Self->TicketPriorityList(%Param);
     if ( !$PriorityList{ $Param{PriorityID} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
@@ -4633,10 +4626,12 @@ sub HistoryTypeLookup {
 
         # check if data exists
         if ( !$Result ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No TypeID for $Param{Type} found!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No TypeID for $Param{Type} found!",
+                );
+            }
             return;
         }
     }
@@ -4653,10 +4648,12 @@ sub HistoryTypeLookup {
 
         # check if data exists
         if ( !$Result ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No Type for $Param{TypeID} found!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No Type for $Param{TypeID} found!",
+                );
+            }
             return;
         }
     }
@@ -6720,132 +6717,6 @@ sub ArticleFlagDataGet {
     return %ArticleFlagData;
 }
 
-=item SendLinkedPersonNotification()
-
-send linked person notification via email
-
-    my $Success = $TicketObject->SendLinkedPersonNotification(
-        TicketID    => 123,
-        ArticleID   => 123,
-        CustomerMessageParams => {
-            SomeParams => 'For the message!',
-        },
-        Type       => 'LinkedPersonPhoneNotification' || 'LinkedPersonNoteNotification',
-        Recipients => $UserID,
-        UserID     => 123,
-    );
-
-Events:
-    ArticleLinkedPersonNotification
-
-=cut
-
-sub SendLinkedPersonNotification {
-    my ( $Self, %Param ) = @_;
-    my @Cc;
-
-    # check needed stuff
-    for (qw(CustomerMessageParams TicketID Type Recipients UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "SendLinkedPersonNotification: Need $_!" );
-            return;
-        }
-    }
-
-    # return if no notification is active
-    return 1 if $Self->{SendNoNotification};
-
-    # proceed selected linked persons
-    return if ref $Param{Recipients} ne 'ARRAY';
-    for my $RecipientStr ( @{ $Param{Recipients} } ) {
-        my ( $RecipientType, $RecipientID ) = split( ':::', $RecipientStr );
-
-        my %User;
-        if ( $RecipientType eq 'Agent' ) {
-            %User = $Kernel::OM->Get('User')->GetUserData(
-                UserID => $RecipientID,
-            );
-        }
-        else {
-            %User = $Kernel::OM->Get('Contact')->ContactGet(
-                ID => $RecipientID,
-            );
-        }
-        next if !$User{UserEmail} || $User{UserEmail} !~ /@/;
-
-        my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
-        my %Notification = $TemplateGeneratorObject->NotificationLinkedPerson(
-            Type                  => $Param{Type},
-            TicketID              => $Param{TicketID},
-            ArticleID             => $Param{ArticleID} || '',
-            CustomerMessageParams => $Param{CustomerMessageParams},
-            RecipientID           => $RecipientID,
-            RecipientType         => $RecipientType,
-            RecipientData         => \%User,
-            UserID                => $Param{UserID},
-        );
-        next if !%Notification || !$Notification{Subject} || !$Notification{Body};
-
-        # send notify
-        $Kernel::OM->Get('Email')->Send(
-            From => $Kernel::OM->Get('Config')->Get('NotificationSenderName') . ' <'
-                . $Kernel::OM->Get('Config')->Get('NotificationSenderEmail') . '>',
-            To       => $User{UserEmail},
-            Subject  => $Notification{Subject},
-            MimeType => $Notification{ContentType} || 'text/plain',
-            Charset  => $Notification{Charset},
-            Body     => $Notification{Body},
-            Loop     => 1,
-        );
-
-        # save person name for Cc update
-        push( @Cc, $User{UserEmail} );
-
-        # write history
-        $Param{HistoryName} = 'Involved Person Phone';
-        if ( $Param{Type} eq 'InvolvedNoteNotification' ) {
-            $Param{HistoryName} = 'Involved Person Note';
-        }
-        $Self->HistoryAdd(
-            TicketID     => $Param{TicketID},
-            HistoryType  => 'SendLinkedPersonNotification',
-            Name         => "$Param{HistoryName}: $User{UserEmail}",
-            CreateUserID => $Param{UserID},
-        );
-
-        # log event
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Sent '$Param{Type}' notification to $RecipientType '$RecipientID'.",
-        );
-
-        # event
-        $Self->EventHandler(
-            Event => 'ArticleLinkedPersonNotification',
-            Data  => {
-                RecipientID => $RecipientID,
-                TicketID    => $Param{TicketID},
-                ArticleID   => $Param{ArticleID},
-            },
-            UserID => $Param{UserID},
-        );
-    }
-
-    # update article Cc
-    if (@Cc) {
-        $Self->ArticleUpdate(
-            ArticleID => $Param{ArticleID},
-            TicketID  => $Param{TicketID},
-            Key       => 'Cc',
-            Value     => join( ',', @Cc ),
-            UserID    => $Param{UserID},
-        );
-    }
-
-    return 1;
-}
-
 =item TicketAccountedTimeDelete()
 
 deletes the accounted time of a ticket.
@@ -7118,97 +6989,7 @@ sub DESTROY {
     return 1;
 }
 
-# COMPAT: to OTRS 1.x and 2.x (can be removed later)
-
-sub InvolvedAgents {
-    my $Self = shift;
-
-    return $Self->TicketInvolvedAgentsList(@_);
-}
-
-sub LockIsTicketLocked {
-    my $Self = shift;
-
-    return $Self->TicketLockGet(@_);
-}
-
-sub LockSet {
-    my $Self = shift;
-
-    return $Self->TicketLockSet(@_);
-}
-
-sub MoveTicket {
-    my $Self = shift;
-
-    return $Self->TicketQueueSet(@_);
-}
-
-sub MoveQueueList {
-    my $Self = shift;
-
-    return $Self->TicketMoveQueueList(@_);
-}
-
-sub OwnerList {
-    my $Self = shift;
-
-    return $Self->TicketOwnerList(@_);
-}
-
-sub OwnerSet {
-    my $Self = shift;
-
-    return $Self->TicketOwnerSet(@_);
-}
-
-sub PriorityList {
-    my $Self = shift;
-
-    return $Self->TicketPriorityList(@_);
-}
-
-sub PrioritySet {
-    my $Self = shift;
-
-    return $Self->TicketPrioritySet(@_);
-}
-
-sub ResponsibleList {
-    my $Self = shift;
-
-    return $Self->TicketResponsibleList(@_);
-}
-
-sub ResponsibleSet {
-    my $Self = shift;
-
-    return $Self->TicketResponsibleSet(@_);
-}
-
-sub SetCustomerData {
-    my $Self = shift;
-
-    return $Self->TicketCustomerSet(@_);
-}
-
-sub StateList {
-    my $Self = shift;
-
-    return $Self->TicketStateList(@_);
-}
-
-sub StateSet {
-    my $Self = shift;
-
-    return $Self->TicketStateSet(@_);
-}
-
 1;
-
-
-
-
 
 =back
 

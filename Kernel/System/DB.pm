@@ -169,7 +169,8 @@ to connect to a database
 =cut
 
 sub Connect {
-    my $Self = shift;
+    my $Self   = shift;
+    my $Silent = shift;
 
     # check database handle
     if ( $Self->{dbh} ) {
@@ -205,11 +206,13 @@ sub Connect {
     );
 
     if ( !$Self->{dbh} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'Error',
-            Message  => $DBI::errstr,
-        );
+        if ( !$Silent ) {
+            $Kernel::OM->Get('Log')->Log(
+                Caller   => 1,
+                Priority => 'Error',
+                Message  => $DBI::errstr,
+            );
+        }
         return;
     }
 
@@ -251,6 +254,7 @@ sub Disconnect {
     if ( $Self->{dbh} ) {
         $Self->{dbh}->disconnect();
         delete $Self->{dbh};
+        delete $Self->{Cursor};
     }
 
     if ( $Self->{SlaveDBObject} ) {
@@ -374,7 +378,7 @@ to quote sql parameters
 =cut
 
 sub Quote {
-    my ( $Self, $Text, $Type ) = @_;
+    my ( $Self, $Text, $Type, $Silent ) = @_;
 
     # return undef if undef
     return if !defined $Text;
@@ -387,6 +391,7 @@ sub Quote {
     # quote integers
     if ( $Type eq 'Integer' ) {
         if ( $Text !~ m{\A [+-]? \d{1,16} \z}xms ) {
+            return if $Silent;
             $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
@@ -400,6 +405,8 @@ sub Quote {
     # quote numbers
     if ( $Type eq 'Number' ) {
         if ( $Text !~ m{ \A [+-]? \d{1,20} (?:\.\d{1,20})? \z}xms ) {
+            return if $Silent;
+
             $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
@@ -414,6 +421,8 @@ sub Quote {
     if ( $Type eq 'Like' ) {
         return ${ $Self->{Backend}->Quote( \$Text, $Type ) };
     }
+
+    return if $Silent;
 
     $Kernel::OM->Get('Log')->Log(
         Caller   => 1,
@@ -584,7 +593,7 @@ sub _InitSlaveDB {
                 IsSlaveDB    => 1,
             );
 
-            if ( $SlaveDBObject->Connect() ) {
+            if ( $SlaveDBObject->Connect( $Param{Silent} ) ) {
                 $Self->{SlaveDBObject} = $SlaveDBObject;
                 return $Self->{SlaveDBObject};
             }
@@ -641,10 +650,12 @@ sub Prepare {
 
     # check needed stuff
     if ( !$Param{SQL} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need SQL!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need SQL!',
+            );
+        }
         return;
     }
 
@@ -659,7 +670,7 @@ sub Prepare {
     if (
         $UseSlaveDB
         && !$Self->{IsSlaveDB}
-        && $Self->_InitSlaveDB()    # this is very cheap after the first call (cached)
+        && $Self->_InitSlaveDB( Silent => $Param{Silent} )    # this is very cheap after the first call (cached)
         && $SQL =~ m{\A\s*SELECT}xms
         )
     {
@@ -706,12 +717,14 @@ sub Prepare {
                 push @Array, $$Data;
             }
             else {
-                $Kernel::OM->Get('Log')->Log(
-                    Caller   => 1,
-                    Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Caller   => 1,
+                        Priority => 'Error',
+                        Message  => 'No SCALAR param in Bind! Bind: ' .
+                            ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                    );
+                }
                 return;
             }
         }
@@ -724,20 +737,24 @@ sub Prepare {
 
     # do
     if ( !( $Self->{Cursor} = $Self->{dbh}->prepare($SQL) ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'Error',
-            Message  => "$DBI::errstr, SQL: '$SQL'",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Caller   => 1,
+                Priority => 'Error',
+                Message  => "$DBI::errstr, SQL: '$SQL'",
+            );
+        }
         return;
     }
 
     if ( !$Self->{Cursor}->execute(@Array) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Caller   => 1,
-            Priority => 'Error',
-            Message  => "$DBI::errstr, SQL: '$SQL'",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Caller   => 1,
+                Priority => 'Error',
+                Message  => "$DBI::errstr, SQL: '$SQL'",
+            );
+        }
         return;
     }
 
@@ -787,7 +804,8 @@ sub FetchrowArray {
     # fetch first not used rows
     if ( $Self->{LimitStart} ) {
         for ( 1 .. $Self->{LimitStart} ) {
-            if ( !$Self->{Cursor}->fetchrow_array() ) {
+            my @Row = $Self->{Cursor}->fetchrow_array();
+            if ( !@Row ) {
                 $Self->{LimitStart} = 0;
                 return ();
             }

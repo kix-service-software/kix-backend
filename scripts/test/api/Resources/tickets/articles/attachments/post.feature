@@ -10,6 +10,7 @@ Feature: POST request to the /tickets/:TicketID/articles/:ArticleID/attachments 
     Given a article
     When I create a article attachment
     Then the response code is 201
+    Then the response object is TicketArticleAttachmentPostResponse
     When I delete this ticket
     Then the response code is 204
     And the response has no content 

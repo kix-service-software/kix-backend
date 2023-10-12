@@ -29,65 +29,6 @@ sub new {
 
 
     return $Self;
-
-}
-
-sub ObjectAttributesGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed object
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')
-            ->Log( Priority => 'error', Message => 'Need UserID!' );
-        return;
-    }
-    my $CategoryTreeListRef = $Kernel::OM->Get('FAQ')->CategoryTreeList(
-        Valid  => 0,
-        UserID => 1,
-    );
-
-    my %CategoryList = %{$CategoryTreeListRef};
-    my %StateList    = $Kernel::OM->Get('FAQ')->StateList( UserID => 1, );
-    my %LanguageList = $Kernel::OM->Get('FAQ')->LanguageList( UserID => 1, );
-    my %FormatList   = ( "plain" => "PlainText", "html" => "HTML" );
-
-    my $Attributes = [
-        {
-            Key   => 'DefaultLanguageID',
-            Name  => 'Default Language (if empty/invalid)',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%LanguageList,
-                Required     => 0,
-                Translation  => 1,
-                PossibleNone => 1,
-            },
-        },
-        {
-            Key   => 'DefaultStateID',
-            Name  => 'Default State (if empty/invalid)',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%StateList,
-                Required     => 0,
-                Translation  => 1,
-                PossibleNone => 1,
-            },
-        },
-        {
-            Key   => 'Format',
-            Name  => 'Format',
-            Input => {
-                Type         => 'Selection',
-                Data         => \%FormatList,
-                Required     => 1,
-                Translation  => 1,
-                PossibleNone => 0,
-            },
-        },
-    ];
-
-    return $Attributes;
 }
 
 sub MappingObjectAttributesGet {
@@ -364,12 +305,6 @@ sub ExportDataGet {
 
         $FAQData{Approved} = $FAQData{Approved} ? "yes" : "no";
 
-        my %LanguageList = $Kernel::OM->Get('FAQ')->LanguageList( UserID => 1, );
-        $FAQData{Language} = $LanguageList{ $FAQData{LanguageID} };
-
-        my %StateList = $Kernel::OM->Get('FAQ')->StateList( UserID => 1, );
-        $FAQData{State} = $StateList{ $FAQData{StateID} };
-
         # build full category name...
         my @NamePartsArray = qw{};
         my $ParentID       = $FAQData{CategoryID};
@@ -555,14 +490,6 @@ sub ImportDataSave {
     #--------------------------------------------------------------------------
     # PREPARE DATA...
 
-    # get all FAQ language ids
-    my %LanguageList = $Kernel::OM->Get('FAQ')->LanguageList( UserID => 1, );
-    my %ReverseLanguageList = reverse( $Kernel::OM->Get('FAQ')->LanguageList( UserID => 1, ) );
-
-    # get all state type ids
-    my %StateList = $Kernel::OM->Get('FAQ')->StateList( UserID => 1, );
-    my %ReverseStateList = reverse(%StateList);
-
     my $ItemID     = 0;
     my $ReturnCode = "";                           # Created | Changed | Failed
     my $FAQNumber  = $Param{ImportDataRow}->[0];
@@ -574,44 +501,6 @@ sub ImportDataSave {
     elsif ( $NewFAQData{Approved} && ( $NewFAQData{Approved} =~ /\D/ ) ) {
         ( $NewFAQData{Approved} eq 'yes' ) ? $NewFAQData{Approved} = "1" : $NewFAQData{Approved} =
             "0";
-    }
-
-    # check language
-    if ( $NewFAQData{Language} && !$NewFAQData{LanguageID} ) {
-        $NewFAQData{LanguageID} = $ReverseLanguageList{ $NewFAQData{Language} } || '';
-    }
-    if ( !$NewFAQData{LanguageID} ) {
-
-        # set default language from mapping configuration...
-        $NewFAQData{LanguageID} = $ObjectData->{DefaultLanguageID};
-    }
-
-    if ( !$NewFAQData{LanguageID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't import entity $Param{Counter}: "
-                . "No language given or found!",
-        );
-        return ( undef, 'Failed' );
-    }
-
-    # check state
-    if ( $NewFAQData{State} && !$NewFAQData{StateID} ) {
-        $NewFAQData{StateID} = $ReverseStateList{ $NewFAQData{State} } || '';
-    }
-    if ( !$NewFAQData{StateID} ) {
-
-        # set default state from mapping configuration...
-        $NewFAQData{DefaultStateID} = $ObjectData->{DefaultStateID};
-    }
-
-    if ( !$NewFAQData{StateID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't import entity $Param{Counter}: "
-                . "No state given or found!",
-        );
-        return ( undef, 'Failed' );
     }
 
     # check / create category structure...
@@ -679,9 +568,8 @@ sub ImportDataSave {
                 ItemID      => $FAQID,
                 Title       => $NewFAQData{Title} || $FAQData{Title},
                 CategoryID  => $NewFAQData{CategoryID} || $FAQData{CategoryID},
-                StateID     => $NewFAQData{StateID} || $FAQData{StateID},
                 Number      => $NewFAQData{Number} || $FAQData{Number},
-                LanguageID  => $NewFAQData{LanguageID} || $FAQData{LanguageID},
+                Language    => $NewFAQData{Language} || $FAQData{Language},
                 Field1      => $NewFAQData{Field1} || $FAQData{Field1},
                 Field2      => $NewFAQData{Field2} || $FAQData{Field2},
                 Field3      => $NewFAQData{Field3} || $FAQData{Field3},

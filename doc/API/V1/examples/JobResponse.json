@@ -6,6 +6,18 @@
         "CreateBy": 1,
         "CreateTime": "2019-05-02 13:35:42",
         "ExecPlanIDs": [ 1,5 ],
+        "Filter": [
+            {
+                "AND": [
+                    {
+                        "Field": "Title",
+                        "Operator": "CONTAINS",
+                        "Type": "STRING",
+                        "Value": "some title"
+                    }
+                ]
+            }
+        ],
         "ID": 1,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
@@ -31,7 +43,9 @@
                 "Comment": "...",
                 "CreateBy": 1,
                 "CreateTime": "2019-05-02 13:40:12",
-                "ExecOrder": [ 1 ],
+                "ExecOrder": [
+                    1
+                ],
                 "ID": 1,
                 "Name": "Some Macro",
                 "Type": "Ticket",

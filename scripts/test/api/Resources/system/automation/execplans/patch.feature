@@ -10,6 +10,7 @@ Feature: PATCH request to the /system/automation/execplans resource
     Then the response code is 201
     When I update this automation execplan
     Then the response code is 200
+    And the response object is ExecPlanPostPatchResponse
     When I delete this automation execplan
     Then the response code is 204
 

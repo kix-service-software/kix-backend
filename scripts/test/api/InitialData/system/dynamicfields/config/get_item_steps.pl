@@ -38,31 +38,82 @@ When qr/I query the collection of dynamicfield (.*?)$/, sub {
 
 When qr/I get this dynamicfield config$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
-      Token => S->{Token},
-      URL   => S->{API_URL}.'/system/dynamicfields/'.S->{ResponseContent}->{DynamicField}->[0]->{ID}.'/config',
+       Token => S->{Token},
+       URL   => S->{API_URL} . '/system/dynamicfields/' . S->{ResponseContent}->{DynamicField}->[0]->{ID} . '/config',
+       Limit => 0,
    );
 };
 
-Then qr/the response contains the following attributes$/, sub {
+Then qr/the response contains the following attributes of (.*?)$/, sub {
     my $Object = $1;
     my $Index = 0;
- 
-    foreach my $Row ( sort keys %{S->{ResponseContent}->{DynamicFieldConfig}} ) {
+
+    foreach my $Row ( sort @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-            C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            C->dispatch( 'Then', "the test attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
         }
         $Index++
     }
 };
 
-Then qr/the response contains the following PossibleValues$/, sub {
-    my $Object = $1;
+Then qr/the test attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+  is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
+};
+
+Then qr/the response contains the following PossibleValues/, sub {
+    my $Object = "PossibleValues";
     my $Index = 0;
- 
-    foreach my $Row ( sort keys %{S->{ResponseContent}->{DynamicFieldConfig}->{PossibleValues}} ) {
+
+    foreach my $Row ( sort @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-            C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+            C->dispatch( 'Then', "the PossibleValues \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    };
+};
+
+Then qr/the PossibleValues "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    is(S->{ResponseContent}->{DynamicFieldConfig}->{$2}->{$1}, $4, 'Check attribute value in response');
+};
+
+Then qr/the response contains the following DefaultValue$/, sub {
+    my $Object = "DefaultValue";
+    my $Index = 0;
+
+    foreach my $Row ( @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "the DefValue \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
         }
         $Index++
     }
 };
+
+Then qr/the DefValue "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
+};
+
+# no arrayhash
+Then qr/the response contains the following Config$/, sub {
+    my $Object = "Config";
+    my $Index = 0;
+
+    foreach my $Row ( sort @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "the Config \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    };
+};
+
+Then qr/the Config "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    is(S->{ResponseContent}->{DynamicFieldConfig}->{$1}, $4, 'Check attribute value in response');
+};
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -19,20 +19,13 @@ use Kernel::System::VariableCheck qw(:all);
 my $ValidatorObject = Kernel::API::Validator::DynamicFieldsValidator->new();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ValidData = {
-    DynamicFields => [
-        {
-            Name  => 'some name',
-            Value => 'some value',
-        }
-    ]
+    DynamicFields => {
+        Name  => 'some name',
+        Value => 'some value',
+    }
 };
 
 my %InvalidData = (
@@ -88,8 +81,6 @@ $Self->False(
     $Result->{Success},
     'Validate() - invalid attribute',
 );
-
-# cleanup is done by RestoreDatabase.
 
 1;
 

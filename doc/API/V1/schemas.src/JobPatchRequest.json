@@ -11,7 +11,8 @@
                     "type": "string"
                 },
                 "Filter": {
-                    "type": "object"
+                    "type": "array",
+                    "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details)."
                 },
                 "Name": {
                     "type": "string"

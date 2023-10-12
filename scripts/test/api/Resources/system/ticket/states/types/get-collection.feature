@@ -41,15 +41,14 @@ Feature: GET request to the /system/ticket/states/types resource
       | merged           |
 
   Scenario: get the list of existing statetypes with limit and offset
-    When I query the collection of statetypes with limit 2 and offset 4
+    When I query the collection of statetypes with limit 2 and offset 1
     Then the response code is 200
 #    And the response object is StateTypeCollectionResponse
     And the response contains 2 items of type "StateType"
     And the response contains the following items of type StateType
-      | Name             |
-      | pending auto     |
-      | removed          |
-      
+      | Name |
+      | open |
+
   Scenario: get the list of existing statetypes with sorted
     When I query the collection of statetypes with sorted by "StateType.-Name:textual" 
     Then the response code is 200
@@ -66,13 +65,14 @@ Feature: GET request to the /system/ticket/states/types resource
       | closed           |
       
   Scenario: get the list of existing statetypes with sorted, limit and offset
-    When I query the collection of statetypes with sorted by "StateType.-Name:textual" limit 2 and offset 5
+    When I query the collection of statetypes with sorted by "StateType.-Name:textual" limit 2 and offset 1
     Then the response code is 200
 #    And the response object is StateTypeCollectionResponse
     And the response contains 2 items of type "StateType"
     And the response contains the following items of type StateType
       | Name             |
-      | merged           |
-      | closed           |     
+      | pending reminder |
+
+
       
       

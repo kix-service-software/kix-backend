@@ -81,6 +81,7 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my $Value;
+    my %OperatorMap;
     my @SQLWhere;
 
     # check params
@@ -100,28 +101,6 @@ sub Search {
         LastChangeTime  => 'st.change_time',
     );
 
-    # convert to unix time and check
-    $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-        String => $Param{Search}->{Value},
-    );
-
-    if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
-        # convert back to timestamp (relative calculations have been done above)
-        $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $Value
-        );
-
-        $Value = "'$Value'";
-    }
-
-    my %OperatorMap = (
-        'EQ'  => '=',
-        'LT'  => '<',
-        'GT'  => '>',
-        'LTE' => '<=',
-        'GTE' => '>='
-    );
-
     if ( $Param{Search}->{Field} eq 'Age' ) {
         # calculate unixtime
         $Value = $Kernel::OM->Get('Time')->SystemTime() - $Param{Search}->{Value};
@@ -133,6 +112,38 @@ sub Search {
             'GT'  => '<',
             'LTE' => '>=',
             'GTE' => '<='
+        );
+    }
+    else {
+        # convert to unix time and check
+        $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Param{Search}->{Value},
+            Silent => 1,
+        );
+        if ( !$Value ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Invalid Date '$Param{Search}->{Value}'!",
+            );
+
+            return;
+        }
+
+        if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
+            # convert back to timestamp (relative calculations have been done above)
+            $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                SystemTime => $Value
+            );
+
+            $Value = "'$Value'";
+        }
+
+        %OperatorMap = (
+            'EQ'  => '=',
+            'LT'  => '<',
+            'GT'  => '>',
+            'LTE' => '<=',
+            'GTE' => '>='
         );
     }
 

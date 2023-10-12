@@ -54,7 +54,7 @@
 
   Scenario: get the list of existing organisations with limit and offset
     Given 8 of organisations
-    When I query the collection of organisations with limit 2 and offset 4
+    When I query the collection of organisations with limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "Organisation"
     When delete all this organisations
@@ -70,7 +70,7 @@
 
   Scenario: get the list of existing organisations with sorted, limit and offset
     Given 8 of organisations
-    When I query the collection of organisations with sorted by "Organisation.-Number:textual" limit 2 and offset 4
+    When I query the collection of organisations with sorted by "Organisation.-Number:textual" limit 2 and offset 1
     Then the response code is 200
     And the response contains 2 items of type "Organisation"
     When delete all this organisations

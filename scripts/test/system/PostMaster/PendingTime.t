@@ -16,18 +16,11 @@ use vars (qw($Self));
 
 use Kernel::System::PostMaster;
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $TicketObject = $Kernel::OM->Get('Ticket');
-my $TimeObject   = $Kernel::OM->Get('Time');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 $Helper->FixedTimeSet();
 
@@ -37,17 +30,13 @@ my %NeededXHeaders = (
     'X-KIX-FollowUp-PendingTime' => 1,
 );
 
-my $XHeaders          = $ConfigObject->Get('PostmasterX-Header');
+my $XHeaders          = $Kernel::OM->Get('Config')->Get('PostmasterX-Header');
 my @PostmasterXHeader = @{$XHeaders};
 HEADER:
 for my $Header ( sort keys %NeededXHeaders ) {
     next HEADER if ( grep $_ eq $Header, @PostmasterXHeader );
     push @PostmasterXHeader, $Header;
 }
-$ConfigObject->Set(
-    Key   => 'PostmasterX-Header',
-    Value => \@PostmasterXHeader
-);
 
 # filter test
 my @Tests = (
@@ -57,19 +46,18 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '2021-01-01 00:00:00',
             'X-KIX-FollowUp-State'             => 'pending reminder',
             'X-KIX-FollowUp-State-PendingTime' => '2022-01-01 00:00:00',
         },
         CheckNewTicket => {
-            PendingTimeUnix => $TimeObject->TimeStamp2SystemTime(
+            PendingTimeUnix => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                 String => '2021-01-01 00:00:00'
             ),
         },
         CheckFollowUp => {
-            PendingTimeUnix => $TimeObject->TimeStamp2SystemTime(
+            PendingTimeUnix => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                 String => '2022-01-01 00:00:00'
             ),
         },
@@ -80,7 +68,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '2022-01- 00:00:00',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -99,7 +86,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+60s',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -118,7 +104,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+60',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -137,7 +122,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '60',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -156,7 +140,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+60m',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -175,7 +158,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+60h',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -194,7 +176,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+60d',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -213,26 +194,6 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
-            'X-KIX-State'                      => 'pending reminder',
-            'X-KIX-State-PendingTime'          => '+30y',
-            'X-KIX-FollowUp-State'             => 'pending reminder',
-            'X-KIX-FollowUp-State-PendingTime' => '+30y',
-        },
-        CheckNewTicket => {
-            UntilTime => 0,
-        },
-        CheckFollowUp => {
-            UntilTime => 0,
-        },
-    },
-    {
-        Name  => 'Relative pending time test, invalid unit',
-        Match => {
-            From => 'sender@example.com',
-        },
-        Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+30y',
             'X-KIX-FollowUp-State'             => 'pending reminder',
@@ -251,30 +212,21 @@ my @Tests = (
             From => 'sender@example.com',
         },
         Set => {
-#rbo - T2016121190001552 - renamed X-KIX headers
             'X-KIX-State'                      => 'pending reminder',
             'X-KIX-State-PendingTime'          => '+30s +30m',
             'X-KIX-FollowUp-State'             => 'pending reminder',
             'X-KIX-FollowUp-State-PendingTime' => '+30s +30m',
         },
         CheckNewTicket => {
-            UntilTime => 0,
+            UntilTime => (30 * 60) + (30),
         },
         CheckFollowUp => {
-            UntilTime => 0,
+            UntilTime => (30 * 60) + (30),
         },
     },
 );
 
 for my $Test (@Tests) {
-
-    $ConfigObject->Set(
-        Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
-        Value => {
-            %{$Test},
-            Module => 'PostMaster::Filter::Match',
-        },
-    );
 
     my $Email = 'From: Sender <sender@example.com>
 To: Some Name <recipient@example.com>
@@ -287,6 +239,18 @@ Some Content in Body
     {
         my $PostMasterObject = Kernel::System::PostMaster->new(
             Email => \$Email,
+        );
+
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'PostmasterX-Header',
+            Value => \@PostmasterXHeader
+        );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
+            Value => {
+                %{$Test},
+                Module => 'Kernel::System::PostMaster::Filter::Match',
+            },
         );
 
         @Return = $PostMasterObject->Run();
@@ -306,7 +270,7 @@ Some Content in Body
 
     my $TicketID = $Return[1];
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
@@ -319,7 +283,7 @@ Some Content in Body
         );
     }
 
-    my $Subject = 'Subject: ' . $TicketObject->TicketSubjectBuild(
+    my $Subject = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
         TicketNumber => $Ticket{TicketNumber},
         Subject      => 'test',
     );
@@ -355,7 +319,7 @@ Some Content in Body
         "$Test->{Name} - Create follow up ticket (TicketID of original ticket)",
     );
 
-    %Ticket = $TicketObject->TicketGet(
+    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
@@ -368,13 +332,14 @@ Some Content in Body
         );
     }
 
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
         Value => undef,
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

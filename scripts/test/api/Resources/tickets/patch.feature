@@ -9,7 +9,18 @@ Feature: PATCH request to the /tickets/:TicketID resource
     Given a ticket
     When I update this ticket
     Then the response code is 200
+# Then the response object is TicketPostPatchResponse
     When I delete this ticket
     Then the response code is 204
 
-
+  Scenario: update a ticket do not changed placeholder
+    Given a ticket
+    When I update this ticket with placeholder
+    Then the response code is 200
+    When I get this ticket with include article
+    Then the response code is 200
+    And the response contains the following article attributes
+      | # Body                                                                                                                                                  |
+      | Calendar: , BusinessTimeDeviaton: , TargetTime: , KIX_CONFIG_Ticket::Hook:,KIX_CONFIG_PGP::Key::Password: ,KIX_CONFIG_ContactSearch::UseWildcardPrefix: |
+    When I delete this ticket
+    Then the response code is 204

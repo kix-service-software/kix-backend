@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -18,12 +18,10 @@ use vars (qw($Self));
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # create a new ticket
 my $TicketID = $TicketObject->TicketCreate(
@@ -59,7 +57,7 @@ for my $Test (@Tests) {
     );
     $Self->False(
         $Flag{ $Test->{Key} },
-        'TicketFlagGet()',
+        "TicketFlagGet() - 1#  Flag '$Test->{Key}' is not given",
     );
     my $Set = $TicketObject->TicketFlagSet(
         TicketID => $TicketID,
@@ -69,7 +67,7 @@ for my $Test (@Tests) {
     );
     $Self->True(
         $Set,
-        'TicketFlagSet()',
+        "TicketFlagSet() - 1# set flag '$Test->{Key}' with true",
     );
     %Flag = $TicketObject->TicketFlagGet(
         TicketID => $TicketID,
@@ -78,7 +76,7 @@ for my $Test (@Tests) {
     $Self->Is(
         $Flag{ $Test->{Key} },
         $Test->{Value},
-        'TicketFlagGet()',
+        "TicketFlagGet() - 1# Flag '$Test->{Key}' is given",
     );
     my $Delete = $TicketObject->TicketFlagDelete(
         TicketID => $TicketID,
@@ -87,7 +85,7 @@ for my $Test (@Tests) {
     );
     $Self->True(
         $Delete,
-        'TicketFlagDelete()',
+        "TicketFlagDelete() - 1# delete flag '$Test->{Key}' is given",
     );
     %Flag = $TicketObject->TicketFlagGet(
         TicketID => $TicketID,
@@ -95,7 +93,7 @@ for my $Test (@Tests) {
     );
     $Self->False(
         $Flag{ $Test->{Key} },
-        'TicketFlagGet()',
+        "TicketFlagGet() - 2#  Flag '$Test->{Key}' is not deleted (with false)",
     );
 
     # check delete for all users
@@ -107,7 +105,7 @@ for my $Test (@Tests) {
     );
     $Self->True(
         $Set,
-        'TicketFlagSet()',
+        "TicketFlagSet() - 2# set flag '$Test->{Key}' with true",
     );
     %Flag = $TicketObject->TicketFlagGet(
         TicketID => $TicketID,
@@ -116,7 +114,7 @@ for my $Test (@Tests) {
     $Self->Is(
         $Flag{ $Test->{Key} },
         $Test->{Value},
-        'TicketFlagGet()',
+        "TicketFlagGet() - 2# Flag '$Test->{Key}' is given",
     );
     $Delete = $TicketObject->TicketFlagDelete(
         TicketID => $TicketID,
@@ -125,7 +123,7 @@ for my $Test (@Tests) {
     );
     $Self->True(
         $Delete,
-        'TicketFlagDelete() for AllUsers',
+        'TicketFlagDelete() - 2# for AllUsers',
     );
     %Flag = $TicketObject->TicketFlagGet(
         TicketID => $TicketID,
@@ -133,7 +131,7 @@ for my $Test (@Tests) {
     );
     $Self->False(
         $Flag{ $Test->{Key} },
-        'TicketFlagGet()',
+        "TicketFlagGet() - 3# Flag '$Test->{Key}' is not given",
     );
 
     $Set = $TicketObject->TicketFlagSet(
@@ -144,47 +142,71 @@ for my $Test (@Tests) {
     );
     $Self->True(
         $Set,
-        'TicketFlagSet()',
+        "TicketFlagSet() - 3# set flag '$Test->{Key}' with true",
     );
 }
 
 my @SearchTests = (
     {
         Name        => 'One matching flag',
-        TicketFlags => {
-            "$TicketID flag 1 key" => "$TicketID flag 1 value",
-        },
+        TicketFlags => [
+            {
+                Flag  => "$TicketID flag 1 key",
+                Value => "$TicketID flag 1 value",
+            }
+        ],
         Result => 1,
     },
     {
         Name        => 'Another matching flag',
-        TicketFlags => {
-            "$TicketID flag 2 key" => "$TicketID flag 2 value",
-        },
+        TicketFlags => [
+            {
+                Flag  => "$TicketID flag 2 key",
+                Value => "$TicketID flag 2 value",
+            }
+        ],
         Result => 1,
     },
     {
         Name        => 'Two matching flags',
-        TicketFlags => {
-            "$TicketID flag 1 key" => "$TicketID flag 1 value",
-            "$TicketID flag 2 key" => "$TicketID flag 2 value",
-        },
+        TicketFlags => [
+            {
+                Flag  => "$TicketID flag 1 key",
+                Value => "$TicketID flag 1 value",
+            },
+            {
+                Flag  => "$TicketID flag 2 key",
+                Value => "$TicketID flag 2 value",
+            }
+        ],
         Result => 1,
     },
     {
         Name        => 'Two flags, one matching',
-        TicketFlags => {
-            "$TicketID flag 1 key" => "$TicketID flag 1 valueOFF",
-            "$TicketID flag 2 key" => "$TicketID flag 2 value",
-        },
+        TicketFlags => [
+            {
+                Flag  => "$TicketID flag 1 key",
+                Value => "$TicketID flag 1 valueOFF",
+            },
+            {
+                Flag  => "$TicketID flag 2 key",
+                Value => "$TicketID flag 2 value",
+            }
+        ],
         Result => 0,
     },
     {
         Name        => 'Two flags, another matching',
-        TicketFlags => {
-            "$TicketID flag 1 key" => "$TicketID flag 1 value",
-            "$TicketID flag 2 key" => "$TicketID flag 2 valueOFF",
-        },
+        TicketFlags => [
+            {
+                Flag  => "$TicketID flag 1 key",
+                Value => "$TicketID flag 1 value",
+            },
+            {
+                Flag  => "$TicketID flag 2 key",
+                Value => "$TicketID flag 2 valueOFF",
+            }
+        ],
         Result => 0,
     },
 );
@@ -194,7 +216,15 @@ for my $SearchTest (@SearchTests) {
     my @Tickets = $TicketObject->TicketSearch(
         Result     => 'ARRAY',
         Limit      => 2,
-        TicketFlag => $SearchTest->{TicketFlags},
+        Search     => {
+            AND => [
+                {
+                    Field    => "TicketFlag",
+                    Value    => $SearchTest->{TicketFlags},
+                    Operator => "EQ"
+                }
+            ]
+        },
         UserID     => 1,
         Permission => 'rw',
     );
@@ -216,15 +246,15 @@ for ( 1 .. 2 ) {
 
 # create some content
 $TicketID = $TicketObject->TicketCreate(
-    Title        => 'Some Ticket Title',
-    Queue        => 'Junk',
-    Lock         => 'unlock',
-    Priority     => '3 normal',
-    State        => 'closed',
+    Title          => 'Some Ticket Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
     OrganisationID => '123465',
-    ContactID    => 'customer@example.com',
-    OwnerID      => 1,
-    UserID       => 1,
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
 );
 $Self->True(
     $TicketID,
@@ -264,6 +294,7 @@ for my $UserID (@UserIDs) {
     );
     for my $ArticleID (@ArticleIDs) {
         my %ArticleFlag = $TicketObject->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID,
             UserID    => $UserID,
         );
@@ -295,6 +326,7 @@ for my $UserID (@UserIDs) {
         "UpdateOne FlagCheck (false) TicketFlagGet() - TicketID($TicketID) - ArticleID($ArticleIDs[0]) - UserID($UserID)",
     );
     my %ArticleFlag = $TicketObject->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[0],
         UserID    => $UserID,
     );
@@ -303,6 +335,7 @@ for my $UserID (@UserIDs) {
         "UpdateOne FlagCheck (true) ArticleFlagGet() - TicketID($TicketID) - ArticleID($ArticleIDs[0]) - UserID($UserID)",
     );
     %ArticleFlag = $TicketObject->ArticleFlagGet(
+        TicketID  => $TicketID,
         ArticleID => $ArticleIDs[1],
         UserID    => $UserID,
     );
@@ -334,6 +367,7 @@ for my $UserID (@UserIDs) {
     );
     for my $ArticleID (@ArticleIDs) {
         my %ArticleFlag = $TicketObject->ArticleFlagGet(
+            TicketID  => $TicketID,
             ArticleID => $ArticleID,
             UserID    => $UserID,
         );
@@ -348,15 +382,31 @@ for my $UserID (@UserIDs) {
 #
 my $Count = $TicketObject->TicketSearch(
     TicketID         => $TicketID,
-    TicketFlagUserID => $UserIDs[0],
     UserID           => 1,
-    NotTicketFlag    => {
-        JustOne => 42,
+    Search   => {
+        AND => [
+            {
+                Field    => "TicketFlag",
+                Value    => [
+                    {
+                        Flag   => "JustOne",
+                        Value  => 42,
+                        UserID => $UserIDs[0]
+                    }
+                ],
+                Operator => "EQ",
+                Not      => 1
+            }
+        ]
     },
     Result => 'COUNT',
 );
 
-$Self->Is( $Count, 1, 'NotTicketFlag with non-existing flag' );
+$Self->Is(
+    $Count,
+    2,
+    'NotTicketFlag with non-existing flag'
+);
 
 $TicketObject->TicketFlagSet(
     TicketID => $TicketID,
@@ -372,78 +422,152 @@ $TicketObject->TicketFlagSet(
     UserID   => $UserIDs[0],
 );
 
+# ToDo: Clearing the TicketSearch cache should be done in the TicketFlagSet at the end
+$Kernel::OM->Get('Cache')->CleanUp(
+    Type => "TicketSearch",
+);
+
 @Tests = (
     {
         Name     => 'NotTicketFlag excludes ticket with correct flag value',
-        Expected => 0,
+        Expected => 1,
         Search   => {
-            TicketFlagUserID => $UserIDs[0],
-            NotTicketFlag    => {
-                JustOne => 42,
-            },
-
+            Search     => {
+            AND => [
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 42,
+                                UserID => $UserIDs[0]
+                            }
+                        ],
+                        Operator => "EQ",
+                        Not      => 1
+                    }
+                ]
+            }
         },
     },
     {
         Name     => 'NotTicketFlag excludes ticket with correct flag value, and ignores non-existing flags',
-        Expected => 0,
+        Expected => 1,
         Search   => {
-            TicketFlagUserID => $UserIDs[0],
-            NotTicketFlag    => {
-                JustOne   => 42,
-                OtherFlag => 'does not matter',
-            },
+            Search     => {
+            AND => [
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 42,
+                                UserID => $UserIDs[0]
+                            },
+                            {
+                                Flag   => "does not matter",
+                                Value  => q{},
+                                UserID => $UserIDs[0]
+                            },
+                        ],
+                        Operator => "EQ",
+                        Not      => 1
+                    }
+                ]
+            }
         },
     },
     {
         Name     => 'NotTicketFlag ignores flags with different value',
-        Expected => 1,
+        Expected => 2,
         Search   => {
-            TicketFlagUserID => $UserIDs[0],
-            NotTicketFlag    => {
-                JustOne => 999,
-            },
+            Search     => {
+            AND => [
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 999,
+                                UserID => $UserIDs[0]
+                            }
+                        ],
+                        Operator => "EQ",
+                        Not      => 1
+                    }
+                ]
             }
-    },
-    {
-        Name     => 'NotTicketFlag ignores flags with different value',
-        Expected => 1,
-        Search   => {
-            TicketFlagUserID => $UserIDs[0],
-            NotTicketFlag    => {
-                JustOne => 999,
-            },
         },
     },
     {
         Name     => 'NotTicketFlag combines with TicketFlag',
         Expected => 1,
         Search   => {
-            TicketFlagUserID => $UserIDs[0],
-            TicketFlag       => {
-                JustOne    => 42,
-                AnotherOne => 23,
-            },
-            NotTicketFlag => {
-                JustOne      => 999,
-                DoesNotExist => 0,
-            },
+            Search     => {
+            AND => [
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 42,
+                                UserID => $UserIDs[0]
+                            },
+                            {
+                                Flag   => "AnotherOne",
+                                Value  => 23,
+                                UserID => $UserIDs[0]
+                            },
+                        ],
+                        Operator => "EQ"
+                    },
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 999,
+                                UserID => $UserIDs[0]
+                            },
+                            {
+                                Flag   => "DoesNotExist",
+                                Value  => 0,
+                                UserID => $UserIDs[0]
+                            },
+                        ],
+                        Operator => "EQ",
+                        Not      => 1
+                    }
+                ]
+            }
         },
     },
     {
         Name     => 'NotTicketFlag ignores flags from other users',
-        Expected => 1,
+        Expected => 2,
         Search   => {
-            TicketFlagUserID => $UserIDs[1],
-            NotTicketFlag    => {
-                JustOne => 42,
-            },
+            Search     => {
+            AND => [
+                    {
+                        Field    => "TicketFlag",
+                        Value    => [
+                            {
+                                Flag   => "JustOne",
+                                Value  => 42,
+                                UserID => $UserIDs[1]
+                            }
+                        ],
+                        Operator => "EQ",
+                        Not      => 1
+                    }
+                ]
+            }
         },
     },
 );
 
 for my $Test (@Tests) {
-    my $Count = $TicketObject->TicketSearch(
+    $Count = $TicketObject->TicketSearch(
         TicketID => $TicketID,
         UserID   => 1,
         Result   => 'COUNT',
@@ -452,11 +576,10 @@ for my $Test (@Tests) {
     $Self->Is( $Count, $Test->{Expected}, $Test->{Name} );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

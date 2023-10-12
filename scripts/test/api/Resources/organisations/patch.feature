@@ -9,6 +9,7 @@ Feature: PATCH request to the /organisations/:OrganisationID resource
     Given a organisation
     When I update this organisation
     Then the response code is 200
+    Then the response object is OrganisationPostPatchResponse
     When I delete this organisation
     Then the response code is 204
 

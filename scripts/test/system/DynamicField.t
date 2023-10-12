@@ -17,15 +17,9 @@ use vars (qw($Self));
 # get needed objects
 my $DBObject           = $Kernel::OM->Get('DB');
 my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
+my $Helper             = $Kernel::OM->Get('UnitTest::Helper');
 
-# get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $Helper = $Kernel::OM->Get('UnitTest::Helper');
-
+$Helper->BeginWork();
 my $RandomID = $Helper->GetRandomNumber();
 my $UserID   = 1;
 
@@ -62,6 +56,7 @@ my @Tests = (
             ValidID    => 1,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'InternalField',
@@ -137,6 +132,7 @@ my @Tests = (
             ValidID    => 2,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test6',
@@ -153,6 +149,7 @@ my @Tests = (
             ValidID    => 2,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test7',
@@ -169,6 +166,7 @@ my @Tests = (
             ValidID    => 1,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test8',
@@ -185,6 +183,7 @@ my @Tests = (
             ValidID    => 1,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test9',
@@ -201,6 +200,7 @@ my @Tests = (
             ValidID    => '',
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test10',
@@ -217,6 +217,7 @@ my @Tests = (
             ValidID    => 1,
             UserID     => '',
         },
+        Silent        => 1,
     },
     {
         Name          => 'Test 11',
@@ -233,6 +234,7 @@ my @Tests = (
             ValidID    => 1,
             UserID     => $UserID,
         },
+        Silent        => 1,
     },
 );
 
@@ -268,8 +270,9 @@ for my $Test (@Tests) {
 
     # add config
     my $DynamicFieldID = $DynamicFieldObject->DynamicFieldAdd(
-        Name => $FieldName,
         %{ $Test->{Add} },
+        Name   => $FieldName,
+        Silent => $Test->{Silent},
     );
     if ( !$Test->{SuccessAdd} ) {
         $Self->False(
@@ -359,9 +362,10 @@ for my $Test (@Tests) {
         $Test->{Update} = $Test->{Add};
     }
     my $Success = $DynamicFieldObject->DynamicFieldUpdate(
-        ID   => $DynamicFieldID,
-        Name => $Test->{Name} . $RandomID,
         %{ $Test->{Update} },
+        ID     => $DynamicFieldID,
+        Name   => $Test->{Name} . $RandomID,
+        Silent => $Test->{Silent},
     );
     if ( !$Test->{SuccessUpdate} ) {
         $Self->False(
@@ -1059,11 +1063,10 @@ for my $ObjectType (qw(Ticket Article)) {
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

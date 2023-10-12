@@ -14,18 +14,14 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $TicketObject = $Kernel::OM->Get('Ticket');
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase  => 1,
-        UseTmpArticleDir => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+$Helper->UseTmpArticleDir();
+
 my $UserID = 1;
 
 my @Tests = (
@@ -403,16 +399,16 @@ my @Tests = (
 
 for my $Backend (qw(DB FS)) {
 
-    my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'Some Ticket_Title',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'closed',
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+        Title          => 'Some Ticket_Title',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
         OrganisationID => 'unittest',
-        ContactID    => 'customer@example.com',
-        OwnerID      => 1,
-        UserID       => 1,
+        ContactID      => 'customer@example.com',
+        OwnerID        => 1,
+        UserID         => 1,
     );
     $Self->True(
         $TicketID,
@@ -424,22 +420,20 @@ for my $Backend (qw(DB FS)) {
         # Make sure that the TicketObject gets recreated for each loop.
         $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::StorageModule',
             Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
         );
 
-        my $TicketObject = $Kernel::OM->Get('Ticket');
-
         $Self->True(
-            $TicketObject->isa( 'Ticket::ArticleStorage' . $Backend ),
+            $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
             "TicketObject loaded the correct backend",
         );
 
         # create an article
-        my $ArticleID = $TicketObject->ArticleCreate(
+        my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
             TicketID       => $TicketID,
-            Channels       => 'note',
+            Channel        => 'note',
             SenderType     => 'agent',
             From           => 'Some Agent <email@example.com>',
             To             => 'Some Customer <customer-a@example.com>',
@@ -457,7 +451,7 @@ for my $Backend (qw(DB FS)) {
         );
 
         # create attachment
-        my $Success = $TicketObject->ArticleWriteAttachment(
+        my $Success = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
             %{ $Test->{Config} },
             ArticleID => $ArticleID,
         );
@@ -467,7 +461,7 @@ for my $Backend (qw(DB FS)) {
         );
 
         # get the list of all attachments (should be only 1)
-        my %AttachmentIndex = $TicketObject->ArticleAttachmentIndex(
+        my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
             ArticleID => $ArticleID,
             UserID    => $UserID,
         );
@@ -480,7 +474,7 @@ for my $Backend (qw(DB FS)) {
         );
 
         # get the attachment individually
-        my %Attachment = $TicketObject->ArticleAttachment(
+        my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
             ArticleID => $ArticleID,
             FileID    => $AttachmentID,
             UserID    => $UserID,
@@ -499,9 +493,8 @@ for my $Backend (qw(DB FS)) {
 
     }
 
-    # cleanup is done by RestoreDatabase, but we need to additionaly
     # run TicketDelete() to cleanup the FS backend too
-    my $Success = $TicketObject->TicketDelete(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketDelete(
         TicketID => $TicketID,
         UserID   => 1,
     );
@@ -510,6 +503,9 @@ for my $Backend (qw(DB FS)) {
         "TicketDelete() - TicketID:'$TicketID'",
     );
 }
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

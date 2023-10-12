@@ -17,6 +17,7 @@ use utf8;
 use base qw(Kernel::System::Daemon::BaseDaemon);
 
 our @ObjectDependencies = (
+    'ClientRegistration',
     'Config',
     'Cache',
     'CronEvent',

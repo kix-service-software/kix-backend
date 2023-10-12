@@ -108,6 +108,14 @@ sub Run {
         }
     }
 
+    # we need to cleanup the relevant caches to update the counters correctly
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('ITSMConfigItem')->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('GeneralCatalog')->{CacheType},
+    );
+
     my $Success = $Kernel::OM->Get('ITSMConfigItem')->UpdateCounters(
         UserID => 1,
     );
@@ -164,11 +172,6 @@ sub _Run {
     if ( $ID ) {
         $Result = 'OK';
 
-        my $SourceClassID = $Self->GetOIDMapping(
-            ObjectType => 'general_catalog',
-            ObjectID   => $Item->{class_id}
-        );
-
         $Self->_MigrateHistory(
             AssetID       => $ID,
             SourceAssetID => $Item->{id},
@@ -177,7 +180,7 @@ sub _Run {
             AssetID       => $ID,
             ClassID       => $Item->{class_id},
             SourceAssetID => $Item->{id},
-            SourceClassID => $SourceClassID,
+            SourceClassID => $Item->{'class_id::raw'},
         );
 
         # update corresponding CIs

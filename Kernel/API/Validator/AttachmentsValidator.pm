@@ -82,7 +82,7 @@ sub Validate {
             }
 
             # check allowed size
-            if ( $Attachment->{Content} && bytes::length($Attachment->{Content}) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
+            if ( $Attachment->{Content} && bytes::length(MIME::Base64::decode_base64($Attachment->{Content})) > $ConfigObject->Get('FileUpload::MaxAllowedSize') ) {
                 return $Self->_Error(
                     Code    => 'Validator.Failed',
                     Message => "Size of attachment exceeds maximum allowed size (attachment: $Attachment->{Filename})!",

@@ -15,12 +15,27 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+my $ContactID = $Helper->TestContactCreate();
+my %Contact   = $Kernel::OM->Get('Contact')->ContactGet(
+    ID => $ContactID,
+);
+
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
+    OrganisationID => $Contact{PrimaryOrganisationID},
+    ContactID      => $ContactID,
+    OwnerID        => 1,
+    UserID         => 1,
+);
 
 # prevent mails send
 $Kernel::OM->Get('Config')->Set(
@@ -33,6 +48,7 @@ my @Tests = (
         Name   => 'Empty',
         Config => {},
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing TaskID',
@@ -44,6 +60,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing Data',
@@ -52,6 +69,7 @@ my @Tests = (
             TaskName => 'UnitTest',
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Data',
@@ -61,6 +79,7 @@ my @Tests = (
             Data     => 1,
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Empty Data',
@@ -70,6 +89,7 @@ my @Tests = (
             Data     => {},
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Missing Module',
@@ -81,6 +101,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Console Module',
@@ -88,12 +109,13 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Maint::Ticket::Test',
+                Module   => 'Kernel::System::Console::Command::Maint::Ticket::Test',
                 Function => 'Execute',
                 Params   => ['-h'],
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Wrong Console Module Function',
@@ -101,7 +123,7 @@ my @Tests = (
             TaskID   => 123,
             TaskName => 'UnitTest',
             Data     => {
-                Module   => 'Console::Command::Admin::Role::Add',
+                Module   => 'Kernel::System::Console::Command::Admin::Role::Add',
                 Function => 'Test',
                 Params   => ['--no-ansi'],
             },
@@ -159,6 +181,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Core Module (wrong params format)',
@@ -172,6 +195,7 @@ my @Tests = (
             },
         },
         Result => 0,
+        Silent => 1,
     },
     {
         Name   => 'Console Command Module',
@@ -181,7 +205,7 @@ my @Tests = (
             Data     => {
                 Module   => 'Console::Command::Maint::Ticket::Dump',
                 Function => 'Execute',
-                Params   => [ '--article-limit', '2', '1' ],
+                Params   => [ '--article-limit', '2', $TicketID, '--quiet' ],
             },
         },
         Result => 1,
@@ -207,7 +231,10 @@ my $TaskHandlerObject = $Kernel::OM->Get('Daemon::DaemonModules::SchedulerTaskWo
 for my $Test (@Tests) {
 
     # result task
-    my $Result = $TaskHandlerObject->Run( %{ $Test->{Config} } );
+    my $Result = $TaskHandlerObject->Run(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     $Self->Is(
         $Result || 0,
@@ -216,11 +243,10 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup cache is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 

@@ -204,7 +204,7 @@ sub Run {
                 my $NextQueueID = $Self->{QueueObject}
                     ->QueueLookup( Queue => $WFConfigRef->{FallbackOnErrorQueue} );
                 if ($NextQueueID) {
-                    $Self->{TicketObject}->MoveTicket(
+                    $Self->{TicketObject}->TicketQueueSet(
                         QueueID  => $NextQueueID,
                         TicketID => $Param{Data}->{TicketID},
                         UserID   => 1,
@@ -221,7 +221,7 @@ sub Run {
                 my %NextState = $Self->{StateObject}
                     ->StateGet( Name => $WFConfigRef->{FallbackOnErrorState} );
                 if ( $NextState{ID} ) {
-                    $Self->{TicketObject}->StateSet(
+                    $Self->{TicketObject}->TicketStateSet(
                         StateID  => $NextState{ID},
                         TicketID => $Param{Data}->{TicketID},
                         UserID   => 1,
@@ -304,7 +304,7 @@ Furthermore this ticket has been moved to "'
             }
 
             # set new state...
-            my $StateSet = $Self->{TicketObject}->StateSet(
+            my $StateSet = $Self->{TicketObject}->TicketStateSet(
                 StateID  => $NextState{ID},
                 TicketID => $Param{Data}->{TicketID},
                 UserID   => 1,

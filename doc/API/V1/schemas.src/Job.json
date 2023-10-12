@@ -40,6 +40,10 @@
           "$ref": "ExecPlan.json"
         }
       },
+      "Filter": {
+        "type": "array",
+        "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details)."
+      },
       "ID": {
          "type": "integer",
          "readOnly": true
@@ -82,6 +86,7 @@
       "ChangeTime",
       "CreateBy",
       "CreateTime",
+      "Filter",
       "ID",
       "Name",
       "Type",

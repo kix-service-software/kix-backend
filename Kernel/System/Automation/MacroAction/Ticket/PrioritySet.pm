@@ -113,7 +113,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->PrioritySet(
+    my $Success = $TicketObject->TicketPrioritySet(
         TicketID   => $Param{TicketID},
         PriorityID => $PriorityID,
         Priority   => $Param{Config}->{Priority},

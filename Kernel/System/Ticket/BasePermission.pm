@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,7 +13,7 @@ package Kernel::System::Ticket::BasePermission;
 use strict;
 use warnings;
 
-use Kernel::System::Role::Permission;
+use Kernel::System::Role::Permission qw(:all);
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -130,7 +130,6 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     my $Value = 0;
-    PERMISSION:
     foreach my $Permission ( split(/,/, $Param{Permission}) ) {
         $Value |= Kernel::System::Role::Permission::PERMISSION->{$Permission};
     }
@@ -176,7 +175,7 @@ sub BasePermissionRelevantObjectIDList {
     }
 
     return if !@QueueIDs;
-    
+
     return \@QueueIDs;
 }
 

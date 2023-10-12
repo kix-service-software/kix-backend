@@ -20,13 +20,14 @@ use warnings;
 use URI;
 use URI::QueryParam;
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'JSON',
-    'Log',
-    'Valid',
-    'WebUserAgent'
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    JSON
+    Log
+    Valid
+    WebUserAgent
 );
 
 =head1 NAME
@@ -625,10 +626,9 @@ sub ProcessAuthCode {
         return;
     }
 
-    # delete state token
+    # delete token of profile
     $Self->_TokenDelete(
         ProfileID => $ProfileID,
-        TokenType => 'state',
     );
 
     # request token with authorization code
@@ -716,10 +716,12 @@ sub HasToken {
         Key  => "AccessToken::$Param{ProfileID}",
     );
     return 1 if $Token;
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'notice',
-        Message  => "No access token found for profile ($Param{ProfileID})!"
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "No access token found for profile ($Param{ProfileID})!"
+        );
+    }
 
     my %TokenList = $Self->_TokenList(
         ProfileID => $Param{ProfileID},
@@ -765,6 +767,12 @@ sub RequestAccessToken {
     );
     return if !%Profile;
 
+    # delete access token
+    $Self->_TokenDelete(
+        ProfileID => $Param{ProfileID},
+        TokenType => 'access',
+    );
+
     # init data
     my %Data = (
         client_id     => $Profile{ClientID},
@@ -774,7 +782,7 @@ sub RequestAccessToken {
         grant_type    => $Param{GrantType},
     );
 
-    # Add optional parameters.
+    # add optional parameters
     if (
         $Param{GrantType} eq 'authorization_code'
         && $Param{Code}
@@ -1029,6 +1037,17 @@ sub _TokenDelete {
         SQL   => $SQL,
         Bind  => \@Bind,
     );
+
+    if (
+        !$Param{TokenType}
+        || $Param{TokenType} eq 'access'
+    ) {
+        # delete access token from cache
+        $Kernel::OM->Get('Cache')->Delete(
+            Type => $Self->{CacheType},
+            Key  => "AccessToken::$Param{ProfileID}",
+        );
+    }
 
     return 1;
 }

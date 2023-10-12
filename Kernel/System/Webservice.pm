@@ -79,46 +79,54 @@ sub WebserviceAdd {
     # check needed stuff
     for my $Key (qw(Name Config ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!"
+                );
+            }
             return;
         }
     }
 
     # check config
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config should be a non empty hash reference!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config should be a non empty hash reference!",
+            );
+        }
         return;
     }
 
     # check config internals
-    if ( !defined $Param{Config}->{Provider} && !defined $Param{Config}->{Requester} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Provider or Requester should be defined!",
-        );
+    if ( !defined $Param{Config}->{Provider} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider should be defined!",
+            );
+        }
         return;
     }
     if ( defined $Param{Config}->{Provider} ) {
         if ( !IsHashRefWithData( $Param{Config}->{Provider} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Webservice Config Provider should be a non empty hash"
-                    . " reference!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Webservice Config Provider should be a non empty hash reference!",
+                );
+            }
             return;
         }
         if ( !IsHashRefWithData( $Param{Config}->{Provider}->{Transport} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Webservice Config Provider Transport should be a"
-                    . " non empty hash reference!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Webservice Config Provider Transport should be a non empty hash reference!",
+                );
+            }
             return;
         }
     }
@@ -335,46 +343,56 @@ sub WebserviceUpdate {
     # check needed stuff
     for my $Key (qw(ID Name Config ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!"
+                );
+            }
             return;
         }
     }
 
     # check config
     if ( !IsHashRefWithData( $Param{Config} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config should be a non empty hash reference!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config should be a non empty hash reference!",
+            );
+        }
         return;
     }
 
     # check config internals
     if ( !defined $Param{Config}->{Provider} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Webservice Config Provider should be defined!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Webservice Config Provider should be defined!",
+            );
+        }
         return;
     }
     if ( defined $Param{Config}->{Provider} ) {
         if ( !IsHashRefWithData( $Param{Config}->{Provider} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Webservice Config Provider should be a non empty hash"
-                    . " reference!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Webservice Config Provider should be a non empty hash"
+                        . " reference!",
+                );
+            }
             return;
         }
         if ( !IsHashRefWithData( $Param{Config}->{Provider}->{Transport} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Webservice Config Provider Transport should be a"
-                    . " non empty hash reference!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Webservice Config Provider Transport should be a"
+                        . " non empty hash reference!",
+                );
+            }
             return;
         }
     }

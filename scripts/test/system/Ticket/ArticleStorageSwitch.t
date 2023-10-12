@@ -14,6 +14,8 @@ use utf8;
 
 use vars (qw($Self));
 
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
 use Kernel::System::PostMaster;
 
 # create tickets/article/attachments in backend for article storage switch tests
@@ -22,28 +24,18 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
     # Make sure that all objects get recreated for each loop.
     $Kernel::OM->ObjectsDiscard();
 
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $MainObject   = $Kernel::OM->Get('Main');
+    # begin transaction on database
+    $Helper->BeginWork();
 
-    # get helper object
-    $Kernel::OM->ObjectParamAdd(
-        'UnitTest::Helper' => {
-            RestoreDatabase  => 1,
-            UseTmpArticleDir => 1,
-        },
-    );
-    my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+    $Helper->UseTmpArticleDir();
 
-    $ConfigObject->Set(
+    $Kernel::OM->Get('Config')->Set(
         Key   => 'Ticket::StorageModule',
         Value => 'Kernel::System::Ticket::' . $SourceBackend,
     );
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     $Self->True(
-        $TicketObject->isa( 'Ticket::' . $SourceBackend ),
+        $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::' . $SourceBackend ),
         "TicketObject loaded the correct backend",
     );
 
@@ -55,9 +47,9 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
         my $NamePrefix = "$NamePrefix #$File ";
 
         # new ticket check
-        my $Location = $ConfigObject->Get('Home')
+        my $Location = $Kernel::OM->Get('Config')->Get('Home')
             . "/scripts/test/system/sample/PostMaster/PostMaster-Test$File.box";
-        my $ContentRef = $MainObject->FileRead(
+        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
             Location => $Location,
             Mode     => 'binmode',
             Result   => 'ARRAY',
@@ -85,7 +77,7 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
         push @TicketIDs, $Return[1];
 
         # remember created article and attachments
-        my @ArticleBox = $TicketObject->ArticleContentIndex(
+        my @ArticleBox = $Kernel::OM->Get('Ticket')->ArticleContentIndex(
             TicketID => $Return[1],
             UserID   => 1,
         );
@@ -108,7 +100,7 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
 
         # verify
         for my $ArticleID ( sort keys %ArticleIDs ) {
-            my %Index = $TicketObject->ArticleAttachmentIndex(
+            my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
                 ArticleID => $ArticleID,
                 UserID    => 1,
             );
@@ -138,7 +130,7 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
 
         # switch to backend b
         for my $TicketID (@TicketIDs) {
-            my $Success = $TicketObject->TicketArticleStorageSwitch(
+            my $Success = $Kernel::OM->Get('Ticket')->TicketArticleStorageSwitch(
                 TicketID    => $TicketID,
                 Source      => $SourceBackend,
                 Destination => $DestinationBackend,
@@ -152,7 +144,7 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
 
         # verify
         for my $ArticleID ( sort keys %ArticleIDs ) {
-            my %Index = $TicketObject->ArticleAttachmentIndex(
+            my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
                 ArticleID => $ArticleID,
                 UserID    => 1,
             );
@@ -180,9 +172,10 @@ for my $SourceBackend (qw(ArticleStorageDB ArticleStorageFS)) {
             }
         }
     }
-}
 
-# cleanup is done by RestoreDatabase.
+    # rollback transaction on database
+    $Helper->Rollback();
+}
 
 1;
 

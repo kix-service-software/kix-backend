@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,14 +15,14 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::AsynchronousExecutor);
 
-our @ObjectDependencies = (
-    'Cache',
-    'ClientRegistration',
-    'Config',
-    'DB',
-    'JSON',
-    'Log',
-    'Main',
+our @ObjectDependencies = qw(
+    Cache
+    ClientRegistration
+    Config
+    DB
+    JSON
+    Log
+    Main
 );
 
 =head1 NAME
@@ -156,6 +156,9 @@ sub JobGet {
             $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
+            if (!IsArrayRefWithData($Result{Filter})) {
+                $Result{Filter} = [$Result{Filter}];
+            }
         }
     }
 
@@ -186,9 +189,15 @@ adds a new job
     my $ID = $AutomationObject->JobAdd(
         Name           => 'test',
         Type           => 'Ticket',
-        Filter         => {                                         # optional
-            Queue => [ 'SomeQueue' ],
-        },
+        Filter         => [                                         # optional
+            {
+                Queue => [ 'SomeQueue' ],
+            },
+            {
+                Queue => [ 'SomeOtherQueue'],
+                Type  => [ 'SomeType' ]
+            }
+        ],
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -219,10 +228,12 @@ sub JobAdd {
         Name => $Param{Name},
     );
     if ( $ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the same name already exists.",
+            );
+        }
         return;
     }
 
@@ -232,9 +243,19 @@ sub JobAdd {
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
+        if ( !IsArrayRefWithData($Param{Filter}) ) {
+            $Param{Filter} = [$Param{Filter}];
+        }
         $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
+        if ( !$Filter ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not add job, Filter is invalid.",
+            );
+            return;
+        }
     }
 
     # insert
@@ -282,9 +303,15 @@ updates a job
         ID             => 123,
         Name           => 'test'
         Type           => 'Ticket',                                 # optional
-        Filter         => {                                         # optional
-            Queue => [ 'SomeQueue' ],
-        },
+        Filter         => [                                         # optional
+            {
+                Queue => [ 'SomeQueue' ],
+            },
+            {
+                Queue => [ 'SomeOtherQueue'],
+                Type  => [ 'SomeType' ]
+            }
+        ],
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -317,22 +344,38 @@ sub JobUpdate {
         Name => $Param{Name} || $Data{Name},
     );
     if ( $ID && $ID != $Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the same name already exists.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the same name already exists.",
+            );
+        }
         return;
     }
 
     # set default value
     $Param{Comment} ||= '';
 
+    if ( $Param{Filter} && !IsArrayRefWithData($Param{Filter}) ) {
+        $Param{Filter} = [$Param{Filter}];
+    }
+
     # check if update is required
     my $ChangeRequired;
     KEY:
     for my $Key ( qw(Type Name Filter Comment IsAsynchronous ValidID) ) {
 
-        next KEY if defined $Data{$Key} && $Data{$Key} eq $Param{$Key};
+        next KEY if (
+            (
+                !defined( $Data{ $Key } )
+                && !defined( $Param{ $Key } )
+            )
+            || (
+                defined( $Data{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Data{ $Key } eq $Param{ $Key }
+            )
+        );
 
         $ChangeRequired = 1;
 
@@ -349,6 +392,13 @@ sub JobUpdate {
         $Filter = $Kernel::OM->Get('JSON')->Encode(
             Data => $Param{Filter}
         );
+        if ( !$Filter ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not update job, Filter is invalid.",
+            );
+            return;
+        }
     }
 
     # update Job in database
@@ -463,10 +513,12 @@ sub JobDelete {
         ID => $Param{ID},
     );
     if ( !$ID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A job with the ID $Param{ID} does not exist.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A job with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
@@ -845,7 +897,7 @@ sub AllUsedExecPlanIDList {
     my ( $Self, %Param ) = @_;
 
     # check cache
-    my $CacheKey = 'JobExecPlanList::' . $Param{JobID};
+    my $CacheKey = 'AllUsedExecPlanIDList';
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1271,6 +1323,111 @@ sub _JobExecute {
     return 1;
 }
 
+=item JobDump()
+
+gets the "script code" of a job
+
+    my $Code = $AutomationObject->JobDump(
+        ID => 123,       # the ID of the job
+    );
+
+=cut
+
+sub JobDump {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %Job = $Self->JobGet(
+        ID => $Param{ID}
+    );
+    if ( !%Job ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Job with ID $Param{ID} not found!"
+        );
+        return;
+    }
+
+    my $Name = $Job{Name};
+    $Name =~ s/"/\\\"/g;
+    my $Script = "Job \"$Name\"";
+
+    foreach my $Attr ( qw(Type Comment) ) {
+        next if !$Job{$Attr};
+        my $Value = $Job{$Attr};
+        $Value =~ s/"/\\\"/g;
+        $Script .= ' --'.$Attr.' "'.$Value.'"';
+    }
+
+    $Script .= "\n";
+
+    # dump exec plans
+    my @ExecPlanIDs = $Self->JobExecPlanList(
+        JobID => $Param{ID}
+    );
+    foreach my $ExecPlanID ( @ExecPlanIDs ) {
+        my $ExecPlanCode = $Self->ExecPlanDump(
+            ID => $ExecPlanID,
+        );
+        foreach my $Line ( split /\n/, $ExecPlanCode) {
+            $Script .= $Self->{DumpConfig}->{Indent} . $Line . "\n";
+        }
+    }
+
+    $Script .= "\n";
+
+    # dump filter
+    if ( IsHashRefWithData($Job{Filter}) ) {
+        $Script .= $Self->{DumpConfig}->{Indent}.'Filter "';
+        foreach my $BoolOperator ( sort keys %{$Job{Filter}} ) {
+            $Script .= '(' if $BoolOperator eq 'AND';
+            my @FilterItems = @{$Job{Filter}->{$BoolOperator}};
+            while ( @FilterItems ) {
+                my $FilterItem = shift @FilterItems;
+
+                my $Operator = $FilterItem->{Operator};
+                $Operator = "!$Operator" if $FilterItem->{Not};
+                if ( IsArrayRef($FilterItem->{Value}) ) {
+                    $Script .= $FilterItem->{Field}.' '.$Operator.' ['.join(',', @{$FilterItem->{Value}})."]";
+                }
+                else {
+                    $Script .= $FilterItem->{Field}.' '.$Operator.' '.$FilterItem->{Value};
+                }
+                $Script .= ' '.$BoolOperator.' ' if @FilterItems;
+            }
+            $Script .= ')' if $BoolOperator eq 'AND';
+        }
+        $Script .= "\"\n\n";
+    }
+
+    # dump macros
+    my @MacroIDs = $Self->JobMacroList(
+        JobID => $Param{ID}
+    );
+    foreach my $MacroID ( @MacroIDs ) {
+        my $MacroCode = $Self->MacroDump(
+            ID => $MacroID,
+        );
+        foreach my $Line ( split /\n/, $MacroCode) {
+            $Script .= $Self->{DumpConfig}->{Indent} . $Line . "\n";
+        }
+    }
+
+    $Script .= "End\n";
+
+    return $Script;
+}
+
 =item JobRunList()
 
 returns a hash of all runs (ID + StateID) for a given job
@@ -1353,10 +1510,12 @@ sub JobRunGet {
 
     # check needed stuff
     if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need ID!'
+            );
+        }
         return;
     }
 
@@ -1397,10 +1556,12 @@ sub JobRunGet {
 
     # no data found...
     if ( !%Result ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "JobRun with ID $Param{ID} not found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "JobRun with ID $Param{ID} not found!",
+            );
+        }
         return;
     }
 
@@ -1730,3 +1891,4 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
+

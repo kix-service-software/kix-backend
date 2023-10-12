@@ -117,6 +117,7 @@ sub Run {
         Comment  => exists $SystemAddress->{Comment} ? $SystemAddress->{Comment} : $SystemAddressData{Comment},
         ValidID  => $SystemAddress->{ValidID} || $SystemAddressData{ValidID},
         Realname => $SystemAddress->{Realname} || $SystemAddressData{Realname},
+        QueueID  => exists $SystemAddress->{QueueID} ? $SystemAddress->{QueueID} : $SystemAddressData{QueueID},
         UserID   => $Self->{Authorization}->{UserID},
     );
 

@@ -8,8 +8,9 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history/:HistoryID r
   Scenario: get an existing history
     Given a configitem
     Then the response code is 201
-    When I query the cmdb collection of configitem historys
-    When I get this configitem history
+    When I query the cmdb collection of configitem historys 1
+    Then the response code is 200
+    When I get this configitem history 1
     Then the response code is 200
 #    And the response object is ConfigItemHistoryResponse
     And the attribute "ConfigItemHistory.HistoryType" is "ConfigItemCreate"
