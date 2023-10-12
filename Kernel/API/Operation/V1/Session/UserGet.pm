@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -150,7 +150,7 @@ sub Run {
     if ( $Param{Data}->{include}->{RoleIDs} ) {
 
         # get roles list
-        my @RoleList = $Kernel::OM->Get('User')->RoleList(
+        my @RoleList = $Kernel::OM->Get('Role')->UserRoleList(
             UserID => $Self->{Authorization}->{UserID},
         );
         my @RoleIDs;
