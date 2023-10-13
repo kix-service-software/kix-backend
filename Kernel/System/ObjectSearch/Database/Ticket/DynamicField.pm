@@ -324,6 +324,7 @@ sub Sort {
                 <<"END"
 LEFT OUTER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+    AND $JoinTable.value_first = 1
 END
             );
         }
@@ -337,6 +338,7 @@ END
                 <<"END"
 LEFT OUTER JOIN dynamic_field_value $JoinTable ON artdfjoin.id =$JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+    AND $JoinTable.value_first = 1
 END
             );
         }
