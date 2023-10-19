@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-10 13:39+0000\n"
-"PO-Revision-Date: 2023-09-27 11:49+0000\n"
-"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
+"PO-Revision-Date: 2023-10-19 14:25+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1367,9 +1367,7 @@ msgstr "Betreff"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
-msgstr ""
-"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
-"Sie dieses weiterverwenden wollen."
+msgstr "Die ID des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
@@ -1389,7 +1387,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
 msgid "ArticleID"
-msgstr ""
+msgstr "ArtikelID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
 msgid ""
@@ -1640,9 +1638,7 @@ msgstr "Team"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
-msgstr ""
-"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
-"Sie dieses weiterverwenden wollen."
+msgstr "Die ID des neuen Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
