@@ -63,6 +63,21 @@ sub RoleUserAdd {
         }
     }
 
+    # check if relation already exists in database
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => <<'END',
+SELECT role_id
+FROM role_user
+WHERE user_id = ?
+    AND role_id = ?
+END
+        Bind  => [ \$Param{AssignUserID}, \$Param{RoleID} ],
+        Limit => 1,
+    );
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        return 1;
+    }
+
     # insert new relation
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO role_user '
