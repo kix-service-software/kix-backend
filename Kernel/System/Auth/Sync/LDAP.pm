@@ -323,9 +323,11 @@ sub Sync {
                 );
             }
 
-            %ContactData = $ContactObject->ContactGet(
-                ID => $ContactID,
-            );
+            if ( $ContactID ) {
+                %ContactData = $ContactObject->ContactGet(
+                    ID => $ContactID,
+                );
+            }
 
             # check if the contact is assigned to another user
             if ( $ContactData{AssignedUserID} && $ContactData{AssignedUserID} != $UserID ) {
@@ -671,9 +673,8 @@ sub Sync {
     $UserContextFromLDAP{IsAgent} = $SyncContact{IsAgent} if ( exists($SyncContact{IsAgent}) );
 
     if ( %User ) {
-
-    # remove UserPw to avoid overwrite
-    $User{UserPw} = undef if defined $User{UserPw};
+        # remove UserPw to avoid overwrite
+        $User{UserPw} = undef if defined $User{UserPw};
 
         my $Success = $UserObject->UserUpdate(
             %User,
