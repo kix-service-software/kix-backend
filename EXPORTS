@@ -213,6 +213,7 @@ OAuth2                                                                        = 
 ObjectIcon                                                                    = Kernel::System::ObjectIcon
 ObjectManager                                                                 = Kernel::System::ObjectManager
 Organisation                                                                  = Kernel::System::Organisation
+OTP                                                                           = Kernel::System::OTP
 PDF                                                                           = Kernel::System::PDF
 PerfLog                                                                       = Kernel::System::PerfLog
 PID                                                                           = Kernel::System::PID
