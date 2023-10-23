@@ -3111,17 +3111,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
-        <Description Translatable="1">Ticket event module to send an acknowledge to registered system monitoring tools.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::SystemMonitoringAcknowledgeX</Item>
-                <Item Key="Event">TicketLockUpdate</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
         <Description Translatable="1">Sends all agent's notifications to its configured out of office substitute while agent is out of office.</Description>
         <Group>Ticket</Group>

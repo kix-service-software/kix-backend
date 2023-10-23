@@ -4623,19 +4623,6 @@ DefaultValue:
     </Insert>
 
     <Insert Table="dynamic_field">
-        <Data Key="id" Type="AutoIncrement">10</Data>
-        <Data Key="internal_field">0</Data>
-        <Data Key="name" Type="Quote" Translatable="0">AcknowledgeName</Data>
-        <Data Key="label" Type="Quote" Translatable="1">System Acknowledge Name</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
-        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">SysMonXAlias</Data>
