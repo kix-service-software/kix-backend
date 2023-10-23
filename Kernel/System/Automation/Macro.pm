@@ -583,6 +583,7 @@ executes a macro
     my $Success = $AutomationObject->MacroExecute(
         ID            => 123,        # the ID of the macro
         ObjectID      => 123,        # the ID of the object to execute the macro onto
+        Variables     => {...}       # optional, these will be available as macro variables
         UserID        => 1
     );
 
@@ -619,8 +620,16 @@ sub MacroExecute {
             AdditionalData => $Param{AdditionalData} || {}
         };
     }
-
+    
     $Self->{MacroID} = $Param{ID};
+
+    # add variables
+    if ( IsHashRefWithData($Param{Variables}) ) {
+        $Self->{MacroResults} = {
+            %{$Self->{MacroResults}||{}},
+            %{$Param{Variables}},
+        }
+    }
 
     # set possible new id e.g. if we are a sub macro
     $Self->{ObjectID} = $Param{ObjectID};

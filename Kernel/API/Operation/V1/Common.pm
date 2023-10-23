@@ -294,7 +294,7 @@ sub RunOperation {
 
     # log created ID of POST requests
     if ( $Self->{RequestMethod} eq 'POST' && IsHashRefWithData($Result) && $Result->{Success} ) {
-        my @Data = %{ $Result->{Data} };
+        my @Data = %{ $Result->{Data} || {} };
         $Self->_Debug( $Self->{LevelIndent}, "created new item (" . join( '=', @Data ) . ")" );
     }
 
@@ -1099,7 +1099,9 @@ helper function to return a successful result.
 
 sub _Success {
     my ( $Self, %Param ) = @_;
-    my %Headers;
+    my %Headers = %{$Param{AdditionalHeaders}||{}};
+    
+    delete $Param{AdditionalHeaders};
 
     # ignore cached values if we have a cached response (see end of Init method)
 
