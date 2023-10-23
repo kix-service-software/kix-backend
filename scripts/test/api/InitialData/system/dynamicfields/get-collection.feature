@@ -12,10 +12,9 @@ Feature: GET request to the /system/dynamicfields resource
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
     Then the response code is 200
-    Then the response contains 17 items of type "DynamicField"
+    Then the response contains 16 items of type "DynamicField"
     And the response contains the following items of type DynamicField
       | Name                         | Label                   | FieldTypeDisplayName    | FieldType               | ObjectType   | InternalField | CustomerVisible |
-      | AcknowledgeName              | System Acknowledge Name | Text                    | Text                    | Ticket       | 0             | 0               |
       | AffectedAsset                | Affected Asset          | AssetReference          | ITSMConfigItemReference | Ticket       | 0             | 1               |
       | MobileProcessingChecklist010 | Checklist 01            | Checklist               | CheckList               | Ticket       | 0             | 0               |
       | MobileProcessingChecklist020 | Checklist 02            | Checklist               | CheckList               | Ticket       | 0             | 0               |
