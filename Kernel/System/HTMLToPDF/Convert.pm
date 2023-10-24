@@ -118,6 +118,18 @@ sub Convert {
         $Data{Definition}->{Expands} = $Param{Expands};
     }
 
+    # set user language if configured
+    my $UserLanguage = $Kernel::OM->Get('User')->GetUserLanguage(UserID => $Param{UserID});
+    if ($UserLanguage) {
+        my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
+        local $Kernel::OM = Kernel::System::ObjectManager->new(
+            'Language' => {
+                UserLanguage => $UserLanguage,
+            },
+        );
+        $LayoutObject->{LanguageObject} = $Kernel::OM->Get('Language');
+    }
+
     my %FileDatas;
     for my $Key ( qw(Header Content Footer ) ) {
         $FileDatas{$Key} = $Self->Render(

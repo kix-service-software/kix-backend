@@ -103,6 +103,17 @@ sub new {
     return $Self;
 }
 
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->DisplayValueRender(%Param);
+    if (IsHashRefWithData($Result) && $Result->{Value}) {
+        $Result->{Value} =~ s/(\r\n|\n\r|\n|\r)/<br>/g;
+    }
+
+    return $Result;
+}
+
 1;
 
 =back
