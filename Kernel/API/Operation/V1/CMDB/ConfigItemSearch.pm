@@ -108,6 +108,10 @@ sub Run {
     my %SearchParam;
     if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
 
+        # Checks whether Previous Version Search exists.
+        # If this is set, it will be extracted from the search params.
+        $Self->_HandlePreviousVersion();
+
         # do first OR to prevent replacement of prior AND search with empty result
         SEARCHTYPE:
         foreach my $SearchType ( qw(OR AND) ) {
@@ -195,8 +199,9 @@ sub Run {
                         # perform search for every attribute
                         $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                             %SearchParam,
-                            UserID  => $Self->{Authorization}->{UserID},
-                            Limit   => $Limit,
+                            UserID                => $Self->{Authorization}->{UserID},
+                            Limit                 => $Limit,
+                            PreviousVersionSearch => $Self->{PreviousVersionSearch},
                             %Sorting,
 
                             # use ids of customer if given
@@ -243,9 +248,10 @@ sub Run {
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
-                        UserID        => $Self->{Authorization}->{UserID},
-                        Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-                        ConfigItemIDs => $KnownIDs,
+                        UserID                => $Self->{Authorization}->{UserID},
+                        Limit                 => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                        ConfigItemIDs         => $KnownIDs,
+                        PreviousVersionSearch => $Self->{PreviousVersionSearch},
                         %Sorting
                     );
 
@@ -348,6 +354,30 @@ sub _GetContactAssignedConfigItems {
     }
 
     return $IDList;
+}
+
+sub _HandlePreviousVersion {
+    my ($Self, %Param) = @_;
+
+    for my $Type ( keys %{$Self->{Search}->{ConfigItem}} ) {
+        my @Items;
+        for my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$Type}} ) {
+            if ($SearchItem->{Field} eq 'PreviousVersionSearch') {
+                $Self->{PreviousVersionSearch} = $SearchItem->{Value};
+            }
+            else {
+                push(@Items, $SearchItem);
+            }
+        }
+        if ( scalar(@Items) ) {
+            $Self->{Search}->{ConfigItem}->{$Type} = \@Items;
+        }
+        else {
+            delete $Self->{Search}->{ConfigItem}->{$Type};
+        }
+    }
+
+    return 1;
 }
 
 1;
