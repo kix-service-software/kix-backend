@@ -2,7 +2,7 @@
 <database Name="kix">
 
     <TableAlter Name="queue">
-        <ColumnDrop Name="calenar_name" />
+        <ColumnDrop Name="calendar_name" />
     </TableAlter>
 
 </database>
