@@ -1187,17 +1187,37 @@ sub ConfigItemSearchExtended {
     # configitem search is required if Number or Name is given
     # special handling for config item number and name
     # number 0 is allowed but not the empty string
-    if ( (defined $Param{Number} && $Param{Number} ne '') || $Param{Name} || $Param{InciStateIDs} ) {
+    if (
+        (
+            defined $Param{Number}
+            && $Param{Number} ne q{}
+        )
+        || (
+            $Param{Name}
+            && !$Param{PreviousVersionSearch}
+        )
+        || $Param{InciStateIDs}
+    ) {
         $RequiredSearch{ConfigItem} = 1;
     }
 
     # version search is required if What or PreviousVersionSearch is given
-    if ( ( defined $Param{What} && $Param{What} ne '' && !$RequiredSearch{ConfigItem} ) || $Param{PreviousVersionSearch} ) {
+    if (
+        (
+            defined $Param{What}
+            && $Param{What} ne q{}
+            && !$RequiredSearch{ConfigItem}
+        )
+        || $Param{PreviousVersionSearch}
+    ) {
         $RequiredSearch{Version} = 1;
     }
 
     # xml version search is required if What is given
-    if ( defined $Param{What} && $Param{What} ne '' ) {
+    if (
+        defined $Param{What}
+        && $Param{What} ne q{}
+    ) {
         $RequiredSearch{XMLVersion} = 1;
     }
 
