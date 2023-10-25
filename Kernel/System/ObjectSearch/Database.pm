@@ -294,7 +294,7 @@ sub Search {
             . q{ }
             . $SQLDef{$SQLPart->{Name}};
     }
-print STDERR Data::Dumper::Dumper($SQL);
+
     # database query
     my %Objects;
     my @ObjectIDs;
@@ -607,6 +607,13 @@ sub _CreateOrderBySQL {
         OrderBy => \@OrderBy
     );
 }
+
+sub GetSupportedSortList {
+    my ( $Self, %Param) =  @_;
+
+    return keys %{$Self->{AttributeModules}->{Sort}};
+}
+
 1;
 
 =end Internal:

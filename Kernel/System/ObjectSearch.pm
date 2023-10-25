@@ -119,38 +119,75 @@ Result: 'COUNT'
 sub Search {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Self->{SearchBackendObject} ) {
-        my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
-
-        # if the backend require failed we will exit
-        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to require search backend!",
-            );
-            return;
-        }
-        my $BackendObject = $Backend->new(
-            %{$Self},
-            ObjectType => $Param{ObjectType}
-        );
-
-        # if the backend constructor failed we will exit
-        if ( ref $BackendObject ne $Backend ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create search backend object!",
-            );
-            return;
-        }
-
-        $Self->{SearchBackendObject} = $BackendObject;
-    }
+    $Self->_GetSearchBackend(
+        %Param
+    );
 
     # execute ticket search in backend
     return $Self->{SearchBackendObject}->Search(
         %Param,
     );
+}
+
+sub GetSupportedSortList {
+    my ( $Self, %Param ) = @_;
+
+    my @List;
+
+    if (
+        $Self->_GetSearchBackend(
+            %Param
+        )
+    ) {
+        @List = $Self->{SearchBackendObject}->GetSupportedSortList();
+    }
+
+    return @List;
+}
+
+sub _GetSearchBackend {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        !defined $Param{ObjectType}
+        || !$Param{ObjectType}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ObjectType!'
+        );
+        return;
+    }
+
+    return 1 if $Self->{SearchBackendObject};
+
+    my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
+
+    # if the backend require failed we will exit
+    if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to require search backend!",
+        );
+        return;
+    }
+    my $BackendObject = $Backend->new(
+        %{$Self},
+        ObjectType => $Param{ObjectType}
+    );
+
+    # if the backend constructor failed we will exit
+    if ( ref $BackendObject ne $Backend ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to create search backend object!",
+        );
+        return;
+    }
+
+    $Self->{SearchBackendObject} = $BackendObject;
+
+    return 1;
 }
 
 1;
