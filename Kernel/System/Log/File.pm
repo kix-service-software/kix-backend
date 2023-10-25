@@ -22,6 +22,14 @@ our @ObjectDependencies = (
     'Encode',
 );
 
+our %DefaultLogFormats = (
+    ''       => '[Error][${Module}] Priority: \'${Priority}\' not defined! Message: ${Message}',
+    'debug'  => '[Debug][${Module}][${Line}] ${Message}',
+    'info'   => '[Info][${Module}] ${Message}',
+    'notice' => '[Notice][${Module}] ${Message}',
+    'error'  => '[Error][${Module}][${Line}] ${Message}',
+);
+
 sub new {
     my ( $Type, %Param ) = @_;
 
@@ -32,9 +40,12 @@ sub new {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
+    # default log formats
+    $Self->{LogFormats} = $Param{LogFormats} || \%DefaultLogFormats;
+
     # get logfile location
-    $Self->{LogFile} = $ConfigObject->Get('LogModule::LogFile')
-        || die 'Need LogModule::LogFile param in Config.pm';
+    $Self->{LogFile} = $Param{LogFile} || $ConfigObject->Get('LogModule::LogFile')
+        || die 'Need LogModule::LogFile config';
 
     # get log file rotation
     my $Rotation = $ConfigObject->Get('LogModule::LogFile::Rotate') || 'never';
@@ -85,8 +96,8 @@ sub new {
     my $Keep = $ConfigObject->Get('LogModule::LogFile::Keep') || 0;
 
     if ( $Keep ) {
-        my $LogDir   = dirname($ConfigObject->Get('LogModule::LogFile'));
-        my $Basename = basename($ConfigObject->Get('LogModule::LogFile'));
+        my $LogDir   = dirname($Self->{LogFile});
+        my $Basename = basename($Self->{LogFile});
 
         my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
             Directory => $LogDir,
@@ -117,24 +128,11 @@ sub Log {
 
     my $FH;
 
-    my $LogMessage = '[' . localtime() . ']';
+    my $LogMessage = '[' . localtime() . ']'.$Self->{LogFormats}->{lc $Param{Priority}}."\n";
 
-    if ( lc $Param{Priority} eq 'debug' ) {
-        $LogMessage .= "[Debug][$Param{Module}][$Param{Line}] $Param{Message}\n";
-    }
-    elsif ( lc $Param{Priority} eq 'info' ) {
-        $LogMessage .= "[Info][$Param{Module}] $Param{Message}\n";
-    }
-    elsif ( lc $Param{Priority} eq 'notice' ) {
-        $LogMessage .= "[Notice][$Param{Module}] $Param{Message}\n";
-    }
-    elsif ( lc $Param{Priority} eq 'error' ) {
-        $LogMessage .= "[Error][$Param{Module}][$Param{Line}] $Param{Message}\n";
-    }
-    else {
-        # and of course to logfile
-        $LogMessage .= "[Error][$Param{Module}] Priority: '$Param{Priority}' not defined! Message: $Param{Message}\n";
+    $LogMessage =~ s/\$\{(.*?)\}/$Param{$1}/g;
 
+    if ( lc $Param{Priority} eq 'error' ) {
         # print error messages to STDERR
         print STDERR $LogMessage;
     }
@@ -164,6 +162,17 @@ sub Log {
 
             # rotate the first file
             rename($Self->{LogFile}, "$Self->{LogFile}_1");
+        }
+    }
+
+    # check and create target directory
+    my $LogDir = dirname($Self->{LogFile});
+    if ( !-e $LogDir ) {
+        if ( !mkdir( $LogDir, 0770 ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't create directory '$LogDir': $!",
+            );
         }
     }
 

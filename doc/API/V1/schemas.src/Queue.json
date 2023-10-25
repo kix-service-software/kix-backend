@@ -4,10 +4,6 @@
   "type": "object",
   "description": "The priority object.",
   "properties": {
-    "Calendar": {
-      "type": "string",
-      "readOnly": true
-    },
     "ChangeBy": {
       "type": "integer",
       "readOnly": true

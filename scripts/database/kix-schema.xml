@@ -266,7 +266,6 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="unlock_timeout" Required="false" Type="INTEGER"/>
     <Column Name="system_address_id" Required="true" Type="SMALLINT"/>
-    <Column Name="calendar_name" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="default_sign_key" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="signature" Required="false"  Size="10000" Type="VARCHAR"/>
     <Column Name="follow_up_id" Required="true" Type="SMALLINT"/>

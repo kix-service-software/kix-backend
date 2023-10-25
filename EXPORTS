@@ -214,6 +214,7 @@ ObjectIcon                                                                    = 
 ObjectManager                                                                 = Kernel::System::ObjectManager
 ObjectSearch                                                                  = Kernel::System::ObjectSearch
 Organisation                                                                  = Kernel::System::Organisation
+OTP                                                                           = Kernel::System::OTP
 PDF                                                                           = Kernel::System::PDF
 PerfLog                                                                       = Kernel::System::PerfLog
 PID                                                                           = Kernel::System::PID

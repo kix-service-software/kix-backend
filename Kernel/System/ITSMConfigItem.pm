@@ -1628,6 +1628,7 @@ sub ConfigItemSearch {
         $SQL .= join ', ', @SQLOrderBy;
         $SQL .= ' ';
     }
+
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
