@@ -52,9 +52,33 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    my $SearchList = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
+        Valid      => 1,
+        ObjectType => 'Ticket',
+        FieldType => [
+            'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
+        ],
+        ResultType => 'HASH',
+    );
+    my @SearchList = map { "DynamicField_$_" } reverse(%{$SearchList});
+
+    my $SortList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        Valid      => 1,
+        ObjectType => 'Ticket',
+        FieldType => [
+            'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
+        ],
+        IsSortable => 1
+    );
+
+    my @SortList;
+    for my $Field ( @{$SortList} ) {
+        push ( @SortList, "DynamicField_$Field->{Name}" );
+    }
+
     return {
-        Search => [ 'DynamicField_\w+' ],
-        Sort   => [ 'DynamicField_\w+' ]
+        Search => \@SearchList || [],
+        Sort   => \@SortList || [],
     };
 }
 

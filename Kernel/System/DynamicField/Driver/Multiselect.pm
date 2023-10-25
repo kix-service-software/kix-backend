@@ -56,7 +56,7 @@ sub new {
     # set field behaviors
     $Self->{Behaviors} = {
         'IsNotificationEventCondition' => 1,
-        'IsSortable'                   => 0,
+        'IsSortable'                   => 1,
         'IsFilterable'                 => 0,
         'IsStatsCondition'             => 1,
         'IsCustomerInterfaceCapable'   => 1,
