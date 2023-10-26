@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,11 +48,15 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'WatcherUserID' => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE']
+    };
+
+    $Self->{SupportedSort} = [];
+
     return {
-        Search => [
-            'WatcherUserID',
-        ],
-        Sort => []
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -74,7 +78,6 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -86,7 +89,10 @@ sub Search {
     }
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
+    if (
+        !$Self->{ModuleData}->{AlreadyJoined}
+        || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}}
+    ) {
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id' );
             push( @SQLJoin, 'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id' );
@@ -96,29 +102,28 @@ sub Search {
         $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'tw_left.user_id = '.$Param{Search}->{Value} );
-            push( @SQLWhere, 'tw_right.user_id = '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'tw.user_id = '.$Param{Search}->{Value} );
-        }
+    my $Column;
+    if ( $Param{BoolOperator} eq 'OR') {
+        $Column = [
+            'tw_left.user_id',
+            'tw_right.user_id'
+        ];
+    } else {
+        $Column = 'tw.user_id';
     }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'tw_left.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-            push( @SQLWhere, 'tw_right.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-        } else {
-            push( @SQLWhere, 'tw.user_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-        }
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $Column,
+        Value     => $Param{Search}->{Value},
+        Prepare   => 1,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLJoin  => \@SQLJoin,

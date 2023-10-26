@@ -12,13 +12,13 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -49,14 +49,18 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'LockID' => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE']
+    };
+
+    $Self->{SupportedSort} = [
+        'LockID',
+        'Lock'
+    ];
+
     return {
-        Search => [
-            'LockID'
-        ],
-        Sort   => [
-            'LockID',
-            'Lock'
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -77,7 +81,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -88,23 +91,24 @@ sub Search {
         return;
     }
 
-    if (IsArrayRefWithData($Param{Search}->{Value})) {
+    if (
+        IsArrayRefWithData($Param{Search}->{Value})
+        && $Param{Search}->{Operator} !~ /IN/sm
+    ) {
         $Param{Search}->{Operator} = 'IN';
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.ticket_lock_id = '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.ticket_lock_id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.ticket_lock_id',
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

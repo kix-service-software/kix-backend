@@ -83,17 +83,28 @@ sub GetBackends {
             next BACKEND;
         }
 
-        foreach my $Type ( qw(Search Sort) ) {
-            if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "SupportedAttributes->{$Type} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
-                );
-                next BACKEND;
-            }
-            foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
-                $AttributeModules{$Type}->{$Attribute} = $Object;
-            }
+        if ( ref($SupportedAttributes->{Sort}) ne 'ARRAY' ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SupportedAttributes->{Sort} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
+            );
+            next BACKEND;
+        }
+
+        foreach my $Attribute ( @{$SupportedAttributes->{Sort}} ) {
+            $AttributeModules{Sort}->{$Attribute} = $Object;
+        }
+
+        if ( ref($SupportedAttributes->{Search}) ne 'HASH' ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SupportedAttributes->{Search} return by module $Backends->{$Backend}->{Module} is not an HashRef!",
+            );
+            next BACKEND;
+        }
+        foreach my $Attribute ( sort keys %{$SupportedAttributes->{Search}} ) {
+            $AttributeModules{Search}->{$Attribute}->{Supported} = $AttributeModules{Search}->{$Attribute};
+            $AttributeModules{Search}->{$Attribute}->{Object}    = $Object;
         }
     }
 
@@ -126,7 +137,10 @@ sub CreatePermissionSQL {
     my ( $Self, %Param ) = @_;
     my %Result;
 
-    if ( !$Param{UserID} || !$Param{UserType} ) {
+    if (
+        !$Param{UserID}
+        || !$Param{UserType}
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No user information for permission check!',

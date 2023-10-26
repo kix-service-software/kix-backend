@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::ITSMConfigItem::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = qw(
@@ -89,24 +89,13 @@ sub Search {
         return;
     }
 
-    my %SupportedOperator = (
-        'EQ' => 1,
-        'NE' => 1,
-        'IN' => 1,
-    );
-
-    if ( !$SupportedOperator{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
-
     my $Where = $Self->GetOperation(
         Operator => $Param{Search}->{Operator},
         Column   => 'ci.id',
         Value    => $Param{Search}->{Value},
+        Supported     => [
+            'EQ', 'NE', 'IN'
+        ]
     );
 
     return if !$Where;

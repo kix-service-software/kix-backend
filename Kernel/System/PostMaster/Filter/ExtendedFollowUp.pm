@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,10 +11,11 @@ package Kernel::System::PostMaster::Filter::ExtendedFollowUp;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicField',
-    'Ticket',
+our @ObjectDependencies = qw(
+    Config
+    DynamicField
+    Ticket
+    ObjectSearch
 );
 
 sub new {
@@ -111,7 +112,7 @@ sub Run {
                 }
 
                 # search for possible follow up
-                my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+                my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
                     Result => 'ARRAY',
                     Search => {
                         AND => [
@@ -122,15 +123,16 @@ sub Run {
                             }
                         ]
                     },
-                    Sort   => [
+                    Sort  => [
                         \%Sort
                     ],
-                    UserID => 1,
+                    UserID     => 1,
+                    ObjectType => 'Ticket'
                 );
 
                 if ( scalar( @TicketIDs ) > 0 ) {
                     # init variable for ticket number lookup
-                    my $TicketNumber = '';
+                    my $TicketNumber = q{};
 
                     # if ticket statetype isn't relevant
                     if ( $Self->{Config}->{AllTicketStateTypesIncluded} ) {
@@ -142,7 +144,7 @@ sub Run {
                     # filter by viewable state types first, fall back to closed tickets
                     else {
                         # filter previous tickets by viewable state type
-                        my @ViewableTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+                        my @ViewableTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
                             Result => 'ARRAY',
                             Search => {
                                 AND => [
@@ -161,8 +163,9 @@ sub Run {
                             Sort   => [
                                 \%Sort
                             ],
-                            UserID => 1,
-                            Limit  => 1,
+                            UserID     => 1,
+                            Limit      => 1,
+                            ObjectType => 'Ticket'
                         );
                         if ( scalar( @ViewableTicketIDs ) > 0 ) {
                             $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(

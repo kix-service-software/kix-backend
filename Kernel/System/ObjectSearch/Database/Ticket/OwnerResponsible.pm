@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,15 +48,19 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'OwnerID'       => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+        'ResponsibleID' => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+    };
+
+    $Self->{SupportedSort} = [
+        'OwnerID',
+        'ResponsibleID',
+    ];
+
     return {
-        Search => [
-            'OwnerID',
-            'ResponsibleID',
-        ],
-        Sort => [
-            'OwnerID',
-            'ResponsibleID',
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -77,7 +81,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -93,19 +96,17 @@ sub Search {
         'ResponsibleID' => 'st.responsible_user_id',
     );
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

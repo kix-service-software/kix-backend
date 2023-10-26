@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,25 +48,29 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'CreatedTypeID'     => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+        'CreatedUserID'     => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+        'CreatedStateID'    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+        'CreatedQueueID'    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+        'CreatedPriorityID' => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+        'CloseTime'         => ['EQ','LT','LTE','GT','GTE'],
+        'ChangeTime'        => ['EQ','LT','LTE','GT','GTE'],
+    };
+
+    $Self->{SupportedSort} = [
+        'CreatedTypeID',
+        'CreatedUserID',
+        'CreatedStateID',
+        'CreatedQueueID',
+        'CreatedPriorityID',
+        'CloseTime',
+        'ChangeTime',
+    ];
+
     return {
-        Search => [
-            'CreatedTypeID',
-            'CreatedUserID',
-            'CreatedStateID',
-            'CreatedQueueID',
-            'CreatedPriorityID',
-            'CloseTime',
-            'ChangeTime',
-        ],
-        Sort => [
-            'CreatedTypeID',
-            'CreatedUserID',
-            'CreatedStateID',
-            'CreatedQueueID',
-            'CreatedPriorityID',
-            'CloseTime',
-            'ChangeTime',
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -139,22 +143,6 @@ sub Search {
             SystemTime => $SystemTime,
         );
 
-        my %OperatorMap = (
-            'EQ'  => '=',
-            'LT'  => '<',
-            'GT'  => '>',
-            'LTE' => '<=',
-            'GTE' => '>='
-        );
-
-        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-            );
-            return;
-        }
-
         if ( $Param{Search}->{Field} eq 'CloseTime' ) {
             # get close state ids
             my @List = $Kernel::OM->Get('State')->StateGetStatesByType(
@@ -178,38 +166,52 @@ sub Search {
             }
         }
 
+        my $Column;
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'th_left.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
-            push( @SQLWhere, 'th_right.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
+            $Column = [
+                'th_left.create_time',
+                'th_right.create_time'
+            ];
         } else {
-            push( @SQLWhere, 'th.create_time '.$OperatorMap{$Param{Search}->{Operator}}." '".$Value."' " );
+            $Column = 'th.create_time';
         }
+
+        my $Where = $Self->GetOperation(
+            Operator  => $Param{Search}->{Operator},
+            Column    => $Column,
+            Value     => $Value,
+            Supported => [
+                'EQ', 'LT', 'LTE',
+                'GT', 'GTE'
+            ]
+        );
+
+        return if !$Where;
+
+        push( @SQLWhere, $Where );
     }
     else {
-        # all other attributes
-        if ( $Param{Search}->{Operator} eq 'EQ' ) {
-            if ( $Param{BoolOperator} eq 'OR') {
-                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
-                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
-            } else {
-                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
-            }
+
+        my $Column;
+        if ( $Param{BoolOperator} eq 'OR') {
+            $Column = [
+                'th_left.'.$AttributeMapping{$Param{Search}->{Field}},
+                'th_right.'.$AttributeMapping{$Param{Search}->{Field}}
+            ];
+        } else {
+            $Column = 'th.'.$AttributeMapping{$Param{Search}->{Field}};
         }
-        elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-            if ( $Param{BoolOperator} eq 'OR') {
-                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-            } else {
-                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-            }
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-            );
-            return;
-        }
+
+        my $Where = $Self->GetOperation(
+            Operator  => $Param{Search}->{Operator},
+            Column    => $Column,
+            Value     => $Param{Search}->{Value},
+            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+        );
+
+        return if !$Where;
+
+        push( @SQLWhere, $Where );
 
         # lookup history type id
         my $HistoryTypeID = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(

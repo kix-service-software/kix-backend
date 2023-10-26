@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,11 +48,15 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'PendingReminderRequired' => []
+    };
+
+    $Self->{SupportedSort} = [];
+
     return {
-        Search => [
-            'PendingReminderRequired',
-        ],
-        Sort => []
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -98,7 +102,19 @@ sub Search {
 
     my $Now = $Kernel::OM->Get('Time')->SystemTime();
 
-    push @SQLWhere, "st.until_time < $Now AND NOT EXISTS (SELECT id FROM ticket_history WHERE history_type_id = $HistoryTypeID AND ticket_id = st.id AND create_time >= '$BeginOfDay')";
+    push(
+        @SQLWhere,
+        <<"END"
+st.until_time < $Now
+    AND NOT EXISTS (
+        SELECT id
+        FROM ticket_history
+        WHERE history_type_id = $HistoryTypeID
+            AND ticket_id = st.id
+            AND create_time >= '$BeginOfDay'
+    )
+END
+    );
 
     return {
         SQLJoin  => \@SQLJoin,

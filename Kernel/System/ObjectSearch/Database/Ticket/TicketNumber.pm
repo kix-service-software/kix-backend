@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,14 +48,18 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'TicketNumber' => ['EQ','IN','!IN','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+    };
+
+    $Self->{SupportedSort} = [
+        'TicketNumber',
+    ];
+
     return {
-        Search => [
-            'TicketNumber',
-        ],
-        Sort => [
-            'TicketNumber',
-        ]
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 =item Search()
@@ -74,7 +78,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -85,33 +88,17 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.tn = '$Param{Search}->{Value}'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        push( @SQLWhere, "st.tn LIKE '$Param{Search}->{Value}%'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        push( @SQLWhere, "st.tn LIKE '%$Param{Search}->{Value}'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        push( @SQLWhere, "st.tn LIKE '%$Param{Search}->{Value}%'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        my $Value = $Param{Search}->{Value};
-        $Value =~ s/\*/%/g;
-        push( @SQLWhere, "st.tn LIKE '$Value'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.tn',
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

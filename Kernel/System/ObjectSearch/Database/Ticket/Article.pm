@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -50,31 +50,35 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'ArticleID'         => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+        'ChannelID'         => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+        'SenderTypeID'      => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+        'CustomerVisible'   => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+        'From'              => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        'To'                => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        'Cc'                => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        'Subject'           => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        'Body'              => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        'ArticleCreateTime' => ['EQ','LT','GT','LTE','GTE']
+    };
+
+    $Self->{SupportedSort} = [
+        'ChannelID',
+        'SenderTypeID',
+        'CustomerVisible',
+        'From',
+        'To',
+        'Cc',
+        'Subject',
+        'Body',
+        'ArticleCreateTime'
+    ];
+
     return {
-        Search => [
-            'ArticleID',
-            'ChannelID',
-            'SenderTypeID',
-            'CustomerVisible',
-            'From',
-            'To',
-            'Cc',
-            'Subject',
-            'Body',
-            'ArticleCreateTime'
-        ],
-        Sort => [
-            'ChannelID',
-            'SenderTypeID',
-            'CustomerVisible',
-            'From',
-            'To',
-            'Cc',
-            'Subject',
-            'Body',
-            'ArticleCreateTime'
-        ]
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 =item Search()
@@ -142,7 +146,10 @@ sub Search {
     }
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
+    if (
+        !$Self->{ModuleData}->{AlreadyJoined}
+        || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}}
+    ) {
         # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
         if ( $IsStaticSearch ) {
@@ -171,114 +178,70 @@ sub Search {
             return;
         }
 
-        my %OperatorMap = (
-            'EQ'  => '=',
-            'LT'  => '<',
-            'GT'  => '>',
-            'LTE' => '<=',
-            'GTE' => '>='
+        my $Where = $Self->GetOperation(
+            Operator  => $Param{Search}->{Operator},
+            Column    => $Param{BoolOperator} eq 'OR' ? 'rt_left.incoming_time' : 'art.incoming_time',
+            Value     => $Param{Search}->{Value},
+            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
         );
 
-        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-            );
-            return;
-        }
+        return if !$Where;
 
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'art_left.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-        } else {
-            push( @SQLWhere, 'art.incoming_time '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-        }
+        push( @SQLWhere, $Where);
     }
     elsif ( $Param{Search}->{Field} =~ /ArticleID|ChannelID|SenderTypeID|CustomerVisible/ ) {
+        my $Column = 'art.';
+        if ( $Param{BoolOperator} eq 'OR') {
+            $Column = 'art_left.';
+        }
+        $Column .= $AttributeMapping{$Param{Search}->{Field}};
 
-        my %OperatorMap = (
-            'EQ'  => '=',
-            'LT'  => '<',
-            'GT'  => '>',
-            'LTE' => '<=',
-            'GTE' => '>=',
-            'IN'  => 'IN',
+        my $Where = $Self->GetOperation(
+            Operator  => $Param{Search}->{Operator},
+            Column    => $Column,
+            Value     => $Param{Search}->{Value},
+            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
         );
 
-        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-            );
-            return;
-        }
+        return if !$Where;
 
-        # prepare Value if needed
-        my $Value = $Param{Search}->{Value};
-        if ( $Param{Search}->{Operator} eq 'IN' ) {
-            $Value = '('.(join(',', @{$Value})).')';
-        } elsif ( $Param{Search}->{Operator} eq 'EQ' && IsArrayRefWithData($Value) ) {
-            $Value = $Value->[0];
-        }
-
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'art_left.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-        } else {
-            push( @SQLWhere, 'art.'.$AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
-        }
+        push( @SQLWhere, $Where);
     }
     else {
         my $Field      = $AttributeMapping{$Param{Search}->{Field}};
         my $FieldValue = $Param{Search}->{Value};
-
-        if ( $Param{Search}->{Operator} eq 'EQ' ) {
-            # no special handling
-        }
-        elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-            $FieldValue = $FieldValue.'%';
-        }
-        elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-            $FieldValue = '%'.$FieldValue;
-        }
-        elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-            $FieldValue = '%'.$FieldValue.'%';
-        }
-        elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-            $FieldValue =~ s/\*/%/g;
-        }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-            );
-            return;
-        }
+        my $Prefix;
+        my $Supplement;
 
         if ( $Param{BoolOperator} eq 'OR') {
-            my @Where = $Self->_prepareField(
-                Field          => 'art_left.' . $Field,
-                FieldValue     => $FieldValue,
-                IsStaticSearch => $IsStaticSearch
-            );
-
-            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            $Prefix = 'art_left.';
             if ( $Param{UserType} eq 'Customer' ) {
-                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_left.customer_visible = 1)';
+                $Supplement = [
+                    'AND art_left.customer_visible = 1'
+                ];
             }
-            push( @SQLWhere, $FieldQuery );
-
         } else {
-            my @Where = $Self->_prepareField(
-                Field          => 'art.' . $Field,
-                FieldValue     => $FieldValue,
-                IsStaticSearch => $IsStaticSearch
-            );
-
-            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            $Prefix = 'art.';
             if ( $Param{UserType} eq 'Customer' ) {
-                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)';
+                $Supplement = [
+                    'AND art.customer_visible = 1'
+                ];
             }
-            push( @SQLWhere, $FieldQuery );
         }
+
+        my $Where = $Self->GetOperation(
+            Operator       => $Param{Search}->{Operator},
+            Column         => $Prefix.$Field,
+            Value          => $FieldValue,
+            Prepare        => 1,
+            Supported      => $Self->{SupportedSearch}->{$Param{Search}->{Field}},
+            Supplement     => $Supplement,
+            IsStaticSearch => $IsStaticSearch
+        );
+
+        return if !$Where;
+
+        push( @SQLWhere, $Where);
     }
 
     return {

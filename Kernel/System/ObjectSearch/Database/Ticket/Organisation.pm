@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,14 +48,18 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'OrganisationID' => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+    };
+
+    $Self->{SupportedSort} = [
+        'OrganisationID',
+    ];
+
     return {
-        Search => [
-            'OrganisationID',
-        ],
-        Sort => [
-            'OrganisationID',
-        ]
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 
@@ -75,7 +79,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -86,50 +89,18 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.organisation_id = '".$Param{Search}->{Value}."'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.organisation_id',
-            Value => $Param{Search}->{Value}.'%'
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.organisation_id',
-            Value => '%'.$Param{Search}->{Value}
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.organisation_id',
-            Value => '%'.$Param{Search}->{Value}.'%'
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        my $Field;
-        my $Value = $Param{Search}->{Value};
-        $Value =~ s/\*/%/g;
-        ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.organisation_id',
-            Value => $Param{Search}->{Value}
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, "st.organisation_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.organisation_id',
+        Value     => $Param{Search}->{Value},
+        Prepare   => 1,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

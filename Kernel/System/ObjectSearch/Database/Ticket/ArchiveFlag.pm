@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,13 +48,17 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'Archived' => ['EQ','IN']
+    };
+
+    $Self->{SupportedSort} = [
+        'AccounArchivedtedTime',
+    ];
+
     return {
-        Search => [
-            'Archived'
-        ],
-        Sort   => [
-            'Archived'
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -75,7 +79,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         # do nothing if archive system is not used
@@ -91,19 +94,17 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, 'st.archive_flag = '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, 'st.archive_flag IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.archive_flag',
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

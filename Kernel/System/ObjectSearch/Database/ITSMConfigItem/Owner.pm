@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::ITSMConfigItem::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = qw(
@@ -92,24 +92,13 @@ sub Search {
         'ChangeBy' => 'ci.change_by',
     );
 
-    my %SupportedOperator = (
-        'EQ' => 1,
-        'NE' => 1,
-        'IN' => 1,
-    );
-
-    if ( !$SupportedOperator{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
-
     my $Where = $Self->GetOperation(
-        Operator => $Param{Search}->{Operator},
-        Column   => $AttributeMapping{$Param{Search}->{Field}},
-        Value    => $Param{Search}->{Value},
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Param{Search}->{Value},
+        Supported => [
+            'EQ', 'NE', 'IN'
+        ]
     );
 
     return if !$Where;

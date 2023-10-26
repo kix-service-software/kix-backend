@@ -85,18 +85,20 @@ sub _Run {
     # do the search
     if (IsArrayRefWithData($Filters)) {
         for my $Search ( @{$Filters} ) {
-            my @TicketIDsPart = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Result => 'ARRAY',
-                Search => $Search,
-                UserID => 1
+            my @TicketIDsPart = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Result     => 'ARRAY',
+                Search     => $Search,
+                UserID     => 1
             );
             push(@TicketIDs, @TicketIDsPart);
         }
         @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
     } else {
-        @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Result => 'ARRAY',
-            UserID => 1
+        @TicketIDs = $Kernel::OM->Get('Ticket')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            UserID     => 1
         );
     }
 

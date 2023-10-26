@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -175,7 +175,7 @@ sub _GetContactData {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $ContactData{$Attribute} ) {
-                    
+
                     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                         Name => $1,
                     );
@@ -227,8 +227,9 @@ sub _GetContactData {
         # execute ticket searches
         my %TicketStats;
         # new tickets
-        $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{NewCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',
@@ -246,8 +247,9 @@ sub _GetContactData {
             Result => 'COUNT',
         );
         # open tickets
-        $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{OpenCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',
@@ -265,8 +267,9 @@ sub _GetContactData {
             Result => 'COUNT',
         );
         # pending tickets
-        $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{PendingReminderCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',

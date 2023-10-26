@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -41,7 +41,9 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
+        Search => {
+            'Propery' => [ ]   # Each property has its own supported operators
+        },
         Sort   => [ ],
     };
 
@@ -50,13 +52,17 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'TicketID' => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+    };
+
+    $Self->{SupportedSort} = [
+        'TicketID',
+    ];
+
     return {
-        Search => [
-            'TicketID',
-        ],
-        Sort => [
-            'TicketID',
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -77,7 +83,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -88,34 +93,17 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id = '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        if (IsArrayRefWithData($Param{Search}->{Value})) {
-            push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-        } else {
-            push( @SQLWhere, '1=0' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id != '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.id',
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

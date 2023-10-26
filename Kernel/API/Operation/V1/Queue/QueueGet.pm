@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -189,8 +189,9 @@ sub Run {
         # include Tickets if requested
         if ( $Param{Data}->{include}->{Tickets} ) {
             # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
+            my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Search     => {
                     AND => [
                         {
                             Field    => 'QueueID',
@@ -284,8 +285,9 @@ sub GetTicketStatsFromTicketSearch {
     if ( IsHashRefWithData($TicketStatsFilter) ) {
         push(@Filter, $TicketStatsFilter);
     }
-    $TicketStats{LockCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    $TicketStats{LockCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -303,8 +305,9 @@ sub GetTicketStatsFromTicketSearch {
     if ( IsHashRefWithData($TicketStatsFilter) ) {
         push(@Filter, $TicketStatsFilter);
     }
-    $TicketStats{TotalCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    $TicketStats{TotalCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},

@@ -1496,7 +1496,7 @@ sub _TicketCacheClear {
 
     # cleanup search cache
     $CacheObject->CleanUp(
-        Type => "TicketSearch",
+        Type => "ObjectSearch_Ticket",
     );
 
     # cleanup index cache
@@ -6917,7 +6917,8 @@ sub GetAssignedTicketsForObject {
         }
 
         my @ORSearch = map { { Field => $_, Operator => 'IN', Value => $SearchData{$_} } } keys %SearchData;
-        @AssignedTicketIDs = $Self->TicketSearch(
+        @AssignedTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
             Result     => 'ARRAY',
             Search     => {
                 %Search,

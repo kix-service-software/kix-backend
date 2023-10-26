@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -368,7 +368,10 @@ sub _TicketSearch {
     # get 1st ticket for search (if there is one)...
     my $TicketID;
     if ( !$Errors ) {
-        my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch( %Query );
+        my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            %Query,
+            ObjectType => 'Ticket'
+        );
         if (@TicketIDs) {
             $TicketID = shift( @TicketIDs );
         }

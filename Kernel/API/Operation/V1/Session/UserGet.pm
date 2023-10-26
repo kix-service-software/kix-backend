@@ -242,8 +242,9 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -275,8 +276,9 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -316,8 +318,9 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -354,8 +357,9 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -390,8 +394,9 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},
@@ -423,8 +428,9 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
         UserID => $Self->{Authorization}->{UserID},

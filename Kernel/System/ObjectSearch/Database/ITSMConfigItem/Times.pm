@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::ITSMConfigItem::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = qw(
@@ -93,23 +93,7 @@ sub Search {
         ChangeTime => 'ci.change_time',
     );
 
-    my %SupportedOperator = (
-        'EQ'  => 1,
-        'LT'  => 1,
-        'GT'  => 1,
-        'LTE' => 1,
-        'GTE' => 1,
-    );
-
     return q{} if !$Param{Search}->{Value};
-
-    if ( !$SupportedOperator{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
 
     # calculate relative times
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
@@ -132,9 +116,13 @@ sub Search {
     $Value = $Kernel::OM->Get('DB')->Quote( $Value );
 
     my $Where = $Self->GetOperation(
-        Operator => $Param{Search}->{Operator},
-        Column   => $AttributeMapping{$Param{Search}->{Field}},
-        Value    => $Value,
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Value,
+        Supported => [
+            'EQ', 'LT', 'GT',
+            'LTE', 'GTE'
+        ]
     );
 
     return if !$Where;

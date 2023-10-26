@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -50,9 +50,10 @@ sub Run {
     if (@PendingAutoStateIDs) {
 
         # do ticket auto jobs
-        @TicketIDs = $TicketObject->TicketSearch(
-            Result   => 'ARRAY',
-            Search => {
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            Search     => {
                 AND => [
                     {
                         Field    => 'StateIDs',
@@ -130,9 +131,10 @@ sub Run {
     my %CronTaskSummary = map { $_->{Name} => $_ } @{( $Kernel::OM->Get('Daemon::SchedulerDB')->CronTaskSummary() )[0]->{Data}} ;
 
     # look for pending reminder tickets with PendingTime in the past
-    my %Tickets = $TicketObject->TicketSearch(
-        Result    => 'HASH',
-        Search => {
+    my %Tickets = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Search     => {
             AND => [
                 {
                     Field    => 'StateType',

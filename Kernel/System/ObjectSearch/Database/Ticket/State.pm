@@ -14,12 +14,12 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -50,16 +50,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'StateID'     => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+        'StateType'   => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+        'StateTypeID' => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+    };
+
+    $Self->{SupportedSort} = [
+        'StateID',
+        'State'
+    ];
+
     return {
-        Search => [
-            'StateID',
-            'StateType',
-            'StateTypeID',
-        ],
-        Sort => [
-            'StateID',
-            'State'
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -80,7 +84,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -214,19 +217,17 @@ sub Search {
         }
     }
 
-    if ( $Operator eq 'EQ' ) {
-        push( @SQLWhere, 'st.ticket_state_id = '.$StateIDs[0] );
-    }
-    elsif ( $Operator eq 'IN' ) {
-        push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @StateIDs)).')' );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Operator,
+        Column    => 'st.ticket_state_id',
+        Value     => \@StateIDs,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

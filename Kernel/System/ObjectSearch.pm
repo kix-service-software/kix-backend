@@ -145,6 +145,23 @@ sub GetSupportedSortList {
     return @List;
 }
 
+
+sub GetPropertyOperations {
+    my ( $Self, %Param ) = @_;
+
+    my @List;
+
+    if (
+        $Self->_GetSearchBackend(
+            %Param
+        )
+    ) {
+        @List = $Self->{SearchBackendObject}->GetPropertyOperations(%Param);
+    }
+
+    return @List;
+}
+
 sub _GetSearchBackend {
     my ( $Self, %Param ) = @_;
 

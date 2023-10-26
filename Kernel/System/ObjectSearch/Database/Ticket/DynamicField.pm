@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = (
@@ -52,33 +52,48 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    my $SearchList = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
-        Valid      => 1,
-        ObjectType => 'Ticket',
-        FieldType => [
-            'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
-        ],
-        ResultType => 'HASH',
-    );
-    my @SearchList = map { "DynamicField_$_" } reverse(%{$SearchList});
-
-    my $SortList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-        Valid      => 1,
-        ObjectType => 'Ticket',
-        FieldType => [
-            'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
-        ],
-        IsSortable => 1
+    # NOTE: The supported operators come from the dynamic field types
+    my %TypeOperators = (
+        'Text'                    => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
+        'TextArea'                => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
+        'CheckList'               => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
+        'Table'                   => ['EQ','GT','GTE','LT','LTE','LIKE'],
+        'Date'                    => ['EQ','GT','GTE','LT','LTE'],
+        'DateTime'                => ['EQ','GT','GTE','LT','LTE'],
+        'Multiselect'             => ['EQ','GT','GTE','LT','LTE','LIKE'],
+        'TicketReference'         => ['EQ','GT','GTE','LT','LTE','LIKE'],
+        'ITSMConfigItemReference' => ['EQ','GT','GTE','LT','LTE','LIKE'],
+        'ContactReference'        => ['EQ','GT','GTE','LT','LTE','LIKE'],
+        'OrganisationReference'   => ['EQ','GT','GTE','LT','LTE','LIKE'],
     );
 
-    my @SortList;
-    for my $Field ( @{$SortList} ) {
-        push ( @SortList, "DynamicField_$Field->{Name}" );
+    for my $Type ( qw(Search Sort) ) {
+        my $Name = "Supported$Type";
+
+        my $List = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+            Valid      => 1,
+            ObjectType => 'Ticket',
+            FieldType => [
+                'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
+            ],
+            ResultType => $Type eq 'Search' ? 'HASH' : 'ARRAY',
+            IsSortable => $Type eq 'Sort' ? 1 : 0,
+        );
+
+        for my $Field ( @{$List} ) {
+            my $DFName = "DynamicField_$Field->{Name}";
+            if ( $Type eq 'Search' ) {
+                $Self->{$Name}->{$DFName} = $TypeOperators{$Field->{FieldType}};
+            }
+            else {
+                push ( @{$Self->{$Name}}, $DFName );
+            }
+        }
     }
 
     return {
-        Search => \@SearchList || [],
-        Sort   => \@SortList || [],
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort},
     };
 }
 
@@ -348,7 +363,7 @@ sub Sort {
                 <<"END"
 LEFT OUTER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-    AND $JoinTable.value_first = 1
+    AND $JoinTable.first_value = 1
 END
             );
         }

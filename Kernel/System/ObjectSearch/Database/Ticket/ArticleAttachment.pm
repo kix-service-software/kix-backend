@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,10 +48,16 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'AttachmentName' => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+    };
+
+    $Self->{SupportedSort} = [];
+
     return {
-        Search => [ 'AttachmentName' ],
-        Sort   => []
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 
@@ -109,48 +115,17 @@ sub Search {
         $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
 
-    my $Field      = 'att.filename';
-    my $FieldValue = $Param{Search}->{Value};
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'att.filename',
+        Value     => $Param{Search}->{Value},
+        Prepare   => 1,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        # no special handling
-    }
-    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        $FieldValue = $FieldValue.'%';
-    }
-    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        $FieldValue = '%'.$FieldValue;
-    }
-    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        $FieldValue = '%'.$FieldValue.'%';
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        $FieldValue =~ s/\*/%/g;
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    return if !$Where;
 
-    # check if database supports LIKE in large text types (in this case for body)
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
-            $Field      = "LCASE($Field)";
-            $FieldValue = "LCASE('$FieldValue')";
-        }
-        else {
-            $Field      = "LOWER($Field)";
-            $FieldValue = "LOWER('$FieldValue')";
-        }
-    }
-    else {
-        $FieldValue = "'$FieldValue'";
-    }
-
-    push( @SQLWhere, $Field.' LIKE '.$FieldValue );
+    push( @SQLWhere, $Where);
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {

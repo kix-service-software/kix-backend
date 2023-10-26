@@ -2443,16 +2443,28 @@ sub _FAQApprovalTicketCreate {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-#rbo - T2016121190001552 - added KIX placeholders
     # get subject
     my $Subject = $ConfigObject->Get('FAQ::ApprovalTicketSubject');
     $Subject =~ s{ <KIX_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
 
     # check if we can find existing open approval tickets for this FAQ article
-    my @TicketIDs = $TicketObject->TicketSearch(
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search => {
+            AND => [
+                {
+                    Field    => 'Title',
+                    Operator => 'EQ',
+                    Value    => $Subject
+                },
+                {
+                    Field    => 'StateType',
+                    Operator => 'IN',
+                    Value    => 'Open'
+                }
+            ]
+        },
         Result    => 'ARRAY',
-        Title     => $Subject,
-        StateType => 'Open',
         UserID    => 1,
     );
 

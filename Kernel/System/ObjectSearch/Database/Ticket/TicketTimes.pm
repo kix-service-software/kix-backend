@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,20 +48,24 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'Age'            => ['EQ','LT','GT','LTE','GTE'],
+        'CreateTime'     => ['EQ','LT','GT','LTE','GTE'],
+        'PendingTime'    => ['EQ','LT','GT','LTE','GTE'],
+        'LastChangeTime' => ['EQ','LT','GT','LTE','GTE'],
+    };
+
+    $Self->{SupportedSort} = [
+        'Age',
+        'CreateTime',
+        'PendingTime',
+        'LastChangeTime',
+    ];
+
     return {
-        Search => [
-            'Age',
-            'CreateTime',
-            'PendingTime',
-            'LastChangeTime',
-        ],
-        Sort => [
-            'Age',
-            'CreateTime',
-            'PendingTime',
-            'LastChangeTime',
-        ]
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 =item Search()
@@ -80,9 +84,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my $Value;
-    my %OperatorMap;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -101,18 +102,10 @@ sub Search {
         LastChangeTime  => 'st.change_time',
     );
 
+    my $Value;
     if ( $Param{Search}->{Field} eq 'Age' ) {
         # calculate unixtime
         $Value = $Kernel::OM->Get('Time')->SystemTime() - $Param{Search}->{Value};
-
-        # invert operators since we "go back in time"
-        %OperatorMap = (
-            'EQ'  => '=',
-            'LT'  => '>',
-            'GT'  => '<',
-            'LTE' => '>=',
-            'GTE' => '<='
-        );
     }
     else {
         # convert to unix time and check
@@ -137,25 +130,19 @@ sub Search {
 
             $Value = "'$Value'";
         }
-
-        %OperatorMap = (
-            'EQ'  => '=',
-            'LT'  => '<',
-            'GT'  => '>',
-            'LTE' => '<=',
-            'GTE' => '>='
-        );
     }
 
-    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Value,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
 
-    push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' '.$OperatorMap{$Param{Search}->{Operator}}.' '.$Value );
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,

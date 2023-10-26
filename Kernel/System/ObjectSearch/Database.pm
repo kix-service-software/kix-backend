@@ -17,7 +17,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::Ticket::TicketSearch::Database - ticket search lib
+Kernel::System::ObjectSearch::Database - ticket search lib
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $SearchBackendObject = $Kernel::OM->Get('Ticket::TicketSearch::Database');
+    my $SearchBackendObject = $Kernel::OM->Get('ObjectSearch::Database');
 
 =cut
 
@@ -72,7 +72,7 @@ sub new {
 
 To find objects in your system.
 
-    my @ObjectIDs = $SearchObject->ObjectSearch(
+    my @ObjectIDs = $SearchObject->Search(
         # result (required)
         Result => 'ARRAY' || 'HASH' || 'COUNT',
 
@@ -154,7 +154,7 @@ sub Search {
     );
 
     my $CacheData = $Kernel::OM->Get('Cache')->Get(
-        Type => 'ObjectSearch',
+        Type => "ObjectSearch_$Param{ObjectType}",
         Key  => $CacheKey,
     );
 
@@ -227,7 +227,7 @@ sub Search {
 
     # init attribute backend modules
     foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
-        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->Init();
+        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->{Object}->Init();
     }
 
     # create basic SQL
@@ -314,7 +314,7 @@ sub Search {
     # return COUNT
     if ( $Result eq 'COUNT' ) {
         $Kernel::OM->Get('Cache')->Set(
-            Type  => 'ObjectSearch',
+            Type  => "ObjectSearch_$Param{ObjectType}",
             Key   => $CacheKey,
             Value => $Count,
             TTL   => $Param{CacheTTL} || 60 * 4,
@@ -325,7 +325,7 @@ sub Search {
     # return HASH
     elsif ( $Result eq 'HASH' ) {
         $Kernel::OM->Get('Cache')->Set(
-            Type  => 'ObjectSearch',
+            Type  => "ObjectSearch_$Param{ObjectType}",
             Key   => $CacheKey,
             Value => \%Objects,
             TTL   => $Param{CacheTTL} || 60 * 4,
@@ -336,7 +336,7 @@ sub Search {
     # return ARRAY
     else {
         $Kernel::OM->Get('Cache')->Set(
-            Type  => 'ObjectSearch',
+            Type  => "ObjectSearch_$Param{ObjectType}",
             Key   => $CacheKey,
             Value => \@ObjectIDs,
             TTL   => $Param{CacheTTL} || 60 * 4,
@@ -437,12 +437,12 @@ sub _CreateAttributeSQL {
                 # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
                 foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
                     next if $Search->{Field} !~ /$SearchableAttribute/g;
-                    $AttributeModule = $Self->{AttributeModules}->{Search}->{$SearchableAttribute};
+                    $AttributeModule = $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->{Object};
                     last;
                 }
             }
             else {
-                $AttributeModule = $Self->{AttributeModules}->{Search}->{$Search->{Field}};
+                $AttributeModule = $Self->{AttributeModules}->{Search}->{$Search->{Field}}->{Object};
             }
 
             # ignore this attribute if we don't have a module for it
@@ -612,6 +612,37 @@ sub GetSupportedSortList {
     my ( $Self, %Param) =  @_;
 
     return keys %{$Self->{AttributeModules}->{Sort}};
+}
+
+sub GetPropertyOperations {
+    my ( $Self, %Param) =  @_;
+
+    my @Operations;
+    if ( $Param{Property} ) {
+        for my $Attribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
+            if ( $Self->{AttributeModules}->{Search}->{$Attribute}->{$Param{Property}} ) {
+                @Operations = @{$Self->{AttributeModules}->{Search}->{$Attribute}->{$Param{Property}} || []};
+            }
+        }
+    }
+    else {
+        for my $Attribute (
+            sort keys %{$Self->{AttributeModules}->{Search}}
+        ) {
+            PROPERTY:
+            for my $Property (
+                sort keys %{$Self->{AttributeModules}->{Search}->{$Attribute}}
+            ) {
+                next PROPERTY if ( IsArrayRefWithData($Self->{AttributeModules}->{Search}->{$Attribute}->{$Property}) );
+                push(
+                    @Operations,
+                    $Self->{AttributeModules}->{Search}->{$Attribute}->{$Property}
+                );
+            }
+        }
+    }
+
+    return @Operations;
 }
 
 1;

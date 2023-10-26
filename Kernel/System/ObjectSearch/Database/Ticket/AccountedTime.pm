@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = (
@@ -49,13 +49,17 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'AccountedTime' => ['EQ','LT','GT','LTE','GTE']
+    };
+
+    $Self->{SupportedSort} = [
+        'AccountedTime',
+    ];
+
     return {
-        Search => [
-            'AccountedTime'
-        ],
-        Sort => [
-            'AccountedTime'
-        ]
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
     };
 }
 
@@ -85,34 +89,31 @@ sub Search {
         return;
     }
 
-    my %OperatorMap = (
-        'EQ'  => '=',
-        'LT'  => '<',
-        'GT'  => '>',
-        'LTE' => '<=',
-        'GTE' => '>=',
-    );
-    if ($Param{Search}->{Operator}) {
-        if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unsupported Operator ($Param{Search}->{Operator})!",
-            );
-            return;
-        }
-        if ( !defined $Param{Search}->{Value} || $Param{Search}->{Value} !~ m/^-?\d+$/ ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid search value ($Param{Search}->{Value})!",
-            );
-            return;
-        }
+    if (
+        !defined $Param{Search}->{Value}
+        || $Param{Search}->{Value} !~ m/^-?\d+$/sm
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid search value ($Param{Search}->{Value})!",
+        );
+        return;
     }
 
-    my @SQLWhere = ( 'st.accounted_time '. $OperatorMap{$Param{Search}->{Operator}} .' '. $Param{Search}->{Value} );
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.accounted_time',
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
+
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
-        SQLWhere => \@SQLWhere
+        SQLWhere => \@SQLWhere,
     };
 }
 

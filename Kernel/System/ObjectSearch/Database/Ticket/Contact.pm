@@ -12,12 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Ticket::Common
+    Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    Log
 );
 
 =head1 NAME
@@ -48,14 +48,18 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
+    $Self->{SupportedSearch} = {
+        'ContactID' => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+    };
+
+    $Self->{SupportedSort} = [
+        'ContactID',
+    ];
+
     return {
-        Search => [
-            'ContactID',
-        ],
-        Sort => [
-            'ContactID',
-        ]
-    }
+        Search => $Self->{SupportedSearch},
+        Sort   => $Self->{SupportedSort}
+    };
 }
 
 
@@ -75,7 +79,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -86,55 +89,18 @@ sub Search {
         return;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        push( @SQLWhere, "st.contact_id = '".$Param{Search}->{Value}."'" );
-    }
+    my @SQLWhere;
+    my $Where = $Self->GetOperation(
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'st.contact_id',
+        Value     => $Param{Search}->{Value},
+        Prepare   => 1,
+        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+    );
 
-    # TODO: temporary enabled NE - remove or extend if negative searches enabled
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, "st.contact_id != '".$Param{Search}->{Value}."'" );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.contact_id',
-            Value => $Param{Search}->{Value}.'%'
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.contact_id',
-            Value => '%'.$Param{Search}->{Value}
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        my ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.contact_id',
-            Value => '%'.$Param{Search}->{Value}.'%'
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        my $Field;
-        my $Value = $Param{Search}->{Value};
-        $Value =~ s/\*/%/g;
-        ($Field, $Value) = $Self->_PrepareFieldAndValue(
-            Field => 'st.contact_id',
-            Value => $Param{Search}->{Value}
-        );
-        push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' ) {
-        push( @SQLWhere, "st.contact_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
+    return if !$Where;
+
+    push( @SQLWhere, $Where);
 
     return {
         SQLWhere => \@SQLWhere,
