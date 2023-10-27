@@ -1638,7 +1638,7 @@
         <IndexColumn Name="object_id"/>
         <IndexColumn Name="field_id"/>
     </Index>
-        <Index Name="dynamic_field_first_value">
+    <Index Name="dynamic_field_first_value">
         <IndexColumn Name="field_id"/>
         <IndexColumn Name="first_value"/>
     </Index>
