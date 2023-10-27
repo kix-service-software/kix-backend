@@ -187,7 +187,7 @@ sub ValueSet {
         # create a new value entry
         return if !$DBObject->Do(
             SQL =>
-                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int, value_first)'
+                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int, first_value)'
                 . ' VALUES (?, ?, ?, ?, ?, ?)',
             Bind => [
                 \$Param{FieldID}, \$Param{ObjectID},
@@ -205,7 +205,7 @@ sub ValueSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'DynamicField.Value',
-        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
+        ObjectID  => $Param{FieldID}.q{::}.$Param{ObjectID},
     );
 
     return 1;

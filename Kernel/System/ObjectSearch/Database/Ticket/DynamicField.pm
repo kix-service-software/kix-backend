@@ -377,7 +377,7 @@ END
                 <<"END"
 LEFT OUTER JOIN dynamic_field_value $JoinTable ON artdfjoin.id =$JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-    AND $JoinTable.value_first = 1
+    AND $JoinTable.first_value = 1
 END
             );
         }
