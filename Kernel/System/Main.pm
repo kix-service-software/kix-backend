@@ -1175,6 +1175,29 @@ sub ResolveValueByKey {
 
     my $Data = $Param{Data};
 
+    # handle comma separated variables and merge to array
+    my @Keys = split( /,/, $Param{Key} );
+    if ( scalar( @Keys ) > 1 ) {
+        my @Result = ();
+
+        for my $Key ( @Keys ) {
+            my $KeyResult = $Self->ResolveValueByKey(
+                Key      => $Key,
+                Data     => $Data,
+                Resolver => $Param{Resolver}
+            );
+
+            if ( ref( $KeyResult ) eq 'ARRAY' ) {
+                push( @Result, @{ $KeyResult } );
+            }
+            else {
+                push( @Result, $KeyResult );
+            }
+        }
+
+        return \@Result;
+    }
+
     my @Parts = split( /\./, $Param{Key});
     my $Attribute = shift @Parts;
     my $ArrayIndex;
