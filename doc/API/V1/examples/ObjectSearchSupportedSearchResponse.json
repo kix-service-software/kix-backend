@@ -1,0 +1,20 @@
+{
+    "SupportedSearch": [
+        {
+            "Property": "Type",
+            "Operators": [
+                "EQ",
+                "NE",
+                "STARTWITH",
+                "ENDWITH",
+                "LIKE",
+                "LT",
+                "LTE",
+                "GT",
+                "GTE",
+                "IN",
+                "!IN"
+            ]
+        }
+    ]
+}
