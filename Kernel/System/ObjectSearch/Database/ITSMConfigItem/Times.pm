@@ -115,7 +115,7 @@ sub Search {
     # quote
     $Value = $Kernel::OM->Get('DB')->Quote( $Value );
 
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
@@ -125,9 +125,9 @@ sub Search {
         ]
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where );
+    push( @SQLWhere, @Where );
 
     return {
         SQLWhere => \@SQLWhere,

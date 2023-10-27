@@ -178,16 +178,16 @@ sub Search {
             return;
         }
 
-        my $Where = $Self->GetOperation(
+        my @Where = $Self->GetOperation(
             Operator  => $Param{Search}->{Operator},
             Column    => $Param{BoolOperator} eq 'OR' ? 'rt_left.incoming_time' : 'art.incoming_time',
             Value     => $Param{Search}->{Value},
             Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
         );
 
-        return if !$Where;
+        return if !@Where;
 
-        push( @SQLWhere, $Where);
+        push( @SQLWhere, @Where);
     }
     elsif ( $Param{Search}->{Field} =~ /ArticleID|ChannelID|SenderTypeID|CustomerVisible/ ) {
         my $Column = 'art.';
@@ -196,16 +196,16 @@ sub Search {
         }
         $Column .= $AttributeMapping{$Param{Search}->{Field}};
 
-        my $Where = $Self->GetOperation(
+        my @Where = $Self->GetOperation(
             Operator  => $Param{Search}->{Operator},
             Column    => $Column,
             Value     => $Param{Search}->{Value},
             Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
         );
 
-        return if !$Where;
+        return if !@Where;
 
-        push( @SQLWhere, $Where);
+        push( @SQLWhere, @Where);
     }
     else {
         my $Field      = $AttributeMapping{$Param{Search}->{Field}};
@@ -229,7 +229,7 @@ sub Search {
             }
         }
 
-        my $Where = $Self->GetOperation(
+        my @Where = $Self->GetOperation(
             Operator       => $Param{Search}->{Operator},
             Column         => $Prefix.$Field,
             Value          => $FieldValue,
@@ -239,9 +239,9 @@ sub Search {
             IsStaticSearch => $IsStaticSearch
         );
 
-        return if !$Where;
+        return if !@Where;
 
-        push( @SQLWhere, $Where);
+        push( @SQLWhere, @Where);
     }
 
     return {

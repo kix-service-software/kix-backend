@@ -115,7 +115,7 @@ sub Search {
         $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
     }
 
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => 'att.filename',
         Value     => $Param{Search}->{Value},
@@ -123,9 +123,9 @@ sub Search {
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where);
+    push( @SQLWhere, @Where);
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {

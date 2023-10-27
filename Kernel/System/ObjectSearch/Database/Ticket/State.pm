@@ -218,7 +218,7 @@ sub Search {
     }
 
     my @SQLWhere;
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator  => $Operator,
         Column    => 'st.ticket_state_id',
         Value     => \@StateIDs,
@@ -226,9 +226,9 @@ sub Search {
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where);
+    push( @SQLWhere, @Where);
 
     return {
         SQLWhere => \@SQLWhere,

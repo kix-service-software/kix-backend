@@ -86,7 +86,7 @@ sub Search {
         return;
     }
 
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator      => $Param{Search}->{Operator},
         Column        => 'ci.name',
         Value         => $Param{Search}->{Value},
@@ -97,9 +97,9 @@ sub Search {
         ]
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where);
+    push( @SQLWhere, @Where);
 
     return {
         SQLWhere => \@SQLWhere,

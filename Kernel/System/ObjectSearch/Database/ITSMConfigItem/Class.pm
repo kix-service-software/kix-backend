@@ -122,7 +122,7 @@ sub Search {
         }
     }
 
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => 'ci.class_id',
         Value     => \@ClassIDs,
@@ -131,9 +131,9 @@ sub Search {
         ]
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where);
+    push( @SQLWhere, @Where);
 
     return {
         SQLWhere => \@SQLWhere,

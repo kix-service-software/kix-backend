@@ -122,7 +122,7 @@ sub Search {
     }
 
     my @SQLWhere;
-    my $Where = $Self->GetOperation(
+    my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.ticket_priority_id',
         Value     => \@QueueIDs,
@@ -130,9 +130,9 @@ sub Search {
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 
-    return if !$Where;
+    return if !@Where;
 
-    push( @SQLWhere, $Where);
+    push( @SQLWhere, @Where);
 
     return {
         SQLWhere => \@SQLWhere,

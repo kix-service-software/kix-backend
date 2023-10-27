@@ -176,7 +176,7 @@ sub Search {
             $Column = 'th.create_time';
         }
 
-        my $Where = $Self->GetOperation(
+        my @Where = $Self->GetOperation(
             Operator  => $Param{Search}->{Operator},
             Column    => $Column,
             Value     => $Value,
@@ -186,9 +186,9 @@ sub Search {
             ]
         );
 
-        return if !$Where;
+        return if !@Where;
 
-        push( @SQLWhere, $Where );
+        push( @SQLWhere, @Where );
     }
     else {
 
@@ -202,16 +202,16 @@ sub Search {
             $Column = 'th.'.$AttributeMapping{$Param{Search}->{Field}};
         }
 
-        my $Where = $Self->GetOperation(
+        my @Where = $Self->GetOperation(
             Operator  => $Param{Search}->{Operator},
             Column    => $Column,
             Value     => $Param{Search}->{Value},
             Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
         );
 
-        return if !$Where;
+        return if !@Where;
 
-        push( @SQLWhere, $Where );
+        push( @SQLWhere, @Where );
 
         # lookup history type id
         my $HistoryTypeID = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(

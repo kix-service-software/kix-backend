@@ -215,7 +215,7 @@ sub GetOperation {
     my $Supported = $Param{Supported} || [];
     if ( IsArrayRefWithData($Supported) ) {
         for my $Operator ( @{$Supported} ) {
-            if ( !$Operators{$Operator} ) {
+            if ( !defined $Operators{$Operator} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Unsupported Operator $Param{Operator}!",
@@ -301,7 +301,7 @@ sub GetOperation {
         push( @Statements, $Statement);
     }
 
-    return \@Statements;
+    return @Statements;
 }
 
 sub _OperationEQ {
