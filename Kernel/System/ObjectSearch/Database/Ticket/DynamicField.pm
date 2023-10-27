@@ -76,8 +76,7 @@ sub GetSupportedAttributes {
             FieldType => [
                 'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
             ],
-            ResultType => $Type eq 'Search' ? 'HASH' : 'ARRAY',
-            IsSortable => $Type eq 'Sort' ? 1 : 0,
+            IsSortable => $Type eq 'Sort' ? 1 : undef,
         );
 
         for my $Field ( @{$List} ) {
@@ -92,8 +91,8 @@ sub GetSupportedAttributes {
     }
 
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort},
+        Search => $Self->{SupportedSearch} || {},
+        Sort   => $Self->{SupportedSort}   || [],
     };
 }
 

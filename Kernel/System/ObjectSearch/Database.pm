@@ -618,23 +618,18 @@ sub GetSupportedSearchList {
     my ( $Self, %Param) =  @_;
 
     my @List;
-    for my $Attribute (
+    for my $Property (
         sort keys %{$Self->{AttributeModules}->{Search}}
     ) {
-        PROPERTY:
-        for my $Property (
-            sort keys %{$Self->{AttributeModules}->{Search}->{$Attribute}}
-        ) {
-            push(
-                @List,
-                {
-                    Property  => $Property,
-                    Operators => $Self->{AttributeModules}->{Search}->{$Attribute}->{$Property}
-                }
-            );
-        }
-    }
 
+        push(
+            @List,
+            {
+                Property  => $Property,
+                Operators => $Self->{AttributeModules}->{Search}->{$Property}->{Supported}
+            }
+        );
+    }
     return @List;
 }
 

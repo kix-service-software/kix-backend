@@ -102,8 +102,9 @@ sub GetBackends {
             );
             next BACKEND;
         }
+
         foreach my $Attribute ( sort keys %{$SupportedAttributes->{Search}} ) {
-            $AttributeModules{Search}->{$Attribute}->{Supported} = $AttributeModules{Search}->{$Attribute};
+            $AttributeModules{Search}->{$Attribute}->{Supported} = $SupportedAttributes->{Search}->{$Attribute};
             $AttributeModules{Search}->{$Attribute}->{Object}    = $Object;
         }
     }
