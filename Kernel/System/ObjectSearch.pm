@@ -146,7 +146,7 @@ sub GetSupportedSortList {
 }
 
 
-sub GetPropertyOperations {
+sub GetSupportedSearchList {
     my ( $Self, %Param ) = @_;
 
     my @List;
@@ -156,7 +156,7 @@ sub GetPropertyOperations {
             %Param
         )
     ) {
-        @List = $Self->{SearchBackendObject}->GetPropertyOperations(%Param);
+        @List = $Self->{SearchBackendObject}->GetSupportedSearchList();
     }
 
     return @List;

@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::ObjectSearch::ObjectSearchSupportedAttributes;
+package Kernel::API::Operation::V1::ObjectSearch::SupportedSorts;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::ObjectSearch::ObjectSearchSupportedAttributes - API ObjectSearch supported attributes Get Operation backend
+Kernel::API::Operation::V1::ObjectSearch::SupportedSorts - API ObjectSearch supported sorts Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -61,8 +61,8 @@ sub ParameterDefinition {
 
 =item Run()
 
-perform ObjectSearchSupportedAttributes Operation. This function is able to return
-one ObjectSearchSortResult entry in one call.
+perform SupportedSorts Operation. This function is able to return
+one SupportedSorts entry in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
@@ -75,13 +75,8 @@ one ObjectSearchSortResult entry in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            Report => [
-                {
-                    ...
-                },
-                {
-                    ...
-                },
+            SupportedSort => [
+                ...
             ]
         },
     };
@@ -90,14 +85,14 @@ one ObjectSearchSortResult entry in one call.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-print STDERR Data::Dumper::Dumper(\%Param);
+
     my @SupportedSortList = $Kernel::OM->Get('ObjectSearch')->GetSupportedSortList(
         ObjectType => $Param{Data}->{ObjectType}
     );
 
     # return result
     return $Self->_Success(
-        ObjectSearchSort => \@SupportedSortList,
+        SupportedSort => \@SupportedSortList,
     );
 }
 
