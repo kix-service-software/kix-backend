@@ -157,12 +157,12 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Type    => 'COALESCE(tl.value, tt.name) AS TanslateName',
+        Type    => 'COALESCE(tl.value, tt.name) AS TranslateType',
         TypeID  => 'st.type_id',
     );
 
     my %OrderMapping = (
-        Type    => 'TanslateName',
+        Type    => 'TranslateType',
         TypeID  => 'st.type_id',
     );
 

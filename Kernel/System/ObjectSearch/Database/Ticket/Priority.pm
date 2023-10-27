@@ -159,12 +159,12 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Priority    => 'COALESCE(tl.value, tp.name) AS TanslateName',
+        Priority    => 'COALESCE(tl.value, tp.name) AS TranslatePriority',
         PriorityID  => 'st.ticket_priority_id',
     );
 
     my %OrderMapping = (
-        Priority    => 'TanslateName',
+        Priority    => 'TranslatePriority',
         PriorityID  => 'st.ticket_priority_id',
     );
 

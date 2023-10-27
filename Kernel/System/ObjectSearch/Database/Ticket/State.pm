@@ -255,12 +255,12 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        State    => 'COALESCE(tl.value, ts.name) AS TanslateName',
+        State    => 'COALESCE(tl.value, ts.name) AS TranslateState',
         StateID  => 'st.ticket_state_id',
     );
 
     my %OrderMapping = (
-        State    => 'TanslateName',
+        State    => 'TranslateState',
         StateID  => 'st.ticket_state_id',
     );
 

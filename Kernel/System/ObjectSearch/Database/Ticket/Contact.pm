@@ -54,6 +54,7 @@ sub GetSupportedAttributes {
 
     $Self->{SupportedSort} = [
         'ContactID',
+        'Contact'
     ];
 
     return {
@@ -125,13 +126,22 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Contact    => ['c.lastname', 'c.firstname'],
+        ContactID  => ['st.contact_id'],
+    );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'Contact' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN contact c ON c.id = st.contact_id'
+        ];
+    }
+
     return {
-        SQLAttrs => [
-            "st.contact_id"
-        ],
-        SQLOrderBy => [
-            "st.contact_id"
-        ],
+        SQLAttrs   => $AttributeMapping{$Param{Attribute}},
+        SQLOrderBy => $AttributeMapping{$Param{Attribute}}
     };
 }
 

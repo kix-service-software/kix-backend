@@ -54,6 +54,7 @@ sub GetSupportedAttributes {
 
     $Self->{SupportedSort} = [
         'OrganisationID',
+        'Organisation'
     ];
 
     return {
@@ -125,13 +126,26 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Organisation    => 'o.name',
+        OrganisationID  => 'st.organisation_id',
+    );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'Organisation' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN organisation o ON o.id = st.organisation_id'
+        ];
+    }
+
     return {
         SQLAttrs => [
-            "st.organisation_id"
+            $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            "st.organisation_id"
-        ],
+            $AttributeMapping{$Param{Attribute}}
+        ]
     };
 }
 
