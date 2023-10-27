@@ -222,6 +222,7 @@ sub Search {
         Operator  => $Operator,
         Column    => 'st.ticket_state_id',
         Value     => \@StateIDs,
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

@@ -103,6 +103,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.ticket_lock_id',
         Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

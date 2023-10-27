@@ -101,6 +101,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

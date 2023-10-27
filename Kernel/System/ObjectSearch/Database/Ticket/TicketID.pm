@@ -98,6 +98,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.id',
         Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

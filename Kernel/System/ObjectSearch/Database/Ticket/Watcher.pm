@@ -118,6 +118,7 @@ sub Search {
         Column    => $Column,
         Value     => $Param{Search}->{Value},
         Prepare   => 1,
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

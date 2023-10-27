@@ -124,6 +124,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.type_id',
         Value     => \@TypeIDs,
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

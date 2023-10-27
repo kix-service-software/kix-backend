@@ -126,6 +126,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.ticket_priority_id',
         Value     => \@QueueIDs,
+        Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
     );
 

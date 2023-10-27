@@ -180,6 +180,7 @@ Generate sql statements for specific object type attributes.
         CaseSensitive =>  0,                # (optional) - (1|0) enables the case sensitive, not related to "Prepare"
         Prepare       => 1,                 # (optional) - (1|0) enables the preparation of string values
         Supported     => [LT,NE,EQ]         # (required) - list of supported operations of the object attributes
+        Type          => 'NUMERIC'          # (optional) - sets the quoting of the values in the sql statements basend on the given type
     );
 
 Returns array ref of statements.
@@ -282,7 +283,8 @@ sub GetOperation {
         my $Statement = $Self->$Function(
             %Param,
             Value  => $Value,
-            Column => $Columns[$Index]
+            Column => $Columns[$Index],
+            Quotes => $Self->_GetQuotes(%Param)
         );
 
         # Adds additional SQL clauses to the statement
@@ -313,11 +315,15 @@ sub _OperationEQ {
 
     if ( $Value ) {
 
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
+
         if ( $Param{CaseSensitive} ) {
-            return "LOWER($Param{Column}) = LOWER('$Value')";
+            return "LOWER($Param{Column}) = LOWER($Value)";
         }
 
-        return "$Param{Column} = '$Value'";
+        return "$Param{Column} = $Value";
     } else {
         return "$Param{Column} IS NULL";
     }
@@ -333,12 +339,19 @@ sub _OperationNE {
     }
 
     if ( $Value ) {
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
 
         if ( $Param{CaseSensitive} ) {
-            return "LOWER($Param{Column}) != LOWER('$Value')";
+            return "LOWER($Param{Column}) != LOWER($Value)";
         }
 
-        return "$Param{Column} != '$Value'";
+        if ( $Param{Type} eq 'NUMERIC' ) {
+            return "$Param{Column} <> $Value";
+        }
+
+        return "$Param{Column} != $Value";
     } else {
         return "$Param{Column} IS NOT NULL";
     }
@@ -455,9 +468,11 @@ sub _OperationIN {
 
     if (IsArrayRefWithData($Param{Value})) {
 
-        my $Value = join(q{','}, @{$Param{Value}});
+        my $Value = $Param{Quotes}->{SQL}
+            . join($Param{Quotes}->{Join}, @{$Param{Value}})
+            . $Param{Quotes}->{SQL};
 
-        return "$Param{Column} IN ('$Value')";
+        return "$Param{Column} IN ($Value)";
     }
     else {
         return '1=0' ;
@@ -469,9 +484,11 @@ sub _OperationNOTIN {
 
     if (IsArrayRefWithData($Param{Value})) {
 
-        my $Value = join(q{','}, @{$Param{Value}});
+        my $Value = $Param{Quotes}->{SQL}
+            . join($Param{Quotes}->{Join}, @{$Param{Value}})
+            . $Param{Quotes}->{SQL};
 
-        return "$Param{Column} NOT IN ('$Value')";
+        return "$Param{Column} NOT IN ($Value)";
     }
     else {
         return '1=0' ;
@@ -488,7 +505,11 @@ sub _OperationLT {
     }
 
     if ( $Value ) {
-        return "$Param{Column} < '$Value'";
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
+
+        return "$Param{Column} < $Value";
     } else {
         return "$Param{Column} IS NOT NULL";
     }
@@ -504,7 +525,11 @@ sub _OperationLTE {
     }
 
     if ( $Value ) {
-        return "$Param{Column} <= '$Value'";
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
+
+        return "$Param{Column} <= $Value";
     } else {
         return "$Param{Column} IS NOT NULL";
     }
@@ -520,7 +545,11 @@ sub _OperationGT {
     }
 
     if ( $Value ) {
-        return "$Param{Column} > '$Value'";
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
+
+        return "$Param{Column} > $Value";
     } else {
         return "$Param{Column} IS NOT NULL";
     }
@@ -536,10 +565,30 @@ sub _OperationGTE {
     }
 
     if ( $Value ) {
-        return "$Param{Column} >= '$Value'";
+        $Value = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
+
+        return "$Param{Column} >= $Value";
     } else {
         return "$Param{Column} IS NOT NULL";
     }
+}
+
+sub _GetQuotes {
+    my ($Self, %Param) = @_;
+
+    if ( $Param{Type} eq 'NUMERIC' ) {
+        return {
+            SQL  => q{},
+            Join => q{,}
+        };
+    }
+
+    return {
+        SQL  => q{'},
+        Join => q{','}
+    };
 }
 
 1;
