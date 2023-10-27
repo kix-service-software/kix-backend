@@ -487,7 +487,7 @@ sub QueueAdd {
             . ' default_sign_key, signature, follow_up_id, '
             . ' follow_up_lock, valid_id, comments, create_time, create_by, '
             . ' change_time, change_by) VALUES '
-            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, '
+            . ' (?, ?, ?, ?, ?, ?, ?, ?, '
             . ' ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name},     \$Param{UnlockTimeout}, \$Param{SystemAddressID},
