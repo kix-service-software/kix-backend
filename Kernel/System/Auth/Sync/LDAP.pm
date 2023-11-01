@@ -289,6 +289,7 @@ sub Sync {
                 );
             }
 
+            my %ContactData;
             if ( $ContactID ) {
                 %ContactData = $ContactObject->ContactGet(
                     ID => $ContactID,

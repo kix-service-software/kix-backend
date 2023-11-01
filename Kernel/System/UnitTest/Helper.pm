@@ -277,6 +277,7 @@ sub TestContactCreate {
             Login                 => $TestContactLogin,
             Password              => $TestContactLogin,
             Email                 => $TestContactLogin . '@localunittest.com',
+            Email1                => $TestContactLogin . '@sub.localunittest.com',
             AssignedUserID        => $TestContactUserID,
             ValidID               => 1,
             UserID                => 1,
