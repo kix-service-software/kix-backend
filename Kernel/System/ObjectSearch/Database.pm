@@ -611,7 +611,9 @@ sub _CreateOrderBySQL {
 sub GetSupportedSortList {
     my ( $Self, %Param) =  @_;
 
-    return keys %{$Self->{AttributeModules}->{Sort}};
+    my @SortList = sort keys %{$Self->{AttributeModules}->{Sort}};
+
+    return @SortList;
 }
 
 sub GetSupportedSearchList {

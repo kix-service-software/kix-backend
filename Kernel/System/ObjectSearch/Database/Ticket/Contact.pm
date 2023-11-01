@@ -141,7 +141,8 @@ sub Sort {
 
     return {
         SQLAttrs   => $AttributeMapping{$Param{Attribute}},
-        SQLOrderBy => $AttributeMapping{$Param{Attribute}}
+        SQLOrderBy => $AttributeMapping{$Param{Attribute}},
+        %Join
     };
 }
 

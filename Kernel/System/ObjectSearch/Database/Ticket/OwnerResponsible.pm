@@ -55,7 +55,9 @@ sub GetSupportedAttributes {
 
     $Self->{SupportedSort} = [
         'OwnerID',
+        'Owner',
         'ResponsibleID',
+        'Responsible',
     ];
 
     return {
@@ -134,17 +136,28 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     my %AttributeMapping = (
-        'OwnerID'       => 'st.user_id',
-        'ResponsibleID' => 'st.responsible_user_id',
+        Owner         => ['ow.lastname', 'ow.firstname'],
+        Responsible   => ['rp.lastname', 'rp.firstname'],
+        OwnerID       => ['st.user_id'],
+        ResponsibleID => ['st.responsible_user_id'],
     );
 
+    my %Join;
+    if ( $Param{Attribute} eq 'Owner' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN user ow ON ow.id = st.user_id'
+        ];
+    }
+    elsif ( $Param{Attribute} eq 'Responsible' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN user rp ON rp.id = st.responsible_user_id'
+        ];
+    }
+
     return {
-        SQLAttrs => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        SQLOrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
+        SQLAttrs   => $AttributeMapping{$Param{Attribute}},
+        SQLOrderBy => $AttributeMapping{$Param{Attribute}},
+        %Join
     };
 }
 

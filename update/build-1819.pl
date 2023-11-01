@@ -38,13 +38,13 @@ sub _SetFlagFirstValue {
 UPDATE dynamic_field_value
 SET first_value = 1
 WHERE id IN (
-	SELECT dfv.id
-	FROM dynamic_field_value dfv
-	WHERE dfv.id = (
-		SELECT MIN(dfv1.id)
-		FROM dynamic_field_value dfv1
-		WHERE dfv1.object_id = dfv.object_id AND dfv1.field_id = dfv.field_id
-	)
+    SELECT dfv.id
+    FROM dynamic_field_value dfv
+    WHERE dfv.id = (
+        SELECT MIN(dfv1.id)
+        FROM dynamic_field_value dfv1
+        WHERE dfv1.object_id = dfv.object_id AND dfv1.field_id = dfv.field_id
+    )
 )
 END
     );

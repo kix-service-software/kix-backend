@@ -652,7 +652,7 @@ sub DynamicFieldList {
             next FIELDNAME if !IsHashRefWithData($FieldConfig);
             next FIELDNAME if !$FieldConfig->{ID};
 
-            $AllowedFieldIDs{ $FieldConfig->{ID} } = 1,
+            $AllowedFieldIDs{ $FieldConfig->{ID} } = 1;
         }
     }
 
@@ -1100,6 +1100,9 @@ sub DynamicFieldListGet {
 
     if ( @SQLWhere ) {
         $SQL .= join ( ' AND ', @SQLWhere );
+    }
+    else {
+        $SQL .= ' 1=1 ';
     }
 
     $SQL .= " ORDER BY id";
