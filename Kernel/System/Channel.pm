@@ -162,10 +162,12 @@ sub ChannelLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Name or ID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Name or ID!',
+            );
+        }
         return;
     }
 
@@ -191,10 +193,12 @@ sub ChannelLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No $Key for $Value found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No $Key for $Value found!",
+            );
+        }
         return;
     }
 

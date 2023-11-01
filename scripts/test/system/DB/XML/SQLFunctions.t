@@ -19,11 +19,6 @@ my $DBObject  = $Kernel::OM->Get('DB');
 my $XMLObject = $Kernel::OM->Get('XML');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # ------------------------------------------------------------ #
@@ -131,8 +126,6 @@ for my $SQL (@SQL) {
         "Do() DROP TABLE ($SQL)",
     );
 }
-
-# cleanup cache is done by RestoreDatabase.
 
 1;
 

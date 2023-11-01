@@ -124,9 +124,6 @@ sub _Run {
         SourceObjectID => $Item->{id},
         NoCache        => 1,        # don't cache this mass data
     );
-    if ( $MappedID ) {
-        return 'Ignored';
-    }
 
     # get the ticket data
     $Item = $Self->GetSourceData(Type => 'ticket', Where => "id = $Item->{id}", NoProgress => 1);
@@ -197,6 +194,11 @@ sub _Run {
         );
 
         $Self->_MigrateTimeUnits(
+            TicketID       => $ID,
+            SourceTicketID => $Item->{id},
+        );
+
+        $Self->_MigrateChecklist(
             TicketID       => $ID,
             SourceTicketID => $Item->{id},
         );
@@ -857,6 +859,127 @@ sub _MigrateTimeUnits {
             Priority => 'notice',
             Message  => "Unable to update \"accounted_time\" of ticket ID $Param{TicketID}"
         );
+    }
+
+    return %Result;
+}
+
+sub _MigrateChecklist {
+    my ( $Self, %Param ) = @_;
+    my %Result;
+
+    # check needed params
+    for my $Needed (qw(TicketID SourceTicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    if ( !$Self->{MobileProcessingChecklist010ID} ) {
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
+            ObjectType => 'Ticket',
+            FieldType  => 'CheckList',
+            ResultType => 'HASH',
+        );
+
+        my %DynamicFieldListReverse = reverse %{$DynamicFieldList||{}};
+        if ( !%DynamicFieldListReverse || !$DynamicFieldListReverse{MobileProcessingChecklist010} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "DynamicField \"MobileProcessingChecklist010\" not found!"
+            );
+            return;
+        }
+        $Self->{MobileProcessingChecklist010ID} = $DynamicFieldListReverse{MobileProcessingChecklist010};
+    }
+
+    # get source data
+    my $SourceData = $Self->GetSourceData(
+        Type       => 'kix_ticket_checklist',
+        Where      => "ticket_id = $Param{SourceTicketID}",
+        OrderBy    => 'position',
+        NoProgress => 1,
+    );
+
+    # bail out if we don't have something to todo
+    return %Result if !IsArrayRefWithData($SourceData);
+
+    my %ValueMapping = (
+        'open'    => '-',
+        'closed'  => 'OK',
+        'notok'   => 'NOK',
+        'pending' => 'pending'
+    );
+    my @CheckList = ();
+
+    foreach my $Item ( @{$SourceData} ) {
+
+        # check if this object is already mapped
+        my $MappedID = $Self->GetOIDMapping(
+            ObjectType     => 'kix_ticket_checklist',
+            SourceObjectID => $Item->{id},
+        );
+
+        # build new checklist
+        my %CheckListItem = (
+            id    => $Item->{id} * 100,
+            title => $Item->{task},
+            value => $ValueMapping{$Item->{state}},
+            input => 'ChecklistState',
+        );
+        push @CheckList, \%CheckListItem;
+    }
+
+    my %InsertItem = (
+        field_id   => $Self->{MobileProcessingChecklist010ID},
+        object_id  => $Param{TicketID},
+        value_text => $Kernel::OM->Get('JSON')->Encode(
+            Data => \@CheckList
+        ),
+    );
+
+    my $ID = $Self->Lookup(
+        Table          => 'dynamic_field_value',
+        PrimaryKey     => 'id',
+        Item           => \%InsertItem,
+        RelevantAttr => [
+            'object_id',
+            'field_id'
+        ],
+        NoCache => 1,  
+    );
+
+    if ( !$ID ) {
+        $ID = $Self->Insert(
+            Table          => 'dynamic_field_value',
+            PrimaryKey     => 'id',
+            Item           => \%InsertItem,
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
+    }
+    else {
+        $ID = $Self->Update(
+            Table          => 'dynamic_field_value',
+            PrimaryKey     => 'id',
+            Item           => {
+                id => $ID,
+                %InsertItem,
+            },
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
+    }
+
+    if ( $ID ) {
+        $Result{OK}++;
+    }
+    else {
+        $Result{Error}++;
     }
 
     return %Result;

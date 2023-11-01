@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -13,9 +13,9 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Main',
-    'Ticket',
+our @ObjectDependencies = qw(
+    Main
+    Ticket
 );
 
 sub Configure {
@@ -151,10 +151,6 @@ sub Run {
 }
 
 1;
-
-
-
-
 
 =back
 

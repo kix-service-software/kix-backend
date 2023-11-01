@@ -161,10 +161,12 @@ sub ValidateConfig {
 
     # check needed stuff
     if ( !$Param{Config} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Config!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Config!',
+            );
+        }
         return;
     }
 
@@ -172,10 +174,12 @@ sub ValidateConfig {
         next if !$Self->{Definition}->{Options}->{$Option}->{Required};
 
         if ( !exists $Param{Config}->{$Option} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Required option \"$Option\" missing!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Required option \"$Option\" missing!",
+                );
+            }
             return;
         }
     }

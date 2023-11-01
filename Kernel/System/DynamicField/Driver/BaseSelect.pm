@@ -46,6 +46,7 @@ sub ValueGet {
     my $DFValue = $DynamicFieldValueObject->ValueGet(
         FieldID  => $Param{DynamicFieldConfig}->{ID},
         ObjectID => $Param{ObjectID},
+        Silent   => $Param{Silent} || 0
     );
 
     return if !$DFValue;
@@ -85,10 +86,13 @@ sub ValueSet {
         my $Valid = $Self->ValueValidate(
             Value              => $Param{Value},
             UserID             => $Param{UserID},
-            DynamicFieldConfig => $Param{DynamicFieldConfig}
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Silent             => $Param{Silent} || 0
         );
 
         if (!$Valid) {
+            return if $Param{Silent};
+
             $LogObject->Log(
                 Priority => 'error',
                 Message  => "The value for the field is invalid!"
@@ -106,6 +110,7 @@ sub ValueSet {
             ObjectID => $Param{ObjectID},
             Value    => \@ValueText,
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent} || 0
         );
     } else {
 
@@ -114,6 +119,7 @@ sub ValueSet {
             FieldID  => $Param{DynamicFieldConfig}->{ID},
             ObjectID => $Param{ObjectID},
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent} || 0
         );
     }
 
@@ -142,6 +148,8 @@ sub ValueValidate {
             $CountMin
             && scalar(@Values) < $CountMin
         ) {
+            return if $Param{Silent};
+
             $LogObject->Log(
                 Priority => 'error',
                 Message => "At least $CountMin value(s) must be selected."
@@ -155,6 +163,8 @@ sub ValueValidate {
             && $CountMax > 1
             && scalar(@Values) > $CountMax
         ) {
+            return if $Param{Silent};
+
             $LogObject->Log(
                 Priority => 'error',
                 Message => "A maximum of $CountMax values can be selected."
@@ -170,11 +180,29 @@ sub ValueValidate {
             )
             && scalar(@Values) > 1
         ) {
+            return if $Param{Silent};
+
             $LogObject->Log(
                 Priority => 'error',
                 Message => "A maximum of 1 value can be selected. (Singleselect)"
             );
             return;
+        }
+
+        if (IsHashRefWithData($Param{DynamicFieldConfig}->{Config}->{PossibleValues})) {
+            for my $Item (@Values) {
+                my $Known = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Item};
+
+                if (!$Known) {
+                    return if $Param{Silent};
+
+                    $LogObject->Log(
+                        Priority => 'error',
+                        Message  => "Unknown value ($Item)"
+                    );
+                    return;
+                }
+            }
         }
     }
 
@@ -187,20 +215,6 @@ sub ValueValidate {
         );
 
         return if !$Success
-    }
-
-    if (IsHashRefWithData($Param{DynamicFieldConfig}->{Config}->{PossibleValues})) {
-        for my $Item (@Values) {
-            my $Known = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Item};
-
-            if (!$Known) {
-                $LogObject->Log(
-                    Priority => 'error',
-                    Message  => "Unknown value ($Item)"
-                );
-                return;
-            }
-        }
     }
 
     return 1;
@@ -262,10 +276,12 @@ sub SearchSQLGet {
         return $SQL;
     }
 
-    $Kernel::OM->Get('Log')->Log(
-        'Priority' => 'error',
-        'Message'  => "Unsupported Operator $Param{Operator}",
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            'Priority' => 'error',
+            'Message'  => "Unsupported Operator $Param{Operator}",
+        );
+    }
 
     return;
 }

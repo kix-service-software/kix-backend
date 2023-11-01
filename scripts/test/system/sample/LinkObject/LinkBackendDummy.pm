@@ -94,29 +94,6 @@ sub LinkListWithData {
     return 1;
 }
 
-#
-#
-#
-
-sub ObjectPermission {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Object Key UserID)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-            return;
-        }
-    }
-
-    # deny access for admin
-    return if $Param{UserID} == 1;
-    return 1;
-}
-
 =item ObjectDescriptionGet()
 
 return a hash of object descriptions

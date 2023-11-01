@@ -15,12 +15,13 @@ use MIME::Base64;
 use Digest::MD5 qw(md5_hex);
 use Encode qw(encode_utf8);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Encode',
-    'Log',
-    'Main'
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    DB
+    Encode
+    Log
+    Main
 );
 
 =head1 NAME

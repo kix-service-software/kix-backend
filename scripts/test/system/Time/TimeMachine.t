@@ -47,11 +47,11 @@ my $StartSystemTime = $TimeObject->SystemTime();
     $Self->Is(
         $TimeObject->SystemTime(),
         $FixedTime - 10,
-        "Stay with increased fixed time",
+        "Stay with decreased fixed time",
     );
 
-    # Let object be destroyed at the end of this scope
-    $Kernel::OM->ObjectsDiscard( Objects => ['UnitTest::Helper'] );
+    # reset fixed time
+    $HelperObject->FixedTimeUnset();
 }
 
 sleep 1;

@@ -17,13 +17,14 @@ use base qw(Kernel::System::EventHandler);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Cache',
-    'DB',
-    'Log',
-    'Valid',
-    'YAML',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Cache
+    DB
+    Log
+    Valid
+    YAML
 );
 
 =head1 NAME
@@ -107,20 +108,24 @@ sub DynamicFieldAdd {
     # check needed stuff
     for my $Key (qw(Name Label FieldType ObjectType Config ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!"
+                );
+            }
             return;
         }
     }
 
     # check needed structure for some fields
     if ( $Param{Name} !~ m{ \A [a-zA-Z\d]+ \z }xms ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Not valid letters on Name:$Param{Name}!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Not valid letters on Name:$Param{Name}!"
+            );
+        }
         return;
     }
 
@@ -143,10 +148,12 @@ sub DynamicFieldAdd {
     }
 
     if ($NameExists) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The name $Param{Name} already exists for a dynamic field!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The name $Param{Name} already exists for a dynamic field!"
+            );
+        }
         return;
     }
 
@@ -386,10 +393,12 @@ sub DynamicFieldUpdate {
     # check needed stuff
     for my $Key (qw(ID Name Label FieldType ObjectType Config ValidID UserID)) {
         if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Key!"
+                );
+            }
             return;
         }
     }
@@ -409,10 +418,12 @@ sub DynamicFieldUpdate {
 
     # check needed structure for some fields
     if ( $Param{Name} !~ m{ \A [a-zA-Z\d]+ \z }xms ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Not valid letters on Name:$Param{Name} or ObjectType:$Param{ObjectType}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Not valid letters on Name:$Param{Name} or ObjectType:$Param{ObjectType}!",
+            );
+        }
         return;
     }
 
@@ -434,10 +445,12 @@ sub DynamicFieldUpdate {
     }
 
     if ($NameExists) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The name $Param{Name} already exists for a dynamic field!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "The name $Param{Name} already exists for a dynamic field!",
+            );
+        }
         return;
     }
 

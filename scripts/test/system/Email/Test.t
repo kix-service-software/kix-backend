@@ -14,11 +14,20 @@ use utf8;
 
 use vars (qw($Self));
 
+# get helper object
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 # do not really send emails
 $Kernel::OM->Get('Config')->Set(
     Key   => 'SendmailModule',
     Value => 'Email::Test',
 );
+
+# get email object
+my $EmailObject = $Kernel::OM->Get('Email');
 
 # get test email backed object
 my $TestBackendObject = $Kernel::OM->Get('Email::Test');
@@ -34,9 +43,6 @@ $Self->IsDeeply(
     [],
     'Test backend empty after initial cleanup',
 );
-
-# get email object
-my $EmailObject = $Kernel::OM->Get('Email');
 
 for ( 1 .. 2 ) {
 
@@ -96,6 +102,9 @@ $Self->IsDeeply(
     [],
     'Test backend empty after final cleanup',
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

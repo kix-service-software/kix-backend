@@ -91,7 +91,8 @@ sub Run {
     if ( !$Class && $Param{Data}->{ConfigItemID} ) {
         # get the class from the configitem
         my $ConfigItem = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemGet(
-            ConfigItemID => $Param{Data}->{ConfigItemID}
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            Silent       => 1,
         );
         if ( IsHashRefWithData($ConfigItem) ) {
             $Class = $ConfigItem->{Class};
@@ -115,6 +116,7 @@ sub _UpdateCounters {
             FunctionParams           => {
                 UserID  => 1,
                 Classes => $Param{Class} ? [ $Param{Class} ] : undef,
+                Silent  => 1,
             },
             MaximumParallelInstances => 1,
         );
@@ -124,6 +126,7 @@ sub _UpdateCounters {
         $Kernel::OM->Get('ITSMConfigItem')->UpdateCounters(
             UserID  => 1,
             Classes => $Param{Class} ? [ $Param{Class} ] : undef,
+            Silent  => 1,
         );
     }
 
@@ -145,3 +148,6 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+
+

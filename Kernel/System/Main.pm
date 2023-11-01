@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -79,10 +79,12 @@ sub Require {
     my ( $Self, $Module, %Param ) = @_;
 
     if ( !$Module ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need module!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need module!',
+            );
+        }
         return;
     }
 
@@ -113,19 +115,13 @@ sub Require {
 
     # if there was an error
     if ($@) {
-
-        # KIXCore-capeIT
         my $ErrorMessage = $@;
-        # EO KIXCore-capeIT
 
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Caller   => 1,
                 Priority => 'error',
-                # KIXCore-capeIT
-                # Message  => "$@",
                 Message  => $ErrorMessage,
-                # EO KIXCore-capeIT
             );
         }
 
@@ -611,8 +607,9 @@ sub FileGetMTime {
     my ( $Self, %Param ) = @_;
 
     my $Stat = $Self->FileStat(
-        %Param
+        %Param,
     );
+    return if ( !$Stat );
 
     return $Stat->mtime();
 }
@@ -826,30 +823,27 @@ sub Dump {
     # strings as latin1/8bit instead of utf8. Use Storable module used for
     # workaround.
     # -> http://rt.cpan.org/Ticket/Display.html?id=28607
-    # if ( $Type eq 'binary' ) {
+    if ( $Type eq 'binary' ) {
 
-    #     # Clone the data because we need to disable the utf8 flag in all
-    #     # reference variables and do not to want to do this in the orig.
-    #     # variables because they will still used in the system.
-    #     my $DataNew = Storable::dclone( \$Data );
+        # Clone the data because we need to disable the utf8 flag in all
+        # reference variables and do not to want to do this in the orig.
+        # variables because they will still used in the system.
+        my $DataNew = Storable::dclone( \$Data );
 
-    #     # Disable utf8 flag.
-    #     $Self->_Dump($DataNew);
+        # Disable utf8 flag.
+        $Self->_Dump($DataNew);
 
-    #     # Dump it as binary strings.
-    #     my $String = Data::Dumper::Dumper( ${$DataNew} );    ## no critic
+        # Dump it as binary strings.
+        my $String = Dumper( ${$DataNew} );
 
-    #     # Enable utf8 flag.
-    #     Encode::_utf8_on($String);
+        # Enable utf8 flag.
+        Encode::_utf8_on($String);
 
-    #     # reset indention
-    #     $Data::Dumper::Indent = 1;
-
-    #     return $String;
-    # }
+        return $String;
+    }
 
     # fallback if Storable can not be loaded
-    my $Result = Data::Dumper::Dumper($Data);                      ## no critic
+    my $Result = Dumper($Data);
 
     # reset indention;
     $Data::Dumper::Indent = 1;
@@ -1156,8 +1150,9 @@ sub GenerateRandomString {
 resolve a value from a complex data structure
 
     my $Value = $MainObject->ResolveValueByKey(
-        Data => {} || [],
-        Key  => '...'
+        Data     => {} || [],
+        Key      => '...',
+        Resolver => {},            # optional, used by RuleSet
     );
 =cut
 
@@ -1190,7 +1185,19 @@ sub ResolveValueByKey {
     }
 
     # get the value of $Attribute
-    $Data = exists $Data->{$Attribute} ? $Data->{$Attribute} : return;
+    if (exists $Data->{$Attribute} ) {
+        $Data = $Data->{$Attribute};
+    }
+    # if not, look if there is a reverse resolver available
+    elsif ( $Param{Resolver} && exists $Data->{$Param{Resolver}->{Resolves}} ) {
+        $Data = $Param{Resolver}->{Handler}(
+            $Param{Resolver}->{HandlerObject},
+            Data => $Data->{$Param{Resolver}->{Resolves}},
+        );
+    }
+    else {
+        return;
+    }
 
     if ( defined $ArrayIndex && IsArrayRef($Data) ) {
         $Data = $Data->[$ArrayIndex];
@@ -1198,8 +1205,9 @@ sub ResolveValueByKey {
 
     if ( @Parts ) {
         return $Self->ResolveValueByKey(
-            Key  => join('.', @Parts),
-            Data => $Data,
+            Key      => join('.', @Parts),
+            Data     => $Data,
+            Resolver => $Param{Resolver}
         );
     }
 
@@ -1484,8 +1492,6 @@ sub FilterObjectList {
     return @FilteredResult;
 }
 
-
-
 =item GetUnique()
 
 returns an array with unique values
@@ -1499,6 +1505,38 @@ sub GetUnique {
     my ( $Self, @Array ) = @_;
     my %Known;
     return grep { !$Known{$_}++ } @Array;
+}
+
+=item GetCombinedList()
+
+returns combined array of two lists
+
+    my @CombinedList = $MainObject->GetCombinedList(
+        ListA => \@Array,
+        ListB => \@Array,
+        Union => 0|1                # Default: 0
+    );
+
+    e.g.
+        ListA = [ 1, 2, 3, 4 ]
+        ListB = [ 2, 4, 5 ]
+
+        as union = [1, 2, 3, 4, 5 ]
+        as intersect = [ 2, 4 ]
+
+
+=cut
+
+sub GetCombinedList {
+    my ( $Self, %Param ) = @_;
+
+    my %Union;
+    my %Isect;
+    for my $E ( $Self->GetUnique( @{ $Param{ListA} } ), $Self->GetUnique( @{ $Param{ListB} } ) ) {
+        $Union{$E}++ && $Isect{$E}++
+    }
+
+    return $Param{Union} ? keys %Union : keys %Isect;
 }
 
 =begin Internal:

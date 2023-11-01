@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,7 +15,10 @@ use utf8;
 use vars (qw($Self));
 
 # get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
+## IMPORTANT - First get DynamicField::Backend object,
+## or it will not use the same config object as the test somehow
+my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+my $ConfigObject    = $Kernel::OM->Get('Config');
 
 # theres is not really needed to add the dynamic fields for this test, we can define a static
 # set of configurations
@@ -53,43 +56,6 @@ my %DynamicFieldConfigs = (
         CreateTime => '2011-02-08 15:08:00',
         ChangeTime => '2011-06-11 17:22:00',
     },
-    Checkbox => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'CheckboxField',
-        Label         => 'CheckboxField',
-        FieldOrder    => 123,
-        FieldType     => 'Checkbox',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue => '',
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
-    Dropdown => {
-        ID            => 123,
-        InternalField => 0,
-        Name          => 'DropdownField',
-        Label         => 'DropdownField',
-        FieldOrder    => 123,
-        FieldType     => 'Dropdown',
-        ObjectType    => 'Ticket',
-        Config        => {
-            DefaultValue       => '',
-            Link               => '',
-            PossibleNone       => 1,
-            TranslatableValues => '',
-            PossibleValues     => {
-                1 => 'A',
-                2 => 'B',
-            },
-        },
-        ValidID    => 1,
-        CreateTime => '2011-02-08 15:08:00',
-        ChangeTime => '2011-06-11 17:22:00',
-    },
     Multiselect => {
         ID            => 123,
         InternalField => 0,
@@ -99,6 +65,7 @@ my %DynamicFieldConfigs = (
         FieldType     => 'Multiselect',
         ObjectType    => 'Ticket',
         Config        => {
+            CountMax           => 2,
             DefaultValue       => '',
             PossibleNone       => 1,
             TranslatableValues => '',
@@ -153,14 +120,14 @@ my %DynamicFieldConfigs = (
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Backend###100-DFDummy',
     Value => {
-        Module => 'scripts::test::sample::DynamicField::DummyBackend',
+        Module => 'scripts::test::system::sample::DynamicField::DummyBackend',
     },
 );
 
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Text###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyText',
+        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyText',
         Behaviors => {
             Dummy1 => 1,
         },
@@ -169,36 +136,16 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::TextArea###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyTextArea',
+        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyTextArea',
         Behaviors => {
             Dummy1 => 1,
-        },
-    },
-);
-$ConfigObject->Set(
-    Key   => 'DynamicFields::Extension::Driver::Checkbox###100-DFDummy',
-    Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyCheckbox',
-        Behaviors => {
-            Dummy1 => 1,
-            Dummy2 => 1,
-        },
-    },
-);
-$ConfigObject->Set(
-    Key   => 'DynamicFields::Extension::Driver::Dropdown###100-DFDummy',
-    Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyDropdown',
-        Behaviors => {
-            Dummy1 => 0,
-            Dummy2 => 1,
         },
     },
 );
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Multiselect###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyMultiselect',
+        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyMultiselect',
         Behaviors => {
             Dummy1 => 0,
             Dummy2 => 1,
@@ -208,7 +155,7 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Date###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::sample::DynamicField::Driver::DummyDate',
+        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyDate',
         Behaviors => {
             Dummy1 => 0,
             Dummy2 => 0,
@@ -218,12 +165,15 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::DateTime###100-DFDummy',
     Value => {
-        Module => 'scripts::test::sample::DynamicField::Driver::DummyDateTime',
+        Module => 'scripts::test::system::sample::DynamicField::Driver::DummyDateTime',
     },
 );
 
+# Make sure that the TicketObject gets recreated for each loop.
+$Kernel::OM->ObjectsDiscard( Objects => ['DynamicField::Backend'] );
+
 # get a new backend object including the extension registrations from the config object
-my $DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+$DFBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
 my @Behaviors = (qw(Dummy1 Dummy2));
 my %Functions = (
@@ -262,38 +212,6 @@ my @Tests = (
             Behaviors => {
                 Dummy1 => 1,
                 Dummy2 => undef,
-            },
-        },
-    },
-    {
-        Name   => 'Dynamic Field Checkbox',
-        Config => {
-            FieldConfig => $DynamicFieldConfigs{Checkbox},
-        },
-        ExpectedResutls => {
-            Functions => {
-                DummyFunction1 => 1,
-                DummyFunction2 => 2,
-            },
-            Behaviors => {
-                Dummy1 => 1,
-                Dummy2 => 1,
-            },
-        },
-    },
-    {
-        Name   => 'Dynamic Field Dropdown',
-        Config => {
-            FieldConfig => $DynamicFieldConfigs{Dropdown},
-        },
-        ExpectedResutls => {
-            Functions => {
-                DummyFunction1 => undef,
-                DummyFunction2 => 1,
-            },
-            Behaviors => {
-                Dummy1 => undef,
-                Dummy2 => 1,
             },
         },
     },

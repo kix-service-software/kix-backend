@@ -18,35 +18,29 @@ my $ReportingObject = $Kernel::OM->Get('Reporting');
 my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 my $PivotObject = $ReportingObject->_LoadDataSourceBackend(Name => 'GenericSQL')->_LoadOutputHandlerBackend(Name => 'Translate');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my @ConfigTests = (
     {
         Test   => 'no config',
         Config => undef,
-        Expect => undef
+        Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'empty config',
         Config => {},
         Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'invalid Config - unknown Language',
         Config => {
             Language => 'cn',
         },
-        Expect => undef
+        Expect => undef,
+        Silent => 1,
     },
     {
         Test   => 'valid Config without Language',
@@ -68,7 +62,8 @@ my @ConfigTests = (
 foreach my $Test ( @ConfigTests ) {
     # wrong config
     my $Result = $PivotObject->ValidateConfig(
-        Config => $Test->{Config}
+        Config => $Test->{Config},
+        Silent => $Test->{Silent},
     );
 
     if ( $Test->{Expect} ) {
@@ -157,8 +152,6 @@ foreach my $Test ( @DataTests ) {
         'Run() - '.$Test->{Test},
     );
 }
-
-# cleanup is done by RestoreDatabase
 
 1;
 

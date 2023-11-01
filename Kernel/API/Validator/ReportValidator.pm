@@ -64,7 +64,8 @@ sub Validate {
     my $Found;
     if ( $Param{Attribute} eq 'ReportID' ) {
         my %Report = $Kernel::OM->Get('Reporting')->ReportGet(
-            ID => $Param{Data}->{$Param{Attribute}},
+            ID     => $Param{Data}->{$Param{Attribute}},
+            Silent => 1,
         );
         $Found = %Report;
     }

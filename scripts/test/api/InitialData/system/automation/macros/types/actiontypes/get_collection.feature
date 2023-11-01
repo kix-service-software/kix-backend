@@ -8,11 +8,12 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
   Scenario: get the list of automation macro type actiontypes
     When I query the collection of automation macro type "Ticket" actiontypes
     Then the response code is 200
-    And the response contains 21 items of type "MacroActionType"
+    And the response contains 23 items of type "MacroActionType"
     And the response contains the following items of type MacroActionType
       | Name                 | Description                                                                                                | MacroType |
       | ArticleCreate        | Creates an article for a ticket.                                                                           | Ticket    |
-      | AssembleObject       | Execute the depending macro if the logical expression is true.                                             | Ticket    |
+      | ArticleDelete        | Deletes an article of a ticket. Inlcuding dynamic fields, attachments, flags and accounted time.           | Ticket    |
+      | AssembleObject       | Assembles a new object to be used later in the execution.                                                  | Ticket    |
       | Conditional          | Execute the depending macro if the logical expression is true.                                             | Ticket    |
       | ContactSet           | Sets the contact (and its primary organisation as organisation) of a ticket.                               | Ticket    |
       | CreateReport         | Create a report from a report definition.                                                                  | Ticket    |
@@ -32,7 +33,7 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
       | TicketDelete         | Deletes a ticket.                                                                                          | Ticket    |
       | TitleSet             | Sets the title of a ticket.                                                                                | Ticket    |
       | TypeSet              | Sets the type of a ticket.                                                                                 | Ticket    |
-
+      | VariableSet          | Assign a value to a macro variable.                                                                        | Ticket    |
       
       
       

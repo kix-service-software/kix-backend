@@ -17,12 +17,10 @@ my $ConfigObject       = $Kernel::OM->Get('Config');
 my $ContactObject = $Kernel::OM->Get('Contact');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $Contact = 'customer' . $Helper->GetRandomID();
 
@@ -94,7 +92,8 @@ for my $Test (@Tests) {
     );
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

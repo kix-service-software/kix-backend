@@ -19,12 +19,10 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 $Kernel::OM->Get('Type')->TypeAdd(
 #rbo - T2016121190001552 - renamed X-KIX headers
@@ -82,7 +80,6 @@ for my $Test (@Tests) {
     {
         my $PostMasterObject = Kernel::System::PostMaster->new(
             Email => \$Test->{Email},
-            Debug => 2,
         );
 
         @Return = $PostMasterObject->Run();
@@ -112,7 +109,8 @@ for my $Test (@Tests) {
     }
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

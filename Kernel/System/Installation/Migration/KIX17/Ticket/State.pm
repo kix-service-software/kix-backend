@@ -103,6 +103,11 @@ sub Run {
         }
     }
 
+    # delete state cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('State')->{CacheType},
+    );
+
     return 1;
 }
 

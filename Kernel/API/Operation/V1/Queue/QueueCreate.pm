@@ -118,7 +118,8 @@ sub Run {
 
     # check if Queue exists
     my $Exists = $Kernel::OM->Get('Queue')->QueueLookup(
-        Queue => $Queue->{Name},
+        Queue  => $Queue->{Name},
+        Silent => 1,
     );
 
     if ( $Exists ) {

@@ -19,16 +19,20 @@ my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::SystemAddress::Ad
 my ( $Result, $ExitCode );
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $SystemAddressName = 'SystemAddress' . $Helper->GetRandomID();
 my $SystemAddress     = $SystemAddressName . '@example.com',
     my $QueueName     = 'queue' . $Helper->GetRandomID();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # try to execute command without any options
 $ExitCode = $CommandObject->Execute();
@@ -94,7 +98,8 @@ $Self->Is(
     "Valid options (but already exists)",
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

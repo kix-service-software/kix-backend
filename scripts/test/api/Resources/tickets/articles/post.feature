@@ -9,6 +9,7 @@ Feature: POST request to the /tickets/:TicketID/articles resource
     Given a ticket
     When I create a article
     Then the response code is 201
+    Then the response object is TicketArticlePostPatchResponse
     When I delete this article
     Then the response code is 204
     When I delete this ticket

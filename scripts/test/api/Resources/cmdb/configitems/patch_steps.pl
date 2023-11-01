@@ -61,11 +61,6 @@ When qr/I update this configitem$/, sub {
                               }
                            ] 
                         }
-                     ],
-                     SectionWarranty => [
-                        {
-                           FirstUsageDate => "04-09-2018"
-                        }
                      ]
                   }
                },

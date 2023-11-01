@@ -68,10 +68,12 @@ sub Dump {
 
     # check for needed data
     if ( !defined $Param{Data} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Data!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Data!',
+            );
+        }
         return;
     }
 
@@ -110,33 +112,38 @@ sub Load {
     my $YAMLImplementation = YAML::Any->implementation();
 
     if ( !eval { $Result = YAML::Any::Load( $Param{Data} ) } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Loading the YAML string failed: ' . $@,
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'YAML data was: "' . $Param{Data} . '"',
-        );
-
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Loading the YAML string failed: ' . $@,
+            );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'YAML data was: "' . $Param{Data} . '"',
+            );
+        }
         # if used implementation is pure perl YAML there is nothing to do, but exit with error
         return if $YAMLImplementation eq 'YAML';
 
         # otherwise use pure-perl YAML as fallback if YAML::XS or other can't parse the data
         # structure correctly
         if ( !eval { $Result = YAML::Load( $Param{Data} ) } ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'YAML data was not readable even by pure-perl YAML module',
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'YAML data was not readable even by pure-perl YAML module',
+                );
+            }
             return;
         }
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Data was only readable pure-perl YAML module, please contact the'
-                . ' System Administrator to update this record, as the stored data is still in a'
-                . ' wrong format!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Data was only readable pure-perl YAML module, please contact the'
+                    . ' System Administrator to update this record, as the stored data is still in a'
+                    . ' wrong format!',
+            );
+        }
     }
 
     # YAML does not set the UTF8 flag on strings that need it, do that manually now.

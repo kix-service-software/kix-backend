@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -14,7 +14,13 @@ use vars (qw($Self));
 
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::SystemMonitoring::NagiosCheck');
 
-my $ConfigFile = $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/NagiosCheckTesting.pm';
+my $ConfigFile = $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/NagiosCheckTestingX.pm';
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 my $ExitCode = $CommandObject->Execute( '--config-file', $ConfigFile, '--as-checker', '--verbose', );
 
@@ -25,8 +31,6 @@ $Self->Is(
 );
 
 1;
-
-
 
 =back
 

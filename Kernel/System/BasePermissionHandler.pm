@@ -15,7 +15,7 @@ use warnings;
 
 use Time::HiRes;
 
-use Kernel::System::Role::Permission;
+use Kernel::System::Role::Permission qw(:all);
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -125,7 +125,7 @@ sub UpdateBasePermissions {
                 );
                 next PERMISSION;
             }
-        } 
+        }
         elsif ( !IsHashRefWithData($AssignedPermission) ) {
             # add permission
             my $Success = $RoleObject->PermissionAdd(

@@ -83,8 +83,9 @@ sub ParameterDefinition {
         'MailAccount::DispatchingBy' => {
             Required => 1,
             OneOf    => [
-                'Queue',
-                'From'
+                'PostmasterDefaultQueue',
+                'From',
+                'Queue'
             ]
         },
         'MailAccount::Trusted' => {
@@ -111,7 +112,7 @@ perform MailAccountCreate Operation. This will return the created MailAccountID.
                 IMAPFolder    => 'Some Folder',     # optional, only valid for IMAP-type accounts
                 ValidID       => 1,
                 Trusted       => 0,
-                DispatchingBy => 'Queue',           # Queue|From
+                DispatchingBy => 'Queue',           # PostmasterDefaultQueue|From|Queue
                 Comment       => '...',             # optional
                 QueueID       => 12,
             },

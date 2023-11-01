@@ -22,12 +22,10 @@ my $MainObject   = $Kernel::OM->Get('Main');
 my $TicketObject = $Kernel::OM->Get('Ticket');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
@@ -89,7 +87,8 @@ for my $File (qw(1 2 3 5 6 11 21)) {
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

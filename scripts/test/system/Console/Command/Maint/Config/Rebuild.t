@@ -17,15 +17,20 @@ use vars (qw($Self));
 use File::stat();
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # get command object
 my $CommandObject = $Kernel::OM->Get('Console::Command::Maint::Config::Rebuild');
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
+
 my $ExitCode      = $CommandObject->Execute();
 
 $Self->Is(
@@ -34,7 +39,8 @@ $Self->Is(
     "Exit code",
 );
 
-# cleanup cache is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

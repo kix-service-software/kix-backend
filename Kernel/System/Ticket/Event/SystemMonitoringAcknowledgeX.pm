@@ -364,8 +364,8 @@ sub _HTTP {
     $URL =~ s{<CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($1)}egx;
     $URL =~ s{<KIX_CONFIG_(.+?)>}{$Self->{ConfigObject}->Get($2)}egx;
 
-    # don't use Crypt::SSLeay but Net::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
+    # don't use Crypt::SSLeay but IO::Socket::SSL instead
+    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
     my $UserAgent = LWP::UserAgent->new();
     $UserAgent->timeout(15);

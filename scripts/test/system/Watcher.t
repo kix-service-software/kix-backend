@@ -15,17 +15,15 @@ use utf8;
 use vars (qw($Self));
 
 # get needed objects
-my $TicketObject = $Kernel::OM->Get('Ticket');
+my $TicketObject  = $Kernel::OM->Get('Ticket');
 my $WatcherObject = $Kernel::OM->Get('Watcher');
-my $UserObject   = $Kernel::OM->Get('User');
+my $UserObject    = $Kernel::OM->Get('User');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my @TicketIDs;
 my @TestUserIDs;
@@ -41,15 +39,15 @@ for ( 1 .. 2 ) {
 
     # create a new ticket
     my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'My ticket for watching',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'open',
-        ContactID    => 'customer@example.com',
+        Title          => 'My ticket for watching',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'open',
+        ContactID      => 'customer@example.com',
         OrganisationID => 'example.com',
-        OwnerID      => 1,
-        UserID       => 1,
+        OwnerID        => 1,
+        UserID         => 1,
     );
 
     $Self->True(
@@ -144,7 +142,8 @@ $Self->True(
     'WatcherList - second user',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

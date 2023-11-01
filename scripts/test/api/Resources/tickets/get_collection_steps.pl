@@ -122,6 +122,13 @@ When qr/I query the collection of tickets (\d+) searchlimit object$/, sub {
    );
 };
 
-
+When qr/I query the collection of tickets with multiplesort by "(.*?)"$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/tickets',
+       Sort => $1,
+       #      Filter => '{"Ticket": {"AND": [{"Field": "StateID","Operator": "EQ","Value": "6","Not": true}]}}',
+   );
+};
 
 

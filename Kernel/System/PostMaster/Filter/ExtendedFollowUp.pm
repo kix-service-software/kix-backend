@@ -26,13 +26,8 @@ sub new {
 
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-    $Self->{ConfigObject}       = $Kernel::OM->Get('Config');
-    $Self->{DynamicFieldObject} = $Kernel::OM->Get('DynamicField');
-    $Self->{TicketObject}       = $Kernel::OM->Get('Ticket');
-
     # get our config
-    $Self->{Config} = $Self->{ConfigObject}->Get('ExtendedFollowUp');
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('ExtendedFollowUp');
 
     return $Self;
 }
@@ -41,24 +36,18 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # no config --> no mapping
-    return if ( !$Self->{Config} || ref( $Self->{Config} ) ne 'HASH' );
-    return if ( !$Self->{Config}->{Identifier} || ref( $Self->{Config}->{Identifier} ) ne 'HASH' );
-    return
-        if ( !$Self->{Config}->{SenderEmail} || ref( $Self->{Config}->{SenderEmail} ) ne 'HASH' );
-    return
-        if (
-        !$Self->{Config}->{ExternalReference}
+    return if (
+        !$Self->{Config}
+        || ref( $Self->{Config} ) ne 'HASH'
+        || ref( $Self->{Config}->{Identifier} ) ne 'HASH'
+        || ref( $Self->{Config}->{SenderEmail} ) ne 'HASH'
         || ref( $Self->{Config}->{ExternalReference} ) ne 'HASH'
-        );
-    return
-        if (
-        !$Self->{Config}->{DynamicFieldMapping}
         || ref( $Self->{Config}->{DynamicFieldMapping} ) ne 'HASH'
-        );
+    );
 
     my %ExistingTicket;
     if ( $Param{TicketID} ) {
-        %ExistingTicket = $Self->{TicketObject}->TicketGet(
+        %ExistingTicket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $Param{TicketID},
             DynamicFields => 1
         )
@@ -66,114 +55,125 @@ sub Run {
 
     my %FilterKeys = %{ $Self->{Config}->{Identifier} };
 
-    foreach my $FilterKey ( sort keys %FilterKeys ) {
-
+    # process configured filters
+    for my $FilterKey ( sort( keys( %FilterKeys ) ) ) {
         # next if not all config values for the key are set
-        next
-            if (
-            !$Self->{Config}->{SenderEmail}->{ $FilterKeys{$FilterKey} }
-            ||
-            !$Self->{Config}->{ExternalReference}->{ $FilterKeys{$FilterKey} } ||
-            !$Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{$FilterKey} }
-            );
+        next if (
+            !$Self->{Config}->{SenderEmail}->{ $FilterKeys{ $FilterKey } }
+            || !$Self->{Config}->{ExternalReference}->{ $FilterKeys{ $FilterKey } }
+            || !$Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{ $FilterKey } }
+        );
+
+        # get config values for filter
+        my $DynamicField      = $Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{ $FilterKey } };
+        my $SenderEmail       = $Self->{Config}->{SenderEmail}->{ $FilterKeys{ $FilterKey } };
+        my $ExternalReference = $Self->{Config}->{ExternalReference}->{ $FilterKeys{ $FilterKey } };
 
         # next if configured dynamic field does not exist
-        my $TicketDynamicFields = $Self->{DynamicFieldObject}->DynamicFieldList(
+        my $TicketDynamicFields = $Kernel::OM->Get('DynamicField')->DynamicFieldList(
             ObjectType => 'Ticket',
             ResultType => 'HASH',
         );
-        my %DynamicFieldHash = reverse %{$TicketDynamicFields};
-        next
-            if (
-            !defined(
-                $DynamicFieldHash{
-                    $Self->{Config}->{DynamicFieldMapping}
-                        ->{ $FilterKeys{$FilterKey} }
-                    }
-            )
-            );
+        my %DynamicFieldHash = reverse( %{ $TicketDynamicFields } );
+        next if ( !defined( $DynamicFieldHash{ $DynamicField } ) );
 
         # next if in the existing ticket the dynamic field is not empty
-        next
-            if (
+        next if (
             %ExistingTicket
-            && ref %ExistingTicket eq 'HASH'
-            && $ExistingTicket{
-                'DynamicField-'
-                    . $Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{$FilterKey} }
-            }
-            );
+            && $ExistingTicket{ 'DynamicField_' . $DynamicField }
+        );
 
         # sender email doesnt match
-        next
-            if (
-            $Param{GetParam}->{From} !~
-            /$Self->{Config}->{SenderEmail}->{$FilterKeys{$FilterKey}}/
-            );
+        next if ( $Param{GetParam}->{From} !~ /$SenderEmail/ );
 
         my $ReferenceNumber = '';
-        if (
-            $Param{GetParam}->{Subject} =~
-            /$Self->{Config}->{ExternalReference}->{$FilterKeys{$FilterKey}}/
-            )
-        {
+        if ( $Param{GetParam}->{Subject} =~ /$ExternalReference/ ) {
             $ReferenceNumber = $1;
         }
 
-        if ($ReferenceNumber) {
-
-            # write DynamicField
-            $Param{GetParam}->{
-                'X-KIX-FollowUp-DynamicField-'
-                    . $Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{$FilterKey} }
-                }
-                =
-                $ReferenceNumber;
+        if ( $ReferenceNumber ) {
+            # remember found reference number at ticket
+            $Param{GetParam}->{ 'X-KIX-DynamicField-' . $DynamicField }          = $ReferenceNumber;
+            $Param{GetParam}->{ 'X-KIX-FollowUp-DynamicField-' . $DynamicField } = $ReferenceNumber;
 
             # if no ticket was found by followup search on by external reference_number
-
             if ( !$Param{TicketID} ) {
+                # prepare sort param
+                my %Sort = (
+                    Field     => 'CreateTime',
+                    Direction => 'ascending',
+                );
+                if (
+                    $Self->{Config}->{SortByAgeOrder}
+                    && $Self->{Config}->{SortByAgeOrder} eq 'Up'
+                ) {
+                    $Sort{Direction} = 'descending';
+                }
 
-                my @TicketIDs = $Self->{TicketObject}->TicketSearch(
+                # search for possible follow up
+                my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
                     Result => 'ARRAY',
-                    'DynamicField_'
-                        . $Self->{Config}->{DynamicFieldMapping}->{ $FilterKeys{$FilterKey} } => {
-                        Like => $ReferenceNumber,
-                        },
-                    UserID  => 1,
-                    OrderBy => [ $Self->{Config}->{SortByAgeOrder} ],
-                    SortBy  => ['Age'],
+                    Search => {
+                        AND => [
+                            {
+                                Field    => 'DynamicField_' . $DynamicField,
+                                Operator => 'EQ',
+                                Value    => $ReferenceNumber
+                            }
+                        ]
+                    },
+                    Sort   => [
+                        \%Sort
+                    ],
+                    UserID => 1,
                 );
 
-                if ( scalar(@TicketIDs) > 0 ) {
-                    ## TODO
+                if ( scalar( @TicketIDs ) > 0 ) {
+                    # init variable for ticket number lookup
                     my $TicketNumber = '';
 
-                    # if ticket statetype isn't relevat
+                    # if ticket statetype isn't relevant
                     if ( $Self->{Config}->{AllTicketStateTypesIncluded} ) {
-                        $TicketNumber = $Self->{TicketObject}->TicketNumberLookup(
+                        $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
                             TicketID => $TicketIDs[0],
                             UserID   => 1,
                         );
                     }
-
-                    # if ticket statetape should by pending or open
+                    # filter by viewable state types first, fall back to closed tickets
                     else {
-                        for my $TicketID (@TicketIDs) {
-                            my %Ticket = $Self->{TicketObject}->TicketGet(
-                                TicketID => $TicketID,
+                        # filter previous tickets by viewable state type
+                        my @ViewableTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+                            Result => 'ARRAY',
+                            Search => {
+                                AND => [
+                                    {
+                                        Field    => 'TicketID',
+                                        Operator => 'IN',
+                                        Value    => \@TicketIDs
+                                    },
+                                    {
+                                        Field    => 'StateType',
+                                        Operator => 'IN',
+                                        Value    => 'Open'
+                                    },
+                                ]
+                            },
+                            Sort   => [
+                                \%Sort
+                            ],
+                            UserID => 1,
+                            Limit  => 1,
+                        );
+                        if ( scalar( @ViewableTicketIDs ) > 0 ) {
+                            $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
+                                TicketID => $ViewableTicketIDs[0],
                                 UserID   => 1,
                             );
-
-                            if ( $Ticket{StateType} =~ /^(pending|new|open)/ ) {
-                                $TicketNumber = $Ticket{TicketNumber};
-                                last;
-                            }
                         }
 
-# if open/pending tickets should be take and no one was found the first closed ticket will be choose
+                        # if none ticket found, use closed ticket
                         if ( !$TicketNumber ) {
-                            $TicketNumber = $Self->{TicketObject}->TicketNumberLookup(
+                            $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
                                 TicketID => $TicketIDs[0],
                                 UserID   => 1,
                             );
@@ -181,7 +181,7 @@ sub Run {
                     }
 
                     if ($TicketNumber) {
-                        $Param{GetParam}->{'Subject'} = $Self->{TicketObject}->TicketSubjectBuild(
+                        $Param{GetParam}->{'Subject'} = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
                             TicketNumber => $TicketNumber,
                             Subject      => $Param{GetParam}->{'Subject'},
                             Type         => 'New',
@@ -193,15 +193,10 @@ sub Run {
         }
     }
 
-    #...done...
     return 1;
-
 }
 
 1;
-
-
-
 
 =back
 

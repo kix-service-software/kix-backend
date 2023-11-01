@@ -8,12 +8,13 @@
   Scenario: get the list of existing notifications
     When I query the collection of notifications
     Then the response code is 200
-    Then the response contains 11 items of type "Notification"
+    Then the response contains 12 items of type "Notification"
     And the response contains the following items of type Notification
       | Name                                     | ValidID |
       | Agent - New Ticket Notification          | 1       |
       | Agent - Reminder (if unlocked)           | 1       |
       | Customer - New Ticket Receipt            | 1       |
+      | Customer - Follow Up Rejection           | 2       |
       | Agent - FUP Notification (if unlocked)   | 1       |
       | Agent - FUP Notification (if locked)     | 1       |
       | Agent - Lock Timeout                     | 1       |
@@ -22,6 +23,68 @@
       | Agent - New Note Notification            | 1       |
       | Agent - Ticket Move Notification         | 1       |
       | Agent - Reminder (if locked)             | 1       |
+
+  Scenario: get the list of Watcher Notifications
+    When I get this notification id 10
+    Then the response code is 200
+    And items of "Recipients"
+      | Attribut              |
+      | AgentMyQueues         |
+      | AgentOwner            |
+      | AgentReadPermissions  |
+      | AgentResponsible      |
+      | AgentWatcher          |
+      | AgentWritePermissions |
+
+   Scenario: get the list of Watcher Notifications
+     When I get this notification id 3
+     Then the response code is 200
+     And items of "Recipients"
+       | Attribut              |
+       | AgentOwner            |
+       | AgentResponsible      |
+       | AgentWatcher          |
+
+   Scenario: get the list of Watcher Notifications
+     When I get this notification id 4
+     Then the response code is 200
+     And items of "Recipients"
+       | Attribut              |
+       | AgentOwner            |
+       | AgentWatcher          |
+
+   Scenario: get the list of Watcher Notifications
+     When I get this notification id 5
+     Then the response code is 200
+     And items of "Recipients"
+       | Attribut              |
+       | AgentOwner            |
+       | AgentWatcher          |
+
+   Scenario: get the list of Watcher Notifications
+     When I get this notification id 7
+     Then the response code is 200
+     And items of "Recipients"
+       | Attribut              |
+       | AgentOwner            |
+       | AgentResponsible      |
+       | AgentWatcher          |
+
+   Scenario: get the list of Watcher Notifications
+     When I get this notification id 9
+     Then the response code is 200
+     And items of "Recipients"
+       | Attribut              |
+       | AgentOwner            |
+       | AgentResponsible      |
+       | AgentWatcher          |
+
+
+
+
+
+
+
 
 
 

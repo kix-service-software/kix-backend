@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -40,7 +40,7 @@ Handles sync jobs.
 
 =item Run()
 
-Run this job module. Returns 1 if the job was executed successful.
+Run this job module. Returns just 1 to run the job without restrictions.
 
 Example:
     my $Result = $Object->Run(
@@ -50,19 +50,8 @@ Example:
 
 =cut
 
-sub Run {
+sub _Run {
     my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
-            return;
-        }
-    }
 
     # return dummy value to make sure the macros will be executed
     return (1);

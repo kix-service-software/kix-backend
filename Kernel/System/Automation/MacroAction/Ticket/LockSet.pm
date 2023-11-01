@@ -113,7 +113,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->LockSet(
+    my $Success = $TicketObject->TicketLockSet(
         TicketID => $Param{TicketID},
         LockID   => $LockID,
         UserID   => $Param{UserID},

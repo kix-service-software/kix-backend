@@ -34,3 +34,14 @@ When qr/I query the collection of objecticons$/, sub {
       URL   => S->{API_URL}.'/system/objecticons',
    );
 };
+
+When qr/I query the collection of objecticons with filter$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/system/objecticons',
+       Filter => '{"ObjectIcon": {"AND":[{"Field": "Object","Operator": "EQ","Type": "STRING","Value": "MIMEType"},{"Field": "ObjectID","Operator": "EQ","Type": "STRING","Value": "image/svg+xml"}]}}',
+   );
+};
+
+
+

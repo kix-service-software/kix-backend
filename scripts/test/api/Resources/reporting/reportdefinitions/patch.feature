@@ -9,6 +9,7 @@ Feature: PATCH request to the /reporting/reportdefinitions/:ReportDefinitionId r
     Given a reportdefinition
     When I update this reportdefinition
     Then the response code is 200
+    And the response object is ReportDefinitionPostPatchResponse
     When I delete this reportdefinition
     Then the response code is 204
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -68,7 +68,51 @@ Example:
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    return 1;
+    # check needed stuff
+    for my $Needed (qw(UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
+        }
+    }
+
+    if (IsHashRefWithData($Param{Filter})) {
+        $Param{Filter} = [$Param{Filter}];
+    }
+
+    my @IDs = $Self->_Run(%Param);
+
+    return @IDs;
+}
+
+sub _Run {
+    my ( $Self, %Param ) = @_;
+
+    return;
+}
+
+sub _ExtendFilter {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Filters} if ( !IsHashRefWithData($Param{Extend}) );
+
+    my $Filters = $Param{Filters};
+
+    if (!IsArrayRef($Filters)) {
+        $Filters = [];
+    }
+    if (!scalar(@{$Filters})) {
+        $Filters->[0] = {};
+    }
+
+    for my $Filter ( @{$Filters} ) {
+        $Filter->{AND} //= [];
+        push( @{$Filter->{AND}}, $Param{Extend} );
+    }
+    return $Filters;
 }
 
 1;

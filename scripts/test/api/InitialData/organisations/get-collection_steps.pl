@@ -36,3 +36,32 @@ When qr/I query the collection of organisations$/, sub {
    );
 };
 
+When qr/I query the collection of organisations with df$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+       Token => S->{Token},
+       URL   => S->{API_URL}.'/organisations',
+       Include  => 'DynamicFields'
+   );
+};
+
+Then qr/the DynamicField attributes are$/, sub {
+   my $Object = 'DynamicFields';
+   my $Index = 0;
+
+   foreach my $Row ( @{ C->data } ) {
+      foreach my $Attribute ( keys %{$Row}) {
+         C->dispatch( 'Then', "the DF \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+      }
+      $Index++
+   }
+};
+
+Then qr/the DF "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+   if ( defined( S->{ResponseContent}->{Organisation}->[0]->{$2}->[$3]->{$1}) ) {
+      S->{ResponseContent}->{Organisation}->[0]->{$2}->[$3]->{$1}   =~ s/^\s+|\s+$//g;
+      is(S->{ResponseContent}->{Organisation}->[0]->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
+   }
+   else{
+      is('', $4, 'Check attribute value in response');
+   }
+};

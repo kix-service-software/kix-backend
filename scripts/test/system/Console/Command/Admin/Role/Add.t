@@ -19,13 +19,18 @@ my $CommandObject = $Kernel::OM->Get('Console::Command::Admin::Role::Add');
 my ( $Result, $ExitCode );
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $Helper   = $Kernel::OM->Get('UnitTest::Helper');
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
 my $RoleName = "role" . $Helper->GetRandomID();
+
+# silence console output
+local *STDOUT;
+local *STDERR;
+open STDOUT, '>>', "/dev/null";
+open STDERR, '>>', "/dev/null";
 
 # try to execute command without any options
 $ExitCode = $CommandObject->Execute();
@@ -51,7 +56,8 @@ $Self->Is(
     "Role with the name $RoleName already exists",
 );
 
-# cleanup is done by RestoreDatabase
+# begin transaction on database
+$Helper->BeginWork();
 
 1;
 

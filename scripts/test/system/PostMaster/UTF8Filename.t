@@ -22,13 +22,12 @@ my $TicketObject = $Kernel::OM->Get('Ticket');
 my $MainObject   = $Kernel::OM->Get('Main');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase  => 1,
-        UseTmpArticleDir => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+$Helper->UseTmpArticleDir();
 
 for my $Backend (qw(DB FS)) {
 
@@ -89,7 +88,8 @@ for my $Backend (qw(DB FS)) {
     );
 }
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

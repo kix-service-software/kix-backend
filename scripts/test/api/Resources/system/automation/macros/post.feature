@@ -8,6 +8,7 @@ Feature: POST request to the /system/automation/macros resource
   Scenario: create a automation macro
     When I create a automation macro 
     Then the response code is 201
+    And the response object is MacroPostPatchResponse
     When I delete this automation macro
     Then the response code is 204
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,17 +15,11 @@ use vars (qw($Self));
 # get Macro object
 my $AutomationObject = $Kernel::OM->Get('Automation');
 
-#
-# Macro tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 my $NameRandom  = $Helper->GetRandomID();
 my %MacroIDByMacroName = (
@@ -60,6 +54,7 @@ for my $MacroName ( sort keys %MacroIDByMacroName ) {
         Type    => 'Ticket',
         ValidID => 1,
         UserID  => 1,
+        Silent  => 1,
     );
 
     $Self->False(
@@ -153,6 +148,7 @@ $MacroID1 = $AutomationObject->MacroAdd(
     Type    => 'Ticket',
     ValidID => 1,
     UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->False(
@@ -179,6 +175,7 @@ my $MacroUpdateWrong = $AutomationObject->MacroUpdate(
     Name    => $ChangedMacroName,
     ValidID => 2,
     UserID  => 1,
+    Silent  => 1,
 );
 
 $Self->False(
@@ -199,8 +196,9 @@ $Self->True(
 
 # delete a non existent macro
 $MacroDelete = $AutomationObject->MacroDelete(
-    ID      => 9999,
-    UserID  => 1,
+    ID     => 9999,
+    UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -208,7 +206,8 @@ $Self->False(
     'MacroDelete() delete non existent macro',
 );
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

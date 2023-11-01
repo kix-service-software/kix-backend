@@ -14,8 +14,8 @@ use utf8;
 
 use vars (qw($Self));
 
-# get config object
-my $ConfigObject = $Kernel::OM->Get('Config');
+# get helper object
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
 
@@ -24,57 +24,55 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         # make sure that the TicketObject gets recreated for each loop.
         $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::Hook',
             Value => $TicketHook,
         );
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectFormat',
             Value => $TicketSubjectConfig,
         );
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::NumberGenerator',
             Value => 'Kernel::System::Ticket::Number::DateChecksum',
         );
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectRe',
             Value => 'RE',
         );
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectFwd',
             Value => 'AW',
         );
 
-        my $TicketObject = $Kernel::OM->Get('Ticket');
-
         $Self->True(
-            $TicketObject->isa('Kernel::System::Ticket::Number::DateChecksum'),
+            $Kernel::OM->Get('Ticket')->isa('Kernel::System::Ticket::Number::DateChecksum'),
             "TicketObject loaded the correct backend",
         );
 
         # check GetTNByString
-        my $Tn = $TicketObject->TicketCreateNumber() || 'NONE!!!';
-        my $String = 'Re: ' . $TicketObject->TicketSubjectBuild(
+        my $Tn = $Kernel::OM->Get('Ticket')->TicketCreateNumber() || 'NONE!!!';
+        my $String = 'Re: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
             TicketNumber => $Tn,
             Subject      => 'Some Test',
         );
-        my $TnGet = $TicketObject->GetTNByString($String) || 'NOTHING FOUND!!!';
+        my $TnGet = $Kernel::OM->Get('Ticket')->GetTNByString($String) || 'NOTHING FOUND!!!';
         $Self->Is(
             $TnGet,
             $Tn,
             "GetTNByString() (DateChecksum: true eq)",
         );
         $Self->IsNot(
-            $TicketObject->GetTNByString('Ticket#: 200206231010138') || '',
+            $Kernel::OM->Get('Ticket')->GetTNByString('Ticket#: 200206231010138') || '',
             $Tn,
             "GetTNByString() (DateChecksum: false eq)",
         );
         $Self->False(
-            $TicketObject->GetTNByString("Ticket#: 1234567") || 0,
+            $Kernel::OM->Get('Ticket')->GetTNByString("Ticket#: 1234567") || 0,
             "GetTNByString() (DateChecksum: false)",
         );
 
-        my $NewSubject = $TicketObject->TicketSubjectClean(
+        my $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'Re: [' . $TicketHook . ': 2004040510440485] Re: RE: Some Subject',
         );
@@ -85,7 +83,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
 
         # TicketSubjectClean()
-        $NewSubject = $TicketObject->TicketSubjectClean(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'Re[5]: [' . $TicketHook . ': 2004040510440485] Re: RE: WG: Some Subject',
         );
@@ -96,7 +94,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
 
         # TicketSubjectClean()
-        $NewSubject = $TicketObject->TicketSubjectClean(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'Re[5]: Re: RE: WG: Some Subject [' . $TicketHook . ': 2004040510440485]',
         );
@@ -107,7 +105,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
 
         # TicketSubjectBuild()
-        $NewSubject = $TicketObject->TicketSubjectBuild(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
             TicketNumber => '2004040510440485',
             Subject      => "Re: [$TicketHook: 2004040510440485] Re: RE: WG: Some Subject",
         );
@@ -127,11 +125,11 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         }
 
         # check Ticket::SubjectRe with "Antwort"
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectRe',
             Value => 'Antwort',
         );
-        $NewSubject = $TicketObject->TicketSubjectClean(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'Antwort: ['
                 . $TicketHook
@@ -144,7 +142,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
 
         # TicketSubjectBuild()
-        $NewSubject = $TicketObject->TicketSubjectBuild(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
             TicketNumber => '2004040510440485',
             Subject      => '[' . $TicketHook . ':2004040510440485] Antwort: Antwort: Some Subject2',
         );
@@ -164,11 +162,11 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         }
 
         # check Ticket::SubjectRe with "Antwort"
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectRe',
             Value => '',
         );
-        $NewSubject = $TicketObject->TicketSubjectClean(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'RE: ['
                 . $TicketHook
@@ -181,7 +179,7 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         );
 
         # TicketSubjectBuild()
-        $NewSubject = $TicketObject->TicketSubjectBuild(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
             TicketNumber => '2004040510440485',
             Subject      => 'Re: [' . $TicketHook . ': 2004040510440485] Re: Antwort: Some Subject2',
         );
@@ -200,20 +198,20 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
             );
         }
 
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectRe',
             Value => 'Re',
         );
 
         # TicketSubjectClean()
         # check Ticket::SubjectFwd with "FWD"
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectFwd',
             Value => 'FWD',
         );
 
         # TicketSubjectBuild()
-        $NewSubject = $TicketObject->TicketSubjectBuild(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
             TicketNumber => '2004040510440485',
             Subject      => "Re: [$TicketHook: 2004040510440485] Re: RE: WG: Some Subject",
             Action       => 'Forward',
@@ -234,11 +232,11 @@ for my $TicketHook ( 'Ticket#', 'Call#', 'Ticket' ) {
         }
 
         # check Ticket::SubjectFwd with "WG"
-        $ConfigObject->Set(
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::SubjectFwd',
             Value => 'WG',
         );
-        $NewSubject = $TicketObject->TicketSubjectClean(
+        $NewSubject = $Kernel::OM->Get('Ticket')->TicketSubjectClean(
             TicketNumber => '2004040510440485',
             Subject      => 'Antwort: ['
                 . $TicketHook

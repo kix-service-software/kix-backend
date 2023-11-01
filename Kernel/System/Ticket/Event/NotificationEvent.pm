@@ -56,6 +56,7 @@ sub Run {
     # check needed stuff
     for my $Needed (qw(Event Data Config UserID)) {
         if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
@@ -71,6 +72,7 @@ sub Run {
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
     if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
+        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need TicketID or TicketList in Data!',
@@ -404,7 +406,7 @@ sub _HandleTicket {
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
-            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, $Notification{Name},
+            Message  => sprintf "NotificationEvent::_HandleTicket: informed %i recipients (notification \"%s\")\n", $InformedRecipientCount, ($Notification{Name} || '- No name -'),
         );
     }
 
@@ -618,7 +620,7 @@ sub _RecipientsGet {
                 }
 
                 # get language and send recipient
-                $Recipient{Language} = $ConfigObject->Get('DefaultLanguage') || 'en';
+                $Recipient{UserLanguage} = $ConfigObject->Get('DefaultLanguage') || 'en';
 
                 if ( $Ticket{ContactID} ) {
 
@@ -629,9 +631,12 @@ sub _RecipientsGet {
                     # join Recipient data with Contact data
                     %Recipient = ( %Recipient, %Contact );
 
-                    # get user language
-                    if ( $Contact{Language} ) {
-                        $Recipient{Language} = $Contact{Language};
+                    # set recipient language
+                    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+                        UserID => $Contact{AssignedUserID}
+                    );
+                    if ( $Language ) {
+                        $Recipient{UserLanguage} = $Language;
                     }
 
                     $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
@@ -720,8 +725,15 @@ sub _RecipientsGet {
         my %User = $UserObject->GetUserData(
             UserID => $UserID,
             Valid  => 1,
+
         );
         next RECIPIENT if !%User;
+
+        # set recipient language
+        my $Language = $UserObject->GetUserLanguage(UserID => $UserID);
+        if ( $Language ) {
+            $User{UserLanguage} = $Language;
+        }
 
         # check if the notification needs to be sent just one time per day
         if (
@@ -898,7 +910,7 @@ sub _SendRecipientNotification {
 
 sub _GetUserIDsWithRequiredPermission {
     my ( $Self, %Param ) = @_;
-   
+
     my @BasePermissionUserIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantQueueUserIDList(
         QueueID       => $Param{Ticket}->{QueueID},
         Permission    => $Param{Permission},

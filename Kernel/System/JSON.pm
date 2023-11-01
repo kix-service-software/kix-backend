@@ -70,10 +70,12 @@ sub Encode {
 
     # check for needed data
     if ( !defined $Param{Data} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Data!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Data!',
+            );
+        }
         return;
     }
 
@@ -138,14 +140,12 @@ sub Decode {
 
     # use eval here, as JSON::XS->decode() dies when providing a malformed JSON string
     if ( !eval { $Scalar = $JSONObject->decode( $Param{Data} ) } ) {
-
-        if ( !$Param{Silence} ) {
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Decoding the JSON string failed: ' . $@,
             );
         }
-
         return;
     }
 

@@ -121,7 +121,7 @@ sub Search {
             }
             else {
                 push( @SQLJoin, "LEFT JOIN ticket_flag ntf$Index ON st.id = ntf$Index.ticket_id" );
-                push( @SQLWhere, "ntf$Index.ticket_key = '$SearchValue->{Flag}'" );
+                push( @SQLJoin, "AND ntf$Index.ticket_key = '$SearchValue->{Flag}'" );
             }
 
             # add value restriction if given
@@ -150,7 +150,7 @@ sub Search {
                     }
                 }
                 else {
-                    push( @SQLWhere, "ntf$Index.create_by = $SearchValue->{UserID}" );
+                    push( @SQLJoin, " AND ntf$Index.create_by = $SearchValue->{UserID}" );
                 }
             }
             $Index++;

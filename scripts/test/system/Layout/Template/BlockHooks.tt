@@ -7,8 +7,6 @@
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-
-
 [% RenderBlockStart('Block1') %]
 Content1
 [% RenderBlockStart('Block11') %]

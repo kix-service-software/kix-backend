@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -67,7 +67,11 @@ sub new {
 
 convert a html string to an ascii string
 
-    my $Ascii = $HTMLUtilsObject->ToAscii( String => $String );
+    my $Ascii = $HTMLUtilsObject->ToAscii( 
+        String       => $String,
+        NoURLGlossar => 0|1,            # optional, default: 0 - don't add the URL list to the end of the document
+        NoForcedLinebreak => 0|1,       # optional, default: 0
+    );
 
 =cut
 
@@ -91,7 +95,7 @@ sub ToAscii {
     # forcing line breaks every 78 chars
     my $LineLength = 78;
 
-    # find <a href=....> and replace it with [x]
+    # find <a href=....> and replace it
     my $LinkList = '';
     my $Counter  = 0;
     $Param{String} =~ s{
@@ -100,8 +104,13 @@ sub ToAscii {
     {
         my $Link = $2;
         $Counter++;
-        $LinkList .= "[$Counter] $Link\n";
-        "[$Counter]";
+        if ( !$Param{NoURLGlossar} ) {
+            $LinkList .= "[$Counter] $Link\n";
+            "[$Counter]";
+        }
+        else {
+            "";
+        }
     }egxi;
 
     # pre-process <blockquote> and <div style=\"cite\"
@@ -115,7 +124,10 @@ sub ToAscii {
             String => $2,
         );
         # force line breaking
-        if ( length $Ascii > $LineLength ) {
+        if (
+            !$Param{NoForcedLinebreak}
+            && length $Ascii > $LineLength
+        ) {
             $Ascii =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
         }
         $Ascii =~ s/^(.*?)$/> $1/gm;
@@ -132,7 +144,10 @@ sub ToAscii {
             String => $1,
         );
         # force line breaking
-        if ( length $Ascii > $LineLength ) {
+        if (
+            !$Param{NoForcedLinebreak}
+            && length $Ascii > $LineLength
+        ) {
             $Ascii =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
         }
         $Ascii =~ s/^(.*?)$/> $1/gm;
@@ -554,7 +569,10 @@ sub ToAscii {
     $Param{String} =~ s/^\s*\n\s*\n/\n/mg;
 
     # force line breaking
-    if ( length $Param{String} > $LineLength ) {
+    if (
+        !$Param{NoForcedLinebreak}
+        && length $Param{String} > $LineLength
+    ) {
         $Param{String} =~ s/(.{4,$LineLength})(?:\s|\z)/$1\n/gm;
     }
 
@@ -564,7 +582,7 @@ sub ToAscii {
     }
 
     # add extracted links
-    if ($LinkList) {
+    if ( !$Param{NoURLGlossar} && $LinkList) {
         $Param{String} .= "\n\n" . $LinkList;
     }
 
@@ -645,15 +663,62 @@ sub DocumentComplete {
 
     return $Param{String} if $Param{String} =~ /<html>/i;
 
-    my $Css = $Kernel::OM->Get('Config')->Get('Frontend::RichText::DefaultCSS')
-        || 'font-size: 12px; font-family:Courier,monospace,fixed;';
+    my $Config = $Kernel::OM->Get('Config')->Get('Frontend::RichText::DefaultCSS');
+    my $Style  = q{};
+    if ( $Config ) {
+        my $StyleData = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Config
+        );
+
+        for my $StyleEntry ( @{$StyleData} ) {
+            my $Selector = $StyleEntry->{Selector};
+            my $CSS      = $StyleEntry->{Value};
+
+            next if !$Selector || !$CSS;
+
+            if ( $Selector eq '.cke_editable' ) {
+                $Selector = 'body';
+            }
+
+            $Style .= <<"END";
+            $Selector {
+                $CSS
+            }
+END
+        }
+    }
+
+    if ( !$Style ) {
+        $Style = <<'END';
+        <style>
+            body {
+                font-size: 12px;
+                font-family:Courier,monospace,fixed;
+            }
+        </style>
+END
+    }
+    else {
+$Style = <<"END";
+        <style>
+            $Style
+        </style>
+END
+    }
 
     # Use the HTML5 doctype because it is compatible with HTML4 and causes the browsers
     #   to render the content in standards mode, which is more safe than quirks mode.
-    my $Body = '<!DOCTYPE html><html><head>';
-    $Body
-        .= '<meta http-equiv="Content-Type" content="text/html; charset=' . $Param{Charset} . '"/>';
-    $Body .= '</head><body style="' . $Css . '">' . $Param{String} . '</body></html>';
+    my $Body = <<"END";
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=$Param{Charset}"/>
+        $Style
+    </head>
+    <body>$Param{String}</body>
+</html>
+END
+
     return $Body;
 }
 
@@ -1208,17 +1273,21 @@ sub EmbeddedImagesExtract {
     my ( $Self, %Param ) = @_;
 
     if ( ref $Param{DocumentRef} ne 'SCALAR' || !defined ${ $Param{DocumentRef} } ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need DocumentRef!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need DocumentRef!"
+            );
+        }
         return;
     }
     if ( ref $Param{AttachmentsRef} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need AttachmentsRef!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need AttachmentsRef!"
+            );
+        }
         return;
     }
 
@@ -1251,106 +1320,7 @@ sub EmbeddedImagesExtract {
     return 1;
 }
 
-=item HTMLTruncate()
-
-DEPRECATED: This function will be removed in further versions
-
-truncate an HTML string to certain amount of characters without loosing the HTML tags, the resulting
-string will contain the specified amount of text characters plus the HTML tags, and ellipsis string.
-
-special characters like &aacute; in HTML code are considered as just one character.
-
-    my $HTML = $HTMLUtilsObject->HTMLTruncate(
-        String   => $String,
-        Chars    => 123,
-        Ellipsis => '...',              # optional (defaults to HTML &#8230;) string to indicate
-                                        #    that the HTML was truncated until that point
-        UTF8Mode => 0,                  # optional 1 or 0 (defaults to 0)
-        OnSpace  => 0,                  # optional 1 or 0 (defaults to 0) if enabled, prevents to
-                                        #    truncate in a middle of a word, but in the space before
-    );
-
-returns
-
-    $HTML => 'some HTML code'           # or false in case of a failure
-
-=cut
-
-sub HTMLTruncate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed
-    for my $Needed (qw(String Chars)) {
-
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!",
-            );
-            return;
-        }
-    }
-
-    # translate params for compatibility reasons with HTML::Truncate
-    my %CompatibilityParams = (
-        'utf8_mode' => $Param{UTF8Mode} ? 1 : 0,
-        'on_space'  => $Param{OnSpace}  ? 1 : 0,
-        'chars'     => $Param{Chars},
-        'repair'    => 1,
-    );
-
-    if ( defined $Param{Ellipsis} ) {
-        $CompatibilityParams{ellipsis} = $Param{Ellipsis};
-    }
-
-    # create new HTML truncate object (with the specified options)
-    my $HTMLTruncateObject;
-    eval {
-        $HTMLTruncateObject = HTML::Truncate->new(%CompatibilityParams);
-    };
-
-    if ( !$HTMLTruncateObject ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Could not create HTMLTruncateObject: $@",
-        );
-        return;
-    }
-
-    # sanitize the string
-    my %Safe = $Self->Safety(
-        String         => $Param{String},
-        NoApplet       => 1,
-        NoObject       => 1,
-        NoEmbed        => 1,
-        NoSVG          => 1,
-        NoImg          => 1,
-        NoIntSrcLoad   => 1,
-        NoExtSrcLoad   => 1,
-        NoJavaScript   => 1,
-        ReplacementStr => '✂︎',
-    );
-
-    # truncate the HTML input string
-    my $Result;
-    if ( !eval { $Result = $HTMLTruncateObject->truncate( $Safe{String} ) } ) {
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Truncating string failed: ' . $@,
-        );
-
-        return;
-    }
-
-    return $Result;
-}
-
 1;
-
-
-
-
 
 =back
 

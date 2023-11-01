@@ -16,12 +16,10 @@ use vars (qw($Self));
 my $TranslationObject = $Kernel::OM->Get('Translation');
 
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 ########################################################################################################################################
 # Pattern handling
@@ -31,8 +29,8 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $Pattern = 'Pattern' . $Helper->GetRandomID();
 
 my $PatternID = $TranslationObject->PatternAdd(
-    Value   => $Pattern,
-    UserID  => 1,
+    Value  => $Pattern,
+    UserID => 1,
 );
 
 $Self->True(
@@ -42,8 +40,9 @@ $Self->True(
 
 # add existing pattern
 my $PatternIDWrong = $TranslationObject->PatternAdd(
-    Value   => $Pattern,
-    UserID  => 1,
+    Value  => $Pattern,
+    UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -84,9 +83,9 @@ $Self->True(
 
 my $PatternUpdate = $Pattern . 'update';
 my $Success = $TranslationObject->PatternUpdate(
-    ID      => $PatternID,
-    Value   => $PatternUpdate,
-    UserID  => 1,
+    ID     => $PatternID,
+    Value  => $PatternUpdate,
+    UserID => 1,
 );
 
 $Self->True(
@@ -105,8 +104,8 @@ $Self->Is(
 # add another pattern
 my $PatternSecond = $Pattern . 'second';
 my $PatternIDSecond   = $TranslationObject->PatternAdd(
-    Value   => $PatternSecond,
-    UserID  => 1,
+    Value  => $PatternSecond,
+    UserID => 1,
 );
 
 $Self->True(
@@ -116,9 +115,10 @@ $Self->True(
 
 # update with existing pattern
 my $PatternUpdateWrong = $TranslationObject->PatternUpdate(
-    ID      => $PatternIDSecond,
-    Value   => $PatternUpdate,
-    UserID  => 1,
+    ID     => $PatternIDSecond,
+    Value  => $PatternUpdate,
+    UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -175,9 +175,9 @@ $Self->True(
 
 # check if language is contained in available languages
 %PatternData = $TranslationObject->PatternGet(
-    ID => $PatternID,
+    ID                        => $PatternID,
     IncludeAvailableLanguages => 1,
-    UserID    => 1,
+    UserID                    => 1,
 );
 
 $Self->IsDeeply(
@@ -191,7 +191,8 @@ $Self->IsDeeply(
 # add existing TranslationLanguage
 $Success = $TranslationObject->TranslationLanguageAdd(
     %TranslationLanguage,
-    UserID    => 1,
+    UserID => 1,
+    Silent => 1,
 );
 
 $Self->False(
@@ -201,9 +202,10 @@ $Self->False(
 
 # add TranslationLanguage with non-existing PatternID
 $Success = $TranslationObject->TranslationLanguageAdd(
-    UserID    => 1,
     %TranslationLanguage,
+    UserID    => 1,
     PatternID => 123456789,
+    Silent    => 1,
 );
 
 $Self->False(
@@ -259,7 +261,8 @@ $Self->True(
 $Success = $TranslationObject->TranslationLanguageUpdate(
     %TranslationLanguage,
     PatternID => 1234567890,
-    UserID  => 1,
+    UserID    => 1,
+    Silent    => 1,
 );
 
 $Self->False(
@@ -309,7 +312,8 @@ $Self->False(
     'TranslationLanguageList() does not contain the deleted TranslationLanguage',
 );
 
-# cleanup is done by RestoreDatabase.
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

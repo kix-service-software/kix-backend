@@ -108,8 +108,6 @@ $Self->Is(
     'FQDN config test - sender mail value (backend)'
 );
 
-# restore to the previous state is done by RestoreDatabase
-
 1;
 
 =back

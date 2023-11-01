@@ -42,16 +42,16 @@ Given qr/a organisation$/, sub {
 };
 
 Given qr/a organisation with Number "(.*?)"$/, sub {
-   ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/organisations',
-      Token   => S->{Token},
-      Content => {
-        Organisation => {
-            Number => $1,
-            Name => "Test Organisation_cu"
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/organisations',
+        Token   => S->{Token},
+        Content => {
+            Organisation => {
+                Number => $1,
+                Name => "Test Organisation_cu"
+            }
         }
-      }
-   );
+    );
 };
 
 Given qr/(\d+) of organisations$/, sub {
@@ -96,3 +96,18 @@ When qr/added a organisation$/, sub {
       }
    );
 };
+
+When qr/added a organisation without number$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/organisations',
+      Token   => S->{Token},
+      Content => {
+        Organisation => {
+            Number => "",
+            Name => "Test Organisation ".rand()
+        }
+      }
+   );
+};
+
+

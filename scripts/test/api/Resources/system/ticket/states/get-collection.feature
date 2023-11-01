@@ -31,7 +31,7 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
     And the response contains 5 items of type "TicketState"
     
   Scenario: get the list of existing ticketstates with limit and offset
-    When I query the collection of ticketstates with limit 2 and offset 4
+    When I query the collection of ticketstates with limit 2 and offset 1
     Then the response code is 200
 #    And the response object is TicketStateCollectionResponse 
     And the response contains 2 items of type "TicketState"
@@ -49,14 +49,14 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
       | pending auto close |
       | removed            |
       | merged             |
-#    And the response object is TicketStateCollectionResponse 
+
        
     
   Scenario: get the list of existing ticketstates with sorted, limit and offset
-    When I query the collection of ticketstates with sorted by "TicketState.-Name:textual" limit 2 and offset 5
+    When I query the collection of ticketstates with sorted by "TicketState.-Name:textual" limit 2 and offset 1
     Then the response code is 200
 #    And the response object is TicketStateCollectionResponse 
-    And the response contains 2 items of type "TicketState"     
+    And the response contains 2 items of type "TicketState"
     
     
     

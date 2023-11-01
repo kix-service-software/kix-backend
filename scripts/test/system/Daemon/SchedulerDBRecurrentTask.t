@@ -38,7 +38,7 @@ my $SchedulerDBObject = $Kernel::OM->Get('Daemon::SchedulerDB');
 
 $Self->Is(
     ref $SchedulerDBObject,
-    'Daemon::SchedulerDB',
+    'Kernel::System::Daemon::SchedulerDB',
     "Kernel::System::Daemon::SchedulerDB->new()",
 );
 
@@ -100,6 +100,7 @@ my @Tests = (
         Name    => 'Empty Config',
         Config  => {},
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing NodeID',
@@ -111,6 +112,7 @@ my @Tests = (
             Data                   => {},
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing PID',
@@ -122,6 +124,7 @@ my @Tests = (
             Data                   => {},
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing TaskName',
@@ -133,6 +136,7 @@ my @Tests = (
             Data                   => {},
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing TaskType',
@@ -144,6 +148,7 @@ my @Tests = (
             Data                   => {},
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing PreviousEventTimestamp',
@@ -155,6 +160,7 @@ my @Tests = (
             Data     => {},
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Missing Data',
@@ -166,6 +172,7 @@ my @Tests = (
             PreviousEventTimestamp => $SystemTime,
         },
         Success => 0,
+        Silent  => 1,
     },
     {
         Name   => 'Correct Initial',
@@ -314,7 +321,10 @@ for my $Test (@Tests) {
         print "  Cache cleared before RecurrentTaskExecute()...\n"
     }
 
-    my $Success = $SchedulerDBObject->RecurrentTaskExecute( %{ $Test->{Config} } );
+    my $Success = $SchedulerDBObject->RecurrentTaskExecute(
+        %{ $Test->{Config} },
+        Silent => $Test->{Silent},
+    );
 
     # return the cache as it was
     if ( $Test->{NoCache} ) {

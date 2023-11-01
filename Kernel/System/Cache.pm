@@ -18,9 +18,10 @@ use Time::HiRes qw(time);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Config
+    Log
 );
 
 =head1 NAME
@@ -159,11 +160,12 @@ sub Set {
 
     # Enforce cache type restriction to make sure it works properly on all file systems.
     if ( $Param{Type} !~ m{ \A [a-zA-Z0-9_]+ \z}smx ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Cache Type '$Param{Type}' contains invalid characters, use [a-zA-Z0-9_] only!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Cache Type '$Param{Type}' contains invalid characters, use [a-zA-Z0-9_] only!",
+            );
+        }
         return;
     }
 

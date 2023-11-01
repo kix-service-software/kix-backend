@@ -26,14 +26,10 @@ my $ContactObject      = $Kernel::OM->Get('Contact');
 my $UserObject         = $Kernel::OM->Get('User');
 my $DynamicFieldObject = $Kernel::OM->Get('DynamicField');
 my $DFBackendObject    = $Kernel::OM->Get('DynamicField::Backend');
+my $Helper             = $Kernel::OM->Get('UnitTest::Helper');
 
-# get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
-my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+# begin transaction on database
+$Helper->BeginWork();
 
 # prepare test data
 my %TestData = _PrepareData();
@@ -46,15 +42,15 @@ sub _PrepareData {
 
     # create ticket
     my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'some test ticket',
-        Queue        => 'Junk',
-        Lock         => 'unlock',
-        Priority     => '3 normal',
-        State        => 'closed',
+        Title          => 'some test ticket',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
         OrganisationID => 1,
-        ContactID    => 1,
-        OwnerID      => 1,
-        UserID       => 1,
+        ContactID      => 1,
+        OwnerID        => 1,
+        UserID         => 1,
     );
     $Self->True(
         $TicketID,
@@ -71,7 +67,7 @@ sub _PrepareData {
         Body             => 'Visible 1',
         ContentType      => 'text/plain; charset=utf-8',
         HistoryType      => 'AddNote',
-        HistoryComment   => '%%',
+        HistoryComment   => q{%%},
         UserID           => 1
     );
     $Self->True(
@@ -87,7 +83,7 @@ sub _PrepareData {
         Body             => 'Visible 2',
         ContentType      => 'text/plain; charset=utf-8',
         HistoryType      => 'AddNote',
-        HistoryComment   => '%%',
+        HistoryComment   => q{%%},
         UserID           => 1
     );
     $Self->True(
@@ -103,7 +99,7 @@ sub _PrepareData {
         Body             => 'Not Visible 1',
         ContentType      => 'text/plain; charset=utf-8',
         HistoryType      => 'AddNote',
-        HistoryComment   => '%%',
+        HistoryComment   => q{%%},
         UserID           => 1
     );
     $Self->True(
@@ -127,24 +123,26 @@ sub _CheckWithStaticData {
 
     _SetConfig(
         'with static for CustomerVisible = 1',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "OwnerID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END",
+{
+    "Contact": {
+        "Ticket": {
+            "OwnerID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }',
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+END
         1
     );
 
@@ -176,24 +174,26 @@ sub _CheckWithStaticData {
 
     _SetConfig(
         'with static for CustomerVisible = 0',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "OwnerID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            0
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "OwnerID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    0
+                ]
+            }
+        }
+    }
+}
+END
     );
 
     # get not visible articles
@@ -208,11 +208,7 @@ sub _CheckWithStaticData {
         (scalar(@{ $TestData{VisibleArticleIDs} }) + scalar(@{ $TestData{NotVisibleArticleIDs} })),
         'Article list should contain '.(scalar(@{ $TestData{VisibleArticleIDs} }) + scalar(@{ $TestData{NotVisibleArticleIDs} })).' articles (visible = 1 and 0)',
     );
-    # $Self->Is(
-    #     scalar(@{$NotVisibleArticleIDList}),
-    #     scalar(@{ $TestData{NotVisibleArticleIDs} }),
-    #     'Article list should contain '.scalar(@{ $TestData{NotVisibleArticleIDs} }).' articles (visible = 0)',
-    # );
+
     for my $NotVisibleArticleID (@{ $TestData{NotVisibleArticleIDs} }) {
         $Self->ContainedIn(
             $NotVisibleArticleID,
@@ -223,24 +219,26 @@ sub _CheckWithStaticData {
 
     _SetConfig(
         'with static for CustomerVisible = 1 OR CustomerVisible = 0 (all)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "OwnerID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1, 0
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "OwnerID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1, 0
+                ]
+            }
+        }
+    }
+}
+END
     );
 
     # get all articles
@@ -268,6 +266,8 @@ sub _CheckWithStaticData {
             'List should contain not visible articles',
         );
     }
+
+    return 1;
 }
 
 sub _DoNegativeTests {
@@ -275,24 +275,26 @@ sub _DoNegativeTests {
     # negative (unknown attribute) ---------------------------
     _SetConfig(
         'unknown attribute',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "OwnerID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "UnknownAttribute": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "OwnerID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "UnknownAttribute": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+END
     );
     my $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -308,24 +310,26 @@ sub _DoNegativeTests {
     # negative (missing ticket config - no ticket = no article) ---------------------------
     _SetConfig(
         'negative (missing ticket config)',
-        '{
-            "Contact": {
-                "FAQArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "FAQArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -341,17 +345,19 @@ sub _DoNegativeTests {
     # negative (missing article config) ---------------------------
     _SetConfig(
         'negative (missing article config)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        }
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -367,18 +373,20 @@ sub _DoNegativeTests {
     # negative (empty article config) ---------------------------
     _SetConfig(
         'negative (missing article config)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {}
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {}
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -394,20 +402,22 @@ sub _DoNegativeTests {
     # negative (empty attribute) ---------------------------
     _SetConfig(
         'negative (missing attribute)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible: {}
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "CustomerVisible": {}
+        }
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -423,15 +433,17 @@ sub _DoNegativeTests {
     # negative (empty value) ---------------------------
     _SetConfig(
         'negative (empty value)',
-        '{
-            "Contact": {
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": []
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": []
             }
-        }'
+        }
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -447,7 +459,7 @@ sub _DoNegativeTests {
     # negative (empty config) ---------------------------
     _SetConfig(
         'negative (empty config)',
-        ''
+        q{}
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
@@ -463,22 +475,25 @@ sub _DoNegativeTests {
     # negative (invalid config, missing " and unnecessary ,) ---------------------------
     _SetConfig(
         'negative (invalid config)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        SearchStatic: [
-                            1
-                        ]
-                    }
-                },
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                SearchStatic: [
+                    1
+                ]
             }
-        }'
+        },
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         TicketID     => $TestData{TicketID},
         ObjectType   => 'Contact',
-        UserID       => 1
+        UserID       => 1,
+        Silent       => 1
     );
     $Self->Is(
         scalar(@{$ArticleIDList}),
@@ -489,24 +504,26 @@ sub _DoNegativeTests {
     # negative (missing ticket id) ---------------------------
     _SetConfig(
         'negative (missing ticket id)',
-        '{
-            "Contact": {
-                "Ticket": {
-                    "ContactID": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                },
-                "TicketArticle": {
-                    "CustomerVisible": {
-                        "SearchStatic": [
-                            1
-                        ]
-                    }
-                }
+        <<"END"
+{
+    "Contact": {
+        "Ticket": {
+            "ContactID": {
+                "SearchStatic": [
+                    1
+                ]
             }
-        }'
+        },
+        "TicketArticle": {
+            "CustomerVisible": {
+                "SearchStatic": [
+                    1
+                ]
+            }
+        }
+    }
+}
+END
     );
     $ArticleIDList = $TicketObject->GetAssignedArticlesForObject(
         # TicketID     => $TestData{TicketID},    # without ticket id
@@ -518,6 +535,8 @@ sub _DoNegativeTests {
         0,
         'Article list should be empty (missing ticket id)',
     );
+
+    return 1;
 }
 
 sub _SetConfig {
@@ -545,9 +564,12 @@ sub _SetConfig {
             "AssignedObjectsMapping - mapping is new value",
         );
     }
+
+    return 1;
 }
 
-# cleanup is done by RestoreDatabase
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

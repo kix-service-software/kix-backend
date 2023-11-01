@@ -8,37 +8,11 @@
   Scenario: get the list of initial faq articles
     When I query the collection of faq articles
     Then the response code is 200
-
-   Scenario: get the list of existing faq articles searchlimit
-     Given 66 of faq articles
-     When I query the collection of faq articles 55 searchlimit
-     Then the response code is 200
-     And the response contains 55 items of type "FAQArticle"
-     When delete all this faq articles
-     Then the response code is 204
-     And the response has no content
-
-   Scenario: get the list of existing faq articles searchlimit object
-     Given 66 of faq articles
-     When I query the collection of faq articles 35 searchlimit object
-     Then the response code is 200
-     And the response contains 35 items of type "FAQArticle"
-     When delete all this faq articles
-     Then the response code is 204
-     And the response has no content
-
-   Scenario: get the list of initial faq articles with limit and offset
-     Given 8 of faq articles
-     When I query the collection of faq articles with limit 2 and offset 4
-     Then the response code is 200
-     And the response contains 2 items of type "FAQArticle"
-     When delete all this faq articles
-     Then the response code is 204
-     And the response has no content
+    Then the response object is FAQArticleCollectionResponse
 
   Scenario: get the list of existing faq articles filtered
     Given 8 of faq articles
-    When I query the collection of faq articles with filter of General
+    When I query the collection of faq articles with filter of "General"
     Then the response code is 200
     And the response contains the following items of type FAQArticle
       | Title                                          |
@@ -62,8 +36,8 @@
     Then the response code is 200
     And the response contains 8 items of type "FAQArticle"
     And the response contains the following items of type FAQArticle
-      | Title                    |
-      | Wie suche ich in KIX 18? |
+      | Title                 |
+      | Title for FAQ Article |
     When delete all this faq articles
     Then the response code is 204
     And the response has no content
@@ -79,23 +53,37 @@
 
   Scenario: get the list of initial faq articles with limit and offset
     Given 8 of faq articles
-    When I query the collection of faq articles with limit 4 and offset 1
+    When I query the collection of faq articles with limit 2 and offset 1
     Then the response code is 200
-    And the response contains 4 items of type "FAQArticle"
+    And the response contains 2 items of type "FAQArticle"
     When delete all this faq articles
     Then the response code is 204
     And the response has no content
 
   Scenario: get the list of initial faq articles with sorted, limit and offset
     Given 8 of faq articles
-    When I query the collection of faq articles with sorted by "Address.-EmailAddress:textual" limit 4 and offset 2
+    When I query the collection of faq articles with sorted by "FAQArticle.-Title:textual" limit 4 and offset 1
     Then the response code is 200
     And the response contains 4 items of type "FAQArticle"
     When delete all this faq articles
     Then the response code is 204
     And the response has no content
 
+   Scenario: get the list of existing faq articles searchlimit
+     Given 66 of faq articles
+     When I query the collection of faq articles 55 searchlimit
+     Then the response code is 200
+     And the response contains 55 items of type "FAQArticle"
+     When delete all this faq articles
+     Then the response code is 204
+     And the response has no content
 
-
-
+   Scenario: get the list of existing faq articles searchlimit object
+     Given 66 of faq articles
+     When I query the collection of faq articles 35 searchlimit object
+     Then the response code is 200
+     And the response contains 35 items of type "FAQArticle"
+     When delete all this faq articles
+     Then the response code is 204
+     And the response has no content
           

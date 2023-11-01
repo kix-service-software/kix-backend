@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,7 +81,7 @@ perform JobCreate Operation. This will return the created JobID.
                 Name    => 'Item Name',
                 Type    => 'Ticket',
                 Comment => 'Comment',              # optional
-                Filter  => {},                     # optional
+                Filter  => [],                     # optional
                 ExecPlanIDs  => [                  # optional
                     123
                 ],

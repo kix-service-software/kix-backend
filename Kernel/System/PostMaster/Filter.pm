@@ -13,7 +13,11 @@ package Kernel::System::PostMaster::Filter;
 use strict;
 use warnings;
 
-our @ObjectDependencies = ( 'DB', 'Log', );
+our @ObjectDependencies = qw(
+    ClientRegistration
+    DB
+    Log
+);
 
 =head1 NAME
 
@@ -299,18 +303,22 @@ sub FilterUpdate {
     # check needed stuff
     for (qw(ID Name StopAfterMatch ValidID UserID Match Set)) {
         if ( !defined $Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
             return;
         }
     }
     if ( !$Param{Name}) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No valid name given!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No valid name given!"
+            );
+        }
         return;
     }
 
@@ -321,10 +329,12 @@ sub FilterUpdate {
 
     # check if a filter with this name already exists
     if ( $Self->NameExistsCheck( Name => $Param{Name}, ID => $Param{ID} ) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A filter with name '$Param{Name}' already exists!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A filter with name '$Param{Name}' already exists!"
+            );
+        }
         return;
     }
 

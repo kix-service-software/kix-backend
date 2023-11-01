@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Ticket',
     'Time',
     'User',
+    'Watcher',
 );
 
 sub Configure {
@@ -183,9 +184,9 @@ sub Run {
 
         $Count = 0;
         for my $TicketID (@TicketIDs) {
-
-            $TicketObject->TicketWatchUnsubscribe(
-                TicketID    => $TicketID,
+            $Kernel::OM->Get('Watcher')->WatcherDelete(
+                Object      => 'Ticket',
+                ObjectID    => $TicketID,
                 WatchUserID => $UserID,
                 UserID      => 1,
             );

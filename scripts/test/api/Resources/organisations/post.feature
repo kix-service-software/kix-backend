@@ -12,3 +12,9 @@ Feature: POST request /organisations resource
     When I delete this organisation
     Then the response code is 204
 
+  Scenario: added a organisation
+    When added a organisation without number
+    Then the response code is 409
+    And the response object is Error
+    And the error code is "Object.AlreadyExists"
+    And the error message is "Cannot create organisation. Another organisation with same number already exists."

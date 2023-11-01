@@ -15,11 +15,12 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'Log',
-    'Valid'
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    Log
+    Valid
 );
 
 =head1 NAME
@@ -60,6 +61,8 @@ sub CategoryAdd {
     # check needed stuff
     for my $Argument (qw(Name UserID)) {
         if ( !$Param{$Argument} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
@@ -71,6 +74,8 @@ sub CategoryAdd {
 
     # check needed stuff
     if ( !defined $Param{ParentID} ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ParentID!",
@@ -81,6 +86,8 @@ sub CategoryAdd {
 
     # check that ParentID is not an empty string but number 0 is allowed
     if ( $Param{ParentID} eq '' ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ParentID cannot be empty!",
@@ -965,6 +972,8 @@ sub CategoryUpdate {
     # check needed stuff
     for my $Argument (qw(Name UserID)) {
         if ( !$Param{$Argument} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
@@ -977,6 +986,8 @@ sub CategoryUpdate {
     # check needed stuff
     for my $Argument (qw(CategoryID ParentID)) {
         if ( !defined $Param{$Argument} ) {
+            return if $Param{Silent};
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!",
@@ -988,6 +999,8 @@ sub CategoryUpdate {
 
     # check that ParentID is not an empty string but number 0 is allowed
     if ( $Param{ParentID} eq '' ) {
+        return if $Param{Silent};
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "ParentID cannot be empty!",

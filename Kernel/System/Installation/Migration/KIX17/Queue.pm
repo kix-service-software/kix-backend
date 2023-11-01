@@ -110,6 +110,11 @@ sub Run {
         }
     }
 
+    # delete queue cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Kernel::OM->Get('Queue')->{CacheType},
+    );
+
     return 1;
 }
 

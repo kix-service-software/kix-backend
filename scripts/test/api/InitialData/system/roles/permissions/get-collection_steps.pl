@@ -33,7 +33,7 @@ When qr/I query the collection of (\w+) with roleid (\d+)$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/roles/'.$2.'/'.$1,
-      Sort  => 'Permission.ID:numeric'
+      Sort  => 'Permission.Target:textual'
    );
 };
 

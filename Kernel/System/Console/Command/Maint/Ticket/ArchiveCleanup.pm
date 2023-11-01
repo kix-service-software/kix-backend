@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Config',
     'DB',
     'Ticket',
+    'Watcher',
 );
 
 sub Configure {
@@ -145,9 +146,9 @@ sub Run {
         my $Count = 0;
         ROW:
         while ( my @Row = $DBObject->FetchrowArray() ) {
-
-            $TicketObject->TicketWatchUnsubscribe(
-                TicketID => $Row[0],
+            $Kernel::OM->Get('Watcher')->WatcherDelete(
+                Object   => 'Ticket',
+                ObjectID => $Row[0],
                 AllUsers => 1,
                 UserID   => 1,
             );

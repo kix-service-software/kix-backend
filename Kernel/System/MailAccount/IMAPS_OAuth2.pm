@@ -122,7 +122,7 @@ sub _Fetch {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Login Password Host Trusted QueueID)) {
+    for (qw(Login Password Host Trusted)) {
         if ( !defined $Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

@@ -327,3 +327,49 @@ msgstr ""
 
 msgid "AlternativeTo"
 msgstr ""
+
+# manual added for ITSMConfigItem History Comment Enrichment
+msgid "CIHistory::ConfigItemCreate"
+msgstr ""
+
+msgid "CIHistory::ConfigItemDelete"
+msgstr ""
+
+msgid "CIHistory::DefinitionUpdate"
+msgstr ""
+
+msgid "CIHistory::DeploymentStateUpdate"
+msgstr ""
+
+msgid "CIHistory::IncidentStateUpdate"
+msgstr ""
+
+msgid "CIHistory::LinkAdd"
+msgstr ""
+
+msgid "CIHistory::LinkDelete"
+msgstr ""
+
+msgid "CIHistory::NameUpdate"
+msgstr ""
+
+msgid "CIHistory::ValueUpdate"
+msgstr ""
+
+msgid "CIHistory::VersionCreate"
+msgstr ""
+
+msgid "CIHistory::VersionDelete"
+msgstr ""
+
+msgid "CIHistory::AttachmentAdd"
+msgstr ""
+
+msgid "CIHistory::AttachmentDelete"
+msgstr ""
+
+msgid "Customer No. / Type"
+msgstr ""
+
+msgid "ZIP, City, Country"
+msgstr ""

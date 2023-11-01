@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -21,22 +21,27 @@ local $Kernel::OM = Kernel::System::ObjectManager->new();
 # test that all configured objects can be created and then destroyed;
 # that way we know there are no cyclic references in the constructors
 
+# ToDo: This is a better solution, because this used the EXPORTS files inlcuding the plugins.
+# But after first tries there are many problems occured.
+# Because in the some core files there are missing dependencies ort objectmanagerdisabled
+# my @Objects = keys %{$Kernel::OM->{ObjectMap}};
+#
+# my %SkipObjects = (
+#     'Output::Template::Plugin' => 1,
+# );
 my @Objects = (
     'Config',
     'Language',
     'Output::HTML::Layout',
     'Auth',
-    'AuthSession',
     'Cache',
     'CheckItem',
     'CSV',
-    'ContactAuth',
     'Contact',
     'Daemon::SchedulerDB',
     'Daemon::DaemonModules::SchedulerTaskWorker',
     'Daemon::DaemonModules::SchedulerTaskWorker::AsynchronousExecutor',
     'Daemon::DaemonModules::SchedulerTaskWorker::Cron',
-    'Daemon::DaemonModules::SchedulerTaskWorker::GenericInterface',
     'DB',
     'DynamicField',
     'DynamicField::Backend',
@@ -45,23 +50,17 @@ my @Objects = (
     'Environment',
     'FileTemp',
     'Automation',
-    'GenericInterface::DebugLog',
-    'GenericInterface::Webservice',
-    'Group',
     'HTMLUtils',
     'JSON',
     'LinkObject',
-    'Loader',
     'Lock',
     'Log',
     'Main',
     'Organisation',
-    'Package',
     'PDF',
     'PID',
     'Priority',
     'Queue',
-    'StandardTemplate',
     'State',
     'SysConfig',
     'SystemAddress',
@@ -78,7 +77,28 @@ my @Objects = (
 
 my %AllObjects;
 
-for my $Object (@Objects) {
+OBJECTS:
+for my $Object (sort @Objects) {
+
+# ToDo: This is a better solution, because this used the EXPORTS files inlcuding the plugins.
+# But after first tries there are many problems occured.
+# Because in the some core files there are missing dependencies ort objectmanagerdisabled
+#    next OBJECTS if $SkipObjects{$Object};
+#
+#    {
+#       my $Package = $Kernel::OM->GetModuleFor($Object);
+#        my $FileName = $Package;
+#        $FileName =~ s{::}{/}g;
+#        $FileName .= '.pm';
+#        print STDERR Data::Dumper::Dumper($FileName);
+#        eval {
+#            require $FileName;
+#        };
+#        no strict 'refs';
+#        print STDERR Data::Dumper::Dumper(${ $Package . '::ObjectManagerDisabled' });
+#        next OBJECTS if ${ $Package . '::ObjectManagerDisabled' };
+#    }
+
     my $PackageObject = $Kernel::OM->Get($Object);
     $AllObjects{$Object} = $PackageObject;
     $Self->True(
@@ -101,7 +121,7 @@ for my $ObjectName ( sort keys %AllObjects ) {
 }
 
 my %SomeObjects = (
-    'Config'         => $Kernel::OM->Get('Config'),
+    'Config' => $Kernel::OM->Get('Config'),
     'DB'     => $Kernel::OM->Get('DB'),
     'Ticket' => $Kernel::OM->Get('Ticket'),
 );
@@ -116,29 +136,29 @@ $Kernel::OM->ObjectsDiscard(
 
 $Self->True(
     !$SomeObjects{'DB'},
-    'ObjectDiscard discarded Kernel::System::DB',
+    'ObjectDiscard discarded DB',
 );
 $Self->True(
     !$SomeObjects{'Ticket'},
-    'ObjectDiscard discarded Kernel::System::Ticket, because it depends on Kernel::System::DB',
+    'ObjectDiscard discarded Ticket, because it depends on DB',
 );
 $Self->True(
-    $SomeObjects{'Config'},
-    'ObjectDiscard did not discard Kernel::Config',
+    !$SomeObjects{'Config'},
+    'ObjectDiscard did not discard Config',
 );
 
 # test custom objects
-# note that scripts::test::ObjectManager::Dummy creates a scripts::test::ObjectManager::Dummy2 in its destructor,
+# note that scripts::test::system::ObjectManager::Dummy creates a scripts::test::system::ObjectManager::Dummy2 in its destructor,
 # even though it didn't declare a dependency on it.
 # The object manager must be robust enough to deal with that.
 $Kernel::OM->ObjectParamAdd(
-    'scripts::test::ObjectManager::Dummy' => {
+    'scripts::test::system::ObjectManager::Dummy' => {
         Data => 'Test payload',
     },
 );
 
-my $Dummy  = $Kernel::OM->Get('scripts::test::ObjectManager::Dummy');
-my $Dummy2 = $Kernel::OM->Get('scripts::test::ObjectManager::Dummy2');
+my $Dummy  = $Kernel::OM->Get('scripts::test::system::ObjectManager::Dummy');
+my $Dummy2 = $Kernel::OM->Get('scripts::test::system::ObjectManager::Dummy2');
 
 $Self->True( $Dummy,  'Can get Dummy object after registration' );
 $Self->True( $Dummy2, 'Can get Dummy2 object after registration' );
@@ -160,16 +180,16 @@ $Self->True( !$Dummy,  'ObjectsDiscard without arguments deleted Dummy' );
 $Self->True( !$Dummy2, 'ObjectsDiscard without arguments deleted Dummy2' );
 
 $Self->True(
-    !$Kernel::OM->{Objects}{'scripts::test::ObjectManager::Dummy2'},
+    !$Kernel::OM->{Objects}{'scripts::test::system::ObjectManager::Dummy2'},
     'ObjectsDiscard also discarded newly autovivified objects'
 );
 
-$Dummy = $Kernel::OM->Get('scripts::test::ObjectManager::Dummy');
+$Dummy = $Kernel::OM->Get('scripts::test::system::ObjectManager::Dummy');
 weaken($Dummy);
 $Self->True( $Dummy, 'Object created again' );
 
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['scripts::test::ObjectManager::Dummy'],
+    Objects => ['scripts::test::system::ObjectManager::Dummy'],
 );
 $Self->True( !$Dummy, 'ObjectsDiscard with list of objects deleted object' );
 

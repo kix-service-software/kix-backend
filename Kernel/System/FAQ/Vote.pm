@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,10 +13,13 @@ package Kernel::System::FAQ::Vote;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Cache',
-    'DB',
-    'Log',
+use Kernel::System::VariableCheck qw(:all);
+
+our @ObjectDependencies = qw(
+    ClientRegistration
+    Cache
+    DB
+    Log
 );
 
 =head1 NAME
@@ -40,15 +43,13 @@ add a vote
     my $VoteID = $FAQObject->VoteAdd(
         CreatedBy => 'Some Text',
         ItemID    => '123456',
-        IP        => '54.43.30.1',
-        Interface => 'Some Text',
         Rate      => 1,
         UserID    => 1,
     );
 
 Returns:
 
-    $Success = 1;              # or undef if vote could not be added
+    $Success = 1; # or undef if vote could not be added
 
 =cut
 
@@ -56,7 +57,7 @@ sub VoteAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(CreatedBy ItemID IP Interface UserID)) {
+    for my $Argument (qw(CreatedBy ItemID UserID)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -67,26 +68,42 @@ sub VoteAdd {
         }
     }
 
+    my $VoteIDs = $Self->VoteSearch(
+        ItemID    => $Param{ItemID},
+        CreatedBy => $Param{CreatedBy},
+        UserID    => $Param{UserID}
+    );
+
+    if ( IsArrayRefWithData($VoteIDs) ) {
+        for my $VoteID ( @{$VoteIDs} ) {
+            $Self->VoteDelete(
+                VoteID => $VoteID,
+                UserID => $Param{UserID}
+            );
+        }
+    }
+
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Do(
-        SQL => '
-            INSERT INTO faq_voting (created_by, item_id, ip, interface, rate, created )
-            VALUES ( ?, ?, ?, ?, ?, current_timestamp )',
+        SQL => <<'END',
+INSERT INTO faq_voting (created_by, item_id, rate, created )
+VALUES ( ?, ?, ?, current_timestamp )
+END
         Bind => [
-            \$Param{CreatedBy}, \$Param{ItemID}, \$Param{IP}, \$Param{Interface},
-            \$Param{Rate},
+            \$Param{CreatedBy}, \$Param{ItemID}, \$Param{Rate},
         ],
     );
 
     # get new category id
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT id
-            FROM faq_voting
-            WHERE created_by = ? AND item_id = ? AND ip = ? AND interface = ?',
+        SQL => <<'END',
+SELECT id
+FROM faq_voting
+WHERE created_by = ? AND item_id = ?
+END
         Bind  => [
-            \$Param{CreatedBy}, \$Param{ItemID}, \$Param{IP}, \$Param{Interface},
+            \$Param{CreatedBy}, \$Param{ItemID}
         ],
         Limit => 1,
     );
@@ -145,11 +162,13 @@ sub VoteDelete {
         VoteID => $Param{VoteID},
         UserID => 1,
     );
+    return 1 if !%Vote;
 
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            DELETE FROM faq_voting
-            WHERE id = ?',
+        SQL => <<'END',
+DELETE FROM faq_voting
+WHERE id = ?
+END
         Bind => [ \$Param{VoteID} ],
     );
 
@@ -162,7 +181,7 @@ sub VoteDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Vote',
-        ObjectID  => $Vote{ItemID}.'::'.$Param{VoteID},
+        ObjectID  => $Vote{ItemID} . q{::} . $Param{VoteID},
     );
 
     return 1;
@@ -183,8 +202,6 @@ Returns:
         ItemID    => 23,
         ID        => 1,
         Rating    => 5,
-        IP        => '192.168.0.1',
-        Interface => '...',
         CreatedBy => 1,
         Created   => '2011-06-14 12:32:03',
     );
@@ -210,9 +227,11 @@ sub VoteGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL   => 'SELECT id, created_by, item_id, interface, ip, created, rate
-                  FROM faq_voting
-                  WHERE id = ?',
+        SQL   => <<'END',
+SELECT id, created_by, item_id, created, rate
+FROM faq_voting
+WHERE id = ?
+END
         Bind  => [ \$Param{VoteID} ],
         Limit => 1,
     );
@@ -223,10 +242,8 @@ sub VoteGet {
             ID        => $Row[0],
             CreatedBy => $Row[1],
             ItemID    => $Row[2],
-            Interface => $Row[3],
-            IP        => $Row[4],
-            Created   => $Row[5],
-            Rating    => $Row[6],
+            Created   => $Row[3],
+            Rating    => $Row[4],
         );
     }
 
@@ -267,16 +284,30 @@ sub VoteSearch {
         }
     }
 
+    my $SQL      = <<'END';
+SELECT id
+FROM faq_voting
+END
+    my $SQLWhere = ' WHERE item_id = ?';
+    my @Bind;
+
+    push(@Bind, \$Param{ItemID});
+
+    if (
+        defined $Param{CreatedBy}
+        && $Param{CreatedBy}
+    ) {
+        $SQLWhere .= ' AND created_by = ?';
+        push(@Bind, \$Param{CreatedBy});
+    }
+
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT id
-            FROM faq_voting
-            WHERE item_id = ?',
-        Bind  => [ \$Param{ItemID} ],
-        Limit => $Param{Limit} || 500,
+        SQL   => $SQL . $SQLWhere,
+        Bind  => \@Bind,
+        Limit => $Param{Limit} // 500,
     );
 
     my @VoteIDs;
@@ -337,12 +368,13 @@ sub ItemVoteDataGet {
 
     # get vote from db
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT count(*), avg(rate)
-            FROM faq_voting
-            WHERE item_id = ?',
+        SQL => <<'END',
+SELECT count(*), avg(rate)
+FROM faq_voting
+WHERE item_id = ?
+END
         Bind  => [ \$Param{ItemID} ],
-        Limit => $Param{Limit} || 500,
+        Limit => $Param{Limit} // 500,
     );
 
     # fetch the result
@@ -364,10 +396,6 @@ sub ItemVoteDataGet {
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -18,16 +18,7 @@ use vars (qw($Self));
 my $ReportingObject = $Kernel::OM->Get('Reporting');
 my $FunctionObject = $ReportingObject->_LoadDataSourceBackend(Name => 'GenericSQL')->_LoadFunctionBackend(Name => 'if_plugin_available');
 
-#
-# log tests
-#
-
 # get helper object
-$Kernel::OM->ObjectParamAdd(
-    'UnitTest::Helper' => {
-        RestoreDatabase => 1,
-    },
-);
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $Home = $Kernel::OM->Get('Config')->Get('Home');
@@ -84,8 +75,6 @@ $Self->True(
     $Success,
     'Remove Plugin Directory',
 );
-
-# cleanup is done by RestoreDatabase
 
 1;
 

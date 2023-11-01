@@ -9,6 +9,7 @@ Feature: PATCH request to the /system/communication/mailaccounts/:MailAccountID 
     Given a mailaccount
     When I update this mailaccount
     Then the response code is 200
+#    Then the response object is MailAccountPostPatchResponse
     When I delete this mailaccount
     Then the response code is 204
     And the response has no content
