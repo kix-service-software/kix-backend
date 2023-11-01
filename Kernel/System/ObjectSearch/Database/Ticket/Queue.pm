@@ -124,7 +124,7 @@ sub Search {
     my @SQLWhere;
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'st.ticket_priority_id',
+        Column    => 'st.ticket_queue_id',
         Value     => \@QueueIDs,
         Type      => 'NUMERIC',
         Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
