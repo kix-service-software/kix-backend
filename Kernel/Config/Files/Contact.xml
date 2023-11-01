@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="Contact::EventModulePost###800-SetOrganisation" Required="0" Valid="1">
+        <Description Translatable="1">Event module to add organisations based on the enabled organisation mapping methods.</Description>
+        <Group>Contact</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Contact::Event::SetOrganisation</Item>
+                <Item Key="Event">(ContactAdd|ContactUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Contact::Organisation::Methode###MailDomain" Required="1" Valid="1">
+        <Description Translatable="1">Enables organization mapping method "MailDomain" to assign the organization based on the contact email domain. The domain patterns are maintained at the organizations.</Description>
+        <Group>Contact</Group>
+        <SubGroup>Core::Organisation::Methode</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Translatable="1" Key="0">No</Item>
+                <Item Translatable="1" Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Contact::Organisation::Methode###Default" Required="1" Valid="1">
+        <Description Translatable="1">Enables organization mapping method "Default" and sets the defined organization from the "Contact::Organization::Default" configuration.</Description>
+        <Group>Contact</Group>
+        <SubGroup>Core::Organisation::Methode</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Translatable="1" Key="0">No</Item>
+                <Item Translatable="1" Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Contact::Organisation::Methode###Personal" Required="1" Valid="1">
+        <Description Translatable="1">Enables organization mapping method "Personal" and sets the contact email as an organization.</Description>
+        <Group>Contact</Group>
+        <SubGroup>Core::Organisation::Methode</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Translatable="1" Key="0">No</Item>
+                <Item Translatable="1" Key="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Contact::Organisation::Default" Required="0" Valid="1">
+        <Description Translatable="1">Defines a standard organization to be used in the "Default" method of organization mapping. The ID or the number or the name of the organization can be specified.</Description>
+        <Group>Contact</Group>
+        <SubGroup>Core::Organisation::Methode</SubGroup>
+        <Setting>
+            <String Regex=""></String>
+        </Setting>
+    </ConfigItem>
+</kix_config>
