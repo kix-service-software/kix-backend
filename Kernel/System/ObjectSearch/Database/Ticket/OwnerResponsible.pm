@@ -136,8 +136,8 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     my %AttributeMapping = (
-        Owner         => ['ow.lastname', 'ow.firstname'],
-        Responsible   => ['rp.lastname', 'rp.firstname'],
+        Owner         => ['co.lastname', 'co.firstname'],
+        Responsible   => ['cr.lastname', 'cr.firstname'],
         OwnerID       => ['st.user_id'],
         ResponsibleID => ['st.responsible_user_id'],
     );
@@ -145,12 +145,12 @@ sub Sort {
     my %Join;
     if ( $Param{Attribute} eq 'Owner' ) {
         $Join{SQLJoin} = [
-            'INNER JOIN user ow ON ow.id = st.user_id'
+            'INNER JOIN contact co ON co.user_id = st.user_id'
         ];
     }
     elsif ( $Param{Attribute} eq 'Responsible' ) {
         $Join{SQLJoin} = [
-            'INNER JOIN user rp ON rp.id = st.responsible_user_id'
+            'INNER JOIN contact cr ON cr.user_id = st.responsible_user_id'
         ];
     }
 
