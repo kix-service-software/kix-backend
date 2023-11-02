@@ -1,13 +1,8 @@
   displayName: ObjectSearch
   description: !include ../descriptions/resources/objectsearch.md
+  type: { collection: { typeName: ObjectSearch } }
   /{objecttype}:
     uriParameters:
       objecttype:
         displayName: ObjectType
         type: string
-    /supportedsearch:
-      description: !include ../descriptions/resources/objectsearch/supportedsearch.md
-      type: { item-readonly: { typeName: ObjectSearchSupportedSearch } }
-    /supportedsorts:
-      description: !include ../descriptions/resources/objectsearch/supportedsorts.md
-      type: { item-readonly: { typeName: ObjectSearchSupportedSorts } }

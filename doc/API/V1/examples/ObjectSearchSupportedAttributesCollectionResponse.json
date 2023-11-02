@@ -1,0 +1,42 @@
+{
+    "SupportedAttributes": [
+        {
+            "Property": "Type",
+            "Operators": [
+                "EQ",
+                "NE",
+                "STARTWITH",
+                "ENDWITH",
+                "LIKE",
+                "LT",
+                "LTE",
+                "GT",
+                "GTE",
+                "IN",
+                "!IN"
+            ],
+            "IsSearchable": 1,
+            "IsSortable": 1,
+            "ObjectType": "Ticket"
+        },
+        {
+            "Property": "TypeID",
+            "Operators": [
+                "EQ",
+                "NE",
+                "STARTWITH",
+                "ENDWITH",
+                "LIKE",
+                "LT",
+                "LTE",
+                "GT",
+                "GTE",
+                "IN",
+                "!IN"
+            ],
+            "IsSearchable": 1,
+            "IsSortable": 0,
+            "ObjectType": "Ticket"
+        }
+    ]
+}
