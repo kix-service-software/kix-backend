@@ -252,8 +252,8 @@
 /links/:LinkID                                                                             | DELETE           | V1::Link::LinkDelete                             |
 /links/:LinkID                                                                             | GET              | V1::Link::LinkGet                                |
 /links/types                                                                               | GET              | V1::Link::LinkTypeSearch                         |
-/objectsearch/:ObjectType/supportedsorts                                                   | GET              | V1::ObjectSearch::SupportedSorts                 |
-/objectsearch/:ObjectType/supportedsearch                                                  | GET              | V1::ObjectSearch::SupportedSearch                |
+/objectsearch                                                                              | GET              | V1::ObjectSearch::SupportedAttributesSearch      |
+/objectsearch/:ObjectType                                                                  | GET              | V1::ObjectSearch::SupportedAttributesGet         |
 /organisations                                                                             | GET              | V1::Organisation::OrganisationSearch             |
 /organisations                                                                             | POST             | V1::Organisation::OrganisationCreate             |
 /organisations/:OrganisationID                                                             | DELETE           | V1::Organisation::OrganisationDelete             |

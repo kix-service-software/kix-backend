@@ -83,29 +83,9 @@ sub GetBackends {
             next BACKEND;
         }
 
-        if ( ref($SupportedAttributes->{Sort}) ne 'ARRAY' ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "SupportedAttributes->{Sort} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
-            );
-            next BACKEND;
-        }
-
-        foreach my $Attribute ( @{$SupportedAttributes->{Sort}} ) {
-            $AttributeModules{Sort}->{$Attribute} = $Object;
-        }
-
-        if ( ref($SupportedAttributes->{Search}) ne 'HASH' ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "SupportedAttributes->{Search} return by module $Backends->{$Backend}->{Module} is not an HashRef!",
-            );
-            next BACKEND;
-        }
-
-        foreach my $Attribute ( sort keys %{$SupportedAttributes->{Search}} ) {
-            $AttributeModules{Search}->{$Attribute}->{Supported} = $SupportedAttributes->{Search}->{$Attribute};
-            $AttributeModules{Search}->{$Attribute}->{Object}    = $Object;
+        foreach my $Attribute ( sort keys %{$SupportedAttributes} ) {
+            $AttributeModules{$Attribute} = $SupportedAttributes->{$Attribute};
+            $AttributeModules{$Attribute}->{Object} = $Object;
         }
     }
 

@@ -39,8 +39,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -48,29 +51,42 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'CreatedTypeID'     => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-        'CreatedUserID'     => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-        'CreatedStateID'    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-        'CreatedQueueID'    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-        'CreatedPriorityID' => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-        'CloseTime'         => ['EQ','LT','LTE','GT','GTE'],
-        'ChangeTime'        => ['EQ','LT','LTE','GT','GTE'],
-    };
-
-    $Self->{SupportedSort} = [
-        'CreatedTypeID',
-        'CreatedUserID',
-        'CreatedStateID',
-        'CreatedQueueID',
-        'CreatedPriorityID',
-        'CloseTime',
-        'ChangeTime',
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'CreatedTypeID'     => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+        },
+        'CreatedUserID'     => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+        },
+        'CreatedStateID'    => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+        },
+        'CreatedQueueID'    => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+        },
+        'CreatedPriorityID' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+        },
+        'CloseTime'         => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','LTE','GT','GTE']
+        },
+        'ChangeTime'        => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','LTE','GT','GTE']
+        },
     };
 }
 

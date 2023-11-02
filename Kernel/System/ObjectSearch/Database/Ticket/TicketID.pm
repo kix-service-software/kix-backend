@@ -52,17 +52,12 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'TicketID' => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
-    };
-
-    $Self->{SupportedSort} = [
-        'TicketID',
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'TicketID' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+        },
     };
 }
 

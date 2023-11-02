@@ -41,8 +41,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -50,19 +53,17 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'Queue'   => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-        'QueueID' => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
-    };
-
-    $Self->{SupportedSort} = [
-        'Queue',
-        'QueueID',
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'Queue'   => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+        },
+        'QueueID' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+        },
     };
 }
 

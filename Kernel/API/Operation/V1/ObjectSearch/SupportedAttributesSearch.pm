@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::ObjectSearch::SupportedSearch;
+package Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesSearch;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::ObjectSearch::SupportedSearch - API ObjectSearch supported attributes Get Operation backend
+Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesSearch - API ObjectSearch supported attributes search Operation backend
 
 =head1 SYNOPSIS
 
@@ -52,11 +52,7 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    return {
-        'ObjectType' => {
-            Required => 1
-        }
-    }
+    return {}
 }
 
 =item Run()
@@ -65,9 +61,7 @@ perform SupportedSearch Operation. This function is able to return
 one SupportedSearchesult entry in one call.
 
     my $Result = $OperationObject->Run(
-        Data => {
-            ObjectType => 'Ticket'
-        },
+        Data => {},
     );
 
     $Result = {
@@ -75,14 +69,7 @@ one SupportedSearchesult entry in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            SupportedSearch => [
-                {
-                    ...
-                },
-                {
-                    ...
-                },
-            ]
+            SupportedAttributes => {}
         },
     };
 
@@ -91,13 +78,46 @@ one SupportedSearchesult entry in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @SupportedSearchList = $Kernel::OM->Get('ObjectSearch')->GetSupportedSearchList(
-        ObjectType => $Param{Data}->{ObjectType}
-    );
+    my $Types = $Kernel::OM->Get('Config')->Get('Object::Types');
+
+    my @AllowTypes;
+    for my $Key ( sort keys %{$Types} ) {
+        next if !$Types->{$Key};
+        push( @AllowTypes, $Key );
+    }
+
+    if ( @AllowTypes ) {
+        my $GetResult = $Self->ExecOperation(
+            OperationType => 'V1::ObjectSearch::SupportedAttributesGet',
+            Data          => {
+                ObjectType => join(q{,}, @AllowTypes),
+            }
+        );
+
+        if (
+            !IsHashRefWithData($GetResult)
+            || !$GetResult->{Success}
+        ) {
+            return $GetResult;
+        }
+
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{SupportedAttributes} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{SupportedAttributes})
+                ? @{$GetResult->{Data}->{SupportedAttributes}}
+                : ( $GetResult->{Data}->{SupportedAttributes} );
+        }
+
+        if ( IsArrayRefWithData(\@ResultList) ) {
+            return $Self->_Success(
+                SupportedAttributes => \@ResultList,
+            )
+        }
+    }
 
     # return result
     return $Self->_Success(
-        SupportedSearch => \@SupportedSearchList,
+        SupportedAttributes => [],
     );
 }
 

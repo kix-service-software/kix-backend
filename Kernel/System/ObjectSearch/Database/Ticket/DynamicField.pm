@@ -43,8 +43,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -67,6 +70,7 @@ sub GetSupportedAttributes {
         'OrganisationReference'   => ['EQ','GT','GTE','LT','LTE','LIKE'],
     );
 
+    my %List;
     for my $Type ( qw(Search Sort) ) {
         my $Name = "Supported$Type";
 
@@ -82,18 +86,19 @@ sub GetSupportedAttributes {
         for my $Field ( @{$List} ) {
             my $DFName = "DynamicField_$Field->{Name}";
             if ( $Type eq 'Search' ) {
-                $Self->{$Name}->{$DFName} = $TypeOperators{$Field->{FieldType}};
+                $List{$DFName} = {
+                    Operators    => $TypeOperators{$Field->{FieldType}},
+                    IsSearchable => 1,
+                    IsSortable   => 0,
+                };
             }
             else {
-                push ( @{$Self->{$Name}}, $DFName );
+                $List{$DFName}->{IsSortable} = 1;
             }
         }
     }
 
-    return {
-        Search => $Self->{SupportedSearch} || {},
-        Sort   => $Self->{SupportedSort}   || [],
-    };
+    return \%List;
 }
 
 

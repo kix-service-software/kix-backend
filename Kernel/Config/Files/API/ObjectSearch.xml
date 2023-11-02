@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <kix_config version="1.0" init="Framework">
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectSearch::SupportedSorts" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectSearch::SupportedAttributesSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SupportedSorts</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::ObjectSearch::SupportedSorts</Item>
+                <Item Key="Name">SupportedAttribbutesSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ObjectID">ObjectType</Item>
-                <Item Key="ResponseSchema">ObjectSearchResponse</Item>
                 <Item Key="CacheType">API_objectsearch</Item>
                 <Item Key="CacheTypeDependency">ObjectSearch</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectSearch::SupportedSearch" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectSearch::SupportedAttributesGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
-                <Item Key="Name">SupportedSearch</Item>
-                <Item Key="Module">Kernel::API::Operation::V1::ObjectSearch::SupportedSearch</Item>
+                <Item Key="Name">SupportedAttributesGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ObjectType</Item>
-                <Item Key="ResponseSchema">ObjectSearchResponse</Item>
                 <Item Key="CacheType">API_objectsearch</Item>
                 <Item Key="CacheTypeDependency">ObjectSearch</Item>
             </Hash>

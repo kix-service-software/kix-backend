@@ -39,8 +39,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -48,23 +51,27 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'Age'            => ['EQ','LT','GT','LTE','GTE'],
-        'CreateTime'     => ['EQ','LT','GT','LTE','GTE'],
-        'PendingTime'    => ['EQ','LT','GT','LTE','GTE'],
-        'LastChangeTime' => ['EQ','LT','GT','LTE','GTE'],
-    };
-
-    $Self->{SupportedSort} = [
-        'Age',
-        'CreateTime',
-        'PendingTime',
-        'LastChangeTime',
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'Age'            => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE']
+        },
+        'CreateTime'     => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE']
+        },
+        'PendingTime'    => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE']
+        },
+        'LastChangeTime' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE']
+        },
     };
 }
 

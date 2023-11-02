@@ -60,6 +60,7 @@ sub new {
         return;    # bail out, this will generate 500 Error
     }
 
+    $Self->{ObjectType}   = $Param{ObjectType};
     $Self->{SearchModule} = $Kernel::OM->Get($ModuleStrg);
 
     # load backend modules
@@ -226,8 +227,8 @@ sub Search {
     }
 
     # init attribute backend modules
-    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
-        $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->{Object}->Init();
+    foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
+        $Self->{AttributeModules}->{$SearchableAttribute}->{Object}->Init();
     }
 
     # create basic SQL
@@ -433,16 +434,18 @@ sub _CreateAttributeSQL {
             my $AttributeModule;
 
             # check if we have a handling module for this field
-            if ( !$Self->{AttributeModules}->{Search}->{$Search->{Field}} ) {
+            if ( !$Self->{AttributeModules}->{$Search->{Field}}->{IsSearchable} ) {
                 # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
-                foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}->{Search}} ) {
+                foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
                     next if $Search->{Field} !~ /$SearchableAttribute/g;
-                    $AttributeModule = $Self->{AttributeModules}->{Search}->{$SearchableAttribute}->{Object};
+                    next if !$Self->{AttributeModules}->{$SearchableAttribute}->{IsSearchable};
+
+                    $AttributeModule = $Self->{AttributeModules}->{$SearchableAttribute}->{Object};
                     last;
                 }
             }
             else {
-                $AttributeModule = $Self->{AttributeModules}->{Search}->{$Search->{Field}}->{Object};
+                $AttributeModule = $Self->{AttributeModules}->{$Search->{Field}}->{Object};
             }
 
             # ignore this attribute if we don't have a module for it
@@ -540,16 +543,17 @@ sub _CreateOrderBySQL {
 
         # check if we have a handling module for this field in case of sorting
         my $AttributeModule;
-        if ( !$Self->{AttributeModules}->{Sort}->{$Attribute} ) {
+        if ( !$Self->{AttributeModules}->{$Attribute}->{IsSortable} ) {
             # we don't have any directly registered search module for this field, check if we have a search module matching a pattern
-            foreach my $SortableAttribute ( sort keys %{$Self->{AttributeModules}->{Sort}} ) {
+            foreach my $SortableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
                 next if $Attribute !~ /$SortableAttribute/g;
-                $AttributeModule = $Self->{AttributeModules}->{Sort}->{$SortableAttribute};
+                next if !$Self->{AttributeModules}->{$SortableAttribute}->{IsSortable};
+                $AttributeModule = $Self->{AttributeModules}->{$SortableAttribute}->{Object};
                 last;
             }
         }
         else {
-            $AttributeModule = $Self->{AttributeModules}->{Sort}->{$Attribute};
+            $AttributeModule = $Self->{AttributeModules}->{$Attribute}->{Object};
         }
 
         # ignore this attribute if we don't have a module for it
@@ -608,31 +612,25 @@ sub _CreateOrderBySQL {
     );
 }
 
-sub GetSupportedSortList {
-    my ( $Self, %Param) =  @_;
-
-    my @SortList = sort keys %{$Self->{AttributeModules}->{Sort}};
-
-    return @SortList;
-}
-
-sub GetSupportedSearchList {
+sub GetSupportedAttributes {
     my ( $Self, %Param) =  @_;
 
     my @List;
-    for my $Property (
-        sort keys %{$Self->{AttributeModules}->{Search}}
-    ) {
-
-        push(
+    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
+        my $Module = $Self->{AttributeModules}->{$Attribute};
+        push (
             @List,
             {
-                Property  => $Property,
-                Operators => $Self->{AttributeModules}->{Search}->{$Property}->{Supported}
+                ObjectType   => $Self->{ObjectType},
+                Property     => $Attribute,
+                IsSearchable => $Module->{IsSearchable} || 0,
+                IsSortable   => $Module->{IsSortable}   || 0,
+                Operators    => $Module->{Operators}    || []
             }
         );
     }
-    return @List;
+
+    return \@List;
 }
 
 1;

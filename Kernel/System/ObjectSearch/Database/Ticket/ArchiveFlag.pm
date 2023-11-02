@@ -39,8 +39,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -48,17 +51,12 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'Archived' => ['EQ','IN']
-    };
-
-    $Self->{SupportedSort} = [
-        'AccounArchivedtedTime',
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        Archived => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','IN']
+        }
     };
 }
 

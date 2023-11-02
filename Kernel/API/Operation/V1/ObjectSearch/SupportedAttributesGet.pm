@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::API::Operation::V1::ObjectSearch::SupportedSorts;
+package Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesGet;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::API::Operation::V1::ObjectSearch::SupportedSorts - API ObjectSearch supported sorts Get Operation backend
+Kernel::API::Operation::V1::ObjectSearch::SupportedAttributesGet - API ObjectSearch supported attributes Get Operation backend
 
 =head1 SYNOPSIS
 
@@ -54,19 +54,21 @@ sub ParameterDefinition {
 
     return {
         'ObjectType' => {
+            Type     => 'ARRAY',
+            DataType => 'STRING',
             Required => 1
-        }
+        },
     }
 }
 
 =item Run()
 
-perform SupportedSorts Operation. This function is able to return
-one SupportedSorts entry in one call.
+perform SupportedSearch Operation. This function is able to return
+one SupportedSearchesult entry in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            ObjectType => 'Ticket'
+            ObjectType => 'Ticket'                   # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -75,8 +77,13 @@ one SupportedSorts entry in one call.
         Code         => '',                          # In case of an error
         Message      => '',                          # In case of an error
         Data         => {
-            SupportedSort => [
-                ...
+            SupportedAttributes => [
+                {
+
+                },
+                {
+
+                }
             ]
         },
     };
@@ -86,13 +93,35 @@ one SupportedSorts entry in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @SupportedSortList = $Kernel::OM->Get('ObjectSearch')->GetSupportedSortList(
-        ObjectType => $Param{Data}->{ObjectType}
-    );
+    my @SupportedList;
+
+    # start loop
+    foreach my $ObjectType ( @{$Param{Data}->{ObjectType}} ) {
+
+        # get the StateType data
+        my $SupportedAttributes = $Kernel::OM->Get('ObjectSearch')->GetSupportedAttributes(
+            ObjectType => $ObjectType
+        );
+
+        if ( !IsHashRefWithData($SupportedAttributes) ) {
+            return $Self->_Error(
+                Code => 'Object.NotFound',
+            );
+        }
+
+        if ( !IsArrayRefWithData($SupportedAttributes->{$ObjectType}) ) {
+            return $Self->_Error(
+                Code => 'Object.NotFound',
+            );
+        }
+
+        # add
+        push(@SupportedList, @{$SupportedAttributes->{$ObjectType}});
+    }
 
     # return result
     return $Self->_Success(
-        SupportedSort => \@SupportedSortList,
+        SupportedAttributes => \@SupportedList,
     );
 }
 

@@ -80,10 +80,7 @@ empty method to be overridden by specific attribute module
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => {},
-        Sort   => []
-    };
+    return {};
 }
 
 =item Search()

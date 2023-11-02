@@ -41,43 +41,68 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
-
-    $Self->{SupportedSearch} = {
-        'ArticleID'         => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-        'ChannelID'         => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-        'SenderTypeID'      => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-        'CustomerVisible'   => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-        'From'              => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        'To'                => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        'Cc'                => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        'Subject'           => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        'Body'              => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        'ArticleCreateTime' => ['EQ','LT','GT','LTE','GTE']
-    };
-
-    $Self->{SupportedSort} = [
-        'ChannelID',
-        'SenderTypeID',
-        'CustomerVisible',
-        'From',
-        'To',
-        'Cc',
-        'Subject',
-        'Body',
-        'ArticleCreateTime'
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'ArticleID'         => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+        },
+        'ChannelID'         => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+        },
+        'SenderTypeID'      => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+        },
+        'CustomerVisible'   => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+        },
+        'From'              => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        'To'                => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        'Cc'                => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        'Subject'           => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        'Body'              => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        'ArticleCreateTime' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','LT','GT','LTE','GTE']
+        },
     };
 }
 

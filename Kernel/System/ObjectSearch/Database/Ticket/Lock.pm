@@ -40,8 +40,11 @@ defines the list of attributes this module is supporting
     my $AttributeList = $Object->GetSupportedAttributes();
 
     $Result = {
-        Search => [ ],
-        Sort   => [ ],
+        Property => {
+            IsSortable     => 0|1,
+            IsSearchable => 0|1,
+            Operators     => []
+        },
     };
 
 =cut
@@ -49,18 +52,17 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{SupportedSearch} = {
-        'LockID' => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE']
-    };
-
-    $Self->{SupportedSort} = [
-        'LockID',
-        'Lock'
-    ];
-
     return {
-        Search => $Self->{SupportedSearch},
-        Sort   => $Self->{SupportedSort}
+        'LockID' => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE']
+        },
+        'Lock' => {
+            IsSearchable => 0,
+            IsSortable   => 1,
+            Operators    => []
+        },
     };
 }
 

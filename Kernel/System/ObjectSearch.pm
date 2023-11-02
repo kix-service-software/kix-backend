@@ -17,6 +17,8 @@ our @ObjectDependencies = qw(
     Log
 );
 
+use Kernel::System::VariableCheck qw(:all);
+
 =head1 NAME
 
 Kernel::System::ObjectSearch - object search lib
@@ -119,64 +121,68 @@ Result: 'COUNT'
 sub Search {
     my ( $Self, %Param ) = @_;
 
-    $Self->_GetSearchBackend(
-        %Param
-    );
-
-    # execute ticket search in backend
-    return $Self->{SearchBackendObject}->Search(
-        %Param,
-    );
-}
-
-sub GetSupportedSortList {
-    my ( $Self, %Param ) = @_;
-
-    my @List;
-
-    if (
-        $Self->_GetSearchBackend(
-            %Param
-        )
-    ) {
-        @List = $Self->{SearchBackendObject}->GetSupportedSortList();
-    }
-
-    return @List;
-}
-
-
-sub GetSupportedSearchList {
-    my ( $Self, %Param ) = @_;
-
-    my @List;
-
-    if (
-        $Self->_GetSearchBackend(
-            %Param
-        )
-    ) {
-        @List = $Self->{SearchBackendObject}->GetSupportedSearchList();
-    }
-
-    return @List;
-}
-
-sub _GetSearchBackend {
-    my ( $Self, %Param ) = @_;
-
     if (
         !defined $Param{ObjectType}
         || !$Param{ObjectType}
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ObjectType!'
+            Message  => 'Need ObjectType'
         );
         return;
     }
 
-    return 1 if $Self->{SearchBackendObject};
+    $Self->_GetSearchBackend(
+        %Param
+    );
+
+    # execute ticket search in backend
+    return $Self->{SearchBackendObject}->{$Param{ObjectType}}->Search(
+        %Param,
+    );
+}
+
+sub GetSupportedAttributes {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_GetSearchBackend(
+        %Param
+    );
+
+    my %List;
+    for my $ObjectType ( sort keys %{$Self->{SearchBackendObject}} ) {
+        $List{$ObjectType} = $Self->{SearchBackendObject}->{$Param{ObjectType}}->GetSupportedAttributes();
+    }
+
+    return \%List;
+}
+
+sub _GetSearchBackend {
+    my ( $Self, %Param ) = @_;
+
+    my $ObjectTypes = $Kernel::OM->Get('Config')->Get('Object::Types');
+
+    if ( !IsHashRefWithData($ObjectTypes) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No enabled ObjectTypes for the search!'
+        );
+        return;
+    }
+
+    if (
+        $Param{ObjectType}
+        && !$ObjectTypes->{$Param{ObjectType}}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Given object type is not allowed!'
+        );
+        return;
+    }
+
+    return 1 if !$Param{ObjectType} && IsHashRefWithData($Self->{SearchBackendObject});
+    return 1 if $Param{ObjectType} && $Self->{SearchBackendObject}->{$Param{ObjectType}};
 
     my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
 
@@ -188,21 +194,28 @@ sub _GetSearchBackend {
         );
         return;
     }
-    my $BackendObject = $Backend->new(
-        %{$Self},
-        ObjectType => $Param{ObjectType}
-    );
 
-    # if the backend constructor failed we will exit
-    if ( ref $BackendObject ne $Backend ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to create search backend object!",
+    for my $ObjectType ( sort keys %{$ObjectTypes} ) {
+        next if !$ObjectTypes->{$ObjectType};
+        next if $Param{ObjectType} && $ObjectType ne $Param{ObjectType};
+
+        my $BackendObject = $Backend->new(
+            %{$Self},
+            ObjectType => $ObjectType
         );
-        return;
-    }
 
-    $Self->{SearchBackendObject} = $BackendObject;
+        # if the backend constructor failed we will exit
+        if ( ref $BackendObject ne $Backend ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create search backend object!",
+            );
+            return;
+        }
+
+        $Self->{SearchBackendObject}->{$ObjectType} = $BackendObject;
+
+    }
 
     return 1;
 }
