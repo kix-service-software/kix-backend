@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Name;
+package Kernel::System::ObjectSearch::Database::ConfigItem::DeplState;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::DeplState - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -54,13 +54,18 @@ sub GetSupportedAttributes {
 
     return {
         Search => [
-            'Name',
+            'DeplStateID',
+            'DeplStateIDs',
+            'DeplState'
         ],
         Sort => [
-            'Name',
+            'DeplStateID',,
+            'DeplStateIDs',
+            'DeplState'
         ]
-    }
+    };
 }
+
 
 =item Search()
 
@@ -89,14 +94,43 @@ sub Search {
         return;
     }
 
+    my @DeplStateIDs;
+    if ( $Param{Search}->{Field} eq 'DeplState' ) {
+        my %States = reverse(
+            %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class => 'ITSM::ConfigItem::DeploymentState',
+            )}
+        );
+
+        my @StateList = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @StateList = @{$Param{Search}->{Value}}
+        }
+        foreach my $State ( @StateList ) {
+            if ( !$States{$State} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown deplayment state $State!",
+                );
+                return;
+            }
+
+            push( @DeplStateIDs, $States{$State} );
+        }
+    }
+    else {
+        @DeplStateIDs = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @DeplStateIDs = @{$Param{Search}->{Value}}
+        }
+    }
+
     my @Where = $Self->GetOperation(
-        Operator      => $Param{Search}->{Operator},
-        Column        => 'ci.name',
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1,
-        Supported     => [
-            'EQ', 'STARTSWITH', 'ENDSWITH',
-            'CONTAINS', 'LIKE', 'IN'
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'ci.cur_depl_state_id',
+        Value     => \@DeplStateIDs,
+        Supported => [
+            'EQ', 'NE', 'IN'
         ]
     );
 
@@ -127,13 +161,28 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        DeplState    => 'gc.name',
+        DeplStateID  => 'ci.cur_depl_state_id',
+        DeplStateIDs => 'ci.cur_depl_state_id',
+    );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'DeplState' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN general_catalog gcd ON gcd.id = ci.cur_depl_state_id'
+        ];
+    }
+
     return {
         SQLAttrs => [
-            'ci.name'
+            $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            'ci.name'
+            $AttributeMapping{$Param{Attribute}}
         ],
+        %Join
     };
 }
 

@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Owner;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Owner;
 
 use strict;
 use warnings;

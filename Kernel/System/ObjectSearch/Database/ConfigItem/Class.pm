@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::DeplState;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Class;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::DeplState - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Class - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -54,14 +54,14 @@ sub GetSupportedAttributes {
 
     return {
         Search => [
-            'DeplStateID',
-            'DeplStateIDs',
-            'DeplState'
+            'ClassID',
+            'ClassIDs',
+            'Class'
         ],
         Sort => [
-            'DeplStateID',,
-            'DeplStateIDs',
-            'DeplState'
+            'ClassID',
+            'ClassIDs',
+            'Class'
         ]
     };
 }
@@ -94,41 +94,41 @@ sub Search {
         return;
     }
 
-    my @DeplStateIDs;
-    if ( $Param{Search}->{Field} eq 'DeplState' ) {
-        my %States = reverse(
+    my @ClassIDs;
+    if ( $Param{Search}->{Field} eq 'Class' ) {
+        my %Classes = reverse(
             %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::DeploymentState',
+                Class => 'ITSM::ConfigItem::Class',
             )}
         );
 
-        my @StateList = ( $Param{Search}->{Value} );
+        my @ClassList = ( $Param{Search}->{Value} );
         if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @StateList = @{$Param{Search}->{Value}}
+            @ClassList = @{$Param{Search}->{Value}}
         }
-        foreach my $State ( @StateList ) {
-            if ( !$States{$State} ) {
+        foreach my $Class ( @ClassList ) {
+            if ( !$Classes{$Class} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Unknown deplayment state $State!",
+                    Message  => "Unknown asset class $Class!",
                 );
                 return;
             }
 
-            push( @DeplStateIDs, $States{$State} );
+            push( @ClassIDs, $Classes{$Class} );
         }
     }
     else {
-        @DeplStateIDs = ( $Param{Search}->{Value} );
+        @ClassIDs = ( $Param{Search}->{Value} );
         if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @DeplStateIDs = @{$Param{Search}->{Value}}
+            @ClassIDs = @{$Param{Search}->{Value}}
         }
     }
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'ci.cur_depl_state_id',
-        Value     => \@DeplStateIDs,
+        Column    => 'ci.class_id',
+        Value     => \@ClassIDs,
         Supported => [
             'EQ', 'NE', 'IN'
         ]
@@ -163,15 +163,15 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        DeplState    => 'gc.name',
-        DeplStateID  => 'ci.cur_depl_state_id',
-        DeplStateIDs => 'ci.cur_depl_state_id',
+        Class    => 'gc.name',
+        ClassID  => 'ci.class_id',
+        ClassIDs => 'ci.class_id',
     );
 
     my %Join;
-    if ( $Param{Attribute} eq 'DeplState' ) {
+    if ( $Param{Attribute} eq 'Class' ) {
         $Join{SQLJoin} = [
-            'INNER JOIN general_catalog gcd ON gcd.id = ci.cur_depl_state_id'
+            'INNER JOIN general_catalog gc ON gc.id = ci.class_id'
         ];
     }
 

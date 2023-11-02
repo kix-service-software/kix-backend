@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::InciState;
+package Kernel::System::ObjectSearch::Database::ConfigItem::InciState;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::InciState - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::InciState - attribute module for database object search
 
 =head1 SYNOPSIS
 

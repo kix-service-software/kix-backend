@@ -6,12 +6,10 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Class;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Times;
 
 use strict;
 use warnings;
-
-use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -23,7 +21,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::Class - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Times - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -54,18 +52,15 @@ sub GetSupportedAttributes {
 
     return {
         Search => [
-            'ClassID',
-            'ClassIDs',
-            'Class'
+            'CreateTime',
+            'ChangeTime'
         ],
         Sort => [
-            'ClassID',
-            'ClassIDs',
-            'Class'
+            'CreateTime',
+            'ChangeTime'
         ]
-    };
+    }
 }
-
 
 =item Search()
 
@@ -83,6 +78,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my $Value;
     my @SQLWhere;
 
     # check params
@@ -94,49 +90,47 @@ sub Search {
         return;
     }
 
-    my @ClassIDs;
-    if ( $Param{Search}->{Field} eq 'Class' ) {
-        my %Classes = reverse(
-            %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::Class',
-            )}
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        CreateTime => 'ci.create_time',
+        ChangeTime => 'ci.change_time',
+    );
+
+    return q{} if !$Param{Search}->{Value};
+
+    # calculate relative times
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => $Param{Search}->{Value}
+    );
+
+    if ( !$SystemTime ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
         );
-
-        my @ClassList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @ClassList = @{$Param{Search}->{Value}}
-        }
-        foreach my $Class ( @ClassList ) {
-            if ( !$Classes{$Class} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown asset class $Class!",
-                );
-                return;
-            }
-
-            push( @ClassIDs, $Classes{$Class} );
-        }
+        return;
     }
-    else {
-        @ClassIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @ClassIDs = @{$Param{Search}->{Value}}
-        }
-    }
+
+    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime
+    );
+
+    # quote
+    $Value = $Kernel::OM->Get('DB')->Quote( $Value );
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'ci.class_id',
-        Value     => \@ClassIDs,
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Value,
         Supported => [
-            'EQ', 'NE', 'IN'
+            'EQ', 'LT', 'GT',
+            'LTE', 'GTE'
         ]
     );
 
     return if !@Where;
 
-    push( @SQLWhere, @Where);
+    push( @SQLWhere, @Where );
 
     return {
         SQLWhere => \@SQLWhere,
@@ -163,17 +157,9 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Class    => 'gc.name',
-        ClassID  => 'ci.class_id',
-        ClassIDs => 'ci.class_id',
+        CreateTime => 'ci.create_time',
+        ChangeTime => 'ci.change_time',
     );
-
-    my %Join;
-    if ( $Param{Attribute} eq 'Class' ) {
-        $Join{SQLJoin} = [
-            'INNER JOIN general_catalog gc ON gc.id = ci.class_id'
-        ];
-    }
 
     return {
         SQLAttrs => [
@@ -182,7 +168,6 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        %Join
     };
 }
 

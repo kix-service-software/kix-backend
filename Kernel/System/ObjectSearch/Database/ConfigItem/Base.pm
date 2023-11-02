@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Base;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Base;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::Base - base module for object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Base - base module for object search
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ empty method to be overridden by specific attribute module if necessary
 sub GetBackends {
     my ( $Self, %Param ) = @_;
 
-    my $Backends = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ITSMConfigItem::Module');
+    my $Backends = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ConfigItem::Module');
     my %AttributeModules;
 
     if ( !IsHashRefWithData($Backends) ) {

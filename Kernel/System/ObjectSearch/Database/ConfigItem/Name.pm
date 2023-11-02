@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::ConfigItemID;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Name;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::ConfigItemID - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -54,16 +54,13 @@ sub GetSupportedAttributes {
 
     return {
         Search => [
-            'ConfigItemID',
-            'ConfigItemIDs',
+            'Name',
         ],
         Sort => [
-            'ConfigItemID',
-            'ConfigItemIDs',
+            'Name',
         ]
-    };
+    }
 }
-
 
 =item Search()
 
@@ -93,11 +90,13 @@ sub Search {
     }
 
     my @Where = $Self->GetOperation(
-        Operator => $Param{Search}->{Operator},
-        Column   => 'ci.id',
-        Value    => $Param{Search}->{Value},
+        Operator      => $Param{Search}->{Operator},
+        Column        => 'ci.name',
+        Value         => $Param{Search}->{Value},
+        CaseSensitive => 1,
         Supported     => [
-            'EQ', 'NE', 'IN'
+            'EQ', 'STARTSWITH', 'ENDSWITH',
+            'CONTAINS', 'LIKE', 'IN'
         ]
     );
 
@@ -130,10 +129,10 @@ sub Sort {
 
     return {
         SQLAttrs => [
-            'ci.id'
+            'ci.name'
         ],
         SQLOrderBy => [
-            'ci.id'
+            'ci.name'
         ],
     };
 }
