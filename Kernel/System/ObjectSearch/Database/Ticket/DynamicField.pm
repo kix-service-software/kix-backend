@@ -70,7 +70,6 @@ sub GetSupportedAttributes {
         'OrganisationReference'   => ['EQ','GT','GTE','LT','LTE','LIKE'],
     );
 
-    my %List;
     for my $Type ( qw(Search Sort) ) {
         my $Name = "Supported$Type";
 
@@ -86,19 +85,19 @@ sub GetSupportedAttributes {
         for my $Field ( @{$List} ) {
             my $DFName = "DynamicField_$Field->{Name}";
             if ( $Type eq 'Search' ) {
-                $List{$DFName} = {
+                $Self->{Supported}->{$DFName} = {
                     Operators    => $TypeOperators{$Field->{FieldType}},
                     IsSearchable => 1,
                     IsSortable   => 0,
                 };
             }
             else {
-                $List{$DFName}->{IsSortable} = 1;
+                $Self->{Supported}->{$DFName}->{IsSortable} = 1;
             }
         }
     }
 
-    return \%List;
+    return $Self->{Supported};
 }
 
 

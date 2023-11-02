@@ -53,7 +53,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
+    $Self->{Supported} = {
         'TypeID' => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -65,6 +65,8 @@ sub GetSupportedAttributes {
             Operators    => []
         },
     };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -127,7 +129,7 @@ sub Search {
         Column    => 'st.type_id',
         Value     => \@TypeIDs,
         Type      => 'NUMERIC',
-        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

@@ -52,7 +52,7 @@ defines the list of attributes this module is supporting
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
-    return {
+    $Self->{Supported} = {
         'ArticleID'         => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -104,6 +104,8 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','LT','GT','LTE','GTE']
         },
     };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -207,7 +209,7 @@ sub Search {
             Operator  => $Param{Search}->{Operator},
             Column    => $Param{BoolOperator} eq 'OR' ? 'rt_left.incoming_time' : 'art.incoming_time',
             Value     => $Param{Search}->{Value},
-            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+            Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
         );
 
         return if !@Where;
@@ -225,7 +227,7 @@ sub Search {
             Operator  => $Param{Search}->{Operator},
             Column    => $Column,
             Value     => $Param{Search}->{Value},
-            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+            Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
         );
 
         return if !@Where;
@@ -259,7 +261,7 @@ sub Search {
             Column         => $Prefix.$Field,
             Value          => $FieldValue,
             Prepare        => 1,
-            Supported      => $Self->{SupportedSearch}->{$Param{Search}->{Field}},
+            Supported      => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
             Supplement     => $Supplement,
             IsStaticSearch => $IsStaticSearch
         );

@@ -53,7 +53,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
+    $Self->{Supported} = {
         'Priority'   => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -65,6 +65,8 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
         },
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -128,7 +130,7 @@ sub Search {
         Column    => 'st.ticket_priority_id',
         Value     => \@PriorityIDs,
         Type      => 'NUMERIC',
-        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

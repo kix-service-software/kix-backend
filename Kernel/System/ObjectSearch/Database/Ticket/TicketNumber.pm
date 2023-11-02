@@ -58,6 +58,8 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','IN','!IN','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
     };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -91,14 +93,14 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.tn',
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
 
     push( @SQLWhere, @Where);
 
-    return {
+    $Self->{Supported} = {
         SQLWhere => \@SQLWhere,
     };
 }

@@ -53,13 +53,15 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
+    $Self->{Supported} = {
         'TicketFlag' => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ']
         },
     };
+
+    return $Self->{Supported};
 }
 
 
