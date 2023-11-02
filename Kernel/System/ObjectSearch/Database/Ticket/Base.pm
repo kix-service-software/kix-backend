@@ -84,7 +84,7 @@ sub GetBackends {
         }
 
         foreach my $Attribute ( sort keys %{$SupportedAttributes} ) {
-            $AttributeModules{$Attribute} = $SupportedAttributes->{$Attribute};
+            $AttributeModules{$Attribute} = $SupportedAttributes->{$Attribute} || {};
             $AttributeModules{$Attribute}->{Object} = $Object;
         }
     }
