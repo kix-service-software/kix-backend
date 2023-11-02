@@ -60,7 +60,7 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE']
         },
         'Type' => {
-            IsSearchable => 0,
+            IsSearchable => 1,
             IsSortable   => 1,
             Operators    => []
         },
