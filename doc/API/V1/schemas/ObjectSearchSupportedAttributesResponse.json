@@ -1,0 +1,51 @@
+{
+   "$id" : "ObjectSearchSupportedAttributesResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a object supported attributes GET request.",
+   "type" : "object",
+   "properties" : {
+      "SupportedAttributes" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_ObjectSearchSupportedAttributes_json"
+         }
+      }
+   },
+   "required" : [
+      "SupportedAttributes"
+   ],
+   "definitions" : {
+      "_ObjectSearchSupportedAttributes_json" : {
+         "$id" : "ObjectSearchSupportedAttributes.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "A object search supported attributes object.",
+         "type" : "object",
+         "properties" : {
+            "IsSearchable" : {
+               "type" : "number",
+               "readOnly" : true
+            },
+            "IsSortable" : {
+               "type" : "number",
+               "readOnly" : true
+            },
+            "ObjectType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Operators" : {
+               "type" : "array",
+               "readOnly" : true
+            },
+            "Property" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Property",
+            "ObjectType"
+         ]
+      }
+   }
+}

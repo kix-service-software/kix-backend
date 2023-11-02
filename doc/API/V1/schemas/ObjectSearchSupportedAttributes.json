@@ -1,0 +1,32 @@
+{
+   "$id" : "ObjectSearchSupportedAttributes.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A object search supported attributes object.",
+   "type" : "object",
+   "properties" : {
+      "IsSearchable" : {
+         "type" : "number",
+         "readOnly" : true
+      },
+      "IsSortable" : {
+         "type" : "number",
+         "readOnly" : true
+      },
+      "ObjectType" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Operators" : {
+         "type" : "array",
+         "readOnly" : true
+      },
+      "Property" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Property",
+      "ObjectType"
+   ]
+}
