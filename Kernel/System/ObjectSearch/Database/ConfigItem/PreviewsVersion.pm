@@ -53,21 +53,9 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        ClassID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
-        },
-        ClassIDs => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
-        },
-        Class => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ', 'NE',]
-        }
+        Search => [
+            'PreviousVersionSearch',
+        ],
     };
 
     return $Self->{Supported};
@@ -136,7 +124,9 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'ci.class_id',
         Value     => \@ClassIDs,
-        Supported => $Self
+        Supported => [
+            'EQ', 'NE', 'IN'
+        ]
     );
 
     return if !@Where;
