@@ -50,16 +50,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'CreateTime',
-            'ChangeTime'
-        ],
-        Sort => [
-            'CreateTime',
-            'ChangeTime'
-        ]
-    }
+    $Self->{Supported} = {
+        CreateTime => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+        },
+        ChangeTime => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+        }
+    };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -122,10 +126,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
-        Supported => [
-            'EQ', 'LT', 'GT',
-            'LTE', 'GTE'
-        ]
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

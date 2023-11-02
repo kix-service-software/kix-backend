@@ -66,7 +66,7 @@ sub GetSupportedAttributes {
         Class => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE',]
+            Operators    => ['EQ', 'NE', 'IN','!IN']
         }
     };
 
@@ -136,7 +136,8 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'ci.class_id',
         Value     => \@ClassIDs,
-        Supported => $Self
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

@@ -52,14 +52,15 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'Name',
-        ],
-        Sort => [
-            'Name',
-        ]
-    }
+    $Self->{Supported} = {
+        Name => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        }
+    };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -94,10 +95,7 @@ sub Search {
         Column        => 'ci.name',
         Value         => $Param{Search}->{Value},
         CaseSensitive => 1,
-        Supported     => [
-            'EQ', 'STARTSWITH', 'ENDSWITH',
-            'CONTAINS', 'LIKE', 'IN'
-        ]
+        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

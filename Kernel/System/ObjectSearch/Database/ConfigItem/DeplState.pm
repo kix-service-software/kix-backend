@@ -52,18 +52,25 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'DeplStateID',
-            'DeplStateIDs',
-            'DeplState'
-        ],
-        Sort => [
-            'DeplStateID',,
-            'DeplStateIDs',
-            'DeplState'
-        ]
+    $Self->{Supported} = {
+        DeplStateID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        DeplStateIDs => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        DeplState => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        }
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -129,9 +136,8 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'ci.cur_depl_state_id',
         Value     => \@DeplStateIDs,
-        Supported => [
-            'EQ', 'NE', 'IN'
-        ]
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

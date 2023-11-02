@@ -52,16 +52,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'ConfigItemID',
-            'ConfigItemIDs',
-        ],
-        Sort => [
-            'ConfigItemID',
-            'ConfigItemIDs',
-        ]
+    $Self->{Supported} = {
+        ConfigItemID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        ConfigItemIDs => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -93,12 +97,11 @@ sub Search {
     }
 
     my @Where = $Self->GetOperation(
-        Operator => $Param{Search}->{Operator},
-        Column   => 'ci.id',
-        Value    => $Param{Search}->{Value},
-        Supported     => [
-            'EQ', 'NE', 'IN'
-        ]
+        Operator  => $Param{Search}->{Operator},
+        Column    => 'ci.id',
+        Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
