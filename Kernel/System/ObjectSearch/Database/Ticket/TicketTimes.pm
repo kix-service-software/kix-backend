@@ -51,7 +51,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
+    $Self->{Supported} = {
         'Age'            => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -73,6 +73,8 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','LT','GT','LTE','GTE']
         },
     };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -144,7 +146,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
-        Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

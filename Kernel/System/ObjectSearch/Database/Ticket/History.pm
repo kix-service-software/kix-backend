@@ -51,7 +51,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
+    $Self->{Supported} = {
         'CreatedTypeID'     => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -88,6 +88,8 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','LT','LTE','GT','GTE']
         },
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -222,7 +224,7 @@ sub Search {
             Operator  => $Param{Search}->{Operator},
             Column    => $Column,
             Value     => $Param{Search}->{Value},
-            Supported => $Self->{SupportedSearch}->{$Param{Search}->{Field}}
+            Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
         );
 
         return if !@Where;

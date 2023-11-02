@@ -98,6 +98,8 @@ sub GetSupportedAttributes {
         }
     }
 
+    return $Self->{Supported};
+
     return \%List;
 }
 
