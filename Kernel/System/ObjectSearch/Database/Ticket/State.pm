@@ -59,7 +59,7 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
         },
-        'StateID'     => {
+        'State'     => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']

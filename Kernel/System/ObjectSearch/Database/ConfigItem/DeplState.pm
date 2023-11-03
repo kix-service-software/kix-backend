@@ -90,6 +90,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -132,9 +133,24 @@ sub Search {
         }
     }
 
+    my $TablePrefix = 'cr';
+    my $ColPrefix   = 'cur_';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
+        $ColPrefix   = q{};
+
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
+        }
+    }
+
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'ci.cur_depl_state_id',
+        Column    => $TablePrefix . q{.} . $ColPrefix . 'depl_state_id',
         Value     => \@DeplStateIDs,
         Type      => 'NUMERIC',
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
@@ -146,6 +162,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
+        SQLJoin  => \@SQLJoin,
     };
 }
 
@@ -167,18 +184,38 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    my @SQLJoin;
+    my $TablePrefix = 'cr';
+    my $ColPrefix   = 'cur_';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
+        $ColPrefix   = q{};
+
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
+        }
+    }
+
     # map search attributes to table attributes
     my %AttributeMapping = (
         DeplState    => 'gc.name',
-        DeplStateID  => 'ci.cur_depl_state_id',
-        DeplStateIDs => 'ci.cur_depl_state_id',
+        DeplStateID  => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
+        DeplStateIDs => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
     );
 
-    my %Join;
     if ( $Param{Attribute} eq 'DeplState' ) {
-        $Join{SQLJoin} = [
-            'INNER JOIN general_catalog gcd ON gcd.id = ci.cur_depl_state_id'
-        ];
+        push(
+            @SQLJoin,
+            ' INNER JOIN general_catalog gcd ON gcd.id = '
+                . $TablePrefix
+                . q{.}
+                . $ColPrefix
+                . 'depl_state_id'
+        );
     }
 
     return {
@@ -188,7 +225,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        %Join
+        SQLJoin => \@SQLJoin
     };
 }
 

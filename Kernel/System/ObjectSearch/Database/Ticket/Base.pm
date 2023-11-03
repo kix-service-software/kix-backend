@@ -102,6 +102,13 @@ sub BaseSQL {
     };
 }
 
+sub BaseFlags {
+    my ( $Self, %Param ) = @_;
+
+    my %Result;
+
+    return %Result;
+}
 
 =item CreatePermissionSQL()
 

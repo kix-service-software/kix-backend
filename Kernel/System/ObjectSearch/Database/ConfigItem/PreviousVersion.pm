@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ConfigItem::Name;
+package Kernel::System::ObjectSearch::Database::ConfigItem::PreviousVersion;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::PreviousVersion - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -53,15 +53,16 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        Name => {
+        PreviousVersionSearch => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSortable   => 0,
+            Operators    => []
         }
     };
 
     return $Self->{Supported};
 }
+
 
 =item Search()
 
@@ -79,7 +80,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -91,77 +91,14 @@ sub Search {
         return;
     }
 
-    my $TablePrefix = 'cr';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
 
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
-        }
-    }
-
-    my @Where = $Self->GetOperation(
-        Operator      => $Param{Search}->{Operator},
-        Column        => "$TablePrefix.name",
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1,
-        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
-    );
-
+    my @Where;
     return if !@Where;
 
     push( @SQLWhere, @Where);
 
     return {
-        SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
-    };
-}
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    my @SQLJoin;
-    my $TablePrefix = 'cr';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
-
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
-        }
-    }
-
-    return {
-        SQLAttrs => [
-            "$TablePrefix.name"
-        ],
-        SQLOrderBy => [
-            "$TablePrefix.name"
-        ],
-        SQLJoin => \@SQLJoin
     };
 }
 

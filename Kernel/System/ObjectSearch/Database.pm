@@ -237,6 +237,11 @@ sub Search {
     $SQLDef{SQLFrom}  = $BaseSQL->{From};
     $SQLDef{SQLWhere} = $BaseSQL->{Where};
 
+    # check and set basic flags of object type
+    $Self->{BaseFlags} = $Self->{SearchModule}->BaseFlags(
+        %Param
+    );
+
     # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
     if ($Param{UserID} && $Param{UserID} != 1) {
         my %PermissionSQL = $Self->_CreatePermissionSQL(
@@ -276,13 +281,23 @@ sub Search {
             # return in case of error
             return;
         }
+    print STDERR Data::Dumper::Dumper(\%Result);
         if (IsArrayRefWithData($Result{OrderBy})) {
+            if ( $SQLDef{SQLOrderBy} ) {
+                $SQLDef{SQLOrderBy} .= q{, };
+            }
             $SQLDef{SQLOrderBy} .= join(q{, }, @{$Result{OrderBy}});
         }
         if (IsArrayRefWithData($Result{Attrs})) {
+            if ( $SQLDef{SQLAttrs} ) {
+                $SQLDef{SQLAttrs} .= q{, };
+            }
             $SQLDef{SQLAttrs}   .= join(q{, }, @{$Result{Attrs}});
         }
         if (IsArrayRefWithData($Result{Join})) {
+            if ( $SQLDef{SQLJoin} ) {
+                $SQLDef{SQLJoin} .= q{ };
+            }
             $SQLDef{SQLJoin}    .= join(q{ }, @{$Result{Join}});
         }
     }
@@ -295,7 +310,7 @@ sub Search {
             . q{ }
             . $SQLDef{$SQLPart->{Name}};
     }
-
+print STDERR Data::Dumper::Dumper($SQL);
     # database query
     my %Objects;
     my @ObjectIDs;
@@ -466,7 +481,8 @@ sub _CreateAttributeSQL {
                 BoolOperator => $BoolOperator,
                 Search       => $Search,
                 WholeSearch  => $Param{Search}->{$BoolOperator},   # forward "whole" search, e.g. if behavior depends on other attributes
-                Silent       => $Param{Silent} || 0
+                Silent       => $Param{Silent} || 0,
+                Flags        => $Self->{BaseFlags}
             );
 
             if ( !IsHashRefWithData($Result) ) {
@@ -572,7 +588,8 @@ sub _CreateOrderBySQL {
         # execute attribute module to prepare SQL
         my $Result = $AttributeModule->Sort(
             Attribute => $Attribute,
-            Language  => $Language
+            Language  => $Language,
+            Flags     => $Self->{BaseFlags}
         );
 
         if ( !IsHashRefWithData($Result) ) {
@@ -600,7 +617,7 @@ sub _CreateOrderBySQL {
             }
 
             foreach my $Element ( @{$Result->{SQLOrderBy}} ) {
-                push(  @OrderBy, $Element.q{ }.$Order);
+                push(  @OrderBy, $Element . q{ } . $Order);
             }
         }
     }

@@ -82,17 +82,9 @@ sub GetBackends {
             next BACKEND;
         }
 
-        foreach my $Type ( qw(Search Sort) ) {
-            if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "SupportedAttributes->{$Type} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
-                );
-                next BACKEND;
-            }
-            foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
-                $AttributeModules{$Type}->{$Attribute} = $Object;
-            }
+        foreach my $Attribute ( sort keys %{$SupportedAttributes} ) {
+            $AttributeModules{$Attribute} = $SupportedAttributes->{$Attribute} || {};
+            $AttributeModules{$Attribute}->{Object} = $Object;
         }
     }
 
@@ -128,6 +120,42 @@ sub CreatePermissionSQL {
 
     return %Result;
 }
+
+sub BaseFlags {
+    my ( $Self, %Param ) = @_;
+
+    my %Result;
+
+    $Result{PreviousVersion} = $Self->_HandlePreviousVersion(%Param);
+
+    return \%Result;
+}
+
+sub _HandlePreviousVersion {
+    my ($Self, %Param) = @_;
+
+    my $PreviousVersion = 0;
+    for my $Type ( keys %{$Param{Search}} ) {
+        my @Items;
+        for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
+            if ($SearchItem->{Field} eq 'PreviousVersionSearch') {
+                $PreviousVersion = $SearchItem->{Value};
+            }
+            else {
+                push(@Items, $SearchItem);
+            }
+        }
+        if ( scalar(@Items) ) {
+            $Param{Search}->{$Type} = \@Items;
+        }
+        else {
+            delete $Param{Search}->{$Type};
+        }
+    }
+
+    return $PreviousVersion;
+}
+
 
 1;
 
