@@ -1488,6 +1488,15 @@ certain views)
         UserID              => 123,
     );
 
+returns articles in array / hash by given ticket id but
+only requested message-ids
+
+    my @ArticleIndex = $TicketObject->ArticleGet(
+        TicketID  => 123,
+        MessageID => \@MessageIDs,
+        UserID    => 123,
+    );
+
 to get extended ticket attributes, use param Extended - see TicketGet() for extended attributes -
 
     my @ArticleIndex = $TicketObject->ArticleGet(
@@ -1638,6 +1647,19 @@ sub ArticleGet {
         $SQL .= $SenderTypeIDSQL;
     }
 
+    # add message id
+    my $MessageIDSQL;
+    if ( IsArrayRefWithData( $Param{MessageID} ) ) {
+        $SQL .= ' AND sa.a_message_id_md5 IN (' . join( ',', map {'?'} @{ $Param{MessageID} } ) . ')';
+
+        for my $MessageID ( @{ $Param{MessageID} } ) {
+            my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $MessageID );
+            push( @Bind, \$MD5 );
+        }
+
+        $MessageIDSQL = 1;
+    }
+
     # set order
     if ( $Param{Order} && $Param{Order} eq 'DESC' ) {
         $SQL .= ' ORDER BY sa.create_time DESC, sa.id DESC';
@@ -1762,6 +1784,7 @@ sub ArticleGet {
             && !$ChannelSQL
             && !$SenderTypeSQL
             && !$CustomerVisibleSQL
+            && !$MessageIDSQL
         ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

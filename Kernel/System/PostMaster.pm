@@ -702,7 +702,6 @@ sub GetEmailParams {
     for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel)) {
         if ( !$GetParam{$Key} ) {
             $GetParam{$Key} = 'email';
-            $GetParam{CustomerVisible} = 1;
         }
 
         # check if X-KIX-Channel exists, if not, set 'email'
@@ -712,7 +711,6 @@ sub GetEmailParams {
                 Message  => "Can't find channel '$GetParam{$Key}' in db, take 'email' and set 'visible for customer'",
             );
             $GetParam{$Key} = 'email';
-            $GetParam{CustomerVisible} = 1;
         }
     }
 
