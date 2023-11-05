@@ -334,33 +334,6 @@ sub Sort {
     };
 }
 
-sub _prepareField {
-    my ( $Self, %Param ) = @_;
-
-    my $Field = $Param{Field};
-    my $FieldValue = $Param{FieldValue};
-
-    # check if database supports LIKE in large text types (in this case for body)
-    if ( !$Param{IsStaticSearch} && $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-        # lower attributes if we don't do a static search
-        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
-            $Field      = "LCASE($Field)";
-            $FieldValue = "LCASE('$FieldValue')";
-        } else {
-            $Field      = "LOWER($Field)";
-            $FieldValue = "LOWER('$FieldValue')";
-        }
-    } else {
-        $FieldValue = "'$FieldValue'";
-        if ( $Param{IsStaticSearch} ) {
-            # lower search pattern if we use static search
-            $FieldValue = lc($FieldValue);
-        }
-    }
-
-    return ($Field, $FieldValue);
-}
-
 1;
 
 

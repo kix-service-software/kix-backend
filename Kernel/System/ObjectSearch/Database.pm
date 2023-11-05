@@ -47,9 +47,6 @@ sub new {
     # 0=off; 1=on;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-    $Self->{DBObject} = $Kernel::OM->Get('DB');
-
     # check module
     my $ModuleStrg = 'Kernel::System::ObjectSearch::Database::' . $Param{ObjectType} . '::Base';
     if ( !$Kernel::OM->Get('Main')->Require($ModuleStrg) ) {
@@ -314,12 +311,12 @@ print STDERR Data::Dumper::Dumper($SQL);
     # database query
     my %Objects;
     my @ObjectIDs;
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Limit => $Param{Limit}
     );
 
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
         $Objects{ $Row[0] } = $Row[1];
