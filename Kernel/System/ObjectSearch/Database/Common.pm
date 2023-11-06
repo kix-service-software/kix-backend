@@ -42,8 +42,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{DBObject} = $Kernel::OM->Get('DB');
-
     return $Self;
 }
 
@@ -140,8 +138,8 @@ sub PrepareFieldAndValue {
     my $Value = $Param{Value};
 
     # check if database supports LIKE in large text types
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
-        if ( $Self->{DBObject}->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
+        if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('LcaseLikeInLargeText') ) {
             $Field = "LCASE($Field)";
             $Value = "LCASE('$Value')";
         }
