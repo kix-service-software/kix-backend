@@ -91,7 +91,7 @@ sub Search {
         return;
     }
 
-    my $TablePrefix = 'cr';
+    my $TablePrefix = 'ci';
     if ( $Param{Flags}->{PreviousVersion} ) {
         $TablePrefix = 'vr';
 
@@ -141,7 +141,7 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     my @SQLJoin;
-    my $TablePrefix = 'cr';
+    my $TablePrefix = 'ci';
     if ( $Param{Flags}->{PreviousVersion} ) {
         $TablePrefix = 'vr';
 

@@ -998,8 +998,15 @@ sub DynamicFieldListGet {
 
     # get cache object
     my $CacheObject = $Kernel::OM->Get('Cache');
-
-    my $CacheKey = 'DynamicFieldListGet::Valid::' . $Valid . '::ObjectType::' . $ObjectType;
+    my $CacheKeyJSON = $Kernel::OM->Get('JSON')->Encode(
+        SortKeys => 1,
+        Data     => {
+            %Param,
+            Valid      => $Valid,
+            ObjectType => $ObjectType
+        }
+    );
+    my $CacheKey = "DynamicFieldListGet::$CacheKeyJSON";
     my $Cache    = $CacheObject->Get(
         Type => 'DynamicField',
         Key  => $CacheKey,

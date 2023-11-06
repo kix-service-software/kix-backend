@@ -132,6 +132,8 @@ sub Search {
         }
     }
 
+    $Param{Flags}->{ClassIDs} = \@ClassIDs;
+
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => 'ci.class_id',

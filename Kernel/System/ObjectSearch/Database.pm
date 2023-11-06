@@ -278,7 +278,7 @@ sub Search {
             # return in case of error
             return;
         }
-    print STDERR Data::Dumper::Dumper(\%Result);
+
         if (IsArrayRefWithData($Result{OrderBy})) {
             if ( $SQLDef{SQLOrderBy} ) {
                 $SQLDef{SQLOrderBy} .= q{, };
@@ -449,6 +449,7 @@ sub _CreateAttributeSQL {
             if ( !$Self->{AttributeModules}->{$Search->{Field}}->{IsSearchable} ) {
                 # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
                 foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
+
                     next if $Search->{Field} !~ /$SearchableAttribute/g;
                     next if !$Self->{AttributeModules}->{$SearchableAttribute}->{IsSearchable};
 
