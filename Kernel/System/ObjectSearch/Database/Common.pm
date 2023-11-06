@@ -573,7 +573,10 @@ sub _OperationGTE {
 sub _GetQuotes {
     my ($Self, %Param) = @_;
 
-    if ( $Param{Type} eq 'NUMERIC' ) {
+    if (
+        defined $Param{Type} 
+        && $Param{Type} eq 'NUMERIC' 
+    ) {
         return {
             SQL  => q{},
             Join => q{,}
