@@ -316,10 +316,11 @@ replaces palceholders
 Example:
     my $Value = $Self->_ReplaceValuePlaceholder(
         Value     => $SomeValue,
-        Richtext  => 0             # optional: 0 will be used if omitted
-        Translate => 0             # optional: 0 will be used if omitted
-        UserID    => 1             # optional: 1 will be used if omitted
-        Data      => {}            # optional: {} will be used
+        Richtext  => 0,                  # optional: 0 will be used if omitted
+        Translate => 0,                  # optional: 0 will be used if omitted
+        UserID    => 1,                  # optional: 1 will be used if omitted
+        Data      => {},                 # optional: {} will be used
+        HandleKeyLikeObjectValue => 0    # optional: 0 will be used if omitted - if 1 and "Value" is just a "_Key" placeholder it will considered just like a "_ObjectValue" placeholder (needed for backward compatibility)
     );
 
 =cut
@@ -336,6 +337,17 @@ sub _ReplaceValuePlaceholder {
             %{$Param{Data}}
         }
     };
+    if(IsHashRefWithData($Param{AdditionalData})) {
+        $Data = {
+            %{$Data},
+            %{$Param{AdditionalData}}
+        }
+    };
+
+    # handle DF "_Key" placeholder like "_ObjectValue" if value is just this placeholder (no surrounding text) and param is active
+    if ($Param{HandleKeyLikeObjectValue} && $Param{Value} =~ m/^<KIX_(?:\w|^>)+_DynamicField_(?:\w+?)_Key>$/) {
+        $Param{Value} =~ s/(.+)Key>/${1}ObjectValue>/;
+    }
 
     return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         Text            => $Param{Value},
