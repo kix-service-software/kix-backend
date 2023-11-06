@@ -56,7 +56,7 @@ sub Run {
             Search     => {
                 AND => [
                     {
-                        Field    => 'StateIDs',
+                        Field    => 'StateID',
                         Operator => 'IN',
                         Value    => \@PendingAutoStateIDs,
                     },
