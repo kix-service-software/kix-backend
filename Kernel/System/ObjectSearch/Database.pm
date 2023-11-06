@@ -307,7 +307,7 @@ sub Search {
             . q{ }
             . $SQLDef{$SQLPart->{Name}};
     }
-print STDERR Data::Dumper::Dumper($SQL);
+
     # database query
     my %Objects;
     my @ObjectIDs;
