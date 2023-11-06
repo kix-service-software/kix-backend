@@ -170,9 +170,11 @@ sub _GetSearchBackend {
         return;
     }
 
+    my $Type = $Param{ObjectType} ? ucfirst $Param{ObjectType} : undef;
+
     if (
-        $Param{ObjectType}
-        && !$ObjectTypes->{$Param{ObjectType}}
+        $Type
+        && !$ObjectTypes->{$Type}
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -181,8 +183,8 @@ sub _GetSearchBackend {
         return;
     }
 
-    return 1 if !$Param{ObjectType} && IsHashRefWithData($Self->{SearchBackendObject});
-    return 1 if $Param{ObjectType} && $Self->{SearchBackendObject}->{$Param{ObjectType}};
+    return 1 if !$Type && IsHashRefWithData($Self->{SearchBackendObject});
+    return 1 if $Type && $Self->{SearchBackendObject}->{$Type};
 
     my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
 
@@ -197,7 +199,7 @@ sub _GetSearchBackend {
 
     for my $ObjectType ( sort keys %{$ObjectTypes} ) {
         next if !$ObjectTypes->{$ObjectType};
-        next if $Param{ObjectType} && $ObjectType ne $Param{ObjectType};
+        next if $Type && $ObjectType ne $Type;
 
         my $BackendObject = $Backend->new(
             %{$Self},

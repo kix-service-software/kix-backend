@@ -72,14 +72,21 @@ sub GetSupportedAttributes {
 
     for my $Type ( qw(Search Sort) ) {
         my $Name = "Supported$Type";
+        my %SearchParams;
+
+        if ( $Type eq 'Sort' ) {
+            %SearchParams = (
+                FieldType => qw(
+                    Text Textarea Date DateTime Multiselect
+                ),
+                IsSortable => 1
+            );
+        }
 
         my $List = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             Valid      => 1,
             ObjectType => 'Ticket',
-            FieldType => [
-                'Text', 'Textarea', 'Date', 'DateTime','Multiselect'
-            ],
-            IsSortable => $Type eq 'Sort' ? 1 : undef,
+            %SearchParams
         );
 
         for my $Field ( @{$List} ) {
