@@ -1634,6 +1634,12 @@ sub _ValidateFilter {
             foreach my $Filter ( @{ $FilterDef->{$Object}->{$BoolOperator} } ) {
                 $Filter->{Operator} = uc( $Filter->{Operator} || '' );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
+                
+                # handle negated operators
+                if ( $Filter->{Operator} =~ /^!(.*?)$/ ) {
+                    $Filter->{Operator} = $1;
+                    $Filter->{Not} = !$Filter->{Not};
+                }
 
                 # check if filter field is valid
                 if ( !$Filter->{Field} ) {

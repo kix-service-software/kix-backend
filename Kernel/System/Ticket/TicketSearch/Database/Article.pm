@@ -197,6 +197,7 @@ sub Search {
 
         my %OperatorMap = (
             'EQ'  => '=',
+            'NE'  => '!=',
             'LT'  => '<',
             'GT'  => '>',
             'LTE' => '<=',
@@ -214,9 +215,11 @@ sub Search {
 
         # prepare Value if needed
         my $Value = $Param{Search}->{Value};
-        if ( $Param{Search}->{Operator} eq 'IN' ) {
+        if ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
             $Value = '('.(join(',', @{$Value})).')';
-        } elsif ( $Param{Search}->{Operator} eq 'EQ' && IsArrayRefWithData($Value) ) {
+        } elsif ( $Param{Search}->{Operator} eq 'IN' ) {
+            $Value = '('.(join(',', @{$Value})).')';
+        } elsif ( $Param{Search}->{Operator} =~ /(EQ|NE)/ && IsArrayRefWithData($Value) ) {
             $Value = $Value->[0];
         }
 
@@ -229,9 +232,13 @@ sub Search {
     else {
         my $Field      = $AttributeMapping{$Param{Search}->{Field}};
         my $FieldValue = $Param{Search}->{Value};
+        my $Operator   = 'LIKE';
 
         if ( $Param{Search}->{Operator} eq 'EQ' ) {
-            # no special handling
+            $Operator = '=';
+        }
+        elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+            $Operator = '!=';
         }
         elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
             $FieldValue = $FieldValue.'%';
@@ -260,9 +267,9 @@ sub Search {
                 IsStaticSearch => $IsStaticSearch
             );
 
-            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            my $FieldQuery = $Where[0] . ' '.$Operator.' ' . $Where[1];
             if ( $Param{UserType} eq 'Customer' ) {
-                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art_left.customer_visible = 1)';
+                $FieldQuery = '(' . $Where[0] . ' '.$Operator.' ' . $Where[1] . ' AND art_left.customer_visible = 1)';
             }
             push( @SQLWhere, $FieldQuery );
 
@@ -273,9 +280,9 @@ sub Search {
                 IsStaticSearch => $IsStaticSearch
             );
 
-            my $FieldQuery = $Where[0] . ' LIKE ' . $Where[1];
+            my $FieldQuery = $Where[0] . ' '.$Operator.' ' . $Where[1];
             if ( $Param{UserType} eq 'Customer' ) {
-                $FieldQuery = '(' . $Where[0] . ' LIKE ' . $Where[1] . ' AND art.customer_visible = 1)';
+                $FieldQuery = '(' . $Where[0] . ' '.$Operator.' ' . $Where[1] . ' AND art.customer_visible = 1)';
             }
             push( @SQLWhere, $FieldQuery );
         }

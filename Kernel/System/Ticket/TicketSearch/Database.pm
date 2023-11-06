@@ -310,6 +310,7 @@ sub TicketSearch {
         return;
     }
 
+print STDERR "SQL: $SQL\n";
     # database query
     my %Tickets;
     my @TicketIDs;
