@@ -151,7 +151,7 @@ sub GetSupportedAttributes {
 
     my %List;
     for my $ObjectType ( sort keys %{$Self->{SearchBackendObject}} ) {
-        $List{$ObjectType} = $Self->{SearchBackendObject}->{$Param{ObjectType}}->GetSupportedAttributes();
+        $List{$ObjectType} = $Self->{SearchBackendObject}->{$ObjectType}->GetSupportedAttributes();
     }
 
     return \%List;

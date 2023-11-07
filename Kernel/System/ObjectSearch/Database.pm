@@ -632,15 +632,26 @@ sub GetSupportedAttributes {
 
     my @List;
     for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
-        my $Module = $Self->{AttributeModules}->{$Attribute};
+        my $Module   = $Self->{AttributeModules}->{$Attribute};
+        my $Property = $Attribute;
+        my %SpecParams;
+        if ( $Self->{ObjectType} eq 'ConfigItem' ) {
+            (my $Class, $Property) = split(/::/sm, $Attribute);
+            %SpecParams = (
+                ClassID => $Module->{ClassID},
+                Class   => $Class
+            );
+        }
+
         push (
             @List,
             {
                 ObjectType   => $Self->{ObjectType},
-                Property     => $Attribute,
+                Property     => $Property,
                 IsSearchable => $Module->{IsSearchable} || 0,
                 IsSortable   => $Module->{IsSortable}   || 0,
-                Operators    => $Module->{Operators}    || []
+                Operators    => $Module->{Operators}    || [],
+                %SpecParams
             }
         );
     }

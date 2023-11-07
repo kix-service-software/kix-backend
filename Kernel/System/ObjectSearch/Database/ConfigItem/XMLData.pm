@@ -52,13 +52,46 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        "Data\." => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','LT','LTE','GT','GTE','CONTAINS','ENDSWITH','STARTSWITH']  # ToDo: currently no '-between' are possible
-        }
-    };
+    $Self->{Supported} = {};
+
+    # check cache
+    my $CacheKey = "GetSupportedAttributes::XMLData";
+    my $Data = $Kernel::OM->Get('Cache')->Get(
+        Type => 'ITSMConfigurationManagement',
+        Key  => $CacheKey,
+    );
+
+    if (
+        $Data
+        && ref $Data eq 'HASH'
+    ) {
+        $Self->{Supported} = $Data;
+        return $Self->{Supported};
+    }
+
+    my $ClassIDs = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::Class'
+    );
+
+    for my $ClassID ( sort keys %{$ClassIDs} ) {
+        my $Definition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+            ClassID => $ClassID
+        );
+
+        $Self->_XMLAttributeGet(
+            DefinitionRef => $Definition->{DefinitionRef},
+            ClassID       => $ClassID,
+            Class         => $Definition->{Class},
+            Key           => 'Data'
+        );
+    }
+
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => 'ITSMConfigurationManagement',
+        TTL   => 60 * 60 * 24 * 20,
+        Key   => $CacheKey,
+        Value => $Self->{Supported},
+    );
 
     return $Self->{Supported};
 }
@@ -177,6 +210,34 @@ sub Search {
         SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
     };
+}
+
+sub _XMLAttributeGet {
+    my ($Self, %Param) = @_;
+
+    return if !$Param{DefinitionRef};
+    return if ref $Param{DefinitionRef} ne 'ARRAY';
+
+    for my $Attr ( @{$Param{DefinitionRef}} ) {
+        my $Key = ($Param{Key} || 'Data') . ".$Attr->{Key}";
+
+        $Self->{Supported}->{"$Param{Class}::$Key"} = {
+            IsSearchable => $Attr->{Searchable} || 0,
+            IsSortable   => 0,
+            ClassID      => $Param{ClassID},
+            Operators    => $Attr->{Searchable} ? ['EQ','NE','LT','LTE','GT','GTE','CONTAINS','ENDSWITH','STARTSWITH'] : []
+        };
+
+        if ( $Attr->{Sub} ) {
+            $Self->_XMLAttributeGet(
+                %Param,
+                DefinitionRef => $Attr->{Sub},
+                Key           => $Key,
+            );
+        }
+    }
+
+    return 1;
 }
 
 1;
