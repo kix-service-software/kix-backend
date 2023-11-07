@@ -151,6 +151,9 @@ sub GetSupportedAttributes {
 
     my %List;
     for my $ObjectType ( sort keys %{$Self->{SearchBackendObject}} ) {
+        next if !$ObjectType;
+        next if !defined $Self->{SearchBackendObject}->{$ObjectType};
+
         $List{$ObjectType} = $Self->{SearchBackendObject}->{$ObjectType}->GetSupportedAttributes();
     }
 
@@ -170,7 +173,7 @@ sub _GetSearchBackend {
         return;
     }
 
-    my $Type = $Param{ObjectType} ? ucfirst $Param{ObjectType} : undef;
+    my $Type = $Param{ObjectType} ? ucfirst $Param{ObjectType} : q{};
 
     if (
         $Type
