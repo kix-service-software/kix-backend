@@ -260,6 +260,9 @@ sub GetOperation {
     }
 
     my $Function = "_Operation$Param{Operator}";
+    if ( $Param{Operator} eq '!IN' ) {
+        $Function = "_OperationNOTIN";
+    }
 
     my @Statements;
     for my $Index ( keys @Columns ) {
@@ -731,8 +734,8 @@ sub _GetQuotes {
     my ($Self, %Param) = @_;
 
     if (
-        defined $Param{Type} 
-        && $Param{Type} eq 'NUMERIC' 
+        defined $Param{Type}
+        && $Param{Type} eq 'NUMERIC'
     ) {
         return {
             SQL  => q{},
