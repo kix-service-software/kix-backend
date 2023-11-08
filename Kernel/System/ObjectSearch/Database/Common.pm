@@ -260,6 +260,9 @@ sub GetOperation {
     }
 
     my $Function = "_Operation$Param{Operator}";
+    if ( $Param{Operator} eq '!IN' ) {
+        $Function = "_OperationNOTIN";
+    }
 
     my @Statements;
     for my $Index ( keys @Columns ) {

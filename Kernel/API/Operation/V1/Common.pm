@@ -1100,7 +1100,7 @@ helper function to return a successful result.
 sub _Success {
     my ( $Self, %Param ) = @_;
     my %Headers = %{$Param{AdditionalHeaders}||{}};
-    
+
     delete $Param{AdditionalHeaders};
 
     # ignore cached values if we have a cached response (see end of Init method)
@@ -1574,12 +1574,12 @@ sub _ValidateFilter {
         'LTE'        => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
         'GTE'        => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
         'IN'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
+        '!IN'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'CONTAINS'   => { 'STRING'  => 1 },
         'STARTSWITH' => { 'STRING'  => 1 },
         'ENDSWITH'   => { 'STRING'  => 1 },
         'LIKE'       => { 'STRING'  => 1 },
     );
-    my $ValidOperators = join( '|', keys %OperatorTypeMapping );
     my %ValidTypes;
     foreach my $Tmp ( values %OperatorTypeMapping ) {
         foreach my $Type ( keys %{$Tmp} ) {
@@ -1632,7 +1632,7 @@ sub _ValidateFilter {
 
             # iterate filters
             foreach my $Filter ( @{ $FilterDef->{$Object}->{$BoolOperator} } ) {
-                $Filter->{Operator} = uc( $Filter->{Operator} || '' );
+                $Filter->{Operator} = uc( $Filter->{Operator} || q{} );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
 
                 # check if filter field is valid
@@ -1644,7 +1644,10 @@ sub _ValidateFilter {
                 }
 
                 # check if filter Operator is valid
-                if ( $Filter->{Operator} !~ /^($ValidOperators)$/g ) {
+                if (
+                    !$Filter->{Operator}
+                    || !$OperatorTypeMapping{$Filter->{Operator}}
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Unknown filter operator $Filter->{Operator} in $Object.$Filter->{Field}!",
@@ -1668,7 +1671,11 @@ sub _ValidateFilter {
                 }
 
                 # check DATE value
-                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
+                if (
+                    $Filter->{Type} eq 'DATE'
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1676,7 +1683,10 @@ sub _ValidateFilter {
                 }
 
                 # check DATETIME value
-                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
+                if (
+                    $Filter->{Type} eq 'DATETIME'
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
