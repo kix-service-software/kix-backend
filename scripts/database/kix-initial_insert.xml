@@ -4678,6 +4678,26 @@ DefaultValue:
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">16</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="0">AddressDomainPattern</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Pattern</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Organisation</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '0'
+CountMax: '25'
+CountDefault: '0'
+DefaultValue:
+        ]]></Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- initial job "KIX Field Agent - Mobile Processing Rejected" -->
     <Insert Table="exec_plan">

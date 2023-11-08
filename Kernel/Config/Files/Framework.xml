@@ -1221,12 +1221,12 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom" Required="0" Valid="1">
-        <Description Translatable="1">Checks if the sender of a follow-up message is contained in customer database an has an identical customer-ID as the ticket. If so, the email is considered as email-external, otherwise it is considered as email-internal. Default KIX behavior if disabled.</Description>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckFromOrganisation" Required="0" Valid="1">
+        <Description Translatable="1">Checks if the sender of a follow-up message is contained in contact database an has an identical organisation as the ticket. If so, the email is visible in the self service portal.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
-            <Option SelectedID="1">
+            <Option SelectedID="0">
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
