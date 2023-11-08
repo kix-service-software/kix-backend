@@ -308,7 +308,6 @@ sub Search {
             . $SQLDef{$SQLPart->{Name}};
     }
 
-print STDERR "SQL: $SQL\n";
     # database query
     my %Objects;
     my @ObjectIDs;
