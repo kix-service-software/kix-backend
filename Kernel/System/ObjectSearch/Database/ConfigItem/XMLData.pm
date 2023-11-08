@@ -296,7 +296,7 @@ sub _GetAssignedSearchData {
 
         # get static search data
         if (IsArrayRefWithData($SearchStatics)) {
-            $Self->_GetAssignedSearchDataStatetic(
+            $Self->_GetAssignedSearchDataStatic(
                 CISearchAttribute => $CISearchAttribute,
                 SearchStatics     => $SearchStatics,
                 SearchData        => \%SearchData,
@@ -311,7 +311,7 @@ sub _GetAssignedSearchData {
     return %SearchData;
 }
 
-sub _GetAssignedSearchDataStatetic {
+sub _GetAssignedSearchDataStatic {
     my ($Self, %Param) = @_;
 
     for my $SearchStatic ( @{$Param{SearchStatics}} ) {
