@@ -429,7 +429,7 @@ sub _CreateAttributeSQL {
     }
 
     # generate SQL from attribute modules
-    foreach my $BoolOperator ( keys %{$Param{Search}} ) {
+    foreach my $BoolOperator ( sort keys %{$Param{Search}} ) {
         if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
             return if $Param{Silent};
 

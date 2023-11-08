@@ -126,20 +126,27 @@ sub BaseFlags {
 
     my %Result;
 
-    $Result{PreviousVersion} = $Self->_HandlePreviousVersion(%Param);
+    %Result = $Self->_ExtractFields(
+        %Param,
+        Extract => {
+            PreviousVersionSearch => 1,
+            AssignedOrganisation  => 1
+        }
+    );
+
 
     return \%Result;
 }
 
-sub _HandlePreviousVersion {
+sub _ExtractFields {
     my ($Self, %Param) = @_;
 
-    my $PreviousVersion = 0;
+    my %Fields;
     for my $Type ( keys %{$Param{Search}} ) {
         my @Items;
         for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
-            if ($SearchItem->{Field} eq 'PreviousVersionSearch') {
-                $PreviousVersion = $SearchItem->{Value};
+            if ($Param{Extract}->{$SearchItem->{Field}}) {
+                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
             }
             else {
                 push(@Items, $SearchItem);
@@ -153,7 +160,7 @@ sub _HandlePreviousVersion {
         }
     }
 
-    return $PreviousVersion;
+    return %Fields;
 }
 
 

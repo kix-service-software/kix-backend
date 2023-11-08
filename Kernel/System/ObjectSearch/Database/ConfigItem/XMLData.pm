@@ -86,6 +86,13 @@ sub GetSupportedAttributes {
         );
     }
 
+    # special supported for assigned contact handle
+    $Self->{Supported}->{AssignedContact} = {
+        IsSearchable => 1,
+        IsSortable   => 0,
+        Operators    => []
+    };
+
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'ITSMConfigurationManagement',
         TTL   => 60 * 60 * 24 * 20,
@@ -113,7 +120,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -125,11 +131,294 @@ sub Search {
         return;
     }
 
+    my @SQLJoin = $Self->_GetJoin(\%Param);
+
+    my @Where;
+    my $Field;
+    if ( $Param{Search}->{Field} eq 'AssignedContact' ) {
+
+        my %What = $Self->_GetAssigendSQL(\%Param);
+    }
+    else {
+        my $SearchKey = "[1]{'Version'}[1]";
+        my @Parts     = split(/[.]/sm, $Param{Search}->{Field});
+
+        if ( scalar( @Parts ) > 1 ) {
+            $Field = 'Data';
+        }
+
+        foreach my $Part ( @Parts[2..$#Parts] ) {
+            $SearchKey .= "{'$Part'}[%]";
+            $Field     .= ".$Part";
+        }
+        $SearchKey .= "{'Content'}";
+
+        my @KeyWhere = $Self->GetOperation(
+            Operator         => 'LIKE',
+            Column           => 'xst.xml_content_key',
+            Value            => $SearchKey,
+            Type             => 'STRING',
+            LikeEscapeString => 1,
+            Supported        => ['LIKE']
+        );
+
+        @Where = $Self->GetOperation(
+            Operator   => $Param{Search}->{Operator},
+            Column     => 'xst.xml_content_value',
+            Value      => $Param{Search}->{Value},
+            Type       => 'STRING',
+            IsOR       => 1,
+            Supplement => [' AND ' . $KeyWhere[0]],
+            Supported  => $Self->{Supported}->{$Field}->{Operators}
+        );
+    }
+
+
+    return if !@Where;
+
+    push( @SQLWhere, @Where);
+
+    return {
+        SQLJoin  => \@SQLJoin,
+        SQLWhere => \@SQLWhere,
+    };
+}
+
+sub _GetAssigendSQL {
+    my ( $Self, %Param ) = @_;
+
+    my %Contact = $Self->_GetAssignedContact(
+        ContactID              => $Param{Search}->{Value},
+        RelevantOrganisationID => $Param{Flags}->{AssignedOrganisation} || q{}
+    );
+
+    my $Mapping = $Self->_GetAssignedMapping(\%Param);
+
+    my %UsedClassIDs;
+    my %ClassIDs = %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
+        Class => 'ITSM::ConfigItem::Class',
+    )};
+    my %Classes = reverse %ClassIDs;
+
+    if ( $Param{Flags}->{ClassIDs} ) {
+        %UsedClassIDs = map { $ClassIDs{$_} => $_ } @{$Param{Flags}->{ClassIDs}};
+    }
+
+    my %SearchWhat;
+    CICLASS:
+    for my $CIClass ( keys %{ $Mapping->{ $Param{ObjectType} } } ) {
+        next CICLASS if ( !IsHashRefWithData( $Mapping->{$CIClass} ) );
+        next CICLASS if !$Classes{$CIClass};
+        next CICLASS if %UsedClassIDs && !$UsedClassIDs{$CIClass};
+
+        # get CI-class definition...
+        my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+            ClassID => $Classes{$CIClass},
+        );
+
+        if ( !$XMLDefinition->{DefinitionID} ) {
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No Definition definied for class $CIClass!",
+                );
+            }
+            next CICLASS;
+        }
+
+        # prepare search data
+        my %SearchData = $Self->_GetAssignedSearchData(
+            CIClass => $CIClass,
+            Mapping => $Mapping,
+            Contact => \%Contact
+        );
+
+        # ignore class if not search is given/usable
+        next if (!scalar(keys %SearchData));
+
+        # prepare xml search params (What)
+        $Self->_GetXMLSearchDataForAssignedCIs(
+            XMLDefinition => $XMLDefinition->{DefinitionRef},
+            SearchWhat    => \%SearchWhat,
+            SearchData    => \%SearchData,
+        );
+
+    }
+
+    return %SearchWhat;
+}
+
+sub _GetAssignedSearchData {
+    my ($Self, %Param) = @_;
+
+    my $CIClass = $Param{CIClass};
+    my $Mapping = $Param{Mapping};
+    my %Contact = %{$Param{Contact}};
+    my %SearchData;
+
+    for my $CISearchAttribute ( keys %{ $Mapping->{$CIClass} } ) {
+        next if (!$CISearchAttribute);
+        next if ( !IsHashRefWithData( $Mapping-{$CIClass}->{$CISearchAttribute} ) );
+
+        my $ObjectSearchAttributes = $Mapping->{$CIClass}->{$CISearchAttribute}->{SearchAttributes};
+        if ($ObjectSearchAttributes && !IsArrayRefWithData($ObjectSearchAttributes)) {
+            $ObjectSearchAttributes = [$ObjectSearchAttributes];
+        }
+        my $SearchStatics = $Mapping->{$CIClass}->{$CISearchAttribute}->{SearchStatic};
+        if ($SearchStatics && !IsArrayRefWithData($SearchStatics)) {
+            $SearchStatics = [$SearchStatics];
+        }
+
+        next if ( !IsArrayRefWithData($ObjectSearchAttributes) && !IsArrayRefWithData($SearchStatics) );
+
+        $CISearchAttribute =~ s/^\s+//g;
+        $CISearchAttribute =~ s/\s+$//g;
+
+        next if !$CISearchAttribute;
+
+        $SearchData{$CISearchAttribute} = [];
+
+        # get attributes search data
+        if (
+            %Contact
+            && IsArrayRefWithData($ObjectSearchAttributes)
+        ) {
+            $Self->_GetAssignedSearchDataObject(
+                CISearchAttribute      => $CISearchAttribute,
+                ObjectSearchAttributes => $ObjectSearchAttributes,
+                SearchData             => \%SearchData,
+                Contact                => \%Contact
+            );
+        }
+
+        # get static search data
+        if (IsArrayRefWithData($SearchStatics)) {
+            $Self->_GetAssignedSearchDataStatetic(
+                CISearchAttribute => $CISearchAttribute,
+                SearchStatics     => $SearchStatics,
+                SearchData        => \%SearchData,
+            );
+        }
+
+        if (!scalar(@{ $SearchData{$CISearchAttribute} })) {
+            delete $SearchData{$CISearchAttribute};
+        }
+    }
+
+    return %SearchData;
+}
+
+sub _GetAssignedSearchDataStatetic {
+    my ($Self, %Param) = @_;
+
+    for my $SearchStatic ( @{$Param{SearchStatics}} ) {
+        next if ( !defined $SearchStatic );
+        push ( @{ $Param{SearchData}->{$Param{CISearchAttribute}} }, $SearchStatic );
+    }
+
+    return 1;
+}
+
+sub _GetAssignedSearchDataObject {
+    my ($Self, %Param) = @_;
+
+    for my $ObjectSearchAttribute ( @{$Param{ObjectSearchAttributes}} ) {
+        my $Value;
+        if ( $ObjectSearchAttribute =~ /.+[.].+/sm ) {
+            my @AttributStructure = split(/[.]/sm, $ObjectSearchAttribute);
+            next if (
+                !$AttributStructure[0]
+                || !$AttributStructure[1]
+                || !IsHashRefWithData( $Param{Contact}->{$AttributStructure[0]} )
+            );
+            $Value = $Param{Contact}->{$AttributStructure[0]}->{$AttributStructure[1]}
+        } else {
+            $Value = $Param{Contact}->{$ObjectSearchAttribute};
+        }
+
+        next if ( !defined $Value );
+
+        push (
+            @{ $Param{SearchData}->{$Param{CISearchAttribute}} },
+            IsArrayRefWithData($Value) ? @{$Value} : $Value
+        );
+    }
+
+    return 1;
+}
+
+sub _GetAssignedContact {
+    my ($Self, %Param) = @_;
+
+    # get contact and user data
+    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+        ID            => $Param{ContactID},
+        DynamicFields => 1
+    );
+    if (
+        !$ContactData{User}
+        && $ContactData{AssignedUserID}
+    ) {
+        my %User = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $ContactData{AssignedUserID},
+        );
+        $ContactData{User} = IsHashRefWithData(\%User) ? \%User : undef;
+    }
+
+    if ($Param{RelevantOrganisationID}) {
+        $ContactData{RelevantOrganisationID} = $Param{RelevantOrganisationID} || undef;
+    }
+
+    return %ContactData;
+}
+
+sub _GetAssignedMapping {
+    my ( $Self, %Param ) = @_;
+
+    my $Mapping;
+    if ( !$Param{Flags}->{AssignedConfigItemsMapping} ) {
+        my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || q{};
+
+        my $MappingData = $Kernel::OM->Get('JSON')->Decode(
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
+        );
+
+        if ( !IsHashRefWithData($MappingData) ) {
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
+                );
+            }
+        }
+
+        $Param{Flags}->{AssignedConfigItemsMapping} = $MappingData;
+        $Mapping = $MappingData->{Contact} if ( !$MappingData->{Contact} );
+    }
+    else {
+        $Mapping = $Param{Flags}->{AssignedConfigItemsMapping}->{Contact} || q{};
+    }
+
+    return $Mapping;
+}
+
+
+sub _GetJoin {
+    my ($Self, %Param) = @_;
+
     my @JoinAND;
     if (
         $Param{Flags}->{ClassIDs}
         && !$Self->{Flags}->{JoinXML}
     ) {
+
         my @Types;
         for my $ClassID ( @{$Param{Flags}->{ClassIDs}}) {
             if ( $Param{Flags}->{PreviousVersion} ) {
@@ -145,7 +434,7 @@ sub Search {
             Supported => ['IN']
         );
     }
-
+    my @SQLJoin;
     my $TablePrefix = 'ci';
     if ( $Param{Flags}->{PreviousVersion} ) {
         $TablePrefix = 'vr';
@@ -176,40 +465,7 @@ sub Search {
         $Param{Flags}->{JoinXML} = 1;
     }
 
-    my $SearchKey = "[1]{'Version'}[1]";
-    my @Parts     = split(/[.]/sm, $Param{Search}->{Field});
-    foreach my $Part ( @Parts[2..$#Parts] ) {
-        $SearchKey .= "{'$Part'}[%]";
-    }
-    $SearchKey .= "{'Content'}";
-
-    my @KeyWhere = $Self->GetOperation(
-        Operator         => 'LIKE',
-        Column           => 'xst.xml_content_key',
-        Value            => $SearchKey,
-        Type             => 'STRING',
-        LikeEscapeString => 1,
-        Supported        => ['LIKE']
-    );
-
-    my @Where = $Self->GetOperation(
-        Operator   => $Param{Search}->{Operator},
-        Column     => 'xst.xml_content_value',
-        Value      => $Param{Search}->{Value},
-        Type       => 'STRING',
-        IsOR       => 1,
-        Supplement => [' AND ' . $KeyWhere[0]],
-        Supported  => $Self->{Supported}->{'Data.'}->{Operators}
-    );
-
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
-    return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
-    };
+    return @SQLJoin;
 }
 
 sub _XMLAttributeGet {
@@ -237,6 +493,60 @@ sub _XMLAttributeGet {
         }
     }
 
+    return 1;
+}
+
+sub _GetXMLSearchDataForAssignedCIs {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if !$Param{XMLDefinition} || ref $Param{XMLDefinition} ne 'ARRAY';
+    return if !$Param{SearchWhat}    || ref $Param{SearchWhat}    ne 'HASH';
+    return if !$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH';
+
+    for my $Item ( @{ $Param{XMLDefinition} } ) {
+        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
+
+        # prepare value
+        my $Values = [];
+        if ( IsArrayRefWithData($Param{SearchData}->{$Key}) ) {
+
+            for my $SingleValue ( @{$Param{SearchData}->{$Key}} ) {
+                my $ValuePart = $Kernel::OM->Get('ITSMConfigItem')->XMLExportSearchValuePrepare(
+                    Item  => $Item,
+                    Value => $SingleValue,
+                );
+
+                if (defined $ValuePart && $ValuePart ne q{}) {
+                    if ( IsArrayRefWithData($ValuePart) ) {
+                        push( @{$Values}, @{$ValuePart} );
+                    } else {
+                        push( @{$Values}, $ValuePart);
+                    }
+                }
+            }
+        }
+
+        if ( IsArrayRefWithData($Values) ) {
+
+            # create search key
+            my $SearchKey = $Key;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
+
+            # create search hash
+            $Param{SearchWhat}->{ "[1]{'Version'}[1]{'" . $SearchKey. "'}[%]{'Content'}" } = $Values;
+        }
+
+        next if !$Item->{Sub};
+
+        # start recursion, if "Sub" was found
+        $Self->_GetXMLSearchDataForAssignedCIs(
+            XMLDefinition => $Item->{Sub},
+            SearchWhat    => $Param{SearchWhat},
+            SearchData    => $Param{SearchData},
+            Prefix        => $Key,
+        );
+    }
     return 1;
 }
 

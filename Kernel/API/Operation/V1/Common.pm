@@ -399,6 +399,9 @@ sub Init {
     # Search parameter is not handled in API by default
     $Self->{HandleSearchInAPI} = 0;
 
+    # Sort parameter is not handled in Core by default
+    $Self->{HandleSortInCORE} = 0;
+
     # calculate LevelIndent for Logging
     $Self->{Level} = $Self->{Level} || 0;
 
@@ -973,6 +976,20 @@ sub HandleSearchInAPI {
     $Self->{HandleSearchInAPI} = 1;
 }
 
+=item HandleSortInCORE()
+
+Tell the API to handle the "sort" parameter in the CORE. This is needed for operations that don't handle the "sort" parameter and leave the work to the CORE.
+
+    $CommonObject->HandleSortInCORE();
+
+=cut
+
+sub HandleSortInCORE {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{HandleSortInCORE} = 1;
+}
+
 =item ApplyPaging()
 
 Apply the relevant limit and offset to the given data.
@@ -1224,7 +1241,10 @@ sub _Success {
         }
 
         # honor a sorter, if we have one
-        if ( IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
+        if (
+            !$Self->{HandleSortInCORE}
+            && IsHashRefWithData( $Self->{Sort} )
+        ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplySort(
