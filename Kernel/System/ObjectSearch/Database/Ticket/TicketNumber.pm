@@ -51,7 +51,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return{
+    $Self->{Supported} = {
         'TicketNumber' => {
             IsSearchable => 1,
             IsSortable   => 1,
