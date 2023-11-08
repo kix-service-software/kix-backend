@@ -139,6 +139,15 @@ sub Run {
             Key    => $FAQArticle{ID}
         );
 
+        if ($Param{Data}->{include}->{Rating}) {
+            my $VoteDataHashRef = $Kernel::OM->Get('FAQ')->ItemVoteDataGet(
+                ItemID => $FAQArticle{ID},
+                UserID => $Self->{Authorization}->{UserID},
+            );
+            $FAQArticle{Rating}    = $VoteDataHashRef->{Result};
+            $FAQArticle{VoteCount} = $VoteDataHashRef->{Votes};
+        }
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }
