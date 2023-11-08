@@ -55,7 +55,6 @@ perform ConfigItemSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->HandleSortInCORE();
     $Self->SetDefaultSort(
         ConfigItem => [
             { Field => 'Name' },
