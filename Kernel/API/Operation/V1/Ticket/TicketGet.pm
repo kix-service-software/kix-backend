@@ -337,7 +337,7 @@ sub _GetTicketData {
     }
 
     # add unseen information
-    if ( $Param{Data}->{include}->{Flags} ) {
+    if ( $Param{Data}->{include}->{Unseen} ) {
         my $Exists = $TicketObject->TicketUserFlagExists(
             TicketID => $TicketID,
             Flag     => 'Seen',
@@ -348,15 +348,13 @@ sub _GetTicketData {
     }
 
     # add watcher info
-    if ( $Param{Data}->{include}->{Watcher} ) {
+    if ( $Param{Data}->{include}->{WatcherID} ) {
         my $WatcherID = $Kernel::OM->Get('Watcher')->WatcherLookup(
             Object      => 'Ticket',
             ObjectID    => $TicketID,
             WatchUserID => $Self->{Authorization}->{UserID},
         );
-        if ( $WatcherID ) {
-            $TicketData{WatcherID} = $WatcherID;
-        }
+        $TicketData{WatcherID} = $WatcherID || undef;
     }
 
     # add link count
