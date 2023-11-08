@@ -57,6 +57,8 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+
+    $Self->HandleSortInCORE();
     $Self->SetDefaultSort(
         Ticket => [
             { Field => 'CreateTime' },
