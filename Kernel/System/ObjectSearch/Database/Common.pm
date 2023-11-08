@@ -646,7 +646,7 @@ sub _OperationNOTIN {
         return "$Param{Column} NOT IN ($Value)";
     }
     else {
-        return '1=0' ;
+        return '1=1' ;
     }
 }
 

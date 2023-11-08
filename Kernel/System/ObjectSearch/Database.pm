@@ -635,7 +635,10 @@ sub GetSupportedAttributes {
         my $Module   = $Self->{AttributeModules}->{$Attribute};
         my $Property = $Attribute;
         my %SpecParams;
-        if ( $Self->{ObjectType} eq 'ConfigItem' ) {
+        if (
+            $Self->{ObjectType} eq 'ConfigItem'
+            && $Property =~ /::/sm
+        ) {
             (my $Class, $Property) = split(/::/sm, $Attribute);
             %SpecParams = (
                 ClassID => $Module->{ClassID},
