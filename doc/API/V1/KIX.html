@@ -18445,132 +18445,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="objectsearch" class="panel-title">ObjectSearch</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="supported-attributes">Supported Attributes</h4><p>Returns all supported attributes of each or one selected object type.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_objectsearch" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/objectsearch</span> <span class="methods"><a href="#objectsearch_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objectsearch_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/objectsearch</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all ObjectSearchSupportedAttributes items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objectsearch_get_request" data-toggle="tab">Request</a></li><li><a href="#objectsearch_get_response" data-toggle="tab">Response</a></li><li><a href="#objectsearch_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objectsearch_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objectsearch_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectSearchSupportedAttributesCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "ObjectSearchSupportedAttributesCollectionResponse.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "A list of supported attributes of each object type",
-   "type" : "object",
-   "properties" : {
-      "SupportedAttributes" : {
-         "type" : "array",
-         "items" : {
-            "$ref" : "#/definitions/_ObjectSearchSupportedAttributes_json"
-         }
-      }
-   },
-   "required" : [
-      "SupportedAttributes"
-   ],
-   "definitions" : {
-      "_ObjectSearchSupportedAttributes_json" : {
-         "$id" : "ObjectSearchSupportedAttributes.json",
-         "$schema" : "http://json-schema.org/draft-07/schema",
-         "description" : "A object search supported attributes object.",
-         "type" : "object",
-         "properties" : {
-            "Class" : {
-               "description" : "is filled only by object type ConfigItem",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ClassID" : {
-               "description" : "is filled only by object type ConfigItem",
-               "type" : "number",
-               "readOnly" : true
-            },
-            "IsSearchable" : {
-               "type" : "number",
-               "readOnly" : true
-            },
-            "IsSortable" : {
-               "type" : "number",
-               "readOnly" : true
-            },
-            "ObjectType" : {
-               "type" : "string",
-               "readOnly" : true
-            },
-            "Operators" : {
-               "type" : "array",
-               "readOnly" : true
-            },
-            "Property" : {
-               "type" : "string",
-               "readOnly" : true
-            }
-         },
-         "required" : [
-            "Property",
-            "ObjectType"
-         ]
-      }
-   }
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "SupportedAttributes": [
-        {
-            "Property": "Type",
-            "Operators": [
-                "EQ",
-                "NE",
-                "STARTWITH",
-                "ENDWITH",
-                "LIKE",
-                "LT",
-                "LTE",
-                "GT",
-                "GTE",
-                "IN",
-                "!IN"
-            ],
-            "IsSearchable": 1,
-            "IsSortable": 1,
-            "ObjectType": "Ticket"
-        },
-        {
-            "Property": "TypeID",
-            "Operators": [
-                "EQ",
-                "NE",
-                "STARTWITH",
-                "ENDWITH",
-                "LIKE",
-                "LT",
-                "LTE",
-                "GT",
-                "GTE",
-                "IN",
-                "!IN"
-            ],
-            "IsSearchable": 1,
-            "IsSortable": 0,
-            "ObjectType": "Ticket"
-        }
-    ]
-}</code></pre></div></div><h2 class="response-title" id="objectsearch_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "Error.json",
-   "$schema" : "http://json-schema.org/draft-07/schema",
-   "description" : "An error object.",
-   "type" : "object",
-   "properties" : {
-      "Code" : {
-         "type" : "string",
-         "readOnly" : true
-      },
-      "Message" : {
-         "type" : "string",
-         "readOnly" : true
-      }
-   },
-   "required" : [
-      "Code",
-      "Message"
-   ]
-}
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Code": "Object.DependingObjectExists",
-    "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="objectsearch_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_objectsearch__objecttype_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span> <span class="methods"><a href="#objectsearch__objecttype__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objectsearch__objecttype__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objectsearch__objecttype__get_request" data-toggle="tab">Request</a></li><li><a href="#objectsearch__objecttype__get_response" data-toggle="tab">Response</a></li><li><a href="#objectsearch__objecttype__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objectsearch__objecttype__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objecttype</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objectsearch__objecttype__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectSearchSupportedAttributesResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="objectsearch" class="panel-title">ObjectSearch</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="supported-attributes">Supported Attributes</h4><p>Returns all supported attributes of the selected object type.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_objectsearch__objecttype_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span> <span class="methods"><a href="#objectsearch__objecttype__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objectsearch__objecttype__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objectsearch__objecttype__get_request" data-toggle="tab">Request</a></li><li><a href="#objectsearch__objecttype__get_response" data-toggle="tab">Response</a></li><li><a href="#objectsearch__objecttype__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objectsearch__objecttype__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objecttype</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objectsearch__objecttype__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectSearchSupportedAttributesResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "ObjectSearchSupportedAttributesResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for a object supported attributes GET request.",
@@ -18593,22 +18468,17 @@ pre code {
          "description" : "A object search supported attributes object.",
          "type" : "object",
          "properties" : {
-            "Class" : {
-               "description" : "is filled only by object type ConfigItem",
-               "type" : "string",
-               "readOnly" : true
-            },
-            "ClassID" : {
-               "description" : "is filled only by object type ConfigItem",
-               "type" : "number",
-               "readOnly" : true
-            },
             "IsSearchable" : {
                "type" : "number",
                "readOnly" : true
             },
             "IsSortable" : {
                "type" : "number",
+               "readOnly" : true
+            },
+            "ObjectSpecifics" : {
+               "description" : "contains object type specific paramters",
+               "type" : "object",
                "readOnly" : true
             },
             "ObjectType" : {
@@ -18648,28 +18518,26 @@ pre code {
                 "IN",
                 "!IN"
             ],
+            "ObjectSpecifics": null,
             "IsSearchable": 1,
             "IsSortable": 1,
             "ObjectType": "Ticket"
         },
         {
-            "Property": "TypeID",
+            "Property": "Data.example.xy.IP",
             "Operators": [
                 "EQ",
                 "NE",
-                "STARTWITH",
-                "ENDWITH",
-                "LIKE",
-                "LT",
-                "LTE",
-                "GT",
-                "GTE",
                 "IN",
                 "!IN"
             ],
             "IsSearchable": 1,
             "IsSortable": 0,
-            "ObjectType": "Ticket"
+            "ObjectType": "ConfigItem",
+            "ObjectSpecifics": {
+                "Class": "Network",
+                "ClassID": 1
+            }
         }
     ]
 }</code></pre></div></div><h2 class="response-title" id="objectsearch__objecttype__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
