@@ -651,6 +651,8 @@ sub GetSupportedAttributes {
             {
                 ObjectType   => $Self->{ObjectType},
                 Property     => $Property,
+                Class        => $SpecParams{Class}      || undef,
+                ClassID      => $SpecParams{ClassID}    || undef,
                 IsSearchable => $Module->{IsSearchable} || 0,
                 IsSortable   => $Module->{IsSortable}   || 0,
                 Operators    => $Module->{Operators}    || [],

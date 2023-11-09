@@ -202,7 +202,7 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        DeplState    => 'gc.name',
+        DeplState    => 'gcd.name',
         DeplStateID  => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
         DeplStateIDs => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
     );
