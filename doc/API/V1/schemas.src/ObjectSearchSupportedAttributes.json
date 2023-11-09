@@ -23,6 +23,16 @@
         "ObjectType": {
             "type": "string",
             "readOnly": true
+        },
+        "Class": {
+            "type": "string",
+            "description": "is filled only by object type ConfigItem",
+            "readOnly": true
+        },
+        "ClassID": {
+            "type": "number",
+            "description": "is filled only by object type ConfigItem",
+            "readOnly": true
         }
     },
     "required": [
