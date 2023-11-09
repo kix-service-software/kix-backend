@@ -175,7 +175,7 @@ sub _GetSearchBackend {
     if ( !$Param{ObjectType} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'No given object type!'
+            Message  => 'No object type given!'
         );
         return;
     }
