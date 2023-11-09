@@ -61,6 +61,18 @@ sub new {
     return $Self;
 }
 
+=item Init()
+
+Initialize this macro action module.
+
+=cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    return 1;
+}
+
 =item Describe()
 
 Describe this macro action module.
@@ -200,6 +212,55 @@ sub SetResult {
     $Self->{MacroResults}->{$VariableName} = $Param{Value};
 
     return 1;
+}
+
+=item SetRepeatExecution()
+
+Set repeat execution of backend.
+
+Example:
+    $Self->SetRepeatExecution();
+
+=cut
+
+sub SetRepeatExecution {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{RepeatExecution} = 1;
+
+    return 1;
+}
+
+=item UnsetRepeatExecution()
+
+Unset repeat execution of backend.
+
+Example:
+    $Self->UnsetRepeatExecution();
+
+=cut
+
+sub UnsetRepeatExecution {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{RepeatExecution} = 0;
+
+    return 1;
+}
+
+=item RepeatExecution()
+
+Returns state of repeat execution of backend.
+
+Example:
+    $Self->RepeatExecution();
+
+=cut
+
+sub RepeatExecution {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->{RepeatExecution};
 }
 
 =item ValidateConfig()
