@@ -21,6 +21,16 @@
          "description" : "A object search supported attributes object.",
          "type" : "object",
          "properties" : {
+            "Class" : {
+               "description" : "is filled only by object type ConfigItem",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ClassID" : {
+               "description" : "is filled only by object type ConfigItem",
+               "type" : "number",
+               "readOnly" : true
+            },
             "IsSearchable" : {
                "type" : "number",
                "readOnly" : true
