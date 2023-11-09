@@ -149,21 +149,21 @@ sub GetSupportedAttributes {
         %Param
     );
 
-    my %List;
     for my $ObjectType ( sort keys %{$Self->{SearchBackendObject}} ) {
-        next if !$ObjectType;
+        next if !$ObjectType || !$Param{ObjectType};
+        next if lc($Param{ObjectType}) ne lc($ObjectType);
         next if !defined $Self->{SearchBackendObject}->{$ObjectType};
 
-        $List{$ObjectType} = $Self->{SearchBackendObject}->{$ObjectType}->GetSupportedAttributes();
+        return $Self->{SearchBackendObject}->{$ObjectType}->GetSupportedAttributes();
     }
 
-    return \%List;
+    return;
 }
 
 sub _GetSearchBackend {
     my ( $Self, %Param ) = @_;
 
-    my $ObjectTypes = $Kernel::OM->Get('Config')->Get('Object::Types');
+    my $ObjectTypes = $Kernel::OM->Get('Config')->Get('ObjectSearch::Types');
 
     if ( !IsHashRefWithData($ObjectTypes) ) {
         $Kernel::OM->Get('Log')->Log(
@@ -172,24 +172,15 @@ sub _GetSearchBackend {
         );
         return;
     }
-
-    my $Type = $Param{ObjectType} ? ucfirst $Param{ObjectType} : q{};
-
-    if (
-        $Type
-        && !$ObjectTypes->{$Type}
-    ) {
+    if ( !$Param{ObjectType} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Given object type is not allowed!'
+            Message  => 'No given object type!'
         );
         return;
     }
 
-    return 1 if !$Type && IsHashRefWithData($Self->{SearchBackendObject});
-    return 1 if $Type && $Self->{SearchBackendObject}->{$Type};
-
-    my $Backend = $Kernel::OM->Get('Config')->Get('Object::SearchBackend');
+    my $Backend = $Kernel::OM->Get('Config')->Get('ObjectSearch::Backend');
 
     # if the backend require failed we will exit
     if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
@@ -201,8 +192,13 @@ sub _GetSearchBackend {
     }
 
     for my $ObjectType ( sort keys %{$ObjectTypes} ) {
+
+        next if lc($Param{ObjectType}) ne lc($ObjectType);
         next if !$ObjectTypes->{$ObjectType};
-        next if $Type && $ObjectType ne $Type;
+
+        return 1 if IsHashRefWithData($Self->{SearchBackendObject})
+            && $Self->{SearchBackendObject}->{$ObjectType};
+
 
         my $BackendObject = $Backend->new(
             %{$Self},
@@ -220,6 +216,7 @@ sub _GetSearchBackend {
 
         $Self->{SearchBackendObject}->{$ObjectType} = $BackendObject;
 
+        last;
     }
 
     return 1;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
-    <ConfigItem AccessLevel="internal" Name="Object::SearchBackend" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Backend" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for objects.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
@@ -10,7 +10,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="Object::Types" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Types" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the allowed object types for object search.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>

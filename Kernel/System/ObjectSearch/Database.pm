@@ -614,22 +614,7 @@ sub _CreateOrderBySQL {
 sub GetSupportedAttributes {
     my ( $Self, %Param) =  @_;
 
-    my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
-        my $Module = $Self->{AttributeModules}->{$Attribute};
-        push (
-            @List,
-            {
-                ObjectType   => $Self->{ObjectType},
-                Property     => $Attribute,
-                IsSearchable => $Module->{IsSearchable} || 0,
-                IsSortable   => $Module->{IsSortable}   || 0,
-                Operators    => $Module->{Operators}    || []
-            }
-        );
-    }
-
-    return \@List;
+    return $Self->{SearchModule}->SupportedList();
 }
 
 1;

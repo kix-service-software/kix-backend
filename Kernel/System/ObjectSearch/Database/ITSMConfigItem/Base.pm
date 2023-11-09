@@ -95,7 +95,7 @@ sub GetBackends {
             }
         }
     }
-
+    $Self->{AttributeModules} = \%AttributeModules;
     return \%AttributeModules;
 }
 
@@ -107,6 +107,39 @@ sub BaseSQL {
         From   => 'FROM configitem ci',
         Where  => ' 1=1'
     };
+}
+
+sub SupportedList {
+    my ( $Self, %Param ) = @_;
+
+    my @List;
+    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
+        my $Module    = $Self->{AttributeModules}->{$Attribute};
+        my $Property  = $Attribute;
+        my %SpecParams = (
+            ClassID => undef,
+            Class   => undef
+        );
+
+        if ( $Property =~ /::/sm ) {
+            ($SpecParams{Class}, $Property) = split(/::/sm, $Attribute);
+            $SpecParams{ClassID} = $Module->{ClassID};
+        }
+
+        push (
+            @List,
+            {
+                ObjectType      => 'ConfigItem',
+                Property        => $Property,
+                ObjectSpecifics => \%SpecParams,
+                IsSearchable    => $Module->{IsSearchable} || 0,
+                IsSortable      => $Module->{IsSortable}   || 0,
+                Operators       => $Module->{Operators}    || []
+            }
+        );
+    }
+
+    return \@List;
 }
 
 

@@ -23,6 +23,11 @@
         "ObjectType": {
             "type": "string",
             "readOnly": true
+        },
+        "ObjectSpecifics": {
+            "type": "object",
+            "description": "contains object type specific paramters",
+            "readOnly": true
         }
     },
     "required": [
