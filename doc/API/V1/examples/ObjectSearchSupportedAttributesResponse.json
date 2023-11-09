@@ -15,28 +15,26 @@
                 "IN",
                 "!IN"
             ],
+            "ObjectSpecifics": null,
             "IsSearchable": 1,
             "IsSortable": 1,
             "ObjectType": "Ticket"
         },
         {
-            "Property": "TypeID",
+            "Property": "Data.example.xy.IP",
             "Operators": [
                 "EQ",
                 "NE",
-                "STARTWITH",
-                "ENDWITH",
-                "LIKE",
-                "LT",
-                "LTE",
-                "GT",
-                "GTE",
                 "IN",
                 "!IN"
             ],
             "IsSearchable": 1,
             "IsSortable": 0,
-            "ObjectType": "Ticket"
+            "ObjectType": "ConfigItem",
+            "ObjectSpecifics": {
+                "Class": "Network",
+                "ClassID": 1
+            }
         }
     ]
 }

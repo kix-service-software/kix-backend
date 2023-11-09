@@ -99,24 +99,18 @@ sub Run {
     foreach my $ObjectType ( @{$Param{Data}->{ObjectType}} ) {
 
         # get the StateType data
-        my $SupportedAttributes = $Kernel::OM->Get('ObjectSearch')->GetSupportedAttributes(
+        my $List = $Kernel::OM->Get('ObjectSearch')->GetSupportedAttributes(
             ObjectType => $ObjectType
         );
 
-        if ( !IsHashRefWithData($SupportedAttributes) ) {
-            return $Self->_Error(
-                Code => 'Object.NotFound',
-            );
-        }
-
-        if ( !IsArrayRefWithData($SupportedAttributes->{$ObjectType}) ) {
+        if ( !IsArrayRefWithData($List) ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
 
         # add
-        push(@SupportedList, @{$SupportedAttributes->{$ObjectType}});
+        push(@SupportedList, @{$List});
     }
 
     # return result

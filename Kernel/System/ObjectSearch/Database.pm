@@ -630,38 +630,7 @@ sub _CreateOrderBySQL {
 sub GetSupportedAttributes {
     my ( $Self, %Param) =  @_;
 
-    my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
-        my $Module   = $Self->{AttributeModules}->{$Attribute};
-        my $Property = $Attribute;
-        my %SpecParams;
-        if (
-            $Self->{ObjectType} eq 'ConfigItem'
-            && $Property =~ /::/sm
-        ) {
-            (my $Class, $Property) = split(/::/sm, $Attribute);
-            %SpecParams = (
-                ClassID => $Module->{ClassID},
-                Class   => $Class
-            );
-        }
-
-        push (
-            @List,
-            {
-                ObjectType   => $Self->{ObjectType},
-                Property     => $Property,
-                Class        => $SpecParams{Class}      || undef,
-                ClassID      => $SpecParams{ClassID}    || undef,
-                IsSearchable => $Module->{IsSearchable} || 0,
-                IsSortable   => $Module->{IsSortable}   || 0,
-                Operators    => $Module->{Operators}    || [],
-                %SpecParams
-            }
-        );
-    }
-
-    return \@List;
+    return $Self->{SearchModule}->SupportedList();
 }
 
 1;

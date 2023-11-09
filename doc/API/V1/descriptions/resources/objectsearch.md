@@ -1,3 +1,3 @@
 #### Supported Attributes
 
-Returns all supported attributes of each or one selected object type.
+Returns all supported attributes of the selected object type.

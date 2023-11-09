@@ -89,6 +89,7 @@ sub GetBackends {
         }
     }
 
+    $Self->{AttributeModules} = \%AttributeModules;
     return \%AttributeModules;
 }
 
@@ -149,6 +150,30 @@ sub CreatePermissionSQL {
     }
 
     return %Result;
+}
+
+
+sub SupportedList {
+    my ( $Self, %Param ) = @_;
+
+    my @List;
+    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
+        my $Module    = $Self->{AttributeModules}->{$Attribute};
+        my $Property  = $Attribute;
+        push (
+            @List,
+            {
+                ObjectType      => 'Ticket',
+                Property        => $Property,
+                ObjectSpecifics => undef,
+                IsSearchable    => $Module->{IsSearchable} || 0,
+                IsSortable      => $Module->{IsSortable}   || 0,
+                Operators       => $Module->{Operators}    || []
+            }
+        );
+    }
+
+    return \@List;
 }
 
 1;
