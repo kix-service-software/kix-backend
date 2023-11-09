@@ -726,6 +726,9 @@ sub MacroActionExecute {
     );
     return if !$BackendObject;
 
+    # call init for backend
+    $BackendObject->Init();
+
     # add referrer data
     for my $CommonParam ( qw(JobID RunID MacroID MacroActionID) ) {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
@@ -748,33 +751,41 @@ sub MacroActionExecute {
     # add event data
     $BackendObject->{EventData} = $Self->{EventData};
 
-    my %Parameters = %{$MacroAction{Parameters} || {}};
+    do {
+        # unset RepeatExecution of backend
+        $BackendObject->UnsetRepeatExecution();
 
-    # replace result variables
-    if (IsHashRefWithData($Self->{MacroResults})) {
-        $Self->_ReplaceResultVariables(
-            Data   => \%Parameters,
-            UserID => $Param{UserID}
-        );
-    }
+        my %Parameters = %{$MacroAction{Parameters} || {}};
 
-    my $Success = $BackendObject->Run(
-        %Param,
-        MacroType  => $Macro{Type},
-        Config     => \%Parameters
-    );
+        # replace result variables
+        if (IsHashRefWithData($Self->{MacroResults})) {
+            $Self->_ReplaceResultVariables(
+                Data   => \%Parameters,
+                UserID => $Param{UserID}
+            );
+        }
 
-    if ( !$Success ) {
-        # get last error message from system log
-        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error',
-            What => 'Message',
+        my $Success = $BackendObject->Run(
+            %Param,
+            MacroType         => $Macro{Type},
+            Config            => \%Parameters,
+            ConfigRaw         => \%{$MacroAction{Parameters} || {}},
         );
-        $Self->LogError(
-            Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
-            UserID   => $Param{UserID},
-        );
-    }
+
+        if ( !$Success ) {
+            # get last error message from system log
+            my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            $Self->LogError(
+                Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
+                UserID   => $Param{UserID},
+            );
+
+            last;
+        }
+    } while ( $BackendObject->RepeatExecution() );
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
