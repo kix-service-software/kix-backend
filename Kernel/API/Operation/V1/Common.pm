@@ -2647,7 +2647,9 @@ sub _GetCacheKey {
         delete $RequestData{offset};
         delete $RequestData{limit};
     }
-    delete $RequestData{sort};
+    if ( !$Self->{HandleSortInCORE} ) {
+        delete $RequestData{sort};
+    }
     delete $RequestData{filter};
 
     my @CacheKeyParts;

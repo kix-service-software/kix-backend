@@ -29,6 +29,16 @@ Kernel::API::Operation::CMDB::ConfigItemSearch - API CMDB Search Operation backe
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item Run()
 
 perform ConfigItemSearch Operation. This will return a class list.
@@ -55,7 +65,6 @@ perform ConfigItemSearch Operation. This will return a class list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->HandleSortInCORE();
     $Self->SetDefaultSort(
         ConfigItem => [
             { Field => 'Name' },

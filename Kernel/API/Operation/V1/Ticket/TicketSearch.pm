@@ -29,6 +29,16 @@ Kernel::API::Operation::V1::Ticket::TicketSearch - API Ticket Search Operation b
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item Run()
 
 perform TicketSearch Operation. This will return a ticket list.
@@ -57,7 +67,6 @@ perform TicketSearch Operation. This will return a ticket list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->HandleSortInCORE();
     $Self->SetDefaultSort(
         Ticket => [
             { Field => 'CreateTime' },
