@@ -12,6 +12,11 @@
          "type" : "number",
          "readOnly" : true
       },
+      "ObjectSpecifics" : {
+         "description" : "contains object type specific paramters",
+         "type" : "object",
+         "readOnly" : true
+      },
       "ObjectType" : {
          "type" : "string",
          "readOnly" : true
