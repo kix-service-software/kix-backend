@@ -400,7 +400,7 @@ sub Init {
     $Self->{HandleSearchInAPI} = 0;
 
     # Sort parameter is not handled in Core by default
-    $Self->{HandleSortInCORE} = 0;
+    $Self->{HandleSortInCORE} //= 0;
 
     # calculate LevelIndent for Logging
     $Self->{Level} = $Self->{Level} || 0;
@@ -1508,7 +1508,8 @@ sub ExecOperation {
         Authorization            => $Self->{Authorization},
         Level                    => ($Self->{Level} || 0) + 1,
         IgnorePermissions        => $Param{IgnorePermissions},
-        SuppressPermissionErrors => $Param{SuppressPermissionErrors}
+        SuppressPermissionErrors => $Param{SuppressPermissionErrors},
+        HandleSortInCORE         => $Self->{HandleSortInCORE}
     );
 
     # if operation init failed, bail out
