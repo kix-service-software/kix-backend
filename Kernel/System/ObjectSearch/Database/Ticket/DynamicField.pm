@@ -76,9 +76,13 @@ sub GetSupportedAttributes {
 
         if ( $Type eq 'Sort' ) {
             %SearchParams = (
-                FieldType => qw(
-                    Text Textarea Date DateTime Multiselect
-                ),
+                FieldType => [
+                    'Text',
+                    'TextArea',
+                    'Date',
+                    'DateTime',
+                    'Multiselect'
+                ],
                 IsSortable => 1
             );
         }
