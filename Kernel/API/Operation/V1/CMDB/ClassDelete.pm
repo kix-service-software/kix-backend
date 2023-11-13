@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,11 +81,22 @@ sub Run {
     # start loop
     foreach my $ClassID ( @{$Param{Data}->{ClassID}} ) {
 
-        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-            ClassIDs     => [$ClassID],
+        my @ConfigItemID = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'ClassID',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => [$ClassID]
+                    }
+                ]
+            }
         );
 
-        if ( $ConfigItemID->[0] ) {
+        if ( $ConfigItemID[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete class. A ConfigItem with this class already exists.',

@@ -108,6 +108,7 @@ sub Search {
         Operator      => $Param{Search}->{Operator},
         Column        => "$TablePrefix.name",
         Value         => $Param{Search}->{Value},
+        IsOR          => $Param{BoolOperator} || 0,
         CaseSensitive => 1,
         Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );

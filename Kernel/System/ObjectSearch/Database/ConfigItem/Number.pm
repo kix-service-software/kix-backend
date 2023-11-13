@@ -93,6 +93,7 @@ sub Search {
         Column        => 'ci.configitem_number',
         Value         => $Param{Search}->{Value},
         CaseSensitive => 1,
+        IsOR          => $Param{BoolOperator} || 0,
         Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 

@@ -315,7 +315,7 @@ sub Search {
         SQL   => $SQL,
         Limit => $Param{Limit}
     );
-
+print STDERR Data::Dumper::Dumper($SQL);
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );

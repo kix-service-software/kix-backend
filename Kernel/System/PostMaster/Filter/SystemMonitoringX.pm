@@ -13,14 +13,15 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicField',
-    'LinkObject',
-    'Log',
-    'Main',
-    'Ticket',
-    'Time',
+our @ObjectDependencies = qw(
+    Config
+    DynamicField
+    LinkObject
+    Log
+    Main
+    Ticket
+    Time
+    ObjectSearch
 );
 
 # the base name for dynamic fields
@@ -44,7 +45,7 @@ sub new {
     $Self->{Config} = {
         Module                         => 'Kernel::System::PostMaster::Filter::SystemMonitoringX',
         'DynamicFieldContent::Ticket'  => 'SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState',
-        'DynamicFieldContent::Article' => '',
+        'DynamicFieldContent::Article' => q{},
 
         AffectedAssetName    => 'AffectedAsset',
 
@@ -52,13 +53,13 @@ sub new {
         CreateTicketState    => 'new',
         CreateSenderType     => 'system',
         CreateChannel        => 'note',
-        CreateTicketQueue    => '',
-        CreateTicketSLA      => '',
+        CreateTicketQueue    => q{},
+        CreateTicketSLA      => q{},
 
         CloseNotIfLocked     => '0',
         StopAfterMatch       => '1',
-        FromAddressRegExp    => '.*',
-        ToAddressRegExp      => '.*',
+        FromAddressRegExp    => q{.*},
+        ToAddressRegExp      => q{.*},
 
         SysMonXAddressRegExp => '\s*Address:\s+(.*)\s*',
         SysMonXAliasRegExp   => '\s*Alias:\s+(.*)\s*',
@@ -99,7 +100,7 @@ sub Run {
     # see, whether to-address is of interest regarding system-monitoring
     my $ReceipientOfInterest = 0;
     if ( $Self->{Config}->{ToAddressRegExp} ) {
-        my $Recipient = '';
+        my $Recipient = q{};
         for my $CurrKey (qw(To Cc Resent-To)) {
             if ( $Param{GetParam}->{$CurrKey} ) {
                 if ($Recipient) {
@@ -113,7 +114,7 @@ sub Run {
             Line => substr($Recipient, 0, 1000)     # reduce parse length to prevent DoS (OSA-2022-13)
         );
         for my $CurrKey (@EmailAddresses) {
-            my $Address = $Self->{ParserObject}->GetEmailAddress( Email => $CurrKey ) || '';
+            my $Address = $Self->{ParserObject}->GetEmailAddress( Email => $CurrKey ) || q{};
             if ( $Address && $Address =~ /$Self->{Config}->{ToAddressRegExp}/i ) {
                 $ReceipientOfInterest = 1;
                 last;
@@ -165,17 +166,17 @@ sub Run {
     }
 
     # search ticket if followup...
-    my $TicketID = $Self->_TicketSearch() || '';
+    my $TicketID = $Self->_TicketSearch() || q{};
     $Kernel::OM->Get('Log')->Log(
         Priority => 'debug',
-        Message  => 'SysMon Mail: TID found <$TicketID>.',
+        Message  => "SysMon Mail: TID found <$TicketID>.",
     );
 
     # OK, found ticket to deal with
     if ($TicketID) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
-            Message  => 'SysMon Mail: FUP for TID <$TicketID> received.',
+            Message  => "SysMon Mail: FUP for TID <$TicketID> received.",
         );
         $Self->_TicketUpdate(
             TicketID => $TicketID,
@@ -208,8 +209,8 @@ sub _MailParse {
     }
 
     # get configured items
-    my @DynamicFieldContentTicket  = split( ',', $Self->{Config}->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle = split( ',', $Self->{Config}->{'DynamicFieldContent::Article'} );
+    my @DynamicFieldContentTicket  = split( /[,]/sm , $Self->{Config}->{'DynamicFieldContent::Ticket'} );
+    my @DynamicFieldContentArticle = split( /[,]/sm , $Self->{Config}->{'DynamicFieldContent::Article'} );
     my @DynamicFieldContent        = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
     # init hash to remember matched items
@@ -262,7 +263,7 @@ sub _MailParse {
                 || $Regex =~ m/^\(\.\+/
                 || $Regex =~ m/^\(\?\:\.\+/
             ) {
-                $Regex = '^' . $Regex;
+                $Regex = q{^} . $Regex;
             }
 
             # process body lines
@@ -452,9 +453,9 @@ sub _TicketCreate {
     my ( $Self, $Param ) = @_;
 
     my @DynamicFieldContentTicket
-        = split( ',', ($Self->{Config}->{'DynamicFieldContent::Ticket'} || '') );
+        = split( /[,]/sm, ($Self->{Config}->{'DynamicFieldContent::Ticket'} || q{}) );
     my @DynamicFieldContentArticle
-        = split( ',', ($Self->{Config}->{'DynamicFieldContent::Article'} || '') );
+        = split( /[,]/sm, ($Self->{Config}->{'DynamicFieldContent::Article'} || q{}) );
     my @DynamicFieldContent = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
 
     for my $ConfiguredDynamicField (@DynamicFieldContentTicket) {
@@ -483,7 +484,10 @@ sub _TicketCreate {
         if ( !$Kernel::OM->Get('Queue')->NameExistsCheck( Name => $Param->{GetParam}->{'X-KIX-Queue'} ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Queue of X-KIX-Queue " . $Param->{GetParam}->{'X-KIX-Queue'} . " not found, using standard " . $Self->{Config}->{CreateTicketQueue},
+                Message  => "Queue of X-KIX-Queue "
+                    . $Param->{GetParam}->{'X-KIX-Queue'}
+                    . " not found, using standard "
+                    . $Self->{Config}->{CreateTicketQueue},
             );
             $Param->{GetParam}->{'X-KIX-Queue'} = $Self->{Config}->{CreateTicketQueue};
         }
@@ -496,7 +500,10 @@ sub _TicketCreate {
         if ( !$Kernel::OM->Get('State')->StateLookup( State => $Param->{GetParam}->{'X-KIX-State'}, Silent => 1 ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "State if X-KIX-State " . $Param->{GetParam}->{'X-KIX-State'} . " not found, using standard " . $Self->{Config}->{CreateTicketState},
+                Message  => "State if X-KIX-State "
+                    . $Param->{GetParam}->{'X-KIX-State'}
+                    . " not found, using standard "
+                    . $Self->{Config}->{CreateTicketState},
             );
             $Param->{GetParam}->{'X-KIX-State'} = $Self->{Config}->{CreateTicketState};
         }
@@ -509,7 +516,10 @@ sub _TicketCreate {
         if ( !$Kernel::OM->Get('Type')->TypeLookup( Type => $Param->{GetParam}->{'X-KIX-Type'}, Silent => 1 ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Type if X-KIX-Type " . $Param->{GetParam}->{'X-KIX-Type'} . " not found, using standard " . $Self->{Config}->{CreateTicketType},
+                Message  => "Type if X-KIX-Type "
+                    . $Param->{GetParam}->{'X-KIX-Type'}
+                    . " not found, using standard "
+                    . $Self->{Config}->{CreateTicketType},
             );
             $Param->{GetParam}->{'X-KIX-Type'} = $Self->{Config}->{CreateTicketType};
         }
@@ -534,14 +544,25 @@ sub _TicketCreate {
             );
         }
         else {
-            my $AssetID = "";
+            my $AssetID = q{};
 
             # search for CI by SysMonHost-Name...
-            my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-                Name => $Self->{SysMonXHost},
+            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Name',
+                            Operator => 'EQ',
+                            Type     => 'STRING',
+                            Value    => $Self->{SysMonXHost}
+                        }
+                    ]
+                }
             );
-            if ( IsArrayRefWithData($ConfigItemIDs) ) {
-                if ( scalar @{$ConfigItemIDs} > 1 ) {
+            if ( @ConfigItemIDs ) {
+                if ( scalar @ConfigItemIDs > 1 ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message  => "Multiple assets for SysMon host <"
@@ -549,25 +570,37 @@ sub _TicketCreate {
                             . "> found, using first item only!",
                     );
                 }
-                $AssetID = $ConfigItemIDs->[0];
+                $AssetID = $ConfigItemIDs[0];
             }
 
             # if no CI found by SysMonHost-Name, search for SysMonService...
             else {
-              $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-                  Name => $Self->{SysMonXService},
-              );
-              if (  IsArrayRefWithData($ConfigItemIDs) ) {
-                    if ( scalar @{$ConfigItemIDs} > 1 ) {
-                        $Kernel::OM->Get('Log')->Log(
-                            Priority => 'notice',
-                            Message  => "Multiple assets for SysMon service <"
-                                .$Self->{Host}
-                                . "> found, using first item only!",
-                        );
+                @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    ObjectType => 'ConfigItem',
+                    Result     => 'ARRAY',
+                    Search     => {
+                        AND => [
+                            {
+                                Field    => 'Name',
+                                Operator => 'EQ',
+                                Type     => 'STRING',
+                                Value    => $Self->{SysMonXService}
+                            }
+                        ]
                     }
-                    $AssetID = $ConfigItemIDs->[0];
-              }
+                );
+
+                if ( @ConfigItemIDs ) {
+                        if ( scalar @ConfigItemIDs > 1 ) {
+                            $Kernel::OM->Get('Log')->Log(
+                                Priority => 'notice',
+                                Message  => "Multiple assets for SysMon service <"
+                                    .$Self->{Host}
+                                    . "> found, using first item only!",
+                            );
+                        }
+                        $AssetID = $ConfigItemIDs[0];
+                }
             }
 
             # set affected asset in ticket...
@@ -577,7 +610,7 @@ sub _TicketCreate {
 
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
-                Message  => 'SysMon Mail: asset found <$AssetID>.',
+                Message  => "SysMon Mail: asset found <$AssetID>.",
             );
 
         }

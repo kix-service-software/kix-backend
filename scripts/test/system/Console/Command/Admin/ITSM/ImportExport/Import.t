@@ -158,10 +158,21 @@ $Self->Is(
 );
 
 # get config item IDs
-my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-    Name => 'TestConfigItem*'
+my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'ConfigItem',
+    Result     => 'ARRAY',
+    Search     => {
+        AND => [
+            {
+                Field    => 'Name',
+                Operator => 'STARTSWITH',
+                Type     => 'STRING',
+                Value    => 'TestConfigItem'
+            }
+        ]
+    }
 );
-my $NumConfigItemImported = scalar @{$ConfigItemIDs};
+my $NumConfigItemImported = scalar @ConfigItemIDs;
 
 # check if the config items are imported
 $Self->True(
