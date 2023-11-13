@@ -107,7 +107,7 @@ sub Search {
 
     push( @SQLWhere, @Where);
 
-    $Self->{Supported} = {
+    return {
         SQLWhere => \@SQLWhere,
     };
 }
