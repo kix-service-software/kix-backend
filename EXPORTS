@@ -264,7 +264,6 @@ ITSMConfigItem::XML::Type::Dummy                                              = 
 ITSMConfigItem::XML::Type::DynamicField                                       = Kernel::System::ITSMConfigItem::XML::Type::DynamicField
 ITSMConfigItem::XML::Type::GeneralCatalog                                     = Kernel::System::ITSMConfigItem::XML::Type::GeneralCatalog
 ITSMConfigItem::XML::Type::Organisation                                       = Kernel::System::ITSMConfigItem::XML::Type::Organisation
-ITSMConfigItem::XML::Type::ServiceReference                                   = Kernel::System::ITSMConfigItem::XML::Type::ServiceReference
 ITSMConfigItem::XML::Type::Text                                               = Kernel::System::ITSMConfigItem::XML::Type::Text
 ITSMConfigItem::XML::Type::TextArea                                           = Kernel::System::ITSMConfigItem::XML::Type::TextArea
 ITSMConfigItem::XML::Type::TicketReference                                    = Kernel::System::ITSMConfigItem::XML::Type::TicketReference
