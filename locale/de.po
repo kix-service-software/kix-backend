@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 14:25+0000\n"
-"PO-Revision-Date: 2023-10-19 14:25+0000\n"
-"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
+"PO-Revision-Date: 2023-11-13 11:37+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -6182,7 +6182,7 @@ msgstr "Inbetriebnahme"
 
 #. manual entry from templates.pot.manual
 msgid "FirstResponse"
-msgstr "Erste Antwort"
+msgstr "Erstreaktion"
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
