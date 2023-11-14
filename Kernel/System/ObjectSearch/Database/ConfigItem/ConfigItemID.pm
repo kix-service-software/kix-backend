@@ -6,10 +6,12 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Times;
+package Kernel::System::ObjectSearch::Database::ConfigItem::ConfigItemID;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -21,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::Times - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::ConfigItemID - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -50,17 +52,22 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'CreateTime',
-            'ChangeTime'
-        ],
-        Sort => [
-            'CreateTime',
-            'ChangeTime'
-        ]
-    }
+    $Self->{Supported} = {
+        ConfigItemID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        ConfigItemIDs => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+    };
+
+    return $Self->{Supported};
 }
+
 
 =item Search()
 
@@ -78,7 +85,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my $Value;
     my @SQLWhere;
 
     # check params
@@ -90,47 +96,17 @@ sub Search {
         return;
     }
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        CreateTime => 'ci.create_time',
-        ChangeTime => 'ci.change_time',
-    );
-
-    return q{} if !$Param{Search}->{Value};
-
-    # calculate relative times
-    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-        String => $Param{Search}->{Value}
-    );
-
-    if ( !$SystemTime ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
-        );
-        return;
-    }
-
-    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-        SystemTime => $SystemTime
-    );
-
-    # quote
-    $Value = $Kernel::OM->Get('DB')->Quote( $Value );
-
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Value,
-        Supported => [
-            'EQ', 'LT', 'GT',
-            'LTE', 'GTE'
-        ]
+        Column    => 'ci.id',
+        Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
 
-    push( @SQLWhere, @Where );
+    push( @SQLWhere, @Where);
 
     return {
         SQLWhere => \@SQLWhere,
@@ -155,18 +131,12 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        CreateTime => 'ci.create_time',
-        ChangeTime => 'ci.change_time',
-    );
-
     return {
         SQLAttrs => [
-            $AttributeMapping{$Param{Attribute}}
+            'ci.id'
         ],
         SQLOrderBy => [
-            $AttributeMapping{$Param{Attribute}}
+            'ci.id'
         ],
     };
 }

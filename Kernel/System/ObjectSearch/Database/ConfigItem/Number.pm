@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Number;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Number;
 
 use strict;
 use warnings;
@@ -50,14 +50,15 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'Number',
-        ],
-        Sort => [
-            'Number',
-        ]
-    }
+    $Self->{Supported} = {
+        Number => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        }
+    };
+
+    return $Self->{Supported};
 }
 
 =item Search()
@@ -92,10 +93,8 @@ sub Search {
         Column        => 'ci.configitem_number',
         Value         => $Param{Search}->{Value},
         CaseSensitive => 1,
-        Supported     => [
-            'EQ', 'STARTSWITH', 'ENDSWITH',
-            'CONTAINS', 'LIKE', 'IN'
-        ]
+        IsOR          => $Param{BoolOperator} || 0,
+        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;

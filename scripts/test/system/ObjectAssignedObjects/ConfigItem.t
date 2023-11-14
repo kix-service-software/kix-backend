@@ -358,29 +358,46 @@ sub _CheckConfig {
 END
         1
     );
-    my $ContactOrgaCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        Object     => $TestData{CustomerContact},
+    my @ContactOrgaCIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{ID}
+                },
+                {
+                    Field    => 'AssignedOrganisation'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
+                        || $TestData{CustomerContact}->{PrimaryOrganisationID}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$ContactOrgaCIIDList}),
+        scalar(@ContactOrgaCIIDList),
         2,
         'Article list should contain 2 article [contact/orga]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
-        $ContactOrgaCIIDList,
+        \@ContactOrgaCIIDList,
         'List should contain CI with matching contact and orga [contact/orga]',
     );
     $Self->ContainedIn(
         $TestData{OrgaCIID},
-        $ContactOrgaCIIDList,
+        \@ContactOrgaCIIDList,
         'List should contain CI with matching orga [contact/orga]',
     );
     $Self->NotContainedIn(
         $TestData{ContactCIID},
-        $ContactOrgaCIIDList,
+        \@ContactOrgaCIIDList,
         'List should NOT contain a CI of other class [contact/orga]',
     );
 
@@ -408,29 +425,46 @@ END
 }
 END
     );
-    my $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        Object     => $TestData{CustomerContact},
+    my @ContactCIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{ID}
+                },
+                {
+                    Field    => 'AssignedOrganisation'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
+                        || $TestData{CustomerContact}->{PrimaryOrganisationID}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$ContactCIIDList}),
+        scalar(@ContactCIIDList),
         2,
         'Article list should contain 2 article [contact]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should contain CI with matching contact and orga [contact]',
     );
     $Self->ContainedIn(
         $TestData{ContactCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should contain a CI of other class with matching contact [contact]',
     );
     $Self->NotContainedIn(
         $TestData{OrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should NOT contain CI with orga [contact]',
     );
 
@@ -470,29 +504,46 @@ END
         $VersionID,
         'Create version (contact - 2nd version)',
     );
-    $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        Object     => $TestData{CustomerContact},
+    @ContactCIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{ID}
+                },
+                {
+                    Field    => 'AssignedOrganisation'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
+                        || $TestData{CustomerContact}->{PrimaryOrganisationID}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$ContactCIIDList}),
+        scalar(@ContactCIIDList),
         1,
         'Article list should contain 2 article [contact v2]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should contain CI with matching contact and orga [contact v2]',
     );
     $Self->NotContainedIn(
         $TestData{ContactCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should NOT contain a CI of other class with matching contact (current version should not match) [contact v2]',
     );
     $Self->NotContainedIn(
         $TestData{OrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should NOT contain CI with orga [contact v2]',
     );
 
@@ -520,29 +571,39 @@ END
 }
 END
     );
-    $ContactCIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        # Object     => $TestData{CustomerContact}, ignore object, should not be required, if static used
+    @ContactCIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$ContactCIIDList}),
+        scalar(@ContactCIIDList),
         2,
         'Article list should contain 2 article [contact static]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should contain CI with matching contact and orga [contact static]',
     );
     $Self->ContainedIn(
         $TestData{ContactCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should contain a CI of other class with matching contact [contact static]',
     );
     $Self->NotContainedIn(
         $TestData{OrgaCIID},
-        $ContactCIIDList,
+        \@ContactCIIDList,
         'List should NOT contain CI with orga [contact static]',
     );
 }
@@ -566,12 +627,23 @@ sub _DoNegativeTests {
 }
 END
     );
-    my $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    my @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [unknown attribute]',
     );
@@ -593,12 +665,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [known attribute but wrong class / wrong structure]',
     );
@@ -620,13 +703,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        UserID     => 1,
-        Silent     => 1
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
+        UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [known attribute but unknwon class]',
     );
@@ -648,12 +741,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [missing object type]',
     );
@@ -667,12 +771,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [empty object type config]',
     );
@@ -688,12 +803,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [empty class config]',
     );
@@ -711,12 +837,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [empty attribute]',
     );
@@ -736,12 +873,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [empty value]',
     );
@@ -751,12 +899,23 @@ END
         'empty class config',
         q{}
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
         UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [empty config]',
     );
@@ -778,13 +937,23 @@ END
 }
 END
     );
-    $CIIDList = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        UserID     => 1,
-        Silent     => 1
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact'.
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => q{}
+                }
+            ]
+        },
+        UserID     => 1
     );
     $Self->Is(
-        scalar(@{$CIIDList}),
+        scalar(@CIIDList),
         0,
         'Article list should be empty [invalid config]',
     );

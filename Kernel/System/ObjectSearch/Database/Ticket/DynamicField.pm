@@ -71,7 +71,6 @@ sub GetSupportedAttributes {
     );
 
     for my $Type ( qw(Search Sort) ) {
-        my $Name = "Supported$Type";
         my %SearchParams;
 
         if ( $Type eq 'Sort' ) {

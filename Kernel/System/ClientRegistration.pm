@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -60,7 +60,6 @@ sub new {
 
     # get needed objects
     $Self->{ConfigObject} = $Kernel::OM->Get('Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('DB');
     $Self->{LogObject}    = $Kernel::OM->Get('Log');
 
     $Self->{CacheType} = 'ClientRegistration';
@@ -105,7 +104,7 @@ sub ClientRegistrationGet {
     );
     return %{$Cache} if $Cache;
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT client_id, notification_url, notification_authorization, additional_data FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
@@ -113,7 +112,7 @@ sub ClientRegistrationGet {
     my %Data;
 
     # fetch the result
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Data = (
             ClientID                  => $Row[0],
             NotificationURL           => $Row[1],
@@ -189,7 +188,7 @@ sub ClientRegistrationAdd {
     );
 
     # do the db insert...
-    my $Result = $Self->{DBObject}->Do(
+    my $Result = $Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_authorization, additional_data) VALUES (?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
@@ -251,12 +250,12 @@ sub ClientRegistrationList {
         $SQL .= ' WHERE notification_url IS NOT NULL'
     }
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL,
     );
 
     my @Result;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Data[0]);
     }
 
@@ -410,7 +409,7 @@ sub NotificationSend {
         NoStatsUpdate => 1,
     );
     return 1 if !@EventList;
-    
+
     # delete the cached events we sent
     foreach my $Key ( @Keys ) {
         $CacheObject->Delete(

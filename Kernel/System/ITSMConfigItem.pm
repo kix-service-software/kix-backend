@@ -42,6 +42,7 @@ our @ObjectDependencies = qw(
     Main
     Time
     VirtualFS
+    ObjectSearch
 );
 
 =head1 NAME
@@ -90,7 +91,6 @@ sub new {
         Kernel::System::EventHandler
     );
 
-    # KIX4OTRS-capeIT
     # Dynamically find packages which are considered as super-classes for this
     # package. These packages may contain methods which overwrite functions
     # contained in @ISA as initially set, but not methods contained in this very
@@ -98,8 +98,7 @@ sub new {
     if (
         !$Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules')
         || ref( $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
-        )
-    {
+    ) {
         die "Got no ITSMConfigItem::CustomModules! Please check your SysConfig! Error occured";
     }
     my %CustomModules = %{ $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') };
@@ -125,8 +124,6 @@ sub new {
             %{$Self},
         },
     );
-
-    # EO KIX4OTRS-capeIT
 
     # init of event handler
     $Self->EventHandlerInit(
@@ -250,11 +247,18 @@ sub ConfigItemResultList {
         return;
     }
 
-    my $CacheKey = 'ConfigItemResultList::'.$Param{ClassID}.'::'.$Param{Start}.'::'.$Param{Limit};
+    my $CacheKey = 'ConfigItemResultList::'
+        . $Param{ClassID}
+        . q{::}
+        . $Param{Start}
+        . q{::}
+        . $Param{Limit};
+
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
+
     return $Cache if $Cache;
 
     # get state list
@@ -490,7 +494,7 @@ sub ConfigItemAdd {
         Data  => {
             ClassID => $Param{ClassID},
             UserID  => $Param{UserID},
-            Version => $Param{Version} || '',
+            Version => $Param{Version} || q{},
         },
         UserID => $Param{UserID},
     );
@@ -568,7 +572,7 @@ sub ConfigItemAdd {
         Event => 'ConfigItemCreate',
         Data  => {
             ConfigItemID => $ConfigItemID,
-            Comment      => $ConfigItemID . '%%' . $Param{Number},
+            Comment      => $ConfigItemID . q{%%} . $Param{Number},
         },
         UserID => $Param{UserID},
     );
@@ -683,7 +687,6 @@ sub ConfigItemDelete {
     );
 
     #---------------------------------------------------------------------------
-    # KIX4OTRS-capeIT
     # trigger ConfigItemDelete
     my $Result = $Self->PreEventHandler(
         Event => 'ConfigItemDelete',
@@ -707,7 +710,6 @@ sub ConfigItemDelete {
         }
     }
 
-    # EO KIX4OTRS-capeIT
     #---------------------------------------------------------------------------
 
     # delete all links to this config item first, before deleting the versions
@@ -886,7 +888,7 @@ sub ConfigItemAttachmentDelete {
     }
 
     # add prefix
-    my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . '/' . $Param{Filename};
+    my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . q{/} . $Param{Filename};
 
     # delete file
     my $Success = $Kernel::OM->Get('VirtualFS')->Delete(
@@ -964,7 +966,7 @@ sub ConfigItemAttachmentGet {
     }
 
     # add prefix
-    my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . '/' . $Param{Filename};
+    my $Filename = 'ConfigItem/' . $Param{ConfigItemID} . q{/} . $Param{Filename};
 
     # find all attachments of this config item
     my @Attachments = $Kernel::OM->Get('VirtualFS')->Find(
@@ -1094,574 +1096,6 @@ sub ConfigItemAttachmentExists {
     );
 
     return 1;
-}
-
-=item ConfigItemSearchExtended()
-
-return a config item list as an array reference
-
-    my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearchExtended(
-        Number       => 'The ConfigItem Number',  # (optional)
-        Name         => 'The Name',               # (optional)
-        ClassIDs     => [9, 8, 7, 6],             # (optional)
-        DeplStateIDs => [1, 2, 3, 4],             # (optional)
-        InciStateIDs => [1, 2, 3, 4],             # (optional)
-
-        ConfigItemIDs => [ 1, 2, 3 ]              # (optional)
-
-        # config items with created time after ...
-        ConfigItemCreateTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
-        # config items with created time before then ....
-        ConfigItemCreateTimeOlderDate => '2006-01-19 23:59:59',  # (optional)
-
-        # config items with changed time after ...
-        ConfigItemChangeTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
-        # config items with changed time before then ....
-        ConfigItemChangeTimeOlderDate => '2006-01-19 23:59:59',  # (optional)
-
-        What => [                                                # (optional)
-            # each array element is a and condition
-            {
-                # or condition in hash
-                "[%]{'ElementA'}[%]{'ElementB'}[%]{'Content'}" => '%contentA%',
-                "[%]{'ElementA'}[%]{'ElementC'}[%]{'Content'}" => '%contentA%',
-            },
-            {
-                "[%]{'ElementA'}[%]{'ElementB'}[%]{'Content'}" => '%contentB%',
-                "[%]{'ElementA'}[%]{'ElementC'}[%]{'Content'}" => '%contentB%',
-            },
-            {
-                # use array reference if different content with same key was searched
-                "[%]{'ElementA'}[%]{'ElementB'}[%]{'Content'}" => ['%contentC%', '%contentD%', '%contentE%'],
-                "[%]{'ElementA'}[%]{'ElementC'}[%]{'Content'}" => ['%contentC%', '%contentD%', '%contentE%'],
-            },
-        ],
-
-        PreviousVersionSearch => 1,  # (optional) default 0 (0|1)
-
-        OrderBy => [ 'ConfigItemID', 'Number' ],                  # (optional)
-        # default: [ 'ConfigItemID' ]
-        # (ConfigItemID, Number, ClassID, DeplStateID, InciStateID,
-        # CreateTime, CreateBy, ChangeTime, ChangeBy)
-
-        # Additional information for OrderBy:
-        # The OrderByDirection can be specified for each OrderBy attribute.
-        # The pairing is made by the array indices.
-
-        OrderByDirection => [ 'Down', 'Up' ],                    # (optional)
-        # default: [ 'Down' ]
-        # (Down | Up)
-
-        Limit          => 122,  # (optional)
-        UsingWildcards => 0,    # (optional) default 1
-    );
-
-=cut
-
-sub ConfigItemSearchExtended {
-    my ( $Self, %Param ) = @_;
-
-    # set limit
-    my $Limit = $Param{Limit};
-    $Param{Limit} = undef;
-
-    # config item search is required if one of these params is given
-    my @ConfigItemSearchParams = (
-        'ConfigItemCreateTimeNewerDate',
-        'ConfigItemCreateTimeOlderDate',
-        'ConfigItemChangeTimeNewerDate',
-        'ConfigItemChangeTimeOlderDate',
-        'ConfigItemIDs'
-    );
-
-    # check, if config item search is required
-    my %RequiredSearch;
-    CONFIGITEMPARAM:
-    for my $ConfigItemParam (@ConfigItemSearchParams) {
-        next CONFIGITEMPARAM if !$Param{$ConfigItemParam};
-
-        $RequiredSearch{ConfigItem} = 1;
-        last CONFIGITEMPARAM;
-    }
-
-    # configitem search is required if Number or Name is given
-    # special handling for config item number and name
-    # number 0 is allowed but not the empty string
-    if (
-        (
-            defined $Param{Number}
-            && $Param{Number} ne q{}
-        )
-        || (
-            $Param{Name}
-            && !$Param{PreviousVersionSearch}
-        )
-        || $Param{InciStateIDs}
-    ) {
-        $RequiredSearch{ConfigItem} = 1;
-    }
-
-    # version search is required if What or PreviousVersionSearch is given
-    if (
-        (
-            defined $Param{What}
-            && $Param{What} ne q{}
-            && !$RequiredSearch{ConfigItem}
-        )
-        || $Param{PreviousVersionSearch}
-    ) {
-        $RequiredSearch{Version} = 1;
-    }
-
-    # xml version search is required if What is given
-    if (
-        defined $Param{What}
-        && $Param{What} ne q{}
-    ) {
-        $RequiredSearch{XMLVersion} = 1;
-    }
-
-    # use config item search as fallback
-    if ( !%RequiredSearch ) {
-        $RequiredSearch{ConfigItem} = 1;
-    }
-
-    # start config item search
-    my %ConfigItemLists;
-    if ( $RequiredSearch{ConfigItem} ) {
-
-        # search config items
-        $ConfigItemLists{ConfigItem} = $Self->ConfigItemSearch(%Param);
-
-        return if !$ConfigItemLists{ConfigItem};
-        return if ref $ConfigItemLists{ConfigItem} ne 'ARRAY';
-        return [] if !@{ $ConfigItemLists{ConfigItem} };
-    }
-
-    # start version search
-    if ( $RequiredSearch{Version} ) {
-
-        # search versions
-        $ConfigItemLists{Version} = $Self->VersionSearch(%Param);
-
-        return if !$ConfigItemLists{Version};
-        return if ref $ConfigItemLists{Version} ne 'ARRAY';
-        return [] if !@{ $ConfigItemLists{Version} };
-    }
-
-    # start xml version search
-    if ( $RequiredSearch{XMLVersion} ) {
-
-        # prepare search values (i.e. relative date/datetime searches)
-        foreach my $What ( @{$Param{What} || []} ) {
-            KEY:
-            foreach my $Key ( keys %{$What||{}} ) {
-                # only look at the conditions with defined op (!LIKE)
-                next KEY if !IsHashRefWithData($What->{$Key});
-
-                # check if the value contains a date calculation and calculate the new timestamp if needed
-                foreach my $Op ( keys %{$What->{$Key}} ) {
-
-                    my $Value = $What->{$Key}->{$Op};
-
-                    next if $Value !~ /^((\d{4}-\d{2}-\d{2})(\s+\d{2}:\d{2}:\d{2})?(\s+([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/;
-
-                    my $IsDate = 0;
-                    if ( $2 && !$3 ) {
-                        $IsDate = 1;
-                        $Value = "$2 00:00:00 $4";
-                    }
-
-                    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                        String => $Value,
-                    );
-                    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-                        SystemTime => $SystemTime,
-                    );
-
-                    if ( $IsDate ) {
-                        $Value = (split(/\s+/, $Value))[0];
-                    }
-
-                    $What->{$Key}->{$Op} = $Value;
-                }
-            }
-        }
-
-        # search xml versions
-        my $XMLVersionList = $Self->_XMLVersionSearch(%Param);
-
-        return if !$XMLVersionList;
-        return if ref $XMLVersionList ne 'HASH';
-        return [] if !%{$XMLVersionList};
-
-        # get config item ids
-        my %ConfigItemListTmp;
-        VERSIONID:
-        for my $VersionID ( sort keys %{$XMLVersionList} ) {
-            my $ConfigItemID = $Self->VersionConfigItemIDGet(
-                VersionID => $VersionID,
-            );
-
-            next VERSIONID if !$ConfigItemID;
-
-            $ConfigItemListTmp{$ConfigItemID} = 1;
-        }
-
-        # add ids to config item list
-        $ConfigItemLists{XMLVersion} = \%ConfigItemListTmp;
-    }
-
-    # create the result list
-    my @ResultList;
-    if ( $RequiredSearch{ConfigItem} && $RequiredSearch{Version} ) {
-
-        # build a lookup hash of all found configitem ids in $ConfigItemLists{ConfigItem}
-        my %ConfigItemSeen = map { $_ => 1 } @{ $ConfigItemLists{ConfigItem} };
-
-        # check all config item ids, we need to keep the sorting
-        CONFIGITEMID:
-        for my $ConfigItemID ( @{ $ConfigItemLists{Version} } ) {
-            next CONFIGITEMID if !$ConfigItemSeen{$ConfigItemID};
-            push @ResultList, $ConfigItemID;
-        }
-    }
-    elsif ( $RequiredSearch{ConfigItem} ) {
-        @ResultList = @{ $ConfigItemLists{ConfigItem} };
-    }
-    elsif ( $RequiredSearch{Version} ) {
-        @ResultList = @{ $ConfigItemLists{Version} };
-    }
-
-    # consider the XML result
-    if ( $RequiredSearch{XMLVersion} ) {
-        @ResultList = grep { $ConfigItemLists{XMLVersion}->{$_} } @ResultList;
-    }
-
-    # consider limit
-    if ( $Limit && $Limit < scalar @ResultList ) {
-
-        # extract the limited ids
-        $Limit--;
-        @ResultList = @ResultList[ 0 .. $Limit ];
-    }
-
-    return \@ResultList;
-}
-
-=item ConfigItemSearch()
-
-return a config item list as an array reference
-
-    my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearch(
-        Number       => 'The ConfigItem Number',  # (optional)
-        Name         => 'some name',              # (optional)
-        ClassIDs     => [9, 8, 7, 6],             # (optional)
-        DeplStateIDs => [1, 2, 3, 4],             # (optional)
-        InciStateIDs => [1, 2, 3, 4],             # (optional)
-        CreateBy     => [1, 2, 3],                # (optional)
-        ChangeBy     => [3, 2, 1],                # (optional)
-
-        ConfigItemIDs => [ 1, 2, 3 ]              # (optional)
-
-        # config items with created time after ...
-        ConfigItemCreateTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
-        # config items with created time before then ....
-        ConfigItemCreateTimeOlderDate => '2006-01-19 23:59:59',  # (optional)
-
-        # config items with changed time after ...
-        ConfigItemChangeTimeNewerDate => '2006-01-09 00:00:01',  # (optional)
-        # config items with changed time before then ....
-        ConfigItemChangeTimeOlderDate => '2006-01-19 23:59:59',  # (optional)
-
-        OrderBy => [ 'ConfigItemID', 'Number' ],                  # (optional)
-        # default: [ 'ConfigItemID' ]
-        # (ConfigItemID, Number, ClassID, DeplStateID, InciStateID,
-        # CreateTime, CreateBy, ChangeTime, ChangeBy)
-
-        # Additional information for OrderBy:
-        # The OrderByDirection can be specified for each OrderBy attribute.
-        # The pairing is made by the array indices.
-
-        OrderByDirection => [ 'Down', 'Up' ],                    # (optional)
-        # default: [ 'Down' ]
-        # (Down | Up)
-
-        Limit          => 122,  # (optional)
-        UsingWildcards => 0,    # (optional) default 1
-    );
-
-=cut
-
-sub ConfigItemSearch {
-    my ( $Self, %Param ) = @_;
-
-    # verify that all passed array parameters contain an arrayref
-    ARGUMENT:
-    for my $Argument (
-        qw(
-        OrderBy
-        OrderByDirection
-        )
-        )
-    {
-        if ( !defined $Param{$Argument} ) {
-            $Param{$Argument} ||= [];
-
-            next ARGUMENT;
-        }
-
-        if ( ref $Param{$Argument} ne 'ARRAY' ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "$Argument must be an array reference!",
-            );
-            return;
-        }
-    }
-
-    # define order table
-    my %OrderByTable = (
-        ConfigItemID => 'id',
-        Number       => 'configitem_number',
-        Name         => 'name',
-        ClassID      => 'class_id',
-        DeplStateID  => 'cur_depl_state_id',
-        InciStateID  => 'cur_inci_state_id',
-        CreateTime   => 'create_time',
-        CreateBy     => 'create_by',
-        ChangeTime   => 'change_time',
-        ChangeBy     => 'change_by',
-    );
-
-    # do default sort if item not used
-    my $Match = 0;
-    for my $OrderBy ( @{ $Param{OrderBy} } ) {
-        next if ( !$OrderByTable{$OrderBy} );
-        $Match = 1;
-    }
-    if ( !$Match ) {
-        @{ $Param{OrderBy} } = ('Number');
-    }
-
-    # check if OrderBy contains only unique valid values
-    my %OrderBySeen;
-    ORDERBY:
-    for my $OrderBy ( @{ $Param{OrderBy} } ) {
-
-        if ( !$OrderBy || !$OrderByTable{$OrderBy} || $OrderBySeen{$OrderBy} ) {
-
-            # found an error
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "OrderBy contains invalid value '$OrderBy' "
-                    . 'or the value is used more than once!',
-            );
-            return;
-        }
-
-        # remember the value to check if it appears more than once
-        $OrderBySeen{$OrderBy} = 1;
-    }
-
-    # check if OrderByDirection array contains only 'Up' or 'Down'
-    DIRECTION:
-    for my $Direction ( @{ $Param{OrderByDirection} } ) {
-
-        # only 'Up' or 'Down' allowed
-        next DIRECTION if $Direction eq 'Up';
-        next DIRECTION if $Direction eq 'Down';
-
-        # found an error
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "OrderByDirection can only contain 'Up' or 'Down'!",
-        );
-        return;
-    }
-
-    # set default values
-    if ( !defined $Param{UsingWildcards} ) {
-        $Param{UsingWildcards} = 1;
-    }
-
-    # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
-
-    # assemble the ORDER BY clause
-    my @SQLOrderBy;
-    my $Count = 0;
-    ORDERBY:
-    for my $OrderBy ( @{ $Param{OrderBy} } ) {
-
-        # set the default order direction
-        my $Direction = 'DESC';
-
-        # add the given order direction
-        if ( $Param{OrderByDirection}->[$Count] ) {
-            if ( $Param{OrderByDirection}->[$Count] eq 'Up' ) {
-                $Direction = 'ASC';
-            }
-            elsif ( $Param{OrderByDirection}->[$Count] eq 'Down' ) {
-                $Direction = 'DESC';
-            }
-        }
-
-        # add SQL
-        push @SQLOrderBy, "$OrderByTable{$OrderBy} $Direction";
-
-    }
-    continue {
-        $Count++;
-    }
-
-    # if there is a possibility that the ordering is not determined
-    # we add an ascending ordering by id
-    if ( !grep { $_ eq 'ConfigItemID' } ( @{ $Param{OrderBy} } ) ) {
-        push @SQLOrderBy, "$OrderByTable{ConfigItemID} ASC";
-    }
-
-    # add number to sql where array
-    my @SQLWhere;
-    if ( defined $Param{Number} && $Param{Number} ne '' ) {
-
-        # quote
-        $Param{Number} = $Kernel::OM->Get('DB')->Quote( $Param{Number} );
-
-        if ( $Param{UsingWildcards} ) {
-
-            # prepare like string
-            $Self->_PrepareLikeString( \$Param{Number} );
-
-            push @SQLWhere,
-                "LOWER(configitem_number) LIKE LOWER('$Param{Number}') $LikeEscapeString";
-        }
-        else {
-            push @SQLWhere, "LOWER(configitem_number) = LOWER('$Param{Number}')";
-        }
-    }
-    if ( defined $Param{Name} && $Param{Name} ne '' ) {
-
-        # quote
-        $Param{Name} = $Kernel::OM->Get('DB')->Quote( $Param{Name} );
-
-        if ( $Param{UsingWildcards} ) {
-
-            # prepare like string
-            $Self->_PrepareLikeString( \$Param{Name} );
-
-            push @SQLWhere,
-                "LOWER(name) LIKE LOWER('$Param{Name}') $LikeEscapeString";
-        }
-        else {
-            push @SQLWhere, "LOWER(name) = LOWER('$Param{Name}')";
-        }
-    }
-
-    # set array params
-    my %ArrayParams = (
-        ClassIDs      => 'class_id',
-        DeplStateIDs  => 'cur_depl_state_id',
-        InciStateIDs  => 'cur_inci_state_id',
-        CreateBy      => 'create_by',
-        ChangeBy      => 'change_by',
-        ConfigItemIDs => 'id',
-    );
-
-    ARRAYPARAM:
-    for my $ArrayParam ( sort keys %ArrayParams ) {
-
-        next ARRAYPARAM if !defined $Param{$ArrayParam};
-
-        if ( ref $Param{$ArrayParam} ne 'ARRAY' ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "$ArrayParam must be an array reference!",
-            );
-            return;
-        }
-
-        return [] if !IsArrayRefWithData($Param{$ArrayParam});
-
-        # quote as integer
-        for my $OneParam ( @{ $Param{$ArrayParam} } ) {
-            $OneParam = $Kernel::OM->Get('DB')->Quote( $OneParam, 'Integer' );
-            return if ( !defined $OneParam );
-        }
-
-        # create string
-        my $InString = join q{, }, @{ $Param{$ArrayParam} };
-
-        push @SQLWhere, "$ArrayParams{ $ArrayParam } IN ($InString)";
-    }
-
-    # set time params
-    my %TimeParams = (
-        ConfigItemCreateTimeNewerDate => 'create_time >=',
-        ConfigItemCreateTimeOlderDate => 'create_time <=',
-        ConfigItemChangeTimeNewerDate => 'change_time >=',
-        ConfigItemChangeTimeOlderDate => 'change_time <=',
-    );
-
-    TIMEPARAM:
-    for my $TimeParam ( sort keys %TimeParams ) {
-
-        next TIMEPARAM if !$Param{$TimeParam};
-
-        my $Value = $Param{$TimeParam};
-
-        # calculate relative times
-        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $Value
-        );
-        if ( !$SystemTime ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid date format found in parameter $TimeParam!",
-            );
-            return;
-        }
-
-        $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $SystemTime
-        );
-
-        # quote
-        $Value = $Kernel::OM->Get('DB')->Quote( $Value );
-
-        push @SQLWhere, "$TimeParams{ $TimeParam } '$Value'";
-    }
-
-    # create where string
-    my $WhereString = @SQLWhere ? ' WHERE ' . join q{ AND }, @SQLWhere : '';
-
-    # set limit
-    if ( $Param{Limit} ) {
-        $Param{Limit} = $Kernel::OM->Get('DB')->Quote( $Param{Limit}, 'Integer' );
-    }
-
-    my $SQL = "SELECT id FROM configitem $WhereString ";
-
-    # add the ORDER BY clause
-    if (@SQLOrderBy) {
-        $SQL .= 'ORDER BY ';
-        $SQL .= join ', ', @SQLOrderBy;
-        $SQL .= ' ';
-    }
-
-    # ask database
-    $Kernel::OM->Get('DB')->Prepare(
-        SQL   => $SQL,
-        Limit => $Param{Limit},
-    );
-
-    # fetch the result
-    my @ConfigItemList;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        push @ConfigItemList, $Row[0];
-    }
-
-    return \@ConfigItemList;
 }
 
 =item ConfigItemLookup()
@@ -1879,21 +1313,43 @@ sub UniqueNameCheck {
         );
     }
 
-    my %SearchCriteria;
+    my @SearchCriteria;
 
     # add the config item class to the search criteria if the uniqueness scope is not global
     if ( $Scope ne 'global' ) {
-        $SearchCriteria{ClassIDs} = [ $Param{ClassID} ];
+        push (
+            @SearchCriteria,
+            {
+                Field    => 'ClassID',
+                Operator => 'IN',
+                Type     => 'NUMERIC',
+                Value    => [ $Param{ClassID} ]
+            }
+        );
     }
 
-    $SearchCriteria{Name} = $Param{Name};
+    push (
+        @SearchCriteria,
+        {
+            Field    => 'Name',
+            Operator => 'EQ',
+            Type     => 'STRING',
+            Value    => $Param{Name}
+        }
+    );
 
     # search for a config item matching the given name
-    my $ConfigItem = $Self->ConfigItemSearchExtended(%SearchCriteria);
+    my @ConfigItem = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => \@SearchCriteria
+        },
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY'
+    );
 
     # remove the provided ConfigItemID from the results, otherwise the duplicate check would fail
     # because the ConfigItem itself is found as duplicate
-    my @Duplicates = map {$_} grep { $_ ne $Param{ConfigItemID} } @{$ConfigItem};
+    my @Duplicates = map {$_} grep { $_ ne $Param{ConfigItemID} } @ConfigItem;
 
     # if a config item was found, the given name is not unique
     # if no config item was found, the given name is unique
@@ -2123,7 +1579,6 @@ sub RecalculateCurrentIncidentState {
     return \%NewConfigItemIncidentState;
 }
 
-# KIX4OTRS-capeIT
 # Thefollowing methods are meant to ease the handling of the XML-LIKE data hash.
 # They do not replace any internal/original methods.
 
@@ -2680,7 +2135,7 @@ sub CountLinkedObjects {
         $LinkObject = $Kernel::OM->Get('LinkObject');
     }
 
-    return '' if !$LinkObject;
+    return q{} if !$LinkObject;
 
     my %PossibleObjectsList = $LinkObject->PossibleObjectsList(
         Object => 'ConfigItem',
@@ -2699,209 +2154,6 @@ sub CountLinkedObjects {
     }
 
     return $Result;
-}
-
-# EO KIX4OTRS-capeIT
-
-=item GetAssignedConfigItemsForObject()
-
-return all assigned config item IDs
-
-    my $ConfigItemIDList = $ITSMConfigItemObject->GetAssignedConfigItemsForObject(
-        ObjectType => 'Contact',
-        Object     => $ContactHashRef,          # (optional)
-        UserID     => 1
-    );
-
-=cut
-
-sub GetAssignedConfigItemsForObject {
-    my ( $Self, %Param ) = @_;
-
-    my @AssignedCIIDs = ();
-
-    for ( qw(ObjectType) ) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || '';
-
-    if ( IsStringWithData($MappingString) ) {
-
-        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data   => $MappingString,
-            Silent => $Param{Silent} || 0
-        );
-
-        if ( !IsHashRefWithData($Mapping) ) {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid JSON for sysconfig option 'AssignedConfigItemsMapping'."
-                );
-            }
-        } elsif ( IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) ) {
-
-            CICLASS:
-            for my $CIClass ( keys %{ $Mapping->{ $Param{ObjectType} } } ) {
-                next CICLASS if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass} ) );
-
-                # get class
-                my $ClassItemRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-                    Class  => 'ITSM::ConfigItem::Class',
-                    Name   => $CIClass,
-                    Silent => $Param{Silent} || 0
-                );
-
-                next CICLASS if ( !IsHashRefWithData($ClassItemRef) || !$ClassItemRef->{ItemID} );
-
-                # get CI-class definition...
-                my $XMLDefinition = $Self->DefinitionGet(
-                    ClassID => $ClassItemRef->{ItemID},
-                );
-
-                if ( !$XMLDefinition->{DefinitionID} ) {
-                    if (
-                        !defined $Param{Silent}
-                        || !$Param{Silent}
-                    ) {
-                        $Kernel::OM->Get('Log')->Log(
-                            Priority => 'error',
-                            Message  => "No Definition definied for class $CIClass!",
-                        );
-                    }
-                    next CICLASS;
-                }
-
-                # prepare search data
-                my %SearchData;
-                for my $CISearchAttribute ( keys %{ $Mapping->{ $Param{ObjectType} }->{$CIClass} } ) {
-                    next if (!$CISearchAttribute);
-                    next if ( !IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute} ) );
-
-                    my $ObjectSearchAttributes = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchAttributes};
-                    if ($ObjectSearchAttributes && !IsArrayRefWithData($ObjectSearchAttributes)) {
-                        $ObjectSearchAttributes = [$ObjectSearchAttributes];
-                    }
-                    my $SearchStatics = $Mapping->{ $Param{ObjectType} }->{$CIClass}->{$CISearchAttribute}->{SearchStatic};
-                    if ($SearchStatics && !IsArrayRefWithData($SearchStatics)) {
-                        $SearchStatics = [$SearchStatics];
-                    }
-
-                    next if ( !IsArrayRefWithData($ObjectSearchAttributes) && !IsArrayRefWithData($SearchStatics) );
-
-                    $CISearchAttribute =~ s/^\s+//g;
-                    $CISearchAttribute =~ s/\s+$//g;
-
-                    next if !$CISearchAttribute;
-
-                    $SearchData{$CISearchAttribute} = [];
-
-                    # get attributes search data
-                    if (IsHashRefWithData( $Param{Object} )) {
-                        if (IsArrayRefWithData($ObjectSearchAttributes)) {
-                            for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                                my $Value;
-                                if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                                    my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                                    next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                                    $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                                } else {
-                                    $Value = $Param{Object}->{$ObjectSearchAttribute};
-                                }
-
-                                next if ( !defined $Value );
-
-                                push (
-                                    @{ $SearchData{$CISearchAttribute} },
-                                    IsArrayRefWithData($Value) ? @{$Value} : $Value
-                                );
-                            }
-                        }
-                    }
-
-                    # get static search data
-                    if (IsArrayRefWithData($SearchStatics)) {
-                        for my $SearchStatic ( @{$SearchStatics} ) {
-                            next if ( !defined $SearchStatic );
-                            push ( @{ $SearchData{$CISearchAttribute} }, $SearchStatic );
-                        }
-                    }
-
-                    if (!scalar(@{ $SearchData{$CISearchAttribute} })) {
-                        delete $SearchData{$CISearchAttribute};
-                    }
-                }
-
-                # ignore class if not search is given/usable
-                next if (!scalar(keys %SearchData));
-
-                # prepare default search params
-                my %SearchDefault;
-                my $PrepareSuccess = $Self->_GetDefaultSearchDataForAssignedCIs(
-                    SearchDefault => \%SearchDefault,
-                    SearchData    => \%SearchData,
-                );
-                if ($PrepareSuccess) {
-
-                    # prepare xml search params (What)
-                    my %SearchWhat;
-                    $Self->_GetXMLSearchDataForAssignedCIs(
-                        XMLDefinition => $XMLDefinition->{DefinitionRef},
-                        SearchWhat    => \%SearchWhat,
-                        SearchData    => \%SearchData,
-                    );
-
-                    # do search - if this CI class doesn't contain all the search attributes then we have to ignore it
-                    if ( (scalar( keys %SearchWhat ) + scalar( keys %SearchDefault)) >= scalar( keys %SearchData ) ) {
-                        my %What;
-                        if (scalar keys %SearchWhat) {
-                            $What{What} = [\%SearchWhat];
-                        }
-                        my $ConfigItemList = $Self->ConfigItemSearchExtended(
-                            ClassIDs => [ $ClassItemRef->{ItemID} ],
-                            UserID   => $Param{UserID},
-                            %SearchDefault,
-                            %What
-                        );
-                        if ( IsArrayRefWithData($ConfigItemList) ) {
-
-                            # add only not existing items
-                            for my $ListItem ( @{$ConfigItemList} ) {
-                                next if (grep { $_ == $ListItem } @AssignedCIIDs);
-                                push(@AssignedCIIDs, $ListItem);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'info',
-                    Message  => "'$Param{ObjectType}' not contained in 'AssignedConfigItemsMapping'."
-                );
-            }
-        }
-    }
-
-    if ( IsArrayRefWithData(\@AssignedCIIDs) ) {
-        @AssignedCIIDs = map { 0 + $_ } @AssignedCIIDs;
-    }
-
-    return \@AssignedCIIDs;
 }
 
 =item GenerateLinkGraph()
@@ -3192,27 +2444,75 @@ sub UpdateCounters {
         my %Counters;
 
         foreach my $Functionality ( sort keys %FunctionalityList ) {
-            my $ConfigItemIDs = $Self->ConfigItemSearch(
-                ClassIDs     => [ $ClassID ],
-                DeplStateIDs => $FunctionalityList{$Functionality},
+            my $ConfigItemCount = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'COUNT',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'ClassIDs',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [ $ClassID ]
+                        },
+                        {
+                            Field    => 'DeplStateIDs',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => $FunctionalityList{$Functionality}
+                        }
+                    ]
+                }
             );
-            $Counters{'DeploymentState::Functionality::'.$Functionality} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+            $Counters{'DeploymentState::Functionality::'.$Functionality} = $ConfigItemCount || 0;
         }
 
         foreach my $DeplStateID ( sort keys %{$DeplStateList} ) {
-            my $ConfigItemIDs = $Self->ConfigItemSearch(
-                ClassIDs     => [ $ClassID ],
-                DeplStateIDs => [ $DeplStateID ],
+            my $ConfigItemCount = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'COUNT',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'ClassIDs',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [ $ClassID ]
+                        },
+                        {
+                            Field    => 'DeplStateIDs',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [ $DeplStateID ]
+                        }
+                    ]
+                }
             );
-            $Counters{'DeploymentState::'.$DeplStateList->{$DeplStateID}->{Name}} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+            $Counters{'DeploymentState::'.$DeplStateList->{$DeplStateID}->{Name}} = $ConfigItemCount || 0;
         }
 
         foreach my $InciStateID ( sort keys %{$InciStateList} ) {
-            my $ConfigItemIDs = $Self->ConfigItemSearch(
-                ClassIDs     => [ $ClassID ],
-                InciStateIDs => [ $InciStateID ],
+            my $ConfigItemCount = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'COUNT',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'ClassIDs',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [ $ClassID ]
+                        },
+                        {
+                            Field    => 'InciStateID',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [ $InciStateID ]
+                        }
+                    ]
+                }
             );
-            $Counters{'IncidentState::'.$InciStateList->{$InciStateID}->{Name}} = IsArrayRef($ConfigItemIDs) ? scalar @{$ConfigItemIDs} : 0;
+            $Counters{'IncidentState::'.$InciStateList->{$InciStateID}->{Name}} = $ConfigItemCount || 0;
         }
 
         foreach my $Counter ( keys %{Counters} ) {
@@ -3322,7 +2622,7 @@ sub _GetXMLSearchDataForAssignedCIs {
     return if !$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH';
 
     for my $Item ( @{ $Param{XMLDefinition} } ) {
-        my $Key = $Param{Prefix} ? $Param{Prefix} . '::' . $Item->{Key} : $Item->{Key};
+        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
 
         # prepare value
         my $Values = [];
@@ -3334,7 +2634,7 @@ sub _GetXMLSearchDataForAssignedCIs {
                     Value => $SingleValue,
                 );
 
-                if (defined $ValuePart && $ValuePart ne '') {
+                if (defined $ValuePart && $ValuePart ne q{}) {
                     if ( IsArrayRefWithData($ValuePart) ) {
                         push( @{$Values}, @{$ValuePart} );
                     } else {

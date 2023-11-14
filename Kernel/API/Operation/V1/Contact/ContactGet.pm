@@ -328,28 +328,25 @@ sub _GetContactData {
     # include assigned config items if requested
     if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
-        # add user data for
-        my %CIContact = %ContactData;
-        if (!$CIContact{User} && $CIContact{AssignedUserID}) {
-            my $UserData = $Self->ExecOperation(
-                OperationType => 'V1::User::UserGet',
-                Data          => {
-                    UserID => $CIContact{AssignedUserID},
-                }
-            );
-            $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-            $Self->AddCacheDependency(Type => 'User');
-        }
-
-        my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
+        my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'Contact',
-            Object     => \%CIContact
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'AssignedContact',
+                        Operator => 'EQ',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{ID}
+                    }
+                ]
+            }
         );
 
         # filter for customer assigned config items if necessary
         my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
             ObjectType   => 'ConfigItem',
-            ObjectIDList => $ItemIDs
+            ObjectIDList => \@ItemIDs
         );
 
         $ContactData{AssignedConfigItems} = \@ConfigItemIDList;

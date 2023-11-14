@@ -1510,7 +1510,6 @@ sub ExecOperation {
         IgnorePermissions        => $Param{IgnorePermissions},
         SuppressPermissionErrors => $Param{SuppressPermissionErrors},
         HandleSortInCORE         => $Self->{HandleSortInCORE}
-
     );
 
     # if operation init failed, bail out
@@ -3898,15 +3897,7 @@ sub _GetCustomerUserVisibleObjectIds {
             }
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
 
-            if ($Param{ObjectType} eq 'ConfigItem') {
-                return $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                    %Param,
-                    ObjectType => 'Contact',
-                    Object     => \%ContactData,
-                    UserID     => $Self->{Authorization}->{UserID},
-                    UserType   => $Self->{Authorization}->{UserType},
-                );
-            } elsif ($Param{ObjectType} eq 'Ticket') {
+            if ($Param{ObjectType} eq 'Ticket') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,
                     ObjectType => 'Contact',

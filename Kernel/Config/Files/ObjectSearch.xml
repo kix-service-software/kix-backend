@@ -5,20 +5,24 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/ObjectSearch/*.pm" SelectedID="Kernel::System::ObjectSearch::Database">
-            </Option>
+            <String Regex="">ObjectSearch::Database"</String>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Types" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the allowed object types for object search.</Description>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Ticket" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <Hash>
-                <Item Key="Ticket">1</Item>
-                <Item Key="ITSMConfigItem">0</Item>
-            </Hash>
+            <String Regex="">ObjectSearch::Database::Ticket</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###ConfigItem" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <String Regex="">ObjectSearch::Database::ConfigItem</String>
         </Setting>
     </ConfigItem>
 
@@ -243,83 +247,93 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###ConfigItemID" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###ConfigItemID" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::ConfigItemID</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::ConfigItemID</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###Name" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Name" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::Name</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Name</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###Number" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Number" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::Number</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Number</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###DeplState" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###DeplState" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::DeplState</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::DeplState</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###InciState" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###InciState" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::InciState</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::InciState</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###Owner" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Owner" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::Owner</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Owner</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###Class" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Class" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::Class</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Class</Item>
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ITSMConfigItem::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Times" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::ITSMConfigItem::Times</Item>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###XMLData" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::XMLData</Item>
             </Hash>
         </Setting>
     </ConfigItem>
