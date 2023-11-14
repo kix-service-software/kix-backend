@@ -6802,14 +6802,18 @@ sub TicketFulltextIndexRebuild {
     my ( $Self, %Param ) = @_;
 
     # get all tickets
-    my @TicketIDs = $Self->TicketSearch(
-        ArchiveFlags => [ 'y', 'n' ],
-        OrderBy      => 'Down',
-        SortBy       => 'Age',
-        Result       => 'ARRAY',
-        Limit        => 100_000_000,
-        Permission   => 'ro',
-        UserID       => 1,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Sort => [
+            {
+                Field     => 'Age',
+                Direction => 'DESCENDING'
+            }
+        ],
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100_000_000,
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     $Kernel::OM->Get('Log')->Log(

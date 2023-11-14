@@ -55,7 +55,7 @@ sub GetSupportedAttributes {
         Archived => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN']
+            Operators    => ['EQ','NE','IN','!IN']
         }
     };
 
@@ -94,11 +94,42 @@ sub Search {
         return;
     }
 
+    my $Value;
+    my %Flags;
+    if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        %Flags = map{ $_ => 1 } @{$Param{Search}->{Value}};
+    }
+    else {
+        $Flags{$Param{Search}->{Value}} = 1;
+    }
+
+    if (
+        (
+            $Flags{y}
+            && !$Flags{n}
+        ) || $Flags{1}
+    ) {
+        $Value = 1;
+    }
+    elsif (
+        (
+            !$Flags{y}
+            && $Flags{n}
+        ) || $Flags{0}
+    ) {
+        $Value = 0;
+    }
+    else {
+        # Don't do anything as no restriction is needed
+        return;
+    }
+
     my @SQLWhere;
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.archive_flag',
-        Value     => $Param{Search}->{Value},
+        Value     => $Value,
+        Type      => 'NUMERIC',
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
