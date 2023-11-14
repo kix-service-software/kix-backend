@@ -121,7 +121,7 @@ sub Search {
     # prepare result ref map
     my %ResultRefMap = (
         'ARRAY' => 'ARRAY',
-        'COUNT' => '',
+        'COUNT' => q{},
         'HASH'  => 'HASH',
     );
 
@@ -287,68 +287,6 @@ sub GetSupportedAttributes {
     return $Self->{Backend}->GetSupportedAttributes(
         ObjectType => $ObjectType
     );
-}
-
-sub _GetSearchBackend {
-    my ( $Self, %Param ) = @_;
-
-    my $ObjectTypes = $Kernel::OM->Get('Config')->Get('ObjectSearch::Types');
-
-    if ( !IsHashRefWithData($ObjectTypes) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No enabled ObjectTypes for the search!'
-        );
-        return;
-    }
-    if ( !$Param{ObjectType} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No object type given!'
-        );
-        return;
-    }
-
-    my $Backend = $Kernel::OM->Get('Config')->Get('ObjectSearch::Backend');
-
-    # if the backend require failed we will exit
-    if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to require search backend!",
-        );
-        return;
-    }
-
-    for my $ObjectType ( sort keys %{$ObjectTypes} ) {
-
-        next if lc($Param{ObjectType}) ne lc($ObjectType);
-        next if !$ObjectTypes->{$ObjectType};
-
-        return 1 if IsHashRefWithData($Self->{SearchBackend})
-            && $Self->{SearchBackend}->{$ObjectType};
-
-
-        my $Backend = $Backend->new(
-            %{$Self},
-            ObjectType => $ObjectType
-        );
-
-        # if the backend constructor failed we will exit
-        if ( ref $Backend ne $Backend ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to create search backend object!",
-            );
-            return;
-        }
-
-        $Self->{SearchBackend}->{$ObjectType} = $Backend;
-
-        last;
-    }
-
-    return 1;
 }
 
 1;
