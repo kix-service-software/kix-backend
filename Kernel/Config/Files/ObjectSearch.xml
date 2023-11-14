@@ -5,20 +5,24 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/ObjectSearch/*.pm" SelectedID="Kernel::System::ObjectSearch::Database">
-            </Option>
+            <String Regex="">ObjectSearch::Database"</String>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Types" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the allowed object types for object search.</Description>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Ticket" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <Hash>
-                <Item Key="Ticket">1</Item>
-                <Item Key="ConfigItem">1</Item>
-            </Hash>
+            <String Regex="">ObjectSearch::Database::Ticket</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###ConfigItem" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <String Regex="">ObjectSearch::Database::ConfigItem</String>
         </Setting>
     </ConfigItem>
 

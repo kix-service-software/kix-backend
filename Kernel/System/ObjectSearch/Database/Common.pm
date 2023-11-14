@@ -13,10 +13,7 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = qw(
-    DB
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -43,23 +40,6 @@ sub new {
     bless( $Self, $Type );
 
     return $Self;
-}
-
-=item Init()
-
-empty method to be overridden by specific attribute module if necessary
-
-    $Object->Init();
-
-=cut
-
-sub Init {
-    my ( $Self, %Param ) = @_;
-
-    # reset module data
-    $Self->{ModuleData} = {};
-
-    return;
 }
 
 =item GetSupportedAttributes()
