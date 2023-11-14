@@ -3914,7 +3914,7 @@ sub _GetCustomerUserVisibleObjectIds {
                                 Value    => $ContactData{RelevantOrganisationID}
                             }
                         ]
-                    }
+                    },
                     Result     => 'ARRAY',
                     ObjectType => 'ConfigItem',
                     UserID     => $Self->{Authorization}->{UserID},

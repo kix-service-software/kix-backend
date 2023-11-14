@@ -154,7 +154,7 @@ sub Search {
                 Operator   => 'EQ',
                 Column     => 'xst.xml_content_value',
                 Value      => $What{$Key},
-                Type       => $Param{Search}->{Type} || 'STRING',
+                Type       => 'STRING',
                 IsOR       => 1,
                 Supplement => [' AND ' . $KeyWhere[0]],
                 Supported  => ['EQ']
