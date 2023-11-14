@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Base;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Base;
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::Base - base module for object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Base - base module for object search
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ empty method to be overridden by specific attribute module if necessary
 sub GetBackends {
     my ( $Self, %Param ) = @_;
 
-    my $Backends = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ITSMConfigItem::Module');
+    my $Backends = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ConfigItem::Module');
     my %AttributeModules;
 
     if ( !IsHashRefWithData($Backends) ) {
@@ -82,17 +82,9 @@ sub GetBackends {
             next BACKEND;
         }
 
-        foreach my $Type ( qw(Search Sort) ) {
-            if ( ref($SupportedAttributes->{$Type}) ne 'ARRAY' ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "SupportedAttributes->{$Type} return by module $Backends->{$Backend}->{Module} is not an ArrayRef!",
-                );
-                next BACKEND;
-            }
-            foreach my $Attribute ( @{$SupportedAttributes->{$Type}} ) {
-                $AttributeModules{$Type}->{$Attribute} = $Object;
-            }
+        foreach my $Attribute ( sort keys %{$SupportedAttributes} ) {
+            $AttributeModules{$Attribute} = $SupportedAttributes->{$Attribute} || {};
+            $AttributeModules{$Attribute}->{Object} = $Object;
         }
     }
     $Self->{AttributeModules} = \%AttributeModules;
@@ -169,6 +161,49 @@ sub CreatePermissionSQL {
 
     return %Result;
 }
+
+sub BaseFlags {
+    my ( $Self, %Param ) = @_;
+
+    my %Result;
+
+    %Result = $Self->_ExtractFields(
+        %Param,
+        Extract => {
+            PreviousVersionSearch => 1,
+            AssignedOrganisation  => 1
+        }
+    );
+
+
+    return \%Result;
+}
+
+sub _ExtractFields {
+    my ($Self, %Param) = @_;
+
+    my %Fields;
+    for my $Type ( keys %{$Param{Search}} ) {
+        my @Items;
+        for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
+            if ($Param{Extract}->{$SearchItem->{Field}}) {
+                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
+            }
+            else {
+                push(@Items, $SearchItem);
+            }
+        }
+        if ( scalar(@Items) ) {
+            $Param{Search}->{$Type} = \@Items;
+        }
+        else {
+            delete $Param{Search}->{$Type};
+        }
+    }
+
+    return %Fields;
+}
+
 
 1;
 

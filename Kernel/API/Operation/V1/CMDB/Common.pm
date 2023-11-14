@@ -105,14 +105,29 @@ sub _CheckConfigItem {
         IsStringWithData( $ConfigItem->{Name} )
         && $ConfigObject->Get('UniqueCIName::EnableUniquenessCheck')
     ) {
-        my $ConfigItemIDs = $ConfigItemObject->ConfigItemSearchExtended(
-            Name           => $ConfigItem->{Name},
-            ClassIDs       => [ $ConfigItem->{ClassID} ],
-            UsingWildcards => 0,
+        my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'Name',
+                        Operator => 'EQ',
+                        Type     => 'STRING',
+                        Value    => $ConfigItem->{Name}
+                    },
+                    {
+                        Field    => 'ClassID',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => [ $ConfigItem->{ClassID} ]
+                    }
+                ]
+            }
         );
 
         my $NameDuplicates = $ConfigItemObject->UniqueNameCheck(
-            ConfigItemID => $ConfigItemIDs->[0],
+            ConfigItemID => $ConfigItemIDs[0],
             ClassID      => $ConfigItem->{ClassID},
             Name         => $ConfigItem->{Name},
         );
@@ -121,7 +136,7 @@ sub _CheckConfigItem {
         if ( IsArrayRefWithData($NameDuplicates) ) {
             return $Self->_Error(
                 Code    => "BadRequest",
-                Message => "The name $ConfigItem->{Name} is already in use by the ConfigItemID(s): $ConfigItemIDs->[0]"
+                Message => "The name $ConfigItem->{Name} is already in use by the ConfigItemID(s): $ConfigItemIDs[0]"
             );
         }
     }

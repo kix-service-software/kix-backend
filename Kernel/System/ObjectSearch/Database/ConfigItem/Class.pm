@@ -6,10 +6,12 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Owner;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Class;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -21,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Class - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -50,16 +52,25 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'CreateBy',
-            'ChangeBy',
-        ],
-        Sort => [
-            'CreateBy',
-            'ChangeBy',
-        ]
+    $Self->{Supported} = {
+        ClassID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ', 'NE', 'IN','!IN']
+        },
+        ClassIDs => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ', 'NE', 'IN','!IN']
+        },
+        Class => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ', 'NE', 'IN','!IN']
+        }
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -90,18 +101,45 @@ sub Search {
         return;
     }
 
-    my %AttributeMapping = (
-        'CreateBy' => 'ci.create_by',
-        'ChangeBy' => 'ci.change_by',
-    );
+    my @ClassIDs;
+    if ( $Param{Search}->{Field} eq 'Class' ) {
+        my %Classes = reverse(
+            %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class => 'ITSM::ConfigItem::Class',
+            )}
+        );
+
+        my @ClassList = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @ClassList = @{$Param{Search}->{Value}}
+        }
+        foreach my $Class ( @ClassList ) {
+            if ( !$Classes{$Class} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown asset class $Class!",
+                );
+                return;
+            }
+
+            push( @ClassIDs, $Classes{$Class} );
+        }
+    }
+    else {
+        @ClassIDs = ( $Param{Search}->{Value} );
+        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+            @ClassIDs = @{$Param{Search}->{Value}}
+        }
+    }
+
+    $Param{Flags}->{ClassIDs} = \@ClassIDs;
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Param{Search}->{Value},
-        Supported => [
-            'EQ', 'NE', 'IN'
-        ]
+        Column    => 'ci.class_id',
+        Value     => \@ClassIDs,
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
@@ -112,7 +150,6 @@ sub Search {
         SQLWhere => \@SQLWhere,
     };
 }
-
 
 =item Sort()
 
@@ -132,10 +169,19 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        'CreateBy' => 'ci.create_by',
-        'ChangeBy' => 'ci.change_by',
+        Class    => 'gc.name',
+        ClassID  => 'ci.class_id',
+        ClassIDs => 'ci.class_id',
     );
+
+    my %Join;
+    if ( $Param{Attribute} eq 'Class' ) {
+        $Join{SQLJoin} = [
+            'INNER JOIN general_catalog gc ON gc.id = ci.class_id'
+        ];
+    }
 
     return {
         SQLAttrs => [
@@ -144,6 +190,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
+        %Join
     };
 }
 

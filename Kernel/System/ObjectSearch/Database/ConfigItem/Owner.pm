@@ -6,12 +6,10 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Name;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Owner;
 
 use strict;
 use warnings;
-
-use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -23,7 +21,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -52,15 +50,22 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'Name',
-        ],
-        Sort => [
-            'Name',
-        ]
-    }
+    $Self->{Supported} = {
+        CreateBy => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        ChangeBy => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        }
+    };
+
+    return $Self->{Supported};
 }
+
 
 =item Search()
 
@@ -89,15 +94,16 @@ sub Search {
         return;
     }
 
+    my %AttributeMapping = (
+        'CreateBy' => 'ci.create_by',
+        'ChangeBy' => 'ci.change_by',
+    );
+
     my @Where = $Self->GetOperation(
-        Operator      => $Param{Search}->{Operator},
-        Column        => 'ci.name',
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1,
-        Supported     => [
-            'EQ', 'STARTSWITH', 'ENDSWITH',
-            'CONTAINS', 'LIKE', 'IN'
-        ]
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Param{Search}->{Value},
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
@@ -108,6 +114,7 @@ sub Search {
         SQLWhere => \@SQLWhere,
     };
 }
+
 
 =item Sort()
 
@@ -127,12 +134,17 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    my %AttributeMapping = (
+        'CreateBy' => 'ci.create_by',
+        'ChangeBy' => 'ci.change_by',
+    );
+
     return {
         SQLAttrs => [
-            'ci.name'
+            $AttributeMapping{$Param{Attribute}}
         ],
         SQLOrderBy => [
-            'ci.name'
+            $AttributeMapping{$Param{Attribute}}
         ],
     };
 }

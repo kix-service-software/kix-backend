@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::Class;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Name;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::Class - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -52,20 +52,16 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'ClassID',
-            'ClassIDs',
-            'Class'
-        ],
-        Sort => [
-            'ClassID',
-            'ClassIDs',
-            'Class'
-        ]
+    $Self->{Supported} = {
+        Name => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        }
     };
-}
 
+    return $Self->{Supported};
+}
 
 =item Search()
 
@@ -83,6 +79,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -94,44 +91,26 @@ sub Search {
         return;
     }
 
-    my @ClassIDs;
-    if ( $Param{Search}->{Field} eq 'Class' ) {
-        my %Classes = reverse(
-            %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::Class',
-            )}
-        );
+    my $TablePrefix = 'ci';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
 
-        my @ClassList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @ClassList = @{$Param{Search}->{Value}}
-        }
-        foreach my $Class ( @ClassList ) {
-            if ( !$Classes{$Class} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown asset class $Class!",
-                );
-                return;
-            }
-
-            push( @ClassIDs, $Classes{$Class} );
-        }
-    }
-    else {
-        @ClassIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @ClassIDs = @{$Param{Search}->{Value}}
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
         }
     }
 
     my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'ci.class_id',
-        Value     => \@ClassIDs,
-        Supported => [
-            'EQ', 'NE', 'IN'
-        ]
+        Operator      => $Param{Search}->{Operator},
+        Column        => "$TablePrefix.name",
+        Value         => $Param{Search}->{Value},
+        IsOR          => $Param{BoolOperator} || 0,
+        CaseSensitive => 1,
+        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
@@ -139,6 +118,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
+        SQLJoin  => \@SQLJoin,
         SQLWhere => \@SQLWhere,
     };
 }
@@ -161,28 +141,28 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Class    => 'gc.name',
-        ClassID  => 'ci.class_id',
-        ClassIDs => 'ci.class_id',
-    );
+    my @SQLJoin;
+    my $TablePrefix = 'ci';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
 
-    my %Join;
-    if ( $Param{Attribute} eq 'Class' ) {
-        $Join{SQLJoin} = [
-            'INNER JOIN general_catalog gc ON gc.id = ci.class_id'
-        ];
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
+        }
     }
 
     return {
         SQLAttrs => [
-            $AttributeMapping{$Param{Attribute}}
+            "$TablePrefix.name"
         ],
         SQLOrderBy => [
-            $AttributeMapping{$Param{Attribute}}
+            "$TablePrefix.name"
         ],
-        %Join
+        SQLJoin => \@SQLJoin
     };
 }
 

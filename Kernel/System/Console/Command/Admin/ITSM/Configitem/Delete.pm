@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -89,12 +89,12 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     my $All               = $Self->GetOption('all');
-    my $Class             = $Self->GetOption('class') // '';
-    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number') // [] };
-    my $DeploymentState   = $Self->GetOption('deployment-state') // '';
-    my $AllOldVersions    = $Self->GetOption('all-old-versions') // '';
-    my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions') // '';
-    my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // '';
+    my $Class             = $Self->GetOption('class')                        // q{};
+    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number')         // [] };
+    my $DeploymentState   = $Self->GetOption('deployment-state')             // q{};
+    my $AllOldVersions    = $Self->GetOption('all-old-versions')             // q{};
+    my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions')   // q{};
+    my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // q{};
 
     if (
         !$All
@@ -126,18 +126,21 @@ sub Run {
     $Self->Print("<yellow>Deleting config items...</yellow>\n\n");
 
     my $All               = $Self->GetOption('all');
-    my $Class             = $Self->GetOption('class') // '';
-    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number') // [] };
-    my $DeploymentState   = $Self->GetOption('deployment-state') // '';
-    my $AllOldVersions    = $Self->GetOption('all-old-versions') // '';
-    my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions') // '';
-    my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // '';
+    my $Class             = $Self->GetOption('class')                        // q{};
+    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number')         // [] };
+    my $DeploymentState   = $Self->GetOption('deployment-state')             // q{};
+    my $AllOldVersions    = $Self->GetOption('all-old-versions')             // q{};
+    my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions')   // q{};
+    my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // q{};
 
     # delete all config items
     if ($All) {
 
         # get all config items ids
-        my @ConfigItemIDs = @{ $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch() };
+        my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+        );
 
         # get number of config items
         my $CICount = scalar @ConfigItemIDs;
@@ -209,11 +212,18 @@ sub Run {
         my %ClassName2ID = reverse %{$ClassList};
 
         if ( $ClassName2ID{$Class} ) {
+            my @SearchParam;
             my $ID = $ClassName2ID{$Class};
 
             # define the search param for the class search
-            my %SearchParam = (
-                ClassIDs => [$ID],
+            push(
+                @SearchParam,
+                {
+                    Field    => 'ClassID',
+                    Operator => 'IN',
+                    Type     => 'NUMERIC',
+                    Value    => [$ID]
+                }
             );
 
             # also a deployment state is given
@@ -231,10 +241,18 @@ sub Run {
                 if ( $DeploymentState2ID{$DeploymentState} ) {
 
                     # get the deployment state id
-                    my $ID = $DeploymentState2ID{$DeploymentState};
+                    my $DeplStateID = $DeploymentState2ID{$DeploymentState};
 
                     # add search parameter
-                    $SearchParam{DeplStateIDs} = [$ID];
+                    push(
+                        @SearchParam,
+                        {
+                            Field    => 'DeplStateID'
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [$DeplStateID]
+                        }
+                    );
                 }
                 else {
                     $Self->PrintError("Unable to find deployment state $DeploymentState.");
@@ -243,9 +261,13 @@ sub Run {
             }
 
             # get ids of this class (and maybe deployment state) config items
-            @ConfigItemIDs = @{
-                $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(%SearchParam)
-            };
+            @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => \@SearchParam
+                }
+            );
         }
         else {
             $Self->PrintError("Unable to find class name $Class.");

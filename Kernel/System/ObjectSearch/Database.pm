@@ -47,8 +47,6 @@ sub new {
     # 0=off; 1=on;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-
     # check module
     my $ModuleStrg = 'Kernel::System::ObjectSearch::Database::' . $Param{ObjectType} . '::Base';
     if ( !$Kernel::OM->Get('Main')->Require($ModuleStrg) ) {
@@ -236,7 +234,7 @@ sub Search {
     $SQLDef{SQLFrom}  = $BaseSQL->{From};
     $SQLDef{SQLWhere} = $BaseSQL->{Where};
 
-    # check and set basic flags of the object type
+    # check and set basic flags of object type
     $Self->{BaseFlags} = $Self->{SearchModule}->BaseFlags(
         %Param
     );
@@ -280,13 +278,23 @@ sub Search {
             # return in case of error
             return;
         }
+
         if (IsArrayRefWithData($Result{OrderBy})) {
+            if ( $SQLDef{SQLOrderBy} ) {
+                $SQLDef{SQLOrderBy} .= q{, };
+            }
             $SQLDef{SQLOrderBy} .= join(q{, }, @{$Result{OrderBy}});
         }
         if (IsArrayRefWithData($Result{Attrs})) {
+            if ( $SQLDef{SQLAttrs} ) {
+                $SQLDef{SQLAttrs} .= q{, };
+            }
             $SQLDef{SQLAttrs}   .= join(q{, }, @{$Result{Attrs}});
         }
         if (IsArrayRefWithData($Result{Join})) {
+            if ( $SQLDef{SQLJoin} ) {
+                $SQLDef{SQLJoin} .= q{ };
+            }
             $SQLDef{SQLJoin}    .= join(q{ }, @{$Result{Join}});
         }
     }
@@ -307,7 +315,7 @@ sub Search {
         SQL   => $SQL,
         Limit => $Param{Limit}
     );
-
+print STDERR Data::Dumper::Dumper($SQL);
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
@@ -421,7 +429,7 @@ sub _CreateAttributeSQL {
     }
 
     # generate SQL from attribute modules
-    foreach my $BoolOperator ( keys %{$Param{Search}} ) {
+    foreach my $BoolOperator ( sort keys %{$Param{Search}} ) {
         if ( !IsArrayRefWithData($Param{Search}->{$BoolOperator}) ) {
             return if $Param{Silent};
 
@@ -441,6 +449,7 @@ sub _CreateAttributeSQL {
             if ( !$Self->{AttributeModules}->{$Search->{Field}}->{IsSearchable} ) {
                 # we don't have any directly registered handling module for this field, check if we have a handling module matching a pattern
                 foreach my $SearchableAttribute ( sort keys %{$Self->{AttributeModules}} ) {
+
                     next if $Search->{Field} !~ /$SearchableAttribute/g;
                     next if !$Self->{AttributeModules}->{$SearchableAttribute}->{IsSearchable};
 
@@ -606,7 +615,7 @@ sub _CreateOrderBySQL {
             }
 
             foreach my $Element ( @{$Result->{SQLOrderBy}} ) {
-                push(  @OrderBy, $Element.q{ }.$Order);
+                push(  @OrderBy, $Element . q{ } . $Order);
             }
         }
     }

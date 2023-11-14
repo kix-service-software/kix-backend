@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ITSMConfigItem::InciState;
+package Kernel::System::ObjectSearch::Database::ConfigItem::DeplState;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::ITSMConfigItem::InciState - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::DeplState - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -52,18 +52,25 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Search => [
-            'InciStateID',
-            'InciStateIDs',
-            'InciState'
-        ],
-        Sort => [
-            'InciStateID',
-            'InciStateIDs',
-            'InciState'
-        ]
+    $Self->{Supported} = {
+        DeplStateID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        DeplStateIDs => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        },
+        DeplState => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
+        }
     };
+
+    return $Self->{Supported};
 }
 
 
@@ -83,6 +90,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my @SQLJoin;
     my @SQLWhere;
 
     # check params
@@ -94,11 +102,11 @@ sub Search {
         return;
     }
 
-    my @InciStateIDs;
-    if ( $Param{Search}->{Field} eq 'InciState' ) {
+    my @DeplStateIDs;
+    if ( $Param{Search}->{Field} eq 'DeplState' ) {
         my %States = reverse(
             %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::IncidentState',
+                Class => 'ITSM::ConfigItem::DeploymentState',
             )}
         );
 
@@ -110,28 +118,42 @@ sub Search {
             if ( !$States{$State} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Unknown incident state $State!",
+                    Message  => "Unknown deplayment state $State!",
                 );
                 return;
             }
 
-            push( @InciStateIDs, $States{$State} );
+            push( @DeplStateIDs, $States{$State} );
         }
     }
     else {
-        @InciStateIDs = ( $Param{Search}->{Value} );
+        @DeplStateIDs = ( $Param{Search}->{Value} );
         if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-            @InciStateIDs = @{$Param{Search}->{Value}}
+            @DeplStateIDs = @{$Param{Search}->{Value}}
+        }
+    }
+
+    my $TablePrefix = 'ci';
+    my $ColPrefix   = 'cur_';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
+        $ColPrefix   = q{};
+
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
         }
     }
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'ci.cur_inci_state_id',
-        Value     => \@InciStateIDs,
-        Supported => [
-            'EQ', 'NE', 'IN'
-        ]
+        Column    => $TablePrefix . q{.} . $ColPrefix . 'depl_state_id',
+        Value     => \@DeplStateIDs,
+        Type      => 'NUMERIC',
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
@@ -140,6 +162,7 @@ sub Search {
 
     return {
         SQLWhere => \@SQLWhere,
+        SQLJoin  => \@SQLJoin,
     };
 }
 
@@ -161,18 +184,38 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    my @SQLJoin;
+    my $TablePrefix = 'ci';
+    my $ColPrefix   = 'cur_';
+    if ( $Param{Flags}->{PreviousVersion} ) {
+        $TablePrefix = 'vr';
+        $ColPrefix   = q{};
+
+        if ( !$Param{Flags}->{JoinVersion} ) {
+            push(
+                @SQLJoin,
+                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+            );
+            $Param{Flags}->{JoinVersion} = 1;
+        }
+    }
+
     # map search attributes to table attributes
     my %AttributeMapping = (
-        InciState    => 'gc.name',
-        InciStateID  => 'ci.cur_inci_state_id',
-        InciStateIDs => 'ci.cur_inci_state_id',
+        DeplState    => 'gcd.name',
+        DeplStateID  => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
+        DeplStateIDs => $TablePrefix .q{.} . $ColPrefix . 'depl_state_id',
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'InciState' ) {
-        $Join{SQLJoin} = [
-            'INNER JOIN general_catalog gci ON gci.id = ci.cur_inci_state_id'
-        ];
+    if ( $Param{Attribute} eq 'DeplState' ) {
+        push(
+            @SQLJoin,
+            ' INNER JOIN general_catalog gcd ON gcd.id = '
+                . $TablePrefix
+                . q{.}
+                . $ColPrefix
+                . 'depl_state_id'
+        );
     }
 
     return {
@@ -182,7 +225,7 @@ sub Sort {
         SQLOrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        %Join
+        SQLJoin => \@SQLJoin
     };
 }
 
