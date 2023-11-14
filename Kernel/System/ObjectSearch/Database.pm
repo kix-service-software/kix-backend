@@ -236,6 +236,11 @@ sub Search {
     $SQLDef{SQLFrom}  = $BaseSQL->{From};
     $SQLDef{SQLWhere} = $BaseSQL->{Where};
 
+    # check and set basic flags of the object type
+    $Self->{BaseFlags} = $Self->{SearchModule}->BaseFlags(
+        %Param
+    );
+
     # check permission if UserID given and prepare relevat part of SQL statement (not needed for user with id 1)
     if ($Param{UserID} && $Param{UserID} != 1) {
         my %PermissionSQL = $Self->_CreatePermissionSQL(
@@ -465,7 +470,8 @@ sub _CreateAttributeSQL {
                 BoolOperator => $BoolOperator,
                 Search       => $Search,
                 WholeSearch  => $Param{Search}->{$BoolOperator},   # forward "whole" search, e.g. if behavior depends on other attributes
-                Silent       => $Param{Silent} || 0
+                Silent       => $Param{Silent} || 0,
+                Flags        => $Self->{BaseFlags}
             );
 
             if ( !IsHashRefWithData($Result) ) {
@@ -571,7 +577,8 @@ sub _CreateOrderBySQL {
         # execute attribute module to prepare SQL
         my $Result = $AttributeModule->Sort(
             Attribute => $Attribute,
-            Language  => $Language
+            Language  => $Language,
+            Flags     => $Self->{BaseFlags}
         );
 
         if ( !IsHashRefWithData($Result) ) {

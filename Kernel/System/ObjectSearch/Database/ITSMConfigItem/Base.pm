@@ -109,6 +109,14 @@ sub BaseSQL {
     };
 }
 
+sub BaseFlags {
+    my ( $Self, %Param ) = @_;
+
+    my %Result;
+
+    return %Result;
+}
+
 sub SupportedList {
     my ( $Self, %Param ) = @_;
 
