@@ -12,9 +12,11 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
+    Cache
     Config
-    Main
+    JSON
     Log
+    Main
 );
 
 use Kernel::System::VariableCheck qw(:all);
@@ -48,116 +50,243 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    # get object search backend from config
+    my $ObjectSearchBackend = $Kernel::OM->Get('Config')->Get('ObjectSearch::Backend');
+
+    # get module name
+    my $ObjectSearchModule  = $Kernel::OM->GetModuleFor( $ObjectSearchBackend );
+
+    # require module
+    return if ( !$Kernel::OM->Get('Main')->Require( $ObjectSearchModule ) );
+
+    # create backend object
+    $Self->{Backend} = $ObjectSearchModule->new( %{ $Self } );
+
     return $Self;
 }
 
 =item Search()
 
-To find tickets in your system.
-
-    my @ObjectIDs = $SearchObject->Search(
-        # result (required)
-        Result => 'ARRAY' || 'HASH' || 'COUNT',
-
-        # result limit
-        Limit => 100,
-
-        # the search params
-        Search => {
-            AND => [        # optional, if not given, OR must be used
-                {
-                    Field    => '...',      # see list of filterable fields
-                    Operator => '...'       # see list of filterable fields
-                    Value    => ...         # see list of filterable fields
-                },
-                ...
-            ]
-            OR => [         # optional, if not given, AND must be used
-                ...         # structure of field filter identical to AND
-            ]
-        },
-
-        # sort option
-        Sort => [
-            {
-                Field => '...',                              # see list of filterable fields
-                Direction => 'ascending' || 'descending'
-            },
-            ...
-        ]
-
-        # user search (UserID and UserType are required)
-        UserID     => 123,
-        UserType   => 'Agent' || 'Customer',
-        Permission => 'ro' || 'rw',
-
-        # CacheTTL, cache search result in seconds (optional)
-        CacheTTL => 60 * 15,
-    );
-
-Filterable fields and possible operators, values and sortablility:
-    => see manual of REST-API (look for "Search Tickets")
-
-Returns:
-
-Result: 'ARRAY'
-
-    @ObjectIDs = ( 1, 2, 3 );
-
-Result: 'HASH'
-
-    %ObjectIDs = (
-        1 => '2010102700001',
-        2 => '2010102700002',
-        3 => '2010102700003',
-    );
-
-Result: 'COUNT'
-
-    $ObjectIDs = 123;
+### TODO ###
 
 =cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
 
-    if (
-        !defined $Param{ObjectType}
-        || !$Param{ObjectType}
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ObjectType'
-        );
+    # check needed stuff
+    for my $Needed ( qw(ObjectType UserType UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!",
+                );
+            }
+            return;
+        }
+    }
+
+    # get normalized object type
+    my $ObjectType = $Self->{Backend}->NormalizedObjectType(
+        ObjectType => $Param{ObjectType},
+    );
+    if ( !$ObjectType ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid ObjectType!",
+            );
+        }
         return;
     }
 
-    $Self->_GetSearchBackend(
-        %Param
+    # set defaults for undefined parameter
+    if ( !defined( $Param{Result} ) ) {
+        $Param{Result} = 'HASH';
+    }
+    if ( !defined( $Param{Search} ) ) {
+        $Param{Search} = {};
+    }
+    if ( !defined( $Param{Sort} ) ) {
+        $Param{Sort} = [];
+    }
+    if ( !defined( $Param{Limit} ) ) {
+        $Param{Limit} = 0;
+    }
+    if ( !defined( $Param{CacheTTL} ) ) {
+        $Param{CacheTTL} = 60 * 4;
+    }
+
+    # prepare result ref map
+    my %ResultRefMap = (
+        'ARRAY' => 'ARRAY',
+        'COUNT' => '',
+        'HASH'  => 'HASH',
     );
 
-    # execute ticket search in backend
-    return $Self->{SearchBackendObject}->{$Param{ObjectType}}->Search(
-        %Param,
+    # normalize parameter result to uppercase
+    $Param{Result} = uc( $Param{Result} );
+
+    # check parameter
+    if ( !defined( $ResultRefMap{ $Param{Result} } ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Result!",
+            );
+        }
+        return;
+    }
+    if ( ref( $Param{Search} ) ne 'HASH' ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Search!",
+            );
+        }
+        return;
+    }
+    if ( ref( $Param{Sort} ) ne 'ARRAY' ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Sort!",
+            );
+        }
+        return;
+    }
+    if ( $Param{Limit} !~ m/^[0-9]+$/ ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Limit!",
+            );
+        }
+        return;
+    }
+    if ( $Param{CacheTTL} !~ m/^[0-9]+$/ ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid CacheTTL!",
+            );
+        }
+        return;
+    }
+
+    # prepare cache key
+    my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
+        Data     => {
+            Result   => $Param{Result},
+            Search   => $Param{Search},
+            Sort     => $Param{Sort},
+            Limit    => $Param{Limit},
+            UserType => $Param{UserType},
+            UserID   => $Param{UserID},
+        },
+        SortKeys => 1
     );
+
+    # check for existing cache value
+    my $CacheData = $Kernel::OM->Get('Cache')->Get(
+        Type => 'ObjectSearch_' . $ObjectType,
+        Key  => $CacheKey,
+    );
+    if ( defined( $CacheData ) ) {
+        # check result ref of cache data
+        if ( ref( $CacheData ) ne $ResultRefMap{ $Param{Result} } ) {
+            # delete invalid cache
+            $Kernel::OM->Get('Cache')->Delete(
+                Type => 'ObjectSearch_' . $ObjectType,
+                Key  => $CacheKey,
+            );
+        }
+        else {
+            # handle return type of cached result
+            if ( ref( $CacheData ) eq 'HASH' ) {
+                return %{ $CacheData };
+            }
+            elsif ( ref( $CacheData ) eq 'ARRAY' ) {
+                return @{ $CacheData };
+            }
+            return $CacheData;
+        }
+    }
+
+    # let backend process search
+    my $SearchResult = $Self->{Backend}->Search(
+        %Param,
+        ObjectType => $ObjectType,
+    );
+
+    if ( !defined( $SearchResult ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got undefined search result!'
+            );
+        }
+        return;
+    }
+
+    # check ref of result
+    if ( ref( $SearchResult ) ne $ResultRefMap{ $Param{Result} } ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got invalid ref of search result!'
+            );
+        }
+        return;
+    }
+
+    # write cache
+    if ( $Param{CacheTTL} ) {
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => 'ObjectSearch_' . $ObjectType,
+            Key   => $CacheKey,
+            Value => $SearchResult,
+            TTL   => $Param{CacheTTL},
+        );
+    }
+
+    # handle return type of result
+    if ( ref( $SearchResult ) eq 'HASH' ) {
+        return %{ $SearchResult };
+    }
+    elsif ( ref( $SearchResult ) eq 'ARRAY' ) {
+        return @{ $SearchResult };
+    }
+    return $SearchResult;
 }
+
+=item GetSupportedAttributes()
+
+### TODO ###
+
+=cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    return if !$Self->_GetSearchBackend(
-        %Param
+    # get normalized object type
+    my $ObjectType = $Self->{Backend}->NormalizedObjectType(
+        ObjectType => $Param{ObjectType},
     );
-
-    for my $ObjectType ( sort keys %{$Self->{SearchBackendObject}} ) {
-        next if !$ObjectType || !$Param{ObjectType};
-        next if lc($Param{ObjectType}) ne lc($ObjectType);
-        next if !defined $Self->{SearchBackendObject}->{$ObjectType};
-
-        return $Self->{SearchBackendObject}->{$ObjectType}->GetSupportedAttributes();
+    if ( !$ObjectType ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid ObjectType!",
+            );
+        }
+        return;
     }
 
-    return;
+    return $Self->{Backend}->GetSupportedAttributes(
+        ObjectType => $ObjectType
+    );
 }
 
 sub _GetSearchBackend {
@@ -196,17 +325,17 @@ sub _GetSearchBackend {
         next if lc($Param{ObjectType}) ne lc($ObjectType);
         next if !$ObjectTypes->{$ObjectType};
 
-        return 1 if IsHashRefWithData($Self->{SearchBackendObject})
-            && $Self->{SearchBackendObject}->{$ObjectType};
+        return 1 if IsHashRefWithData($Self->{SearchBackend})
+            && $Self->{SearchBackend}->{$ObjectType};
 
 
-        my $BackendObject = $Backend->new(
+        my $Backend = $Backend->new(
             %{$Self},
             ObjectType => $ObjectType
         );
 
         # if the backend constructor failed we will exit
-        if ( ref $BackendObject ne $Backend ) {
+        if ( ref $Backend ne $Backend ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Unable to create search backend object!",
@@ -214,7 +343,7 @@ sub _GetSearchBackend {
             return;
         }
 
-        $Self->{SearchBackendObject}->{$ObjectType} = $BackendObject;
+        $Self->{SearchBackend}->{$ObjectType} = $Backend;
 
         last;
     }
