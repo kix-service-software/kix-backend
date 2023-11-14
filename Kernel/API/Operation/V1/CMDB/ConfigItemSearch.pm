@@ -73,61 +73,40 @@ sub Run {
     );
 
     # get customer relevant ids if necessary
-    my $CustomerCIIDList;
+    my @CustomerCIIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
-        $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
+        @CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
             ObjectType             => 'ConfigItem',
             UserID                 => $Self->{Authorization}->{UserID},
+            UserType               => $Self->{Authorization}->{UserType},
             RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
         # return empty result if there are no assigned config items for customer
         return $Self->_Success(
             ConfigItem => [],
-        ) if (!IsArrayRefWithData($CustomerCIIDList));
+        ) if (!scalar(@CustomerCIIDList));
+
+        push(
+            @{$Self->{Search}->{ConfigItem}->{AND}},
+            {
+                Field    => 'ConfigItemID',
+                Operator => 'IN',
+                Type     => 'Numeric',
+                Value    => \@CustomerCIIDList
+            }
+        );
     }
 
-    my @ConfigItemList;
-    # prepare search if given
-    if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
-        @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-            Result   => 'ARRAY',
-            Search   => $Self->{Search}->{ConfigItem},
-            Limit    => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-            Sort     => $Self->{Sort}->{ConfigItem} || $Self->{DefaultSort}->{ConfigItem},
-            UserType => $Self->{Authorization}->{UserType},
-            UserID   => $Self->{Authorization}->{UserID},
-            ObjectType => 'ConfigItem'
-        );
-    }
-    elsif ( IsArrayRefWithData($CustomerCIIDList) ) {
-        @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-            UserID  => $Self->{Authorization}->{UserID},
-            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-            Sort    => $Self->{Sort}->{ConfigItem} || $Self->{DefaultSort}->{ConfigItem},
-            Search  => {
-                AND => [
-                    {
-                        Field    => 'ConfigItemID',
-                        Operator => 'IN',
-                        Type     => 'Numeric',
-                        Value    => $CustomerCIIDList
-                    }
-                ]
-            },
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY'
-        );
-    }
-    else {
-        @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-            UserID  => $Self->{Authorization}->{UserID},
-            Limit   => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-            Sort    => $Self->{Sort}->{ConfigItem} || $Self->{DefaultSort}->{ConfigItem},
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY'
-        );
-    }
+    my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{ConfigItem}      || {},
+        Limit      => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{ConfigItem}        || $Self->{DefaultSort}->{ConfigItem},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
+        ObjectType => 'ConfigItem'
+    );
 
     # get already prepared CI data from ConfigItemGet operation
     if ( @ConfigItemList ) {
@@ -140,7 +119,10 @@ sub Run {
             }
         );
 
-        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+        if (
+            !IsHashRefWithData($GetResult)
+            || !$GetResult->{Success}
+        ) {
             return $GetResult;
         }
 

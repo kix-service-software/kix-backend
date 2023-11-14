@@ -132,14 +132,17 @@ sub Search {
     );
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
+    if (
+        !$Param{Flags}->{HistoryJoined}
+        || !$Param{Flags}->{HistoryJoined}->{$Param{BoolOperator}}
+    ) {
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN ticket_history th_left ON st.id = th_left.ticket_id ' );
             push( @SQLJoin, 'RIGHT OUTER JOIN ticket_history th_right ON st.id = th_right.ticket_id ' );
         } else {
             push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id ' );
         }
-        $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
+        $Param{Flags}->{HistoryJoined}->{$Param{BoolOperator}} = 1;
     }
 
     if ( $Param{Search}->{Field} =~ /(Change|Close)Time/ ) {
@@ -280,7 +283,10 @@ sub Sort {
     );
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{AND} ) {
+    if (
+        !$Param{Flags}->{HistoryJoined}
+        || !$Param{Flags}->{HistoryJoined}->{AND}
+    ) {
         push( @SQLJoin, 'INNER JOIN ticket_history th ON st.id = th.ticket_id' );
     }
 

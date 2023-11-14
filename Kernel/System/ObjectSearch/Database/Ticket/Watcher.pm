@@ -92,8 +92,8 @@ sub Search {
 
     # check if we have to add a join
     if (
-        !$Self->{ModuleData}->{AlreadyJoined}
-        || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}}
+        !$Param{Flags}->{WatcherJoined}
+        || !$Param{Flags}->{WatcherJoined}->{$Param{BoolOperator}}
     ) {
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id' );
@@ -101,7 +101,7 @@ sub Search {
         } else {
             push( @SQLJoin, 'INNER JOIN watcher tw ON st.id = tw.object_id' );
         }
-        $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
+        $Param{Flags}->{WatcherJoined}->{$Param{BoolOperator}} = 1;
     }
 
     my $Column;

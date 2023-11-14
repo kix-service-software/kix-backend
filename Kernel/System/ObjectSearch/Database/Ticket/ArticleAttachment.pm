@@ -105,7 +105,10 @@ sub Search {
     }
 
     # check if we have to add a join
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} ) {
+    if (
+        !$Param{Flags}->{ArticleAttJoined}
+        || !$Param{Flags}->{ArticleAttJoined}->{$Param{BoolOperator}}
+    ) {
         if ( $Param{BoolOperator} eq 'OR') {
             push( @SQLJoin, 'LEFT OUTER JOIN article art_for_att_left ON st.id = art_for_att_left.ticket_id' );
             push( @SQLJoin, 'RIGHT OUTER JOIN article art_for_att_right ON st.id = art_for_att_right.ticket_id' );
@@ -114,7 +117,7 @@ sub Search {
             push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
             push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
         }
-        $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
+        $Param{Flags}->{ArticleAttJoined}->{$Param{BoolOperator}} = 1;
     }
 
     my @Where = $Self->GetOperation(

@@ -271,7 +271,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         },
         UserType    => 'Agent',
         UserID      => 1,
-        Permission  => 'rw',
     );
 
     $Self->IsDeeply(
@@ -305,7 +304,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         },
         UserID      => 1,
         UserType    => 'Agent',
-        Permission  => 'rw',
     );
 
     $Self->IsDeeply(
@@ -339,7 +337,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         },
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -373,7 +370,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         },
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -410,7 +406,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         },
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -453,7 +448,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         ],
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -493,7 +487,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         ],
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -528,7 +521,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         ],
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(
@@ -563,7 +555,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         ],
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->IsDeeply(

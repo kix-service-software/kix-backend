@@ -214,11 +214,11 @@ sub Search {
     }
 
     # increase count
-    my $Count = $Self->{ModuleData}->{JoinCounter}++;
+    my $Count = $Param{Flags}->{DynamicFieldJoinCounter}++;
 
     # join tables
     my $JoinTable = "dfv$Count";
-    $Self->{ModuleData}->{JoinTables}->{$DFName} = $JoinTable;
+    $Param{Flags}->{DynamicFieldJoin}->{$DFName} = $JoinTable;
 
     if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
         if ( $Param{BoolOperator} eq 'OR') {
@@ -241,11 +241,11 @@ END
     }
     elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+            if ( !$Param{Flags}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "LEFT OUTER JOIN article artdfjoin_left ON st.id = artdfjoin_left.ticket_id");
                 # FIXME: maybe unnecessary?
                 push( @SQLJoin, "RIGHT OUTER JOIN article artdfjoin_right ON st.id = artdfjoin_right.ticket_id");
-                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+                $Param{Flags}->{ArticleTableJoined} = 1;
             }
             # FIXME: maybe LEFT JOIN necessary?
             push(
@@ -258,9 +258,9 @@ INNER JOIN dynamic_field_value $JoinTable ON (
 END
             );
         } else {
-            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+            if ( !$Param{Flags}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
-                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+                $Param{Flags}->{ArticleTableJoined} = 1;
             }
             push(
                 @SQLJoin,
@@ -364,12 +364,12 @@ sub Sort {
     my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
 
     # increase count
-    my $Count = $Self->{ModuleData}->{SortJoinCounter}++;
+    my $Count = $Param{Flags}->{DynamicFieldJoin}++;
 
     # join tables
-    my $JoinTable = $Self->{ModuleData}->{JoinTables}->{$DFName};
+    my $JoinTable = $Param{Flags}->{DynamicFieldJoin}->{$DFName};
     if ( !$JoinTable ) {
-        $JoinTable = "dfvsort$Count";
+        $JoinTable = "dfv$Count";
         if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
             push(
                 @SQLJoin,
@@ -381,9 +381,9 @@ END
             );
         }
         elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
-            if ( !$Self->{ModuleData}->{ArticleTableJoined} ) {
+            if ( !$Param{Flags}->{ArticleTableJoined} ) {
                 push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
-                $Self->{ModuleData}->{ArticleTableJoined} = 1;
+                $Param{Flags}->{ArticleTableJoined} = 1;
             }
             push(
                 @SQLJoin,

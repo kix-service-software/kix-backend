@@ -3890,14 +3890,37 @@ sub _GetCustomerUserVisibleObjectIds {
             my @RelevantIDs = split(/\s*,\s*/, $Param{RelevantOrganisationID} // $ContactData{PrimaryOrganisationID});
             # make sure given id belongs to contact, else given id is not usable
             my @ValidRelevantIDs;
+            my %ContactOrgaIDs = map{ $_ => 1 } @{ $ContactData{OrganisationIDs} };
             for my $RelevantID (@RelevantIDs) {
-                if ( grep { $_ eq $RelevantID } @{ $ContactData{OrganisationIDs} } ) {
-                    push(@ValidRelevantIDs, $RelevantID);
-                }
+                next if ( !$ContactOrgaIDs{$RelevantID} )
+                push(@ValidRelevantIDs, $RelevantID);
             }
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
 
-            if ($Param{ObjectType} eq 'Ticket') {
+            if ($Param{ObjectType} eq 'ConfigItem') {
+                return $Kernel::OM->Get('ObjectSearch')->Search(
+                    Search => {
+                        AND => [
+                            {
+                                Field => 'AssignedContact',
+                                Operator => 'EQ',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{ID}
+                            },
+                            {
+                                Field => 'AssignedOrganisation',
+                                Operator => 'IN',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{RelevantOrganisationID}
+                            }
+                        ]
+                    }
+                    Result     => 'ARRAY',
+                    ObjectType => 'ConfigItem',
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType}
+                );
+            } elsif ($Param{ObjectType} eq 'Ticket') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,
                     ObjectType => 'Contact',
