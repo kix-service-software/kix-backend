@@ -234,7 +234,7 @@ sub Search {
     $SQLDef{SQLFrom}  = $BaseSQL->{From};
     $SQLDef{SQLWhere} = $BaseSQL->{Where};
 
-    # check and set basic flags of object type
+    # check and set basic flags of the object type
     $Self->{BaseFlags} = $Self->{SearchModule}->BaseFlags(
         %Param
     );
