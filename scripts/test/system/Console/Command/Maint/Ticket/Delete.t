@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -80,10 +80,21 @@ $Self->Is(
     "Maint::Ticket::Delete exit code - delete by --ticket-id options.",
 );
 
-my %TicketIDs = $TicketObject->TicketSearch(
+my %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectSearch => 'Ticket',
     Result       => 'HASH',
-    ContactLogin => $ContactID,
+    Search       => {
+        AND => [
+            {
+                Field    => 'ContactID',
+                Operator => 'EQ',
+                Type     => 'NUMERIC',
+                VALUE    => $ContactID
+            }
+        ]
+    },
     UserID       => 1,
+    UserType     => 'Agent'
 );
 
 $Self->False(
@@ -104,10 +115,21 @@ $Self->Is(
     "Maint::Ticket::Delete exit code - delete by --ticket-number options.",
 );
 
-%TicketIDs = $TicketObject->TicketSearch(
-    Result            => 'HASH',
-    ContactLogin => $ContactID,
-    UserID            => 1,
+%TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectSearch => 'Ticket',
+    Result       => 'HASH',
+    Search       => {
+        AND => [
+            {
+                Field    => 'ContactID',
+                Operator => 'EQ',
+                Type     => 'NUMERIC',
+                VALUE    => $ContactID
+            }
+        ]
+    },
+    UserID       => 1,
+    UserType     => 'Agent'
 );
 
 $Self->False(

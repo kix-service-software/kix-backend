@@ -210,10 +210,12 @@ for my $Value (@Values) {
     );
 }
 
-my %TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+my %TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -237,10 +239,12 @@ $Self->IsDeeply(
     'Search for one field',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -264,10 +268,12 @@ $Self->IsDeeply(
     'Search for one field',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -296,10 +302,12 @@ $Self->IsDeeply(
     'Search for two fields',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -328,10 +336,12 @@ $Self->IsDeeply(
     'Search for two fields, wrong first value',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -361,10 +371,12 @@ $Self->IsDeeply(
     'Search for two fields, wrong second value',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -398,10 +410,12 @@ $Self->IsDeeply(
     'Search for two fields, match two tickets',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -445,10 +459,12 @@ $Self->IsDeeply(
     'Search for five fields',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -497,10 +513,12 @@ $Self->IsDeeply(
     'Search for five fields, two operators with equals',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -549,10 +567,12 @@ $Self->IsDeeply(
     'Search for five fields, two operators without equals',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -601,10 +621,12 @@ $Self->IsDeeply(
     'Search for five fields, two operators without equals (no match)',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -648,10 +670,12 @@ $Self->IsDeeply(
     'Search for five fields, wrong third value',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
-    Search  => {
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -695,9 +719,11 @@ $Self->IsDeeply(
     'Search for five fields, wrong fourth value',
 );
 
-%TicketIDsSearch = $TicketObject->TicketSearch(
-    Result  => 'HASH',
-    Limit   => 100,
+%TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'HASH',
+    Limit      => 100,
     Search  => {
         AND => [
             {
@@ -743,10 +769,12 @@ $Self->IsDeeply(
     'Search for five fields, wrong fifth value',
 );
 
-my @TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+my @TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -781,10 +809,11 @@ $Self->IsDeeply(
     'Search for two fields, match two tickets, sort for search field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -819,10 +848,12 @@ $Self->IsDeeply(
     'Search for two fields, match two tickets, sort for search field, DESC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -852,10 +883,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for another field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -885,10 +918,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for another field, DESC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -918,10 +953,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for date field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -951,10 +988,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for date field, DESC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -984,10 +1023,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for text (DFT4) field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -1017,10 +1058,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for text (DFT4) field, DESC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -1045,10 +1088,12 @@ $Self->IsDeeply(
     'Search for no field, sort for text (DFT4) field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -1073,10 +1118,12 @@ $Self->IsDeeply(
     'Search for no field, sort for text (DFT4) field, DESC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -1106,10 +1153,12 @@ $Self->IsDeeply(
     'Search for field, match two tickets, sort for text field, ASC',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
@@ -1139,10 +1188,12 @@ $Self->IsDeeply(
     'Search for one value, match two ticket',
 );
 
-@TicketResultSearch = $TicketObject->TicketSearch(
-    Result  => 'ARRAY',
-    Limit   => 100,
-    Search  => {
+@TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    Result     => 'ARRAY',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Title',
