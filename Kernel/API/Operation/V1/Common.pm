@@ -976,20 +976,6 @@ sub HandleSearchInAPI {
     $Self->{HandleSearchInAPI} = 1;
 }
 
-=item HandleSortInCORE()
-
-Tell the API to handle the "sort" parameter in the CORE. This is needed for operations that don't handle the "sort" parameter and leave the work to the CORE.
-
-    $CommonObject->HandleSortInCORE();
-
-=cut
-
-sub HandleSortInCORE {
-    my ( $Self, %Param ) = @_;
-
-    $Self->{HandleSortInCORE} = 1;
-}
-
 =item ApplyPaging()
 
 Apply the relevant limit and offset to the given data.
@@ -3892,7 +3878,7 @@ sub _GetCustomerUserVisibleObjectIds {
             my @ValidRelevantIDs;
             my %ContactOrgaIDs = map{ $_ => 1 } @{ $ContactData{OrganisationIDs} };
             for my $RelevantID (@RelevantIDs) {
-                next if ( !$ContactOrgaIDs{$RelevantID} )
+                next if ( !$ContactOrgaIDs{$RelevantID} );
                 push(@ValidRelevantIDs, $RelevantID);
             }
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
