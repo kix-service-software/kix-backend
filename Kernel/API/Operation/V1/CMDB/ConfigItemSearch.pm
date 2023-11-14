@@ -135,7 +135,7 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data          => {
-                ConfigItemID           => join(q{,}, sort @ConfigItemList),
+                ConfigItemID           => join(q{,}, @ConfigItemList),
                 RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );
