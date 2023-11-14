@@ -22,7 +22,6 @@ use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
 use Kernel::System::Ticket::TicketIndex;
-use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -93,7 +92,6 @@ sub new {
     @ISA = qw(
         Kernel::System::Ticket::Article
         Kernel::System::Ticket::TicketIndex
-        Kernel::System::Ticket::TicketSearch
         Kernel::System::Ticket::BasePermission
         Kernel::System::EventHandler
         Kernel::System::PerfLog
