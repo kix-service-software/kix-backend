@@ -41,11 +41,14 @@ sub Init {
     my ( $Self, %Param ) = @_;
 
     # extract flags from fields
-    my %Flags = $Self->_ExtractFields(
+    my %Flags = $Self->_CheckFields(
         %Param,
         Extract => {
-            PreviousVersionSearch => 1,
-            AssignedOrganisation  => 1
+            PreviousVersionSearch => 1
+        },
+        Draft => {
+            AssignedOrganisation  => 1,
+            AssignedContact       => 1
         }
     );
 
@@ -108,13 +111,17 @@ sub GetSupportedAttributes {
 
 =cut
 
-sub _ExtractFields {
+sub _CheckFields {
     my ($Self, %Param) = @_;
 
     my %Fields;
     for my $Type ( keys %{$Param{Search}} ) {
         my @Items;
         for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
+            if ( $Param{Draft}->{$SearchItem->{Field}} ) {
+                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
+            }
+
             if ($Param{Extract}->{$SearchItem->{Field}}) {
                 $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
             }

@@ -101,6 +101,13 @@ sub Search {
     my $Assigned = $Param{Search}->{Field};
     $Assigned =~ s/Assigned//sm;
 
+    if (
+        $Assigned eq 'Organisation'
+        && $Self->{Flags}->{AssignedContact}
+    ) {
+        return;
+    }
+
     my %GetParams = $Self->_GetAssigendParams(
         %Param,
         Assigned => $Assigned
