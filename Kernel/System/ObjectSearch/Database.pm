@@ -171,19 +171,20 @@ sub _GetObjectTypeBackend {
     my ( $Self, %Param ) = @_;
 
     # get module name
-    my $ObjectTypeModule = $Kernel::OM->GetModuleFor( $Self->{ObjectTypeBackends}->{ $Param{ObjectType} } );
+    my $ObjectTypeModule = $Kernel::OM->GetModuleFor( $Self->{ObjectTypeModules}->{ $Param{ObjectType} }->{Module} )
+        || $Self->{ObjectTypeModules}->{ $Param{ObjectType} }->{Module};
 
     # require module
     return if ( !$Kernel::OM->Get('Main')->Require( $ObjectTypeModule ) );
 
     # create backend object
-    $Self->{ObjectTypeModules}->{ $Param{ObjectType} } = $ObjectTypeModule->new(
+    $Self->{ObjectTypeBackends}->{ $Param{ObjectType} } = $ObjectTypeModule->new(
         %{ $Self },
         ObjectType => $Param{ObjectType}
     );
 
     # return object type backend
-    return $Self->{ObjectTypeModules}->{ $Param{ObjectType} };
+    return $Self->{ObjectTypeBackends}->{ $Param{ObjectType} };
 }
 
 =item _PrepareSQLDef()
@@ -217,7 +218,7 @@ sub _PrepareSQLDef {
     return if ( ref( $BaseDef ) ne 'HASH' );
 
     # add base def to sql def
-    for my $Key ( %{ $BaseDef } ) {
+    for my $Key ( keys %{ $BaseDef } ) {
         push( @{ $SQLDef{ $Key } }, @{ $BaseDef->{ $Key } } );
     }
 
@@ -230,7 +231,7 @@ sub _PrepareSQLDef {
         return if ( ref( $PermissionDef ) ne 'HASH' );
 
         # add permission def to sql def
-        for my $Key ( %{ $PermissionDef } ) {
+        for my $Key ( keys %{ $PermissionDef } ) {
             push( @{ $SQLDef{ $Key } }, @{ $PermissionDef->{ $Key } } );
         }
     }
@@ -244,7 +245,7 @@ sub _PrepareSQLDef {
         return if ( ref( $SearchDef ) ne 'HASH' );
 
         # add search def to sql def
-        for my $Key ( %{ $SearchDef } ) {
+        for my $Key ( keys %{ $SearchDef } ) {
             push( @{ $SQLDef{ $Key } }, @{ $SearchDef->{ $Key } } );
         }
     }
@@ -258,7 +259,7 @@ sub _PrepareSQLDef {
         return if ( ref( $SortDef ) ne 'HASH' );
 
         # add sort def to sql def
-        for my $Key ( %{ $SortDef } ) {
+        for my $Key ( keys %{ $SortDef } ) {
             push( @{ $SQLDef{ $Key } }, @{ $SortDef->{ $Key } } );
         }
     }

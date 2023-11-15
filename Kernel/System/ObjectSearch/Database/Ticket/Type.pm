@@ -78,7 +78,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -137,7 +137,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -150,8 +150,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -172,17 +172,17 @@ sub Sort {
 
     my %Join;
     if ( $Param{Attribute} eq 'Type' ) {
-        $Join{SQLJoin} = [
+        $Join{Join} = [
             'INNER JOIN ticket_type tt ON tt.id = st.type_id',
 	        'LEFT OUTER JOIN translation_pattern tlp ON tlp.value = tt.name',
             "LEFT OUTER JOIN translation_language tl ON tl.pattern_id = tlp.id AND tl.language = '$Param{Language}'"
         ];
     }
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $OrderMapping{$Param{Attribute}}
         ],
         %Join

@@ -5,7 +5,9 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <String Regex="">ObjectSearch::Database</String>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 
@@ -14,7 +16,9 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <String Regex="">ObjectSearch::Database::Ticket</String>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::Ticket</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###ConfigItem" Required="1" Valid="1" ConfigLevel="200">
@@ -22,7 +26,9 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <String Regex="">ObjectSearch::Database::ConfigItem</String>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::ConfigItem</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 

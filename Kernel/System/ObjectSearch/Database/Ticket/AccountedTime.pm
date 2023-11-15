@@ -72,7 +72,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -113,7 +113,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -126,8 +126,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -136,10 +136,10 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     return {
-        SQLAttrs => [
+        Select => [
             'st.accounted_time'
         ],
-        SQLOrderBy => [
+        OrderBy => [
             'st.accounted_time'
         ]
     };

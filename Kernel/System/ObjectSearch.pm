@@ -54,7 +54,8 @@ sub new {
     my $ObjectSearchBackend = $Kernel::OM->Get('Config')->Get('ObjectSearch::Backend');
 
     # get module name
-    my $ObjectSearchModule  = $Kernel::OM->GetModuleFor( $ObjectSearchBackend );
+    my $ObjectSearchModule  = $Kernel::OM->GetModuleFor( $ObjectSearchBackend->{Module} )
+        || $ObjectSearchBackend->{Module};
 
     # require module
     return if ( !$Kernel::OM->Get('Main')->Require( $ObjectSearchModule ) );

@@ -73,7 +73,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -119,8 +119,8 @@ END
     );
 
     return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => \@SQLWhere,
     };
 }
 
@@ -133,8 +133,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -143,9 +143,9 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     return {
-        SQLAttrs   => [],
-        SQLOrderBy => [],
-        SQLJoin    => [],
+        Select   => [],
+        OrderBy => [],
+        Join    => [],
     };
 }
 
