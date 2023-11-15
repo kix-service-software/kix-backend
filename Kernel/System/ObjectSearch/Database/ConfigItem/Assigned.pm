@@ -56,7 +56,7 @@ sub GetSupportedAttributes {
         AssignedContact => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => []
+            Operators    => ['EQ']
         },
         AssignedOrganisation => {
             IsSearchable => 1,
@@ -85,7 +85,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my %SearchParams;
+    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -108,135 +108,162 @@ sub Search {
         return;
     }
 
-    my %GetParams = $Self->_GetAssigendParams(
+    my $GetParams = $Self->_GetAssigendParams(
         %Param,
         Assigned => $Assigned
     );
 
-    return if !%GetParams;
+    return if !IsHashRefWithData($GetParams);
 
-    for my $Key ( keys %{$GetParams{SearchParams}} ) {
-        if ( $GetParams{IsWhat}->{$Key} ) {
-            push(
-                @{$SearchParams{OR}},
-                {
-                    Field => $Key,
-                    Operator => 'EQ',
-                    Type     => 'STRING',
-                    Value    => $GetParams{SearchParams}->{$Key}
-                }
-            );
+    my @Values;
+    for my $ClassID ( sort keys %{$GetParams} ) {
+        next if !$GetParams->{$ClassID}->{SearchParams};
+
+        my $SearchParams = $GetParams->{$ClassID}->{SearchParams};
+        my $IsWhat       = $GetParams->{$ClassID}->{IsWhat};
+        my %Search;
+
+        push(
+            @{$Search{AND}},
+            {
+                Field    => 'ClassID',
+                Operator => 'EQ',
+                Value    => $ClassID
+            }
+        );
+
+        for my $Attr ( keys %{$SearchParams} ) {
+            if ( $IsWhat->{$Attr} ) {
+                push(
+                    @{$Search{OR}},
+                    {
+                        Field    => "CurrentVersion.Data.$Attr",
+                        Operator => 'EQ',
+                        Type     => 'STRING',
+                        Value    => $SearchParams->{$Attr}
+                    }
+                );
+            }
+            else {
+                push(
+                    @{$Search{AND}},
+                    {
+                        Field    => $Attr,
+                        Operator => IsArrayRef($SearchParams->{$Attr}) ? 'IN' : 'EQ',
+                        Type     => 'STRING',
+                        Value    => $SearchParams->{$Attr}
+                    }
+                );
+            }
         }
-        else {
-            push(
-                @{$SearchParams{AND}},
-                {
-                    Field    => $Key,
-                    Operator => IsArrayRef($GetParams{SearchParams}->{$Key}) ? 'IN' : 'EQ',
-                    Type     => 'STRING',
-                    Value    => $GetParams{SearchParams}->{$Key}
-                }
-            );
+        my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            UserID     => $Param{UserID},
+            UserType   => $Param{UserType},
+            Search     => \%Search
+        );
+
+        if ( scalar(@IDs) ) {
+            push ( @Values, @IDs );
         }
     }
 
     $Param{Flags} = $Self->{Flags};
 
+    my @Where = $Self->GetOperation(
+        Operator  => 'IN',
+        Column    => 'ci.id',
+        Value     => \@Values,
+        Supported => ['IN']
+    );
+
+    return if !@Where;
+
+    push( @SQLWhere, @Where );
+
     return {
-        Search => \%SearchParams
+        Where => \@SQLWhere,
     };
 }
 
 sub _GetAssigendParams {
     my ( $Self, %Param ) = @_;
 
-    my %SearcParams;
-    my %IsWhat;
+    my %Result;
 
     my $Mapping = $Self->_GetAssignedMapping(%Param);
 
-    return %SearcParams if !$Mapping;
+    return %Result if !$Mapping;
 
-    my %UsedClassIDs;
     my %ClassIDs = %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class => 'ITSM::ConfigItem::Class',
     )};
     my %Classes = reverse %ClassIDs;
 
-    if ( $Self->{Flags}->{ClassIDs} ) {
-        %UsedClassIDs = map { $ClassIDs{$_} => $_ } @{$Self->{Flags}->{ClassIDs}};
+    my $Value = IsArrayRef($Param{Search}->{Value}) ? $Param{Search}->{Value}->[0] : $Param{Search}->{Value};
+
+    my %ObjectData;
+    if ( $Param{Assigned} eq 'Contact' ) {
+        %ObjectData = $Self->_GetAssignedContact(
+            ContactID              => $Value,
+            RelevantOrganisationID => $Self->{Flags}->{AssignedOrganisation} || q{}
+        );
     }
-    else {
-        @{$Self->{Flags}->{ClassIDs}} = keys %ClassIDs;
+    elsif ( $Param{Assigned} eq 'Organisation' ) {
+        %ObjectData = $Self->_GetAssignedOrganisation(
+            OrganisationID => $Value
+        );
     }
 
-    my $Values = IsArrayRef($Param{Search}->{Value}) ? $Param{Search}->{Value} : [$Param{Search}->{Value}];
+    next if !%ObjectData;
 
-    for my $Value ( @{$Values} ) {
-        my %ObjectData;
-        if ( $Param{Assigned} eq 'Contact' ) {
-            %ObjectData = $Self->_GetAssignedContact(
-                ContactID              => $Value,
-                RelevantOrganisationID => $Self->{Flags}->{AssignedOrganisation} || q{}
-            );
-        }
-        elsif ( $Param{Assigned} eq 'Organisation' ) {
-            %ObjectData = $Self->_GetAssignedOrganisation(
-                OrganisationID => $Value
-            );
-        }
+    CICLASS:
+    for my $CIClass ( keys %{ $Mapping } ) {
+        next CICLASS if !$Classes{$CIClass};
+        next CICLASS if ( !IsHashRefWithData( $Mapping->{$CIClass} ) );
 
-        next if !%ObjectData;
+        my %SearchParam;
 
-        CICLASS:
-        for my $CIClass ( keys %{ $Mapping } ) {
-            next CICLASS if ( !IsHashRefWithData( $Mapping->{$CIClass} ) );
-            next CICLASS if !$Classes{$CIClass};
-            next CICLASS if %UsedClassIDs && !$UsedClassIDs{$CIClass};
+        # get CI-class definition...
+        my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+            ClassID => $Classes{$CIClass},
+        );
 
-            # get CI-class definition...
-            my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
-                ClassID => $Classes{$CIClass},
-            );
-
-            if ( !$XMLDefinition->{DefinitionID} ) {
-                if (
-                    !defined $Param{Silent}
-                    || !$Param{Silent}
-                ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "No Definition definied for class $CIClass!",
-                    );
-                }
-                next CICLASS;
+        if ( !$XMLDefinition->{DefinitionID} ) {
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No Definition definied for class $CIClass!",
+                );
             }
-
-            # prepare search data
-            my %SearchData = $Self->_GetAssignedSearchData(
-                CIClass => $CIClass,
-                Mapping => $Mapping,
-                Object  => \%ObjectData
-            );
-
-            # ignore class if not search is given/usable
-            next if (!scalar(keys %SearchData));
-
-            # prepare xml search params (What)
-            $Self->_GetXMLSearchDataForAssignedCIs(
-                XMLDefinition => $XMLDefinition->{DefinitionRef},
-                SearcParams   => \%SearcParams,
-                SearchData    => \%SearchData,
-                IsWhat        => \%IsWhat
-            );
-
+            next CICLASS;
         }
+
+        # prepare search data
+        my %SearchData = $Self->_GetAssignedSearchData(
+            CIClass => $CIClass,
+            Mapping => $Mapping,
+            Object  => \%ObjectData
+        );
+
+        # ignore class if not search is given/usable
+        next if (!scalar(keys %SearchData));
+
+        # prepare xml search params (What)
+        $Self->_GetXMLSearchDataForAssignedCIs(
+            XMLDefinition => $XMLDefinition->{DefinitionRef},
+            SearchParams  => \%SearchParam,
+            SearchData    => \%SearchData
+        );
+
+        $Result{$Classes{$CIClass}} = \%SearchParam;
     }
 
-    return {
-        SearchParams => \%SearcParams,
-        IsWhat       => \%IsWhat
-    };
+    return \%Result;
 }
 
 sub _GetAssignedSearchData {
@@ -278,7 +305,7 @@ sub _GetAssignedSearchData {
                 CISearchAttribute      => $CISearchAttribute,
                 ObjectSearchAttributes => $ObjectSearchAttributes,
                 SearchData             => \%SearchData,
-                Object                => \%Object
+                Object                 => \%Object
             );
         }
 
@@ -451,19 +478,17 @@ sub _GetXMLSearchDataForAssignedCIs {
 
     # check needed stuff
     return if !$Param{XMLDefinition} || ref $Param{XMLDefinition} ne 'ARRAY';
-    return if !$Param{SearcParams}   || ref $Param{SearcParams}    ne 'HASH';
+    return if !$Param{SearchParams}  || ref $Param{SearchParams}   ne 'HASH';
     return if !$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH';
-    return if !$Param{IsWhat}        || ref $Param{IsWhat}        ne 'HASH';
 
     for my $Item ( @{ $Param{XMLDefinition} } ) {
         my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
-
 
         if ( $Item->{Sub} ) {
             # start recursion, if "Sub" was found
             $Self->_GetXMLSearchDataForAssignedCIs(
                 XMLDefinition => $Item->{Sub},
-                SearcParams   => $Param{SearcParams},
+                SearchParams  => $Param{SearchParams},
                 SearchData    => $Param{SearchData},
                 IsWhat        => $Param{IsWhat},
                 Prefix        => $Key,
@@ -493,43 +518,10 @@ sub _GetXMLSearchDataForAssignedCIs {
         }
 
         # create search key
-        my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{}). $Key;
+        my $SearchKey = $Key;
         $SearchKey =~ s{::}{.}xmsg;
-        $Param{IsWhat}->{$Key} = 1;
-        # create search hash
-        if ( $Param{SearcParams}->{ $SearchKey } ) {
-            if ( IsArrayRef($Param{SearcParams}->{ $SearchKey }) ) {
-                my %WhatValues = map { $_ => 1 } @{$Param{SearcParams}->{ $SearchKey }};
-                if ( IsArrayRef($Values) ) {
-                    VALUE:
-                    for my $Value ( @{$Values} ) {
-                        next VALUE if ( $WhatValues{$Value} );
-                        push ( @{$Param{SearcParams}->{ $SearchKey }}, $Value);
-                    }
-                }
-                else {
-                    if ( !$WhatValues{$Values} ) {
-                        push ( @{$Param{SearcParams}->{ $SearchKey }}, $Values);
-                    }
-                }
-            }
-            else {
-                my $WhatValue  = $Param{SearcParams}->{ $SearchKey };
-                if ( IsArrayRef($Values) ) {
-                    my %WhatValues = map { $_ => 1 } @{$Values};
-                    if ( !$WhatValues{$WhatValue} ) {
-                        $Param{SearcParams}->{ $SearchKey } = $Values;
-                        push ( @{$Param{SearcParams}->{ $SearchKey }}, $WhatValue);
-                    }
-                }
-                elsif ($WhatValue ne $Values ) {
-                    $Param{SearcParams}->{ $SearchKey } = [$Values,$WhatValue];
-                }
-            }
-        } else {
-            $Param{SearcParams}->{ $SearchKey } = $Values;
-        }
-
+        $Param{SearchParams}->{ IsWhat }->{ $SearchKey }       = 1;
+        $Param{SearchParams}->{ SearchParams }->{ $SearchKey } = $Values;
 
     }
     return 1;

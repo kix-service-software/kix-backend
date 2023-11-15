@@ -41,7 +41,7 @@ sub Init {
     my ( $Self, %Param ) = @_;
 
     # extract flags from fields
-    my %Flags = $Self->_CheckFields(
+    $Param{Flags} = $Self->_CheckFields(
         %Param,
         Extract => {
             PreviousVersionSearch => 1
@@ -51,9 +51,6 @@ sub Init {
             AssignedContact       => 1
         }
     );
-
-    # init flags
-    $Self->{Flags} = \%Flags;
 
     return 1;
 }
@@ -77,29 +74,52 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
-        my $Module    = $Self->{AttributeModules}->{$Attribute};
+    for my $Attribute ( sort keys %{$Self->{AttributeMapping}} ) {
+        my $Module    = $Self->{AttributeMapping}->{$Attribute};
         my $Property  = $Attribute;
-        my %SpecParams = (
-            ClassID => undef,
-            Class   => undef
-        );
 
-        if ( $Property =~ /::/sm ) {
-            ($SpecParams{Class}, $Property) = split(/::/sm, $Attribute);
-            $SpecParams{ClassID} = $Module->{ClassID};
-        }
-
-        push (
-            @List,
-            {
-                ObjectType      => 'ConfigItem',
-                Property        => $Property,
-                ObjectSpecifics => \%SpecParams,
-                IsSearchable    => $Module->{IsSearchable} || 0,
-                IsSortable      => $Module->{IsSortable}   || 0,
-                Operators       => $Module->{Operators}    || []
+        if ( IsArrayRefWithData($Module->{Class})) {
+            for my $Index ( keys @{$Module->{Class}} ) {
+                push (
+                    @List,
+                    {
+                        ObjectType      => $Self->{ObjectType},
+                        Property        => $Property,
+                        ObjectSpecifics => {
+                            ClassID => $Module->{ClassID}->[$Index],
+                            Class   => $Module->{Class}->[$Index]
+                        },
+                        IsSearchable    => $Module->{IsSearchable} || 0,
+                        IsSortable      => $Module->{IsSortable}   || 0,
+                        Operators       => $Module->{Operators}    || []
+                    }
+                );
             }
+        } else {
+            push (
+                @List,
+                {
+                    ObjectType      => $Self->{ObjectType},
+                    Property        => $Property,
+                    ObjectSpecifics => {
+                        ClassID => undef,
+                        Class   => undef
+                    },
+                    IsSearchable    => $Module->{IsSearchable} || 0,
+                    IsSortable      => $Module->{IsSortable}   || 0,
+                    Operators       => $Module->{Operators}    || []
+                }
+            );
+        }
+    }
+
+    if ( @List ) {
+        @List = sort(
+            {
+                $a->{Property} cmp $b->{Property}
+                && $a->{ObjectSpecifics}->{Class} cmp $b->{ObjectSpecifics}->{Class}
+            }
+            @List
         );
     }
 
@@ -137,7 +157,7 @@ sub _CheckFields {
         }
     }
 
-    return %Fields;
+    return \%Fields;
 }
 
 =end Internal:

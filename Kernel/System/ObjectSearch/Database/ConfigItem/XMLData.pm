@@ -82,7 +82,7 @@ sub GetSupportedAttributes {
             DefinitionRef => $Definition->{DefinitionRef},
             ClassID       => $ClassID,
             Class         => $Definition->{Class},
-            Key           => 'Data'
+            Key           => 'CurrentVersion.Data'
         );
     }
 
@@ -133,7 +133,7 @@ sub Search {
     my @Parts     = split(/[.]/sm, $Param{Search}->{Field});
 
     if ( scalar( @Parts ) > 1 ) {
-        $Field = 'Data';
+        $Field = 'CurrentVersion.Data';
     }
 
     foreach my $Part ( @Parts[2..$#Parts] ) {
@@ -207,7 +207,7 @@ sub _GetJoin {
         if ( !$Self->{Flags}->{JoinVersion} ) {
             push(
                 @SQLJoin,
-                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
+                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
             );
             $Self->{Flags}->{JoinVersion} = 1;
         }
@@ -215,7 +215,7 @@ sub _GetJoin {
 
             push(
                 @SQLJoin,
-                ' LEFT OUTER JOIN xml_storage xst on vr.id = CAST(xst.xml_key AS BIGINT)'
+                'LEFT OUTER JOIN xml_storage xst on vr.id = CAST(xst.xml_key AS BIGINT)'
                 . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
             );
             $Self->{Flags}->{JoinXML} = 1;
@@ -224,7 +224,7 @@ sub _GetJoin {
     elsif ( !$Self->{Flags}->{JoinXML} ) {
         push(
             @SQLJoin,
-            ' LEFT OUTER JOIN xml_storage xst on ci.last_version_id = CAST(xst.xml_key AS BIGINT)'
+            'LEFT OUTER JOIN xml_storage xst on ci.last_version_id = CAST(xst.xml_key AS BIGINT)'
             . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
         );
         $Self->{Flags}->{JoinXML} = 1;
@@ -242,12 +242,26 @@ sub _XMLAttributeGet {
     for my $Attr ( @{$Param{DefinitionRef}} ) {
         my $Key = ($Param{Key} || 'Data') . ".$Attr->{Key}";
 
-        $Self->{Supported}->{"$Param{Class}::$Key"} = {
-            IsSearchable => $Attr->{Searchable} || 0,
-            IsSortable   => 0,
-            ClassID      => $Param{ClassID},
-            Operators    => $Attr->{Searchable} ? ['EQ','NE','LT','LTE','GT','GTE','CONTAINS','ENDSWITH','STARTSWITH'] : []
-        };
+        if ( $Self->{Supported}->{$Key} ) {
+            push(
+                @{$Self->{Supported}->{$Key}->{Class}},
+                $Param{Class}
+            );
+            push(
+                @{$Self->{Supported}->{$Key}->{ClassID}},
+                $Param{ClassID}
+            );
+        }
+        else {
+            $Self->{Supported}->{$Key} = {
+                IsSearchable => $Attr->{Searchable} || 0,
+                IsSortable   => 0,
+                Class        => [$Param{Class}],
+                ClassID      => [$Param{ClassID}],
+                Operators    => $Attr->{Searchable} ? ['EQ','NE','LT','LTE','GT','GTE','CONTAINS','ENDSWITH','STARTSWITH'] : []
+            };
+        }
+
 
         if ( $Attr->{Sub} ) {
             $Self->_XMLAttributeGet(
