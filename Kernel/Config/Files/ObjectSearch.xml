@@ -5,7 +5,7 @@
         <Group>ObjectSearch</Group>
         <SubGroup>Core::ObjectSearch</SubGroup>
         <Setting>
-            <String Regex="">ObjectSearch::Database"</String>
+            <String Regex="">ObjectSearch::Database</String>
         </Setting>
     </ConfigItem>
 

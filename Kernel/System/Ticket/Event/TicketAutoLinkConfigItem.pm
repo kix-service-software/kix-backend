@@ -344,7 +344,8 @@ sub Run {
                     }
                 ]
             },
-            UserID   => 1,
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
 
         next if !@ConfigItemList;

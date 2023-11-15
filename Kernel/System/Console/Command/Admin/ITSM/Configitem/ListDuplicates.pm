@@ -127,7 +127,9 @@ sub Run {
         Result     => 'ARRAY',
         Search     => {
             AND => $Self->{SearchCriteria}
-        }
+        },
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # get number of config items

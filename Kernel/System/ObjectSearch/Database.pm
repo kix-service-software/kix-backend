@@ -41,7 +41,7 @@ sub new {
     bless( $Self, $Type );
 
     # get registered object types
-    my $RegisteredObjectTypes = $Kernel::OM->Get('ObjectSearch::Database::ObjectType') || {};
+    my $RegisteredObjectTypes = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType') || {};
 
     # prepare mapping for object type modules and normalized object type names
     $Self->{NormalizedObjectTypes} = {};

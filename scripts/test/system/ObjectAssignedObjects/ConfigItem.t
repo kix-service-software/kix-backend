@@ -81,6 +81,7 @@ sub _PrepareData {
     my $Class_A_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_A_ID,
         UserID     => 1,
+        UsertType  => 'Agent',
         Definition => <<'END'
 [
     {
@@ -140,6 +141,7 @@ END
     my $Class_B_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_B_ID,
         UserID     => 1,
+        UsertType  => 'Agent',
         Definition => <<'END'
 [
     {
@@ -378,7 +380,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@ContactOrgaCIIDList),
@@ -445,7 +448,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -524,7 +528,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -584,7 +589,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -640,7 +646,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -678,7 +685,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -716,7 +724,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -754,7 +763,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -784,7 +794,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -816,7 +827,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -850,7 +862,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -886,7 +899,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -912,7 +926,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -950,7 +965,8 @@ END
                 }
             ]
         },
-        UserID     => 1
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),

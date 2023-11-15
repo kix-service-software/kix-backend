@@ -93,7 +93,9 @@ sub Run {
                         Value    => [$ClassID]
                     }
                 ]
-            }
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
         if ( $ConfigItemID[0] ) {

@@ -94,8 +94,9 @@ sub Run {
                 }
             ]
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     if (IsArrayRefWithData(\@TicketList)) {

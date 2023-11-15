@@ -371,7 +371,9 @@ sub _TicketSearch {
     if ( !$Errors ) {
         my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
             %Query,
-            ObjectType => 'Ticket'
+            ObjectType => 'Ticket',
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
         if (@TicketIDs) {
             $TicketID = shift( @TicketIDs );
@@ -559,7 +561,9 @@ sub _TicketCreate {
                             Value    => $Self->{SysMonXHost}
                         }
                     ]
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
             if ( @ConfigItemIDs ) {
                 if ( scalar @ConfigItemIDs > 1 ) {
@@ -587,19 +591,21 @@ sub _TicketCreate {
                                 Value    => $Self->{SysMonXService}
                             }
                         ]
-                    }
+                    },
+                    UserID     => 1,
+                    UsertType  => 'Agent'
                 );
 
                 if ( @ConfigItemIDs ) {
-                        if ( scalar @ConfigItemIDs > 1 ) {
-                            $Kernel::OM->Get('Log')->Log(
-                                Priority => 'notice',
-                                Message  => "Multiple assets for SysMon service <"
-                                    .$Self->{Host}
-                                    . "> found, using first item only!",
-                            );
-                        }
-                        $AssetID = $ConfigItemIDs[0];
+                    if ( scalar @ConfigItemIDs > 1 ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'notice',
+                            Message  => "Multiple assets for SysMon service <"
+                                .$Self->{Host}
+                                . "> found, using first item only!",
+                        );
+                    }
+                    $AssetID = $ConfigItemIDs[0];
                 }
             }
 

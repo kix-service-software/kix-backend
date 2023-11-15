@@ -15,12 +15,13 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Config',
-    'State',
-    'Ticket',
-    'Time',
-    'User',
+our @ObjectDependencies = qw(
+    Config
+    State
+    Ticket
+    Time
+    User
+    ObjectSearch
 );
 
 sub Configure {
@@ -67,7 +68,8 @@ sub Run {
                     },
                 ]
             },
-            UserID   => 1,
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
 
         my $States = $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') || {};
@@ -148,7 +150,8 @@ sub Run {
                 },
             ]
         },
-        UserID => 1,
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     my $NotificationCount = 0;

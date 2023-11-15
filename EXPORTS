@@ -214,6 +214,7 @@ ObjectIcon                                                                    = 
 ObjectManager                                                                 = Kernel::System::ObjectManager
 ObjectSearch                                                                  = Kernel::System::ObjectSearch
 ObjectSearch::Database                                                        = Kernel::System::ObjectSearch::Database
+ObjectSearch::Database::ConfigItem                                            = Kernel::System::ObjectSearch::Database::ConfigItem
 ObjectSearch::Database::Ticket                                                = Kernel::System::ObjectSearch::Database::Ticket
 Organisation                                                                  = Kernel::System::Organisation
 OTP                                                                           = Kernel::System::OTP

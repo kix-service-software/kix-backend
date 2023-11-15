@@ -200,8 +200,9 @@ sub Run {
                         }
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'ARRAY',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'ARRAY',
             );
             $QueueData{Tickets} = \@TicketIDs;
 
@@ -290,8 +291,9 @@ sub GetTicketStatsFromTicketSearch {
         Search     => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'COUNT',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'COUNT',
     );
 
     # all relevant tickets
@@ -310,8 +312,9 @@ sub GetTicketStatsFromTicketSearch {
         Search     => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'COUNT',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'COUNT',
     );
 
     # force numeric values

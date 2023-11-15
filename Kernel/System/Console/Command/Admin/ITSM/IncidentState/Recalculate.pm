@@ -55,7 +55,9 @@ sub Run {
                     Value    => \@ValidClassIDs
                 }
             ]
-        }
+        },
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # get number of config items

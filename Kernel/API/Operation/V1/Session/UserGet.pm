@@ -247,8 +247,9 @@ sub _GetOwnedTickets {
         Search     => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -281,8 +282,9 @@ sub _GetOwnedTickets {
         Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets
@@ -323,8 +325,9 @@ sub _GetOwnedAndLockedTickets {
         Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -349,7 +352,7 @@ sub _GetOwnedAndLockedTickets {
                     UserID => $Self->{Authorization}->{UserID},
                 }
             ]
-        }
+        },
     );
 
     if ( IsHashRefWithData($Param{TicketFilter}) ) {
@@ -362,8 +365,9 @@ sub _GetOwnedAndLockedTickets {
         Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets
@@ -399,8 +403,9 @@ sub _GetWatchedTickets {
         Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -433,8 +438,9 @@ sub _GetWatchedTickets {
         Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets

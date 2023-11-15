@@ -347,7 +347,9 @@ sub ImportValuePrepare {
                 Result     => 'ARRAY',
                 Search     => {
                     AND => \@SearchParams
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
 
             # get and return CofigItem ID
@@ -400,7 +402,9 @@ sub ImportValuePrepare {
                         Value    => [$ReferencedCIClassID]
                     }
                 ]
-            }
+            },
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
         my $CIID = q{};
         if ( @ConfigItemIDs ) {

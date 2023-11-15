@@ -170,7 +170,9 @@ my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
                 Value    => 'TestConfigItem'
             }
         ]
-    }
+    },
+    UserID     => 1,
+    UsertType  => 'Agent'
 );
 my $NumConfigItemImported = scalar @ConfigItemIDs;
 
