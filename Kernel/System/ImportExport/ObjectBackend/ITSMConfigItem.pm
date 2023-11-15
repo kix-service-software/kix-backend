@@ -437,99 +437,57 @@ sub ExportDataGet {
         Silent  => $Param{Silent}
     );
 
-    my @SearchParams;
+    my %SearchParams;
 
     # add number to the search params
     if ( $SearchData->{Number} ) {
-        my $Number = delete $SearchData->{Number};
-        push(
-            @SearchParams,
-            {
-                Field    => 'Number',
-                Operator => 'IN',
-                Type     => 'STRING',
-                Value    => IsArrayRef($Number) ? $Number : [$Number]
-            }
-        );
+        $SearchParams{Number} = delete $SearchData->{Number};
     }
 
     # add name to the search params
     if ( $SearchData->{Name} ) {
-        my $Name = delete $SearchData->{Name};
-        push(
-            @SearchParams,
-            {
-                Field    => 'Name',
-                Operator => 'EQ',
-                Type     => 'STRING',
-                Value    => $Name
-            }
-        );
+        $SearchParams{Name} = delete $SearchData->{Name};
     }
 
     # add deployment state to the search params
     if ( $SearchData->{DeplStateIDs} ) {
         my @DeplStateIDs = split(/#####/sm , $SearchData->{DeplStateIDs});
+        $SearchParams{DeplStateIDs} = \@DeplStateIDs;
         delete $SearchData->{DeplStateIDs};
-        push(
-            @SearchParams,
-            {
-                Field    => 'DeplStateIDs',
-                Operator => 'IN',
-                Type     => 'NUMERIC',
-                Value    => \@DeplStateIDs
-            }
-        );
     }
 
     # add incident state to the search params
     if ( $SearchData->{InciStateIDs} ) {
         my @InciStateIDs = split(/#####/sm , $SearchData->{InciStateIDs});
+        $SearchParams{InciStateIDs} = \@InciStateIDs;
         delete $SearchData->{InciStateIDs};
-        push(
-            @SearchParams,
-            {
-                Field    => 'InciStateIDs',
-                Operator => 'IN',
-                Type     => 'NUMERIC',
-                Value    => \@InciStateIDs
-            }
-        );
     }
 
     # add all XML data to the search params
     my @SearchParamsWhat;
     $Self->_ExportXMLSearchDataPrepare(
         XMLDefinition => $DefinitionData->{DefinitionRef},
-        What          => \@SearchParams,
+        What          => \@SearchParamsWhat,
         SearchData    => $SearchData,
-        Prefix        => 'CurrentVersion.Data'
     );
 
-    push(
-        @SearchParams,
-        {
-            Field    => 'ClassID',
-            Operator => 'IN',
-            Type     => 'NUMERIC',
-            Value    => [ $ObjectData->{ClassID} ]
-        }
-    );
+    # add XML search params to the search hash
+    if (@SearchParamsWhat) {
+        $SearchParams{What} = \@SearchParamsWhat;
+    }
 
     # search the config items
-    my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'ConfigItem',
-        Result     => 'ARRAY',
-        Search     => {
-            AND => \@SearchParams
-        },
-        UserID     => $Param{UserID},
-        Silent     => $Param{Silent}
+    my $ConfigItemList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+        %SearchParams,
+        ClassIDs              => [ $ObjectData->{ClassID} ],
+        PreviousVersionSearch => 0,
+        UserID                => $Param{UserID},
+        Silent                => $Param{Silent}
     );
 
     my @ExportData;
     CONFIGITEMID:
-    for my $ConfigItemID ( @ConfigItemList ) {
+    for my $ConfigItemID ( @{$ConfigItemList} ) {
 
         # get last version
         my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
@@ -896,38 +854,21 @@ sub ImportDataSave {
     my $ConfigItemID;
     if (%Identifier) {
 
-        my @SearchParams;
+        my %SearchParams;
 
         # add number to the search params
         if ( $Identifier{Number} ) {
-            my $Number = delete $Identifier{Number};
-            push(
-                @SearchParams,
-                {
-                    Field    => 'Number',
-                    Operator => 'IN',
-                    Type     => 'STRING',
-                    Value    => IsArrayRef($Number) ? $Number : [$Number]
-                }
-            );
+            $SearchParams{Number} = delete $Identifier{Number};
         }
 
         # add name to the search params
         if ( $Identifier{Name} ) {
-            my $Name = delete $Identifier{Name};
-            push(
-                @SearchParams,
-                {
-                    Field    => 'Name',
-                    Operator => 'EQ',
-                    Type     => 'STRING',
-                    Value    => $Name
-                }
-            );
+            $SearchParams{Name} = delete $Identifier{Name};
         }
 
         # add deployment state to the search params
         if ( $Identifier{DeplState} ) {
+
             # extract deployment state id
             my $DeplStateID = $DeplStateListReverse{ $Identifier{DeplState} } || q{};
 
@@ -942,15 +883,8 @@ sub ImportDataSave {
                 );
                 return;
             }
-            push(
-                @SearchParams,
-                {
-                    Field    => 'DeplStateIDs',
-                    Operator => 'IN',
-                    Type     => 'NUMERIC',
-                    Value    => [$DeplStateID]
-                }
-            );
+
+            $SearchParams{DeplStateIDs} = [$DeplStateID];
             delete $Identifier{DeplState};
         }
 
@@ -971,15 +905,8 @@ sub ImportDataSave {
                 );
                 return;
             }
-            push(
-                @SearchParams,
-                {
-                    Field    => 'InciStateIDs',
-                    Operator => 'IN',
-                    Type     => 'NUMERIC',
-                    Value    => [$InciStateID]
-                }
-            );
+
+            $SearchParams{InciStateIDs} = [$InciStateID];
             delete $Identifier{InciState};
         }
 
@@ -987,31 +914,23 @@ sub ImportDataSave {
         my @SearchParamsWhat;
         $Self->_ImportXMLSearchDataPrepare(
             XMLDefinition => $DefinitionData->{DefinitionRef},
-            What          => \@SearchParams,
+            What          => \@SearchParamsWhat,
             Identifier    => \%Identifier,
-            Prefix        => 'CurrentVersion.Data'
         );
 
-        push (
-            @SearchParams,
-            {
-                Field    => 'ClassID',
-                Operator => 'IN',
-                Type     => 'NUMERIC',
-                Value    => [ $ObjectData->{ClassID} ]
-            }
-        );
+        # add XML search params to the search hash
+        if (@SearchParamsWhat) {
+            $SearchParams{What} = \@SearchParamsWhat;
+        }
 
         # search existing config item with the same identifiers
-        my $ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            Search     => {
-                AND => \@SearchParams
-            },
-            UsingWildcards => 0,
-            UserID         => $Param{UserID},
-            Silent         => $Param{Silent}
+        my $ConfigItemList = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+            %SearchParams,
+            ClassIDs              => [ $ObjectData->{ClassID} ],
+            PreviousVersionSearch => 0,
+            UsingWildcards        => 0,
+            UserID                => $Param{UserID},
+            Silent                => $Param{Silent}
         );
 
         if ( scalar @{$ConfigItemList} > 1 ) {
@@ -1512,7 +1431,7 @@ sub _ExportXMLSearchDataPrepare {
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . q{.} . $Item->{Key} : $Item->{Key};
+        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
 
         # prepare value
         my $Values = $Kernel::OM->Get('ITSMConfigItem')->XMLExportSearchValuePrepare(
@@ -1524,13 +1443,11 @@ sub _ExportXMLSearchDataPrepare {
 
             # create search key
             my $SearchKey = $Key;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
 
             # create search hash
             my $SearchHash = {
-                Field    => $SearchKey,
-                Operator => 'EQ',
-                Type     => 'STRING',
-                Value    => $Values
+                '[1]{\'Version\'}[1]{\'' . $SearchKey . '\'}[%]{\'Content\'}' => $Values,
             };
 
             push @{ $Param{What} }, $SearchHash;

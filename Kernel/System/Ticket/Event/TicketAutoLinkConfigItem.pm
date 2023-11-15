@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -30,6 +30,15 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Self->{ConfigObject}         = $Kernel::OM->Get('Config');
+    $Self->{LogObject}            = $Kernel::OM->Get('Log');
+    $Self->{TicketObject}         = $Kernel::OM->Get('Ticket');
+    $Self->{UserObject}           = $Kernel::OM->Get('User');
+    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
+    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
+    $Self->{DynamicFieldObject}   = $Kernel::OM->Get('DynamicField');
+    $Self->{DynamicFieldBEObject} = $Kernel::OM->Get('DynamicField::Backend');
+
     return $Self;
 }
 
@@ -49,24 +58,24 @@ sub Run {
     }
 
     if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
+        $Self->{LogObject}->Log(
             Priority => 'error',
             Message  => "Event TicketAutoLinkConfigItem: need TicketID!"
         );
         return 0;
     }
 
-    my $OnlyFirstArticle = $Param{'Config'}->{'FirstArticleOnly'} || q{};
-    my $AppendDFName     = $Param{'Config'}->{'DynamicFieldName'} || q{};
+    my $OnlyFirstArticle = $Param{'Config'}->{'FirstArticleOnly'} || '';
+    my $AppendDFName     = $Param{'Config'}->{'DynamicFieldName'} || '';
 
     # check the DF config...
     my $AppendDFConfig = undef;
     if ( $AppendDFName ) {
-        $AppendDFConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+        $AppendDFConfig = $Self->{DynamicFieldObject}->DynamicFieldGet(
             'Name' => $AppendDFName,
         );
         if ( !IsHashRefWithData($AppendDFConfig) ) {
-            $Kernel::OM->Get('Log')->Log(
+            $Self->{LogObject}->Log(
                 Priority => 'error',
                 Message  => "Event TicketAutoLinkConfigItem: "
                  . "no valid Dynamic Field defined <$AppendDFName>.",
@@ -75,7 +84,7 @@ sub Run {
         }
     }
     else {
-      $Kernel::OM->Get('Log')->Log(
+      $Self->{LogObject}->Log(
           Priority => 'error',
           Message  => "Event TicketAutoLinkConfigItem: no Dynamic Field defined.",
       );
@@ -83,10 +92,10 @@ sub Run {
     }
 
     # prepare asset class params..
-    my $CISearchPatternRef = $Kernel::OM->Get('Config')->Get('TicketAutoLinkConfigItem::CISearchPattern');
-    my $SearchInClassesRef = $Kernel::OM->Get('Config')->Get('TicketAutoLinkConfigItem::CISearchInClasses');
+    my $CISearchPatternRef = $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::CISearchPattern');
+    my $SearchInClassesRef = $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::CISearchInClasses');
 
-    my $SearchClassesPerRecipientRef = $Kernel::OM->Get('Config')->Get('TicketAutoLinkConfigItem::CISearchInClassesPerRecipient');
+    my $SearchClassesPerRecipientRef = $Self->{ConfigObject}->Get('TicketAutoLinkConfigItem::CISearchInClassesPerRecipient');
 
     return 0 if( ref($CISearchPatternRef) ne 'HASH');
     return 0 if( ref($SearchInClassesRef) ne 'HASH');
@@ -105,12 +114,12 @@ sub Run {
     # EVENT ArticleCreate - check article id and index...
     my %ArticleData = ();
     if ( $Param{Event} eq 'ArticleCreate' && $Param{Data}->{ArticleID} ) {
-        %ArticleData = $Kernel::OM->Get('Ticket')->ArticleGet(
+        %ArticleData = $Self->{TicketObject}->ArticleGet(
             ArticleID => $Param{Data}->{ArticleID},
             UserID    => 1,
         );
         if ($OnlyFirstArticle) {
-            my %FirstArticleData = $Kernel::OM->Get('Ticket')->ArticleFirstArticle(
+            my %FirstArticleData = $Self->{TicketObject}->ArticleFirstArticle(
                 TicketID => $Param{Data}->{TicketID},
                 UserID   => 1,
             );
@@ -122,7 +131,7 @@ sub Run {
 
     }
     elsif ( $Param{Event} eq 'ArticleCreate' && !$Param{Data}->{ArticleID} ) {
-        $Kernel::OM->Get('Log')->Log(
+        $Self->{LogObject}->Log(
             Priority => 'error',
             Message  => "Event TicketAutoLinkConfigItem: nee ArticleID!"
         );
@@ -131,13 +140,13 @@ sub Run {
     else {
 
         #use the last article...
-        my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
+        my @ArticleIDs = $Self->{TicketObject}->ArticleIndex(
             TicketID => $Param{Data}->{TicketID},
             UserID   => 1,
         );
 
         if (@ArticleIDs) {
-            %ArticleData = $Kernel::OM->Get('Ticket')->ArticleGet(
+            %ArticleData = $Self->{TicketObject}->ArticleGet(
                 ArticleID => $ArticleIDs[-1],
                 UserID    => 1,
             );
@@ -145,24 +154,25 @@ sub Run {
     }
 
 
-    my $SearchPatternRegExp = q{};
+    my $SearchPatternRegExp = '';
     my $SearchInIndex       = 0;
-    my $SearchIn            = q{};
+    my $SearchIn            = '';
     my @SearchStrings       = ();
 
     #---------------------------------------------------------------------------
     # GET SEARCH PATTERN for event ArticleCreate
     if ( $Param{Event} eq 'ArticleCreate' ) {
         for my $Key ( keys %{$CISearchPatternRef} ) {
-            my $SearchString = q{};
+            my $SearchString = '';
             if ( $Key =~ /(Article_)(.*)/ ) {
                 $SearchIn = $2;
                 $SearchIn =~ s/_OR\d*//g;
-                $SearchPatternRegExp = $CISearchPatternRef->{$Key} || q{};
+                $SearchPatternRegExp = $CISearchPatternRef->{$Key} || '';
                 if (
                     $SearchPatternRegExp
                     && $ArticleData{$SearchIn} =~ /$SearchPatternRegExp/m
-                ) {
+                    )
+                {
                     $SearchString = $1;
                     $SearchString =~ s/^\s+//g;
                     $SearchString =~ s/\s+$//g;
@@ -177,7 +187,7 @@ sub Run {
     elsif ( $Param{Event} =~ /TicketDynamicFieldUpdate_/ ) {
 
         # get ticket data...
-        my %TicketData = $Kernel::OM->Get('Ticket')->TicketGet(
+        my %TicketData = $Self->{TicketObject}->TicketGet(
             TicketID      => $Param{Data}->{TicketID},
             UserID        => 1,
             DynamicFields => 1,
@@ -198,7 +208,7 @@ sub Run {
             my $KeyPattern = "DynamicField_".$TriggerDF;
             next CISEARCHPATTERN if ( $Key !~ /$KeyPattern(_OR\d*)?/ );
 
-            $SearchPatternRegExp = $CISearchPatternRef->{$Key} || q{};
+            $SearchPatternRegExp = $CISearchPatternRef->{$Key} || '';
 
             # next pattern if no regex defined..
             next CISEARCHPATTERN if( !$SearchPatternRegExp );
@@ -233,12 +243,14 @@ sub Run {
     #---------------------------------------------------------------------------
     # ASSET SEARCH - limit search classes if restricted to-address...
     if ( keys (%SearchClassesRecip) ) {
-        my $ToAddress = lc( $ArticleData{To} || q{} );
-        $ToAddress =~ s/(?:.*<|>.*)//g;
+        my $ToAddress = lc( $ArticleData{To} || '' );
+        $ToAddress =~ s/(.*<|>.*)//g;
         if ( $ToAddress && $SearchClassesRecip{$ToAddress} ) {
             for my $CIClass ( keys %{$SearchInClassesRef} ) {
-                next if ( $SearchClassesRecip{$ToAddress} =~ /(?:^|.*,\s*)$CIClass(?:,.*|$)/ );
-                delete( $SearchInClassesRef->{$CIClass} );
+                if ( $SearchClassesRecip{$ToAddress} !~ /(^|.*,\s*)$CIClass(,.*|$)/ )
+                {
+                    delete( $SearchInClassesRef->{$CIClass} );
+                }
             }
         }
     }
@@ -246,112 +258,77 @@ sub Run {
     #---------------------------------------------------------------------------
     # ASSET SEARCH - let's do it...
     my %FoundCIIDs = ();
-    CLASS:
     for my $CIClass ( keys %{$SearchInClassesRef} ) {
-        next CLASS if ( !$SearchInClassesRef->{$CIClass} );
+        if ( $SearchInClassesRef->{$CIClass} ) {
+            my $SearchAttributeKeyList = $SearchInClassesRef->{$CIClass} || '';
+            my $ClassItemRef = $Self->{GeneralCatalogObject}->ItemGet(
+                Class => 'ITSM::ConfigItem::Class',
+                Name  => $CIClass,
+            ) || 0;
 
-        my $SearchAttributeKeyList = $SearchInClassesRef->{$CIClass} || q{};
-        my $ClassItemRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-            Class => 'ITSM::ConfigItem::Class',
-            Name  => $CIClass,
-        ) || 0;
+            if ( ref($ClassItemRef) eq 'HASH' && $ClassItemRef->{ItemID} ) {
 
-        next CLASS if ref($ClassItemRef) ne 'HASH';
-        next CLASS if !$ClassItemRef->{ItemID};
+                # get CI-class definition...
+                my $XMLDefinition = $Self->{ConfigItemObject}->DefinitionGet(
+                    ClassID => $ClassItemRef->{ItemID},
+                );
 
-        # get CI-class definition...
-        my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
-            ClassID => $ClassItemRef->{ItemID},
-        );
-
-        if ( !$XMLDefinition->{DefinitionID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => "TicketAutoLinkConfigItem: no definition "
-                    . "found for class $CIClass!",
-            );
-            next CLASS;
-        }
-
-        my %SearchData;
-        my @SearchParams;
-
-        SEARCHATTR:
-        for my $SearchAttributeKey ( split( /[,]/sm, $SearchAttributeKeyList ) ) {
-
-            $SearchAttributeKey =~ s/^\s+//g;
-            $SearchAttributeKey =~ s/\s+$//g;
-
-            next if ( !$SearchAttributeKey );
-
-            if ( $SearchAttributeKey =~ /(?:Number|Name|DeplStateIDs|InciStateIDs)/sm ) {
-                # get search attributes
-                ATTR:
-                for my $AttributeValue (
-                    qw(
-                        Number Name DeplStateIDs InciStateIDs
-                    )
-                ) {
-                    next ATTR if $AttributeValue ne $SearchAttributeKey;
-
-                    my $Operator = 'CONTAINS';
-                    my $Type     = 'STRING';
-                    my $Value    = \@SearchStrings;
-                    if ( $AttributeValue !~ /^(?:Name|Number)$/sm ) {
-                        $Operator = 'IN';
-                        $Type     = 'NUMERIC';
-                    }
-
-                    push(
-                        @SearchParams,
-                        {
-                            Field    => $AttributeValue,
-                            Operator => $Operator,
-                            Type     => $Type,
-                            Value    => $Value
-                        }
+                if ( !$XMLDefinition->{DefinitionID} ) {
+                    $Self->{LogObject}->Log(
+                        Priority => 'error',
+                        Message => "TicketAutoLinkConfigItem: no definition "
+                            . "found for class $CIClass!",
                     );
                 }
-                next SEARCHATTR;
-            }
 
-            # build search params...
-            $SearchData{$SearchAttributeKey} = \@SearchStrings;
-        }
+                for my $SearchAttributeKey ( split( ',', $SearchAttributeKeyList ) ) {
+                    $SearchAttributeKey =~ s/^\s+//g;
+                    $SearchAttributeKey =~ s/\s+$//g;
+                    next if ( !$SearchAttributeKey );
+                    for my $CurrSearchString (@SearchStrings) {
+                        my %SearchParams = ();
+                        my %SearchData   = ();
 
-        if ( %SearchData ) {
-            $Self->_ExportXMLSearchDataPrepare(
-                XMLDefinition => $XMLDefinition->{DefinitionRef},
-                What          => \@SearchParams,
-                SearchData    => \%SearchData,
-            );
-        }
+                        # get search attributes
+                        for my $AttributeValue (qw(Number Name)) {
+                            next if $AttributeValue ne $SearchAttributeKey;
+                            $SearchParams{$AttributeValue} = $CurrSearchString;
+                        }
 
-        # search if there's sth to search for...
-        next SEARCHSTRING if !scalar( @SearchParams );
+                        for my $AttributeArray (qw(DeplStateIDs InciStateIDs)) {
+                            next if $AttributeArray ne $SearchAttributeKey;
+                            $SearchParams{$AttributeArray} = [$CurrSearchString];
+                        }
 
-        my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            Search     => {
-                OR  => \@SearchParams,
-                AND => [
-                    {
-                        Field    => 'ClassID',
-                        Operator => 'EQ',
-                        Type     => 'NUMERIC',
-                        Value    => $ClassItemRef->{ItemID}
+                        # build search params...
+                        $SearchData{$SearchAttributeKey} = $CurrSearchString;
+                        my @SearchParamsWhat;
+                        $Self->_ExportXMLSearchDataPrepare(
+                            XMLDefinition => $XMLDefinition->{DefinitionRef},
+                            What          => \@SearchParamsWhat,
+                            SearchData    => \%SearchData,
+                        );
+
+                        # build search hash...
+                        if (@SearchParamsWhat) {
+                            $SearchParams{What} = \@SearchParamsWhat;
+                        }
+
+                        # search if there's sth to search for...
+                        if ( scalar( keys(%SearchParams) ) ) {
+                            my $ConfigItemList = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
+                                %SearchParams,
+                                ClassIDs => [ $ClassItemRef->{ItemID} ],
+                                UserID   => 1,
+                            );
+
+                            for my $ConfigItemID ( @{$ConfigItemList} ) {
+                              $FoundCIIDs{$ConfigItemID} = "1";
+                            }
+                        }
                     }
-                ]
-            },
-            UserID     => 1,
-            UsertType  => 'Agent'
-        );
-
-        next if !@ConfigItemList;
-
-        for my $ConfigItemID ( @ConfigItemList ) {
-            $FoundCIIDs{$ConfigItemID} = 1;
+                }
+            }
         }
     }
 
@@ -360,7 +337,7 @@ sub Run {
     my @FoundCIs = keys(%FoundCIIDs);
 
     if ( scalar(@FoundCIs) ) {
-        my $CurrDFValue = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
+        my $CurrDFValue = $Self->{DynamicFieldBEObject}->ValueGet(
             DynamicFieldConfig => $AppendDFConfig,
             ObjectID           => $Param{Data}->{TicketID},
         );
@@ -377,7 +354,7 @@ sub Run {
         @NewDFValArr  = keys( %NewValues );
 
         # set new DF value
-        my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+        my $Success = $Self->{DynamicFieldBEObject}->ValueSet(
             DynamicFieldConfig => $AppendDFConfig,
             ObjectID           => $Param{Data}->{TicketID},
             Value              => \@NewDFValArr,
@@ -418,10 +395,10 @@ sub _ExportXMLSearchDataPrepare {
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
+        my $Key = $Param{Prefix} ? $Param{Prefix} . '::' . $Item->{Key} : $Item->{Key};
 
         # prepare value
-        my $Values = $Kernel::OM->Get('ITSMConfigItem')->XMLExportSearchValuePrepare(
+        my $Values = $Self->{ConfigItemObject}->XMLExportSearchValuePrepare(
             Item  => $Item,
             Value => $Param{SearchData}->{$Key},
         );
@@ -429,18 +406,15 @@ sub _ExportXMLSearchDataPrepare {
         if ($Values) {
 
             # create search key
-            my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{} ) . $Key;
-            $SearchKey =~ s/::/./gsm;
+            my $SearchKey = $Key;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
 
-            push(
-                @{ $Param{What} },
-                {
-                    Field    => $SearchKey,
-                    Operator => 'IN',
-                    Type     => 'STRING',
-                    Value    => $Values
-                }
-            );
+            # create search hash
+            my $SearchHash = {
+                '[1]{\'Version\'}[1]{\'' . $SearchKey . '\'}[%]{\'Content\'}' => $Values,
+            };
+
+            push @{ $Param{What} }, $SearchHash;
         }
 
         next ITEM if !$Item->{Sub};

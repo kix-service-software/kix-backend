@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -454,37 +454,24 @@ if (
         );
 
         if (IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) && $Host) {
-            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'ConfigItem',
-                Result     => 'ARRAY',
-                Search     => {
-                    AND => [
-                        {
-                            Field    => 'Name',
-                            Operator => 'EQ',
-                            Type     => 'STRING',
-                            Value    => $Host
-                        }
-                    ]
-                },
-                UserID     => 1,
-                UsertType  => 'Agent'
+            my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                Name => $Host,
             );
             $Self->True(
-                scalar(@ConfigItemIDs) || 0,
+                IsArrayRefWithData($ConfigItemIDs) || 0,
                 'Affected asset found',
             );
 
-            if (@ConfigItemIDs) {
+            if (IsArrayRefWithData($ConfigItemIDs)) {
                 $Self->Is(
-                    (scalar @ConfigItemIDs),
+                    (scalar @{$ConfigItemIDs}),
                     3,
                     'Affected asset found (length)',
                 );
 
                 # first found should be affected asset
                 $Self->ContainedIn(
-                    $ConfigItemIDs[0],
+                    $ConfigItemIDs->[0],
                     $Ticket{DynamicField_AffectedAsset},
                     'Affected asset check',
                 );

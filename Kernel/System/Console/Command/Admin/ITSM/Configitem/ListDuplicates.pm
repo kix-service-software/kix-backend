@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -16,11 +16,10 @@ use Kernel::System::VariableCheck qw(IsArrayRefWithData);
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = qw(
-    Config
-    GeneralCatalog
-    ITSMConfigItem
-    ObjectSearch
+our @ObjectDependencies = (
+    'Config',
+    'GeneralCatalog',
+    'ITSMConfigItem',
 );
 
 sub Configure {
@@ -55,7 +54,7 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     # get class argument
-    my $Class = $Self->GetOption('class') // q{};
+    my $Class = $Self->GetOption('class') // '';
 
     if ($Class) {
 
@@ -72,15 +71,7 @@ sub PreRun {
             my $ID = $ClassName2ID{$Class};
 
             # get ids of this class' config items
-            push(
-                @{$Self->{SearchCriteria}},
-                {
-                    Field    => 'ClassID',
-                    Operator => 'IN'
-                    Type     => 'NUMERIC',
-                    Value    => [$ID]
-                }
-            );
+            $Self->{SearchCriteria}->{ClassIDs} = [$ID];
         }
         else {
             die "Class $Class does not exist...\n";
@@ -106,15 +97,7 @@ sub Run {
 
         my $DeploymentStateIDs = [ keys %{$StateList} ];
 
-        push(
-            @{$Self->{SearchCriteria}},
-            {
-                Field    => 'DeplStateIDs',
-                Operator => 'IN'
-                Type     => 'NUMERIC',
-                Value    => [keys %{$StateList}]
-            }
-        );
+        $Self->{SearchCriteria}->{DeplStateIDs} = [ keys %{$StateList} ];
 
     }
 
@@ -122,21 +105,13 @@ sub Run {
     my $ITSMConfigitemObject = $Kernel::OM->Get('ITSMConfigItem');
 
     # get all config items ids
-    my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'ConfigItem',
-        Result     => 'ARRAY',
-        Search     => {
-            AND => $Self->{SearchCriteria}
-        },
-        UserID     => 1,
-        UsertType  => 'Agent'
-    );
+    my @ConfigItemIDs = @{ $ITSMConfigitemObject->ConfigItemSearch( %{ $Self->{SearchCriteria} } ) };
 
     # get number of config items
     my $CICount = scalar @ConfigItemIDs;
 
     # get class argument
-    my $Class = $Self->GetOption('class') // q{};
+    my $Class = $Self->GetOption('class') // '';
 
     # if there are any CI to check
     if ($CICount) {
@@ -158,7 +133,7 @@ sub Run {
             $Self->Print("<yellow>Checking all config items...\n</yellow>\n");
         }
 
-        $Self->Print( "<green>" . ( q{=} x 69 ) . "</green>\n" );
+        $Self->Print( "<green>" . ( '=' x 69 ) . "</green>\n" );
 
         my $DuplicatesFound = 0;
 
@@ -226,7 +201,7 @@ sub Run {
                     );
                 }
 
-                $Self->Print( "<green>" . ( q{-} x 69 ) . "</green>\n" );
+                $Self->Print( "<green>" . ( '-' x 69 ) . "</green>\n" );
             }
         }
 
