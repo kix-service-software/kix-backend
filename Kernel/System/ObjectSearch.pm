@@ -68,7 +68,58 @@ sub new {
 
 =item Search()
 
-### TODO ###
+search for objects
+
+    my %Result = $ObjectSearch->Search(
+        ObjectType => 'Ticket',             # registered object type of the search backend
+        Result     => 'HASH',               # Optional. Default: HASH; Possible values: HASH, ARRAY, COUNT
+        Search     => { ... },              # Optional. HashRef with SearchParams
+        Sort       => [ ... ],              # Optional. ArrayRef of hashes with SortParams
+        Limit      => 100,                  # Optional. Limit provided resultes. Use '0' to search without limit
+        CacheTTL   => 60,                   # Optional. Default: 240; Time is seconds the result will be cached. Use '0' if result should not be cached.
+        UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
+        UserID     => 1,                    # ID of requesting user. Used for permission checks
+    );
+
+SearchParams:
+    Search => {
+        AND => [        # optional, if not given, OR must be used
+            {
+                Field    => '...',      # see list of filterable fields
+                Operator => '...'       # see list of filterable fields
+                Value    => ...         # see list of filterable fields
+            },
+            ...
+        ]
+        OR => [         # optional, if not given, AND must be used
+            ...         # structure of field filter identical to AND
+        ]
+    }
+
+SortParams:
+    Sort => [
+        {
+            Field => '...',                              # see list of filterable fields
+            Direction => 'ascending' || 'descending'
+        },
+        ...
+    ]
+
+Returns:
+    Result HASH
+    %Result = (
+        1 => 123,
+        2 => 456
+    )
+
+    Result ARRAY
+    @Result = (
+        1,
+        2
+    )
+
+    Result COUNT
+    $Result = 2
 
 =cut
 
@@ -178,6 +229,15 @@ sub Search {
         }
         return;
     }
+    if ( $Param{UserType} !~ m/^(?:Agent|Customer)$/ ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid UserType!",
+            );
+        }
+        return;
+    }
 
     # prepare cache key
     my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
@@ -267,12 +327,44 @@ sub Search {
 
 =item GetSupportedAttributes()
 
-### TODO ###
+get supported attributes for a given object type
+
+    my $Result = $ObjectSearch->GetSupportedAttributes(
+        ObjectType => 'Ticket',             # registered object type of the search backend
+    );
+
+Returns:
+    $Result = [
+        {
+            ObjectType      => 'Ticket',
+            Property        => 'TicketID,
+            ObjectSpecifics => undef,
+            IsSearchable    => 1,
+            IsSortable      => 1,
+            Operators       => [
+                'EQ','IN','!IN','NE','LT','LTE','GT','GTE'
+            ]
+        },
+        ...
+    ]
 
 =cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(ObjectType) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!",
+                );
+            }
+            return;
+        }
+    }
 
     # get normalized object type
     my $ObjectType = $Self->{Backend}->NormalizedObjectType(

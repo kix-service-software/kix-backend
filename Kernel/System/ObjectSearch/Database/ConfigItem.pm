@@ -117,7 +117,7 @@ sub GetSupportedAttributes {
         @List = sort(
             {
                 $a->{Property} cmp $b->{Property}
-                && $a->{ObjectSpecifics}->{Class} cmp $b->{ObjectSpecifics}->{Class}
+                && ( $a->{ObjectSpecifics}->{Class} || '' ) cmp ( $b->{ObjectSpecifics}->{Class} || '' )
             }
             @List
         );

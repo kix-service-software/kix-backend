@@ -299,7 +299,7 @@ sub Sort {
     my %AttributeMapping = (
         'ArticleID'         => 'art.id',
         'ChannelID'         => 'art.channel_id',
-        'SenderTypeID'      => 'art.sender_type_id',
+        'SenderTypeID'      => 'art.article_sender_type_id',
         'CustomerVisible'   => 'art.customer_visible',
         'From'              => 'art.a_from',
         'To'                => 'art.a_to',

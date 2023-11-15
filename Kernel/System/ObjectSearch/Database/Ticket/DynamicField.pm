@@ -363,12 +363,12 @@ sub Sort {
 
     my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
 
-    # increase count
-    my $Count = $Param{Flags}->{DynamicFieldJoin}++;
-
     # join tables
     my $JoinTable = $Param{Flags}->{DynamicFieldJoin}->{$DFName};
     if ( !$JoinTable ) {
+        # increase count
+        my $Count = $Param{Flags}->{DynamicFieldJoinCounter}++;
+
         $JoinTable = "dfv$Count";
         if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
             push(

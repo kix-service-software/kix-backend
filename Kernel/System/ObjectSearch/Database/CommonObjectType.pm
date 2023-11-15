@@ -258,6 +258,9 @@ sub GetSortDef {
         return if ( !IsHashRefWithData($AttributeDef) );
 
         for my $Key ( keys( %{ $AttributeDef  } ) ) {
+            # skip OrderBySwitch
+            next if ( $Key eq 'OrderBySwitch' );
+
             # special handling for OrderBy
             if ( $Key eq 'OrderBy' ) {
                 my $Order = 'ASC';
