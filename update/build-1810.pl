@@ -205,71 +205,32 @@ sub _GetSysConfigOptions {
 
     my @Options = (
         {
-            Name            => 'Contact::EventModulePost###800-SetOrganisation',
+            Name            => 'Contact::EventModulePost###800-AutoAssignOrganisation',
             Description     => 'Event module to add organisations based on the enabled organisation mapping methods.',
             Type            => 'Hash',
             AccessLevel     => 'internal',
             Group           => 'Contact',
             Default         => {
-                Module      => 'Kernel::System::Contact::Event::SetOrganisation',
-                Event       => '(ContactAdd|ContactUpdate)'
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 1,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => 'MY_ORGA'
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
             },
             UserID          => 1
-        },
-        {
-            Name            => 'Contact::Organisation::Methode###MailDomain',
-            Description     => 'Enables organization mapping method "MailDomain" to assign the organization based on the contact email domain. The domain patterns are maintained at the organizations.',
-            Type            => 'Option',
-            AccessLevel     => 'internal',
-            IsRequired      => 1,
-            Group           => 'Contact',
-            Default         => 1,
-            Setting         => {
-                0 => 'No',
-                1 => 'Yes'
-            },
-            UserID          => 1
-        },
-        {
-            Name            => 'Contact::Organisation::Methode###Default',
-            Description     => 'Enables organization mapping method "Default" and sets the defined organization from the "Contact::Organization::Default" configuration.',
-            Type            => 'Option',
-            AccessLevel     => 'internal',
-            IsRequired      => 1,
-            Group           => 'Contact',
-            Default         => 0,
-            Setting         => {
-                0 => 'No',
-                1 => 'Yes'
-            },
-            UserID          => 1
-        },
-        {
-            Name            => 'Contact::Organisation::Methode###Personal',
-            Description     => 'Enables organization mapping method "Personal" and sets the contact email as an organization.',
-            Type            => 'Option',
-            AccessLevel     => 'internal',
-            IsRequired      => 1,
-            Group           => 'Contact',
-            Default         => 0,
-            Setting         => {
-                0 => 'No',
-                1 => 'Yes'
-            },
-            UserID          => 1
-        },
-        {
-            Name            => 'Contact::Organisation::Default',
-            Description     => 'Defines a standard organization to be used in the "Default" method of organization mapping. The ID or the number or the name of the organization can be specified.',
-            Type            => 'String',
-            AccessLevel     => 'internal',
-            Group           => 'Contact',
-            Default         => q{},
-            Setting         => {
-                Regex => q{}
-            },
-            UserID          => 1
-        },
+        }
     );
 
     return @Options;

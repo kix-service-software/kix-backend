@@ -6,16 +6,15 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Contact::Event::SetOrganisation;
+package Kernel::System::Contact::Event::AutoAssignOrganisation;
 
 use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
-    Config
-    Log
     Contact
-    DB
+    Log
+    Organisation
 );
 
 use Kernel::System::VariableCheck qw(:all);
@@ -34,9 +33,8 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Data Event Config)) {
+    for ( qw(Data Event Config) ) {
         if ( !$Param{$_} ) {
-            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!"
@@ -44,9 +42,8 @@ sub Run {
             return;
         }
     }
-    for (qw(ID)) {
+    for ( qw(ID) ) {
         if ( !$Param{Data}->{$_} ) {
-            return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_ in Data!"
@@ -54,27 +51,43 @@ sub Run {
             return;
         }
     }
-
-    my $Config = $Kernel::OM->Get('Config')->Get('Contact::Organisation::Methode');
-
-    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $Param{Data}->{ID}
+    return if (
+        ref( $Param{Config}->{MappingMethods} ) ne 'ARRAY'
+        || !@{ $Param{Config}->{MappingMethods} }
     );
 
+    # check if contact exists and has no PrimaryOrganisationID
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        ID     => $Param{Data}->{ID},
+        Silent => 1,
+    );
+    return 1 if ( !%Contact );
     return 1 if $Contact{PrimaryOrganisationID};
 
-    for my $Method (
-        qw(
-            MailDomain Default Personal
-        )
-    ) {
-        my $Function = "_$Method";
-        my $Success = $Self->$Function(
-            Config  => $Config,
-            Contact => \%Contact
+    # process mapping methods
+    METHOD:
+    for my $MappingMethod ( @{ $Param{Config}->{MappingMethods} } ) {
+        # check if method config is valid and active
+        next METHOD if (
+            ref( $MappingMethod ) ne 'HASH'
+            || !$MappingMethod->{Active}
+            || !$MappingMethod->{Method}
         );
 
-        last if ( $Success ) ;
+        # prepare function name
+        my $Function = '_' . $MappingMethod->{Method};
+
+        # check for supported method
+        next METHOD if ( !$Self->can( $Function ) );
+
+        # process method
+        my $Success = $Self->$Function(
+            Contact => \%Contact,
+            Config  => $MappingMethod,
+        );
+
+        # end processing, if organisation was set
+        last METHOD if ( $Success ) ;
     }
 
     return 1;
@@ -83,20 +96,21 @@ sub Run {
 sub _MailDomain {
     my ( $Self, %Param ) = @_;
 
-    return if !defined $Param{Config}->{MailDomain};
-    return if !$Param{Config}->{MailDomain};
-
+    # get domain part of contact primary email
     my ($Name, $Domain) = split( /[@]/sm, $Param{Contact}->{Email});
+
+    # prepare parts of domain
     my @Parts = split(/[.]/sm, $Domain);
 
-    my $Pattern = $Self->_GetPattern(
+    # prepare possible pattern
+    my $Pattern = $Self->_GetMailDomainPattern(
         Parts => \@Parts,
         Count => 0
     );
+    return if ( !IsArrayRefWithData( $Pattern ) );
 
-    return if ( !IsArrayRefWithData($Pattern) );
-
-    # Todo: Use the new search function (ObjectSearch) to search for organisations
+    # TODO: Use the new search function (ObjectSearch) to search for organisations
+    # search for relevant organisations
     my %Organisations = $Kernel::OM->Get('Organisation')->OrganisationSearch(
         DynamicField => {
             Operator => 'EQ',
@@ -104,64 +118,72 @@ sub _MailDomain {
             Value    => $Pattern
         }
     );
-
     return if ( !%Organisations );
 
-    my @OrganisationIDs  = sort keys %Organisations;
+    # TODO: get sorted list directly from ObjectSearch
+    # prepare hash for sort by number
+    my %OrganisationNumbers;
+    for my $OrganisationID ( keys ( %Organisations ) ) {
+        my $OrganisationNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            ID     => $OrganisationID,
+            Silent => 1,
+        );
+        next if ( !$OrganisationNumber );
 
+        $OrganisationNumbers{ $OrganisationID } = $OrganisationNumber;
+    }
+
+    # map organisation ids to an array sorted by organisation number
+    my @OrganisationIDs  = sort { $OrganisationNumbers{ $a } cmp $OrganisationNumbers{ $b } } ( keys( %OrganisationNumbers ) );
+
+    # update contact with found organisations
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
-        %{$Param{Contact}},
+        %{ $Param{Contact} },
         PrimaryOrganisationID => $OrganisationIDs[0],
         OrganisationIDs       => \@OrganisationIDs,
         UserID                => 1
     );
-
     if ( !$Success ) {
-        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Event::SetOrganisation: could not update contact with method "MailDomain".'
+            Message  => 'Could not update contact with method "MailDomain".'
         );
         return;
     }
 
+    # confirm that organisation was set
     return 1;
 }
 
-sub _Default {
+sub _DefaultOrganisation {
     my ( $Self, %Param ) = @_;
 
-    return if !defined $Param{Config}->{Default};
-    return if !$Param{Config}->{Default};
-
-    my $Default = $Kernel::OM->Get('Config')->Get('Contact::Organisation::Default');
-
-    if ( !$Default ) {
-        return if $Param{Silent};
+    # check configuration
+    my $DefaultOrganisation = $Param{Config}->{DefaultOrganisation};
+    if ( !$DefaultOrganisation ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Event::SetOrganisation: Need configuration "Contact::Organisation::Default"'
+            Message  => 'Need "DefaultOrganisation" in method configuration'
         );
         return;
     }
 
-    my $OrganisationID = $Self->_CheckDefault(
-        Default => $Default
+    # check default organisation
+    my $OrganisationID = $Self->_GetOrganisationID(
+        Organisation => $DefaultOrganisation
     );
-
     return if ( !$OrganisationID );
 
+    # update contact with default organisation
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
-        %{$Param{Contact}},
+        %{ $Param{Contact} },
         PrimaryOrganisationID => $OrganisationID,
         UserID                => 1
     );
-
     if ( !$Success ) {
-        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Event::SetOrganisation: could not update contact with method "Default".'
+            Message  => 'Could not update contact with method "DefaultOrganisation".'
         );
         return;
     }
@@ -169,46 +191,42 @@ sub _Default {
     return 1;
 }
 
-sub _Personal {
+sub _PersonalOrganisation {
     my ( $Self, %Param ) = @_;
 
-    return if !defined $Param{Config}->{Personal};
-    return if !$Param{Config}->{Personal};
-
+    # create organisation based on contact email
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
         Number  => $Param{Contact}->{Email},
         Name    => $Param{Contact}->{Email},
         ValidID => 1,
         UserID  => 1
     );
-
     if ( !$OrganisationID ) {
-        return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Event::SetOrganisation: could not set organisation for contact with method "Personal".'
+            Message  => 'Could not create organisation for method "PersonalOrganisation".'
         );
         return;
     }
 
+    # update contact with personal organisation
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
-        %{$Param{Contact}},
+        %{ $Param{Contact} },
         PrimaryOrganisationID => $OrganisationID,
         UserID                => 1
     );
-
     if ( !$Success ) {
         return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Event::SetOrganisation: could not update contact with method "Personal".'
+            Message  => 'Could not update contact with method "PersonalOrganisation".'
         );
     }
 
     return 1;
 }
 
-sub _GetPattern {
+sub _GetMailDomainPattern {
     my ( $Self, %Param ) = @_;
 
     my @Pattern;
@@ -220,7 +238,7 @@ sub _GetPattern {
     for ( 0 .. 1 ) {
         my $Part = ($_ == 0 ? q{*} : $Parts->[$Count]);
 
-        my $Result = $Self->_GetPattern(
+        my $Result = $Self->_GetMailDomainPattern(
             Parts  => $Parts,
             Count  => $Count+1
         );
@@ -237,35 +255,33 @@ sub _GetPattern {
     return \@Pattern;
 }
 
-sub _CheckDefault {
+sub _GetOrganisationID {
     my ( $Self, %Param ) = @_;
 
-    my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-        Number => $Param{Default},
+    # lookup organisation by number
+    my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+        Number => $Param{Organisation},
         Silent => 1,
     );
+    return $OrganisationID if ( $OrganisationID );
 
-    if ( !$ID ) {
-        $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            Name   => $Param{Default},
-            Silent => 1,
-        );
-    }
+    # lookup organisation by name
+    $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+        Name   => $Param{Organisation},
+        Silent => 1,
+    );
+    return $OrganisationID if ( $OrganisationID );
 
-    if (
-        !$ID
-        && $Param{Default} =~ /^\d+$/sm
-    ) {
+    # if given value is a number, check if it is a valid organisation id
+    if ( $Param{Organisation} =~ m/^\d+$/ ) {
         my $Number = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            ID     => 1,
+            ID     => $Param{Organisation},
             Silent => 1,
         );
-
-        return if !$Number;
-        $ID = $Param{Default};
+        return $Param{Organisation} if ( $Number );
     }
 
-    return $ID;
+    return;
 }
 
 1;
@@ -283,3 +299,5 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
+
+
