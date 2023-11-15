@@ -549,11 +549,24 @@ sub _TicketCreate {
             my $AssetID = q{};
 
             # search for CI by SysMonHost-Name...
-            my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-                Name => $Self->{SysMonXHost},
+            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Name',
+                            Operator => 'EQ',
+                            Type     => 'STRING',
+                            Value    => $Self->{SysMonXHost}
+                        }
+                    ]
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
-            if ( IsArrayRefWithData($ConfigItemIDs) ) {
-                if ( scalar @{$ConfigItemIDs} > 1 ) {
+            if ( @ConfigItemIDs ) {
+                if ( scalar @ConfigItemIDs > 1 ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
                         Message  => "Multiple assets for SysMon host <"
@@ -561,16 +574,30 @@ sub _TicketCreate {
                             . "> found, using first item only!",
                     );
                 }
-                $AssetID = $ConfigItemIDs->[0];
+                $AssetID = $ConfigItemIDs[0];
             }
 
             # if no CI found by SysMonHost-Name, search for SysMonService...
             else {
-                $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
-                    Name => $Self->{SysMonXService},
+                @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    ObjectType => 'ConfigItem',
+                    Result     => 'ARRAY',
+                    Search     => {
+                        AND => [
+                            {
+                                Field    => 'Name',
+                                Operator => 'EQ',
+                                Type     => 'STRING',
+                                Value    => $Self->{SysMonXService}
+                            }
+                        ]
+                    },
+                    UserID     => 1,
+                    UsertType  => 'Agent'
                 );
-                if (  IsArrayRefWithData($ConfigItemIDs) ) {
-                    if ( scalar @{$ConfigItemIDs} > 1 ) {
+
+                if ( @ConfigItemIDs ) {
+                    if ( scalar @ConfigItemIDs > 1 ) {
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'notice',
                             Message  => "Multiple assets for SysMon service <"
@@ -578,7 +605,7 @@ sub _TicketCreate {
                                 . "> found, using first item only!",
                         );
                     }
-                    $AssetID = $ConfigItemIDs->[0];
+                    $AssetID = $ConfigItemIDs[0];
                 }
             }
 
