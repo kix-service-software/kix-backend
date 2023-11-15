@@ -81,9 +81,6 @@ sub new {
 sub Init {
     my ( $Self, %Param ) = @_;
 
-    # init flags
-    $Self->{Flags} = {};
-
     return 1;
 }
 
@@ -175,32 +172,12 @@ sub GetSearchDef {
                 Search       => $SearchEntry,
                 WholeSearch  => $Param{Search}->{ $BoolOperator },   # forward "whole" search, e.g. if behavior depends on other attributes
                 BoolOperator => $BoolOperator,
-                Flags        => $Self->{Flags},
+                Flags        => $Param{Flags},
                 UserType     => $Param{UserType},
                 UserID       => $Param{UserID},
                 Silent       => $Param{Silent}
             );
             return if ( !IsHashRefWithData($AttributeDef) );
-
-            if ( ref( $AttributeDef->{Search} ) eq 'HASH' ) {
-                $AttributeDef = $Self->GetSearchDef(
-                    Search   => $AttributeDef->{Search},
-                    UserType => $Param{UserType},
-                    UserID   => $Param{UserID},
-                    Silent   => $Param{Silent}
-                );
-                return if ( !IsHashRefWithData($AttributeDef) );
-
-                # special handling for Where def
-                if (
-                    ref( $AttributeDef->{Where} ) eq 'ARRAY'
-                    && @{ $AttributeDef->{Where} }
-                ) {
-                    $AttributeDef->{Where} = [
-                        q{(} . join( ' AND ', @{ $AttributeDef->{Where} } ) . q{)}
-                    ];
-                }
-            }
 
             for my $Key ( keys( %{ $AttributeDef } ) ) {
                 # special handling for where statement, when boolean is 'OR'
@@ -276,7 +253,7 @@ sub GetSortDef {
         my $AttributeDef = $AttributeModule->Sort(
             Attribute => $Attribute,
             Language  => $Language,
-            Flags     => $Self->{Flags}
+            Flags     => $Param{Flags}
         );
         return if ( !IsHashRefWithData($AttributeDef) );
 
