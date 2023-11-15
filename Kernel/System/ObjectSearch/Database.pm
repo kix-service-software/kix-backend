@@ -225,7 +225,7 @@ sub _PrepareSQLDef {
     # check permission if UserID given and prepare relevant part of SQL statement (not needed for user with id 1)
     if ( $Param{UserID} != 1 ) {
         # get permission def from backend
-        my $PermissionDef = $Self->GetPermissionDef(
+        my $PermissionDef = $Param{Backend}->GetPermissionDef(
             %Param
         );
         return if ( ref( $PermissionDef ) ne 'HASH' );
@@ -321,7 +321,7 @@ sub _PrepareSQLStatement {
         },
     );
 
-    my $SQL = '';
+    my $SQL = q{};
     for my $SQLPart ( @SQLPartsDef ) {
         if (
             ref( $Param{SQLDef}->{ $SQLPart->{Name} } ) ne 'ARRAY'
@@ -331,7 +331,7 @@ sub _PrepareSQLStatement {
                 if ( !$Param{Silent} ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => 'Missing required sql part "' . $SQLPart->{Name} . '"!',
+                        Message  => 'Missing required sql part "' . $SQLPart->{Name} . q{"!},
                     );
                 }
                 return;
