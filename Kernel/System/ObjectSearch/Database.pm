@@ -205,15 +205,20 @@ sub _PrepareSQLDef {
         OrderBy => []
     );
 
+    # init flags
+    my %Flags = ();
+
     # init backend
     my $InitSuccess = $Param{Backend}->Init(
-        %Param
+        %Param,
+        Flags => \%Flags
     );
     return if ( !$InitSuccess );
 
     # get base def from backend
     my $BaseDef = $Param{Backend}->GetBaseDef(
-        %Param
+        %Param,
+        Flags => \%Flags
     );
     return if ( ref( $BaseDef ) ne 'HASH' );
 
@@ -226,7 +231,8 @@ sub _PrepareSQLDef {
     if ( $Param{UserID} != 1 ) {
         # get permission def from backend
         my $PermissionDef = $Param{Backend}->GetPermissionDef(
-            %Param
+            %Param,
+            Flags => \%Flags
         );
         return if ( ref( $PermissionDef ) ne 'HASH' );
 
@@ -240,7 +246,8 @@ sub _PrepareSQLDef {
     if ( IsHashRefWithData( $Param{Search} ) ) {
         # get search def from backend
         my $SearchDef = $Param{Backend}->GetSearchDef(
-            %Param
+            %Param,
+            Flags => \%Flags
         );
         return if ( ref( $SearchDef ) ne 'HASH' );
 
@@ -254,7 +261,8 @@ sub _PrepareSQLDef {
     if ( IsArrayRefWithData( $Param{Sort} ) ) {
         # get sort def from backend
         my $SortDef = $Param{Backend}->GetSortDef(
-            %Param
+            %Param,
+            Flags => \%Flags
         );
         return if ( ref( $SortDef ) ne 'HASH' );
 
