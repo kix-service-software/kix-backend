@@ -70,11 +70,11 @@ empty method to be overridden by specific attribute module
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLFrom    => [ ],          # optional
-        SQLJoin    => [ ],          # optional
-        SQLWhere   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        From    => [ ],          # optional
+        Join    => [ ],          # optional
+        Where   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -94,8 +94,8 @@ empty method to be overridden by specific attribute module
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut

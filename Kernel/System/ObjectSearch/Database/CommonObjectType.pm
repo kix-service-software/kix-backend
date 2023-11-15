@@ -45,13 +45,14 @@ sub new {
     $Self->{ObjectType} = $Param{ObjectType};
 
     # get registered object types
-    my $RegisteredAttributeMapping = $Kernel::OM->Get('ObjectSearch::Database::' . $Param{ObjectType} . '::Module') || {};
+    my $RegisteredAttributeMapping = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::' . $Param{ObjectType} . '::Module') || {};
 
     # prepare attribute backends
     $Self->{AttributeMapping} = {};
     for my $RegisteredKey ( keys( %{ $RegisteredAttributeMapping } ) ) {
         # get module name
-        my $AttributeModule = $Kernel::OM->GetModuleFor( $RegisteredAttributeMapping->{ $RegisteredKey } );
+        my $AttributeModule = $Kernel::OM->GetModuleFor( $RegisteredAttributeMapping->{ $RegisteredKey }->{Module} )
+            || $RegisteredAttributeMapping->{ $RegisteredKey }->{Module};
 
         # require module
         return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -246,9 +247,6 @@ sub GetSortDef {
         OrderBy => []
     );
 
-    my @OrderBy;
-    my @AttrList;
-    my @JoinList;
     for my $SortEntry ( @{ $Param{Sort} } ) {
         # get attribute
         my $Attribute = $SortEntry->{Field};

@@ -78,7 +78,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -116,7 +116,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -130,8 +130,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -147,15 +147,15 @@ sub Sort {
 
     my %Join;
     if ( $Param{Attribute} eq 'Lock' ) {
-        $Join{SQLJoin} = [
+        $Join{Join} = [
             'INNER JOIN ticket_lock_type tlt ON tlt.id = st.ticket_lock_id'
         ];
     }
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
         %Join

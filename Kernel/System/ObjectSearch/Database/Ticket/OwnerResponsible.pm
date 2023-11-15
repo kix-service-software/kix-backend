@@ -87,7 +87,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -123,7 +123,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -137,8 +137,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -155,19 +155,19 @@ sub Sort {
 
     my %Join;
     if ( $Param{Attribute} eq 'Owner' ) {
-        $Join{SQLJoin} = [
+        $Join{Join} = [
             'INNER JOIN contact co ON co.user_id = st.user_id'
         ];
     }
     elsif ( $Param{Attribute} eq 'Responsible' ) {
-        $Join{SQLJoin} = [
+        $Join{Join} = [
             'INNER JOIN contact cr ON cr.user_id = st.responsible_user_id'
         ];
     }
 
     return {
-        SQLAttrs   => $AttributeMapping{$Param{Attribute}},
-        SQLOrderBy => $AttributeMapping{$Param{Attribute}},
+        Select   => $AttributeMapping{$Param{Attribute}},
+        OrderBy => $AttributeMapping{$Param{Attribute}},
         %Join
     };
 }

@@ -103,7 +103,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -247,8 +247,8 @@ sub Search {
     }
 
     return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => \@SQLWhere,
     };
 }
 
@@ -261,8 +261,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -291,13 +291,13 @@ sub Sort {
     }
 
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLJoin  => \@SQLJoin
+        Join  => \@SQLJoin
     };
 }
 

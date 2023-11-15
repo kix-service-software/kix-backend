@@ -121,8 +121,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLJoin    => [ ],
-        SQLWhere   => [ ],
+        Join    => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -176,8 +176,8 @@ sub Search {
         if ( !IsArrayRefWithData($DynamicFieldList) ) {
             # we don't have any  DFs
             return {
-                SQLJoin  => [],
-                SQLWhere => [],
+                Join  => [],
+                Where => [],
             };
         }
         $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
@@ -200,8 +200,8 @@ sub Search {
         );
         # return empty result
         return {
-            SQLJoin  => [],
-            SQLWhere => [],
+            Join  => [],
+            Where => [],
         };
     }
 
@@ -316,8 +316,8 @@ END
     push( @SQLWhere, "($DynamicFieldSQL)" );
 
     return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => \@SQLWhere,
     };
 }
 
@@ -330,9 +330,9 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLFrom    => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        From    => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -351,8 +351,8 @@ sub Sort {
         if ( !IsArrayRefWithData($DynamicFieldList) ) {
             # we don't have any  DFs
             return {
-                SQLJoin  => [],
-                SQLWhere => [],
+                Join  => [],
+                Where => [],
             };
         }
         $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
@@ -403,11 +403,11 @@ END
     );
 
     return {
-        SQLJoin  => \@SQLJoin,
-        SQLAttrs => [
+        Join  => \@SQLJoin,
+        Select => [
             $SQLOrderField,
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $SQLOrderField
         ],
     };

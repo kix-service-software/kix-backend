@@ -72,7 +72,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLJoin    => [ ],
+        Join    => [ ],
     };
 
 =cut
@@ -129,8 +129,8 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => \@SQLWhere,
     };
 }
 
