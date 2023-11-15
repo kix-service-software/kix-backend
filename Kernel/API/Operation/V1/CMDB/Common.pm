@@ -123,7 +123,9 @@ sub _CheckConfigItem {
                         Value    => [ $ConfigItem->{ClassID} ]
                     }
                 ]
-            }
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
         my $NameDuplicates = $ConfigItemObject->UniqueNameCheck(

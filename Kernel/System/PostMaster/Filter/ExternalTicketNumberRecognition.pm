@@ -193,7 +193,9 @@ sub Run {
     # search tickets
     my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
         %Query,
-        ObjectType => 'Ticket'
+        ObjectType => 'Ticket',
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # get the first and only ticket id

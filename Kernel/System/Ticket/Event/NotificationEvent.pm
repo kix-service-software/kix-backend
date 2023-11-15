@@ -450,7 +450,9 @@ sub _NotificationFilter {
         ObjectType => 'Ticket',
         Result     => 'ARRAY',
         Search     => $Filter,
-        Limit      => 1
+        Limit      => 1,
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};

@@ -75,7 +75,7 @@ sub Search {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed ( qw(ObjectType UserType UserID) ) {
+    for my $Needed ( qw(ObjectType UserID) ) {
         if ( !$Param{ $Needed } ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -86,6 +86,9 @@ sub Search {
             return;
         }
     }
+
+    # FIXME: Should be set, but not all functions provide the UserType
+    $Param{UserType} //= 'Agent';
 
     # get normalized object type
     my $ObjectType = $Self->{Backend}->NormalizedObjectType(

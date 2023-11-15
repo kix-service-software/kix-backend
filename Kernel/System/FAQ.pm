@@ -2465,7 +2465,8 @@ sub _FAQApprovalTicketCreate {
             ]
         },
         Result    => 'ARRAY',
-        UserID    => 1,
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # we don't need to create another approval ticket if there is still at least one ticket open

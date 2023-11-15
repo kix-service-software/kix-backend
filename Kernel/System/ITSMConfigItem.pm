@@ -1344,7 +1344,9 @@ sub UniqueNameCheck {
             AND => \@SearchCriteria
         },
         ObjectType => 'ConfigItem',
-        Result     => 'ARRAY'
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # remove the provided ConfigItemID from the results, otherwise the duplicate check would fail
@@ -2462,7 +2464,9 @@ sub UpdateCounters {
                             Value    => $FunctionalityList{$Functionality}
                         }
                     ]
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
             $Counters{'DeploymentState::Functionality::'.$Functionality} = $ConfigItemCount || 0;
         }
@@ -2486,7 +2490,9 @@ sub UpdateCounters {
                             Value    => [ $DeplStateID ]
                         }
                     ]
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
             $Counters{'DeploymentState::'.$DeplStateList->{$DeplStateID}->{Name}} = $ConfigItemCount || 0;
         }
@@ -2510,7 +2516,9 @@ sub UpdateCounters {
                             Value    => [ $InciStateID ]
                         }
                     ]
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
             $Counters{'IncidentState::'.$InciStateList->{$InciStateID}->{Name}} = $ConfigItemCount || 0;
         }

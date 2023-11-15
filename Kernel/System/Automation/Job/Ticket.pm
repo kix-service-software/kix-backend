@@ -89,16 +89,18 @@ sub _Run {
                 ObjectType => 'Ticket',
                 Result     => 'ARRAY',
                 Search     => $Search,
-                UserID     => 1
+                UserID     => 1,
+                UserType   => 'Agent'
             );
             push(@TicketIDs, @TicketIDsPart);
         }
         @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
     } else {
-        @TicketIDs = $Kernel::OM->Get('Ticket')->Search(
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'Ticket',
             Result     => 'ARRAY',
-            UserID     => 1
+            UserID     => 1,
+            UserType   => 'Agent'
         );
     }
 

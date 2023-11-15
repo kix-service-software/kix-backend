@@ -190,8 +190,9 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
             # open tickets
             $TicketStats{OpenCount} = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -210,8 +211,9 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
             # pending tickets
             $TicketStats{PendingReminderCount} = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -230,8 +232,9 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
 
             $OrganisationData{TicketStats} = \%TicketStats;
@@ -257,7 +260,9 @@ sub Run {
                             Value    => $OrganisationData{ID}
                         }
                     ]
-                }
+                },
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType}
             );
 
             # filter for customer assigned config items if necessary

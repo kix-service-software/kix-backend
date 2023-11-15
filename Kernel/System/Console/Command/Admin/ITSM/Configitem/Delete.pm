@@ -140,6 +140,8 @@ sub Run {
         my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'ConfigItem',
             Result     => 'ARRAY',
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
 
         # get number of config items
@@ -266,7 +268,9 @@ sub Run {
                 Result     => 'ARRAY',
                 Search     => {
                     AND => \@SearchParam
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
         }
         else {

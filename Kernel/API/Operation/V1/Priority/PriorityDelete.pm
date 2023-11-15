@@ -97,8 +97,8 @@ sub Run {
                     },
                 ]
             },
-            UserID       => 1,
-            Permission   => 'ro',
+            UserID   => 1,
+            UserType => 'Agent',
         );
 
         if ( $ResultTicketSearch ) {

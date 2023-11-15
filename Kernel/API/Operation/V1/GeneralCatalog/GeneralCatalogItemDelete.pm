@@ -93,7 +93,9 @@ sub Run {
                         Value    => [$GeneralCatalogItemID]
                     }
                 ]
-            }
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
         if ( $ConfigItemID[0] ) {

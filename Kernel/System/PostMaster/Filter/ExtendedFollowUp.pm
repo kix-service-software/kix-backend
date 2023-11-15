@@ -127,6 +127,7 @@ sub Run {
                         \%Sort
                     ],
                     UserID     => 1,
+                    UsertType  => 'Agent',
                     ObjectType => 'Ticket'
                 );
 
@@ -164,6 +165,7 @@ sub Run {
                                 \%Sort
                             ],
                             UserID     => 1,
+                            UsertType  => 'Agent',
                             Limit      => 1,
                             ObjectType => 'Ticket'
                         );

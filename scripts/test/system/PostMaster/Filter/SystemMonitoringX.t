@@ -466,7 +466,9 @@ if (
                             Value    => $Host
                         }
                     ]
-                }
+                },
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
             $Self->True(
                 scalar(@ConfigItemIDs) || 0,

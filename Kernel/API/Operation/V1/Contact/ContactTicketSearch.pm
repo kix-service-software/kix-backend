@@ -94,7 +94,8 @@ sub Run {
                 }
             ]
         },
-        UserID => $Self->{Authorization}->{UserID},
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
         Result => 'ARRAY',
     );
 
