@@ -29,16 +29,6 @@ Kernel::API::Operation::CMDB::ConfigItemSearch - API CMDB Search Operation backe
 
 =cut
 
-sub Init {
-    my ( $Self, %Param ) = @_;
-
-    my $Result = $Self->SUPER::Init(%Param);
-
-    $Self->{HandleSortInCORE} = 1;
-
-    return $Result;
-}
-
 =item Run()
 
 perform ConfigItemSearch Operation. This will return a class list.
@@ -96,6 +86,7 @@ sub Run {
                 Value    => \@CustomerCIIDList
             }
         );
+        $ConfigItemList = $SearchResult;
     }
 
     my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -109,7 +100,7 @@ sub Run {
     );
 
     # get already prepared CI data from ConfigItemGet operation
-    if ( @ConfigItemList ) {
+    if ( IsArrayRefWithData($ConfigItemList) ) {
 
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
@@ -128,9 +119,7 @@ sub Run {
 
         my @ResultList;
         if ( defined $GetResult->{Data}->{ConfigItem} ) {
-            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItem})
-                ? @{$GetResult->{Data}->{ConfigItem}}
-                : ( $GetResult->{Data}->{ConfigItem} );
+            @ResultList = IsArrayRef($GetResult->{Data}->{ConfigItem}) ? @{$GetResult->{Data}->{ConfigItem}} : ( $GetResult->{Data}->{ConfigItem} );
         }
 
         if ( IsArrayRefWithData(\@ResultList) ) {

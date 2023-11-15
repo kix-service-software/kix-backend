@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -66,7 +66,7 @@ get the xml data of a version
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    return q{} if !$Param{Value};
+    return '' if !$Param{Value};
 
     my $CIVersionDataRef = $Self->{ConfigItemObject}->VersionGet(
         ConfigItemID => $Param{Value},
@@ -148,7 +148,7 @@ sub ExportSearchValuePrepare {
     return if !defined $Param{Value};
 
     # empty value?
-    return q{} if !$Param{Value};
+    return '' if !$Param{Value};
 
     # lookup CI number for given CI ID
     my $CIRef = $Self->{ConfigItemObject}->ConfigItemGet(
@@ -158,7 +158,7 @@ sub ExportSearchValuePrepare {
         return $CIRef->{Number};
     }
 
-    return q{};
+    return '';
 }
 
 =item ExportValuePrepare()
@@ -178,9 +178,9 @@ sub ExportValuePrepare {
     return if !defined $Param{Value};
 
     # empty value?
-    return q{} if !$Param{Value};
+    return '' if !$Param{Value};
 
-    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
 
     if ($SearchAttr) {
 
@@ -191,7 +191,7 @@ sub ExportValuePrepare {
         if ( $VersionData && ref $VersionData eq 'HASH' ) {
 
             # get ConfigItem class ID
-            my $ReferencedCIClassID = q{};
+            my $ReferencedCIClassID = "";
             if (
                 $Param{Item}
                 && ref( $Param{Item} ) eq 'HASH'
@@ -202,10 +202,10 @@ sub ExportValuePrepare {
             {
                 my $ItemDataRef = $Self->{GeneralCatalogObject}->ItemGet(
                     Class => 'ITSM::ConfigItem::Class',
-                    Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
+                    Name => $Param{Item}->{Input}->{ReferencedCIClassName} || '',
                 );
                 if ( $ItemDataRef && ref($ItemDataRef) eq 'HASH' && $ItemDataRef->{ItemID} ) {
-                    $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
+                    $ReferencedCIClassID = $ItemDataRef->{ItemID} || '';
                 }
 
                 my $XMLDefinition =
@@ -232,7 +232,7 @@ sub ExportValuePrepare {
         return $CIRef->{Number};
     }
 
-    return q{};
+    return '';
 }
 
 =item ImportSearchValuePrepare()
@@ -252,7 +252,7 @@ sub ImportSearchValuePrepare {
     return if !defined $Param{Value};
 
     # empty value?
-    return q{} if !$Param{Value};
+    return '' if !$Param{Value};
 
     # check if CI number was given
     my $CIID = $Self->{ConfigItemObject}->ConfigItemLookup(
@@ -268,7 +268,7 @@ sub ImportSearchValuePrepare {
         return $Param{Value} if $CINumber;
     }
 
-    return q{};
+    return '';
 }
 
 =item ImportValuePrepare()
@@ -288,36 +288,33 @@ sub ImportValuePrepare {
     return if !defined $Param{Value};
 
     # empty value?
-    return q{} if !$Param{Value};
+    return '' if !$Param{Value};
 
-    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
 
     # make CI-Number out of given value
     if ($SearchAttr) {
 
         # get ConfigItem class ID
-        my $ReferencedCIClassID = q{};
+        my $ReferencedCIClassID = "";
         if (
             $Param{Item}
             && ref( $Param{Item} ) eq 'HASH'
             && $Param{Item}->{Input}
             && ref( $Param{Item}->{Input} ) eq 'HASH'
             && $Param{Item}->{Input}->{ReferencedCIClassName}
-        ) {
+            )
+        {
             my $ItemDataRef = $Self->{GeneralCatalogObject}->ItemGet(
                 Class => 'ITSM::ConfigItem::Class',
-                Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
+                Name => $Param{Item}->{Input}->{ReferencedCIClassName} || '',
             );
-            if (
-                $ItemDataRef
-                && ref($ItemDataRef) eq 'HASH'
-                && $ItemDataRef->{ItemID}
-            ) {
-                $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
+            if ( $ItemDataRef && ref($ItemDataRef) eq 'HASH' && $ItemDataRef->{ItemID} ) {
+                $ReferencedCIClassID = $ItemDataRef->{ItemID} || '';
             }
 
             # prepare search params
-            my @SearchParams;
+            my %SearchParams = ();
             my %SearchData   = ();
 
             $SearchData{$SearchAttr} = $Param{Value};
@@ -325,37 +322,28 @@ sub ImportValuePrepare {
             my $XMLDefinition =
                 $Self->{ConfigItemObject}->DefinitionGet( ClassID => $ReferencedCIClassID, );
 
+            my @SearchParamsWhat;
             $Self->_XMLSearchDataPrepare(
                 XMLDefinition => $XMLDefinition->{DefinitionRef},
-                What          => \@SearchParams,
+                What          => \@SearchParamsWhat,
                 SearchData    => \%SearchData,
             );
 
-            push (
-                @SearchParams,
-                {
-                    Field    => 'ClassID',
-                    Operator => 'IN',
-                    Type     => 'NUMERIC',
-                    Value    => [$ReferencedCIClassID]
-                }
-            );
+            if (@SearchParamsWhat) {
+                $SearchParams{What} = \@SearchParamsWhat;
+            }
 
             # search the config items
-            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'ConfigItem',
-                Result     => 'ARRAY',
-                Search     => {
-                    AND => \@SearchParams
-                },
-                UserID     => 1,
-                UsertType  => 'Agent'
+            my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
+                %SearchParams,
+                ClassIDs              => [$ReferencedCIClassID],
+                PreviousVersionSearch => 0,
             );
 
             # get and return CofigItem ID
-            my $CIID = q{};
-            if ( @ConfigItemIDs ) {
-                $CIID = $ConfigItemIDs[0] || q{};
+            my $CIID = "";
+            if ( $ConfigItemIDs && ref($ConfigItemIDs) eq 'ARRAY' ) {
+                $CIID = $ConfigItemIDs->[0] || '';
             }
             return $CIID;
         }
@@ -368,47 +356,30 @@ sub ImportValuePrepare {
     return $CIID if $CIID;
 
     # make CI-Number out of given Name...
-    my $ReferencedCIClassID = q{};
+    my $ReferencedCIClassID = "";
     if (
         $Param{Item}
         && ref( $Param{Item} ) eq 'HASH'
         && $Param{Item}->{Input}
         && ref( $Param{Item}->{Input} ) eq 'HASH'
         && $Param{Item}->{Input}->{ReferencedCIClassName}
-    ) {
+        )
+    {
         my $RefClassName = $Param{Item}->{Input}->{ReferencedCIClassName};
         my $ItemDataRef  = $Self->{GeneralCatalogObject}->ItemGet(
             Class => 'ITSM::ConfigItem::Class',
-            Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
+            Name => $Param{Item}->{Input}->{ReferencedCIClassName} || '',
         );
         if ( $ItemDataRef && ref($ItemDataRef) eq 'HASH' && $ItemDataRef->{ItemID} ) {
-            $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
+            $ReferencedCIClassID = $ItemDataRef->{ItemID} || '';
         }
-        my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            Search     => {
-                AND => [
-                    {
-                        Field    => 'Name',
-                        Operator => 'EQ',
-                        Type     => 'STRING',
-                        Value    => $Param{Value}
-                    },
-                    {
-                        Field    => 'ClassID',
-                        Operator => 'IN',
-                        Type     => 'NUMERIC',
-                        Value    => [$ReferencedCIClassID]
-                    }
-                ]
-            },
-            UserID     => 1,
-            UsertType  => 'Agent'
+        my $ConfigItemIDs = $Self->{ConfigItemObject}->ConfigItemSearchExtended(
+            Name     => $Param{Value},
+            ClassIDs => [$ReferencedCIClassID],
         );
-        my $CIID = q{};
-        if ( @ConfigItemIDs ) {
-            $CIID = $ConfigItemIDs[0] || q{};
+        my $CIID = "";
+        if ( $ConfigItemIDs && ref($ConfigItemIDs) eq 'ARRAY' ) {
+            $CIID = $ConfigItemIDs->[0] || '';
         }
         return $CIID if $CIID;
     }
@@ -421,7 +392,7 @@ sub ImportValuePrepare {
         return $Param{Value} if $CINumber;
     }
 
-    return q{};
+    return '';
 }
 
 sub _XMLSearchDataPrepare {
@@ -436,23 +407,23 @@ sub _XMLSearchDataPrepare {
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
+        my $Key =
+            $Param{Prefix} ? $Param{Prefix} . '::' . $Item->{Key} : $Item->{Key};
 
         if ( $Param{SearchData}->{$Key} ) {
 
             # create search key
-            my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{} ) . $Key;
-            $SearchKey =~ s/::/./gsm;
+            my $SearchKey = $Key;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
 
-            push (
-                @{ $Param{What} },
+            # create search hash
+            my $SearchHash =
                 {
-                    Field    => $SearchKey,
-                    Operator => 'EQ',
-                    Type     => 'STRING',
-                    Value    => $Param{SearchData}->{$Key}
-                }
-            );
+                '[1]{\'Version\'}[1]{\''
+                    . $SearchKey
+                    . '\'}[%]{\'Content\'}' => $Param{SearchData}->{$Key},
+                };
+            push @{ $Param{What} }, $SearchHash;
         }
         next ITEM if !$Item->{Sub};
 
@@ -468,6 +439,10 @@ sub _XMLSearchDataPrepare {
 }
 
 1;
+
+
+
+
 
 =back
 
