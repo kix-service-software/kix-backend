@@ -343,7 +343,7 @@ sub _GetContactData {
                         Value    => $ContactData{ID}
                     },
                 ]
-            }
+            },
             UserID   => $Self->{Authorization}->{UserID},
             UserType => $Self->{Authorization}->{UserType}
         );

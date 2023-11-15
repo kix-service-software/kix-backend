@@ -76,7 +76,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -111,7 +111,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -125,8 +125,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -140,10 +140,10 @@ sub Sort {
     );
 
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
     };
