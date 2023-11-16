@@ -56,7 +56,8 @@ sub GetSupportedAttributes {
         AccountedTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'Integer'
         }
     };
 

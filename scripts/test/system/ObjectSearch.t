@@ -309,6 +309,59 @@ for my $Test ( @GetSupportedAttributesTests ) {
     );
 }
 
+# begin transaction on database
+$Helper->BeginWork();
+
+# create test organisation
+my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
+    Number  => $Helper->GetRandomID(),
+    Name    => $Helper->GetRandomID(),
+    ValidID => 1,
+    UserID  => 1,
+);
+
+# create test contact
+my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => $Helper->GetRandomID(),
+    Lastname  => $Helper->GetRandomID(),
+    ValidID   => 1,
+    UserID    => 1,
+);
+
+# get general catalog entry for class 'Hardware'
+my $ClassDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::ConfigItem::Class',
+    Name  => 'Hardware',
+);
+
+# get general catalog entry for deployment state 'Production'
+my $DeplStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::ConfigItem::DeploymentState',
+    Name  => 'Production',
+);
+
+# get general catalog entry for incident state 'Operational'
+my $InciStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::Core::IncidentState',
+    Name  => 'Operational',
+);
+
+# get priority with ID 1
+my %Priority = $Kernel::OM->Get('Priority')->PriorityGet(
+    PriorityID => 1,
+    UserID     => 1,
+);
+
+# get queue with ID 1
+my %Queue = $Kernel::OM->Get('Queue')->QueueGet(
+    ID => 1,
+);
+
+# get queue with ID 1
+my %State = $Kernel::OM->Get('State')->StateGet(
+    ID => 1,
+);
+
 # get registered object types for backend database
 my $RegisteredObjectTypes = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType') || {};
 for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
@@ -342,9 +395,140 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                 && ref( $Entry->{IsSortable} ) eq ''
                 && defined( $Entry->{Operators} )
                 && ref( $Entry->{Operators} ) eq 'ARRAY'
+                && defined( $Entry->{ValueType} )
+                && ref( $Entry->{ValueType} ) eq ''
             ),
             'ObjectSearch > GetSupportedAttributes: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' (expected structure)'
         );
+
+        if ( $Entry->{IsSearchable} ) {
+            if ( @{ $Entry->{Operators} } ) {
+                for my $Operator ( @{ $Entry->{Operators} } ) {
+                    my $SearchValue;
+                    if ( $Entry->{ValueType} eq 'Integer' ) {
+                        $SearchValue = 1;
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Date' ) {
+                        $SearchValue = '1990-01-01';
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DateTime' ) {
+                        $SearchValue = '1990-01-01 00:00:00';
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Contact.ID' ) {
+                        $SearchValue = $ContactID;
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Organisation.ID' ) {
+                        $SearchValue = $OrganisationID;
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Class.ID' ) {
+                        $SearchValue = $ClassDataRef->{ItemID};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Class.Name' ) {
+                        $SearchValue = $ClassDataRef->{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DeploymentState.ID' ) {
+                        $SearchValue = $DeplStateDataRef->{ItemID};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DeploymentState.Name' ) {
+                        $SearchValue = $DeplStateDataRef->{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'IncidentState.ID' ) {
+                        $SearchValue = $InciStateDataRef->{ItemID};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'IncidentState.Name' ) {
+                        $SearchValue = $InciStateDataRef->{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Flag.y/n' ) {
+                        $SearchValue = 'y';
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Flag.ArrayOfHashes' ) {
+                        $SearchValue = [
+                            {
+                                Flag  => 'Seen',
+                                Value => 1
+                            }
+                        ];
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Priority.Name' ) {
+                        $SearchValue = $Priority{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'Queue.Name' ) {
+                        $SearchValue = $Queue{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'State.Name' ) {
+                        $SearchValue = $State{Name};
+                    }
+                    elsif ( $Entry->{ValueType} eq 'StateType.Name' ) {
+                        $SearchValue = $State{TypeName};
+                    }
+                    else {
+                        $SearchValue = 'Test';
+                    }
+
+                    my $Result = $ObjectSearch->Search(
+                        ObjectType => $ObjectType,
+                        UserID     => 1,
+                        Search     => {
+                            AND => [
+                                {
+                                    Field    => $Entry->{Property},
+                                    Operator => $Operator,
+                                    Value    => $SearchValue
+                                }
+                            ]
+                        }
+                    );
+                    $Self->Is(
+                        defined( $Result ),
+                        '1',
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator
+                    );
+
+                    if ( $Operator =~ m/IN/ ) {
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                AND => [
+                                    {
+                                        Field    => $Entry->{Property},
+                                        Operator => $Operator,
+                                        Value    => [ $SearchValue, $SearchValue ]
+                                    }
+                                ]
+                            }
+                        );
+                        $Self->Is(
+                            defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / value array'
+                        );
+
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                AND => [
+                                    {
+                                        Field    => $Entry->{Property},
+                                        Operator => $Operator,
+                                        Value    => []
+                                    }
+                                ]
+                            }
+                        );
+                        $Self->Is(
+                            defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array'
+                        );
+                    }
+                }
+            }
+            else {
+
+            }
+        }
 
         if ( $Entry->{IsSortable} ) {
             my $Result = $ObjectSearch->Search(
@@ -364,6 +548,9 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
         }
     }
 }
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

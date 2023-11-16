@@ -60,10 +60,13 @@ sub new {
     # set field behaviors
     $Self->{Behaviors} = {
         'IsNotificationEventCondition' => 1,
+        'IsSearchable'                 => 1,
         'IsSortable'                   => 1,
         'IsFilterable'                 => 0,
         'IsStatsCondition'             => 1,
         'IsCustomerInterfaceCapable'   => 1,
+        'SearchOperators'              => ['EQ','GT','GTE','LT','LTE'],
+        'SearchValueType'              => 'Date'
     };
 
     # get the Dynamic Field Backend custom extensions

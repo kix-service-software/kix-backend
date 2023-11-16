@@ -90,7 +90,8 @@ sub GetSupportedAttributes {
                         },
                         IsSearchable    => $Module->{IsSearchable} || 0,
                         IsSortable      => $Module->{IsSortable}   || 0,
-                        Operators       => $Module->{Operators}    || []
+                        Operators       => $Module->{Operators}    || [],
+                        ValueType       => $Module->{ValueType}    || ''
                     }
                 );
             }
@@ -106,7 +107,8 @@ sub GetSupportedAttributes {
                     },
                     IsSearchable    => $Module->{IsSearchable} || 0,
                     IsSortable      => $Module->{IsSortable}   || 0,
-                    Operators       => $Module->{Operators}    || []
+                    Operators       => $Module->{Operators}    || [],
+                    ValueType       => $Module->{ValueType}    || ''
                 }
             );
         }

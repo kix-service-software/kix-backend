@@ -54,12 +54,14 @@ sub GetSupportedAttributes {
         CreateTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         ChangeTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         }
     };
 

@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::ConfigItem::Owner;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Editor;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Editor - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -39,9 +39,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable     => 0|1,
+            IsSortable   => 0|1,
             IsSearchable => 0|1,
-            Operators     => []
+            Operators    => []
         },
     };
 
@@ -54,12 +54,14 @@ sub GetSupportedAttributes {
         CreateBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         },
         ChangeBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         }
     };
 

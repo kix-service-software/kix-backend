@@ -57,12 +57,14 @@ sub GetSupportedAttributes {
         'Priority'   => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Priority.Name'
         },
         'PriorityID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
     };
 
@@ -99,7 +101,7 @@ sub Search {
     my @PriorityIDs;
     if ( $Param{Search}->{Field} eq 'Priority' ) {
         my @PriorityList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @PriorityList = @{$Param{Search}->{Value}}
         }
         foreach my $Priority ( @PriorityList ) {
@@ -119,7 +121,7 @@ sub Search {
     }
     else {
         @PriorityIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @PriorityIDs = @{$Param{Search}->{Value}}
         }
     }

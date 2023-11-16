@@ -57,22 +57,26 @@ sub GetSupportedAttributes {
         'StateID'     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'State'       => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'State.Name'
         },
         'StateType'   => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'StateType.Name'
         },
         'StateTypeID' => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
     };
 
@@ -115,7 +119,7 @@ sub Search {
 
         # get all StateIDs for the given StateTypes
         my @StateTypes = ( $Value );
-        if ( IsArrayRefWithData($Value) ) {
+        if ( IsArrayRef($Value) ) {
             @StateTypes = @{$Value};
         }
 
@@ -159,11 +163,6 @@ sub Search {
             }
         }
 
-        if (!@StateIDs) {
-            # we need to restrict to something
-            push(@StateIDs, -1);
-        }
-
         # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
@@ -171,7 +170,7 @@ sub Search {
 
         # get all StateIDs for the given StateTypeIDs
         my @StateTypeIDs = ( $Value );
-        if ( IsArrayRefWithData($Value) ) {
+        if ( IsArrayRef($Value) ) {
             @StateTypeIDs = @{$Value};
         }
 
@@ -194,17 +193,12 @@ sub Search {
             push(@StateIDs, @StateTypeStateIDs);
         }
 
-        if (!@StateIDs) {
-            # we need to restrict to something
-            push(@StateIDs, -1);
-        }
-
         # we have to do an IN seasrch in this case
         $Operator = 'IN';
     }
     elsif ( $Param{Search}->{Field} eq 'State' ) {
         my @StateList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
@@ -224,7 +218,7 @@ sub Search {
     }
     else {
         @StateIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @StateIDs = @{$Param{Search}->{Value}}
         }
     }

@@ -359,7 +359,10 @@ sub _OperationNE {
             if ( $Param{CaseSensitive} ) {
                 $SQL .= "LOWER($Param{Column}) != LOWER($Str)";
             }
-            elsif ( $Param{Type} eq 'NUMERIC' ) {
+            elsif (
+                defined $Param{Type}
+                && $Param{Type} eq 'NUMERIC'
+            ) {
                 $SQL .= "$Param{Column} <> $Str";
             }
             else {

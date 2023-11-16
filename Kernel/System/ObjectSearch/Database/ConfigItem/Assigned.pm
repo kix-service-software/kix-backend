@@ -56,12 +56,14 @@ sub GetSupportedAttributes {
         AssignedContact => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ']
+            Operators    => ['EQ'],
+            ValueType    => 'Contact.ID'
         },
         AssignedOrganisation => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ']
+            Operators    => ['EQ'],
+            ValueType    => 'Organisation.ID'
         }
     };
 
@@ -111,59 +113,59 @@ sub Search {
         Assigned => $Assigned
     );
 
-    return if !IsHashRefWithData($GetParams);
-
     my @Values;
-    for my $ClassID ( sort keys %{$GetParams} ) {
-        next if !$GetParams->{$ClassID}->{SearchParams};
+    if ( IsHashRefWithData($GetParams) ) {
+        for my $ClassID ( sort keys %{$GetParams} ) {
+            next if !$GetParams->{$ClassID}->{SearchParams};
 
-        my $SearchParams = $GetParams->{$ClassID}->{SearchParams};
-        my $IsWhat       = $GetParams->{$ClassID}->{IsWhat};
-        my %Search;
+            my $SearchParams = $GetParams->{$ClassID}->{SearchParams};
+            my $IsWhat       = $GetParams->{$ClassID}->{IsWhat};
+            my %Search;
 
-        push(
-            @{$Search{AND}},
-            {
-                Field    => 'ClassID',
-                Operator => 'EQ',
-                Value    => $ClassID
+            push(
+                @{$Search{AND}},
+                {
+                    Field    => 'ClassID',
+                    Operator => 'EQ',
+                    Value    => $ClassID
+                }
+            );
+
+            for my $Attr ( keys %{$SearchParams} ) {
+                if ( $IsWhat->{$Attr} ) {
+                    push(
+                        @{$Search{OR}},
+                        {
+                            Field    => "CurrentVersion.Data.$Attr",
+                            Operator => 'EQ',
+                            Type     => 'STRING',
+                            Value    => $SearchParams->{$Attr}
+                        }
+                    );
+                }
+                else {
+                    push(
+                        @{$Search{AND}},
+                        {
+                            Field    => $Attr,
+                            Operator => IsArrayRef($SearchParams->{$Attr}) ? 'IN' : 'EQ',
+                            Type     => 'STRING',
+                            Value    => $SearchParams->{$Attr}
+                        }
+                    );
+                }
             }
-        );
+            my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                UserID     => $Param{UserID},
+                UserType   => $Param{UserType},
+                Search     => \%Search
+            );
 
-        for my $Attr ( keys %{$SearchParams} ) {
-            if ( $IsWhat->{$Attr} ) {
-                push(
-                    @{$Search{OR}},
-                    {
-                        Field    => "CurrentVersion.Data.$Attr",
-                        Operator => 'EQ',
-                        Type     => 'STRING',
-                        Value    => $SearchParams->{$Attr}
-                    }
-                );
+            if ( scalar(@IDs) ) {
+                push ( @Values, @IDs );
             }
-            else {
-                push(
-                    @{$Search{AND}},
-                    {
-                        Field    => $Attr,
-                        Operator => IsArrayRef($SearchParams->{$Attr}) ? 'IN' : 'EQ',
-                        Type     => 'STRING',
-                        Value    => $SearchParams->{$Attr}
-                    }
-                );
-            }
-        }
-        my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            UserID     => $Param{UserID},
-            UserType   => $Param{UserType},
-            Search     => \%Search
-        );
-
-        if ( scalar(@IDs) ) {
-            push ( @Values, @IDs );
         }
     }
 
@@ -212,7 +214,7 @@ sub _GetAssigendParams {
         );
     }
 
-    next if !%ObjectData;
+    return if !%ObjectData;
 
     CICLASS:
     for my $CIClass ( keys %{ $Mapping } ) {
@@ -388,7 +390,8 @@ sub _GetAssignedContact {
     # get contact and user data
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
         ID            => $Param{ContactID},
-        DynamicFields => 1
+        DynamicFields => 1,
+        Silent        => 1
     );
 
     if ( !%ContactData ) {

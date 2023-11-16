@@ -57,7 +57,8 @@ sub GetSupportedAttributes {
         'TypeID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE']
+            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
+            ValueType    => 'Integer'
         },
         'Type' => {
             IsSearchable => 1,
@@ -98,7 +99,7 @@ sub Search {
     my @TypeIDs;
     if ( $Param{Search}->{Field} eq 'Type' ) {
         my @TypeList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @TypeList = @{$Param{Search}->{Value}}
         }
         foreach my $Type ( @TypeList ) {
@@ -118,7 +119,7 @@ sub Search {
     }
     else {
         @TypeIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @TypeIDs = @{$Param{Search}->{Value}}
         }
     }

@@ -55,22 +55,26 @@ sub GetSupportedAttributes {
         'Age'            => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'Integer'
         },
         'CreateTime'     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         'PendingTime'    => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         'LastChangeTime' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
     };
 
@@ -131,13 +135,11 @@ sub Search {
             return;
         }
 
-        if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
+        if ( $Param{Search}->{Field} eq 'LastChangeTime' ) {
             # convert back to timestamp (relative calculations have been done above)
             $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                 SystemTime => $Value
             );
-
-            $Value = "'$Value'";
         }
     }
 

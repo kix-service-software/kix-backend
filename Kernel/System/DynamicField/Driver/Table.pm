@@ -53,10 +53,12 @@ sub new {
     $Self->{Behaviors} = {
         'IsACLReducible'               => 0,
         'IsNotificationEventCondition' => 0,
+        'IsSearchable'                 => 1,
         'IsSortable'                   => 0,
         'IsFilterable'                 => 0,
         'IsStatsCondition'             => 0,
         'IsCustomerInterfaceCapable'   => 1,
+        'SearchOperators'              => ['EQ','GT','GTE','LT','LTE']
     };
 
     # get the Dynamic Field Backend custom extensions

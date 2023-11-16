@@ -55,7 +55,8 @@ sub GetSupportedAttributes {
         'WatcherUserID' => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE']
+            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
+            ValueType    => 'Integer'
         },
     };
 

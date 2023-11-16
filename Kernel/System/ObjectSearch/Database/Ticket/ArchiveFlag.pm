@@ -55,7 +55,8 @@ sub GetSupportedAttributes {
         Archived => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Flag.y/n'
         }
     };
 
@@ -82,7 +83,7 @@ sub Search {
 
     if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         # do nothing if archive system is not used
-        return;
+        return {};
     }
 
     # check params

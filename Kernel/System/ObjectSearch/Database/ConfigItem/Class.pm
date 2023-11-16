@@ -56,17 +56,20 @@ sub GetSupportedAttributes {
         ClassID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.ID'
         },
         ClassIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.ID'
         },
         Class => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.Name'
         }
     };
 
@@ -110,7 +113,7 @@ sub Search {
         );
 
         my @ClassList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @ClassList = @{$Param{Search}->{Value}}
         }
         foreach my $Class ( @ClassList ) {
@@ -127,7 +130,7 @@ sub Search {
     }
     else {
         @ClassIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @ClassIDs = @{$Param{Search}->{Value}}
         }
     }

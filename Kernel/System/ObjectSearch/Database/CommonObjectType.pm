@@ -321,7 +321,8 @@ sub GetSupportedAttributes {
                 ObjectSpecifics => undef,
                 IsSearchable    => $AttributeRef->{IsSearchable} || 0,
                 IsSortable      => $AttributeRef->{IsSortable}   || 0,
-                Operators       => $AttributeRef->{Operators}    || []
+                Operators       => $AttributeRef->{Operators}    || [],
+                ValueType       => $AttributeRef->{ValueType}    || ''
             }
         );
     }

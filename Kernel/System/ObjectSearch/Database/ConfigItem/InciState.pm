@@ -56,17 +56,20 @@ sub GetSupportedAttributes {
         InciStateID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.ID'
         },
         InciStateIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.ID'
         },
         InciState => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.Name'
         }
     };
 
@@ -106,12 +109,12 @@ sub Search {
     if ( $Param{Search}->{Field} eq 'InciState' ) {
         my %States = reverse(
             %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::IncidentState',
+                Class => 'ITSM::Core::IncidentState',
             )}
         );
 
         my @StateList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
@@ -128,7 +131,7 @@ sub Search {
     }
     else {
         @InciStateIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @InciStateIDs = @{$Param{Search}->{Value}}
         }
     }

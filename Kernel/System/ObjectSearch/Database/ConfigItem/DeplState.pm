@@ -56,17 +56,20 @@ sub GetSupportedAttributes {
         DeplStateID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'DeploymentState.ID'
         },
         DeplStateIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'DeploymentState.ID'
         },
         DeplState => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'DeploymentState.Name'
         }
     };
 
@@ -111,14 +114,14 @@ sub Search {
         );
 
         my @StateList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
             if ( !$States{$State} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Unknown deplayment state $State!",
+                    Message  => "Unknown deployment state $State!",
                 );
                 return;
             }
@@ -128,7 +131,7 @@ sub Search {
     }
     else {
         @DeplStateIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @DeplStateIDs = @{$Param{Search}->{Value}}
         }
     }
