@@ -249,7 +249,7 @@ sub Run {
         if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
             my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                Objecttype => 'ConfigItem',
+                ObjectType => 'ConfigItem',
                 Result     => 'ARRAY',
                 Search     => {
                     AND => [
