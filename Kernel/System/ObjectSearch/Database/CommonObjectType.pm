@@ -177,7 +177,16 @@ sub GetSearchDef {
                 UserID       => $Param{UserID},
                 Silent       => $Param{Silent}
             );
-            return if ( !IsHashRefWithData($AttributeDef) );
+
+            if ( !IsHashRef($AttributeDef) ) {
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to prepare search for attribute $Attribute!",
+                    );
+                }
+                return;
+            }
 
             for my $Key ( keys( %{ $AttributeDef } ) ) {
                 # special handling for where statement, when boolean is 'OR'

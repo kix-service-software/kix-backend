@@ -41,7 +41,7 @@ sub Init {
     my ( $Self, %Param ) = @_;
 
     # extract flags from fields
-    $Param{Flags} = $Self->_CheckFields(
+    $Self->_CheckFields(
         %Param,
         Extract => {
             PreviousVersionSearch => 1
@@ -51,7 +51,6 @@ sub Init {
             AssignedContact       => 1
         }
     );
-
     return 1;
 }
 
@@ -117,7 +116,7 @@ sub GetSupportedAttributes {
         @List = sort(
             {
                 $a->{Property} cmp $b->{Property}
-                && ( $a->{ObjectSpecifics}->{Class} || '' ) cmp ( $b->{ObjectSpecifics}->{Class} || '' )
+                && ( $a->{ObjectSpecifics}->{Class} || q{} ) cmp ( $b->{ObjectSpecifics}->{Class} || q{} )
             }
             @List
         );
@@ -134,16 +133,15 @@ sub GetSupportedAttributes {
 sub _CheckFields {
     my ($Self, %Param) = @_;
 
-    my %Fields;
     for my $Type ( keys %{$Param{Search}} ) {
         my @Items;
         for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
             if ( $Param{Draft}->{$SearchItem->{Field}} ) {
-                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
+                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
             }
 
             if ($Param{Extract}->{$SearchItem->{Field}}) {
-                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
+                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
             }
             else {
                 push(@Items, $SearchItem);
@@ -157,7 +155,7 @@ sub _CheckFields {
         }
     }
 
-    return \%Fields;
+    return 1;
 }
 
 =end Internal:

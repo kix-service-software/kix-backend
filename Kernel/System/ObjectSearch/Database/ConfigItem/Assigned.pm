@@ -86,7 +86,7 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
-
+print STDERR Data::Dumper::Dumper(\%Param);
     # check params
     if ( !$Param{Search} ) {
         $Kernel::OM->Get('Log')->Log(
@@ -96,16 +96,14 @@ sub Search {
         return;
     }
 
-    $Self->{Flags} = $Param{Flags};
-
     my $Assigned = $Param{Search}->{Field};
     $Assigned =~ s/Assigned//sm;
 
     if (
         $Assigned eq 'Organisation'
-        && $Self->{Flags}->{AssignedContact}
+        && $Param{Flags}->{AssignedContact}
     ) {
-        return;
+        return {};
     }
 
     my $GetParams = $Self->_GetAssigendParams(
@@ -169,8 +167,6 @@ sub Search {
         }
     }
 
-    $Param{Flags} = $Self->{Flags};
-
     my @Where = $Self->GetOperation(
         Operator  => 'IN',
         Column    => 'ci.id',
@@ -207,7 +203,7 @@ sub _GetAssigendParams {
     if ( $Param{Assigned} eq 'Contact' ) {
         %ObjectData = $Self->_GetAssignedContact(
             ContactID              => $Value,
-            RelevantOrganisationID => $Self->{Flags}->{AssignedOrganisation} || q{}
+            RelevantOrganisationID => $Param{Flags}->{AssignedOrganisation} || q{}
         );
     }
     elsif ( $Param{Assigned} eq 'Organisation' ) {
@@ -469,7 +465,7 @@ sub _GetAssignedMapping {
     my ( $Self, %Param ) = @_;
 
     my $Mapping;
-    if ( !$Self->{Flags}->{AssignedConfigItemsMapping} ) {
+    if ( !$Param{Flags}->{AssignedConfigItemsMapping} ) {
         my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedConfigItemsMapping') || q{};
 
         my $MappingData = $Kernel::OM->Get('JSON')->Decode(
@@ -489,11 +485,11 @@ sub _GetAssignedMapping {
             }
         }
 
-        $Self->{Flags}->{AssignedConfigItemsMapping} = $MappingData;
+        $Param{Flags}->{AssignedConfigItemsMapping} = $MappingData;
         $Mapping = $MappingData->{$Param{Assigned}} if ( $MappingData->{$Param{Assigned}} );
     }
     else {
-        $Mapping = $Self->{Flags}->{AssignedConfigItemsMapping}->{$Param{Assigned}} || q{};
+        $Mapping = $Param{Flags}->{AssignedConfigItemsMapping}->{$Param{Assigned}} || q{};
     }
 
     return $Mapping;
