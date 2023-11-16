@@ -309,25 +309,6 @@ for my $Test ( @GetSupportedAttributesTests ) {
     );
 }
 
-# begin transaction on database
-$Helper->BeginWork();
-
-# create test organisation
-my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $Helper->GetRandomID(),
-    Name    => $Helper->GetRandomID(),
-    ValidID => 1,
-    UserID  => 1,
-);
-
-# create test contact
-my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname => $Helper->GetRandomID(),
-    Lastname  => $Helper->GetRandomID(),
-    ValidID   => 1,
-    UserID    => 1,
-);
-
 # get general catalog entry for class 'Hardware'
 my $ClassDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class => 'ITSM::ConfigItem::Class',
@@ -413,12 +394,6 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                     }
                     elsif ( $Entry->{ValueType} eq 'DateTime' ) {
                         $SearchValue = '1990-01-01 00:00:00';
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Contact.ID' ) {
-                        $SearchValue = $ContactID;
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Organisation.ID' ) {
-                        $SearchValue = $OrganisationID;
                     }
                     elsif ( $Entry->{ValueType} eq 'Class.ID' ) {
                         $SearchValue = $ClassDataRef->{ItemID};
@@ -548,9 +523,6 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
         }
     }
 }
-
-# rollback transaction on database
-$Helper->Rollback();
 
 1;
 

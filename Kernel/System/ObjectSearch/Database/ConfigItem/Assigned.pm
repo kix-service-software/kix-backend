@@ -57,13 +57,13 @@ sub GetSupportedAttributes {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ'],
-            ValueType    => 'Contact.ID'
+            ValueType    => 'Integer'
         },
         AssignedOrganisation => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ'],
-            ValueType    => 'Organisation.ID'
+            ValueType    => 'Integer'
         }
     };
 
