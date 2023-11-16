@@ -31,6 +31,24 @@ Kernel::System::ObjectSearch::Database::Ticket - object type module for object s
 
 =cut
 
+=item Init()
+
+### TODO ###
+
+=cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    # init dynamic field join map as empty hash
+    $Param{Flags}->{DynamicFieldJoin} = {};
+
+    # init dynamic field join counter with 0
+    $Param{Flags}->{DynamicFieldJoinCounter} = 0;
+
+    return 1;
+}
+
 =item GetBase()
 
 ### TODO ###

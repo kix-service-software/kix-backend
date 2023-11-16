@@ -174,8 +174,8 @@ sub Search {
 
     # check if we have to add a join
     if (
-        !$Self->{ModuleData}->{AlreadyJoined}
-        || !$Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}}
+        !$Param{Flags}->{ArticleJoined}
+        || !$Param{Flags}->{ArticleJoined}->{$Param{BoolOperator}}
     ) {
         # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
@@ -187,7 +187,7 @@ sub Search {
         } else {
             push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id ' );
         }
-        $Self->{ModuleData}->{AlreadyJoined}->{$Param{BoolOperator}} = 1;
+        $Param{Flags}->{ArticleJoined}->{$Param{BoolOperator}} = 1;
     }
 
     if ( $Param{Search}->{Field} =~ /ArticleCreateTime/ ) {
@@ -299,7 +299,7 @@ sub Sort {
     my %AttributeMapping = (
         'ArticleID'         => 'art.id',
         'ChannelID'         => 'art.channel_id',
-        'SenderTypeID'      => 'art.sender_type_id',
+        'SenderTypeID'      => 'art.article_sender_type_id',
         'CustomerVisible'   => 'art.customer_visible',
         'From'              => 'art.a_from',
         'To'                => 'art.a_to',
@@ -311,7 +311,10 @@ sub Sort {
 
     # check if we have to add a join
     my @SQLJoin;
-    if ( !$Self->{ModuleData}->{AlreadyJoined} || !$Self->{ModuleData}->{AlreadyJoined}->{AND} ) {
+    if (
+        !$Param{Flags}->{ArticleJoined}
+        || !$Param{Flags}->{ArticleJoined}->{AND}
+    ) {
 
         # use appropriate table for selected search index module
         my $ArticleSearchTable = 'article';
