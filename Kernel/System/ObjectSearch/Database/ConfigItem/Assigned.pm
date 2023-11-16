@@ -86,7 +86,7 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
-print STDERR Data::Dumper::Dumper(\%Param);
+
     # check params
     if ( !$Param{Search} ) {
         $Kernel::OM->Get('Log')->Log(
