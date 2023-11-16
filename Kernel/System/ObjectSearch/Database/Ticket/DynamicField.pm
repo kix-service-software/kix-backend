@@ -94,13 +94,6 @@ sub GetSupportedAttributes {
         };
     }
 
-    # NOTE: The supported operators come from the dynamic field types
-    my %TypeOperators = (
-        'TicketReference'         => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'ContactReference'        => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'OrganisationReference'   => ['EQ','GT','GTE','LT','LTE','LIKE'],
-    );
-
     return $Self->{Supported};
 }
 
