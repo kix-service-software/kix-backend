@@ -61,7 +61,7 @@ sub GetSupportedAttributes {
         AssignedOrganisation => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => []
+            Operators    => ['EQ']
         }
     };
 
@@ -86,7 +86,7 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
-
+print STDERR Data::Dumper::Dumper(\%Param);
     # check params
     if ( !$Param{Search} ) {
         $Kernel::OM->Get('Log')->Log(
@@ -413,8 +413,34 @@ sub _GetAssignedContact {
         $ContactData{User} = IsHashRefWithData(\%User) ? \%User : undef;
     }
 
-    if ($Param{RelevantOrganisationID}) {
-        $ContactData{RelevantOrganisationID} = $Param{RelevantOrganisationID} || undef;
+    my %RelevantOrganisationIDs;
+    if ( $Param{RelevantOrganisationID} ) {
+        if ( IsArrayRefWithData($Param{RelevantOrganisationID}) ) {
+            %RelevantOrganisationIDs = map {$_ => 1} @{$Param{RelevantOrganisationID} || {}};
+        }
+        else {
+            $RelevantOrganisationIDs{$Param{RelevantOrganisationID}} = 1;
+        }
+    }
+
+    if (
+        %RelevantOrganisationIDs
+        && IsArrayRefWithData($ContactData{OrgisationIDs})
+    ) {
+        for my $OrgID ( @{$ContactData{OrgisationIDs}}) {
+            next if !$RelevantOrganisationIDs{$OrgID};
+            push(
+                @{$ContactData{RelevantOrganisationID}},
+                $OrgID
+            );
+        }
+    }
+
+    if (
+        !$ContactData{RelevantOrganisationID}
+        && $ContactData{PrimaryOrganisationID}
+    ) {
+        $ContactData{RelevantOrganisationID} = $ContactData{PrimaryOrganisationID};
     }
 
     return %ContactData;

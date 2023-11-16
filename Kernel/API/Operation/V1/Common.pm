@@ -3810,13 +3810,13 @@ sub _FilterCustomerUserVisibleObjectIds {
     ) {
 
         # get object relevant ids
-        my $ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
+        my @ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
             %Param
         );
 
         # keep relevant ids
-        if ( IsArrayRefWithData($ItemIDs) ) {
-            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
+        if ( scalar( @ItemIDs ) ) {
+            my %ItemIDsHash = map { $_ => 1 } @ItemIDs;
             my @Result;
             for my $ObjectID ( @ObjectIDList ) {
                 push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
@@ -3897,7 +3897,7 @@ sub _GetCustomerUserVisibleObjectIds {
                                 Field => 'AssignedOrganisation',
                                 Operator => 'IN',
                                 Type     => 'NUMERIC',
-                                Value    => $ContactData{RelevantOrganisationID}
+                                Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
                             }
                         ]
                     },
