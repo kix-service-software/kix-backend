@@ -3810,13 +3810,13 @@ sub _FilterCustomerUserVisibleObjectIds {
     ) {
 
         # get object relevant ids
-        my @ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
+        my $ItemIDs = $Self->_GetCustomerUserVisibleObjectIds(
             %Param
         );
 
         # keep relevant ids
-        if ( scalar( @ItemIDs ) ) {
-            my %ItemIDsHash = map { $_ => 1 } @ItemIDs;
+        if ( IsArrayRefWithData($ItemIDs) ) {
+            my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
             my @Result;
             for my $ObjectID ( @ObjectIDList ) {
                 push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
@@ -3884,7 +3884,7 @@ sub _GetCustomerUserVisibleObjectIds {
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
 
             if ($Param{ObjectType} eq 'ConfigItem') {
-                return $Kernel::OM->Get('ObjectSearch')->Search(
+                my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
                     Search => {
                         AND => [
                             {
@@ -3906,6 +3906,7 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserID     => $Self->{Authorization}->{UserID},
                     UserType   => $Self->{Authorization}->{UserType}
                 );
+                return scalar(@IDs) ? \@IDs : [];
             } elsif ($Param{ObjectType} eq 'Ticket') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,

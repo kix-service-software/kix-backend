@@ -73,9 +73,8 @@ sub Run {
     );
 
     # get customer relevant ids if necessary
-    my @CustomerCIIDList;
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
-        @CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
+        my $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
             ObjectType             => 'ConfigItem',
             UserID                 => $Self->{Authorization}->{UserID},
             UserType               => $Self->{Authorization}->{UserType},
@@ -85,7 +84,7 @@ sub Run {
         # return empty result if there are no assigned config items for customer
         return $Self->_Success(
             ConfigItem => [],
-        ) if (!scalar(@CustomerCIIDList));
+        ) if (!IsArrayRefWithData($CustomerCIIDList));
 
         push(
             @{$Self->{Search}->{ConfigItem}->{AND}},
@@ -93,7 +92,7 @@ sub Run {
                 Field    => 'ConfigItemID',
                 Operator => 'IN',
                 Type     => 'Numeric',
-                Value    => \@CustomerCIIDList
+                Value    => $CustomerCIIDList
             }
         );
     }
