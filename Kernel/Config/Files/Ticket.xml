@@ -3142,7 +3142,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-ArticleCustomerVisibleByRecipient" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
+        <Description Translatable="1">Is executed when an article is created in the "Email" channel. Checks whether at least one of the recipient addresses (To, Cc or Bcc) is assigned to the ticket contact. If Yes: The visibility of the article in the SSP is automatically activated (regardless of the agent's setting). If No: The visibility selected by the agent is not changed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
@@ -3153,7 +3153,7 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###910-ArticleCustomerVisibleByReferences" Required="0" Valid="1">
-        <Description Translatable="1"></Description>
+        <Description Translatable="1">Is executed when an article is created in the "Email" channel. Checks whether at least one email reference (References and InReplyTo) is a message-id of a customer visible article at the same ticket. If Yes: The visibility of the article in the SSP is automatically activated (regardless of the agent's setting). If No: The visibility selected by the agent is not changed.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
