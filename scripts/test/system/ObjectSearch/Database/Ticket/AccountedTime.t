@@ -28,6 +28,14 @@ $Self->Is(
     'Attribute object has correct module ref'
 );
 
+# check supported methods
+for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+    $Self->True(
+        $AttributeObject->can($Method),
+        'Attribute object can "' . $Method . '"'
+    );
+}
+
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
@@ -323,7 +331,7 @@ $Self->True(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name => 'Search: Operator EQ / Value 2',
+        Name     => 'Search: Field AccountedTime / Operator EQ / Value 2',
         Search   => {
             'AND' => [
                 {
@@ -336,7 +344,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name => 'Search: Operator LT / Value 2',
+        Name     => 'Search: Field AccountedTime / Operator LT / Value 2',
         Search   => {
             'AND' => [
                 {
@@ -349,7 +357,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name => 'Search: Operator GT / Value 2',
+        Name     => 'Search: Field AccountedTime / Operator GT / Value 2',
         Search   => {
             'AND' => [
                 {
@@ -362,7 +370,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name => 'Search: Operator LTE / Value 2',
+        Name     => 'Search: Field AccountedTime / Operator LTE / Value 2',
         Search   => {
             'AND' => [
                 {
@@ -375,7 +383,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name => 'Search: Operator GTE / Value 2',
+        Name     => 'Search: Field AccountedTime / Operator GTE / Value 2',
         Search   => {
             'AND' => [
                 {
@@ -393,6 +401,53 @@ for my $Test ( @IntegrationSearchTests ) {
         ObjectType => 'Ticket',
         Result     => 'ARRAY',
         Search     => $Test->{Search},
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# test Sort
+my @IntegrationSortTests = (
+    {
+        Name     => 'Sort: Field AccountedTime',
+        Sort     => [
+            {
+                Field => 'AccountedTime'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field AccountedTime / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'AccountedTime',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field AccountedTime  / Direction descending',
+        Sort     => [
+            {
+                Field     => 'AccountedTime',
+                Direction => 'descending'
+            }
+        ],
+        Expected => [$TicketID3, $TicketID2, $TicketID1]
+    }
+);
+for my $Test ( @IntegrationSortTests ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Sort       => $Test->{Sort},
         UserType   => 'Agent',
         UserID     => 1,
     );
