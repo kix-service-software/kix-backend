@@ -245,11 +245,6 @@ sub IsDeeply {
         return;
     }
 
-    my $Diff = $Self->_DataDiff(
-        Data1 => $Test,
-        Data2 => $ShouldBe,
-    );
-
     if ( !defined $Test && !defined $ShouldBe ) {
         $Self->_Print( 1, "$Name (is 'undef')" );
         return 1;
@@ -262,7 +257,12 @@ sub IsDeeply {
         $Self->_Print( 0, "$Name (is defined should be 'undef')" );
         return;
     }
-    elsif ( !$Diff ) {
+
+    my $Diff = $Self->_DataDiff(
+        Data1 => $Test,
+        Data2 => $ShouldBe,
+    );
+    if ( !$Diff ) {
         $Self->_Print( 1, "$Name matches expected value" );
         return 1;
     }

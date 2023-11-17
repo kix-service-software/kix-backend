@@ -191,10 +191,12 @@ sub GetOperation {
     if ( IsArrayRefWithData($Supported) ) {
         for my $Operator ( @{$Supported} ) {
             if ( !defined $Operators{$Operator} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unsupported Operator $Param{Operator}!",
-                );
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unsupported Operator $Param{Operator}!",
+                    );
+                }
                 return;
             }
             $Operators{$Operator} = 1;
@@ -204,18 +206,22 @@ sub GetOperation {
     return if !%Operators;
 
     if ( !$Operators{$Param{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Operator}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unsupported Operator $Param{Operator}!",
+            );
+        }
         return;
     }
 
     if ( !$Param{Column} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No given column!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No given column!",
+            );
+        }
         return;
     }
 
@@ -766,6 +772,69 @@ sub _SetSupplement {
     }
 
     return $Statement;
+}
+
+sub _CheckSearchParams {
+    my ($Self, %Param) = @_;
+
+    if (
+        ref( $Param{Search} ) ne 'HASH'
+        || !defined( $Param{Search}->{Field} )
+        || !defined( $Param{Search}->{Operator} )
+        || !defined( $Param{Search}->{Value} )
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid Search!',
+            );
+        }
+        return;
+    }
+
+    if (
+        !defined( $Self->{Supported}->{$Param{Search}->{Field}} )
+        || !$Self->{Supported}->{$Param{Search}->{Field}}->{IsSearchable}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid search field "' . $Param{Search}->{Field} . '"!',
+            );
+        }
+        return;
+    }
+
+    return 1;
+}
+
+sub _CheckSortParams {
+    my ($Self, %Param) = @_;
+
+    if ( !defined( $Param{Attribute} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Attribute!',
+            );
+        }
+        return;
+    }
+
+    if (
+        !defined( $Self->{Supported}->{ $Param{Attribute} } )
+        || !$Self->{Supported}->{ $Param{Attribute} }->{IsSortable}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid sort attribute "' . $Param{Attribute} . '"!',
+            );
+        }
+        return;
+    }
+
+    return 1;
 }
 
 1;

@@ -82,22 +82,18 @@ sub Search {
     my ( $Self, %Param ) = @_;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    my $Check = $Self->_CheckSearchParams(
+        %Param
+    );
+    return if ( !$Check );
 
-    if (
-        !defined $Param{Search}->{Value}
-        || $Param{Search}->{Value} !~ m/^-?\d+$/sm
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid search value ($Param{Search}->{Value})!",
-        );
+    if ( $Param{Search}->{Value} !~ m/^-?\d+$/sm ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid search value ($Param{Search}->{Value})!",
+            );
+        }
         return;
     }
 
@@ -106,12 +102,12 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.accounted_time',
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        Silent    => $Param{Silent}
     );
-
     return if !@Where;
 
-    push( @SQLWhere, @Where);
+    push( @SQLWhere, @Where );
 
     return {
         Where => \@SQLWhere,
@@ -127,7 +123,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        Select   => [ ],          # optional
+        Select  => [ ],          # optional
         OrderBy => [ ]           # optional
     };
 
@@ -136,13 +132,15 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    my $Check = $Self->_CheckSortParams(
+        %Param
+    );
+    return if ( !$Check );
+
     return {
-        Select => [
-            'st.accounted_time'
-        ],
-        OrderBy => [
-            'st.accounted_time'
-        ]
+        Select  => [ 'st.accounted_time' ],
+        OrderBy => [ 'st.accounted_time' ]
     };
 }
 
