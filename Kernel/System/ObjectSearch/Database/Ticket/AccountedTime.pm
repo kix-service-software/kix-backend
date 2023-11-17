@@ -82,10 +82,7 @@ sub Search {
     my ( $Self, %Param ) = @_;
 
     # check params
-    my $Check = $Self->_CheckSearchParams(
-        %Param
-    );
-    return if ( !$Check );
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     if ( $Param{Search}->{Value} !~ m/^-?\d+$/sm ) {
         if ( !$Param{Silent} ) {
@@ -133,10 +130,7 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    my $Check = $Self->_CheckSortParams(
-        %Param
-    );
-    return if ( !$Check );
+    return if ( !$Self->_CheckSortParams(%Param) );
 
     return {
         Select  => [ 'st.accounted_time' ],

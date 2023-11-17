@@ -217,6 +217,195 @@ for my $Test ( @SortTests ) {
     );
 }
 
+### Integration Test ###
+# discard current object search object
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['ObjectSearch'],
+);
+
+# make sure config 'ObjectSearch::Backend' is set to Module 'ObjectSearch::Database'
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'ObjectSearch::Backend',
+    Value => {
+        Module => 'ObjectSearch::Database',
+    }
+);
+
+# get objectsearch object
+my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+## prepare test tickets ##
+# first ticket
+my $TicketID1 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID1,
+    'Created first ticket'
+);
+my $TicketAccountTime1 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
+    TicketID  => $TicketID1,
+    TimeUnit  => '1',
+    UserID    => 1,
+);
+$Self->True(
+    $TicketAccountTime1,
+    'Accounted time for first ticket'
+);
+# second ticket
+my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID2,
+    'Created second ticket'
+);
+my $TicketAccountTime2 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
+    TicketID  => $TicketID2,
+    TimeUnit  => '2',
+    UserID    => 1,
+);
+$Self->True(
+    $TicketAccountTime2,
+    'Accounted time for second ticket'
+);
+# third ticket
+my $TicketID3 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID3,
+    'Created third ticket'
+);
+my $TicketAccountTime3 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
+    TicketID  => $TicketID3,
+    TimeUnit  => '3',
+    UserID    => 1,
+);
+$Self->True(
+    $TicketAccountTime3,
+    'Accounted time for third ticket'
+);
+
+# test Search
+my @IntegrationSearchTests = (
+    {
+        Name => 'Search: Operator EQ / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'EQ',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name => 'Search: Operator LT / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'LT',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name => 'Search: Operator GT / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'GT',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name => 'Search: Operator LTE / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'LTE',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name => 'Search: Operator GTE / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'GTE',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID2, $TicketID3]
+    }
+);
+for my $Test ( @IntegrationSearchTests ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Test->{Search},
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# rollback transaction on database
+$Helper->Rollback();
+
 1;
 
 =back
