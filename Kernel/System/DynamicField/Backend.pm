@@ -1548,35 +1548,26 @@ sub ValueLookup {
     return $Self->{$DynamicFieldBackend}->ValueLookup(%Param);
 }
 
-=item HasBehavior()
+=item GetProperty()
 
-checks if the dynamic field as an specified behavior
+checks if the dynamic field as an specified property
 
-    my $Success = $BackendObject->HasBehavior(
+    my $Success = $BackendObject->GetProperty(
         DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
-        Behavior           => 'Some Behavior',           # 'IsNotificationEventCondition' to be used
-                                                         #     in the notification events as a
-                                                         #     ticket condition
-                                                         # 'IsSortable' to sort by this field in
-                                                         #     "Small" overviews
-                                                         # 'IsStatsCondition' to be used in
-                                                         #     Statistics as a condition
-                                                         # 'IsCustomerInterfaceCapable' to make
-                                                         #     the field usable in the customer
-                                                         #     interface
+        Property           => 'Some Property',           # 'IsSearchable','IsSortable','SearchOperators','SearchValueType'
     );
 
     Returns:
 
-    $Success = 1;                # or undefined (if the dynamic field does not have that behavior)
+    $Success = 1;                # or undefined (if the dynamic field does not have that property)
 
 =cut
 
-sub HasBehavior {
+sub GetProperty {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig Behavior)) {
+    for my $Needed (qw(DynamicFieldConfig Property)) {
         if ( !$Param{$Needed} ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -1626,16 +1617,15 @@ sub HasBehavior {
     }
 
     # verify if function is available
-    return if !$Self->{$DynamicFieldBackend}->can('HasBehavior');
+    return if !$Self->{$DynamicFieldBackend}->can('GetProperty');
 
-    # call HasBehavior on the specific backend
-    return $Self->{$DynamicFieldBackend}->HasBehavior(%Param);
+    # call GetProperty on the specific backend
+    return $Self->{$DynamicFieldBackend}->GetProperty(%Param);
 }
 
-=head2 Functions For IsNotificationEventCondition Behavior
+=head2 Functions For Serialization
 
-The following functions should be only used if the dynamic field has IsNotificationEventCondition
-behavior
+The following functions are used to de-/serialize the dynamic field
 
 =over 4
 

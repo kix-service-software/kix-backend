@@ -17,7 +17,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::CommonObjectType - base object type module for object search
+Kernel::System::ObjectSearch::Database::CommonObjectType - base object type module for object search backend 'ObjectSearch::Database'
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Kernel::System::ObjectSearch::Database::CommonObjectType - base object type modu
 
 =item new()
 
-create an object.
+common module is not intended for direct usage, but as base for real object type modules
 
 =cut
 

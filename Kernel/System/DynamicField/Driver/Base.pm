@@ -103,17 +103,14 @@ sub AllValuesDelete {
     return $Success;
 }
 
-sub HasBehavior {
+sub GetProperty {
     my ( $Self, %Param ) = @_;
 
     # return fail if Behaviors hash does not exists
-    return if !IsHashRefWithData( $Self->{Behaviors} );
+    return if !IsHashRefWithData( $Self->{Properties} );
 
-    # return success if the dynamic field has the expected behavior
-    return 1 if IsPositiveInteger( $Self->{Behaviors}->{ $Param{Behavior} } );
-
-    # otherwise return fail
-    return;
+    # return requested Property
+    return $Self->{Properties}->{ $Param{Property} };
 }
 
 sub HTMLDisplayValueRender {

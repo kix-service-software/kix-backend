@@ -309,6 +309,9 @@ for my $Test ( @GetSupportedAttributesTests ) {
     );
 }
 
+# begin transaction on database
+$Helper->BeginWork();
+
 # get general catalog entry for class 'Hardware'
 my $ClassDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class => 'ITSM::ConfigItem::Class',
@@ -341,6 +344,12 @@ my %Queue = $Kernel::OM->Get('Queue')->QueueGet(
 # get queue with ID 1
 my %State = $Kernel::OM->Get('State')->StateGet(
     ID => 1,
+);
+
+# create test asset
+my $AssetID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassDataRef->{ItemID},
+    UserID  => 1,
 );
 
 # get registered object types for backend database
@@ -436,6 +445,9 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                     elsif ( $Entry->{ValueType} eq 'StateType.Name' ) {
                         $SearchValue = $State{TypeName};
                     }
+                    elsif ( $Entry->{ValueType} eq 'Asset.ID' ) {
+                        $SearchValue = $AssetID;
+                    }
                     else {
                         $SearchValue = 'Test';
                     }
@@ -523,6 +535,9 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
         }
     }
 }
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

@@ -65,25 +65,25 @@ sub GetSupportedAttributes {
     for my $DynamicFieldConfig ( @{ $DynamicFieldList } ) {
         my $DFName = 'DynamicField_' . $DynamicFieldConfig->{Name};
 
-        my $IsSearchable = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+        my $IsSearchable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
             DynamicFieldConfig => $DynamicFieldConfig,
-            Behavior           => 'IsSearchable'
+            Property           => 'IsSearchable'
         );
         my $Operators = [];
         my $ValueType = '';
         if ( $IsSearchable ) {
-            $Operators = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+            $Operators = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
                 DynamicFieldConfig => $DynamicFieldConfig,
-                Behavior           => 'SearchOperators'
+                Property           => 'SearchOperators'
             );
-            $ValueType = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+            $ValueType = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
                 DynamicFieldConfig => $DynamicFieldConfig,
-                Behavior           => 'SearchValueType'
+                Property           => 'SearchValueType'
             );
         }
-        my $IsSortable = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+        my $IsSortable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
             DynamicFieldConfig => $DynamicFieldConfig,
-            Behavior           => 'IsSortable'
+            Property           => 'IsSortable'
         );
 
         $Self->{Supported}->{ $DFName } = {

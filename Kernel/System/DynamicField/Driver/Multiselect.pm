@@ -53,15 +53,11 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # set field behaviors
-    $Self->{Behaviors} = {
-        'IsNotificationEventCondition' => 1,
-        'IsSearchable'                 => 1,
-        'IsSortable'                   => 1,
-        'IsFilterable'                 => 0,
-        'IsStatsCondition'             => 1,
-        'IsCustomerInterfaceCapable'   => 1,
-        'SearchOperators'              => ['EQ','GT','GTE','LT','LTE','LIKE']
+    # set field properties
+    $Self->{Properties} = {
+        'IsSearchable'    => 1,
+        'IsSortable'      => 1,
+        'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE']
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -90,12 +86,12 @@ sub new {
             }
         }
 
-        # check if extension contains more behaviors
-        if ( IsHashRefWithData( $Extension->{Behaviors} ) ) {
+        # check if extension contains more properties
+        if ( IsHashRefWithData( $Extension->{Properties} ) ) {
 
-            %{ $Self->{Behaviors} } = (
-                %{ $Self->{Behaviors} },
-                %{ $Extension->{Behaviors} }
+            %{ $Self->{Properties} } = (
+                %{ $Self->{Properties} },
+                %{ $Extension->{Properties} }
             );
         }
     }

@@ -1122,20 +1122,9 @@ sub DynamicFieldListGet {
     }
 
     for my $ItemID (@DynamicFieldIDs) {
-
         my $DynamicField = $Self->DynamicFieldGet(
             ID => $ItemID,
         );
-
-        if (
-            defined $Param{IsSortable}
-            && $Param{IsSortable} != $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
-                DynamicFieldConfig => $DynamicField,
-                Behavior           => 'IsSortable'
-            )
-        ) {
-            next;
-        }
 
         push @Data, $DynamicField;
     }

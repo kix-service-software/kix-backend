@@ -17,11 +17,11 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database - ### TODO ###
+Kernel::System::ObjectSearch::Database - object search backend
 
 =head1 SYNOPSIS
 
-### TODO ###
+All object search backend functions.
 
 =over 4
 
@@ -29,7 +29,12 @@ Kernel::System::ObjectSearch::Database - ### TODO ###
 
 =item new()
 
-### TODO ###
+Do not use it directly, instead configure 'ObjectSearch::Backend' to use Module 'ObjectSearch::Database'
+and use ObjectSearch with its provided functions:
+
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 
 =cut
 
@@ -59,7 +64,13 @@ sub new {
 
 =item NormalizedObjectType()
 
-### TODO ###
+provides normalized name of object type
+    my $ObjectType = $ObjectSearch->{Backend}->NormalizedObjectType(
+        ObjectType => 'ticket',
+    );
+
+Returns:
+    $ObjectType = 'Ticket'
 
 =cut
 
@@ -72,7 +83,58 @@ sub NormalizedObjectType {
 
 =item Search()
 
-### TODO ###
+search for objects in backend
+
+    my %Result = $ObjectSearch->{Backend}->Search(
+        ObjectType => 'Ticket',             # registered object type of this search backend
+        Result     => 'HASH',               # Optional. Default: HASH; Possible values: HASH, ARRAY, COUNT
+        Search     => { ... },              # Optional. HashRef with SearchParams
+        Sort       => [ ... ],              # Optional. ArrayRef of hashes with SortParams
+        Limit      => 100,                  # Optional. Limit provided resultes. Use '0' to search without limit
+        CacheTTL   => 60,                   # Optional. Default: 240; Time is seconds the result will be cached. Use '0' if result should not be cached.
+        UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
+        UserID     => 1,                    # ID of requesting user. Used for permission checks
+    );
+
+SearchParams:
+    Search => {
+        AND => [        # optional, if not given, OR must be used
+            {
+                Field    => '...',      # see list of filterable fields
+                Operator => '...'       # see list of filterable fields
+                Value    => ...         # see list of filterable fields
+            },
+            ...
+        ]
+        OR => [         # optional, if not given, AND must be used
+            ...         # structure of field filter identical to AND
+        ]
+    }
+
+SortParams:
+    Sort => [
+        {
+            Field => '...',                              # see list of filterable fields
+            Direction => 'ascending' || 'descending'
+        },
+        ...
+    ]
+
+Returns:
+    Result HASH
+    %Result = (
+        1 => 123,
+        2 => 456
+    )
+
+    Result ARRAY
+    @Result = (
+        1,
+        2
+    )
+
+    Result COUNT
+    $Result = 2
 
 =cut
 
@@ -90,6 +152,7 @@ sub Search {
             ObjectType => $Param{ObjectType}
         );
     }
+    return if ( !$ObjectTypeBackend );
 
     # prepare sql defintion
     my $SQLDef = $Self->_PrepareSQLDef(
@@ -136,6 +199,31 @@ sub Search {
         return \@ObjectIDs;
     }
 }
+
+=item GetSupportedAttributes()
+
+get supported attributes for a given object type
+
+    my $Result = $ObjectSearch->{Backend}->GetSupportedAttributes(
+        ObjectType => 'Ticket',             # registered object type of this search backend
+    );
+
+Returns:
+    $Result = [
+        {
+            ObjectType      => 'Ticket',
+            Property        => 'TicketID,
+            ObjectSpecifics => undef,
+            IsSearchable    => 1,
+            IsSortable      => 1,
+            Operators       => [
+                'EQ','IN','!IN','NE','LT','LTE','GT','GTE'
+            ]
+        },
+        ...
+    ]
+
+=cut
 
 sub GetSupportedAttributes {
     my ( $Self, %Param) =  @_;

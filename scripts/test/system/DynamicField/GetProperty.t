@@ -162,11 +162,9 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 1,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE','STARTSWITH','ENDSWITH']
         },
         Success => 1,
     },
@@ -176,11 +174,9 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 0,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE','STARTSWITH','ENDSWITH']
         },
         Success => 1,
     },
@@ -190,11 +186,9 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 0,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE']
         },
         Success => 1,
     },
@@ -204,11 +198,9 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 0,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE']
         },
         Success => 1,
     },
@@ -218,11 +210,10 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 1,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE'],
+            'SearchValueType' => 'DateTime'
         },
         Success => 1,
     },
@@ -232,11 +223,10 @@ my @Tests = (
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
         },
         ExpectedResults => {
-            'IsNotificationEventCondition' => 1,
-            'IsSortable'                   => 1,
-            'IsFilterable'                 => 0,
-            'IsStatsCondition'             => 1,
-            'IsCustomerInterfaceCapable'   => 1,
+            'IsSearchable'    => 1,
+            'IsSortable'      => 1,
+            'SearchOperators' => ['EQ','GT','GTE','LT','LTE'],
+            'SearchValueType' => 'Date'
         },
         Success => 1,
     },
@@ -247,15 +237,10 @@ for my $Test (@Tests) {
 
     # set known behaviors
     BEHAVIOR:
-    for my $Behavior (
+    for my $Property (
         qw(
-<<<<<<< HEAD
-            IsNotificationEventCondition IsSortable IsFiltrable IsStatsCondition
-            IsCustomerInterfaceCapable NotExisting
-=======
-        IsNotificationEventCondition IsSortable IsFilterable IsStatsCondition
-        IsCustomerInterfaceCapable NotExisting
->>>>>>> 65dc58204845e03edf0370aecf437a7fd799650b
+            IsSearchable IsSortable SearchOperators SearchValueType
+            NotExisting
         )
     ) {
 
@@ -266,12 +251,12 @@ for my $Test (@Tests) {
         if ( IsHashRefWithData( $Test->{Config} ) ) {
             %Config = (
                 %{ $Test->{Config} },
-                Behavior => $Behavior,
+                Property => $Property,
             );
         }
 
-        # call HasBehavior for each test for each known behavior
-        my $Success = $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+        # call GetProperty for each test for each known behavior
+        my $Success = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
             %Config,
             Silent => $Test->{Silent},
         );
@@ -279,8 +264,8 @@ for my $Test (@Tests) {
         # if the test is a success then check the expected results with true
         if ($Success) {
             $Self->True(
-                $Test->{ExpectedResults}->{$Behavior},
-                "$Test->{Name} HasBehavior() for $Behavior executed with True",
+                $Test->{ExpectedResults}->{$Property},
+                "$Test->{Name} GetProperty() for $Property executed with True",
             );
         }
 
@@ -288,8 +273,8 @@ for my $Test (@Tests) {
         else {
             if ( $Test->{Success} ) {
                 $Self->False(
-                    $Test->{ExpectedResults}->{$Behavior},
-                    "$Test->{Name} HasBehavior() for $Behavior executed with False",
+                    $Test->{ExpectedResults}->{$Property},
+                    "$Test->{Name} GetProperty() for $Property executed with False",
                 );
             }
 
@@ -297,7 +282,7 @@ for my $Test (@Tests) {
             else {
                 $Self->True(
                     1,
-                    "$Test->{Name} HasBehavior() Should not run on missing configuration",
+                    "$Test->{Name} GetProperty() Should not run on missing configuration",
                 );
 
                 # if the tests supposed to fail due to missing essential configuration there is no
