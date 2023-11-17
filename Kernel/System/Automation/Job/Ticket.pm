@@ -58,6 +58,7 @@ sub _Run {
 
     # extend the filter with the ArticleID or TicketID
     if ( IsHashRefWithData($Param{Data}) && $Param{Data}->{ArticleID} ) {
+
         # add ArticleID to filter
         $Filters = $Self->_ExtendFilter(
             Filters => $Filters,
@@ -69,6 +70,7 @@ sub _Run {
         );
     }
     elsif ( IsHashRefWithData($Param{Data}) && $Param{Data}->{TicketID} ) {
+
         # add TicketID to filter
         $Filters = $Self->_ExtendFilter(
             Filters => $Filters,
@@ -85,12 +87,14 @@ sub _Run {
     # do the search
     if (IsArrayRefWithData($Filters)) {
         for my $Search ( @{$Filters} ) {
-            my @TicketIDsPart = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Result => 'ARRAY',
-                Search => $Search,
-                UserID => 1
-            );
-            push(@TicketIDs, @TicketIDsPart);
+            if ( IsHashRefWithData($Search) ) {
+                my @TicketIDsPart = $Kernel::OM->Get('Ticket')->TicketSearch(
+                    Result => 'ARRAY',
+                    Search => $Search,
+                    UserID => 1
+                );
+                push(@TicketIDs, @TicketIDsPart);
+            }
         }
         @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
     } else {
