@@ -1,0 +1,8 @@
+  displayName: ObjectSearch
+  description: !include ../descriptions/resources/objectsearch.md
+  /{objecttype}:
+    type: { item-readonly: { typeName: ObjectSearchSupportedAttributes } }
+    uriParameters:
+      objecttype:
+        displayName: ObjectType
+        type: string

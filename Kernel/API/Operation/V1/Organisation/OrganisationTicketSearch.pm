@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -83,8 +83,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ticket search
-    my @TicketList = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => [
                 {
                     Field    => 'OrganisationID',
@@ -93,8 +94,9 @@ sub Run {
                 }
             ]
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     if (IsArrayRefWithData(\@TicketList)) {

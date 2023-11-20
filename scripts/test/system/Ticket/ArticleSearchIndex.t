@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -74,10 +74,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    my %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    my %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [
@@ -115,10 +117,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [
@@ -136,10 +140,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [
@@ -157,10 +163,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [
@@ -199,10 +207,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [
@@ -220,10 +230,12 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
     );
 
     # search
-    %TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+    %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'HASH',
         Limit      => 100,
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
         Search     => {
             'AND' => [

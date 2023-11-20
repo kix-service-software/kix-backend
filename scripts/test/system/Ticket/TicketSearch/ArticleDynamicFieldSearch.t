@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -251,10 +251,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
     # process event queue
     $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-    my %TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'HASH',
-        Limit   => 100,
-        Search  => {
+    my %TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field    => 'Title',
@@ -268,8 +269,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                 }
             ]
         },
-        UserID     => 1,
-        Permission => 'rw',
+        UserType    => 'Agent',
+        UserID      => 1,
+        Permission  => 'rw',
     );
 
     $Self->IsDeeply(
@@ -278,10 +280,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Search for one article field",
     );
 
-    %TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'HASH',
-        Limit   => 100,
-        Search  => {
+    %TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field    => 'Title',
@@ -300,8 +303,9 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                 }
             ]
         },
-        UserID     => 1,
-        Permission => 'rw',
+        UserID      => 1,
+        UserType    => 'Agent',
+        Permission  => 'rw',
     );
 
     $Self->IsDeeply(
@@ -310,10 +314,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Search for two article fields in one article",
     );
 
-    %TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'HASH',
-        Limit   => 100,
-        Search  => {
+    %TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field    => 'Title',
@@ -333,6 +338,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             ]
         },
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -342,10 +348,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Search for two article fields in different articles",
     );
 
-    %TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'HASH',
-        Limit   => 100,
-        Search  => {
+    %TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field    => 'Title',
@@ -365,6 +372,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             ]
         },
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -377,10 +385,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Search for two article fields in different tickets, wildcard",
     );
 
-    %TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'HASH',
-        Limit   => 100,
-        Search  => {
+    %TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'HASH',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field    => 'Title',
@@ -400,6 +409,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             ]
         },
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -412,10 +422,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Search for two article fields in different tickets, hardcoded",
     );
 
-    my @TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'ARRAY',
-        Limit   => 100,
-        Search  => {
+    my @TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field => 'Title',
@@ -441,6 +452,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             }
         ],
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -450,10 +462,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Sort by search field, ASC",
     );
 
-    @TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'ARRAY',
-        Limit   => 100,
-        Search  => {
+    @TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field => 'Title',
@@ -479,6 +492,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             }
         ],
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -488,10 +502,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Sort by search field, DESC",
     );
 
-    @TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'ARRAY',
-        Limit   => 100,
-        Search  => {
+    @TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field => 'Title',
@@ -512,6 +527,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             }
         ],
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 
@@ -521,10 +537,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         "$Module - Sort by another field, ASC",
     );
 
-    @TicketIDsSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result  => 'ARRAY',
-        Limit   => 100,
-        Search  => {
+    @TicketIDsSearch =  $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100,
+        Search     => {
             AND => [
                 {
                     Field => 'Title',
@@ -545,6 +562,7 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             }
         ],
         UserID     => 1,
+        UserType   => 'Agent',
         Permission => 'rw',
     );
 

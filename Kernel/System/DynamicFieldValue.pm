@@ -178,18 +178,24 @@ sub ValueSet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    $Counter = 0;
     for my $Value (@Values) {
-
+        my $FirstValue;
+        if ( !$Counter ) {
+            $FirstValue = 1;
+        }
         # create a new value entry
         return if !$DBObject->Do(
             SQL =>
-                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int)'
-                . ' VALUES (?, ?, ?, ?, ?)',
+                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int, first_value)'
+                . ' VALUES (?, ?, ?, ?, ?, ?)',
             Bind => [
                 \$Param{FieldID}, \$Param{ObjectID},
                 \$Value->{ValueText}, \$Value->{ValueDateTime}, \$Value->{ValueInt},
+                \$FirstValue
             ],
         );
+        $Counter++;
     }
 
     # delete cache
@@ -199,7 +205,7 @@ sub ValueSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'DynamicField.Value',
-        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
+        ObjectID  => $Param{FieldID}.q{::}.$Param{ObjectID},
     );
 
     return 1;

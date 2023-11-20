@@ -242,12 +242,14 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -275,12 +277,14 @@ sub _GetOwnedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets
@@ -316,12 +320,14 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -346,7 +352,7 @@ sub _GetOwnedAndLockedTickets {
                     UserID => $Self->{Authorization}->{UserID},
                 }
             ]
-        }
+        },
     );
 
     if ( IsHashRefWithData($Param{TicketFilter}) ) {
@@ -354,12 +360,14 @@ sub _GetOwnedAndLockedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets
@@ -390,12 +398,14 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
     $Tickets{All} = \@TicketIDs;
 
@@ -423,12 +433,14 @@ sub _GetWatchedTickets {
     }
 
     # execute ticket search
-    my @SeenTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @SeenTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search    => {
             AND => \@Filter
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
     # extract all unseen tickets

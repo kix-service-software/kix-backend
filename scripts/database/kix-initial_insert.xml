@@ -5268,6 +5268,7 @@ DefaultValue:
     <Data Key="field_id">8</Data>
     <Data Key="object_id" Type="Quote">1</Data>
     <Data Key="value_text" Type="Quote">service provider</Data>
+    <Data Key="first_value" >1</Data>
 </Insert>
 
 <Insert Table="html_to_pdf">
@@ -5469,6 +5470,16 @@ DefaultValue:
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}]]></Data>
     <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">3</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/objectsearch]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -7829,6 +7840,16 @@ DefaultValue:
     <Data Key="type_id">4</Data>
     <Data Key="target" Type="Quote"><![CDATA[*]]></Data>
     <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/objectsearch]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>

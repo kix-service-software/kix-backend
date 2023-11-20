@@ -1,0 +1,40 @@
+{
+    "SupportedAttributes": [
+        {
+            "Property": "Type",
+            "Operators": [
+                "EQ",
+                "NE",
+                "STARTWITH",
+                "ENDWITH",
+                "LIKE",
+                "LT",
+                "LTE",
+                "GT",
+                "GTE",
+                "IN",
+                "!IN"
+            ],
+            "ObjectSpecifics": null,
+            "IsSearchable": 1,
+            "IsSortable": 1,
+            "ObjectType": "Ticket"
+        },
+        {
+            "Property": "Data.example.xy.IP",
+            "Operators": [
+                "EQ",
+                "NE",
+                "IN",
+                "!IN"
+            ],
+            "IsSearchable": 1,
+            "IsSortable": 0,
+            "ObjectType": "ConfigItem",
+            "ObjectSpecifics": {
+                "Class": "Network",
+                "ClassID": 1
+            }
+        }
+    ]
+}
