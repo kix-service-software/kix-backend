@@ -22,7 +22,6 @@ use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
 use Kernel::System::Ticket::TicketIndex;
-use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -93,7 +92,6 @@ sub new {
     @ISA = qw(
         Kernel::System::Ticket::Article
         Kernel::System::Ticket::TicketIndex
-        Kernel::System::Ticket::TicketSearch
         Kernel::System::Ticket::BasePermission
         Kernel::System::EventHandler
         Kernel::System::PerfLog
@@ -1496,7 +1494,7 @@ sub _TicketCacheClear {
 
     # cleanup search cache
     $CacheObject->CleanUp(
-        Type => "TicketSearch",
+        Type => "ObjectSearch_Ticket",
     );
 
     # cleanup index cache
@@ -6802,14 +6800,18 @@ sub TicketFulltextIndexRebuild {
     my ( $Self, %Param ) = @_;
 
     # get all tickets
-    my @TicketIDs = $Self->TicketSearch(
-        ArchiveFlags => [ 'y', 'n' ],
-        OrderBy      => 'Down',
-        SortBy       => 'Age',
-        Result       => 'ARRAY',
-        Limit        => 100_000_000,
-        Permission   => 'ro',
-        UserID       => 1,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Sort => [
+            {
+                Field     => 'Age',
+                Direction => 'DESCENDING'
+            }
+        ],
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100_000_000,
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     $Kernel::OM->Get('Log')->Log(
@@ -6917,7 +6919,8 @@ sub GetAssignedTicketsForObject {
         }
 
         my @ORSearch = map { { Field => $_, Operator => 'IN', Value => $SearchData{$_} } } keys %SearchData;
-        @AssignedTicketIDs = $Self->TicketSearch(
+        @AssignedTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
             Result     => 'ARRAY',
             Search     => {
                 %Search,

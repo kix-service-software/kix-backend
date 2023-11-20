@@ -67,6 +67,7 @@
         },
         "LinkCount": {
             "type": "integer",
+            "description": "added via include \"LinkCount\"",
             "readOnly": true
         },
         "Lock": {
@@ -159,6 +160,7 @@
         },
         "Unseen": {
             "type": "integer",
+            "description": "added via include \"Unseen\"",
             "readOnly": true
         },
         "UntilTime": {
@@ -167,7 +169,7 @@
         },
         "WatcherID": {
             "type": "integer",
-            "description": "the ID of the watcher, if the current user is watching this ticket",
+            "description": "the ID of the watcher, if the current user is watching this ticket, added via include \"WatcherID\"",
             "readOnly": true
         },
         "Watchers": {

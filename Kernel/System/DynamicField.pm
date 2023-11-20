@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -652,7 +652,7 @@ sub DynamicFieldList {
             next FIELDNAME if !IsHashRefWithData($FieldConfig);
             next FIELDNAME if !$FieldConfig->{ID};
 
-            $AllowedFieldIDs{ $FieldConfig->{ID} } = 1,
+            $AllowedFieldIDs{ $FieldConfig->{ID} } = 1;
         }
     }
 
@@ -998,8 +998,15 @@ sub DynamicFieldListGet {
 
     # get cache object
     my $CacheObject = $Kernel::OM->Get('Cache');
-
-    my $CacheKey = 'DynamicFieldListGet::Valid::' . $Valid . '::ObjectType::' . $ObjectType;
+    my $CacheKeyJSON = $Kernel::OM->Get('JSON')->Encode(
+        SortKeys => 1,
+        Data     => {
+            %Param,
+            Valid      => $Valid,
+            ObjectType => $ObjectType
+        }
+    );
+    my $CacheKey = "DynamicFieldListGet::$CacheKeyJSON";
     my $Cache    = $CacheObject->Get(
         Type => 'DynamicField',
         Key  => $CacheKey,
@@ -1040,44 +1047,69 @@ sub DynamicFieldListGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     my @Data;
-    my $SQL = 'SELECT id, name FROM dynamic_field';
+    my $SQL = 'SELECT id, name FROM dynamic_field WHERE';
+    my @SQLWhere;
 
     if ($Valid) {
+        push (
+            @SQLWhere,
+            ' valid_id IN ('
+                . join( q{, } , $Kernel::OM->Get('Valid')->ValidIDsGet())
+                . q{)}
+        );
+    }
 
-        # get valid object
-        my $ValidObject = $Kernel::OM->Get('Valid');
+    if ( $Param{ObjectType} ) {
+        if (
+            IsStringWithData( $Param{ObjectType} )
+            && $Param{ObjectType} ne 'All'
+        ) {
+            push (
+                @SQLWhere,
+                "object_type = '"
+                    . $DBObject->Quote( $Param{ObjectType} )
+                    . q{'}
+            );
+        }
+        elsif ( IsArrayRefWithData( $Param{ObjectType} ) ) {
+            my @ObjectTypes      = map { q{'} . $DBObject->Quote($_) . q{'} } @{ $Param{ObjectType}};
+            my $ObjectTypeString = join( q{,}, @ObjectTypes);
 
-        $SQL .= ' WHERE valid_id IN (' . join ', ', $ValidObject->ValidIDsGet() . ')';
-
-        if ( $Param{ObjectType} ) {
-            if ( IsStringWithData( $Param{ObjectType} ) && $Param{ObjectType} ne 'All' ) {
-                $SQL .=
-                    " AND object_type = '" . $DBObject->Quote( $Param{ObjectType} ) . "'";
-            }
-            elsif ( IsArrayRefWithData( $Param{ObjectType} ) ) {
-                my $ObjectTypeString =
-                    join ',',
-                    map "'" . $DBObject->Quote($_) . "'",
-                    @{ $Param{ObjectType} };
-                $SQL .= " AND object_type IN ($ObjectTypeString)";
-
-            }
+            push (
+                @SQLWhere,
+                "object_type IN ($ObjectTypeString)"
+            );
         }
     }
-    else {
-        if ( $Param{ObjectType} ) {
-            if ( IsStringWithData( $Param{ObjectType} ) && $Param{ObjectType} ne 'All' ) {
-                $SQL .=
-                    " WHERE object_type = '" . $DBObject->Quote( $Param{ObjectType} ) . "'";
-            }
-            elsif ( IsArrayRefWithData( $Param{ObjectType} ) ) {
-                my $ObjectTypeString =
-                    join ',',
-                    map "'" . $DBObject->Quote($_) . "'",
-                    @{ $Param{ObjectType} };
-                $SQL .= " WHERE object_type IN ($ObjectTypeString)";
-            }
+
+    if ( $Param{FieldType} ) {
+        if (
+            IsStringWithData( $Param{FieldType} )
+            && $Param{FieldType} ne 'All'
+        ) {
+            push (
+                @SQLWhere,
+                "field_type = '"
+                    . $DBObject->Quote( $Param{FieldType} )
+                    . q{'}
+            );
         }
+        elsif ( IsArrayRefWithData( $Param{FieldType} ) ) {
+            my @FieldTypes      =  map {q{'} . $DBObject->Quote($_) . q{'}} @{ $Param{FieldType} };
+            my $FieldTypeString = join( q{,}, @FieldTypes );
+
+            push (
+                @SQLWhere,
+                "field_type IN ($FieldTypeString)"
+            );
+        }
+    }
+
+    if ( @SQLWhere ) {
+        $SQL .= join ( ' AND ', @SQLWhere );
+    }
+    else {
+        $SQL .= ' 1=1 ';
     }
 
     $SQL .= " ORDER BY id";
@@ -1094,6 +1126,17 @@ sub DynamicFieldListGet {
         my $DynamicField = $Self->DynamicFieldGet(
             ID => $ItemID,
         );
+
+        if (
+            defined $Param{IsSortable}
+            && $Param{IsSortable} != $Kernel::OM->Get('DynamicField::Backend')->HasBehavior(
+                DynamicFieldConfig => $DynamicField,
+                Behavior           => 'IsSortable'
+            )
+        ) {
+            next;
+        }
+
         push @Data, $DynamicField;
     }
 
@@ -1144,9 +1187,6 @@ sub DESTROY {
 }
 
 1;
-
-
-
 
 =back
 

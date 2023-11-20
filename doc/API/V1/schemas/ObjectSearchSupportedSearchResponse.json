@@ -1,0 +1,27 @@
+{
+   "$id" : "ObjectSearchSupportedSearchResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a object search supported properties and operators GET request.",
+   "type" : "object",
+   "properties" : {
+      "SupportedSearch" : {
+         "type" : "array",
+         "properties" : {
+            "Operators" : {
+               "type" : "array",
+               "readOnly" : true
+            },
+            "Property" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Property"
+         ]
+      }
+   },
+   "required" : [
+      "SupportedSearch"
+   ]
+}
