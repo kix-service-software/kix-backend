@@ -11,6 +11,8 @@ package Kernel::System::ObjectSearch::Database::Ticket::ArchiveFlag;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
@@ -81,6 +83,9 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if ( !$Self->_CheckSearchParams( %Param ) );
+
     if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         # do nothing if archive system is not used
         return {};
@@ -97,32 +102,83 @@ sub Search {
 
     my $Value;
     my %Flags;
-    if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
-        %Flags = map{ $_ => 1 } @{$Param{Search}->{Value}};
+    if ( IsArrayRef( $Param{Search}->{Value} ) ) {
+        %Flags = map{ lc( $_ ) => 1 } @{ $Param{Search}->{Value} };
     }
     else {
-        $Flags{$Param{Search}->{Value}} = 1;
+        $Flags{ lc( $Param{Search}->{Value} ) } = 1;
     }
 
+    # both flags are set
     if (
         (
-            $Flags{y}
-            && !$Flags{n}
-        ) || $Flags{1}
+            $Flags{0}
+            || $Flags{n}
+        )
+        && (
+            $Flags{1}
+            || $Flags{y}
+        )
+    ) {
+        $Value = [0,1];
+    }
+    # active flag is set
+    elsif(
+        $Flags{1}
+        || $Flags{y}
     ) {
         $Value = 1;
     }
-    elsif (
-        (
-            !$Flags{y}
-            && $Flags{n}
-        ) || $Flags{0}
+    # inactive flag is set
+    elsif(
+        $Flags{0}
+        || $Flags{n}
     ) {
         $Value = 0;
     }
-    else {
-        # Don't do anything as no restriction is needed
+
+    # check mappend value
+    if (
+        !defined( $Value )
+        && (
+            ref( $Param{Search}->{Value} ) ne 'ARRAY'
+            || @{ $Param{Search}->{Value} }
+        )
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid search value!",
+            );
+        }
         return;
+    }
+
+    # switch to IN-based operation, if value is array
+    if (
+        $Param{Search}->{Operator} !~ m/IN$/
+        && ref( $Value ) eq 'ARRAY'
+    ) {
+        if ( $Param{Search}->{Operator} eq 'EQ' ) {
+            $Param{Search}->{Operator} = 'IN';
+        }
+        else {
+            $Param{Search}->{Operator} = '!IN';
+        }
+    }
+
+    # convert value to array if operation is IN-based
+    if (
+        $Param{Search}->{Operator} =~ m/IN$/
+        && ref( $Value ) ne 'ARRAY'
+    ) {
+        # fallback to empty array, if value is undefined
+        if ( !defined( $Value ) ) {
+            $Value = [];
+        }
+        else {
+            $Value = [ $Value ];
+        }
     }
 
     my @SQLWhere;
@@ -131,7 +187,8 @@ sub Search {
         Column    => 'st.archive_flag',
         Value     => $Value,
         Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        Silent    => $Param{Silent}
     );
 
     return if !@Where;
@@ -160,6 +217,14 @@ run this module and return the SQL extensions
 
 sub Sort {
     my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
+    if ( !$Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
+        # do nothing if archive system is not used
+        return [];
+    }
 
     return {
         Select => [

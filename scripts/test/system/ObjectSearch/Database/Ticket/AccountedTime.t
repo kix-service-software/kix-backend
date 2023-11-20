@@ -433,7 +433,7 @@ my @IntegrationSortTests = (
         Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => 'Sort: Field AccountedTime  / Direction descending',
+        Name     => 'Sort: Field AccountedTime / Direction descending',
         Sort     => [
             {
                 Field     => 'AccountedTime',
