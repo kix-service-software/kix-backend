@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -61,6 +61,21 @@ sub RoleUserAdd {
             );
             return;
         }
+    }
+
+    # check if relation already exists in database
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => <<'END',
+SELECT role_id
+FROM role_user
+WHERE user_id = ?
+    AND role_id = ?
+END
+        Bind  => [ \$Param{AssignUserID}, \$Param{RoleID} ],
+        Limit => 1,
+    );
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        return 1;
     }
 
     # insert new relation
@@ -141,8 +156,8 @@ sub BasePermissionAgentList {
         JOIN users as u
             ON ru.user_id=u.id
         WHERE pt.name='Base::Ticket'
-            AND rp.target IN ('*', ?)     
-            AND u.valid_id=1       
+            AND rp.target IN ('*', ?)
+            AND u.valid_id=1
             AND u.is_agent=1
 END
 
@@ -237,6 +252,81 @@ sub RoleUserList {
         Key   => $CacheKey,
         Value => \@Result,
         TTL   => $Self->{CacheTTL},
+    );
+
+    return @Result;
+}
+
+=item UserRoleList()
+
+return a list of all roles of a given user
+
+    my @RoleIDs = $RoleObject->UserRoleList(
+        UserID       => 123,                    # required
+        UsageContext => 'Agent'|'Customer'      # optional, if not given, all assigned roles will be returned
+        Valid        => 1                       # optional
+    );
+
+=cut
+
+sub UserRoleList {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # set default value
+    my $Valid = $Param{Valid} ? 1 : 0;
+
+    # check cache
+    my $CacheKey = 'UserRoleList::' . $Param{UserID} . '::' . $Valid . '::' . ($Param{UsageContext} || '');
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return @{$Cache} if $Cache;
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('DB');
+    my @Bind     = ();
+    push @Bind, \$Param{UserID};
+
+    # create sql
+    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
+
+    if ( $Valid ) {
+        $SQL .= ' AND valid_id = 1';
+    }
+
+    # get data
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@Bind,
+    );
+
+    # fetch the result
+    my @Result;
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        # check if this role is valid for the given usage context
+        next if ( $Param{UsageContext} && ($Row[1] & Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}) != Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})} );
+
+        push(@Result, $Row[0]);
+    }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \@Result,
     );
 
     return @Result;

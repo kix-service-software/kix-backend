@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,7 +56,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     $Self->SetDefaultSort(
-        ConfigItem => [ 
+        ConfigItem => [
             { Field => 'Name' },
             { Field => 'Number' },
         ]
@@ -107,6 +107,10 @@ sub Run {
     # prepare search if given
     my %SearchParam;
     if ( IsHashRefWithData($Self->{Search}->{ConfigItem}) ) {
+
+        # Checks whether Previous Version Search exists.
+        # If this is set, it will be extracted from the search params.
+        $Self->_HandlePreviousVersion();
 
         # do first OR to prevent replacement of prior AND search with empty result
         SEARCHTYPE:
@@ -195,8 +199,9 @@ sub Run {
                         # perform search for every attribute
                         $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                             %SearchParam,
-                            UserID  => $Self->{Authorization}->{UserID},
-                            Limit   => $Limit,
+                            UserID                => $Self->{Authorization}->{UserID},
+                            Limit                 => $Limit,
+                            PreviousVersionSearch => $Self->{PreviousVersionSearch},
                             %Sorting,
 
                             # use ids of customer if given
@@ -232,17 +237,24 @@ sub Run {
                 if (!$SkipAndSearch) {
 
                     # use ids of customer and result from OR search if given
-                    # check for undef "refs" to prevent implicit undef to array-ref conversion (see below "!defiend")
-                    my @KnownIDs = ( @{ $ConfigItemList || [] }, @{ $CustomerCIIDList || [] } );
+                    my $KnownIDs = undef;
+                    if ( IsArrayRef($ConfigItemList) ) {
+                        $KnownIDs = $ConfigItemList;
+                    }
+                    elsif ( IsArrayRef($CustomerCIIDList) ) {
+                        $KnownIDs = $CustomerCIIDList;
+                    }
 
                     # perform ConfigItem search
                     my $SearchResult = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
                         %SearchParam,
-                        UserID        => $Self->{Authorization}->{UserID},
-                        Limit         => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
-                        ConfigItemIDs => \@KnownIDs,
+                        UserID                => $Self->{Authorization}->{UserID},
+                        Limit                 => $Self->{SearchLimit}->{ConfigItem} || $Self->{SearchLimit}->{'__COMMON'},
+                        ConfigItemIDs         => $KnownIDs,
+                        PreviousVersionSearch => $Self->{PreviousVersionSearch},
                         %Sorting
                     );
+
                     @SearchTypeResult = @{$SearchResult};
                 }
             }
@@ -342,6 +354,30 @@ sub _GetContactAssignedConfigItems {
     }
 
     return $IDList;
+}
+
+sub _HandlePreviousVersion {
+    my ($Self, %Param) = @_;
+
+    for my $Type ( keys %{$Self->{Search}->{ConfigItem}} ) {
+        my @Items;
+        for my $SearchItem ( @{$Self->{Search}->{ConfigItem}->{$Type}} ) {
+            if ($SearchItem->{Field} eq 'PreviousVersionSearch') {
+                $Self->{PreviousVersionSearch} = $SearchItem->{Value};
+            }
+            else {
+                push(@Items, $SearchItem);
+            }
+        }
+        if ( scalar(@Items) ) {
+            $Self->{Search}->{ConfigItem}->{$Type} = \@Items;
+        }
+        else {
+            delete $Self->{Search}->{ConfigItem}->{$Type};
+        }
+    }
+
+    return 1;
 }
 
 1;

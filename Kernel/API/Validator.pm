@@ -17,11 +17,6 @@ use base qw(
 
 use Kernel::System::VariableCheck qw(:all);
 
-# prevent 'Used once' warning for Kernel::OM
-use Kernel::System::ObjectManager;
-
-our $ObjectManagerDisabled = 1;
-
 =head1 NAME
 
 Kernel::API::Validator - API data validation interface
@@ -54,15 +49,6 @@ sub new {
     my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
 
     foreach my $Validator (sort keys %{$ValidatorList}) {
-        if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
-            # next validator if this one doesn't consider our current operation
-            next;
-        }
-        elsif ( $ValidatorList->{$Validator}->{IgnoreOperationRegEx} && $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/ ) {
-            # next validator if this one ignores our current operation
-            next;
-        }
-
         if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
             return $Self->_Error(
                 Code    => 'Validator.InternalError',
@@ -81,7 +67,11 @@ sub new {
             if ( !IsArrayRefWithData( $Self->{Validators}->{$ValidatedAttribute} ) ) {
                 $Self->{Validators}->{$ValidatedAttribute} = [];
             }
-            push @{$Self->{Validators}->{$ValidatedAttribute}}, $BackendObject;
+            push @{$Self->{Validators}->{$ValidatedAttribute}}, {
+                BackendObject          => $BackendObject,
+                ConsiderOperationRegEx => $ValidatorList->{$Validator}->{ConsiderOperationRegEx},
+                IgnoreOperationRegEx   => $ValidatorList->{$Validator}->{IgnoreOperationRegEx}
+            };
         }
     }
 
@@ -112,6 +102,16 @@ sub Validate {
         Success => 1,
     };
 
+
+        # if ( $ValidatorList->{$Validator}->{ConsiderOperationRegEx} && $Param{Operation} !~ /$ValidatorList->{$Validator}->{ConsiderOperationRegEx}/ ) {
+        #     # next validator if this one doesn't consider our current operation
+        #     next;
+        # }
+        # elsif ( $ValidatorList->{$Validator}->{IgnoreOperationRegEx} && $Param{Operation} =~ /$ValidatorList->{$Validator}->{IgnoreOperationRegEx}/ ) {
+        #     # next validator if this one ignores our current operation
+        #     next;
+        # }
+
     # if no Data is given to validate, then return successful
     if ( !IsHashRefWithData($Param{Data}) ) {
         return $Self->_Success();
@@ -130,6 +130,7 @@ sub Validate {
         # execute validator if one exists for this attribute
         if ( IsArrayRefWithData($Self->{Validators}->{$Attribute}) ) {
             $Result = $Self->_ValidateAttribute(
+                Operation        => $Param{Operation},
                 ParentAttribute  => $Param{ParentAttribute},
                 Attribute        => $Attribute,
                 Data             => $Param{Data},
@@ -143,6 +144,7 @@ sub Validate {
             if ( IsArrayRefWithData($Param{Data}->{$Attribute}) ) {
                 foreach my $Item ( @{$Param{Data}->{$Attribute}} ) {
                     my $ValidationResult = $Self->Validate(
+                        Operation        => $Param{Operation},
                         ParentAttribute  => $Attribute,
                         Data             => $Item,
                     );
@@ -154,6 +156,7 @@ sub Validate {
             }
             elsif ( IsHashRefWithData($Param{Data}->{$Attribute}) ) {
                 my $ValidationResult = $Self->Validate(
+                    Operation        => $Param{Operation},
                     ParentAttribute  => $Attribute,
                     Data             => $Param{Data}->{$Attribute},
                 );
@@ -178,8 +181,17 @@ sub _ValidateAttribute {
 
     VALIDATOR:
     foreach my $Validator ( @{$Self->{Validators}->{$Param{Attribute}}} ) {
+        if ( $Validator->{ConsiderOperationRegEx} && $Param{Operation} !~ /$Validator->{ConsiderOperationRegEx}/ ) {
+            # next validator if this one doesn't consider our current operation
+            next;
+        }
+        elsif ( $Validator->{IgnoreOperationRegEx} && $Param{Operation} =~ /$Validator->{IgnoreOperationRegEx}/ ) {
+            # next validator if this one ignores our current operation
+            next;
+        }
+        
         foreach my $Value ( @Values ) {
-            my $ValidatorResult = $Validator->Validate(
+            my $ValidatorResult = $Validator->{BackendObject}->Validate(
                 Attribute => $Param{Attribute},
                 Data      => {
                     $Param{Attribute} => $Value

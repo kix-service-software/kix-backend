@@ -46,7 +46,6 @@ sub new {
         'DynamicFieldContent::Ticket'  => 'SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState',
         'DynamicFieldContent::Article' => '',
 
-        AcknowledgeName      => 'Nagios1',
         AffectedAssetName    => 'AffectedAsset',
 
         CreateTicketType     => 'Incident',
@@ -517,30 +516,6 @@ sub _TicketCreate {
 
     $Param->{GetParam}->{'X-KIX-SLA'} = $Self->{Config}->{CreateTicketSLA}
         || $Param->{GetParam}->{'X-KIX-SLA'};
-
-    # set DF AcknowledgeNameField to allow later sysmon source identification...
-    if ( $Self->{Config}->{AcknowledgeName} ) {
-        my $AcknowledgeNameField = $Kernel::OM->Get('Config')->Get('Tool::Acknowledge::RegistrationAllocation');
-        if ($AcknowledgeNameField) {
-            if ( $AcknowledgeNameField =~ /^\d+$/ ) {
-                $AcknowledgeNameField = $DynamicFieldTicketTextPrefix . $AcknowledgeNameField
-            }
-            my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-                'Name' => $AcknowledgeNameField,
-            );
-            if ( !IsHashRefWithData($DynamicField) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "SysMon Mail DF <" . $AcknowledgeNameField
-                        . "> does not exist.",
-                );
-            }
-            else {
-                $Param->{GetParam}->{ 'X-KIX-DynamicField-' . $AcknowledgeNameField }
-                    = $Self->{Config}->{AcknowledgeName} || 'Nagios';
-            }
-        }
-    }
 
     # set AffectedAssetNameField (thus linking ticket with asset and set inci state)
     if ( $Self->{Config}->{AffectedAssetName} ) {

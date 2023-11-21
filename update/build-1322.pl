@@ -68,7 +68,6 @@ sub _UpdateAccessLevels {
 
     my @Items = qw{
         AuthTwoFactorModule::SecretPreferencesKey
-        Tool::Acknowledge::HTTP::Password
         Authentication###000-Default
     };
 

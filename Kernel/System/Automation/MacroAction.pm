@@ -726,6 +726,9 @@ sub MacroActionExecute {
     );
     return if !$BackendObject;
 
+    # call init for backend
+    $BackendObject->Init();
+
     # add referrer data
     for my $CommonParam ( qw(JobID RunID MacroID MacroActionID) ) {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
@@ -748,33 +751,41 @@ sub MacroActionExecute {
     # add event data
     $BackendObject->{EventData} = $Self->{EventData};
 
-    my %Parameters = %{$MacroAction{Parameters} || {}};
+    do {
+        # unset RepeatExecution of backend
+        $BackendObject->UnsetRepeatExecution();
 
-    # replace result variables
-    if (IsHashRefWithData($Self->{MacroResults})) {
-        $Self->_ReplaceResultVariables(
-            Data   => \%Parameters,
-            UserID => $Param{UserID}
-        );
-    }
+        my %Parameters = %{$MacroAction{Parameters} || {}};
 
-    my $Success = $BackendObject->Run(
-        %Param,
-        MacroType  => $Macro{Type},
-        Config     => \%Parameters
-    );
+        # replace result variables
+        if (IsHashRefWithData($Self->{MacroResults})) {
+            $Self->_ReplaceResultVariables(
+                Data   => \%Parameters,
+                UserID => $Param{UserID}
+            );
+        }
 
-    if ( !$Success ) {
-        # get last error message from system log
-        my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error',
-            What => 'Message',
+        my $Success = $BackendObject->Run(
+            %Param,
+            MacroType         => $Macro{Type},
+            Config            => \%Parameters,
+            ConfigRaw         => \%{$MacroAction{Parameters} || {}},
         );
-        $Self->LogError(
-            Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
-            UserID   => $Param{UserID},
-        );
-    }
+
+        if ( !$Success ) {
+            # get last error message from system log
+            my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            $Self->LogError(
+                Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
+                UserID   => $Param{UserID},
+            );
+
+            last;
+        }
+    } while ( $BackendObject->RepeatExecution() );
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
@@ -1098,8 +1109,11 @@ sub _ReplaceResultVariables {
         }
     }
     else {
+        # init index for temp variables
+        my $VariableFilterValueIndex = 0;
+
         # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
+        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
@@ -1119,15 +1133,32 @@ sub _ReplaceResultVariables {
                 );
             }
 
+            # variable is part of a string, we have to do a string replace
             if ( $Leading || $Trailing ) {
-                # variable is part of a string, we have to do a string replace
-                $Param{Data} =~ s/\Q$Expression\E/$Value/gmx;
+                # value is a data structure, replace with temp variable
+                if ( ref( $Value ) ) {
+                    # increment index
+                    $VariableFilterValueIndex += 1;
+
+                    # store value in MacroResults
+                    $Self->{MacroResults}->{VariableFilterValue}->{ $VariableFilterValueIndex } = $Value;
+
+                    # replace current variable with variable filter value
+                    $Param{Data} =~ s/\Q$Expression\E/<VariableFilterValue$VariableFilterValueIndex>/gmx;
+                }
+                # replace value as string
+                else {
+                    $Param{Data} =~ s/\Q$Expression\E/$Value/gmx;
+                }
             }
             else {
                 # variable is an assignment, we can replace it with the actual value (i.e. Object)
                 $Param{Data} = $Value;
             }
         }
+
+        # remove temp variables from MacroResult
+        delete( $Self->{MacroResults}->{VariableFilterValue} );
     }
 
     return $Param{Data};
@@ -1174,6 +1205,15 @@ sub _ExecuteVariableFilters {
         elsif (IsHashRefWithData($Self->{VariableFilter})) {
             $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
             my $Parameter = $+{parameter};
+
+            # check for stored variable filter value
+            if ( $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
+                my $VariableFilterValueIndex = $1;
+                $Parameter = $Kernel::OM->Get('Main')->ResolveValueByKey(
+                    Key  => $VariableFilterValueIndex,
+                    Data => $Self->{MacroResults}->{VariableFilterValue},
+                );
+            }
 
             my $Handler;
             for my $HandlerName ( %{$Self->{VariableFilter}} ) {

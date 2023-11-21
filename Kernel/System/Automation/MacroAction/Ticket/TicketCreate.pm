@@ -595,24 +595,11 @@ sub _SetDynamicFields {
                     || !IsHashRefWithData($DynamicFieldLookup{$DynamicField->[0]})
             );
 
-            my $ReplacedValue;
-
-            if ($DynamicField->[1] =~ m/^<KIX_TICKET_DynamicField_(\w+?)>$/) {
-                my $DFName = $1;
-                $DFName =~ s/(\w+?)_.+/$1/;
-
-                if ($DFName && IsHashRefWithData( $DynamicFieldLookup{$DFName} ) ) {
-                    $ReplacedValue = $DynamicFieldBackendObject->ValueGet(
-                        DynamicFieldConfig => $DynamicFieldLookup{$DFName},
-                        ObjectID           => $Self->{RootObjectID} || $Param{TicketID},
-                    );
-                }
-            } else {
-                $ReplacedValue = $Self->_ReplaceValuePlaceholder(
-                    %Param,
-                    Value => $DynamicField->[1]
-                );
-            }
+            my $ReplacedValue = $Self->_ReplaceValuePlaceholder(
+                %Param,
+                Value => $DynamicField->[1],
+                HandleKeyLikeObjectValue => 1
+            );
 
             next if (!$ReplacedValue);
 

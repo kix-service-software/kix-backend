@@ -88,6 +88,9 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, $Param{Search}->{Field}." = '".$Param{Search}->{Value}."'" );
     }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        push( @SQLWhere, $Param{Search}->{Field}." != '".$Param{Search}->{Value}."'" );
+    }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         my ($Field, $Value) = $Self->_PrepareFieldAndValue(
             Field => 'st.title',
@@ -118,6 +121,9 @@ sub Search {
             Value => $Value
         );
         push( @SQLWhere, $Field." LIKE ".$Value );
+    }
+    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
+        push( @SQLWhere, "st.tn NOT IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );

@@ -137,19 +137,6 @@ sub _GetDynamicFieldsDefinitions {
 
     my @DynamicFields = (
         {
-            Name          => 'AcknowledgeName',
-            Label         => Kernel::Language::Translatable('System Acknowledge Name'),
-            FieldType     => 'Text',
-            ObjectType    => 'Ticket',
-            InternalField => 0,
-            Config        => {
-                CountDefault          => 1,
-                CountMax              => 1,
-                CountMin              => 1,
-                DefaultValue          => ""
-            }
-        },
-        {
             Name          => 'SysMonXAlias',
             Label         => Kernel::Language::Translatable('System Alias'),
             FieldType     => 'Text',

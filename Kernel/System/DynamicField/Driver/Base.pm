@@ -147,11 +147,10 @@ sub DFValueObjectReplace {
         if ($Param{Placeholder} =~ m/_Object_(\d+)_(.+)/) {
             if (($1 || $1 == 0) && $2 && $Param{Value}->[$1]) {
                 return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                    %Param,
                     Text        => "<KIX_$Self->{ReferencePlaceholderParameter}->{Prefix}\_$2>",
                     ObjectType  => $Self->{ReferencePlaceholderParameter}->{ObjectType},
-                    ObjectID    => $Param{Value}->[$1],
-                    UserID      => $Param{UserID},
-                    Language    => $Param{Language}
+                    ObjectID    => $Param{Value}->[$1]
                 );
             }
         }

@@ -88,6 +88,9 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.tn = '$Param{Search}->{Value}'" );
     }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        push( @SQLWhere, "st.tn != '$Param{Search}->{Value}'" );
+    }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         push( @SQLWhere, "st.tn LIKE '$Param{Search}->{Value}%'" );
     }
@@ -101,6 +104,9 @@ sub Search {
         my $Value = $Param{Search}->{Value};
         $Value =~ s/\*/%/g;
         push( @SQLWhere, "st.tn LIKE '$Value'" );
+    }
+    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
+        push( @SQLWhere, "st.tn NOT IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.tn IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );

@@ -4,6 +4,7 @@
         <Description Translatable="1">Defines a list of Ticket Dynamic Fields which are evaluated by the KIXMobileApp. The lists consists of dynamic field names (e.g. 'MobileProcessingState') or regular expressions matching dynamic field names (e.g. 'MobileProcessingChecklist.*').</Description>
         <Group>KIXMobileApp</Group>
         <SubGroup>Core::DynamicField</SubGroup>
+        <Context>mobile-app</Context>
         <Setting>
             <Array>
                 <Item>MobileProcessingState</Item>
@@ -12,10 +13,21 @@
             </Array>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::TicketDynamicFields::Edit" Required="0" Valid="1">
+        <Description Translatable="1">Defines a list of Ticket Dynamic Fields which are available for editing in the KIXMobileApp. The lists consists of dynamic field names (e.g. 'WorkOrder') or regular expressions matching dynamic field names (e.g. 'Work.*'). Be aware that field types which are not supported by the app, will not be available for input. Furthermore some specific DF such as any fields of type  Checklist, fields MobileProcessingState, PlanBegin, PlanEnd are fixed and cannot be removed or changed in their app behavior by this setting</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>Core::DynamicField</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Array>
+            </Array>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="KIXMobileApp::GeoPosition::ChangeThreshold" Required="0" Valid="1">
         <Description Translatable="1">Defines the minimum position changes required to report a new position for the user of the KIX Field Agent App. The distance is given in meters. The value must be given in natural numbers greater than zero. Invalid settings cause the app to use a default value.</Description>
         <Group>KIXMobileApp</Group>
         <SubGroup>GeoPosition</SubGroup>
+        <Context>mobile-app</Context>
         <Setting>
             <String Regex="^\d*$">1000</String>
         </Setting>
@@ -24,6 +36,7 @@
         <Description Translatable="1">Defines the initial setting of the position reporting behavior of the KIX Field Agent app when the user first logs into the app on a device. The app-specific setting applies to further use.</Description>
         <Group>KIXMobileApp</Group>
         <SubGroup>GeoPosition</SubGroup>
+        <Context>mobile-app</Context>
         <Setting>
             <Option SelectedID="0">
                 <Item Key="0">Disabled</Item>

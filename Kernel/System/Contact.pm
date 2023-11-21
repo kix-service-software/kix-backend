@@ -1315,8 +1315,12 @@ sub ContactSearch {
             $Where .= " AND ";
         }
 
-        $Where .= "$Self->{Lower}(c.email) = $Self->{Lower}(?)";
-        push(@Bind, \$Param{EmailEquals});
+        my @EmailWheres;
+        for my $EMailAttr ( qw(email email1 email2 email3 email4 email5) ) {
+            push(@EmailWheres, "$Self->{Lower}(c.$EMailAttr) = $Self->{Lower}(?)");
+            push(@Bind, \$Param{EmailEquals});
+        }
+        $Where .= '( ' . join(' OR ', @EmailWheres) . ' )';
     }
     elsif ($Param{EmailIn}) {
 
@@ -1329,11 +1333,18 @@ sub ContactSearch {
         }
 
         my @BindVars;
+        my @BindValues;
         foreach my $Mail ( @{$Param{EmailIn}} ) {
-            push(@BindVars, '?');
-            push(@Bind, \$Mail);
+            push(@BindVars, "$Self->{Lower}(?)");
+            push(@BindValues, \$Mail);
         }
-        $Where .= "(c.email IN ( " . join(',', @BindVars) . " ))";
+
+        my @EmailWheres;
+        for my $EMailAttr ( qw(email email1 email2 email3 email4 email5) ) {
+            push(@EmailWheres, "$Self->{Lower}(c.$EMailAttr) IN ( " . join(',', @BindVars) . " )");
+            push(@Bind, @BindValues);
+        }
+        $Where .= '( ' . join(' OR ', @EmailWheres) . ' )';
     }
     elsif ($Param{Login}) {
         $Join = 'LEFT JOIN users u ON c.user_id = u.id';
