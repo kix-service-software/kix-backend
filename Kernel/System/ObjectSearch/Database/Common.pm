@@ -82,6 +82,9 @@ empty method to be overridden by specific attribute module
 sub Search {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if !$Self->_CheckSearchParams(%Param);
+
     return;
 }
 
@@ -102,6 +105,9 @@ empty method to be overridden by specific attribute module
 
 sub Sort {
     my ( $Self, %Param ) = @_;
+
+    # check params
+    return if !$Self->_CheckSortParams(%Param);
 
     return;
 }
@@ -146,16 +152,20 @@ sub PrepareFieldAndValue {
 Generate sql statements for specific object type attributes.
 
     my $Statements = $Self->GetOperation(
-        Column        => 'st.title'         # (required) - table column for statement
-                                            #              can be given as string or array ref
-        Value         => '123'              # (optional) - table column value for statement
-                                            #              can be given as string or array ref
-        Supplement    => []                 # (optional) - an array ref of additional statements that will be add to the generated statement
-        Operator      => '!IN',             # (required) - operation for the statement
-        CaseSensitive =>  0,                # (optional) - (1|0) enables the case sensitive, not related to "Prepare"
-        Prepare       => 1,                 # (optional) - (1|0) enables the preparation of string values
-        Supported     => [LT,NE,EQ]         # (required) - list of supported operations of the object attributes
-        Type          => 'NUMERIC'          # (optional) - sets the quoting of the values in the sql statements basend on the given type
+        Column           => 'st.title'         # (required) - table column for statement
+                                               #              can be given as string or array ref
+        Value            => '123'              # (optional) - table column value for statement
+                                               #              can be given as string or array ref
+                                               #              If the operator is “EQ” or “NE” and the number of values is greater than 1,
+                                               #              then the operator changes to “IN” or “!IN”.
+        Supplement       => []                 # (optional) - an array ref of additional statements that will be add to the generated statement
+        Operator         => '!IN',             # (required) - operation for the statement
+        CaseSensitive    =>  0,                # (optional) - (1|0) enables the case sensitive, not related to "Prepare"
+        Prepare          => 1,                 # (optional) - (1|0) enables the preparation of string values
+        Supported        => [LT,NE,EQ]         # (required) - list of supported operations of the object attributes
+        Type             => 'NUMERIC'          # (optional) - sets the quoting of the values in the sql statements basend on the given type
+        ColumnValueIndex => 1                  # (optional) - sets the assignment of column to value, if active then the value is assigned to the column based on the index.
+                                               #              If disabled, all values are assigned to each column.
     );
 
 Returns array ref of statements.
@@ -168,6 +178,82 @@ Returns array ref of statements.
 =cut
 
 sub GetOperation {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckOperators(%Param);
+
+    if ( !$Param{Column} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No given column!",
+            );
+        }
+        return;
+    }
+
+    my $Columns = $Param{Column};
+    if ( ref $Param{Column} ne 'ARRAY' ) {
+        push( @{$Columns}, $Param{Column} );
+    }
+
+    my $Values = $Param{Value};
+    if ( ref $Param{Value} ne 'ARRAY' ) {
+        push( @{$Values}, $Param{Value} );
+    }
+
+    my $Function = "_Operation$Param{Operator}";
+    if ( $Param{Operator} eq '!IN' ) {
+        $Function = "_OperationNOTIN";
+    }
+
+    if (
+        IsArrayRef($Param{Value})
+        && scalar(@{$Param{Value}}) > 1
+        && $Param{Operator} =~ /^(?:EQ|NE)$/sm
+    ) {
+        $Function = $Param{Operator} eq 'EQ' ? '_OperationIN' : '_OperationNOTIN';
+    }
+
+    my @Statements;
+    for my $Index ( keys @{$Columns} ) {
+
+        my $Value = $Values;
+        if ( $Param{ColumnValueIndex} ) {
+            $Value = $Values->[$Index];
+        }
+
+        my $Statement = $Self->$Function(
+            %Param,
+            Value  => $Value,
+            Column => $Columns->[$Index],
+            Quotes => $Self->_GetQuotes(%Param)
+        );
+
+        $Statement = $Self->_SetSupplement(
+            %Param,
+            Statement => $Statement
+        );
+
+        push( @Statements, $Statement);
+    }
+
+    return @Statements;
+}
+
+=item _CheckOperators()
+
+Checks whether the specified operator is supported by the attribute.
+
+    my $Statements = $Self->GetOperation(
+        Operator  => '!IN',             # (required) - operation for the statement
+        Supported => [LT,NE,EQ]         # (required) - list of supported operations of the object attributes
+    );
+
+Returns boolean.
+
+=cut
+sub _CheckOperators {
     my ( $Self, %Param ) = @_;
 
     # All supported operators are initially disabled.
@@ -215,200 +301,70 @@ sub GetOperation {
         return;
     }
 
-    if ( !$Param{Column} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No given column!",
-            );
-        }
-        return;
-    }
-
-    my @Columns;
-    my $OneColumn = 1;
-    if ( ref $Param{Column} ne 'ARRAY' ) {
-        push( @Columns, $Param{Column} );
-    }
-    else {
-        @Columns   = @{$Param{Column}};
-        $OneColumn = 0 if ( scalar(@Columns) > 1 );
-    }
-
-    my @Values;
-    my $FirstValue = 1;
-    if ( ref $Param{Value} ne 'ARRAY' ) {
-        push( @Values, $Param{Value} );
-    }
-    else {
-        @Values     = @{$Param{Value}};
-        $FirstValue = 0 if ( scalar(@Values) > 1 );
-    }
-
-    my $Function = "_Operation$Param{Operator}";
-    if ( $Param{Operator} eq '!IN' ) {
-        $Function = "_OperationNOTIN";
-    }
-
-    my @Statements;
-    for my $Index ( keys @Columns ) {
-
-        my $Value;
-        if ( $OneColumn ) {
-            $Value = \@Values;
-        }
-        elsif ( $FirstValue ){
-            $Value = $Values[0];
-        }
-        else {
-            $Value = $Values[$Index];
-        }
-
-        my $Statement = $Self->$Function(
-            %Param,
-            Value  => $Value,
-            Column => $Columns[$Index],
-            IsOR   => $Param{IsOR} || 0,
-            Quotes => $Self->_GetQuotes(%Param)
-        );
-
-        $Statement = $Self->_SetOR(
-            %Param,
-            Statement => $Statement
-        );
-
-        $Statement = $Self->_SetSupplement(
-            %Param,
-            Statement => $Statement
-        );
-
-        push( @Statements, $Statement);
-    }
-
-    return @Statements;
+    return 1;
 }
 
 sub _OperationEQ {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    my $Value = $Param{Value}->[0] || q{};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( $Value ) {
 
-    if ( scalar(@Values) ) {
+        my $Str = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
 
-        my $SQL;
-        for my $Val ( @Values) {
-
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
-
-            my $Str = $Param{Quotes}->{SQL}
-                . $Val
-                . $Param{Quotes}->{SQL};
-
-            if ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Param{Column}) = LOWER($Str)";
-            }
-            else {
-                $SQL .= "$Param{Column} = $Str";
-            }
-
-            last if (!$Param{IsOR});
+        if ( $Param{CaseSensitive} ) {
+            return "LOWER($Param{Column}) = LOWER($Str)";
         }
-        return $SQL;
-
-    } else {
-        return "$Param{Column} IS NULL";
+        else {
+            return "$Param{Column} = $Str";
+        }
     }
+
+    return "$Param{Column} IS NULL";
 }
 
 sub _OperationNE {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    my $Value = $Param{Value}->[0] || q{};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( $Value ) {
 
-    if ( scalar(@Values) ) {
+        my $Str = $Param{Quotes}->{SQL}
+            . $Value
+            . $Param{Quotes}->{SQL};
 
-        my $SQL;
-        for my $Val ( @Values) {
-
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
-
-            my $Str = $Param{Quotes}->{SQL}
-                . $Val
-                . $Param{Quotes}->{SQL};
-
-            if ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Param{Column}) != LOWER($Str)";
-            }
-            elsif (
-                defined $Param{Type}
-                && $Param{Type} eq 'NUMERIC'
-            ) {
-                $SQL .= "$Param{Column} <> $Str";
-            }
-            else {
-                $SQL .= "$Param{Column} != $Str";
-            }
-
-            last if (!$Param{IsOR});
+        if ( $Param{CaseSensitive} ) {
+            return "LOWER($Param{Column}) != LOWER($Str)";
         }
-        return $SQL;
-    } else {
-        return "$Param{Column} IS NOT NULL";
+        elsif (
+            defined $Param{Type}
+            && $Param{Type} eq 'NUMERIC'
+        ) {
+            return "$Param{Column} <> $Str";
+        }
+        else {
+            return "$Param{Column} != $Str";
+        }
+
     }
+
+    return "$Param{Column} IS NOT NULL";
 }
 
 sub _OperationSTARTSWITH {
     my ( $Self, %Param ) = @_;
 
     my $Column = $Param{Column};
-    my $Value = $Param{Value};
+    my $Value  = $Param{Value};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( scalar(@{$Value}) ) {
 
-    if ( scalar(@Values) ) {
-
-        my $SQL;
-        for my $Val ( @Values) {
-
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
-
+        my @SQL;
+        for my $Val ( @{$Value}) {
             my $Str = $Param{Quotes}->{SQL}
                 . $Val
                 . $Param{Quotes}->{SQL};
@@ -419,50 +375,48 @@ sub _OperationSTARTSWITH {
                     Value          => $Val . q{%},
                     IsStaticSearch => $Param{IsStaticSearch}
                 );
-                $SQL .= "$Col LIKE $PreVal";
+                push(
+                    @SQL,
+                    "$Col LIKE $PreVal"
+                );
             }
 
             elsif ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Column) LIKE LOWER('$Val%')";
+                push(
+                    @SQL,
+                    "LOWER($Column) LIKE LOWER('$Val%')"
+                );
             }
             else {
-                $SQL .= "$Column LIKE '$Val%'";
+                push(
+                    @SQL,
+                    "$Column LIKE '$Val%'"
+                );
             }
-
-            last if (!$Param{IsOR});
         }
-        return $SQL;
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    return "$Column LIKE '$Value%'";
+    return '1=0';
 }
 
 sub _OperationENDSWITH {
     my ( $Self, %Param ) = @_;
 
     my $Column = $Param{Column};
-    my $Value = $Param{Value};
+    my $Value  = $Param{Value};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( scalar(@{$Value}) ) {
 
-    if ( scalar(@Values) ) {
-
-        my $SQL;
-        for my $Val ( @Values) {
-
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
-
+        my @SQL;
+        for my $Val ( @{$Value}) {
             my $Str = $Param{Quotes}->{SQL}
                 . $Val
                 . $Param{Quotes}->{SQL};
@@ -473,22 +427,36 @@ sub _OperationENDSWITH {
                     Value          => q{%} . $Val,
                     IsStaticSearch => $Param{IsStaticSearch}
                 );
-                $SQL .= "$Col LIKE $PreVal";
+                push(
+                    @SQL,
+                    "$Col LIKE $PreVal"
+                );
             }
 
             elsif ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Column) LIKE LOWER('%$Val')";
+                push(
+                    @SQL,
+                    "LOWER($Column) LIKE LOWER('%$Val')"
+                );
             }
             else {
-                $SQL .= "$Column LIKE '%$Val'";
+                push(
+                    @SQL,
+                    "$Column LIKE '%$Val'"
+                );
             }
-
-            last if (!$Param{IsOR});
         }
-        return $SQL;
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    return "$Column LIKE '%$Value'";
+    return '1=0';
 }
 
 sub _OperationCONTAINS {
@@ -497,26 +465,10 @@ sub _OperationCONTAINS {
     my $Column = $Param{Column};
     my $Value  = $Param{Value};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( scalar(@{$Value}) ) {
 
-    if ( scalar(@Values) ) {
-
-        my $SQL;
-        for my $Val ( @Values) {
-
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
-
+        my @SQL;
+        for my $Val ( @{$Value}) {
             my $Str = $Param{Quotes}->{SQL}
                 . $Val
                 . $Param{Quotes}->{SQL};
@@ -527,22 +479,36 @@ sub _OperationCONTAINS {
                     Value          => q{%} . $Val . q{%},
                     IsStaticSearch => $Param{IsStaticSearch}
                 );
-                $SQL .= "$Col LIKE $PreVal";
+                push(
+                    @SQL,
+                    "$Col LIKE $PreVal"
+                );
             }
 
             elsif ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Column) LIKE LOWER('%$Val%')";
+                push(
+                    @SQL,
+                    "LOWER($Column) LIKE LOWER('%$Val%')"
+                );
             }
             else {
-                $SQL .= "$Column LIKE '%$Val%'";
+                push(
+                    @SQL,
+                    "$Column LIKE '%$Val%'"
+                );
             }
-
-            last if (!$Param{IsOR});
         }
-        return $SQL;
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    return "$Column LIKE '%$Value%'";
+    return '1=0';
 }
 
 sub _OperationLIKE {
@@ -551,26 +517,11 @@ sub _OperationLIKE {
     my $Column = $Param{Column};
     my $Value  = $Param{Value};
 
-    my @Values;
-    if (IsArrayRefWithData($Value)) {
-        @Values = @{$Value};
-    }
-    elsif ( defined $Value )  {
-        push(@Values, $Value);
-    }
+    if ( scalar(@{$Value}) ) {
 
-    if ( scalar(@Values) ) {
-
-        my $SQL;
-        for my $Val ( @Values) {
-
+        my @SQL;
+        for my $Val ( @{$Value}) {
             $Val =~ s/[*]/%/gms;
-            if (
-                $Param{IsOR}
-                && $SQL
-            ) {
-                $SQL .= ' OR ';
-            }
 
             my $Str = $Param{Quotes}->{SQL}
                 . $Val
@@ -579,32 +530,48 @@ sub _OperationLIKE {
             if ( $Param{Prepare} ) {
                 my ($Col, $PreVal) = $Self->PrepareFieldAndValue(
                     Field          => $Column,
-                    Value          => $Val . q{%},
+                    Value          => $Val,
                     IsStaticSearch => $Param{IsStaticSearch}
                 );
-                $SQL .= "$Col LIKE $PreVal";
+                push(
+                    @SQL,
+                    "$Col LIKE $PreVal"
+                );
             }
 
             elsif ( $Param{CaseSensitive} ) {
-                $SQL .= "LOWER($Column) LIKE LOWER('$Val')";
+                push(
+                    @SQL,
+                    "LOWER($Column) LIKE LOWER('$Val')"
+                );
             }
             elsif ( $Param{LikeEscapeString} ) {
                 my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
                 $Val = $Kernel::OM->Get('DB')->Quote( $Val, 'Like' );
-                $SQL .= "$Column LIKE '" . $Val ."' $LikeEscapeString";
+
+                push(
+                    @SQL,
+                    "$Column LIKE '" . $Val ."' $LikeEscapeString"
+                );
             }
             else {
-                $SQL .= "$Column LIKE '$Val'";
+                push(
+                    @SQL,
+                    "$Column LIKE '$Val'"
+                );
             }
-
-            last if (!$Param{IsOR});
         }
-        return $SQL;
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    $Value =~ s/[*]/%/gms;
-
-    return "$Column LIKE '$Value'";
+    return '1=0';
 }
 
 sub _OperationIN {
@@ -618,9 +585,9 @@ sub _OperationIN {
 
         return "$Param{Column} IN ($Value)";
     }
-    else {
-        return '1=0' ;
-    }
+
+    return '1=0' ;
+
 }
 
 sub _OperationNOTIN {
@@ -634,89 +601,124 @@ sub _OperationNOTIN {
 
         return "$Param{Column} NOT IN ($Value)";
     }
-    else {
-        return '1=1' ;
-    }
+
+    return '1=1' ;
 }
 
 sub _OperationLT {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    if ( scalar(@{$Param{Value}}) ) {
 
-    if (IsArrayRefWithData($Value)) {
-        $Value = $Value->[0];
+        my @SQL;
+        for my $Value ( @{$Param{Value}}) {
+            $Value = $Param{Quotes}->{SQL}
+                . $Value
+                . $Param{Quotes}->{SQL};
+
+            push(
+                @SQL,
+                "$Param{Column} < $Value"
+            );
+        }
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    if ( $Value ) {
-        $Value = $Param{Quotes}->{SQL}
-            . $Value
-            . $Param{Quotes}->{SQL};
-
-        return "$Param{Column} < $Value";
-    } else {
-        return "$Param{Column} IS NOT NULL";
-    }
+    return "$Param{Column} IS NOT NULL";
 }
 
 sub _OperationLTE {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    if ( scalar(@{$Param{Value}}) ) {
 
-    if (IsArrayRefWithData($Value)) {
-        $Value = $Value->[0];
+        my @SQL;
+        for my $Value ( @{$Param{Value}}) {
+            $Value = $Param{Quotes}->{SQL}
+                . $Value
+                . $Param{Quotes}->{SQL};
+
+            push(
+                @SQL,
+                "$Param{Column} <= $Value"
+            );
+        }
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    if ( $Value ) {
-        $Value = $Param{Quotes}->{SQL}
-            . $Value
-            . $Param{Quotes}->{SQL};
-
-        return "$Param{Column} <= $Value";
-    } else {
-        return "$Param{Column} IS NOT NULL";
-    }
+    return "$Param{Column} IS NOT NULL";
 }
 
 sub _OperationGT {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    if ( scalar(@{$Param{Value}}) ) {
 
-    if (IsArrayRefWithData($Value)) {
-        $Value = $Value->[0];
+        my @SQL;
+        for my $Value ( @{$Param{Value}}) {
+            $Value = $Param{Quotes}->{SQL}
+                . $Value
+                . $Param{Quotes}->{SQL};
+
+            push(
+                @SQL,
+                "$Param{Column} > $Value"
+            );
+        }
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    if ( $Value ) {
-        $Value = $Param{Quotes}->{SQL}
-            . $Value
-            . $Param{Quotes}->{SQL};
-
-        return "$Param{Column} > $Value";
-    } else {
-        return "$Param{Column} IS NOT NULL";
-    }
+    return "$Param{Column} IS NOT NULL";
 }
 
 sub _OperationGTE {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value};
+    if ( scalar(@{$Param{Value}}) ) {
 
-    if (IsArrayRefWithData($Value)) {
-        $Value = $Value->[0];
+        my @SQL;
+        for my $Value ( @{$Param{Value}}) {
+            $Value = $Param{Quotes}->{SQL}
+                . $Value
+                . $Param{Quotes}->{SQL};
+
+            push(
+                @SQL,
+                "$Param{Column} => $Value"
+            );
+        }
+
+        my $Statement = join(q{ OR }, (@SQL || () ) );
+        if ( $Statement ) {
+            return $Self->_MaskStatement(
+                Count     => scalar(@SQL),
+                Statement => $Statement
+            );
+        }
     }
 
-    if ( $Value ) {
-        $Value = $Param{Quotes}->{SQL}
-            . $Value
-            . $Param{Quotes}->{SQL};
-
-        return "$Param{Column} >= $Value";
-    } else {
-        return "$Param{Column} IS NOT NULL";
-    }
+    return "$Param{Column} IS NOT NULL";
 }
 
 sub _GetQuotes {
@@ -738,14 +740,14 @@ sub _GetQuotes {
     };
 }
 
-sub _SetOR {
+sub _MaskStatement {
     my ($Self, %Param) = @_;
 
     my $Statement = $Param{Statement};
     # Adds additional SQL clauses to the statement
     if (
         $Statement
-        && $Param{IsOR}
+        && $Param{Count} > 1
     ) {
         $Statement = q{(}
             . $Statement
@@ -799,7 +801,7 @@ sub _CheckSearchParams {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Invalid search field "' . $Param{Search}->{Field} . '"!',
+                Message  => 'Invalid search field "' . $Param{Search}->{Field} . q{"!},
             );
         }
         return;
@@ -828,7 +830,7 @@ sub _CheckSortParams {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Invalid sort attribute "' . $Param{Attribute} . '"!',
+                Message  => 'Invalid sort attribute "' . $Param{Attribute} . q{"!},
             );
         }
         return;
