@@ -976,6 +976,20 @@ sub HandleSearchInAPI {
     $Self->{HandleSearchInAPI} = 1;
 }
 
+=item HandleSortInCORE()
+
+Tell the API to handle the "sort" parameter in the CORE. This is needed for operations that don't handle the "sort" parameter and leave the work to the CORE.
+
+    $CommonObject->HandleSortInCORE();
+
+=cut
+
+sub HandleSortInCORE {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{HandleSortInCORE} = 1;
+}
+
 =item ApplyPaging()
 
 Apply the relevant limit and offset to the given data.
