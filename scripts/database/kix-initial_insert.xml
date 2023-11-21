@@ -863,15 +863,6 @@
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">19</Data>
-        <Data Key="name" Type="Quote">LoopProtection</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="ticket_history_type">
         <Data Key="id" Type="AutoIncrement">20</Data>
         <Data Key="name" Type="Quote">Misc</Data>
         <Data Key="valid_id">1</Data>
@@ -4623,19 +4614,6 @@ DefaultValue:
     </Insert>
 
     <Insert Table="dynamic_field">
-        <Data Key="id" Type="AutoIncrement">10</Data>
-        <Data Key="internal_field">0</Data>
-        <Data Key="name" Type="Quote" Translatable="0">AcknowledgeName</Data>
-        <Data Key="label" Type="Quote" Translatable="1">System Acknowledge Name</Data>
-        <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
-        <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="dynamic_field">
         <Data Key="id" Type="AutoIncrement">11</Data>
         <Data Key="internal_field">0</Data>
         <Data Key="name" Type="Quote" Translatable="0">SysMonXAlias</Data>
@@ -4694,6 +4672,26 @@ DefaultValue:
         <Data Key="label" Type="Quote" Translatable="1">System State</Data>
         <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
         <Data Key="object_type" Type="Quote" Translatable="1">Ticket</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="dynamic_field">
+        <Data Key="id" Type="AutoIncrement">16</Data>
+        <Data Key="internal_field">1</Data>
+        <Data Key="name" Type="Quote" Translatable="0">AddressDomainPattern</Data>
+        <Data Key="label" Type="Quote" Translatable="1">Pattern</Data>
+        <Data Key="field_type" Type="Quote" Translatable="1">Text</Data>
+        <Data Key="object_type" Type="Quote" Translatable="1">Organisation</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+---
+CountMin: '0'
+CountMax: '25'
+CountDefault: '0'
+DefaultValue:
+        ]]></Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>

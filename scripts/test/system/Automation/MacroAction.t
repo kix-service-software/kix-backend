@@ -508,6 +508,38 @@ END
 3',
         }
     },
+    {
+        Name => 'Combine variables as array',
+        MacroResults => {
+            Test1 => 'Test1',
+            Test2 => 'Test2',
+        },
+        Data => {
+            Dummy => '${Test1,Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1','Test2'],
+        }
+    },
+    {
+        Name => 'Combine variables containing arrays as array',
+        MacroResults => {
+            Test1 => [
+                'Test1.1',
+                'Test1.2'
+            ],
+            Test2 => [
+                'Test2.1',
+                'Test2.2'
+            ],
+        },
+        Data => {
+            Dummy => '${Test1,Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1.1','Test1.2','Test2.1','Test2.2'],
+        }
+    },
 );
 
 # load additional filter

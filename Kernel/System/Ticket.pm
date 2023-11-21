@@ -43,7 +43,6 @@ our @ObjectDependencies = (
     'Lock',
     'Log',
     'Main',
-    'PostMaster::LoopProtection',
     'Priority',
     'Queue',
     'State',
@@ -326,6 +325,13 @@ sub TicketCreate {
             $Param{Type} = $DefaultTicketType;
         }
         else {
+            if ( $DefaultTicketType ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default type \"$DefaultTicketType\" in config setting Ticket::Type::Default!",
+                );
+            }
+
             $Param{TypeID} = 1;
         }
     }
@@ -360,6 +366,13 @@ sub TicketCreate {
             $Param{Queue} = $DefaultTicketQueue;
         }
         else {
+            if ( $DefaultTicketQueue ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default queue \"$DefaultTicketQueue\" in config setting Ticket::Queue::Default!",
+                );
+            }
+
             $Param{QueueID} = 1;
         }
     }
@@ -394,6 +407,12 @@ sub TicketCreate {
             $Param{State} = $DefaultTicketState;
         }
         else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
             $Param{StateID} = 1;
         }
     }
@@ -446,6 +465,12 @@ sub TicketCreate {
             $Param{Priority} = $DefaultTicketPriority;
         }
         else {
+            if ( $DefaultTicketPriority ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default priority \"$DefaultTicketPriority\" in config setting Ticket::Priority::Default!",
+                );
+            }
             $Param{PriorityID} = 1;
         }
     }
@@ -680,7 +705,8 @@ sub TicketCreate {
     $Self->EventHandler(
         Event => 'TicketCreate',
         Data  => {
-            TicketID => $TicketID
+            TicketID => $TicketID,
+            OwnerID  => $Param{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -722,6 +748,11 @@ sub TicketDelete {
             return;
         }
     }
+
+    # get the ticket data
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
@@ -813,6 +844,7 @@ sub TicketDelete {
         Event => 'TicketDelete',
         Data  => {
             TicketID => $Param{TicketID},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -2973,6 +3005,8 @@ sub TicketLockSet {
         Event => 'TicketLockUpdate',
         Data  => {
             TicketID => $Param{TicketID},
+            Lock     => lc $Param{Lock},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -3278,6 +3312,7 @@ sub TicketStateSet {
         Event => 'TicketStateUpdate',
         Data  => {
             TicketID      => $Param{TicketID},
+            State         => \%State,
             OldTicketData => \%Ticket,
         },
         UserID => $Param{UserID},
@@ -3636,7 +3671,9 @@ sub TicketOwnerSet {
     $Self->EventHandler(
         Event => 'TicketOwnerUpdate',
         Data  => {
-            TicketID => $Param{TicketID},
+            TicketID        => $Param{TicketID},
+            OwnerID         => $Param{NewUserID},
+            PreviousOwnerID => $OwnerID,
         },
         UserID => $Param{UserID},
     );
@@ -5180,6 +5217,7 @@ sub TicketFlagSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -5300,6 +5338,7 @@ sub TicketFlagDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -6858,76 +6897,6 @@ sub _CalcStringDistance {
         }
     }
     return $d{$len1}{$len2};
-}
-
-=item TicketCalendarGet()
-
-get the relevant calendar for the ticket
-
-    my $Calendar = $TicketObject->TicketCalendarGet(
-        TicketID  => 123     # or
-        TicketIDs => []      # or
-        Ticket    => {}
-    );
-
-returns calendar number or empty string for default calendar (in case of "TicketIDs" it returns a HashRef of TicketIDs with Calendar)
-
-=cut
-
-sub TicketCalendarGet {
-    my ( $Self, %Param ) = @_;
-
-    my $Result;
-
-    if ( $Param{TicketID} ) {
-        $Param{TicketIDs} = [ $Param{TicketID} ];
-    }
-
-    if ( IsHashRefWithData($Param{Ticket}) ) {
-        # get queue specific calendar
-        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $Param{Ticket}->{QueueID},
-        );
-        $Result = $QueueData{Calendar} || '';
-    }
-    elsif ( IsArrayRefWithData($Param{TicketIDs}) ) {
-        # get database object
-        my $DBObject = $Kernel::OM->Get('DB');
-
-        my @TicketIDs = @{$Param{TicketIDs}};
-        foreach my $TicketID ( @TicketIDs ) {
-            $TicketID = $DBObject->Quote( $TicketID, 'Integer' );
-        }
-
-        my $SQL = 'SELECT t.id, q.calendar_name FROM ticket t, queue q WHERE t.queue_id = q.id AND t.id IN ('.(join(',', @TicketIDs)).')';
-
-        if ( IsArrayRefWithData($Param{OnlyCalendars}) ) {
-            my @Calendars;
-            foreach my $Calendar ( @{$Param{OnlyCalendars}} ) {
-                push @Calendars, "'" . $DBObject->Quote( $Calendar ) . "'";
-            }
-
-            $SQL .= ' AND (q.calendar_name IS null OR q.calendar_name IN (null, '.(join(',', @Calendars)).'))';
-        }
-
-        # db query
-        return if !$DBObject->Prepare(
-            SQL => $SQL,
-        );
-
-        $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-            Columns => [ 'TicketID', 'Calendar' ]
-        );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID or TicketIDs or Ticket!'
-        );
-        return;
-    }
-
-    return $Result;
 }
 
 =item GetAssignedTicketsForObject()

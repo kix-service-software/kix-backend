@@ -195,6 +195,54 @@ sub Search {
                 push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
             }
         }
+        elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' != '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' != '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' != '.$Param{Search}->{Value} );
+            }
+        }
+        elsif ( $Param{Search}->{Operator} eq 'LT' ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' < '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' < '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' < '.$Param{Search}->{Value} );
+            }
+        }
+        elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' <= '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' <= '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' <= '.$Param{Search}->{Value} );
+            }
+        }
+        elsif ( $Param{Search}->{Operator} eq 'GT' ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' > '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' > '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' > '.$Param{Search}->{Value} );
+            }
+        }
+        elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' >= '.$Param{Search}->{Value} );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' >= '.$Param{Search}->{Value} );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' >= '.$Param{Search}->{Value} );
+            }
+        }
+        elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
+            if ( $Param{BoolOperator} eq 'OR') {
+                push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+                push( @SQLWhere, 'th_right.'.$AttributeMapping{$Param{Search}->{Field}}.' NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            } else {
+                push( @SQLWhere, 'th.'.$AttributeMapping{$Param{Search}->{Field}}.' NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
+            }
+        }
         elsif ( $Param{Search}->{Operator} eq 'IN' ) {
             if ( $Param{BoolOperator} eq 'OR') {
                 push( @SQLWhere, 'th_left.'.$AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );

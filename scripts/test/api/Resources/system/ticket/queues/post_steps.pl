@@ -34,7 +34,6 @@ Given qr/a ticket queue$/, sub {
       Token   => S->{Token},
       Content => {
         Queue => {
-            Calendar => "",
             Comment => "Postmaster queue.",
             FollowUpID => 1,
             FollowUpLock => 0,
@@ -55,7 +54,6 @@ When qr/added a ticket queue$/, sub {
       Token   => S->{Token},
       Content => {
         Queue => {
-            Calendar => "",
             Comment => "Postmaster queue.".rand(),
             FollowUpID => 1,
             FollowUpLock => 0,

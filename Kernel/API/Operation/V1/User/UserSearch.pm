@@ -87,7 +87,7 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
                     $UserSearch{$SearchType} //= [];
                     push @{$UserSearch{$SearchType}}, $SearchItem;
                 }
@@ -279,6 +279,9 @@ sub _GetSearchParam {
     }
     elsif ( $Param{SearchItem}->{Field} eq 'UserIDs' ) {
         $SearchParam{UserIDs} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'UserID' ) {
+        $SearchParam{SearchUserID} = $Value;
     }
     else {
         $SearchParam{Search} = $Value;

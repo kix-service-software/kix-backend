@@ -1989,10 +1989,6 @@ msgid "Work Order"
 msgstr "Arbeitsanweisung"
 
 #. Perl Module: update/build-1455.pl
-msgid "System Acknowledge Name"
-msgstr "System Acknowledge Name"
-
-#. Perl Module: update/build-1455.pl
 msgid "System Address"
 msgstr "Systemadresse"
 
@@ -2714,10 +2710,6 @@ msgstr "Standard-Ticket-Typ"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default value for NameX"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Define Tool (Nagios) acknowledge type."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3855,14 +3847,6 @@ msgid "NameX"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Named pipe acknowledge format for host."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Named pipe acknowledge format for service."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Never"
 msgstr ""
 
@@ -3955,13 +3939,6 @@ msgstr "Erstellt den Ticketindex für Teams/Queues neu."
 msgid ""
 "Registers an identifier for the email filters. Value is used in the "
 "following config options. The keys will use for sorting."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Registration for possible system monitoring tool acknowledge. Content is "
-"used as allocation in following config options. Key must be some of "
-"AcknowledgeName-value, used in PostMasterFilter."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4074,12 +4051,6 @@ msgstr ""
 msgid ""
 "Sends all outgoing email via bcc to the specified address. Please use this "
 "only for backup reasons."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Set Dynamic Field, which contains allocation for system monitoring "
-"acknowledge."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4383,18 +4354,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The directory to use for temporary files."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "The http acknowledge password."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "The http acknowledge url."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "The http acknowledge user."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5617,12 +5576,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
-"Path for the log file (it only applies if \"FS\" was selected for "
-"LoopProtectionModule and it is mandatory)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
 "Performs ticket update actions after state update - currently limited to "
 "state update."
 msgstr ""
@@ -5895,14 +5848,6 @@ msgid ""
 "This event module stores attributes from Contact as DynamicFields tickets. "
 "Please see the setting above for how to configure the mapping."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Ticket event module to send an acknowledge to registered system monitoring "
-"tools."
-msgstr ""
-"Der Text am Anfang des Betreffs bei der Weiterleitung einer E-Mail, z.B. FW, "
-"Fwd oder WG."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Ticket moved into Queue \"%s\" (%s) from Queue \"%s\" (%s)."
