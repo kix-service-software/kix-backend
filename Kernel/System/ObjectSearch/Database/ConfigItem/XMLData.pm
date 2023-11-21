@@ -124,8 +124,6 @@ sub Search {
         return;
     }
 
-    $Self->{Flags} = $Param{Flags};
-
     my @Where;
     my $Field;
 
@@ -165,8 +163,6 @@ sub Search {
 
     my @SQLJoin = $Self->_GetJoin(%Param);
 
-    $Param{Flags} = $Self->{Flags};
-
     push( @SQLWhere, @Where);
 
     return {
@@ -180,13 +176,13 @@ sub _GetJoin {
 
     my @JoinAND;
     if (
-        $Self->{Flags}->{ClassIDs}
-        && !$Self->{Flags}->{JoinXML}
+        $Param{Flags}->{ClassIDs}
+        && !$Param{Flags}->{JoinXML}
     ) {
 
         my @Types;
-        for my $ClassID ( @{$Self->{Flags}->{ClassIDs}}) {
-            if ( $Self->{Flags}->{PreviousVersion} ) {
+        for my $ClassID ( @{$Param{Flags}->{ClassIDs}}) {
+            if ( $Param{Flags}->{PreviousVersion} ) {
                 push (@Types, 'ITSM::ConfigItem::Archiv::' . $ClassID);
             }
             push (@Types, 'ITSM::ConfigItem::' . $ClassID)
@@ -201,33 +197,33 @@ sub _GetJoin {
     }
     my @SQLJoin;
     my $TablePrefix = 'ci';
-    if ( $Self->{Flags}->{PreviousVersion} ) {
+    if ( $Param{Flags}->{PreviousVersion} ) {
         $TablePrefix = 'vr';
 
-        if ( !$Self->{Flags}->{JoinVersion} ) {
+        if ( !$Param{Flags}->{JoinVersion} ) {
             push(
                 @SQLJoin,
                 'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
             );
-            $Self->{Flags}->{JoinVersion} = 1;
+            $Param{Flags}->{JoinVersion} = 1;
         }
-        if ( !$Self->{Flags}->{JoinXML} ) {
+        if ( !$Param{Flags}->{JoinXML} ) {
 
             push(
                 @SQLJoin,
                 'LEFT OUTER JOIN xml_storage xst on vr.id = CAST(xst.xml_key AS BIGINT)'
                 . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
             );
-            $Self->{Flags}->{JoinXML} = 1;
+            $Param{Flags}->{JoinXML} = 1;
         }
     }
-    elsif ( !$Self->{Flags}->{JoinXML} ) {
+    elsif ( !$Param{Flags}->{JoinXML} ) {
         push(
             @SQLJoin,
             'LEFT OUTER JOIN xml_storage xst on ci.last_version_id = CAST(xst.xml_key AS BIGINT)'
             . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
         );
-        $Self->{Flags}->{JoinXML} = 1;
+        $Param{Flags}->{JoinXML} = 1;
     }
 
     return @SQLJoin;
