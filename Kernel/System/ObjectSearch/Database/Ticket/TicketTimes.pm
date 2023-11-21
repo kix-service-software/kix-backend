@@ -115,6 +115,7 @@ sub Search {
         LastChangeTime  => 'st.change_time',
     );
 
+    my $Type = 'NUMERIC';
     my $Value;
     if ( $Param{Search}->{Field} eq 'Age' ) {
         # calculate unixtime
@@ -140,6 +141,7 @@ sub Search {
             $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                 SystemTime => $Value
             );
+            $Type = 'STRING';
         }
     }
 
@@ -148,6 +150,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
+        Type      => $Type,
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 

@@ -192,14 +192,19 @@ sub GetOperation {
         return;
     }
 
-    my $Columns = $Param{Column};
-    if ( ref $Param{Column} ne 'ARRAY' ) {
+    my $Columns = [];
+    if ( !IsArrayRef($Param{Column}) ) {
         push( @{$Columns}, $Param{Column} );
+    } else {
+        $Columns = $Param{Column};
     }
 
-    my $Values = $Param{Value};
-    if ( ref $Param{Value} ne 'ARRAY' ) {
+    my $Values = [];
+    if ( !IsArrayRef($Param{Value}) ) {
         push( @{$Values}, $Param{Value} );
+    }
+    else {
+        $Values = $Param{Value};
     }
 
     my $Function = "_Operation$Param{Operator}";
@@ -395,8 +400,8 @@ sub _OperationSTARTSWITH {
             }
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -447,8 +452,8 @@ sub _OperationENDSWITH {
             }
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -499,8 +504,8 @@ sub _OperationCONTAINS {
             }
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -562,8 +567,8 @@ sub _OperationLIKE {
             }
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -622,8 +627,8 @@ sub _OperationLT {
             );
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -651,8 +656,8 @@ sub _OperationLTE {
             );
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -680,8 +685,8 @@ sub _OperationGT {
             );
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
@@ -709,8 +714,8 @@ sub _OperationGTE {
             );
         }
 
-        my $Statement = join(q{ OR }, (@SQL || () ) );
-        if ( $Statement ) {
+        if ( @SQL ) {
+            my $Statement = join(q{ OR }, @SQL );
             return $Self->_MaskStatement(
                 Count     => scalar(@SQL),
                 Statement => $Statement
