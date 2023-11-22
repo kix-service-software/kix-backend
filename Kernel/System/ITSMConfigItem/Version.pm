@@ -378,10 +378,12 @@ sub VersionGet {
 
     # check needed stuff
     if ( !$Param{VersionID} && !$Param{ConfigItemID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need VersionID or ConfigItemID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need VersionID or ConfigItemID!',
+            );
+        }
         return;
     }
 
@@ -446,10 +448,12 @@ sub VersionGet {
 
     # check version
     if ( !$Version{VersionID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No such config item version!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'No such config item version!',
+            );
+        }
         return;
     }
 
@@ -477,10 +481,12 @@ sub VersionGet {
 
     # check config item data
     if ( !$ConfigItem || ref $ConfigItem ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't get config item $Version{ConfigItemID}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't get config item $Version{ConfigItemID}!",
+            );
+        }
         return;
     }
 

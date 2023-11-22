@@ -2144,13 +2144,9 @@ sub GetAttributeValuesByKey {
     # check required params...
     if (
         !$Param{KeyName}
-        ||
-        ( !$Param{XMLData} ) ||
-        ( !$Param{XMLDefinition} ) ||
-        ( ref $Param{XMLData} ne 'HASH' ) ||
-        ( ref $Param{XMLDefinition} ne 'ARRAY' )
-        )
-    {
+        || ref( $Param{XMLData} ) ne 'HASH'
+        || ref( $Param{XMLDefinition} ) ne 'ARRAY'
+    ) {
         return \@RetArray;
     }
 
@@ -2161,7 +2157,10 @@ sub GetAttributeValuesByKey {
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
             # no content then stop loop...
-            last COUNTER if $Item->{Input}->{Type} ne 'Dummy' && !defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content};
+            last COUNTER if (
+                $Item->{Input}->{Type} ne 'Dummy'
+                && !defined( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} )
+            );
 
             # check if we are looking for this key
             if ( $Item->{Key} eq $Param{KeyName} ) {
