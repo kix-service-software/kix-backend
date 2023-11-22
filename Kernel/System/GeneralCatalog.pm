@@ -407,10 +407,7 @@ sub ItemGet {
 
     # check item
     if ( !$ItemData{ItemID} ) {
-        if (
-            !defined $Param{Silent}
-            || !$Param{Silent}
-        ) {
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Item not found in database!',
