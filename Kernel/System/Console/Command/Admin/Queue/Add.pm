@@ -59,6 +59,13 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/\d/smx,
     );
+    $Self->AddOption(
+        Name        => 'calendar',
+        Description => 'Name of the calendar for the new queue.',
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/.*/smx,
+    );
 
     return;
 }
@@ -98,6 +105,7 @@ sub Run {
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),
         UnlockTimeout     => $Self->GetOption('unlock-timeout'),
+        Calendar          => $Self->GetOption('calendar'),
         ValidID           => 1,
         UserID            => 1,
     );

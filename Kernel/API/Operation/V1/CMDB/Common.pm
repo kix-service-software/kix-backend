@@ -214,6 +214,13 @@ sub _CheckConfigItemVersion {
 
     if ( defined $Version->{Data} ) {
 
+        if ( !IsHashRefWithData($Version->{Data}) ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => "Parameter Version::Data is invalid!",
+            );
+        }
+
         my $DataCheckResult = $Self->_CheckData(
             Definition => $Definition,
             Data       => $Version->{Data},

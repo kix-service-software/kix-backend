@@ -14,8 +14,6 @@ use strict;
 use warnings;
 use utf8;
 
-use String::ShellQuote;
-
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Automation::MacroAction::Ticket::Common);
@@ -162,11 +160,9 @@ sub Run {
 
         my $PendingTime;
         if ( defined $Param{Config}->{PendingTimeDiff} ) {
-            # prepare system call
-            my $SystemCall = 'echo ' . shell_quote( $Param{Config}->{PendingTimeDiff} ) . ' | bc 2>&1';
 
-            # calculate if necessary - execute system call with quoted arguments
-            my $PendingTimeDiffResult = `$SystemCall`;
+            # calculate if necessary
+            my $PendingTimeDiffResult = `echo "$Param{Config}->{PendingTimeDiff}" | bc 2>&1`;
             chomp $PendingTimeDiffResult;
 
             if ( !IsNumber($PendingTimeDiffResult) ) {

@@ -114,8 +114,7 @@ sub WatcherAdd {
     $TicketObject->EventHandler(
         Event => 'TicketSubscribe',
         Data  => {
-            TicketID    => $Param{ObjectID},
-            WatchUserID => $Param{WatchUserID},
+            TicketID => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );
@@ -177,7 +176,6 @@ sub WatcherDelete {
         Event => 'TicketUnsubscribe',
         Data  => {
             TicketID => $Param{ObjectID},
-            WatchUserID => $Param{WatchUserID},
         },
         UserID => $Param{UserID},
     );

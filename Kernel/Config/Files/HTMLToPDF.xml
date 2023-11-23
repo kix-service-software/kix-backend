@@ -6,10 +6,10 @@
         <SubGroup>Core::HTMLToPDF</SubGroup>
         <Setting>
             <Hash>
+                <Item Key="Binary">/usr/local/bin/wkhtmltopdf</Item>
                 <Item Key="Parameter">
                     <Array>
-                        <Item>-s</Item>
-                        <Item>A4</Item>
+                        <Item>-s A4</Item>
                         <Item>--images</Item>
                         <Item>--enable-internal-links</Item>
                         <Item>--enable-local-file-access</Item>

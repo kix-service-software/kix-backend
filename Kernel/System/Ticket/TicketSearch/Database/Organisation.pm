@@ -89,9 +89,6 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, "st.organisation_id = '".$Param{Search}->{Value}."'" );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, "st.organisation_id != '".$Param{Search}->{Value}."'" );
-    }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         my ($Field, $Value) = $Self->_PrepareFieldAndValue(
             Field => 'st.organisation_id',
@@ -122,9 +119,6 @@ sub Search {
             Value => $Param{Search}->{Value}
         );
         push( @SQLWhere, $Field." LIKE ".$Value );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, "st.organisation_id NOT IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.organisation_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );

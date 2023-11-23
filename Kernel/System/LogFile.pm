@@ -11,8 +11,6 @@ package Kernel::System::LogFile;
 use strict;
 use warnings;
 
-use String::ShellQuote;
-
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
@@ -139,19 +137,10 @@ sub LogFileGet {
     elsif ( $Param{Tail} ) {
         if ( IsArrayRefWithData($Param{Categories}) ) {
             my $Categories = join('|', @{$Param{Categories}});
-
-            # prepare system call
-            my $SystemCall = 'grep -a -E ' . shell_quote('\\[' . $Categories . '\\]') . ' ' .  shell_quote( $LogDir . '/' . $LogFileList{$Param{ID}} ) . ' | tail -n ' . shell_quote( $Param{Tail} );
-
-            # execute system call
-            $LogFile{Content} = `$SystemCall`;
+            $LogFile{Content} = `grep -a -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
         }
         else {
-            # prepare system call
-            my $SystemCall = 'tail -n ' . shell_quote( $Param{Tail} ) . ' ' . shell_quote( $LogDir . '/' . $LogFileList{$Param{ID}} );
-
-            # execute system call
-            $LogFile{Content} = `$SystemCall`;
+            $LogFile{Content} = `tail -n $Param{Tail} $LogDir/$LogFileList{$Param{ID}}`;
         }
     }
 

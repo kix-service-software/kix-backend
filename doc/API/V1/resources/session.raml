@@ -5,12 +5,6 @@
     displayName: Current User
     description: !include ../descriptions/resources/session/user.md
     type: [ item-nodelete: { typeName: User } ]
-    /counters:
-      description: !include ../descriptions/resources/session/user/counters.md
-      type: { item-readonly: { typeName: Counter } }  
-    /tickets:
-      description: !include ../descriptions/resources/session/user/tickets.md
-      type: { collection-readonly: { typeName: Ticket } }  
     /preferences:
       type: { collection: { typeName: UserPreference } }  
       /{preferenceId}:

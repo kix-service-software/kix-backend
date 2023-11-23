@@ -289,12 +289,10 @@ sub Sync {
                 );
             }
 
-            my %ContactData;
-            if ( $ContactID ) {
-                %ContactData = $ContactObject->ContactGet(
-                    ID => $ContactID,
-                );
-            }
+            my %ContactData = $ContactObject->ContactGet(
+                ID     => $ContactID,
+                Silent => 1,
+            );
 
             # if the UserLogin was changed, we cannot find the user by UserLogin. We had to look the user up by email.
             # this only works with enabled EmailUniqueCheck!
@@ -666,8 +664,9 @@ sub Sync {
     );
 
     if ( %User ) {
-        # remove UserPw to avoid overwrite
-        $User{UserPw} = undef if defined $User{UserPw};
+
+    # remove UserPw to avoid overwrite
+    $User{UserPw} = undef if defined $User{UserPw};
 
     # set UserLogin from LDAP
     # (at this point, user was either successfully identified by email or newly created )

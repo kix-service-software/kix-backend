@@ -63,7 +63,9 @@ sub Run {
         my @Row = @{$_};
 
         # get used calendar
-        my $Calendar = '';          # use main calendar as fallback
+        my $Calendar = $Kernel::OM->Get('Ticket')->TicketCalendarGet(
+            TicketID => $Row[1],
+        );
 
         my $CountedTime = $Kernel::OM->Get('Time')->WorkingTime(
             StartTime => $Row[2],

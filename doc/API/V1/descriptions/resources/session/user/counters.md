@@ -1,1 +1,0 @@
-This resource returns the most relevant ticket counters.

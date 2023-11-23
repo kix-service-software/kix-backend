@@ -87,7 +87,6 @@ sub Search {
 
     my %OperatorMap = (
         'EQ'  => '=',
-        'NE'  => '!=',
         'LT'  => '<',
         'GT'  => '>',
         'LTE' => '<=',

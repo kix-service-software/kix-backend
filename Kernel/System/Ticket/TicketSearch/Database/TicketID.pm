@@ -95,53 +95,18 @@ sub Search {
             push( @SQLWhere, 'st.id IS NULL' );
         }
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id != '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id < '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id <= '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id > '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        if ($Param{Search}->{Value}) {
-            push( @SQLWhere, 'st.id >= '.$Param{Search}->{Value} );
-        } else {
-            push( @SQLWhere, 'st.id IS NOT NULL' );
-        }
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        if (IsArrayRefWithData($Param{Search}->{Value})) {
-            push( @SQLWhere, 'st.id NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-        } else {
-            push( @SQLWhere, '1=1' );
-        }
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         if (IsArrayRefWithData($Param{Search}->{Value})) {
             push( @SQLWhere, 'st.id IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
         } else {
             push( @SQLWhere, '1=0' );
+        }
+    }
+    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
+        if ($Param{Search}->{Value}) {
+            push( @SQLWhere, 'st.id != '.$Param{Search}->{Value} );
+        } else {
+            push( @SQLWhere, 'st.id IS NOT NULL' );
         }
     }
     else {

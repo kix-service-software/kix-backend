@@ -94,24 +94,6 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.archive_flag = '.$Param{Search}->{Value} );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, 'st.archive_flag != '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, 'st.archive_flag < '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, 'st.archive_flag > '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, 'st.archive_flag <= '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, 'st.archive_flag >= '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, 'st.archive_flag NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.archive_flag IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
     }

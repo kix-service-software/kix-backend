@@ -11,7 +11,6 @@ package Kernel::API::Provider::REST;
 use strict;
 use warnings;
 
-use CGI;
 use HTTP::Status;
 use URI::Escape;
 use Time::HiRes qw(time);
@@ -198,7 +197,9 @@ sub ProcessRequest {
     ROUTE:
     for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
+        next ROUTE if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
+
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
 
         if ( $RequestMethod ne 'OPTIONS' && IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
             next ROUTE if !grep { $RequestMethod eq $_ } @{ $RouteMapping{RequestMethod} };
@@ -266,7 +267,9 @@ sub ProcessRequest {
     my %AvailableMethods;
     for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
+        next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
+
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
         my $RouteRegEx = $RouteMapping{Route};
         $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
@@ -276,9 +279,8 @@ sub ProcessRequest {
         next if !( $Base =~ m{^ $BaseRoute }xms );
 
         next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
-        
         # only add if we didn't have a match upto now
-        next if exists $AvailableMethods{$RouteMapping{RequestMethod}->[0]};
+        next if IsHashRefWithData($AvailableMethods{$RouteMapping{RequestMethod}->[0]});
 
         $AvailableMethods{$RouteMapping{RequestMethod}->[0]} = {
             Operation => $CurrentOperation,
@@ -415,18 +417,15 @@ sub ProcessRequest {
         $EncodeObject->EncodeInput( \$Content );
     }
 
-    my $ContentDecoded = $Content;
-    if ( $ENV{'CONTENT_TYPE'} =~ /^application\/json/ ) {
-        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
-            Data => $Content,
-        );
+    my $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+        Data => $Content,
+    );
 
-        if ( !$ContentDecoded ) {
-            return $Self->_Error(
-                Code    => 'Transport.REST.InvalidJSON',
-                Message => 'Error while decoding request content.',
-            );
-        }
+    if ( !$ContentDecoded ) {
+        return $Self->_Error(
+            Code    => 'Transport.REST.InvalidJSON',
+            Message => 'Error while decoding request content.',
+        );
     }
 
     my $ReturnData;
@@ -448,8 +447,10 @@ sub ProcessRequest {
         }
     }
     else {
-        $ReturnData = { Content => $ContentDecoded };
-        @{$ReturnData}{ keys %URIData } = values %URIData;
+        return $Self->_Error(
+            Code    => 'Transport.REST.InvalidRequest',
+            Message => 'Unsupported request content structure.',
+        );
     }
 
     # all ok - return data
@@ -506,7 +507,7 @@ sub GenerateResponse {
     }
 
     # do we have to return an http error code
-    if ( IsStringWithData( $Param{Code} ) && !IsInteger($Param{Code}) ) {
+    if ( IsStringWithData( $Param{Code} ) ) {
         # map error code to HTTP code
         my $Result = $Self->_MapReturnCode(
             Transport    => 'HTTP::REST',
@@ -529,9 +530,6 @@ sub GenerateResponse {
                 $MappedMessage = $Param{Message};
             }
         }
-    }
-    elsif ( IsInteger($Param{Code}) ) {
-        $MappedCode = $Param{Code},
     }
 
     # do we have to return an error message
@@ -571,15 +569,14 @@ sub GenerateResponse {
     }
 
     # prepare data
-    my $Content = $Param{Message};
-
+    my $JSONString = '';
     if ( IsHashRefWithData($Param{Data}) ) {
-        $Content = $Kernel::OM->Get('JSON')->Encode(
+        $JSONString = $Kernel::OM->Get('JSON')->Encode(
             Data     => $Param{Data},
             SortKeys => $Param{DoNotSortAttributes} ? 0 : 1
         );
 
-        if ( !$Content ) {
+        if ( !$JSONString ) {
             return $Self->_Output(
                 HTTPCode => 500,
                 Content  => {
@@ -593,7 +590,7 @@ sub GenerateResponse {
     # no error - return output
     return $Self->_Output(
         HTTPCode   => $HTTPCode,
-        Content    => $Content,
+        Content    => $JSONString,
         AddHeader  => $AddHeader,
     );
 }
@@ -632,7 +629,6 @@ sub _Output {
     my ( $Self, %Param ) = @_;
     my $Success = 1;
     my $Message;
-    my %Headers = %{$Param{AddHeader}||{}};
 
     my $Content = $Param{Content};
     if ( IsHashRefWithData($Content) ) {
@@ -666,8 +662,7 @@ sub _Output {
     # prepare data
     $Content         ||= '';
     $Param{HTTPCode} ||= 500;
-    my $ContentType =  $Headers{'Content-Type'} || $Headers{'content-type'} || 'application/json';
-    delete $Headers{'Content-Type'};
+    my $ContentType =  'application/json';
 
     # adjust HTTP code
     my $HTTPCode = $Param{HTTPCode};
@@ -679,22 +674,15 @@ sub _Output {
 
     # log error message
     if ( $HTTPCode !~ /^2/ ) {
-        my $Message = '';
-
-        if ( IsHashRefWithData($Content) || IsHashRefWithData($Param{Content}) ) {
-            $Message = sprintf "\n%11s: %s\n%11s: %s",
-                'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code},
-                'Message', IsHashRefWithData($Content) ? $Content->{Message} : $Param{Content}->{Message};
-        }
-
-        printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s%s\n\n",
+        printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s\n%11s: %s\n%11s: %s\n\n",
             $$,
             $Kernel::OM->Get('Time')->CurrentTimestamp(),
             'Method', $Self->{RequestMethod},
             'Resource', $ENV{REQUEST_URI},
             'Duration', TimeDiff($Self->{RequestStartTime}),
             'HTTPStatus', $HTTPCode.' '.$StatusMessage,
-            $Message
+            'Code', IsHashRefWithData($Content) ? $Content->{Code} : $Param{Content}->{Code},
+            'Message', IsHashRefWithData($Content) ? $Content->{Message} : $Param{Content}->{Message};
     }
 
     # finally
@@ -729,8 +717,10 @@ sub _Output {
     print STDOUT "Connection: $Connection\r\n";
 
     # add headers if requested
-    foreach my $Header ( sort keys %Headers ) {
-        print STDOUT "$Header: $Headers{$Header}\r\n";
+    if ( IsHashRefWithData($Param{AddHeader}) ) {
+        foreach my $Header ( sort keys %{$Param{AddHeader}} ) {
+            print STDOUT "$Header: $Param{AddHeader}->{$Header}\r\n";
+        }
     }
 
     print STDOUT "\r\n";

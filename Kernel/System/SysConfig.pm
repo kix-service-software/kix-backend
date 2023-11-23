@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -709,7 +709,7 @@ sub ValueGetAll {
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
-    return %{$CacheResult} if IsHashRefWithData($CacheResult);
+    return %{$CacheResult} if (IsArrayRefWithData($CacheResult));
 
     my $Where = '';
     if ( $Param{Valid} ) {
@@ -990,7 +990,7 @@ sub _RebuildFromFile {
     }
 
     # Now process the entries in init order and assign them to the xml entry list.
-     for my $Init (qw(Framework Application Config Changes Unknown)) {
+     for my $Init (qw(Framework Application Config Changes Unkown)) {
         for my $Option ( @{ $XMLConfigTMP{$Init} } ) {
             push(
                 @{ $Self->{XMLConfig} },
@@ -1048,7 +1048,6 @@ sub _RebuildFromFile {
             Name            => $OptionRaw->{Name},
             Description     => $OptionRaw->{Description}->{content} || '',
             AccessLevel     => $OptionRaw->{AccessLevel},
-            Context         => $OptionRaw->{Context},
             ExperienceLevel => $OptionRaw->{ExperienceLevel},
             Type            => $Type,
             Group           => $OptionRaw->{Group},

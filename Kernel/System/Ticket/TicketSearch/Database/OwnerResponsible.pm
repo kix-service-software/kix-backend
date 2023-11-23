@@ -96,24 +96,6 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' = '.$Param{Search}->{Value} );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' != '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' < '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' <= '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' > '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' >= '.$Param{Search}->{Value} );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' NOT IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, $AttributeMapping{$Param{Search}->{Field}}.' IN ('.(join(',', @{$Param{Search}->{Value}})).')' );
     }
