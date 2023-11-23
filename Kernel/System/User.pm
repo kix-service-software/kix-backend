@@ -19,7 +19,6 @@ use Data::Dumper;
 use Time::HiRes;
 
 use Kernel::System::Role;
-use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
 
@@ -600,6 +599,7 @@ to search users
         ValidID         => 2                          # optional - if given "Valid" is ignored
         Valid           => 1                          # optional - if omitted, 1 is used
         UserIDs         => [1,2,3]                    # optional
+        HasPermission   => {...}                      # optional
     );
 
 Returns hash of UserID, Login pairs:
@@ -626,11 +626,13 @@ sub UserSearch {
         && !$Param{IsAgent}
         && !$Param{IsCustomer}
         && !$Param{ValidID}
-        && !IsArrayRef$Param{UserIDs}
+        && !$Param{SearchUserID}
+        && !IsArrayRef{$Param{UserIDs}}
+        && !IsHashRefWithData($Param{HasPermission})
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID - else use UserList!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID or SearchUserID or HasPermission - else use UserList!',
         );
         return;
     }
@@ -644,7 +646,9 @@ sub UserSearch {
         . ( $Param{Valid} || '' ) . '::'
         . ( $Param{ValidID} || '' ) . '::'
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
-        . ( $Param{Limit} || '' );
+        . ( $Param{Limit} || '' ) . '::'
+        . ( $Param{SearchUserID} || '') . '::'
+        . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' );
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -660,9 +664,10 @@ sub UserSearch {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
-    my $SQL = "SELECT u.$Self->{UserTableUserID}, u.login FROM $Self->{UserTable} u";
+    my $SQL = "SELECT DISTINCT(u.$Self->{UserTableUserID}), u.login FROM $Self->{UserTable} u";
     my @Where;
     my @Bind;
+    my @OrderBy = ( 'id' );
 
     if ( $Param{Search} ) {
 
@@ -717,8 +722,39 @@ sub UserSearch {
         push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
     }
 
+    if ( $Param{SearchUserID} ) {
+        push(@Where, "u.id = ?");
+        push(@Bind, \$Param{SearchUserID});
+    }
+
+    if ( IsHashRefWithData($Param{HasPermission}) ) {
+        my @PermissionValues;
+        foreach my $Permission ( split(/,/, $Param{HasPermission}->{Permission}) ) {
+            push @PermissionValues, Kernel::System::Role::Permission::PERMISSION->{$Permission};
+        }
+
+        # join the relevant permission tables
+        $SQL .= ' JOIN role_user ru 
+                      ON ru.user_id = u.id
+                  JOIN role_permission as rp
+                      ON ru.role_id=rp.role_id
+                  JOIN permission_type as pt
+                      ON pt.id=rp.type_id';
+
+        foreach my $PermissionValue ( @PermissionValues ) {
+            my $WhereSQL = "(
+                (pt.name='Base::Ticket' AND rp.target IN ('*', ?) AND (rp.value & ?) = ?) 
+                OR 
+                (pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?)
+            )";
+
+            push(@Where, $WhereSQL);
+            push(@Bind, ( \$Param{HasPermission}->{ObjectID}, \$PermissionValue, \$PermissionValue, \$PermissionValue, \$PermissionValue ));
+        }
+    }
+
     if (@Where) {
-        $SQL .= ' WHERE ' . join(' AND ', @Where);
+        $SQL .= ' WHERE ' . join(' AND ', @Where) . ' ORDER BY ' . join(',', @OrderBy);
     }
 
     # get data
