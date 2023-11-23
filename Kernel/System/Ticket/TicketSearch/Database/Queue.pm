@@ -121,24 +121,6 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.queue_id = '.$QueueIDs[0] );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, 'st.queue_id != '.$QueueIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, 'st.queue_id < '.$QueueIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, 'st.queue_id <= '.$QueueIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, 'st.queue_id > '.$QueueIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, 'st.queue_id >= '.$QueueIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, 'st.queue_id NOT IN ('.(join(',', @QueueIDs)).')' );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.queue_id IN ('.(join(',', @QueueIDs)).')' );
     }

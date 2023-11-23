@@ -121,21 +121,6 @@ sub Search {
     elsif ( $Param{Search}->{Operator} eq 'NE' ) {
         push( @SQLWhere, 'st.type_id != '.$TypeIDs[0] );
     }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, 'st.type_id < '.$TypeIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, 'st.type_id <= '.$TypeIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, 'st.type_id > '.$TypeIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, 'st.type_id >= '.$TypeIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, 'st.type_id NOT IN ('.(join(',', @TypeIDs)).')' );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.type_id IN ('.(join(',', @TypeIDs)).')' );
     }

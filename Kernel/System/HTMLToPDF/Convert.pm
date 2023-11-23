@@ -55,7 +55,6 @@ sub Convert {
         return;
     }
 
-    my $Binary        = '/usr/local/bin/wkhtmltopdf';
     my $Config        = $ConfigObject->Get('HTMLToPDF::wkhtmltopdf');
     my $TempDir       = $ConfigObject->Get('TempDir');
     my $Directory     = $TempDir . '/PDFPrint';
@@ -64,7 +63,10 @@ sub Convert {
     my $Filename      = $Param{Filename} || q{};
     my $Output        = q{};
 
-    if ( !-e $Binary ) {
+    if (
+        !$Config->{Binary}
+        || !-e $Config->{Binary}
+    ) {
         $LogObject->Log(
             Priority => 'error',
             Message  => "HTMLToPDF: wkhtmltopdf binary doesn't exist!",
@@ -149,7 +151,6 @@ sub Convert {
     # prepare temp file names
     my $TempPDFFile  = $Filename . '-Temp.pdf';
     $Self->_Call(
-        Binary    => $Binary,
         Config    => $Config,
         Page      => $Data{Definition}->{Page},
         Directory => $Directory,
@@ -200,7 +201,6 @@ sub Convert {
 sub _Call {
     my ($Self, %Param) = @_;
 
-    my $Binary    = $Param{Binary};
     my %Config    = %{$Param{Config}};
     my %Page      = %{$Param{Page}};
     my $Directory = $Param{Directory};
@@ -210,47 +210,43 @@ sub _Call {
     my $TmpPDF    = $Param{TmpPDF};
 
     # prepare system call
-    my @SystemCallArg = ( $Binary );
-
+    my $SystemCall = $Config{Binary};
     # add parameter to system call
     if ( ref( $Config{Parameter} ) eq 'ARRAY' ) {
-        push( @SystemCallArg, @{ $Config{Parameter} } );
+        $SystemCall .= q{ } . join( q{ }, @{ $Config{Parameter} });
     }
-
     # add content parameter to system call
     for my $Key ( qw(
             Top Bottom Left Right
         )
     ) {
         next if !$Page{$Key};
-
-        my $Char = substr( $Key, 0 ,1 );
+        my $Char = substr( $Key,0,1 );
         if ( $Page{$Key} ) {
-            push( @SystemCallArg, q{-} . $Char, $Page{ $Key } );
+            $SystemCall .= " -$Char $Page{$Key}";
         }
     }
     if ( $Page{SpacingHeader} ) {
-        push( @SystemCallArg, '--header-spacing',  $Page{SpacingHeader} );
+        $SystemCall .= ' --header-spacing ' . $Page{SpacingHeader};
     }
     if ( $Page{SpacingFooter} ) {
-        push( @SystemCallArg, '--footer-spacing',  $Page{SpacingFooter} );
+        $SystemCall .= ' --footer-spacing ' . $Page{SpacingFooter};
     }
 
     if ( $Header ) {
-        push( @SystemCallArg, '--header-html',  $Directory . q{/} . $Header );
+        $SystemCall .= q{ --header-html "} . $Directory . q{/} . $Header . q{"};
     }
     if ( $Footer ) {
-        push( @SystemCallArg, '--footer-html',  $Directory . q{/} . $Footer );
+        $SystemCall .= q{ --footer-html "} . $Directory . q{/} . $Footer . q{"};
     }
 
     # add input to system call
-    push( @SystemCallArg,  $Directory . q{/} . $Content );
-
+    $SystemCall .= q{ "} . $Directory . q{/} . $Content . q{"};
     # add output to system call
-    push( @SystemCallArg, $Directory . q{/} . $TmpPDF );
+    $SystemCall .= q{ "} . $Directory . q{/} . $TmpPDF . q{"};
 
-    # process system call
-    system( @SystemCallArg );
+    # call wkhtmltopdf from commandline...
+    system($SystemCall);
 
     return 1;
 }

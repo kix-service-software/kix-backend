@@ -111,13 +111,9 @@ sub Search {
 
     my $Field      = 'att.filename';
     my $FieldValue = $Param{Search}->{Value};
-    my $Operator   = 'LIKE';
 
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        $Operator = '=';
-    }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        $Operator = '!=';
+        # no special handling
     }
     elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
         $FieldValue = $FieldValue.'%';
@@ -154,7 +150,7 @@ sub Search {
         $FieldValue = "'$FieldValue'";
     }
 
-    push( @SQLWhere, $Field.' '.$Operator.' '.$FieldValue );
+    push( @SQLWhere, $Field.' LIKE '.$FieldValue );
 
     # restrict search from customers to only customer articles
     if ( $Param{UserType} eq 'Customer' ) {

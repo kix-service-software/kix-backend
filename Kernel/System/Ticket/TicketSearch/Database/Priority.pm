@@ -120,24 +120,6 @@ sub Search {
     if ( $Param{Search}->{Operator} eq 'EQ' ) {
         push( @SQLWhere, 'st.ticket_priority_id = '.$PriorityIDs[0] );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, 'st.ticket_priority_id != '.$PriorityIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, 'st.ticket_priority_id < '.$PriorityIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, 'st.ticket_priority_id <= '.$PriorityIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, 'st.ticket_priority_id > '.$PriorityIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, 'st.ticket_priority_id >= '.$PriorityIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, 'st.ticket_priority_id NOT IN ('.(join(',', @PriorityIDs)).')' );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, 'st.ticket_priority_id IN ('.(join(',', @PriorityIDs)).')' );
     }

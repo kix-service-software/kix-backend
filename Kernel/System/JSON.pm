@@ -149,7 +149,7 @@ sub Decode {
         return;
     }
 
-    # # sanitize leftover boolean objects
+    # sanitize leftover boolean objects
     $Scalar = $Self->_BooleansProcess(
         JSON => $Scalar,
     );

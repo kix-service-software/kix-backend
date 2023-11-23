@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -160,7 +160,7 @@ sub Run {
     # assign roles
     if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
-        my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('Role')->UserRoleList(
+        my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('User')->RoleList(
             RoleID => 1,
             UserID => $UserID,
         );

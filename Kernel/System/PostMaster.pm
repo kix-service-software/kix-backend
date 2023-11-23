@@ -663,6 +663,20 @@ sub GetEmailParams {
     if ( $GetParam{'Reply-To'} ) {
         $GetParam{'ReplyTo'} = $GetParam{'Reply-To'};
     }
+    if (
+#rbo - T2016121190001552 - renamed X-KIX headers
+        $GetParam{'Mailing-List'}
+        || $GetParam{'Precedence'}
+        || $GetParam{'X-Loop'}
+        || $GetParam{'X-No-Loop'}
+        || $GetParam{'X-KIX-Loop'}
+        || (
+            $GetParam{'Auto-Submitted'}
+            && substr( $GetParam{'Auto-Submitted'}, 0, 5 ) eq 'auto-'
+        )
+    ) {
+        $GetParam{'X-KIX-Loop'} = 'yes';
+    }
     if ( !$GetParam{'X-Sender'} ) {
 
         # get sender email
@@ -702,6 +716,7 @@ sub GetEmailParams {
     for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel)) {
         if ( !$GetParam{$Key} ) {
             $GetParam{$Key} = 'email';
+            $GetParam{CustomerVisible} = 1;
         }
 
         # check if X-KIX-Channel exists, if not, set 'email'
@@ -711,6 +726,7 @@ sub GetEmailParams {
                 Message  => "Can't find channel '$GetParam{$Key}' in db, take 'email' and set 'visible for customer'",
             );
             $GetParam{$Key} = 'email';
+            $GetParam{CustomerVisible} = 1;
         }
     }
 

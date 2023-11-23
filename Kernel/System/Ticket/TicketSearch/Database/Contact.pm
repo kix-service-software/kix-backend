@@ -125,9 +125,6 @@ sub Search {
         );
         push( @SQLWhere, $Field." LIKE ".$Value );
     }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, "st.contact_id NOT IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
-    }
     elsif ( $Param{Search}->{Operator} eq 'IN' ) {
         push( @SQLWhere, "st.contact_id IN ('".(join("','", @{$Param{Search}->{Value}}))."')" );
     }

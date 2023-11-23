@@ -667,10 +667,6 @@ sub _Replace {
         }
     }
 
-    # do not handle DF object value as text (prevent string handling)
-    # TODO: ... but do it elsewhere
-    my $KeepValueAsIs = $Param{Text} =~ m/^<KIX_(?:\w|^>)+_DynamicField_(?:\w+?)_ObjectValue>$/ ? 1 : 0;
-
     # get and execute placeholder modules
     my $PlaceholderModules = $Kernel::OM->Get('Config')->Get('Placeholder::Module');
     if (IsHashRefWithData($PlaceholderModules)) {
@@ -702,7 +698,7 @@ sub _Replace {
     }
 
     # convert any html to ascii
-    if ( !$Param{RichText} && !$KeepValueAsIs ) {
+    if ( !$Param{RichText} ) {
         $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
             String            => $Param{Text},
             NoURLGlossar      => 1,

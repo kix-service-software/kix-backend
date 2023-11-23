@@ -321,7 +321,6 @@ Pushes a notification event to inform the clients
     my $Result = $ClientRegistrationObject->NotifyClients(
         Event     => 'CREATE|UPDATE|DELETE',             # required
         Namespace => 'Ticket.Article',                   # required
-        UserID    => 123,                                # optional
         ObjectID  => '...'                               # optional
     );
 

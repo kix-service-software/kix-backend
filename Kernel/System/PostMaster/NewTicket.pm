@@ -368,23 +368,16 @@ sub Run {
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
 
         my $Key;
-        my $CheckKey  = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
         my $CheckKey2 = 'X-KIX-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
 
-        if (
-            defined( $GetParam{ $CheckKey } )
-            && length( $GetParam{ $CheckKey } )
-        ) {
+        if ( defined $GetParam{$CheckKey} && length $GetParam{$CheckKey} ) {
             $Key = $CheckKey;
-        }
-        elsif (
-            defined( $GetParam{ $CheckKey2 } )
-            && length( $GetParam{ $CheckKey2 } )
-        ) {
+        } elsif ( defined $GetParam{$CheckKey2} && length $GetParam{$CheckKey2} ) {
             $Key = $CheckKey2;
         }
 
-        if ( $Key ) {
+        if ($Key) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
@@ -598,25 +591,9 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
+        my $Key = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
 
-        my $Key;
-        my $CheckKey  = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        my $CheckKey2 = 'X-KIX-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
-
-        if (
-            defined( $GetParam{ $CheckKey } )
-            && length( $GetParam{ $CheckKey } )
-        ) {
-            $Key = $CheckKey;
-        }
-        elsif (
-            defined( $GetParam{ $CheckKey2 } )
-            && length( $GetParam{ $CheckKey2 } )
-        ) {
-            $Key = $CheckKey2;
-        }
-
-        if ( $Key ) {
+        if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(

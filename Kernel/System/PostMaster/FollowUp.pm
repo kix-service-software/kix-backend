@@ -294,23 +294,16 @@ sub Run {
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
 
         my $Key;
-        my $CheckKey  = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
         my $CheckKey2 = 'X-KIX-FollowUp-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
 
-        if (
-            defined( $GetParam{ $CheckKey } )
-            && length( $GetParam{ $CheckKey } )
-        ) {
+        if ( defined $GetParam{$CheckKey} && length $GetParam{$CheckKey} ) {
             $Key = $CheckKey;
-        }
-        elsif (
-            defined( $GetParam{ $CheckKey2 } )
-            && length( $GetParam{ $CheckKey2 } )
-        ) {
+        } elsif ( defined $GetParam{$CheckKey2} && length $GetParam{$CheckKey2} ) {
             $Key = $CheckKey2;
         }
 
-        if ( $Key ) {
+        if ($Key) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
@@ -404,32 +397,13 @@ sub Run {
     }
 
     # apply stricter methods to set article-type and -sender.
-
-    # get addresses of From
-    my @FromAddresses = $Self->{ParserObject}->SplitAddressLine( Line => $GetParam{From} );
-
-    # prepare addresses for search
-    my @EmailIn = ();
-    EMAIL:
-    for my $Email ( @FromAddresses ) {
-        next EMAIL if ( !$Email );
-
-        my $Address = $Self->{ParserObject}->GetEmailAddress( Email => $Email );
-        next EMAIL if ( !$Address );
-
-        # remove quotation marks
-        $Address =~ s/("|')//g;
-        
-        # add address for search
-        push( @EmailIn, $Address );
-    }
+    my @SplitFrom = grep {/.+@.+/} split( /[<>,"\s\/\\()\[\]\{\}]/, $GetParam{From} );
 
     # check if email-from is a valid agent...
     if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
-        FROM:
-        for my $FromAddress (@EmailIn) {
-
-            my %UserData = $Kernel::OM->Get('User')->UserSearch(
+        for my $FromAddress (@SplitFrom) {
+            my $UserObject = $Kernel::OM->Get('User');
+            my %UserData = $UserObject->UserSearch(
                 Search  => $FromAddress,
                 ValidID => 1
             );
@@ -445,58 +419,38 @@ sub Run {
         }
     }
 
-    # CustomerVisible: check if X-KIX-FollowUp-CustomerVisible is set
-    if (
-        !$GetParam{CustomerVisible}
-        && $GetParam{'X-KIX-FollowUp-CustomerVisible'}
-    ) {
-        $GetParam{CustomerVisible} = 1;
-    }
-
-    # CustomerVisible: check if from is ticket contact
-    if (
-        !$GetParam{CustomerVisible}
-        && @EmailIn
-        && $Ticket{ContactID}
-    ) {
-        # search for relevant contacts by email
-        my %ContactListEmail = $Kernel::OM->Get('Contact')->ContactSearch(
-            EmailIn => \@EmailIn,
-            Valid   => 1
-        );
-
-        # check for ticket contact
-        if ( $ContactListEmail{ $Ticket{ContactID} } ) {
-            $GetParam{CustomerVisible} = 1;
-        }
-    }
-
-    # CustomerVisible: check if from is known contact AND has the same organisation as ticket
-    if (
-        !$GetParam{CustomerVisible}
-        && @EmailIn
-        && $Ticket{OrganisationID}
-        && $ConfigObject->Get('PostMaster::FollowUp::CheckFromOrganisation')
-    ) {
-        # search for relevant contacts by email
-        my %ContactListEmail = $Kernel::OM->Get('Contact')->ContactSearch(
-            EmailIn => \@EmailIn,
-            Valid   => 1
-        );
-
-        # search for relevant contacts by ticket organisation
-        my %ContactListOrganisation = $Kernel::OM->Get('Contact')->ContactSearch(
-            OrganisationID => $Ticket{OrganisationID},
-            Valid          => 1
-        );
-
-        # check for matching entry in both lists
-        for my $ContactID ( keys( %ContactListEmail ) ) {
-            if ( $ContactListOrganisation{ $ContactID } ) {
+    # check if from is known customer AND has the same customerID as in Ticket
+    if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom') ) {
+        $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
+        for my $FromAddress (@SplitFrom) {
+            my $ContactObject = $Kernel::OM->Get('Contact');
+            my %UserListCustomer = $ContactObject->ContactSearch(
+                Email => $FromAddress
+            );
+            # FIXME: some attributes do not exisit anymore (e.g. UserCUstomerID)
+            if (keys %UserListCustomer) {
+                for my $CurrKey ( keys(%UserListCustomer) ) {
+                    my %ContactData = $ContactObject->ContactGet(
+                        ID => $CurrKey,
+                    );
+                    if (
+                        $ContactData{UserCustomerID} && $Ticket{CustomerID}
+                        && $Ticket{CustomerID} eq $ContactData{UserCustomerID}
+                    ) {
+                        $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
+                        $GetParam{CustomerVisible} = 1;
+                        last;
+                    }
+                }
+            }
+            # seems to be a customer user not existing in the database -> check if this one is identical to Ticket{ContactID}
+            elsif ($FromAddress && $Ticket{ContactID} && $Ticket{ContactID} eq $FromAddress) {
+                $GetParam{'X-KIX-FollowUp-Channel'} = 'email';
                 $GetParam{CustomerVisible} = 1;
-
                 last;
             }
+
+            last if ( $GetParam{'X-KIX-FollowUp-Channel'} eq 'email' );
         }
     }
 
@@ -601,25 +555,9 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
+        my $Key = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
 
-        my $Key;
-        my $CheckKey  = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
-        my $CheckKey2 = 'X-KIX-FollowUp-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
-
-        if (
-            defined( $GetParam{ $CheckKey } )
-            && length( $GetParam{ $CheckKey } )
-        ) {
-            $Key = $CheckKey;
-        }
-        elsif (
-            defined( $GetParam{ $CheckKey2 } )
-            && length( $GetParam{ $CheckKey2 } )
-        ) {
-            $Key = $CheckKey2;
-        }
-
-        if ( $Key ) {
+        if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
                 ID => $DynamicFieldID,

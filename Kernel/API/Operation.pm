@@ -144,7 +144,25 @@ sub new {
     }
 
     # create validator
-    $Self->{ValidatorObject} = $Kernel::OM->Get('API::Validator');
+    my $ValidatorModule = $Kernel::OM->GetModuleFor('API::Validator');
+    if ( !$Kernel::OM->Get('Main')->Require($ValidatorModule) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Can't load module $ValidatorModule",
+        );
+        return;    # bail out, this will generate 500 Error
+    }
+
+    $Self->{ValidatorObject} = $ValidatorModule->new(
+        %{$Self},
+    );
+
+    # if validator init failed, bail out
+    if ( ref $Self->{ValidatorObject} ne $ValidatorModule ) {
+        return $Self->_Error(
+            %{$Self->{ValidatorObject}},
+        );
+    }
 
     # load backend module
     my $GenericModule = $Self->{OperationConfig}->{Module};
@@ -214,7 +232,7 @@ sub Run {
 
     if ( !$Param{PermissionCheckOnly} ) {
 
-        my $DoValidate = $Param{IgnoreValidators} ? 0 : 1;
+        my $DoValidate = 1;
 
         my $DoNotValidate = $Kernel::OM->Get('Config')->Get('API::Validator::DisableForResource');
         if ( IsHashRefWithData($DoNotValidate)) {
@@ -231,7 +249,6 @@ sub Run {
         if ( $DoValidate ) {
             # validate data
             my $ValidatorResult = $Self->{ValidatorObject}->Validate(
-                Operation => $Self->{Operation},
                 %Param
             );
 

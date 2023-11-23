@@ -279,8 +279,6 @@
 /session                                                                                   | GET              | V1::Session::SessionGet                          |
 /session/user                                                                              | GET              | V1::Session::UserGet                             |
 /session/user                                                                              | PATCH            | V1::Session::UserUpdate                          |
-/session/user/counters                                                                     | GET              | V1::Session::UserCountersGet                     |
-/session/user/tickets                                                                      | GET              | V1::Session::UserTicketsGet                      |
 /session/user/preferences                                                                  | GET              | V1::Session::UserPreferenceSearch                |
 /session/user/preferences                                                                  | POST             | V1::Session::UserPreferenceCreate                |
 /session/user/preferences/:UserPreferenceID                                                | DELETE           | V1::Session::UserPreferenceDelete                |

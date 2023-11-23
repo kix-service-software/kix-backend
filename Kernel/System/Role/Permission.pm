@@ -481,15 +481,6 @@ sub PermissionAdd {
         ],
     );
 
-    # update change_time and change_by on role object
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE roles SET '
-            . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
-            \$Param{UserID}, \$Param{RoleID}
-        ],
-    );
-
     # get new id
     return if !$DBObject->Prepare(
         SQL  => 'SELECT id FROM role_permission WHERE role_id = ? AND type_id = ? AND target = ?',
@@ -606,15 +597,6 @@ sub PermissionUpdate {
             \$Param{Comment}, \$Param{UserID}, \$Param{ID}
         ],
     );
-
-    # update change_time and change_by on role object
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE roles SET '
-            . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
-            \$Param{UserID}, \$Data{RoleID}
-        ],
-    );    
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();

@@ -216,24 +216,6 @@ sub Search {
     if ( $Operator eq 'EQ' ) {
         push( @SQLWhere, 'st.ticket_state_id = '.$StateIDs[0] );
     }
-    elsif ( $Param{Search}->{Operator} eq 'NE' ) {
-        push( @SQLWhere, 'st.ticket_state_id != '.$StateIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LT' ) {
-        push( @SQLWhere, 'st.ticket_state_id < '.$StateIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'LTE' ) {
-        push( @SQLWhere, 'st.ticket_state_id <= '.$StateIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GT' ) {
-        push( @SQLWhere, 'st.ticket_state_id > '.$StateIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'GTE' ) {
-        push( @SQLWhere, 'st.ticket_state_id >= '.$StateIDs[0] );
-    }
-    elsif ( $Param{Search}->{Operator} eq 'IN' && $Param{Search}->{Not} ) {
-        push( @SQLWhere, 'st.ticket_state_id NOT IN ('.(join(',', @StateIDs)).')' );
-    }
     elsif ( $Operator eq 'IN' ) {
         push( @SQLWhere, 'st.ticket_state_id IN ('.(join(',', @StateIDs)).')' );
     }

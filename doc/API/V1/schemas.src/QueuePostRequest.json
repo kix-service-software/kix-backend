@@ -7,6 +7,9 @@
     "Queue": {
       "type": "object",
       "properties": {
+        "Calendar": {
+          "type": "string"
+        },
         "Comment": {
           "type": "string"
         },

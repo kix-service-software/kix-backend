@@ -87,6 +87,7 @@ one or more ticket entries in one call.
                     "UnlockTimeout":...,
                     "ChangeTime": "...",
                     "Email": "...",
+                    "Calendar": "",
                     "CreateTime": "...",
                     "ValidID": ...,
                     "QueueID": ...,

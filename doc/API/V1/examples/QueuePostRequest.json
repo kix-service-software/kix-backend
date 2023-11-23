@@ -1,5 +1,6 @@
 {
     "Queue": {
+        "Calendar": "",
         "Comment": "Postmaster queue.",
         "FollowUpID": 1,
         "FollowUpLock": 0,

@@ -145,6 +145,15 @@ sub Run {
         }
     }
 
+    if ( !$Ticket{Calendar} && $Ticket{QueueID} ) {
+        my %Queue = $Self->{QueueObject}->QueueGet(
+            ID => $Ticket{QueueID},
+        );
+        if ( $Queue{Calendar} ) {
+            $Ticket{Calendar} = $Queue{Calendar};
+        }
+    }
+
     # do automatic QueueMove
     if (
         $WFConfigRef->{QueueMove}
