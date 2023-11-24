@@ -569,6 +569,7 @@ sub ArticleCreate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$ArticleID,
     );
 
@@ -1490,6 +1491,15 @@ certain views)
         UserID              => 123,
     );
 
+returns articles in array / hash by given ticket id but
+only requested message-ids
+
+    my @ArticleIndex = $TicketObject->ArticleGet(
+        TicketID  => 123,
+        MessageID => \@MessageIDs,
+        UserID    => 123,
+    );
+
 to get extended ticket attributes, use param Extended - see TicketGet() for extended attributes -
 
     my @ArticleIndex = $TicketObject->ArticleGet(
@@ -1568,6 +1578,9 @@ sub ArticleGet {
     if ( $Param{CustomerVisible} ) {
         $CustomerVisibleSQL = " AND sa.customer_visible = 1";
     }
+    elsif ( defined( $Param{CustomerVisible} ) ) {
+        $CustomerVisibleSQL = " AND sa.customer_visible = 0";
+    }
 
     # sender type lookup
     my $SenderTypeSQL = '';
@@ -1635,6 +1648,19 @@ sub ArticleGet {
     }
     if ($SenderTypeIDSQL) {
         $SQL .= $SenderTypeIDSQL;
+    }
+
+    # add message id
+    my $MessageIDSQL;
+    if ( IsArrayRefWithData( $Param{MessageID} ) ) {
+        $SQL .= ' AND sa.a_message_id_md5 IN (' . join( ',', map {'?'} @{ $Param{MessageID} } ) . ')';
+
+        for my $MessageID ( @{ $Param{MessageID} } ) {
+            my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $MessageID );
+            push( @Bind, \$MD5 );
+        }
+
+        $MessageIDSQL = 1;
     }
 
     # set order
@@ -2107,7 +2133,8 @@ sub ArticleUpdate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
-        ObjectID  => $Param{TicketID}.q{::}.$Param{ArticleID},
+        UserID    => $Param{UserID},
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2284,7 +2311,8 @@ sub ArticleFlagSet {
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key}.'::'.$Param{UserID},
+            UserID    => $Param{UserID},
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -2388,6 +2416,7 @@ sub ArticleFlagDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
     );
 

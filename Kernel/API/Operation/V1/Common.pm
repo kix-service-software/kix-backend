@@ -294,7 +294,7 @@ sub RunOperation {
 
     # log created ID of POST requests
     if ( $Self->{RequestMethod} eq 'POST' && IsHashRefWithData($Result) && $Result->{Success} ) {
-        my @Data = %{ $Result->{Data} };
+        my @Data = %{ $Result->{Data} || {} };
         $Self->_Debug( $Self->{LevelIndent}, "created new item (" . join( '=', @Data ) . ")" );
     }
 
@@ -553,7 +553,7 @@ sub PrepareData {
                 $Direction = 'descending';
             }
 
-            if ( !IsArrayRefWithData( $Self->{Sorter}->{$Object} ) ) {
+            if ( !IsArrayRefWithData( $Self->{Sort}->{$Object} ) ) {
                 $Self->{Sort}->{$Object} = [];
             }
             push @{ $Self->{Sort}->{$Object} }, {
@@ -1399,33 +1399,49 @@ sub ExecOperation {
     # TODO: the following code is nearly identical to the code used in Transport::REST, method ProcessRequest -> should be generalized
     # maybe another solution to execute operations / API calls is needed
 
-    # determine available methods
-    my %AvailableMethods;
-    for my $CurrentOperation ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
-
-        next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$CurrentOperation} );
-
-        my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$CurrentOperation} };
-        my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
-
-        next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
-
-        $AvailableMethods{ $RouteMapping{RequestMethod}->[0] } = {
-            Operation => $CurrentOperation,
-            Route     => $RouteMapping{Route}
-        };
-    }
-
     # get direct sub-resource for generic including
     my %OperationRouteMapping = (
         $Param{OperationType} => $CurrentRoute
     );
+
+    # determine parent mapping as well
+    my $ParentObjectRoute = $CurrentRoute;
+    $ParentObjectRoute =~ s/^((.*?):(\w+))\/(.+?)$/$1/g;
+    $ParentObjectRoute = '' if $ParentObjectRoute eq $CurrentRoute;
+    my %ParentMethodOperationMapping;
+
+    # determine available methods
+    my %AvailableMethods;
     for my $Op ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
-        # ignore invalid config
-        next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$Op} );
+
+        my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$Op} || {} };
+        my $RouteRegEx = $RouteMapping{Route};
+        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+
+        if ( $ParentObjectRoute ) {
+            # ignore anything that has nothing to do with the parent Ops route
+            if ( $ParentObjectRoute ne '/' && "$RouteMapping{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
+                # do nothing
+            }
+            elsif ( $ParentObjectRoute eq '/' && "$RouteMapping{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
+                # do nothing
+            }
+            else {
+                my $Method = $TransportConfig->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
+                $ParentMethodOperationMapping{$Method} = $Op;
+            }
+        }
+
+        if ( $RequestURI =~ m{^ $RouteRegEx $}xms ) {
+            $AvailableMethods{ $RouteMapping{RequestMethod}->[0] } = {
+                Operation => $Op,
+                Route     => $RouteMapping{Route}
+            };
+        }
+
         # ignore non-search or -get operations
         next if $Op !~ /(Search|Get)$/;
+
         # ignore anything that has nothing to do with the current Ops route
         if ( $CurrentRoute ne '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
             next;
@@ -1435,30 +1451,7 @@ sub ExecOperation {
         }
 
         $OperationRouteMapping{$Op} = $TransportConfig->{RouteOperationMapping}->{$Op}->{Route};
-    }
 
-    # determine parent mapping as well
-    my $ParentObjectRoute = $CurrentRoute;
-    $ParentObjectRoute =~ s/^((.*?):(\w+))\/(.+?)$/$1/g;
-    $ParentObjectRoute = '' if $ParentObjectRoute eq $CurrentRoute;
-
-    my %ParentMethodOperationMapping;
-    if ( $ParentObjectRoute ) {
-        for my $Op ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
-            # ignore invalid config
-            next if !IsHashRefWithData( $TransportConfig->{RouteOperationMapping}->{$Op} );
-
-            # ignore anything that has nothing to do with the parent Ops route
-            if ( $ParentObjectRoute ne '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute\/$/ ) {
-                next;
-            }
-            elsif ( $ParentObjectRoute eq '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$ParentObjectRoute[:a-zA-Z_]+$\//g ) {
-                next;
-            }
-
-            my $Method = $TransportConfig->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
-            $ParentMethodOperationMapping{$Method} = $Op;
-        }
     }
 
     # init new Operation object
@@ -1485,8 +1478,9 @@ sub ExecOperation {
         ParentMethodOperationMapping => \%ParentMethodOperationMapping,
         Authorization            => $Self->{Authorization},
         Level                    => ($Self->{Level} || 0) + 1,
+        SuppressPermissionErrors => $Param{SuppressPermissionErrors},
         IgnorePermissions        => $Param{IgnorePermissions},
-        SuppressPermissionErrors => $Param{SuppressPermissionErrors}
+        IgnoreValidators         => 1,                                  # always ignore validators in internal API calls
     );
 
     # if operation init failed, bail out
@@ -1532,9 +1526,10 @@ sub ExecOperation {
             %{$Param{Data} || {}},
             %AdditionalData
         },
-        IgnorePermissions           => $Param{IgnorePermissions},
-        IgnoreParentPermissions     => $Param{IgnoreParentPermissions},
-        PermissionCheckOnly         => $Param{PermissionCheckOnly},
+        PermissionCheckOnly     => $Param{PermissionCheckOnly},
+        IgnorePermissions       => $Param{IgnorePermissions},
+        IgnoreParentPermissions => $Param{IgnoreParentPermissions},
+        IgnoreValidators         => 1,                                  # always ignore validators in internal API calls
     );
 
     # check result and add cachetype if neccessary
@@ -1632,6 +1627,12 @@ sub _ValidateFilter {
             foreach my $Filter ( @{ $FilterDef->{$Object}->{$BoolOperator} } ) {
                 $Filter->{Operator} = uc( $Filter->{Operator} || '' );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
+                
+                # handle negated operators
+                if ( $Filter->{Operator} =~ /^!(.*?)$/ ) {
+                    $Filter->{Operator} = $1;
+                    $Filter->{Not} = !$Filter->{Not};
+                }
 
                 # check if filter field is valid
                 if ( !$Filter->{Field} ) {
