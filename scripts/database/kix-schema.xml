@@ -93,6 +93,32 @@
     </ForeignKey>
 </Table>
 
+<Table Name="user_counter">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
+    <Column Name="user_id" Required="true" Type="INTEGER" />
+    <Column Name="category" Required="true" Size="50" Type="VARCHAR" />
+    <Column Name="counter" Required="true" Size="255" Type="VARCHAR" />
+    <Column Name="object_id" Required="true" Type="BIGINT" />
+    <Unique Name="user_counter_unique">
+        <UniqueColumn Name="user_id"/>
+        <UniqueColumn Name="category"/>
+        <UniqueColumn Name="counter"/>
+        <UniqueColumn Name="object_id"/>
+    </Unique>
+    <Index Name="user_counter_user_id">
+        <IndexColumn Name="user_id"/>
+    </Index>
+    <Index Name="user_counter_category">
+        <IndexColumn Name="category"/>
+    </Index>
+    <Index Name="user_counter_counter">
+        <IndexColumn Name="counter"/>
+    </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="user_id" Foreign="id" />
+    </ForeignKey>
+</Table>
+
 <!-- role - all roles -->
 <Table Name="roles">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
