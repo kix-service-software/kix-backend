@@ -45,7 +45,7 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Flag.y/n'
+            ValueType    => 'Integer'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -734,8 +734,9 @@ my @SearchTests = (
 );
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
-        Search => $Test->{Search},
-        Silent => defined( $Test->{Expected} ) ? 0 : 1
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
         $Result,
@@ -1005,11 +1006,12 @@ $Kernel::OM->Get('Config')->Set(
 
 # check search
 my $InactiveSearchResult = $AttributeObject->Search(
-    Search => {
+    Search       => {
         Field    => 'Archived',
         Operator => 'EQ',
         Value    => 1
-    }
+    },
+    BoolOperator => 'AND'
 );
 $Self->IsDeeply(
     $InactiveSearchResult,
@@ -1023,7 +1025,7 @@ my $InactiveSortResult = $AttributeObject->Sort(
 );
 $Self->IsDeeply(
     $InactiveSortResult,
-    [],
+    {},
     'Sort: "Ticket::ArchiveSystem" inactive'
 );
 

@@ -206,9 +206,6 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                     elsif ( $Entry->{ValueType} eq 'IncidentState.Name' ) {
                         $SearchValue = $InciStateDataRef->{Name};
                     }
-                    elsif ( $Entry->{ValueType} eq 'Flag.y/n' ) {
-                        $SearchValue = 'y';
-                    }
                     elsif ( $Entry->{ValueType} eq 'Flag.ArrayOfHashes' ) {
                         $SearchValue = [
                             {

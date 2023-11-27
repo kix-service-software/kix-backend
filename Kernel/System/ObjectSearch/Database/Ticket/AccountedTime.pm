@@ -17,9 +17,7 @@ use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Log'
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 

@@ -264,7 +264,7 @@ sub GetSortDef {
             Language  => $Language,
             Flags     => $Param{Flags}
         );
-        return if ( !IsHashRefWithData($AttributeDef) );
+        return if ( !IsHashRef($AttributeDef) );
 
         for my $Key ( keys( %{ $AttributeDef  } ) ) {
             # skip OrderBySwitch

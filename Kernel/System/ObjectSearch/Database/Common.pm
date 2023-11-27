@@ -312,9 +312,12 @@ sub _CheckOperators {
 sub _OperationEQ {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value}->[0] || q{};
+    my $Value = $Param{Value}->[0] // q{};
 
-    if ( $Value ) {
+    if (
+        defined( $Value )
+        && $Value ne ''
+    ) {
 
         my $Str = $Param{Quotes}->{SQL}
             . $Value
@@ -334,9 +337,12 @@ sub _OperationEQ {
 sub _OperationNE {
     my ( $Self, %Param ) = @_;
 
-    my $Value = $Param{Value}->[0] || q{};
+    my $Value = $Param{Value}->[0] // q{};
 
-    if ( $Value ) {
+    if (
+        defined( $Value )
+        && $Value ne ''
+    ) {
 
         my $Str = $Param{Quotes}->{SQL}
             . $Value
@@ -710,7 +716,7 @@ sub _OperationGTE {
 
             push(
                 @SQL,
-                "$Param{Column} => $Value"
+                "$Param{Column} >= $Value"
             );
         }
 
@@ -807,6 +813,22 @@ sub _CheckSearchParams {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Invalid search field "' . $Param{Search}->{Field} . q{"!},
+            );
+        }
+        return;
+    }
+
+    if (
+        !$Param{BoolOperator}
+        || (
+            $Param{BoolOperator} ne 'AND'
+            && $Param{BoolOperator} ne 'OR'
+        )
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid BoolOperator!',
             );
         }
         return;

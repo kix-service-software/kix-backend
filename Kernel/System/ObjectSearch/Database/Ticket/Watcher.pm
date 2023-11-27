@@ -15,10 +15,7 @@ use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -40,9 +37,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable     => 0|1,
+            IsSortable   => 0|1,
             IsSearchable => 0|1,
-            Operators     => []
+            Operators    => []
         },
     };
 
@@ -52,12 +49,12 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        'WatcherUserID' => {
+        WatcherUserID => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
             ValueType    => 'Integer'
-        },
+        }
     };
 
     return $Self->{Supported};
@@ -73,40 +70,59 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        Join    => [ ],
+        Join  => [...],
+        Where => [...],
     };
 
 =cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
+    return if ( !$Self->_CheckSearchParams( %Param ) );
+
+    if ( ref( $Param{Search}->{Value} ) eq 'ARRAY' ) {
+        for my $Entry ( @{ $Param{Search}->{Value} } ) {
+            if ( $Entry !~ m/^\d+$/sm ) {
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Invalid search value ($Entry)!",
+                    );
+                }
+                return;
+            }
+        }
+    }
+    elsif ( $Param{Search}->{Value} !~ m/^\d+$/sm ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid search value ($Param{Search}->{Value})!",
+            );
+        }
         return;
     }
 
+
     # check if we have to add a join
+    my @SQLJoin;
     if (
         !$Param{Flags}->{WatcherJoined}
-        || !$Param{Flags}->{WatcherJoined}->{$Param{BoolOperator}}
+        || !$Param{Flags}->{WatcherJoined}->{ $Param{BoolOperator} }
     ) {
         if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id' );
+            push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'' );
+            push( @SQLJoin, 'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\'' );
         } else {
-            push( @SQLJoin, 'INNER JOIN watcher tw ON st.id = tw.object_id' );
+            push( @SQLJoin, 'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\'' );
         }
-        $Param{Flags}->{WatcherJoined}->{$Param{BoolOperator}} = 1;
+        $Param{Flags}->{WatcherJoined}->{ $Param{BoolOperator} } = 1;
     }
 
     my $Column;
-    if ( $Param{BoolOperator} eq 'OR') {
+    if ( $Param{BoolOperator} eq 'OR' ) {
         $Column = [
             'tw_left.user_id',
             'tw_right.user_id'
@@ -115,19 +131,16 @@ sub Search {
         $Column = 'tw.user_id';
     }
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    my @SQLWhere = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => $Column,
         Value     => $Param{Search}->{Value},
         Prepare   => 1,
         Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Supported => $Self->{Supported}->{ $Param{Search}->{Field} }->{Operators},
+        Silent    => $Param{Silent}
     );
-
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
+    return if ( !@SQLWhere );
 
     return {
         Join  => \@SQLJoin,

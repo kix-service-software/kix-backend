@@ -182,8 +182,9 @@ my @SearchTests = (
 );
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
-        Search => $Test->{Search},
-        Silent => defined( $Test->{Expected} ) ? 0 : 1
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
         $Result,
