@@ -6,25 +6,22 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Priority;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Editor;
 
 use strict;
 use warnings;
-
-use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
 
 our @ObjectDependencies = qw(
-    Config
     Log
 );
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Priority - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Editor - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -42,9 +39,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable     => 0|1,
+            IsSortable   => 0|1,
             IsSearchable => 0|1,
-            Operators     => []
+            Operators    => []
         },
     };
 
@@ -54,18 +51,18 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        'Priority'   => {
+        CreateBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Priority.Name'
-        },
-        'PriorityID' => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            Operators    => ['EQ','NE','IN','!IN'],
             ValueType    => 'Integer'
         },
+        ChangeBy => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
+        }
     };
 
     return $Self->{Supported};
@@ -88,6 +85,7 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my @SQLWhere;
 
     # check params
     if ( !$Param{Search} ) {
@@ -98,40 +96,15 @@ sub Search {
         return;
     }
 
-    my @PriorityIDs;
-    if ( $Param{Search}->{Field} eq 'Priority' ) {
-        my @PriorityList = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @PriorityList = @{$Param{Search}->{Value}}
-        }
-        foreach my $Priority ( @PriorityList ) {
-            my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
-                Priority => $Priority,
-            );
-            if ( !$PriorityID ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown priority $Priority!",
-                );
-                return;
-            }
+    my %AttributeMapping = (
+        'CreateBy' => 'ci.create_by',
+        'ChangeBy' => 'ci.change_by',
+    );
 
-            push( @PriorityIDs, $PriorityID );
-        }
-    }
-    else {
-        @PriorityIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @PriorityIDs = @{$Param{Search}->{Value}}
-        }
-    }
-
-    my @SQLWhere;
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'st.ticket_priority_id',
-        Value     => \@PriorityIDs,
-        Type      => 'NUMERIC',
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Value     => $Param{Search}->{Value},
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
@@ -143,6 +116,7 @@ sub Search {
         Where => \@SQLWhere,
     };
 }
+
 
 =item Sort()
 
@@ -162,34 +136,18 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
-    # map search attributes to table attributes
     my %AttributeMapping = (
-        Priority    => 'COALESCE(tl.value, tp.name) AS TranslatePriority',
-        PriorityID  => 'st.ticket_priority_id',
+        'CreateBy' => 'ci.create_by',
+        'ChangeBy' => 'ci.change_by',
     );
-
-    my %OrderMapping = (
-        Priority    => 'TranslatePriority',
-        PriorityID  => 'st.ticket_priority_id',
-    );
-
-    my %Join;
-    if ( $Param{Attribute} eq 'Priority' ) {
-        $Join{Join} = [
-            'INNER JOIN ticket_priority tp ON tp.id = st.ticket_priority_id',
-	        'LEFT OUTER JOIN translation_pattern tlp ON tlp.value = tp.name',
-            "LEFT OUTER JOIN translation_language tl ON tl.pattern_id = tlp.id AND tl.language = '$Param{Language}'"
-        ];
-    }
 
     return {
         Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
         OrderBy => [
-            $OrderMapping{$Param{Attribute}}
+            $AttributeMapping{$Param{Attribute}}
         ],
-        %Join
     };
 }
 
@@ -209,4 +167,3 @@ LICENSE-GPL3 for license information (GPL3). If you did not receive this file, s
 <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 =cut
-

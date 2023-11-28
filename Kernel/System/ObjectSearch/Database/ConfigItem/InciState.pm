@@ -56,17 +56,20 @@ sub GetSupportedAttributes {
         InciStateID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.ID'
         },
         InciStateIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.ID'
         },
         InciState => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'IncidentState.Name'
         }
     };
 
@@ -83,7 +86,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -106,12 +109,12 @@ sub Search {
     if ( $Param{Search}->{Field} eq 'InciState' ) {
         my %States = reverse(
             %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::ConfigItem::IncidentState',
+                Class => 'ITSM::Core::IncidentState',
             )}
         );
 
         my @StateList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @StateList = @{$Param{Search}->{Value}}
         }
         foreach my $State ( @StateList ) {
@@ -128,7 +131,7 @@ sub Search {
     }
     else {
         @InciStateIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @InciStateIDs = @{$Param{Search}->{Value}}
         }
     }
@@ -161,8 +164,8 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
-        SQLJoin  => \@SQLJoin,
+        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
     };
 }
 
@@ -175,8 +178,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -219,13 +222,13 @@ sub Sort {
     }
 
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLJoin => \@SQLJoin
+        Join => \@SQLJoin
     };
 }
 

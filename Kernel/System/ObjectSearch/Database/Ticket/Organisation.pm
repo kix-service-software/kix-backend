@@ -55,7 +55,8 @@ sub GetSupportedAttributes {
         'OrganisationID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         },
         'Organisation' => {
             IsSearchable => 0,

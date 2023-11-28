@@ -287,7 +287,6 @@ my %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 
 $Self->True(
@@ -308,8 +307,8 @@ $Self->True(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -329,8 +328,8 @@ $Self->True(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -350,8 +349,8 @@ $Self->True(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -362,7 +361,7 @@ $Self->False(
     ObjectType => 'Ticket',
     Result     => 'HASH',
     Limit      => 100,
-    Search       => {
+    Search     => {
         AND => [
             {
                 Field => 'TicketID',
@@ -373,7 +372,6 @@ $Self->False(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 
 $Self->True(
@@ -401,7 +399,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 
 $Self->True(
@@ -411,8 +408,8 @@ $Self->True(
 
 my $Count = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'COUNT',
-    Search       => {
+    Result     => 'COUNT',
+    Search     => {
         OR => [
             {
                 Field => 'TicketNumber',
@@ -421,8 +418,8 @@ my $Count = $Kernel::OM->Get('ObjectSearch')->Search(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->Is(
     $Count,
@@ -432,9 +429,9 @@ $Self->Is(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'HASH',
-    Limit        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         OR => [
             {
                 Field => 'TicketNumber',
@@ -443,8 +440,8 @@ $Self->Is(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -467,7 +464,6 @@ $Self->True(
     Title      => $Ticket{Title},
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -494,7 +490,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -516,7 +511,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -538,7 +532,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -565,7 +558,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->False(
     scalar $TicketIDs{$TicketID},
@@ -574,8 +566,8 @@ $Self->False(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result            => 'HASH',
-    Limit             => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         OR => [
             {
@@ -585,8 +577,8 @@ $Self->False(
             },
         ]
     },
-    UserID            => 1,
-    Permission        => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -595,8 +587,8 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result            => 'HASH',
-    Limit             => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         OR => [
             {
@@ -606,8 +598,8 @@ $Self->True(
             },
         ]
     },
-    UserID            => 1,
-    Permission        => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -616,8 +608,8 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result            => 'HASH',
-    Limit             => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         AND => [
             {
@@ -642,8 +634,8 @@ $Self->True(
             },
         ]
     },
-    UserID            => 1,
-    Permission        => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -652,8 +644,8 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result            => 'HASH',
-    Limit             => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         AND => [
             {
@@ -678,8 +670,8 @@ $Self->True(
             },
         ]
     },
-    UserID            => 1,
-    Permission        => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -715,7 +707,6 @@ $Self->False(
         ]
     },
     UserID            => 1,
-    Permission        => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -724,8 +715,8 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'HASH',
-    Limit        => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         AND => [
             {
@@ -740,8 +731,8 @@ $Self->True(
             },
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -767,7 +758,6 @@ $Self->True(
         ]
     },
     UserID       => 1,
-    Permission   => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -776,8 +766,8 @@ $Self->False(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result              => 'HASH',
-    Limit               => 100,
+    Result     => 'HASH',
+    Limit      => 100,
     Search     => {
         AND => [
             {
@@ -792,8 +782,8 @@ $Self->False(
             },
         ]
     },
-    UserID              => 1,
-    Permission          => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -819,7 +809,6 @@ $Self->True(
         ]
     },
     UserID              => 1,
-    Permission          => 'rw',
 );
 $Self->True(
     !$TicketIDs{$TicketID},
@@ -877,9 +866,9 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'HASH',
-    Limit        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'TicketNumber',
@@ -893,8 +882,8 @@ $Self->True(
             }
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -903,9 +892,9 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'HASH',
-    Limit        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'TicketNumber',
@@ -919,8 +908,8 @@ $Self->True(
             }
         ]
     },
-    UserID       => 1,
-    Permission   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -1164,9 +1153,9 @@ $Self->True(
 # Test CreatedUserIDs
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result         => 'HASH',
-    Limit          => 100,
-    Search         => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field    => 'CreatedUserID',
@@ -1181,8 +1170,8 @@ $Self->True(
             Direction => 'descending',
         },
     ],
-    UserID         => 1,
-    Permission     => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1192,9 +1181,9 @@ $Self->True(
 # Test CreatedPriorityIDs
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result             => 'HASH',
-    Limit              => 100,
-    Search             => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field    => 'CreatedPriorityID',
@@ -1209,8 +1198,8 @@ $Self->True(
             Direction => 'descending',
         },
     ],
-    UserID             => 1,
-    Permission         => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1237,8 +1226,8 @@ $Self->True(
             Direction => 'descending',
         },
     ],
-    UserID          => 1,
-    Permission      => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1248,9 +1237,9 @@ $Self->True(
 # Test CreatedQueueIDs
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result          => 'HASH',
-    Limit           => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'CreatedQueueID',
@@ -1265,8 +1254,8 @@ $Self->True(
             Direction => 'descending',
         },
     ],
-    UserID          => 1,
-    Permission      => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1279,9 +1268,9 @@ my $CreateTime = $TimeObject->SystemTime2TimeStamp(
 );
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'CreateTime',
@@ -1290,8 +1279,8 @@ my $CreateTime = $TimeObject->SystemTime2TimeStamp(
             },
         ]
     },
-    UserID                       => 1,
-    Permission                   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1304,9 +1293,9 @@ $CreateTime = $TimeObject->SystemTime2TimeStamp(
 );
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result                           => 'HASH',
-    Limit                            => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'LastChangeTime',
@@ -1315,8 +1304,8 @@ $CreateTime = $TimeObject->SystemTime2TimeStamp(
             },
         ]
     },
-    UserID                           => 1,
-    Permission                       => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1338,7 +1327,6 @@ $Self->True(
         ]
     },
     UserID                        => 1,
-    Permission                    => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1348,9 +1336,9 @@ $Self->True(
 # Test CreateTime
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result                       => 'HASH',
-    Limit                        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'CreateTime',
@@ -1359,8 +1347,8 @@ $Self->True(
             },
         ]
     },
-    UserID                       => 1,
-    Permission                   => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -1382,7 +1370,6 @@ $Self->False(
         ]
     },
     UserID                           => 1,
-    Permission                       => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -1392,9 +1379,9 @@ $Self->False(
 # Test ArticleCreateTime
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result                        => 'HASH',
-    Limit                         => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'ArticleCreateTime',
@@ -1403,8 +1390,8 @@ $Self->False(
             },
         ]
     },
-    UserID                        => 1,
-    Permission                    => 'rw',
+    UserType => 'Agent',
+    UserID   => 1,
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -1427,7 +1414,6 @@ $Self->False(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->True(
     $TicketIDs{$TicketID},
@@ -1450,7 +1436,6 @@ $Self->True(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -2473,7 +2458,6 @@ my $FutureTime = $TimeObject->SystemTime2TimeStamp(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -2496,7 +2480,6 @@ $Self->False(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -2519,7 +2502,6 @@ $Self->False(
     },
     UserID     => 1,
     UserType   => 'Agent',
-    Permission => 'rw',
 );
 $Self->False(
     $TicketIDs{$TicketID},
@@ -2573,7 +2555,6 @@ my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
         ]
     },
     UserID       => 1,
-    Permission   => 'rw',
 );
 $Self->False(
     $TicketIDs[0],

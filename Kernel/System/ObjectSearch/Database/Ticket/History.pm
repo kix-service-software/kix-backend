@@ -55,37 +55,44 @@ sub GetSupportedAttributes {
         'CreatedTypeID'     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'CreatedUserID'     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'CreatedStateID'    => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'CreatedQueueID'    => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'CreatedPriorityID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'CloseTime'         => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','LTE','GT','GTE']
+            Operators    => ['EQ','LT','LTE','GT','GTE'],
+            ValueType    => 'DateTime'
         },
         'ChangeTime'        => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','LTE','GT','GTE']
+            Operators    => ['EQ','LT','LTE','GT','GTE'],
+            ValueType    => 'DateTime'
         },
     };
 

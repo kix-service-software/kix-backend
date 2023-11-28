@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,11 +11,12 @@ package Kernel::System::ITSMConfigItem::XML::Type::CIClassReference;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'GeneralCatalog',
-    'ITSMConfigItem',
-    'Log'
+our @ObjectDependencies = qw(
+    Config
+    GeneralCatalog
+    ITSMConfigItem
+    Log
+    ObjectSearch
 );
 
 =head1 NAME
@@ -64,7 +65,7 @@ sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
     # return empty string, when false value (undef, 0, empty string) is given
-    return '' if ( !$Param{Value} );
+    return q{} if ( !$Param{Value} );
 
     # return given value, if given value is not a number
     return $Param{Value} if ( $Param{Value} =~ /\D/ );
@@ -168,12 +169,12 @@ sub ExportValuePrepare {
     return if !defined $Param{Value};
 
     # return empty string if given value is false (empty string, or 0)
-    return '' if !$Param{Value};
+    return q{} if !$Param{Value};
 
     # return empty string, if given value is not a number
-    return '' if ( $Param{Value} =~ /\D/ );
+    return q{} if ( $Param{Value} =~ /\D/ );
 
-    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
+    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
 
     # check if special attribut should be used for export
     if ($SearchAttr) {
@@ -215,7 +216,7 @@ sub ExportValuePrepare {
         ConfigItemID => $Param{Value},
     );
 
-    return $ConfigItemNumber || '';
+    return $ConfigItemNumber || q{};
 }
 
 =item ImportSearchValuePrepare()
@@ -235,10 +236,10 @@ sub ImportSearchValuePrepare {
     return if !defined $Param{Value};
 
     # return empty string if given value is false (empty string, or 0)
-    return '' if !$Param{Value};
+    return q{} if !$Param{Value};
 
-    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
-    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || '';
+    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || q{};
 
     # make CI-Number out of given value
     if (
@@ -275,21 +276,42 @@ sub ImportSearchValuePrepare {
 
             # search for name if ReferencedCIClassReferenceAttributeKey is 'Name'
             if ( $SearchAttr eq 'Name' ) {
-                my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                    ClassIDs              => [ $ClassID ],
-                    Name                  => $Param{Value},
-                    PreviousVersionSearch => 0,
-                    Limit                 => 1,
-                    OrderBy               => [ 'Number' ],
-                    OrderByDirection      => [ 'Up' ],
+                my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    ObjectType => 'ConfigItem',
+                    Result     => 'ARRAY',
+                    Search     => {
+                        AND => [
+                            {
+                                Field    => 'Name',
+                                Operator => 'EQ',
+                                Type     => 'STRING',
+                                Value    => $Param{Value}
+                            },
+                            {
+                                Field    => 'ClassID',
+                                Operator => 'IN',
+                                Type     => 'NUMERIC',
+                                Value    => [$ClassID]
+                            }
+                        ]
+                    },
+                    Sort => [
+                        {
+                            Field     => 'Number',
+                            Direction => 'ASCENDING'
+                        }
+                    ],
+                    Limit      => 1,
+                    UserID     => 1,
+                    UsertType  => 'Agent'
                 );
 
                 # return config item id if found
                 if (
-                    ref( $ConfigItemIDs ) eq 'ARRAY'
-                    && $ConfigItemIDs->[0]
+                    @ConfigItemIDs
+                    && $ConfigItemIDs[0]
                 ) {
-                    return $ConfigItemIDs->[0];
+                    return $ConfigItemIDs[0];
                 }
             }
             # search for xml attribute
@@ -303,33 +325,52 @@ sub ImportSearchValuePrepare {
                 my %SearchData   = (
                     $SearchAttr => $Param{Value},
                 );
-                my @SearchParamsWhat;
+                my @SearchParams;
                 $Self->_XMLSearchDataPrepare(
                     XMLDefinition => $XMLDefinition->{DefinitionRef},
-                    What          => \@SearchParamsWhat,
+                    What          => \@SearchParams,
                     SearchData    => \%SearchData,
-                    Prefix        => '',
+                    Prefix        => q{},
                 );
 
                 # only search if parameter is prepared
-                if ( @SearchParamsWhat ) {
+                if ( @SearchParams ) {
+
+                    # add class to search in
+                    push (
+                        @SearchParams,
+                        {
+                            Field    => 'ClassID',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [$ClassID]
+                        }
+                    );
 
                     # search the config items
-                    my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                        ClassIDs              => [ $ClassID ],
-                        What                  => \@SearchParamsWhat,
-                        PreviousVersionSearch => 0,
-                        Limit                 => 1,
-                        OrderBy               => [ 'Number' ],
-                        OrderByDirection      => [ 'Up' ],
+                    my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                        ObjectType => 'ConfigItem',
+                        Result     => 'ARRAY',
+                        Search     => {
+                            AND => \@SearchParams
+                        },
+                        Sort => [
+                            {
+                                Field     => 'Number',
+                                Direction => 'ASCENDING'
+                            }
+                        ],
+                        Limit      => 1,
+                        UserID     => 1,
+                        UsertType  => 'Agent'
                     );
 
                     # return config item id if found
                     if (
-                        ref( $ConfigItemIDs ) eq 'ARRAY'
-                        && $ConfigItemIDs->[0]
+                        @ConfigItemIDs
+                        && $ConfigItemIDs[0]
                     ) {
-                        return $ConfigItemIDs->[0];
+                        return $ConfigItemIDs[0];
                     }
                 }
             }
@@ -403,21 +444,42 @@ sub ImportSearchValuePrepare {
             }
             my $ClassID = $ItemDataRef->{ItemID};
 
-            my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                ClassIDs              => [ $ClassID ],
-                Name                  => $Param{Value},
-                PreviousVersionSearch => 0,
-                Limit                 => 1,
-                OrderBy               => [ 'Number' ],
-                OrderByDirection      => [ 'Up' ],
+            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Name',
+                            Operator => 'EQ',
+                            Type     => 'STRING',
+                            Value    => $Param{Value}
+                        },
+                        {
+                            Field    => 'ClassID',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [$ClassID]
+                        }
+                    ]
+                },
+                Sort => [
+                    {
+                        Field     => 'Number',
+                        Direction => 'ASCENDING'
+                    }
+                ],
+                Limit      => 1,
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
 
             # return config item id if found
             if (
-                ref( $ConfigItemIDs ) eq 'ARRAY'
-                && $ConfigItemIDs->[0]
+                @ConfigItemIDs
+                && $ConfigItemIDs[0]
             ) {
-                return $ConfigItemIDs->[0];
+                return $ConfigItemIDs[0];
             }
         }
     }
@@ -442,10 +504,10 @@ sub ImportValuePrepare {
     return if !defined $Param{Value};
 
     # return empty string if given value is false (empty string, or 0)
-    return '' if !$Param{Value};
+    return q{} if !$Param{Value};
 
-    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
-    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || '';
+    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || q{};
 
     # make CI-Number out of given value
     if (
@@ -482,21 +544,42 @@ sub ImportValuePrepare {
 
             # search for name if ReferencedCIClassReferenceAttributeKey is 'Name'
             if ( $SearchAttr eq 'Name' ) {
-                my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                    ClassIDs              => [ $ClassID ],
-                    Name                  => $Param{Value},
-                    PreviousVersionSearch => 0,
-                    Limit                 => 1,
-                    OrderBy               => [ 'Number' ],
-                    OrderByDirection      => [ 'Up' ],
+                my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    ObjectType => 'ConfigItem',
+                    Result     => 'ARRAY',
+                    Search     => {
+                        AND => [
+                            {
+                                Field    => 'Name',
+                                Operator => 'EQ',
+                                Type     => 'STRING',
+                                Value    => $Param{Value}
+                            },
+                            {
+                                Field    => 'ClassID',
+                                Operator => 'IN',
+                                Type     => 'NUMERIC',
+                                Value    => [$ClassID]
+                            }
+                        ]
+                    },
+                    Sort => [
+                        {
+                            Field     => 'Number',
+                            Direction => 'ASCENDING'
+                        }
+                    ],
+                    Limit      => 1,
+                    UserID     => 1,
+                    UsertType  => 'Agent'
                 );
 
                 # return config item id if found
                 if (
-                    ref( $ConfigItemIDs ) eq 'ARRAY'
-                    && $ConfigItemIDs->[0]
+                    @ConfigItemIDs
+                    && $ConfigItemIDs[0]
                 ) {
-                    return $ConfigItemIDs->[0];
+                    return $ConfigItemIDs[0];
                 }
             }
             # search for xml attribute
@@ -510,33 +593,50 @@ sub ImportValuePrepare {
                 my %SearchData   = (
                     $SearchAttr => $Param{Value},
                 );
-                my @SearchParamsWhat;
+                my @SearchParams;
                 $Self->_XMLSearchDataPrepare(
                     XMLDefinition => $XMLDefinition->{DefinitionRef},
-                    What          => \@SearchParamsWhat,
+                    What          => \@SearchParams,
                     SearchData    => \%SearchData,
-                    Prefix        => '',
+                    Prefix        => q{},
                 );
 
                 # only search if parameter is prepared
-                if ( @SearchParamsWhat ) {
-
+                if ( @SearchParams ) {
+                    # add class to search in
+                    push (
+                        @SearchParams,
+                        {
+                            Field    => 'ClassID',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [$ClassID]
+                        }
+                    );
                     # search the config items
-                    my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                        ClassIDs              => [ $ClassID ],
-                        What                  => \@SearchParamsWhat,
-                        PreviousVersionSearch => 0,
-                        Limit                 => 1,
-                        OrderBy               => [ 'Number' ],
-                        OrderByDirection      => [ 'Up' ],
+                    my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                        ObjectType => 'ConfigItem',
+                        Result     => 'ARRAY',
+                        Search     => {
+                            AND => \@SearchParams
+                        },
+                        Sort => [
+                            {
+                                Field     => 'Number',
+                                Direction => 'ASCENDING'
+                            }
+                        ],
+                        Limit      => 1,
+                        UserID     => 1,
+                        UsertType  => 'Agent'
                     );
 
                     # return config item id if found
                     if (
-                        ref( $ConfigItemIDs ) eq 'ARRAY'
-                        && $ConfigItemIDs->[0]
+                        @ConfigItemIDs
+                        && $ConfigItemIDs[0]
                     ) {
-                        return $ConfigItemIDs->[0];
+                        return $ConfigItemIDs[0];
                     }
                 }
             }
@@ -609,21 +709,42 @@ sub ImportValuePrepare {
             }
             my $ClassID = $ItemDataRef->{ItemID};
 
-            my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
-                ClassIDs              => [ $ClassID ],
-                Name                  => $Param{Value},
-                PreviousVersionSearch => 0,
-                Limit                 => 1,
-                OrderBy               => [ 'Number' ],
-                OrderByDirection      => [ 'Up' ],
+            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Name',
+                            Operator => 'EQ',
+                            Type     => 'STRING',
+                            Value    => $Param{Value}
+                        },
+                        {
+                            Field    => 'ClassID',
+                            Operator => 'IN',
+                            Type     => 'NUMERIC',
+                            Value    => [$ClassID]
+                        }
+                    ]
+                },
+                Sort => [
+                    {
+                        Field     => 'Number',
+                        Direction => 'ASCENDING'
+                    }
+                ],
+                Limit      => 1,
+                UserID     => 1,
+                UsertType  => 'Agent'
             );
 
             # return config item id if found
             if (
-                ref( $ConfigItemIDs ) eq 'ARRAY'
-                && $ConfigItemIDs->[0]
+                @ConfigItemIDs
+                && $ConfigItemIDs[0]
             ) {
-                return $ConfigItemIDs->[0];
+                return $ConfigItemIDs[0];
             }
         }
     }
@@ -648,7 +769,7 @@ sub _XMLSearchDataPrepare {
         # combine prefix with current key
         my $CombinedKey;
         if ( $Param{Prefix} ) {
-            $CombinedKey = $Param{Prefix} . '::' . $Item->{Key};
+            $CombinedKey = $Param{Prefix} . q{::} . $Item->{Key};
         }
         else {
             $CombinedKey = $Item->{Key};
@@ -658,15 +779,19 @@ sub _XMLSearchDataPrepare {
         if ( $Param{SearchData}->{ $Item->{Key} } ) {
             # prepare search key
             my $SearchKey = $CombinedKey;
-            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
-
-            # prepare search hash
-            my $SearchHash = {
-                '[1]{\'Version\'}[1]{\'' . $SearchKey . '\'}[%]{\'Content\'}' => $Param{SearchData}->{ $Item->{Key} },
-            };
+            $SearchKey = 'CurrentVersion.Data.' . $SearchKey;
+            $SearchKey =~ s/::/./gsm;
 
             # push search hash to What parameter
-            push( @{ $Param{What} }, $SearchHash );
+            push (
+                @{ $Param{What} },
+                {
+                    Field    => $SearchKey,
+                    Operator => 'EQ',
+                    Type     => 'STRING',
+                    Value    => $Param{SearchData}->{$Item->{Key}}
+                }
+            );
         }
         next ITEM if( !$Item->{Sub} );
 
@@ -683,10 +808,6 @@ sub _XMLSearchDataPrepare {
 }
 
 1;
-
-
-
-
 
 =back
 

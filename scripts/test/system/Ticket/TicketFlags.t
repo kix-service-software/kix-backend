@@ -228,7 +228,6 @@ for my $SearchTest (@SearchTests) {
         },
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
     );
 
     $Self->Is(

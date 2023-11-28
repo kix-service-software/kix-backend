@@ -17,7 +17,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::CommonObjectType - base object type module for object search
+Kernel::System::ObjectSearch::Database::CommonObjectType - base object type module for object search backend 'ObjectSearch::Database'
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Kernel::System::ObjectSearch::Database::CommonObjectType - base object type modu
 
 =item new()
 
-create an object.
+common module is not intended for direct usage, but as base for real object type modules
 
 =cut
 
@@ -177,7 +177,16 @@ sub GetSearchDef {
                 UserID       => $Param{UserID},
                 Silent       => $Param{Silent}
             );
-            return if ( !IsHashRefWithData($AttributeDef) );
+
+            if ( !IsHashRef($AttributeDef) ) {
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to prepare search for attribute $Attribute!",
+                    );
+                }
+                return;
+            }
 
             for my $Key ( keys( %{ $AttributeDef } ) ) {
                 # special handling for where statement, when boolean is 'OR'
@@ -255,7 +264,7 @@ sub GetSortDef {
             Language  => $Language,
             Flags     => $Param{Flags}
         );
-        return if ( !IsHashRefWithData($AttributeDef) );
+        return if ( !IsHashRef($AttributeDef) );
 
         for my $Key ( keys( %{ $AttributeDef  } ) ) {
             # skip OrderBySwitch
@@ -312,7 +321,8 @@ sub GetSupportedAttributes {
                 ObjectSpecifics => undef,
                 IsSearchable    => $AttributeRef->{IsSearchable} || 0,
                 IsSortable      => $AttributeRef->{IsSortable}   || 0,
-                Operators       => $AttributeRef->{Operators}    || []
+                Operators       => $AttributeRef->{Operators}    || [],
+                ValueType       => $AttributeRef->{ValueType}    || ''
             }
         );
     }

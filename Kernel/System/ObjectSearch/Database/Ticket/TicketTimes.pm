@@ -55,22 +55,26 @@ sub GetSupportedAttributes {
         'Age'            => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'Integer'
         },
         'CreateTime'     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         'PendingTime'    => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         'LastChangeTime' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
     };
 
@@ -111,6 +115,7 @@ sub Search {
         LastChangeTime  => 'st.change_time',
     );
 
+    my $Type = 'NUMERIC';
     my $Value;
     if ( $Param{Search}->{Field} eq 'Age' ) {
         # calculate unixtime
@@ -131,13 +136,12 @@ sub Search {
             return;
         }
 
-        if ( $Param{Search}->{Field} !~ /^(Create|Pending)/ ) {
+        if ( $Param{Search}->{Field} eq 'LastChangeTime' ) {
             # convert back to timestamp (relative calculations have been done above)
             $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                 SystemTime => $Value
             );
-
-            $Value = "'$Value'";
+            $Type = 'STRING';
         }
     }
 
@@ -146,6 +150,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
+        Type      => $Type,
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 

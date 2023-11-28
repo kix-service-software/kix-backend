@@ -41,17 +41,16 @@ sub Init {
     my ( $Self, %Param ) = @_;
 
     # extract flags from fields
-    my %Flags = $Self->_ExtractFields(
+    $Self->_CheckFields(
         %Param,
         Extract => {
-            PreviousVersionSearch => 1,
-            AssignedOrganisation  => 1
+            PreviousVersionSearch => 1
+        },
+        Draft => {
+            AssignedOrganisation  => 1,
+            AssignedContact       => 1
         }
     );
-
-    # init flags
-    $Self->{Flags} = \%Flags;
-
     return 1;
 }
 
@@ -74,29 +73,54 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeModules}} ) {
-        my $Module    = $Self->{AttributeModules}->{$Attribute};
+    for my $Attribute ( sort keys %{$Self->{AttributeMapping}} ) {
+        my $Module    = $Self->{AttributeMapping}->{$Attribute};
         my $Property  = $Attribute;
-        my %SpecParams = (
-            ClassID => undef,
-            Class   => undef
-        );
 
-        if ( $Property =~ /::/sm ) {
-            ($SpecParams{Class}, $Property) = split(/::/sm, $Attribute);
-            $SpecParams{ClassID} = $Module->{ClassID};
-        }
-
-        push (
-            @List,
-            {
-                ObjectType      => 'ConfigItem',
-                Property        => $Property,
-                ObjectSpecifics => \%SpecParams,
-                IsSearchable    => $Module->{IsSearchable} || 0,
-                IsSortable      => $Module->{IsSortable}   || 0,
-                Operators       => $Module->{Operators}    || []
+        if ( IsArrayRefWithData($Module->{Class})) {
+            for my $Index ( keys @{$Module->{Class}} ) {
+                push (
+                    @List,
+                    {
+                        ObjectType      => $Self->{ObjectType},
+                        Property        => $Property,
+                        ObjectSpecifics => {
+                            ClassID => $Module->{ClassID}->[$Index],
+                            Class   => $Module->{Class}->[$Index]
+                        },
+                        IsSearchable    => $Module->{IsSearchable} || 0,
+                        IsSortable      => $Module->{IsSortable}   || 0,
+                        Operators       => $Module->{Operators}    || [],
+                        ValueType       => $Module->{ValueType}    || ''
+                    }
+                );
             }
+        } else {
+            push (
+                @List,
+                {
+                    ObjectType      => $Self->{ObjectType},
+                    Property        => $Property,
+                    ObjectSpecifics => {
+                        ClassID => undef,
+                        Class   => undef
+                    },
+                    IsSearchable    => $Module->{IsSearchable} || 0,
+                    IsSortable      => $Module->{IsSortable}   || 0,
+                    Operators       => $Module->{Operators}    || [],
+                    ValueType       => $Module->{ValueType}    || ''
+                }
+            );
+        }
+    }
+
+    if ( @List ) {
+        @List = sort(
+            {
+                $a->{Property} cmp $b->{Property}
+                && ( $a->{ObjectSpecifics}->{Class} || q{} ) cmp ( $b->{ObjectSpecifics}->{Class} || q{} )
+            }
+            @List
         );
     }
 
@@ -108,15 +132,18 @@ sub GetSupportedAttributes {
 
 =cut
 
-sub _ExtractFields {
+sub _CheckFields {
     my ($Self, %Param) = @_;
 
-    my %Fields;
     for my $Type ( keys %{$Param{Search}} ) {
         my @Items;
         for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
+            if ( $Param{Draft}->{$SearchItem->{Field}} ) {
+                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
+            }
+
             if ($Param{Extract}->{$SearchItem->{Field}}) {
-                $Fields{$SearchItem->{Field}} = $SearchItem->{Value};
+                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
             }
             else {
                 push(@Items, $SearchItem);
@@ -130,7 +157,7 @@ sub _ExtractFields {
         }
     }
 
-    return %Fields;
+    return 1;
 }
 
 =end Internal:

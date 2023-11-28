@@ -230,7 +230,6 @@ my %TicketIDsSearch = $Kernel::OM->Get('ObjectSearch')->Search(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -259,7 +258,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -293,7 +291,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -327,7 +324,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -361,7 +357,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Silent     => 1
 );
 
@@ -396,7 +391,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Silent     => 0
 );
 
@@ -450,7 +444,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -504,7 +497,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -558,7 +550,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -612,7 +603,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -661,7 +651,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -710,7 +699,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
 );
 
 $Self->IsDeeply(
@@ -759,7 +747,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Silent     => 1
 );
 
@@ -794,7 +781,6 @@ my @TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -833,7 +819,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -868,7 +853,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -903,7 +887,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -938,7 +921,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT3$RandomID",
@@ -973,7 +955,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT3$RandomID",
@@ -1008,7 +989,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT4$RandomID",
@@ -1043,7 +1023,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT4$RandomID",
@@ -1073,7 +1052,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT4$RandomID",
@@ -1103,7 +1081,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT4$RandomID",
@@ -1138,7 +1115,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -1173,7 +1149,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",
@@ -1208,7 +1183,6 @@ $Self->IsDeeply(
         ]
     },
     UserID     => 1,
-    Permission => 'rw',
     Sort       => [
         {
             Field => "DynamicField_DFT1$RandomID",

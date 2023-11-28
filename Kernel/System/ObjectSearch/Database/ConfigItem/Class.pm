@@ -56,17 +56,20 @@ sub GetSupportedAttributes {
         ClassID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.ID'
         },
         ClassIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.ID'
         },
         Class => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ', 'NE', 'IN','!IN']
+            Operators    => ['EQ', 'NE', 'IN','!IN'],
+            ValueType    => 'Class.Name'
         }
     };
 
@@ -83,7 +86,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -110,7 +113,7 @@ sub Search {
         );
 
         my @ClassList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @ClassList = @{$Param{Search}->{Value}}
         }
         foreach my $Class ( @ClassList ) {
@@ -127,7 +130,7 @@ sub Search {
     }
     else {
         @ClassIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @ClassIDs = @{$Param{Search}->{Value}}
         }
     }
@@ -147,7 +150,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -160,8 +163,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -178,16 +181,16 @@ sub Sort {
 
     my %Join;
     if ( $Param{Attribute} eq 'Class' ) {
-        $Join{SQLJoin} = [
+        $Join{Join} = [
             'INNER JOIN general_catalog gc ON gc.id = ci.class_id'
         ];
     }
 
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
         %Join

@@ -56,22 +56,26 @@ sub GetSupportedAttributes {
         'ArticleID'         => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+            ValueType    => 'Integer'
         },
         'ChannelID'         => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+            ValueType    => 'Integer'
         },
         'SenderTypeID'      => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+            ValueType    => 'Integer'
         },
         'CustomerVisible'   => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE']
+            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
+            ValueType    => 'Integer'
         },
         'From'              => {
             IsSearchable => 1,
@@ -101,7 +105,8 @@ sub GetSupportedAttributes {
         'ArticleCreateTime' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
     };
 
@@ -190,7 +195,7 @@ sub Search {
         $Param{Flags}->{ArticleJoined}->{$Param{BoolOperator}} = 1;
     }
 
-    if ( $Param{Search}->{Field} =~ /ArticleCreateTime/ ) {
+    if ( $Param{Search}->{Field} eq 'ArticleCreateTime' ) {
         # convert to unix time
         my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Search}->{Value},
@@ -208,7 +213,7 @@ sub Search {
         my @Where = $Self->GetOperation(
             Operator  => $Param{Search}->{Operator},
             Column    => $Param{BoolOperator} eq 'OR' ? 'rt_left.incoming_time' : 'art.incoming_time',
-            Value     => $Param{Search}->{Value},
+            Value     => $Value,
             Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
         );
 

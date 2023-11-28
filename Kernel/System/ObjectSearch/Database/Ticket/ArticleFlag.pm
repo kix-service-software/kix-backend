@@ -57,7 +57,8 @@ sub GetSupportedAttributes {
         'ArticleFlag' => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ']
+            Operators    => ['EQ'],
+            ValueType    => 'Flag.ArrayOfHashes'
         },
     };
 

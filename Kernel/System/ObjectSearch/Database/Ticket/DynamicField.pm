@@ -55,56 +55,43 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    # NOTE: The supported operators come from the dynamic field types
-    my %TypeOperators = (
-        'Text'                    => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
-        'TextArea'                => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
-        'CheckList'               => ['EQ','GT','GTE','LT','LTE','LIKE','STARTWITH','ENDWITH'],
-        'Table'                   => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'Date'                    => ['EQ','GT','GTE','LT','LTE'],
-        'DateTime'                => ['EQ','GT','GTE','LT','LTE'],
-        'Multiselect'             => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'TicketReference'         => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'ITSMConfigItemReference' => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'ContactReference'        => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'OrganisationReference'   => ['EQ','GT','GTE','LT','LTE','LIKE'],
+    # get all valid dynamic fields for object type ticket
+    my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
+        ObjectType => 'Ticket',
+        Valid      => 1
     );
 
-    for my $Type ( qw(Search Sort) ) {
-        my %SearchParams;
+    # process fields
+    for my $DynamicFieldConfig ( @{ $DynamicFieldList } ) {
+        my $DFName = 'DynamicField_' . $DynamicFieldConfig->{Name};
 
-        if ( $Type eq 'Sort' ) {
-            %SearchParams = (
-                FieldType => [
-                    'Text',
-                    'TextArea',
-                    'Date',
-                    'DateTime',
-                    'Multiselect'
-                ],
-                IsSortable => 1
+        my $IsSearchable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Property           => 'IsSearchable'
+        );
+        my $Operators = [];
+        my $ValueType = '';
+        if ( $IsSearchable ) {
+            $Operators = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                Property           => 'SearchOperators'
+            );
+            $ValueType = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                Property           => 'SearchValueType'
             );
         }
-
-        my $List = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-            Valid      => 1,
-            ObjectType => 'Ticket',
-            %SearchParams
+        my $IsSortable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+            DynamicFieldConfig => $DynamicFieldConfig,
+            Property           => 'IsSortable'
         );
 
-        for my $Field ( @{$List} ) {
-            my $DFName = "DynamicField_$Field->{Name}";
-            if ( $Type eq 'Search' ) {
-                $Self->{Supported}->{$DFName} = {
-                    Operators    => $TypeOperators{$Field->{FieldType}},
-                    IsSearchable => 1,
-                    IsSortable   => 0,
-                };
-            }
-            else {
-                $Self->{Supported}->{$DFName}->{IsSortable} = 1;
-            }
-        }
+        $Self->{Supported}->{ $DFName } = {
+            Operators    => $Operators    || [],
+            IsSearchable => $IsSearchable || 0,
+            IsSortable   => $IsSortable   || 0,
+            ValueType    => $ValueType    || ''
+        };
     }
 
     return $Self->{Supported};

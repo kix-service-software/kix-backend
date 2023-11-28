@@ -248,15 +248,27 @@ sub Run {
         # include assigned config items if requested
         if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
-            my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                ObjectType => 'Organisation',
-                Object     => \%OrganisationData
+            my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'AssignedOrganisation',
+                            Operator => 'EQ',
+                            Type     => 'NUMERIC',
+                            Value    => $OrganisationData{ID}
+                        }
+                    ]
+                },
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType}
             );
 
             # filter for customer assigned config items if necessary
             my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
                 ObjectType   => 'ConfigItem',
-                ObjectIDList => $ItemIDs
+                ObjectIDList => \@ItemIDs
             );
 
             $OrganisationData{AssignedConfigItems} = \@ConfigItemIDList;

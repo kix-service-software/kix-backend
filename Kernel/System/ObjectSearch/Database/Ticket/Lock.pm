@@ -56,7 +56,8 @@ sub GetSupportedAttributes {
         'LockID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
         'Lock' => {
             IsSearchable => 0,

@@ -243,8 +243,9 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
         # open tickets
         $TicketStats{OpenCount} = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -263,8 +264,9 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
         # pending tickets
         $TicketStats{PendingReminderCount} = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -283,8 +285,9 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
 
         $ContactData{TicketStats} = \%TicketStats;
@@ -329,7 +332,7 @@ sub _GetContactData {
     if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
         my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'Contact',
+            ObjectType => 'ConfigItem',
             Result     => 'ARRAY',
             Search     => {
                 AND => [
@@ -338,9 +341,11 @@ sub _GetContactData {
                         Operator => 'EQ',
                         Type     => 'NUMERIC',
                         Value    => $ContactData{ID}
-                    }
+                    },
                 ]
-            }
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
         # filter for customer assigned config items if necessary

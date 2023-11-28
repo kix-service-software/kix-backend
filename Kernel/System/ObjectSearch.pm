@@ -99,8 +99,8 @@ SearchParams:
 SortParams:
     Sort => [
         {
-            Field => '...',                              # see list of filterable fields
-            Direction => 'ascending' || 'descending'
+            Field => '...',                             # see list of filterable fields
+            Direction => 'ascending' || 'descending'    # optional
         },
         ...
     ]

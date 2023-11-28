@@ -56,12 +56,14 @@ sub GetSupportedAttributes {
         ConfigItemID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         },
         ConfigItemIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         },
     };
 
@@ -78,7 +80,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -109,7 +111,7 @@ sub Search {
     push( @SQLWhere, @Where);
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -122,8 +124,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -132,10 +134,10 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     return {
-        SQLAttrs => [
+        Select => [
             'ci.id'
         ],
-        SQLOrderBy => [
+        OrderBy => [
             'ci.id'
         ],
     };

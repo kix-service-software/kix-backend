@@ -80,7 +80,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {
@@ -123,7 +122,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {
@@ -146,7 +144,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {
@@ -169,7 +166,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {
@@ -213,7 +209,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {
@@ -236,7 +231,6 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
         Limit      => 100,
         UserID     => 1,
         UserType   => 'Agent',
-        Permission => 'rw',
         Search     => {
             'AND' => [
                 {

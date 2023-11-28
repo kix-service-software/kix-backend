@@ -17,9 +17,7 @@ use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
 
-our @ObjectDependencies = (
-    'Log'
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -56,7 +54,8 @@ sub GetSupportedAttributes {
         AccountedTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE']
+            Operators    => ['EQ','LT','GT','LTE','GTE'],
+            ValueType    => 'Integer'
         }
     };
 
@@ -81,22 +80,15 @@ sub Search {
     my ( $Self, %Param ) = @_;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if (
-        !defined $Param{Search}->{Value}
-        || $Param{Search}->{Value} !~ m/^-?\d+$/sm
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid search value ($Param{Search}->{Value})!",
-        );
+    if ( $Param{Search}->{Value} !~ m/^-?\d+$/sm ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid search value ($Param{Search}->{Value})!",
+            );
+        }
         return;
     }
 
@@ -105,12 +97,12 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.accounted_time',
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        Silent    => $Param{Silent}
     );
-
     return if !@Where;
 
-    push( @SQLWhere, @Where);
+    push( @SQLWhere, @Where );
 
     return {
         Where => \@SQLWhere,
@@ -126,7 +118,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        Select   => [ ],          # optional
+        Select  => [ ],          # optional
         OrderBy => [ ]           # optional
     };
 
@@ -135,13 +127,12 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
     return {
-        Select => [
-            'st.accounted_time'
-        ],
-        OrderBy => [
-            'st.accounted_time'
-        ]
+        Select  => [ 'st.accounted_time' ],
+        OrderBy => [ 'st.accounted_time' ]
     };
 }
 

@@ -57,12 +57,14 @@ sub GetSupportedAttributes {
         'Queue'   => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Queue.Name'
         },
         'QueueID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE']
+            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
+            ValueType    => 'Integer'
         },
     };
 
@@ -99,7 +101,7 @@ sub Search {
     my @QueueIDs;
     if ( $Param{Search}->{Field} eq 'Queue' ) {
         my @QueueList = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @QueueList = @{$Param{Search}->{Value}}
         }
         foreach my $Queue ( @QueueList ) {
@@ -119,7 +121,7 @@ sub Search {
     }
     else {
         @QueueIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRefWithData($Param{Search}->{Value}) ) {
+        if ( IsArrayRef($Param{Search}->{Value}) ) {
             @QueueIDs = @{$Param{Search}->{Value}}
         }
     }

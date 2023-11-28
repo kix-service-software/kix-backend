@@ -54,12 +54,14 @@ sub GetSupportedAttributes {
         CreateTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         },
         ChangeTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DateTime'
         }
     };
 
@@ -75,7 +77,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLWhere   => [ ],
+        Where   => [ ],
     };
 
 =cut
@@ -134,7 +136,7 @@ sub Search {
     push( @SQLWhere, @Where );
 
     return {
-        SQLWhere => \@SQLWhere,
+        Where => \@SQLWhere,
     };
 }
 
@@ -147,8 +149,8 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        SQLAttrs   => [ ],          # optional
-        SQLOrderBy => [ ]           # optional
+        Select   => [ ],          # optional
+        OrderBy => [ ]           # optional
     };
 
 =cut
@@ -163,10 +165,10 @@ sub Sort {
     );
 
     return {
-        SQLAttrs => [
+        Select => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        SQLOrderBy => [
+        OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
     };

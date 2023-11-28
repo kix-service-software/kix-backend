@@ -55,7 +55,8 @@ sub GetSupportedAttributes {
         'ContactID' => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
         },
         'Contact' => {
             IsSearchable => 0,

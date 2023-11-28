@@ -436,7 +436,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                 ],
                 UserType   => $Test->{UserType},
                 UserID     => 1,
-                Permission => 'rw',
             );
 
             @FoundTicketIDs = sort @FoundTicketIDs;
