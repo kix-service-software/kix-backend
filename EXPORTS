@@ -158,6 +158,7 @@ Console::Command::Maint::Ticket::UnlockAll                                    = 
 Console::Command::Maint::Ticket::UnlockTicket                                 = Kernel::System::Console::Command::Maint::Ticket::UnlockTicket
 Console::Command::Maint::Ticket::UnlockTimeout                                = Kernel::System::Console::Command::Maint::Ticket::UnlockTimeout
 Console::Command::Maint::Token::Remove                                        = Kernel::System::Console::Command::Maint::Token::Remove
+Console::Command::Maint::User::UpdateCounters                                 = Kernel::System::Console::Command::Maint::User::UpdateCounters
 Contact                                                                       = Kernel::System::Contact
 CronEvent                                                                     = Kernel::System::CronEvent
 Crypt::PGP                                                                    = Kernel::System::Crypt::PGP

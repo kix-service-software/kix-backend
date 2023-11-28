@@ -18060,7 +18060,836 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="session_user_patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_preferences" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/preferences</span> <span class="methods"><a href="#session_user_preferences_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#session_user_preferences_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_preferences_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/preferences</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_preferences_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_preferences_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_preferences_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_preferences_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_preferences_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: UserPreferenceCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_counters" class="panel"><div class="resource-description"><p>This resource returns the most relevant ticket counters.</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/counters</span> <span class="methods"><a href="#session_user_counters_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_counters_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/counters</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_counters_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_counters_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_counters_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_counters_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_counters_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_counters_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CounterResponse</p></div><h2 class="response-title" id="session_user_counters_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_counters_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_counters_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_tickets" class="panel"><div class="resource-description"><p>This resource returns the ticket list for the given counter, i.e. <code>Owned</code>, <code>OwnedAndLocked</code>, ... The requested counter must be given as the URL parameter <code>Counter</code>.</p><p><strong>Example</strong></p><pre><code class="language-bash">/session/user/tickets?Counter=OwnedAndLocked</code></pre></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/tickets</span> <span class="methods"><a href="#session_user_tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Ticket items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "TicketCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of tickets.",
+   "type" : "object",
+   "properties" : {
+      "Ticket" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_Ticket_json"
+         }
+      }
+   },
+   "required" : [
+      "Ticket"
+   ],
+   "definitions" : {
+      "_DynamicFieldValue_json" : {
+         "$id" : "DynamicFieldValue.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The dynamic field value object.",
+         "type" : "object",
+         "properties" : {
+            "DisplayValue" : {
+               "description" : "prepared values ",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueHTML" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DisplayValueShort" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "description" : "ID of the dynamic field",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Label" : {
+               "description" : "label of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Name" : {
+               "description" : "name of the dynamic field",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PreparedValue" : {
+               "description" : "prepared values - e.g. display values of a selection field instead of the keys",
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "array",
+               "items" : {
+                  "type" : "string"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "DisplayValue",
+            "DisplayValueHTML",
+            "DisplayValueShort",
+            "ID",
+            "Label",
+            "Name",
+            "PreparedValue",
+            "Value"
+         ]
+      },
+      "_TicketArticleAttachment_json" : {
+         "$id" : "TicketArticleAttachment.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article attachment object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "description" : "added via include \"Content\" (base64 encoded)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentAlternative" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Disposition" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ContentAlternative",
+            "ContentID",
+            "ContentType",
+            "Disposition",
+            "Filename",
+            "Filesize",
+            "FilesizeRaw",
+            "ID"
+         ]
+      },
+      "_TicketArticleFlag_json" : {
+         "$id" : "TicketArticleFlag.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article flag object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Value" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Name",
+            "Value"
+         ]
+      },
+      "_TicketArticle_json" : {
+         "$id" : "TicketArticle.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket article object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Attachments" : {
+               "description" : "added via include \"Attachments\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_TicketArticleAttachment_json"
+               },
+               "readOnly" : true
+            },
+            "Bcc" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "BccRealname" : {
+               "description" : "realnames from \"Bcc\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Body" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Cc" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CcRealname" : {
+               "description" : "realnames from \"Cc\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ChangedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChannelID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Charset" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentCharset" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreatedBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CustomerVisible" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
+               "readOnly" : true
+            },
+            "Flags" : {
+               "description" : "added via include \"Flags\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_TicketArticleFlag_json"
+               },
+               "readOnly" : true
+            },
+            "From" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FromRealname" : {
+               "description" : "realnames from \"From\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "InReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "IncommingTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "MessageID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "MimeType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "NotSentError" : {
+               "description" : "error string if article is an outgoing email article which could not be sent",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Plain" : {
+               "description" : "added via include \"Plain\" - the source string of the message if it is an email article (channel)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "References" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SenderType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SenderTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TimeUnits" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "To" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ToRealname" : {
+               "description" : "realnames from \"To\" (if email address has no real name, email address is used)",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Unseen" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "Bcc",
+            "BccRealname",
+            "Body",
+            "Cc",
+            "CcRealname",
+            "ChangeTime",
+            "ChangedBy",
+            "Channel",
+            "ChannelID",
+            "Charset",
+            "ContentCharset",
+            "ContentType",
+            "CreateTime",
+            "CreatedBy",
+            "CustomerVisible",
+            "From",
+            "FromRealname",
+            "InReplyTo",
+            "IncomingTime",
+            "MessageID",
+            "MimeType",
+            "NotSentError",
+            "References",
+            "ReplyTo",
+            "SenderType",
+            "SenderTypeID",
+            "Subject",
+            "TicketID",
+            "TimeUnits",
+            "To",
+            "ToRealname",
+            "Unseen"
+         ]
+      },
+      "_TicketHistory_json" : {
+         "$id" : "TicketHistory.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket history object.",
+         "type" : "object",
+         "properties" : {
+            "ArticleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "HistoryType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "HistoryTypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OwnerID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "PriorityID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ArticleID",
+            "CreateBy",
+            "CreateTime",
+            "HistoryID",
+            "HistoryType",
+            "HistoryTypeID",
+            "Name",
+            "OwnerID",
+            "PriorityID",
+            "QueueID",
+            "StateID",
+            "TicketID",
+            "TypeID"
+         ]
+      },
+      "_Ticket_json" : {
+         "$id" : "Ticket.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The ticket object.",
+         "type" : "object",
+         "properties" : {
+            "AccountedTime" : {
+               "description" : "added via include \"AccountedTime\". Sum of all time units of the ticket and its articles.",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Age" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ArchiveFlag" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Articles" : {
+               "description" : "added via include \"Articles\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_TicketArticle_json"
+               },
+               "readOnly" : true
+            },
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Changed" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContactID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Created" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "DynamicFields" : {
+               "description" : "added via include \"DynamicFields\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_DynamicFieldValue_json"
+               },
+               "readOnly" : true
+            },
+            "History" : {
+               "description" : "added via include \"History\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_TicketHistory_json"
+               },
+               "readOnly" : true
+            },
+            "LinkCount" : {
+               "description" : "added via include \"LinkCount\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Lock" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "LockID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "OrganisationID" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Owner" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "OwnerID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "PendingTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PendingTimeUnix" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Priority" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "PriorityID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Queue" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "QueueID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Responsible" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ResponsibleID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "State" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StateID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StateType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TicketID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "TicketNumber" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Title" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "TypeID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UnlockTimeout" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Unseen" : {
+               "description" : "added via include \"Unseen\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "UntilTime" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "WatcherID" : {
+               "description" : "the ID of the watcher, if the current user is watching this ticket, added via include \"WatcherID\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Watchers" : {
+               "description" : "added via include \"Watchers\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_Watcher_json"
+               },
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "Age",
+            "ChangeBy",
+            "Changed",
+            "ContactID",
+            "CreateBy",
+            "Created",
+            "LinkCount",
+            "LockID",
+            "OrganisationID",
+            "OwnerID",
+            "PendingTime",
+            "PendingTimeUnix",
+            "PriorityID",
+            "QueueID",
+            "ResponsibleID",
+            "StateID",
+            "TicketID",
+            "TicketNumber",
+            "Title",
+            "TypeID",
+            "Unseen",
+            "UntilTime"
+         ]
+      },
+      "_Watcher_json" : {
+         "$id" : "Watcher.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The watcher object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Object" : {
+               "description" : "The type of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ObjectID" : {
+               "description" : "The ID of the object.",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "UserID" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "ChangeBy",
+            "ChangeTime",
+            "CreateBy",
+            "CreateTime",
+            "ID",
+            "Object",
+            "ObjectID",
+            "UserID"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Ticket": [
+        {
+            "Age": 1316865,
+            "ChangeBy": 1,
+            "Changed": "2020-04-24 13:23:20",
+            "ContactID": "1",
+            "CreateBy": 1,
+            "Created": "2020-04-09 08:25:15",
+            "DynamicFields": [
+                {
+                    "DisplayValue": "20.04.2020 10:33",
+                    "DisplayValueHTML": "20.04.2020 10:33",
+                    "DisplayValueShort": "20.04.2020 10:33",
+                    "ID": 5,
+                    "Label": "Plan Begin",
+                    "Name": "PlanBegin",
+                    "PreparedValue": [
+                        "2020-04-20 10:33:00"
+                    ],
+                    "Value": [
+                        "2020-04-20 10:33:00"
+                    ]
+                },
+                {
+                    "DisplayValue": "20.04.2020 10:33",
+                    "DisplayValueHTML": "20.04.2020 10:33",
+                    "DisplayValueShort": "20.04.2020 10:33",
+                    "ID": 6,
+                    "Label": "Plan End",
+                    "Name": "PlanEnd",
+                    "PreparedValue": [
+                        "2020-04-20 10:33:00"
+                    ],
+                    "Value": [
+                        "2020-04-20 10:33:00"
+                    ]
+                }
+            ],
+            "LinkCount": 0,
+            "LockID": 1,
+            "OrganisationID": "1",
+            "OwnerID": 1,
+            "PendingTime": "",
+            "PendingTimeUnix": 0,
+            "PriorityID": 5,
+            "QueueID": 3,
+            "ResponsibleID": 1,
+            "StateID": 1,
+            "TicketID": 49,
+            "TicketNumber": "2020040917000014",
+            "Title": "Some title",
+            "TypeID": 1,
+            "Unseen": 0,
+            "UntilTime": 0
+        },
+        {
+            "Age": 1316731,
+            "ChangeBy": 1,
+            "Changed": "2020-04-24 13:24:20",
+            "ContactID": "1",
+            "CreateBy": 1,
+            "Created": "2020-04-09 08:28:19",
+            "DynamicFields": [],
+            "LinkCount": 0,
+            "LockID": 1,
+            "OrganisationID": "1",
+            "OwnerID": 1,
+            "PendingTime": "",
+            "PendingTimeUnix": 0,
+            "PriorityID": 3,
+            "QueueID": 2,
+            "ResponsibleID": 1,
+            "StateID": 1,
+            "TicketID": 50,
+            "TicketNumber": "2020040917000015",
+            "Title": "another title",
+            "TypeID": 2,
+            "Unseen": 0,
+            "UntilTime": 0,
+            "WatcherID": 101
+          }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="session_user_tickets_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_tickets_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_tickets_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_preferences" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/preferences</span> <span class="methods"><a href="#session_user_preferences_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#session_user_preferences_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_preferences_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/preferences</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_preferences_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_preferences_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_preferences_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_preferences_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_preferences_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: UserPreferenceCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "UserPreferenceCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of user preferences.",

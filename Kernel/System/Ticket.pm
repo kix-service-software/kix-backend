@@ -703,7 +703,8 @@ sub TicketCreate {
     $Self->EventHandler(
         Event => 'TicketCreate',
         Data  => {
-            TicketID => $TicketID
+            TicketID => $TicketID,
+            OwnerID  => $Param{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -745,6 +746,11 @@ sub TicketDelete {
             return;
         }
     }
+
+    # get the ticket data
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
@@ -836,6 +842,7 @@ sub TicketDelete {
         Event => 'TicketDelete',
         Data  => {
             TicketID => $Param{TicketID},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -2996,6 +3003,8 @@ sub TicketLockSet {
         Event => 'TicketLockUpdate',
         Data  => {
             TicketID => $Param{TicketID},
+            Lock     => lc $Param{Lock},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -3301,6 +3310,7 @@ sub TicketStateSet {
         Event => 'TicketStateUpdate',
         Data  => {
             TicketID      => $Param{TicketID},
+            State         => \%State,
             OldTicketData => \%Ticket,
         },
         UserID => $Param{UserID},
@@ -3659,7 +3669,9 @@ sub TicketOwnerSet {
     $Self->EventHandler(
         Event => 'TicketOwnerUpdate',
         Data  => {
-            TicketID => $Param{TicketID},
+            TicketID        => $Param{TicketID},
+            OwnerID         => $Param{NewUserID},
+            PreviousOwnerID => $OwnerID,
         },
         UserID => $Param{UserID},
     );
@@ -5203,6 +5215,7 @@ sub TicketFlagSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -5323,6 +5336,7 @@ sub TicketFlagDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 

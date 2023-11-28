@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
+    'Config',
     'GeneralCatalog',
     'ITSMConfigItem',
     'Log'
@@ -46,10 +47,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{GeneralCatalogObject} = $Kernel::OM->Get('GeneralCatalog');
-    $Self->{ConfigItemObject}     = $Kernel::OM->Get('ITSMConfigItem');
-    $Self->{LogObject}            = $Kernel::OM->Get('Log');
-
     return $Self;
 }
 
@@ -66,21 +63,27 @@ get the xml data of a version
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    return q{} if !$Param{Value};
+    # return empty string, when false value (undef, 0, empty string) is given
+    return '' if ( !$Param{Value} );
 
-    my $CIVersionDataRef = $Self->{ConfigItemObject}->VersionGet(
+    # return given value, if given value is not a number
+    return $Param{Value} if ( $Param{Value} =~ /\D/ );
+
+    # get current version of given config item
+    my $CIVersionDataRef = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $Param{Value},
         XMLDataGet   => 0,
+        Silent       => 1,
     );
+
+    # init result variable with given value
     my $CIName = $Param{Value};
 
+    # set result with name and number if available in data
     if (
-        $CIVersionDataRef
-        &&
-        ( ref($CIVersionDataRef) eq 'HASH' ) &&
-        $CIVersionDataRef->{Name}
-        )
-    {
+        ref( $CIVersionDataRef ) eq 'HASH'
+        && $CIVersionDataRef->{Name}
+    ) {
         $CIName = $CIVersionDataRef->{Name}
             . " ("
             . $CIVersionDataRef->{Number}
@@ -106,9 +109,9 @@ sub StatsAttributeCreate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(Key Name Item)) {
-        if ( !$Param{$Argument} ) {
-            $Self->{LogObject}->Log(
+    for my $Argument ( qw(Key Name Item) ) {
+        if ( !$Param{ $Argument } ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Argument!"
             );
@@ -144,21 +147,8 @@ prepare search value for export
 sub ExportSearchValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # nothing given?
     return if !defined $Param{Value};
-
-    # empty value?
-    return q{} if !$Param{Value};
-
-    # lookup CI number for given CI ID
-    my $CIRef = $Self->{ConfigItemObject}->ConfigItemGet(
-        ConfigItemID => $Param{Value},
-    );
-    if ( $CIRef && ref $CIRef eq 'HASH' && $CIRef->{Number} ) {
-        return $CIRef->{Number};
-    }
-
-    return q{};
+    return $Param{Value};
 }
 
 =item ExportValuePrepare()
@@ -174,65 +164,58 @@ prepare value for export
 sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # nothing given?
+    # return undefined value if given value is undefined
     return if !defined $Param{Value};
 
-    # empty value?
-    return q{} if !$Param{Value};
+    # return empty string if given value is false (empty string, or 0)
+    return '' if !$Param{Value};
 
-    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    # return empty string, if given value is not a number
+    return '' if ( $Param{Value} =~ /\D/ );
 
+    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
+
+    # check if special attribut should be used for export
     if ($SearchAttr) {
-
-        my $VersionData = $Self->{ConfigItemObject}->VersionGet(
+        # get current version data including xml data
+        my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
             ConfigItemID => $Param{Value},
+            XMLDataGet   => 1,
+            Silent       => 1,
         );
 
-        if ( $VersionData && ref $VersionData eq 'HASH' ) {
+        if ( ref( $VersionData ) eq 'HASH' ) {
+            # return name of referenced asset if ReferencedCIClassReferenceAttributeKey is 'Name'
+            return $VersionData->{Name} if ( $SearchAttr eq 'Name' );
 
-            # get ConfigItem class ID
-            my $ReferencedCIClassID = q{};
+            # get current definition of the asset class
+            my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+                ClassID => $VersionData->{ClassID},
+            );
+
+            # get export value from xml data with current definition
+            my $ArrRef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeValuesByKey(
+                KeyName       => $SearchAttr,
+                XMLData       => $VersionData->{XMLData}->[1]->{Version}->[1],
+                XMLDefinition => $XMLDefinition->{DefinitionRef},
+            );
+
+            # return first value if set
             if (
-                $Param{Item}
-                && ref( $Param{Item} ) eq 'HASH'
-                && $Param{Item}->{Input}
-                && ref( $Param{Item}->{Input} ) eq 'HASH'
-                && $Param{Item}->{Input}->{ReferencedCIClassName}
-                )
-            {
-                my $ItemDataRef = $Self->{GeneralCatalogObject}->ItemGet(
-                    Class => 'ITSM::ConfigItem::Class',
-                    Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
-                );
-                if ( $ItemDataRef && ref($ItemDataRef) eq 'HASH' && $ItemDataRef->{ItemID} ) {
-                    $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
-                }
-
-                my $XMLDefinition =
-                    $Self->{ConfigItemObject}->DefinitionGet( ClassID => $ReferencedCIClassID, );
-
-                my $ArrRef = $Self->{ConfigItemObject}->GetAttributeValuesByKey(
-                    KeyName       => $SearchAttr,
-                    XMLData       => $VersionData->{XMLData}->[1]->{Version}->[1],
-                    XMLDefinition => $XMLDefinition->{DefinitionRef},
-                );
-
-                if ( $ArrRef && $ArrRef->[0] ) {
-                    return $ArrRef->[0];
-                }
+                ref( $ArrRef ) eq 'ARRAY'
+                && $ArrRef->[0]
+            ) {
+                return $ArrRef->[0];
             }
         }
     }
 
     # lookup CI number for given CI ID
-    my $CIRef = $Self->{ConfigItemObject}->ConfigItemGet(
+    my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemID => $Param{Value},
     );
-    if ( $CIRef && ref $CIRef eq 'HASH' && $CIRef->{Number} ) {
-        return $CIRef->{Number};
-    }
 
-    return q{};
+    return $ConfigItemNumber || '';
 }
 
 =item ImportSearchValuePrepare()
@@ -248,27 +231,198 @@ prepare search value for import
 sub ImportSearchValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # nothing given?
+    # return undefined value if given value is undefined
     return if !defined $Param{Value};
 
-    # empty value?
-    return q{} if !$Param{Value};
+    # return empty string if given value is false (empty string, or 0)
+    return '' if !$Param{Value};
 
-    # check if CI number was given
-    my $CIID = $Self->{ConfigItemObject}->ConfigItemLookup(
-        ConfigItemNumber => $Param{Value},
-    );
-    return $CIID if $CIID;
+    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
+    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || '';
 
-    # check if given value is a valid CI ID
-    if ( $Param{Value} !~ /\D/ ) {
-        my $CINumber = $Self->{ConfigItemObject}->ConfigItemLookup(
-            ConfigItemID => $Param{Value},
-        );
-        return $Param{Value} if $CINumber;
+    # make CI-Number out of given value
+    if (
+        $SearchAttr
+        && $SearchClasses
+    ) {
+        # get array of relevant class names
+        my @CIClassNames;
+        if ( ref( $SearchClasses ) eq 'ARRAY' ) {
+            @CIClassNames = @{ $SearchClasses };
+        }
+        else {
+            @CIClassNames = ( $SearchClasses );
+        }
+
+        # process classes
+        CLASS:
+        for my $ClassName ( @CIClassNames ) {
+            next CLASS if ( !$ClassName );
+
+            # get class id
+            my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+                Class  => 'ITSM::ConfigItem::Class',
+                Name   => $ClassName,
+                Silent => 1,
+            );
+            if (
+                ref($ItemDataRef) ne 'HASH'
+                || !$ItemDataRef->{ItemID}
+            ) {
+                next CLASS;
+            }
+            my $ClassID = $ItemDataRef->{ItemID};
+
+            # search for name if ReferencedCIClassReferenceAttributeKey is 'Name'
+            if ( $SearchAttr eq 'Name' ) {
+                my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                    ClassIDs              => [ $ClassID ],
+                    Name                  => $Param{Value},
+                    PreviousVersionSearch => 0,
+                    Limit                 => 1,
+                    OrderBy               => [ 'Number' ],
+                    OrderByDirection      => [ 'Up' ],
+                );
+
+                # return config item id if found
+                if (
+                    ref( $ConfigItemIDs ) eq 'ARRAY'
+                    && $ConfigItemIDs->[0]
+                ) {
+                    return $ConfigItemIDs->[0];
+                }
+            }
+            # search for xml attribute
+            else {
+                # get current definition of the asset class
+                my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+                    ClassID => $ClassID,
+                );
+
+                # prepare search params
+                my %SearchData   = (
+                    $SearchAttr => $Param{Value},
+                );
+                my @SearchParamsWhat;
+                $Self->_XMLSearchDataPrepare(
+                    XMLDefinition => $XMLDefinition->{DefinitionRef},
+                    What          => \@SearchParamsWhat,
+                    SearchData    => \%SearchData,
+                    Prefix        => '',
+                );
+
+                # only search if parameter is prepared
+                if ( @SearchParamsWhat ) {
+
+                    # search the config items
+                    my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                        ClassIDs              => [ $ClassID ],
+                        What                  => \@SearchParamsWhat,
+                        PreviousVersionSearch => 0,
+                        Limit                 => 1,
+                        OrderBy               => [ 'Number' ],
+                        OrderByDirection      => [ 'Up' ],
+                    );
+
+                    # return config item id if found
+                    if (
+                        ref( $ConfigItemIDs ) eq 'ARRAY'
+                        && $ConfigItemIDs->[0]
+                    ) {
+                        return $ConfigItemIDs->[0];
+                    }
+                }
+            }
+        }
     }
 
-    return q{};
+    # if given value begins with asset hook, lookup as asset number
+    my $Hook = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Hook');
+    if (
+        $Hook
+        && $Param{Value} =~ m/^$Hook(.+)$/
+    ) {
+        my $ConfigItemNumber = $1;
+
+        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            ConfigItemNumber => $ConfigItemNumber,
+        );
+
+        return $ConfigItemID if ( $ConfigItemID );
+    }
+
+    # check if given value is asset number
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+        ConfigItemNumber => $Param{Value},
+    );
+    return $ConfigItemID if $ConfigItemID;
+
+    # if given value is an number, check if it is an ID
+    if ( $Param{Value} !~ /\D/ ) {
+        my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            ConfigItemID => $Param{Value},
+        );
+        return $Param{Value} if ( $ConfigItemNumber );
+    }
+
+    # check if given value is name of an asset in relevant classes
+    if (
+        $SearchClasses
+        && (
+            !$SearchAttr
+            || $SearchAttr ne 'Name'
+        )
+    ) {
+
+        # get array of relevant class names
+        my @CIClassNames;
+        if ( ref( $SearchClasses ) eq 'ARRAY' ) {
+            @CIClassNames = @{ $SearchClasses };
+        }
+        else {
+            @CIClassNames = ( $SearchClasses );
+        }
+
+        # prepare class ids for search
+        my @SearchClassIDs;
+        CLASS:
+        for my $ClassName ( @CIClassNames ) {
+            next CLASS if ( !$ClassName );
+
+            # get class id
+            my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+                Class  => 'ITSM::ConfigItem::Class',
+                Name   => $ClassName,
+                Silent => 1,
+            );
+            if (
+                ref( $ItemDataRef ) ne 'HASH'
+                || !$ItemDataRef->{ItemID}
+            ) {
+                next CLASS;
+            }
+            my $ClassID = $ItemDataRef->{ItemID};
+
+            my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                ClassIDs              => [ $ClassID ],
+                Name                  => $Param{Value},
+                PreviousVersionSearch => 0,
+                Limit                 => 1,
+                OrderBy               => [ 'Number' ],
+                OrderByDirection      => [ 'Up' ],
+            );
+
+            # return config item id if found
+            if (
+                ref( $ConfigItemIDs ) eq 'ARRAY'
+                && $ConfigItemIDs->[0]
+            ) {
+                return $ConfigItemIDs->[0];
+            }
+        }
+    }
+
+    return;
 }
 
 =item ImportValuePrepare()
@@ -284,186 +438,247 @@ prepare value for import
 sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # nothing given?
+    # return undefined value if given value is undefined
     return if !defined $Param{Value};
 
-    # empty value?
-    return q{} if !$Param{Value};
+    # return empty string if given value is false (empty string, or 0)
+    return '' if !$Param{Value};
 
-    my $SearchAttr = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || q{};
+    my $SearchAttr    = $Param{Item}->{Input}->{ReferencedCIClassReferenceAttributeKey} || '';
+    my $SearchClasses = $Param{Item}->{Input}->{ReferencedCIClassName} || '';
 
     # make CI-Number out of given value
-    if ($SearchAttr) {
+    if (
+        $SearchAttr
+        && $SearchClasses
+    ) {
+        # get array of relevant class names
+        my @CIClassNames;
+        if ( ref( $SearchClasses ) eq 'ARRAY' ) {
+            @CIClassNames = @{ $SearchClasses };
+        }
+        else {
+            @CIClassNames = ( $SearchClasses );
+        }
 
-        # get ConfigItem class ID
-        my $ReferencedCIClassID = q{};
-        if (
-            $Param{Item}
-            && ref( $Param{Item} ) eq 'HASH'
-            && $Param{Item}->{Input}
-            && ref( $Param{Item}->{Input} ) eq 'HASH'
-            && $Param{Item}->{Input}->{ReferencedCIClassName}
-        ) {
-            my $ItemDataRef = $Self->{GeneralCatalogObject}->ItemGet(
-                Class => 'ITSM::ConfigItem::Class',
-                Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
+        # process classes
+        CLASS:
+        for my $ClassName ( @CIClassNames ) {
+            next CLASS if ( !$ClassName );
+
+            # get class id
+            my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+                Class  => 'ITSM::ConfigItem::Class',
+                Name   => $ClassName,
+                Silent => 1,
             );
             if (
-                $ItemDataRef
-                && ref($ItemDataRef) eq 'HASH'
-                && $ItemDataRef->{ItemID}
+                ref($ItemDataRef) ne 'HASH'
+                || !$ItemDataRef->{ItemID}
             ) {
-                $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
+                next CLASS;
             }
+            my $ClassID = $ItemDataRef->{ItemID};
 
-            # prepare search params
-            my @SearchParams;
-            my %SearchData   = ();
+            # search for name if ReferencedCIClassReferenceAttributeKey is 'Name'
+            if ( $SearchAttr eq 'Name' ) {
+                my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                    ClassIDs              => [ $ClassID ],
+                    Name                  => $Param{Value},
+                    PreviousVersionSearch => 0,
+                    Limit                 => 1,
+                    OrderBy               => [ 'Number' ],
+                    OrderByDirection      => [ 'Up' ],
+                );
 
-            $SearchData{$SearchAttr} = $Param{Value};
-
-            my $XMLDefinition =
-                $Self->{ConfigItemObject}->DefinitionGet( ClassID => $ReferencedCIClassID, );
-
-            $Self->_XMLSearchDataPrepare(
-                XMLDefinition => $XMLDefinition->{DefinitionRef},
-                What          => \@SearchParams,
-                SearchData    => \%SearchData,
-            );
-
-            push (
-                @SearchParams,
-                {
-                    Field    => 'ClassID',
-                    Operator => 'IN',
-                    Type     => 'NUMERIC',
-                    Value    => [$ReferencedCIClassID]
+                # return config item id if found
+                if (
+                    ref( $ConfigItemIDs ) eq 'ARRAY'
+                    && $ConfigItemIDs->[0]
+                ) {
+                    return $ConfigItemIDs->[0];
                 }
-            );
-
-            # search the config items
-            my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'ConfigItem',
-                Result     => 'ARRAY',
-                Search     => {
-                    AND => \@SearchParams
-                },
-                UserID     => 1,
-                UsertType  => 'Agent'
-            );
-
-            # get and return CofigItem ID
-            my $CIID = q{};
-            if ( @ConfigItemIDs ) {
-                $CIID = $ConfigItemIDs[0] || q{};
             }
-            return $CIID;
+            # search for xml attribute
+            else {
+                # get current definition of the asset class
+                my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+                    ClassID => $ClassID,
+                );
+
+                # prepare search params
+                my %SearchData   = (
+                    $SearchAttr => $Param{Value},
+                );
+                my @SearchParamsWhat;
+                $Self->_XMLSearchDataPrepare(
+                    XMLDefinition => $XMLDefinition->{DefinitionRef},
+                    What          => \@SearchParamsWhat,
+                    SearchData    => \%SearchData,
+                    Prefix        => '',
+                );
+
+                # only search if parameter is prepared
+                if ( @SearchParamsWhat ) {
+
+                    # search the config items
+                    my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                        ClassIDs              => [ $ClassID ],
+                        What                  => \@SearchParamsWhat,
+                        PreviousVersionSearch => 0,
+                        Limit                 => 1,
+                        OrderBy               => [ 'Number' ],
+                        OrderByDirection      => [ 'Up' ],
+                    );
+
+                    # return config item id if found
+                    if (
+                        ref( $ConfigItemIDs ) eq 'ARRAY'
+                        && $ConfigItemIDs->[0]
+                    ) {
+                        return $ConfigItemIDs->[0];
+                    }
+                }
+            }
         }
     }
 
-    # check if CI number was given
-    my $CIID = $Self->{ConfigItemObject}->ConfigItemLookup(
+    # if given value begins with asset hook, lookup as asset number
+    my $Hook = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Hook');
+    if (
+        $Hook
+        && $Param{Value} =~ m/^$Hook(.+)$/
+    ) {
+        my $ConfigItemNumber = $1;
+
+        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            ConfigItemNumber => $ConfigItemNumber,
+        );
+
+        return $ConfigItemID if ( $ConfigItemID );
+    }
+
+    # check if given value is asset number
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
         ConfigItemNumber => $Param{Value},
     );
-    return $CIID if $CIID;
+    return $ConfigItemID if $ConfigItemID;
 
-    # make CI-Number out of given Name...
-    my $ReferencedCIClassID = q{};
-    if (
-        $Param{Item}
-        && ref( $Param{Item} ) eq 'HASH'
-        && $Param{Item}->{Input}
-        && ref( $Param{Item}->{Input} ) eq 'HASH'
-        && $Param{Item}->{Input}->{ReferencedCIClassName}
-    ) {
-        my $RefClassName = $Param{Item}->{Input}->{ReferencedCIClassName};
-        my $ItemDataRef  = $Self->{GeneralCatalogObject}->ItemGet(
-            Class => 'ITSM::ConfigItem::Class',
-            Name => $Param{Item}->{Input}->{ReferencedCIClassName} || q{},
-        );
-        if ( $ItemDataRef && ref($ItemDataRef) eq 'HASH' && $ItemDataRef->{ItemID} ) {
-            $ReferencedCIClassID = $ItemDataRef->{ItemID} || q{};
-        }
-        my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            Search     => {
-                AND => [
-                    {
-                        Field    => 'Name',
-                        Operator => 'EQ',
-                        Type     => 'STRING',
-                        Value    => $Param{Value}
-                    },
-                    {
-                        Field    => 'ClassID',
-                        Operator => 'IN',
-                        Type     => 'NUMERIC',
-                        Value    => [$ReferencedCIClassID]
-                    }
-                ]
-            },
-            UserID     => 1,
-            UsertType  => 'Agent'
-        );
-        my $CIID = q{};
-        if ( @ConfigItemIDs ) {
-            $CIID = $ConfigItemIDs[0] || q{};
-        }
-        return $CIID if $CIID;
-    }
-
-    # check if given value is a valid CI ID
+    # if given value is an number, check if it is an ID
     if ( $Param{Value} !~ /\D/ ) {
-        my $CINumber = $Self->{ConfigItemObject}->ConfigItemLookup(
+        my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
             ConfigItemID => $Param{Value},
         );
-        return $Param{Value} if $CINumber;
+        return $Param{Value} if ( $ConfigItemNumber );
     }
 
-    return q{};
+    # check if given value is name of an asset in relevant classes
+    if (
+        $SearchClasses
+        && (
+            !$SearchAttr
+            || $SearchAttr ne 'Name'
+        )
+    ) {
+        # get array of relevant class names
+        my @CIClassNames;
+        if ( ref( $SearchClasses ) eq 'ARRAY' ) {
+            @CIClassNames = @{ $SearchClasses };
+        }
+        else {
+            @CIClassNames = ( $SearchClasses );
+        }
+
+        # prepare class ids for search
+        my @SearchClassIDs;
+        CLASS:
+        for my $ClassName ( @CIClassNames ) {
+            next CLASS if ( !$ClassName );
+
+            # get class id
+            my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+                Class  => 'ITSM::ConfigItem::Class',
+                Name   => $ClassName,
+                Silent => 1,
+            );
+            if (
+                ref( $ItemDataRef ) ne 'HASH'
+                || !$ItemDataRef->{ItemID}
+            ) {
+                next CLASS;
+            }
+            my $ClassID = $ItemDataRef->{ItemID};
+
+            my $ConfigItemIDs = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearchExtended(
+                ClassIDs              => [ $ClassID ],
+                Name                  => $Param{Value},
+                PreviousVersionSearch => 0,
+                Limit                 => 1,
+                OrderBy               => [ 'Number' ],
+                OrderByDirection      => [ 'Up' ],
+            );
+
+            # return config item id if found
+            if (
+                ref( $ConfigItemIDs ) eq 'ARRAY'
+                && $ConfigItemIDs->[0]
+            ) {
+                return $ConfigItemIDs->[0];
+            }
+        }
+    }
+
+    return;
 }
 
 sub _XMLSearchDataPrepare {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    return if !$Param{XMLDefinition} || ref $Param{XMLDefinition} ne 'ARRAY';
-    return if !$Param{What}          || ref $Param{What}          ne 'ARRAY';
-    return if !$Param{SearchData}    || ref $Param{SearchData}    ne 'HASH';
+    return if (
+        ref( $Param{XMLDefinition} ) ne 'ARRAY'
+        || ref( $Param{What} ) ne 'ARRAY'
+        || ref( $Param{SearchData} ) ne 'HASH'
+        || !defined( $Param{Prefix} )
+    );
 
+    # process definition
     ITEM:
     for my $Item ( @{ $Param{XMLDefinition} } ) {
-
-        # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
-
-        if ( $Param{SearchData}->{$Key} ) {
-
-            # create search key
-            my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{} ) . $Key;
-            $SearchKey =~ s/::/./gsm;
-
-            push (
-                @{ $Param{What} },
-                {
-                    Field    => $SearchKey,
-                    Operator => 'EQ',
-                    Type     => 'STRING',
-                    Value    => $Param{SearchData}->{$Key}
-                }
-            );
+        # combine prefix with current key
+        my $CombinedKey;
+        if ( $Param{Prefix} ) {
+            $CombinedKey = $Param{Prefix} . '::' . $Item->{Key};
         }
-        next ITEM if !$Item->{Sub};
+        else {
+            $CombinedKey = $Item->{Key};
+        }
+
+        # check for relevant search value
+        if ( $Param{SearchData}->{ $Item->{Key} } ) {
+            # prepare search key
+            my $SearchKey = $CombinedKey;
+            $SearchKey =~ s{ :: }{\'\}[%]\{\'}xmsg;
+
+            # prepare search hash
+            my $SearchHash = {
+                '[1]{\'Version\'}[1]{\'' . $SearchKey . '\'}[%]{\'Content\'}' => $Param{SearchData}->{ $Item->{Key} },
+            };
+
+            # push search hash to What parameter
+            push( @{ $Param{What} }, $SearchHash );
+        }
+        next ITEM if( !$Item->{Sub} );
 
         # start recursion, if "Sub" was found
         $Self->_XMLSearchDataPrepare(
             XMLDefinition => $Item->{Sub},
             What          => $Param{What},
             SearchData    => $Param{SearchData},
-            Prefix        => $Key,
+            Prefix        => $CombinedKey,
         );
     }
+
     return 1;
 }
 
