@@ -11,6 +11,7 @@ package Kernel::API::Provider::REST;
 use strict;
 use warnings;
 
+use CGI;
 use HTTP::Status;
 use URI::Escape;
 use Time::HiRes qw(time);
@@ -197,9 +198,7 @@ sub ProcessRequest {
     ROUTE:
     for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        next ROUTE if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
-
-        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
 
         if ( $RequestMethod ne 'OPTIONS' && IsArrayRefWithData( $RouteMapping{RequestMethod} ) ) {
             next ROUTE if !grep { $RequestMethod eq $_ } @{ $RouteMapping{RequestMethod} };
@@ -267,9 +266,7 @@ sub ProcessRequest {
     my %AvailableMethods;
     for my $CurrentOperation ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
 
-        next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} );
-
-        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} };
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
         my $RouteRegEx = $RouteMapping{Route};
         $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
 
@@ -279,8 +276,9 @@ sub ProcessRequest {
         next if !( $Base =~ m{^ $BaseRoute }xms );
 
         next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        
         # only add if we didn't have a match upto now
-        next if IsHashRefWithData($AvailableMethods{$RouteMapping{RequestMethod}->[0]});
+        next if exists $AvailableMethods{$RouteMapping{RequestMethod}->[0]};
 
         $AvailableMethods{$RouteMapping{RequestMethod}->[0]} = {
             Operation => $CurrentOperation,

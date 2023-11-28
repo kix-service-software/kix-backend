@@ -104,13 +104,15 @@ sub _ExtendFilter {
     if (!IsArrayRef($Filters)) {
         $Filters = [];
     }
-    if (!scalar(@{$Filters})) {
+    if ( !scalar(@{$Filters}) || (scalar(@{$Filters}) == 1 && !IsHashRef($Filters->[0])) ) {
         $Filters->[0] = {};
     }
 
     for my $Filter ( @{$Filters} ) {
-        $Filter->{AND} //= [];
-        push( @{$Filter->{AND}}, $Param{Extend} );
+        if (IsHashRef($Filter)) {
+            $Filter->{AND} //= [];
+            push( @{$Filter->{AND}}, $Param{Extend} );
+        }
     }
     return $Filters;
 }

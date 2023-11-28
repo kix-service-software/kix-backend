@@ -94,7 +94,7 @@ This returns something like:
         'ID'                => 2,
         'Type'              => 'Ticket',
         'Name'              => 'Test',
-        'Filter'            => {},
+        'Filter'            => [],
         'IsAsynchronous'    => 0|1,
         'Comment'           => '...',
         'LastExecutionTime' => '2019-10-21 12:00:00',
@@ -156,7 +156,7 @@ sub JobGet {
             $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
-            if (!IsArrayRefWithData($Result{Filter})) {
+            if (!IsArrayRef($Result{Filter})) {
                 $Result{Filter} = [$Result{Filter}];
             }
         }
@@ -243,7 +243,7 @@ sub JobAdd {
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
-        if ( !IsArrayRefWithData($Param{Filter}) ) {
+        if ( !IsArrayRef($Param{Filter}) ) {
             $Param{Filter} = [$Param{Filter}];
         }
         $Filter = $Kernel::OM->Get('JSON')->Encode(
@@ -356,7 +356,7 @@ sub JobUpdate {
     # set default value
     $Param{Comment} ||= '';
 
-    if ( $Param{Filter} && !IsArrayRefWithData($Param{Filter}) ) {
+    if ( $Param{Filter} && !IsArrayRef($Param{Filter}) ) {
         $Param{Filter} = [$Param{Filter}];
     }
 

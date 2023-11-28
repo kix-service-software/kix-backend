@@ -27,6 +27,31 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Session::UserCountersGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserCountersGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserCountersGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">UserCounterResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Session::UserTicketsGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">UserTicketsGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Session::UserTicketsGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">TicketCollectionResponse</Item>
+                <Item Key="CacheType">API_user</Item>
+                <Item Key="CacheTypeDependency">Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Session::SessionGet" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>

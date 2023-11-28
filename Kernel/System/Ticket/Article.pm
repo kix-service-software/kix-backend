@@ -567,6 +567,7 @@ sub ArticleCreate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$ArticleID,
     );
 
@@ -2136,7 +2137,8 @@ sub ArticleUpdate {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
-        ObjectID  => $Param{TicketID}.q{::}.$Param{ArticleID},
+        UserID    => $Param{UserID},
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2313,7 +2315,8 @@ sub ArticleFlagSet {
         $Kernel::OM->Get('ClientRegistration')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key}.'::'.$Param{UserID},
+            UserID    => $Param{UserID},
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -2417,6 +2420,7 @@ sub ArticleFlagDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
     );
 
