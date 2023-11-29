@@ -43,7 +43,6 @@ our @ObjectDependencies = (
     'Lock',
     'Log',
     'Main',
-    'PostMaster::LoopProtection',
     'Priority',
     'Queue',
     'State',
@@ -360,6 +359,13 @@ sub TicketCreate {
             $Param{Queue} = $DefaultTicketQueue;
         }
         else {
+            if ( $DefaultTicketQueue ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default queue \"$DefaultTicketQueue\" in config setting Ticket::Queue::Default!",
+                );
+            }
+
             $Param{QueueID} = 1;
         }
     }
@@ -394,6 +400,12 @@ sub TicketCreate {
             $Param{State} = $DefaultTicketState;
         }
         else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
             $Param{StateID} = 1;
         }
     }
@@ -446,6 +458,12 @@ sub TicketCreate {
             $Param{Priority} = $DefaultTicketPriority;
         }
         else {
+            if ( $DefaultTicketPriority ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default priority \"$DefaultTicketPriority\" in config setting Ticket::Priority::Default!",
+                );
+            }
             $Param{PriorityID} = 1;
         }
     }
@@ -680,7 +698,8 @@ sub TicketCreate {
     $Self->EventHandler(
         Event => 'TicketCreate',
         Data  => {
-            TicketID => $TicketID
+            TicketID => $TicketID,
+            OwnerID  => $Param{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -722,6 +741,11 @@ sub TicketDelete {
             return;
         }
     }
+
+    # get the ticket data
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
@@ -813,6 +837,7 @@ sub TicketDelete {
         Event => 'TicketDelete',
         Data  => {
             TicketID => $Param{TicketID},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -2973,6 +2998,8 @@ sub TicketLockSet {
         Event => 'TicketLockUpdate',
         Data  => {
             TicketID => $Param{TicketID},
+            Lock     => lc $Param{Lock},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -3278,6 +3305,7 @@ sub TicketStateSet {
         Event => 'TicketStateUpdate',
         Data  => {
             TicketID      => $Param{TicketID},
+            State         => \%State,
             OldTicketData => \%Ticket,
         },
         UserID => $Param{UserID},
@@ -3636,7 +3664,9 @@ sub TicketOwnerSet {
     $Self->EventHandler(
         Event => 'TicketOwnerUpdate',
         Data  => {
-            TicketID => $Param{TicketID},
+            TicketID        => $Param{TicketID},
+            OwnerID         => $Param{NewUserID},
+            PreviousOwnerID => $OwnerID,
         },
         UserID => $Param{UserID},
     );
@@ -5180,6 +5210,7 @@ sub TicketFlagSet {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -5300,6 +5331,7 @@ sub TicketFlagDelete {
     $Kernel::OM->Get('ClientRegistration')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 

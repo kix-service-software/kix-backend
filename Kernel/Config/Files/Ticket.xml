@@ -543,6 +543,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###990-UpdateUserCounters" Required="0" Valid="1">
+        <Description Translatable="1">Updates the user ticket counters.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::UpdateUserCounters</Item>
+                <Item Key="Event">(TicketCreate|TicketDelete|TicketStateUpdate|TicketFlagSet|TicketFlagDelete|TicketLockUpdate|TicketOwnerUpdate|TicketSubscribe|TicketUnsubscribe)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::CustomModule###001-CustomModule" Required="0" Valid="0">
         <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::Ticket. Used to easily add customizations.</Description>
         <Group>Ticket</Group>

@@ -1,0 +1,11 @@
+{
+    "Counter": {
+        "Ticket": {
+            "Owned": 5,
+            "OwnedAndLocked": 2,
+            "OwnedAndLockedAndUnseen": 2,
+            "Watched": 2,
+            "WatchedAndUnseen": 2
+        }
+    }
+}
