@@ -57,7 +57,7 @@ sub Run {
 
     # get all tickets with an archive flag and an open statetype
     my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-        Search = {
+        Search => {
             AND => [
                 {
                     Field    => 'StateType',

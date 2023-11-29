@@ -76,7 +76,7 @@ sub PreRun {
                 @{$Self->{SearchCriteria}},
                 {
                     Field    => 'ClassID',
-                    Operator => 'IN'
+                    Operator => 'IN',
                     Type     => 'NUMERIC',
                     Value    => [$ID]
                 }
@@ -110,7 +110,7 @@ sub Run {
             @{$Self->{SearchCriteria}},
             {
                 Field    => 'DeplStateIDs',
-                Operator => 'IN'
+                Operator => 'IN',
                 Type     => 'NUMERIC',
                 Value    => [keys %{$StateList}]
             }
