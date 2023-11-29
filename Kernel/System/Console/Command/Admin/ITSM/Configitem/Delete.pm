@@ -249,7 +249,7 @@ sub Run {
                     push(
                         @SearchParam,
                         {
-                            Field    => 'DeplStateID'
+                            Field    => 'DeplStateID',
                             Operator => 'IN',
                             Type     => 'NUMERIC',
                             Value    => [$DeplStateID]
