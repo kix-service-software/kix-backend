@@ -2043,7 +2043,10 @@ sub UpdateCounters {
     # cleanup existing counters
     $Self->DeleteCounters();
 
-    my %UserList = $Self->UserList( Valid => 0 );
+    my %UserList = $Self->UserSearch(
+        IsAgent => 1,
+        Valid   => 0,
+    );
 
     foreach my $UserID ( sort keys %UserList ) {
         my %Counters = (
