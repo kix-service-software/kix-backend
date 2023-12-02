@@ -20,6 +20,7 @@
         <Context>mobile-app</Context>
         <Setting>
             <Array>
+                <Item>MobileProcessingChecklist.*</Item>
             </Array>
         </Setting>
     </ConfigItem>
