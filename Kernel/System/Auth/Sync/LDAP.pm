@@ -212,20 +212,6 @@ sub Sync {
                             $Value =~s/\{(.+?)\}/$ValuePart/;
                         }
                     }
-                    # set a value concatenation of array attribute
-                    # LDAP attributes are marked with curly brackets
-                    elsif ( $AttributeName =~ /^ARRAYJOIN\[(.+)\]\:(.+)$/i ) {
-                        my $SepStrg    = $1;
-                        $Value = $2;
-                        $Value =~ s/^\s+|\s+$//g;
-                        while ( $Value =~ /\{(.+?)\}/) {
-                            $AttributeName = $1;
-                            my @ValueArray = $Entry->get_value($AttributeName);
-                            my $ValuePart = join( $SepStrg, @ValueArray ) || '';
-                            $ValuePart =~ s/^\s+|\s+$//g;
-                            $Value =~s/\{(.+?)\}/$ValuePart/;
-                        }
-                    }
                     # just set the attribute...
                     elsif ( $Entry->get_value($AttributeName) ) {
                         $Value = $Entry->get_value($AttributeName);
