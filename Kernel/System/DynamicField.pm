@@ -1066,7 +1066,7 @@ sub DynamicFieldListGet {
         ) {
             push (
                 @SQLWhere,
-                "object_type = '"
+                " object_type = '"
                     . $DBObject->Quote( $Param{ObjectType} )
                     . q{'}
             );
@@ -1077,7 +1077,7 @@ sub DynamicFieldListGet {
 
             push (
                 @SQLWhere,
-                "object_type IN ($ObjectTypeString)"
+                " object_type IN ($ObjectTypeString)"
             );
         }
     }
@@ -1089,7 +1089,7 @@ sub DynamicFieldListGet {
         ) {
             push (
                 @SQLWhere,
-                "field_type = '"
+                " field_type = '"
                     . $DBObject->Quote( $Param{FieldType} )
                     . q{'}
             );
@@ -1100,7 +1100,7 @@ sub DynamicFieldListGet {
 
             push (
                 @SQLWhere,
-                "field_type IN ($FieldTypeString)"
+                " field_type IN ($FieldTypeString)"
             );
         }
     }

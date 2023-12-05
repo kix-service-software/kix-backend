@@ -2161,7 +2161,7 @@ sub GetUserCounters {
 add a user counter entry
 
     my $Success = $UserObject->AddUserCounterObject(
-        Category => 'Ticket'
+        Category => 'Ticket',
         Counter  => '...',
         ObjectID => 123,
         UserID   => 123,
@@ -2183,9 +2183,17 @@ sub AddUserCounterObject {
         }
     }
 
+    my $SQL = "INSERT INTO user_counter (user_id, category, counter, object_id) VALUES (?, ?, ?, ?)";
+    if ( $Kernel::OM->Get('DB')->{'DB::Type'} eq 'postgresql' ) {
+        $SQL .= ' ON CONFLICT DO NOTHING'
+    }
+    elsif ($Kernel::OM->Get('DB')->{'DB::Type'} eq 'mysql' ) {
+        $SQL .= ' ON DUPLICATE KEY UPDATE user_id = user_id'
+    }
+
     # sql
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => "INSERT INTO user_counter (user_id, category, counter, object_id) VALUES (?, ?, ?, ?)",
+        SQL  => $SQL,
         Bind => [
             \$Param{UserID}, \$Param{Category}, \$Param{Counter}, \$Param{ObjectID},
         ],
