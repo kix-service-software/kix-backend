@@ -2466,7 +2466,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="0">
         <Description Translatable="1">Links ticket with an FAQArticle using a "ParentChild" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
