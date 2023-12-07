@@ -6,10 +6,12 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Editor;
+package Kernel::System::ObjectSearch::Database::Contact::ContactID;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -21,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Editor - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Contact::ContactID - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -39,9 +41,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable   => 0|1,
+            IsSortable     => 0|1,
             IsSearchable => 0|1,
-            Operators    => []
+            Operators     => []
         },
     };
 
@@ -51,17 +53,15 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        CreateBy => {
+        ContactID => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
         },
-        ChangeBy => {
+        ID => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
         }
     };
 
@@ -88,17 +88,13 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    my %AttributeMapping = (
-        'CreateBy' => 'st.create_by',
-        'ChangeBy' => 'st.change_by',
-    );
+    return if !$Self->_CheckSearchParams(%Param);
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Column    => 'c.id',
         Value     => $Param{Search}->{Value},
+        Type      => 'NUMERIC',
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
@@ -130,31 +126,14 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
-
-    my %AttributeMapping = (
-        CreateBy => ['ccr.lastname', 'ccr.firstname'],
-        ChangeBy => ['cch.lastname', 'cch.firstname'],
-    );
-
-    my %Join;
-    if ( $Param{Attribute} eq 'CreateBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = st.create_by'
-        ];
-    }
-    elsif ( $Param{Attribute} eq 'ChangeBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = st.change_by'
-        ];
-    }
+    return if !$Self->_CheckSortParams(%Param);
 
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy  => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Select  => ['c.id'],
+        OrderBy => ['c.id'],
     };
 }
+
 1;
 
 

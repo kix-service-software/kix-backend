@@ -98,7 +98,7 @@ sub Run {
 
         # remove quotation marks
         $Address =~ s/("|')//g;
-        
+
         # add address for search
         push( @EmailIn, $Address );
     }
@@ -110,11 +110,22 @@ sub Run {
         DynamicFields => 0,
         UserID        => 1,
     );
-    
+
     # search for relevant contacts
-    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
-        EmailIn => \@EmailIn,
-        Valid   => 0
+    my %ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Emails',
+                    Operator => 'IN',
+                    Value    => \@EmailIn
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'HASH',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     # check if ticket customer is a relevant contact

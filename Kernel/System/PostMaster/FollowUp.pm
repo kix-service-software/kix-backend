@@ -419,7 +419,7 @@ sub Run {
 
         # remove quotation marks
         $Address =~ s/("|')//g;
-        
+
         # add address for search
         push( @EmailIn, $Address );
     }
@@ -460,9 +460,25 @@ sub Run {
         && $Ticket{ContactID}
     ) {
         # search for relevant contacts by email
-        my %ContactListEmail = $Kernel::OM->Get('Contact')->ContactSearch(
-            EmailIn => \@EmailIn,
-            Valid   => 1
+        my %ContactListEmail = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'IN',
+                        Value    => \@EmailIn
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            ObjectType => 'Contact',
+            Result     => 'HASH',
+            UserID     => 1,
+            UserType   => 'Agent'
         );
 
         # check for ticket contact
@@ -479,19 +495,51 @@ sub Run {
         && $ConfigObject->Get('PostMaster::FollowUp::CheckFromOrganisation')
     ) {
         # search for relevant contacts by email
-        my %ContactListEmail = $Kernel::OM->Get('Contact')->ContactSearch(
-            EmailIn => \@EmailIn,
-            Valid   => 1
+        my @ContactListEmail = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'IN',
+                        Value    => \@EmailIn
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            UserID     => 1,
+            UserType   => 'Agent'
         );
 
         # search for relevant contacts by ticket organisation
-        my %ContactListOrganisation = $Kernel::OM->Get('Contact')->ContactSearch(
-            OrganisationID => $Ticket{OrganisationID},
-            Valid          => 1
+        my %ContactListOrganisation = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'OrganisationID',
+                        Operator => 'EQ',
+                        Value    => $Ticket{OrganisationID}
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            ObjectType => 'Contact',
+            Result     => 'HASH',
+            UserID     => 1,
+            UserType   => 'Agent'
         );
 
         # check for matching entry in both lists
-        for my $ContactID ( keys( %ContactListEmail ) ) {
+        for my $ContactID ( @ContactListEmail ) {
             if ( $ContactListOrganisation{ $ContactID } ) {
                 $GetParam{CustomerVisible} = 1;
 

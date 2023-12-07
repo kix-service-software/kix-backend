@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Editor;
+package Kernel::System::ObjectSearch::Database::Contact::Times;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Editor - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Contact::Times - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -39,9 +39,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable   => 0|1,
+            IsSortable     => 0|1,
             IsSearchable => 0|1,
-            Operators    => []
+            Operators     => []
         },
     };
 
@@ -51,23 +51,20 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        CreateBy => {
+        CreateTime => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
         },
-        ChangeBy => {
+        ChangeTime => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
         }
     };
 
     return $Self->{Supported};
 }
-
 
 =item Search()
 
@@ -85,26 +82,50 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my $Value;
     my @SQLWhere;
 
     # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
+    return if !$Self->_CheckSearchParams(%Param);
 
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        'CreateBy' => 'st.create_by',
-        'ChangeBy' => 'st.change_by',
+        CreateTime => 'c.create_time',
+        ChangeTime => 'c.change_time',
     );
+
+    return q{} if !$Param{Search}->{Value};
+
+    # calculate relative times
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => $Param{Search}->{Value}
+    );
+
+    if ( !$SystemTime ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
+        );
+        return;
+    }
+
+    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime
+    );
+
+    # quote
+    $Value = $Kernel::OM->Get('DB')->Quote( $Value );
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Param{Search}->{Value},
+        Value     => $Value,
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
 
-    push( @SQLWhere, @Where);
+    push( @SQLWhere, @Where );
 
     return {
         Where => \@SQLWhere,
@@ -130,31 +151,20 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if !$Self->_CheckSortParams(%Param);
 
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        CreateBy => ['ccr.lastname', 'ccr.firstname'],
-        ChangeBy => ['cch.lastname', 'cch.firstname'],
+        CreateTime => 'c.create_time',
+        ChangeTime => 'c.change_time',
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'CreateBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = st.create_by'
-        ];
-    }
-    elsif ( $Param{Attribute} eq 'ChangeBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = st.change_by'
-        ];
-    }
-
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy  => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Select  => [$AttributeMapping{$Param{Attribute}}],
+        OrderBy => [$AttributeMapping{$Param{Attribute}}],
     };
 }
+
 1;
 
 

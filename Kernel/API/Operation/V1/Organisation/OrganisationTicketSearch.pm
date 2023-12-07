@@ -29,6 +29,16 @@ Kernel::API::Operation::Organisation::OrganisationTicketSearch - API Organisatio
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -99,25 +109,28 @@ sub Run {
         Result   => 'ARRAY',
     );
 
-    if (IsArrayRefWithData(\@TicketList)) {
+    if (@TicketList) {
 
         # get already prepared Ticket data from TicketGet operation
         my $TicketGetResult = $Self->ExecOperation(
             OperationType => 'V1::Ticket::TicketGet',
             Data          => {
-                TicketID => [ sort @TicketList ],
+                TicketID => join(q{,}, @TicketList),
             }
         );
+
         if ( !IsHashRefWithData($TicketGetResult) || !$TicketGetResult->{Success} ) {
             return $TicketGetResult;
         }
 
-        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
+        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket})
+            ? @{$TicketGetResult->{Data}->{Ticket}}
+            : ( $TicketGetResult->{Data}->{Ticket} );
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Ticket => \@ResultList,
-            )
+            );
         }
     }
 
