@@ -239,18 +239,29 @@ sub Search {
         return;
     }
 
+    # prepare cache key data
+    my $CacheKeyData = {
+        Result   => $Param{Result},
+        Search   => $Param{Search},
+        Sort     => $Param{Sort},
+        Limit    => $Param{Limit},
+        UserType => $Param{UserType},
+        UserID   => $Param{UserID},
+    };
+
     # prepare cache key
     my $CacheKey = $Kernel::OM->Get('JSON')->Encode(
-        Data     => {
-            Result   => $Param{Result},
-            Search   => $Param{Search},
-            Sort     => $Param{Sort},
-            Limit    => $Param{Limit},
-            UserType => $Param{UserType},
-            UserID   => $Param{UserID},
-        },
+        Data     => $CacheKeyData,
         SortKeys => 1
     );
+
+    if ( $Param{Debug} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => 'ObjectSearch CacheKey:'
+                . Data::Dumper::Dumper($CacheKeyData)
+        );
+    }
 
     # check for existing cache value
     my $CacheData = $Kernel::OM->Get('Cache')->Get(

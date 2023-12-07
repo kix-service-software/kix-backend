@@ -59,12 +59,12 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','NE','IN','!IN'],
             ValueType    => 'Integer'
         },
-        ConfigItemIDs => {
+        ID => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN'],
             ValueType    => 'Integer'
-        },
+        }
     };
 
     return $Self->{Supported};
@@ -90,13 +90,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
@@ -132,6 +126,9 @@ run this module and return the SQL extensions
 
 sub Sort {
     my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
 
     return {
         Select => [

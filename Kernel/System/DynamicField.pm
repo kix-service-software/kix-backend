@@ -1047,7 +1047,7 @@ sub DynamicFieldListGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     my @Data;
-    my $SQL = 'SELECT id, name FROM dynamic_field WHERE';
+    my $SQL = 'SELECT id, name FROM dynamic_field WHERE ';
     my @SQLWhere;
 
     if ($Valid) {

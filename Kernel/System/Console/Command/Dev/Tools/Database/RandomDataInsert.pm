@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -360,11 +360,22 @@ sub ContactCreate {
 sub OrganisationGet {
     my ($Self) = @_;
 
-    my %Organisations = $Kernel::OM->Get('Organisation')->OrganisationSearch(
-        Valid => 1,          # not required
+    return $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Organisation',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Valid',
+                    Operator => 'EQ',
+                    Type     => 'STRING',
+                    Value    => 'valid'
+                }
+            ]
+        },
+        UserType   => 'Agent',
+        UserID     => 1,
     );
-
-    return sort keys %Organisations;
 }
 
 sub OrganisationCreate {

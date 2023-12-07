@@ -109,32 +109,30 @@ sub _MailDomain {
     );
     return if ( !IsArrayRefWithData( $Pattern ) );
 
-    # TODO: Use the new search function (ObjectSearch) to search for organisations
     # search for relevant organisations
-    my %Organisations = $Kernel::OM->Get('Organisation')->OrganisationSearch(
-        DynamicField => {
-            Operator => 'EQ',
-            Field    => 'AddressDomainPattern',
-            Value    => $Pattern
-        }
+    my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectSearch => 'Organisation',
+        Result       => 'ARRAY',
+        Search       => {
+            AND => [
+                {
+                    Operator => 'IN',
+                    Field    => 'DynamicField_AddressDomainPattern',
+                    Value    => $Pattern
+                }
+            ]
+        },
+        Sort => [
+            {
+                Field     => 'Number',
+                Direction => 'ASCENDING'
+            }
+        ],
+        UserID   => 1,
+        UserType => 'Agent'
     );
-    return if ( !%Organisations );
 
-    # TODO: get sorted list directly from ObjectSearch
-    # prepare hash for sort by number
-    my %OrganisationNumbers;
-    for my $OrganisationID ( keys ( %Organisations ) ) {
-        my $OrganisationNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            ID     => $OrganisationID,
-            Silent => 1,
-        );
-        next if ( !$OrganisationNumber );
-
-        $OrganisationNumbers{ $OrganisationID } = $OrganisationNumber;
-    }
-
-    # map organisation ids to an array sorted by organisation number
-    my @OrganisationIDs  = sort { $OrganisationNumbers{ $a } cmp $OrganisationNumbers{ $b } } ( keys( %OrganisationNumbers ) );
+    return if ( !@OrganisationIDs );
 
     # update contact with found organisations
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(

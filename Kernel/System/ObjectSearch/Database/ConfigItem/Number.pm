@@ -80,20 +80,13 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my @Where = $Self->GetOperation(
         Operator      => $Param{Search}->{Operator},
         Column        => 'ci.configitem_number',
         Value         => $Param{Search}->{Value},
         CaseSensitive => 1,
-        IsOR          => $Param{BoolOperator} || 0,
         Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
@@ -123,6 +116,9 @@ run this module and return the SQL extensions
 
 sub Sort {
     my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
 
     return {
         Select => [

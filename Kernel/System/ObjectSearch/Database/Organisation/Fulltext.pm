@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::PendingReminder;
+package Kernel::System::ObjectSearch::Database::Organisation::Fulltext;
 
 use strict;
 use warnings;
@@ -16,13 +16,12 @@ use base qw(
 );
 
 our @ObjectDependencies = qw(
-    Config
     Log
 );
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::PendingReminder - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Organisation::Fulltext - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -52,24 +51,22 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        'PendingReminderRequired' => {
+        Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => []
+            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
     };
 
     return $Self->{Supported};
 }
 
-
 =item Search()
 
 run this module and return the SQL extensions
 
     my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
+        Search => {}
     );
 
     $Result = {
@@ -80,41 +77,30 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $HistoryTypeID = $Kernel::OM->Get('Ticket')->HistoryTypeLookup(
-        Type => 'SendAgentNotification',
-    );
-
-    my $BeginOfDay = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-        SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => '00:00:00'
+    my %Search;
+    for my $Field (
+        qw(
+            Name Number Street
+            Zip City Country Url
         )
-    );
-
-    my $Now = $Kernel::OM->Get('Time')->SystemTime();
-
-    push(
-        @SQLWhere,
-        <<"END"
-st.until_time < $Now
-    AND NOT EXISTS (
-        SELECT id
-        FROM ticket_history
-        WHERE history_type_id = $HistoryTypeID
-            AND ticket_id = st.id
-            AND create_time >= '$BeginOfDay'
-    )
-END
-    );
+    ) {
+        push (
+            @{$Search{OR}},
+            {
+                Field    => $Field,
+                Operator => $Param{Search}->{Operator},
+                Type     => 'STRING',
+                Value    => $Param{Search}->{Value}
+            }
+        );
+    }
 
     return {
-        Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Search => \%Search,
     };
 }
 

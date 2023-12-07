@@ -170,6 +170,17 @@ sub Search {
         SQLDef => $SQLDef,
         Silent => $Param{Silent}
     );
+
+    if ( $Param{Debug} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => <<"END"
+ObjectSearch SQL-Limit: $Param{Limit}
+ObjectSearch SQL-Statement: $SQL
+END
+        );
+    }
+
     return if ( !$SQL );
 
     # prepare database query

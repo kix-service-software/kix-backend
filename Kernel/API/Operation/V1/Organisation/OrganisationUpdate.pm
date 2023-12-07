@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -109,10 +109,11 @@ sub Run {
 
     # check if Number already exists
     if ( IsStringWithData($Organisation->{Number}) ) {
-        my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
             Number => $Organisation->{Number},
+            Silent => 1,
         );
-        if ( %OrganisationSearch && (scalar(keys %OrganisationSearch) > 1 || !$OrganisationSearch{$OrganisationData{ID}})) {
+        if ( $ID && $ID != $Param{Data}->{OrganisationID} ) {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update organisation. Another organisation with this number already exists.',

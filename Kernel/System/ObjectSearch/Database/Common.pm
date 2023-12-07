@@ -123,6 +123,10 @@ sub PrepareFieldAndValue {
     my $Field = $Param{Field};
     my $Value = $Param{Value};
 
+    if ( $Param{LikeEscapeString} ) {
+        $Value = $Kernel::OM->Get('DB')->Quote( $Value, 'Like' );
+    }
+
     # check if database supports LIKE in large text types
     if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
         if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('LcaseLikeInLargeText') ) {
@@ -316,12 +320,12 @@ sub _OperationEQ {
 
     if (
         defined( $Value )
-        && $Value ne ''
+        && $Value ne q{}
     ) {
 
-        my $Str = $Param{Quotes}->{SQL}
+        my $Str = $Param{Quotes}->{PreSQL}
             . $Value
-            . $Param{Quotes}->{SQL};
+            . $Param{Quotes}->{SufSQL};
 
         if ( $Param{CaseSensitive} ) {
             return "LOWER($Param{Column}) = LOWER($Str)";
@@ -341,12 +345,12 @@ sub _OperationNE {
 
     if (
         defined( $Value )
-        && $Value ne ''
+        && $Value ne q{}
     ) {
 
-        my $Str = $Param{Quotes}->{SQL}
+        my $Str = $Param{Quotes}->{PreSQL}
             . $Value
-            . $Param{Quotes}->{SQL};
+            . $Param{Quotes}->{SufSQL};
 
         if ( $Param{CaseSensitive} ) {
             return "LOWER($Param{Column}) != LOWER($Str)";
@@ -376,9 +380,9 @@ sub _OperationSTARTSWITH {
 
         my @SQL;
         for my $Val ( @{$Value}) {
-            my $Str = $Param{Quotes}->{SQL}
+            my $Str = $Param{Quotes}->{PreSQL}
                 . $Val
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
             if ( $Param{Prepare} ) {
                 my ($Col, $PreVal) = $Self->PrepareFieldAndValue(
@@ -428,9 +432,9 @@ sub _OperationENDSWITH {
 
         my @SQL;
         for my $Val ( @{$Value}) {
-            my $Str = $Param{Quotes}->{SQL}
+            my $Str = $Param{Quotes}->{PreSQL}
                 . $Val
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
             if ( $Param{Prepare} ) {
                 my ($Col, $PreVal) = $Self->PrepareFieldAndValue(
@@ -480,9 +484,9 @@ sub _OperationCONTAINS {
 
         my @SQL;
         for my $Val ( @{$Value}) {
-            my $Str = $Param{Quotes}->{SQL}
+            my $Str = $Param{Quotes}->{PreSQL}
                 . $Val
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
             if ( $Param{Prepare} ) {
                 my ($Col, $PreVal) = $Self->PrepareFieldAndValue(
@@ -533,10 +537,11 @@ sub _OperationLIKE {
         my @SQL;
         for my $Val ( @{$Value}) {
             $Val =~ s/[*]/%/gms;
+            $Val =~ s/[%]+/%/gms;
 
-            my $Str = $Param{Quotes}->{SQL}
+            my $Str = $Param{Quotes}->{PreSQL}
                 . $Val
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
             if ( $Param{Prepare} ) {
                 my ($Col, $PreVal) = $Self->PrepareFieldAndValue(
@@ -544,6 +549,17 @@ sub _OperationLIKE {
                     Value          => $Val,
                     IsStaticSearch => $Param{IsStaticSearch}
                 );
+
+                if ( $Param{LikeEscapeString} ) {
+                    my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
+
+                    push(
+                        @SQL,
+                        "$Col LIKE $PreVal $LikeEscapeString"
+                    );
+                    next;
+                }
+
                 push(
                     @SQL,
                     "$Col LIKE $PreVal"
@@ -590,9 +606,13 @@ sub _OperationIN {
 
     if (IsArrayRefWithData($Param{Value})) {
 
-        my $Value = $Param{Quotes}->{SQL}
+        my $Value = $Param{Quotes}->{PreSQL}
             . join($Param{Quotes}->{Join}, @{$Param{Value}})
-            . $Param{Quotes}->{SQL};
+            . $Param{Quotes}->{SufSQL};
+
+        if ( $Param{CaseSensitive} ) {
+            return "LOWER($Param{Column}) IN ($Value)";
+        }
 
         return "$Param{Column} IN ($Value)";
     }
@@ -606,9 +626,13 @@ sub _OperationNOTIN {
 
     if (IsArrayRefWithData($Param{Value})) {
 
-        my $Value = $Param{Quotes}->{SQL}
+        my $Value = $Param{Quotes}->{PreSQL}
             . join($Param{Quotes}->{Join}, @{$Param{Value}})
-            . $Param{Quotes}->{SQL};
+            . $Param{Quotes}->{SufSQL};
+
+        if ( $Param{CaseSensitive} ) {
+            return "LOWER($Param{Column}) NOT IN ($Value)";
+        }
 
         return "$Param{Column} NOT IN ($Value)";
     }
@@ -623,14 +647,22 @@ sub _OperationLT {
 
         my @SQL;
         for my $Value ( @{$Param{Value}}) {
-            $Value = $Param{Quotes}->{SQL}
+            $Value = $Param{Quotes}->{PreSQL}
                 . $Value
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
-            push(
-                @SQL,
-                "$Param{Column} < $Value"
-            );
+            if ( $Param{CaseSensitive} ) {
+                push(
+                    @SQL,
+                    "LOWER($Param{Column}) < $Value"
+                );
+            }
+            else {
+                push(
+                    @SQL,
+                    "$Param{Column} < $Value"
+                );
+            }
         }
 
         if ( @SQL ) {
@@ -652,14 +684,22 @@ sub _OperationLTE {
 
         my @SQL;
         for my $Value ( @{$Param{Value}}) {
-            $Value = $Param{Quotes}->{SQL}
+            $Value = $Param{Quotes}->{PreSQL}
                 . $Value
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
-            push(
-                @SQL,
-                "$Param{Column} <= $Value"
-            );
+            if ( $Param{CaseSensitive} ) {
+                push(
+                    @SQL,
+                    "LOWER($Param{Column}) <= $Value"
+                );
+            }
+            else {
+                push(
+                    @SQL,
+                    "$Param{Column} <= $Value"
+                );
+            }
         }
 
         if ( @SQL ) {
@@ -681,14 +721,22 @@ sub _OperationGT {
 
         my @SQL;
         for my $Value ( @{$Param{Value}}) {
-            $Value = $Param{Quotes}->{SQL}
+            $Value = $Param{Quotes}->{PreSQL}
                 . $Value
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
-            push(
-                @SQL,
-                "$Param{Column} > $Value"
-            );
+            if ( $Param{CaseSensitive} ) {
+                push(
+                    @SQL,
+                    "LOWER($Param{Column}) > $Value"
+                );
+            }
+            else {
+                push(
+                    @SQL,
+                    "$Param{Column} > $Value"
+                );
+            }
         }
 
         if ( @SQL ) {
@@ -710,14 +758,22 @@ sub _OperationGTE {
 
         my @SQL;
         for my $Value ( @{$Param{Value}}) {
-            $Value = $Param{Quotes}->{SQL}
+            $Value = $Param{Quotes}->{PreSQL}
                 . $Value
-                . $Param{Quotes}->{SQL};
+                . $Param{Quotes}->{SufSQL};
 
-            push(
-                @SQL,
-                "$Param{Column} >= $Value"
-            );
+            if ( $Param{CaseSensitive} ) {
+                push(
+                    @SQL,
+                    "LOWER($Param{Column}) >= $Value"
+                );
+            }
+            else {
+                push(
+                    @SQL,
+                    "$Param{Column} >= $Value"
+                );
+            }
         }
 
         if ( @SQL ) {
@@ -739,15 +795,27 @@ sub _GetQuotes {
         defined $Param{Type}
         && $Param{Type} eq 'NUMERIC'
     ) {
+        if (
+            defined $Param{Type}
+            && $Param{CaseSensitive}
+        ) {
+            return {
+                PreSQL  => q{LOWER(},
+                SufSQL  => q{)},
+                Join    => q{),LOWER(}
+        };
+        }
         return {
-            SQL  => q{},
-            Join => q{,}
+            PreSQL  => q{},
+            SufSQL  => q{},
+            Join    => q{,}
         };
     }
 
     return {
-        SQL  => q{'},
-        Join => q{','}
+        PreSQL  => q{'},
+        SufSQL  => q{'},
+        Join    => q{','}
     };
 }
 

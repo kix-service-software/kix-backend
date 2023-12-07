@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::DynamicField;
+package Kernel::System::ObjectSearch::Database::Organisation::DynamicField;
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ sub GetSupportedAttributes {
 
     # get all valid dynamic fields for object type ticket
     my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-        ObjectType => 'Ticket',
+        ObjectType => 'Organisation',
         Valid      => 1
     );
 
@@ -207,56 +207,22 @@ sub Search {
     my $JoinTable = "dfv$Count";
     $Param{Flags}->{DynamicFieldJoin}->{$DFName} = $JoinTable;
 
-    if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push(
-                @SQLJoin,
-                <<"END"
-LEFT JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
+    if ( $Param{BoolOperator} eq 'OR') {
+        push(
+            @SQLJoin,
+            <<"END"
+LEFT JOIN dynamic_field_value $JoinTable ON o.id = $JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
 END
-            );
-        } else {
-            push(
-                @SQLJoin,
-                <<"END"
-INNER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
+        );
+    } else {
+        push(
+            @SQLJoin,
+            <<"END"
+INNER JOIN dynamic_field_value $JoinTable ON o.id = $JoinTable.object_id
     AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
 END
-            );
-        }
-    }
-    elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            if ( !$Param{Flags}->{ArticleTableJoined} ) {
-                push( @SQLJoin, "LEFT OUTER JOIN article artdfjoin_left ON st.id = artdfjoin_left.ticket_id");
-                # FIXME: maybe unnecessary?
-                push( @SQLJoin, "RIGHT OUTER JOIN article artdfjoin_right ON st.id = artdfjoin_right.ticket_id");
-                $Param{Flags}->{ArticleTableJoined} = 1;
-            }
-            # FIXME: maybe LEFT JOIN necessary?
-            push(
-                @SQLJoin,
-                <<"END"
-INNER JOIN dynamic_field_value $JoinTable ON (
-    artdfjoin_left.id = $JoinTable.object_id
-        OR artdfjoin_right.id = $JoinTable.object_id
-    ) AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-END
-            );
-        } else {
-            if ( !$Param{Flags}->{ArticleTableJoined} ) {
-                push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
-                $Param{Flags}->{ArticleTableJoined} = 1;
-            }
-            push(
-                @SQLJoin,
-                <<"END"
-INNER JOIN dynamic_field_value $JoinTable ON artdfjoin.id) = $JoinTable.object_id
-    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-END
-            );
-        }
+        );
     }
 
     my $DynamicFieldSQL;
@@ -360,30 +326,14 @@ sub Sort {
         my $Count = $Param{Flags}->{DynamicFieldJoinCounter}++;
 
         $JoinTable = "dfv$Count";
-        if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
-            push(
-                @SQLJoin,
-                <<"END"
-LEFT OUTER JOIN dynamic_field_value $JoinTable ON st.id = $JoinTable.object_id
-    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-    AND $JoinTable.first_value = 1
+        push(
+            @SQLJoin,
+            <<"END"
+LEFT OUTER JOIN dynamic_field_value $JoinTable ON o.id = $JoinTable.object_id
+AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
+AND $JoinTable.first_value = 1
 END
-            );
-        }
-        elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
-            if ( !$Param{Flags}->{ArticleTableJoined} ) {
-                push( @SQLJoin, "INNER JOIN article artdfjoin ON st.id = artdfjoin.ticket_id");
-                $Param{Flags}->{ArticleTableJoined} = 1;
-            }
-            push(
-                @SQLJoin,
-                <<"END"
-LEFT OUTER JOIN dynamic_field_value $JoinTable ON artdfjoin.id =$JoinTable.object_id
-    AND $JoinTable.field_id = $DynamicFieldConfig->{ID}
-    AND $JoinTable.first_value = 1
-END
-            );
-        }
+        );
     }
 
     # get field specific SQL

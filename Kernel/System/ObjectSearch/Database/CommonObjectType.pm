@@ -187,6 +187,35 @@ sub GetSearchDef {
                 }
                 return;
             }
+            elsif ( ref( $AttributeDef->{Search} ) eq 'HASH' ) {
+                $AttributeDef = $Self->GetSearchDef(
+                    Flags    => $Param{Flags},
+                    Search   => $AttributeDef->{Search},
+                    UserType => $Param{UserType},
+                    UserID   => $Param{UserID},
+                    Silent   => $Param{Silent}
+                );
+
+                if ( !IsHashRef($AttributeDef) ) {
+                    if ( !$Param{Silent} ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "Unable to prepare search for attribute $Attribute!",
+                        );
+                    }
+                    return;
+                }
+
+                # special handling for Where def
+                if (
+                    ref( $AttributeDef->{Where} ) eq 'ARRAY'
+                    && @{ $AttributeDef->{Where} }
+                ) {
+                    $AttributeDef->{Where} = [
+                        q{(} . join( ' AND ', @{ $AttributeDef->{Where} } ) . q{)}
+                    ];
+                }
+            }
 
             for my $Key ( keys( %{ $AttributeDef } ) ) {
                 # special handling for where statement, when boolean is 'OR'
