@@ -209,6 +209,35 @@ $Self->Is(
     "Counter \"WatchedAndUnseen\" (UserID: $UserID1) is 1",
 );
 
+# try adding the same object again to see if some unique key violation occurs
+$Success = $Kernel::OM->Get('User')->AddUserCounterObject(
+    Category => 'Ticket',
+    Counter  => 'WatchedAndUnseen',
+    ObjectID => $TicketID,
+    UserID   => $UserID1,
+);
+
+# sanity check
+$Self->True(
+    $Success,
+    "AddUserCounterObject() duplicate for Ticket ID $TicketID",
+);
+
+# check counters
+%Counters = $Kernel::OM->Get('User')->GetUserCounters(
+    UserID => $UserID1
+);
+$Self->Is(
+    $Counters{Ticket}->{Watched},
+    1,
+    "Counter \"Watched\" (UserID: $UserID1) is 1",
+);
+$Self->Is(
+    $Counters{Ticket}->{WatchedAndUnseen},
+    1,
+    "Counter \"WatchedAndUnseen\" (UserID: $UserID1) is 1",
+);
+
 $Success = $Kernel::OM->Get('Watcher')->WatcherDelete(
     Object      => 'Ticket',
     ObjectID    => $TicketID,
@@ -419,7 +448,7 @@ $Self->Is(
     "Counter \"OwnedAndLockedAndUnseen\" (UserID: $UserID2) is 1",
 );
 
-my $Success = $Kernel::OM->Get('Ticket')->TicketLockSet(
+$Success = $Kernel::OM->Get('Ticket')->TicketLockSet(
     TicketID => $TicketID2,
     Lock     => 'lock',
     UserID   => $UserID2,
@@ -513,7 +542,7 @@ $Self->Is(
 );
 
 # set non-viewable state
-my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
+$Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
     TicketID => $TicketID2,
     State    => 'merged',
     UserID   => $UserID2,
@@ -546,7 +575,7 @@ $Self->False(
 );
 
 # set non-viewable state
-my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
+$Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
     TicketID => $TicketID2,
     State    => 'open',
     UserID   => $UserID2,
