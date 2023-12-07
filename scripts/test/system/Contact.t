@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -195,13 +195,29 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     );
 
     # search by OrganisationID
-    my %List = $ContactObject->ContactSearch(
-        OrganisationID => $OrganisationIDForUpdate,
-        ValidID        => 1,
+    my %List = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EQ',
+                    Value    => $OrganisationIDForUpdate
+                },
+                {
+                    Field    => 'Valid',
+                    Operator => 'EQ',
+                    Value    => 'valid'
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'HASH',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
     $Self->True(
         $List{$ContactID},
-        "ContactSearch() - PrimaryOrganisationID=\'$OrganisationIDForUpdate\' - $ContactID is found",
+        "ObjectSearch - Contact - PrimaryOrganisationID=\'$OrganisationIDForUpdate\' - $ContactID is found",
     );
 
     # START CaseSensitive
@@ -213,210 +229,406 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     $CacheObject->CleanUp();
 
     # Customer Search
-    %List = $ContactObject->ContactSearch(
-        Search  => lc( $ContactRandom . '-Customer-Update-Id' ),
-        ValidID => 1,
+    %List = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'EQ',
+                    Value    => lc( $ContactRandom . '-Customer-Update-Id' )
+                },
+                {
+                    Field    => 'Valid',
+                    Operator => 'EQ',
+                    Value    => 'valid'
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'HASH',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     if ($DatabaseCaseSensitive) {
 
         $Self->False(
             $List{$ContactID},
-            "ContactSearch() - ContactID - $ContactID (SearchCaseSensitive = 1)",
+            "ObjectSearch - Contact - ContactID - $ContactID (SearchCaseSensitive = 1)",
         );
     } else {
         $Self->True(
             $List{$ContactID},
-            "ContactSearch() - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
+            "ObjectSearch - Contact - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
         );
     }
 
-    %List = $ContactObject->ContactSearch(
-        Email   => 'test@example.org' . $Key,
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Email - $ContactID",
-    );
-    %List = $ContactObject->ContactSearch(
-        Email   => lc( 'test@example.org' . $Key ),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Email lc() - $ContactID",
-    );
-    %List = $ContactObject->ContactSearch(
-        Email   => uc( 'test@example.org' . $Key ),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Email uc() - $ContactID",
+    my @TestData = (
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'EQ',
+                        Value    => 'test@example.org' . $Key,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Email - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'EQ',
+                        Value    => lc( 'test@example.org' . $Key ),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Email lc() - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'EQ',
+                        Value    => uc( 'test@example.org' . $Key ),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Email uc() - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Login',
+                        Operator => 'EQ',
+                        Value    => $ContactRandom,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Login - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Login',
+                        Operator => 'EQ',
+                        Value    => lc($ContactRandom),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Login - lc - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Login',
+                        Operator => 'EQ',
+                        Value    => uc($ContactRandom),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Login - uc - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'EQ',
+                        Value    => $ContactRandom,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Fulltext '\$ContactID' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'EQ',
+                        Value    => 'Firstname Test Update' . $Key,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'EQ',
+                        Value    => 'Firstname Test Update' . $Key . 'not_match',
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Not    => 1,
+            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname_with_not_match' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'STARTSWITH',
+                        Value    => $ContactRandom,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext STARTSWITH '\$ContactRandom*' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'ENDSWITH',
+                        Value    => $ContactRandom,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext ENDSWITH '*\$ContactRandom' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'CONTAINS',
+                        Value    => $ContactRandom,
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext CONTAINS '*\$ContactRandom*' - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => lc("$ContactRandom"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc('') - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => lc("$ContactRandom*"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc('\$ContactRandom*') - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => lc("*$ContactRandom"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(\"*\$ContactRandom\") - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => lc("*$ContactRandom*"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext CONTAINS lc(\"\*$ContactRandom\") - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => lc("$ContactRandom"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc('') - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => uc("$ContactRandom*"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc('\$ContactRandom*') - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => uc("*$ContactRandom"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lucc(\"*\$ContactRandom\") - $ContactID",
+        },
+        {
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'LIKE',
+                        Value    => uc("*$ContactRandom*"),
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(\"\*$ContactRandom\") - $ContactID",
+        }
     );
 
-    %List = $ContactObject->ContactSearch(
-        Login   => $ContactRandom,
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Login - $ContactID",
-    );
-    %List = $ContactObject->ContactSearch(
-        Login   => lc($ContactRandom),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Login - lc - $ContactID",
-    );
-    %List = $ContactObject->ContactSearch(
-        Login   => uc($ContactRandom),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Login - uc - $ContactID",
-    );
+    for my $Test ( @TestData ) {
+        my %ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search     => $Test->{Search},
+            ObjectType => 'Contact',
+            Result     => 'HASH',
+            UserID     => 1,
+            UserType   => 'Agent'
+        );
 
-    %List = $ContactObject->ContactSearch(
-        Search  => $ContactRandom,
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search '\$ContactID' - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => 'Firstname Test Update' . $Key,
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search '\$ContactRandom+firstname' - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => 'Firstname Test Update' . $Key . 'not_match',
-        ValidID => 1,
-    );
-    $Self->True(
-        !$List{$ContactID},
-        "ContactSearch() - Search '\$ContactRandom+firstname_with_not_match' - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => "$ContactRandom*",
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search '\$ContactRandom*' - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => "*$ContactRandom",
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search '*\$ContactRandom' - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => "*$ContactRandom*",
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search '*\$ContactRandom*' - $ContactID",
-    );
-
-    # lc()
-    %List = $ContactObject->ContactSearch(
-        Search  => lc("$ContactRandom"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search lc('') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => lc("$ContactRandom*"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search lc('\$ContactRandom*') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => lc("*$ContactRandom"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search lc('*\$ContactRandom') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => lc("*$ContactRandom*"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search lc('*\$ContactRandom*') - $ContactID",
-    );
-
-    # uc()
-    %List = $ContactObject->ContactSearch(
-        Search  => uc("$ContactRandom"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search uc('\$ContactRandom') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => uc("$ContactRandom*"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search uc('\$ContactRandom*') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => uc("*$ContactRandom"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search uc('*\$ContactRandom') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => uc("*$ContactRandom*"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search uc('*\$ContactRandom*') - $ContactID",
-    );
-
-    %List = $ContactObject->ContactSearch(
-        Search  => uc("*$ContactRandom*"),
-        ValidID => 1,
-    );
-    $Self->True(
-        $List{$ContactID},
-        "ContactSearch() - Search uc('*\$ContactRandom*') - $ContactID",
-    );
+        if ( $Test->{Not} ) {
+            $Self->False(
+                $ContactList{$ContactID},
+                $Test->{Text},
+            );
+        }
+        else {
+            $Self->True(
+                $ContactList{$ContactID},
+                $Test->{Text},
+            );
+        }
+    }
 
     # check token support
     my $Token = $ContactObject->TokenGenerate(

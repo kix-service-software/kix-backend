@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Editor;
+package Kernel::System::ObjectSearch::Database::Contact::Editor;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Editor - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Contact::Editor - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -39,9 +39,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable   => 0|1,
+            IsSortable     => 0|1,
             IsSearchable => 0|1,
-            Operators    => []
+            Operators     => []
         },
     };
 
@@ -53,15 +53,13 @@ sub GetSupportedAttributes {
     $Self->{Supported} = {
         CreateBy => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
         },
         ChangeBy => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN']
         }
     };
 
@@ -88,11 +86,11 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
+    return if !$Self->_CheckSearchParams(%Param);
 
     my %AttributeMapping = (
-        'CreateBy' => 'st.create_by',
-        'ChangeBy' => 'st.change_by',
+        'CreateBy' => 'c.create_by',
+        'ChangeBy' => 'c.change_by',
     );
 
     my @Where = $Self->GetOperation(
@@ -110,6 +108,7 @@ sub Search {
         Where => \@SQLWhere,
     };
 }
+
 
 =item Sort()
 
@@ -140,12 +139,12 @@ sub Sort {
     my %Join;
     if ( $Param{Attribute} eq 'CreateBy' ) {
         $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = st.create_by'
+            'INNER JOIN contact ccr ON ccr.user_id = c.create_by'
         ];
     }
     elsif ( $Param{Attribute} eq 'ChangeBy' ) {
         $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = st.change_by'
+            'INNER JOIN contact cch ON cch.user_id = c.change_by'
         ];
     }
 
@@ -155,6 +154,7 @@ sub Sort {
         %Join
     };
 }
+
 1;
 
 

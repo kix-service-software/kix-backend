@@ -6,10 +6,12 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Editor;
+package Kernel::System::ObjectSearch::Database::Contact::UsageContext;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
@@ -21,7 +23,7 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Editor - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Contact::UsageContext - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -39,9 +41,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable   => 0|1,
+            IsSortable     => 0|1,
             IsSearchable => 0|1,
-            Operators    => []
+            Operators     => []
         },
     };
 
@@ -51,17 +53,15 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        CreateBy => {
+        IsAgent => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE']
         },
-        ChangeBy => {
+        IsCustomer => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            IsSortable   => 1,
+            Operators    => ['EQ','NE']
         }
     };
 
@@ -86,20 +86,34 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
     my @SQLWhere;
+    my @SQLJoin;
 
     # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
+    return if !$Self->_CheckSearchParams(%Param);
 
+    my $TableAlias = $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} // 'u';
+    if ( !$Param{Flags}->{UserJoin}->{$Param{BoolOperator}} ) {
+        my $Count = $Param{Flags}->{UserCounter}++;
+        $TableAlias .= $Count;
+        push(
+            @SQLJoin,
+            "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
+        );
+        $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} = $TableAlias;
+    }
+
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        'CreateBy' => 'st.create_by',
-        'ChangeBy' => 'st.change_by',
+        IsAgent    => "$TableAlias.is_agent",
+        IsCustomer => "$TableAlias.is_customer"
     );
 
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        Type      => 'NUMERIC'
     );
 
     return if !@Where;
@@ -108,6 +122,7 @@ sub Search {
 
     return {
         Where => \@SQLWhere,
+        Join  => \@SQLJoin
     };
 }
 
@@ -130,31 +145,39 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if !$Self->_CheckSortParams(%Param);
 
+    my @SQLJoin;
+    my $TableAlias = $Param{Flags}->{UserJoin}->{AND} // 'u';
+    if ( !$Param{Flags}->{UserJoin}->{AND} ) {
+        my $Count = $Param{Flags}->{UserCounter}++;
+        $TableAlias .= $Count;
+        push(
+            @SQLJoin,
+            "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
+        );
+        $Param{Flags}->{UserJoin}->{AND} = $TableAlias;
+    }
+
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        CreateBy => ['ccr.lastname', 'ccr.firstname'],
-        ChangeBy => ['cch.lastname', 'cch.firstname'],
+        IsAgent    => "COALESCE($TableAlias.is_agent,0) AS isagent",
+        IsCustomer => "COALESCE($TableAlias.is_customer,0) AS iscustomer"
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'CreateBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = st.create_by'
-        ];
-    }
-    elsif ( $Param{Attribute} eq 'ChangeBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = st.change_by'
-        ];
-    }
+    # map search attributes to table attributes
+    my %AttributeOrderMapping = (
+        IsAgent    => 'isagent',
+        IsCustomer => 'iscustomer'
+    );
 
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy  => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Select  => [$AttributeMapping{$Param{Attribute}}],
+        OrderBy => [$AttributeOrderMapping{$Param{Attribute}}],
+        Join    => \@SQLJoin
     };
 }
+
 1;
 
 

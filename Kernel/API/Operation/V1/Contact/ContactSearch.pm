@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -28,6 +28,16 @@ Kernel::API::Operation::Contact::ContactSearch - API Contact Search Operation ba
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item Run()
 
@@ -61,107 +71,16 @@ sub Run {
         ]
     );
 
-    # prepare search if given
-    if ( IsHashRefWithData( $Self->{Search}->{Contact} ) ) {
-        # do first OR to prevent replacement of prior AND search with empty result
-        my %SearchParams;
-        SEARCHTYPE:
-        foreach my $SearchType ( qw(OR AND) ) {
-            next SEARCHTYPE if ( !IsArrayRefWithData($Self->{Search}->{Contact}->{$SearchType}) );
-            my @SearchTypeResult;
-            foreach my $SearchItem ( @{ $Self->{Search}->{Contact}->{$SearchType} } ) {
-
-                my $Value = $SearchItem->{Value};
-
-                if ( $SearchItem->{Operator} eq 'CONTAINS' ) {
-                    $Value = '*' . $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'STARTSWITH' ) {
-                    $Value = $Value . '*';
-                } elsif ( $SearchItem->{Operator} eq 'ENDSWITH' ) {
-                    $Value = '*' . $Value;
-                } elsif ( $SearchItem->{Operator} eq 'LIKE' ) {
-                    $Value .= '*';
-                    # just prefix needed as config, because some DB do not use indices with leading wildcard - performance!
-                    if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
-                        $Value = '*' . $Value;
-                    }
-                }
-
-                if ( $SearchItem->{Field} =~ /^(Login|UserLogin)$/ ) {
-                    if ( $SearchItem->{Operator} eq 'EQ' ) {
-                        $SearchParams{LoginEquals} = $Value;
-                    } else {
-                        $SearchParams{Login} = $Value;
-                    }
-                } elsif ( $SearchItem->{Field} =~ /^(AssignedUserID|UserID|OrganisationIDs|Title|Firstname|Lastname|City|Country|Fax|Mobil|Phone|Street|Zip|ValidID)$/ ) {
-                    $SearchParams{$SearchItem->{Field}} = $Value;
-                } elsif ( $SearchItem->{Field} eq 'Email' ) {
-                    if ($SearchItem->{Operator} eq 'EQ') {
-                        $SearchParams{EmailEquals} = $Value;
-                    } elsif ($SearchItem->{Operator} eq 'IN') {
-                        $SearchParams{EmailIn} = $Value;
-                    } else {
-                        $SearchParams{Email} = $Value;
-                    }
-                } elsif ( $SearchItem->{Field} eq 'PrimaryOrganisationID' ) {
-                    $SearchParams{OrganisationID} = $Value;
-                } elsif ($SearchItem->{Field} =~ /^DynamicField_/smx ) {
-                    $SearchParams{DynamicField} = {
-                        Field    => $SearchItem->{Field},
-                        Operator => $SearchItem->{Operator},
-                        Value    => $Value
-                    };
-                } else {
-                    $SearchParams{Search} = $Value;
-                }
-
-                # merge results
-                if ( $SearchType eq 'OR' ) {
-                    my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                        %SearchParams,
-                        Valid => 0,
-                        Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
-                    );
-
-                    @SearchTypeResult = $Kernel::OM->Get('Main')->GetCombinedList(
-                        ListA => \@SearchTypeResult,
-                        ListB => [ keys %SearchResult ],
-                        Union => 1
-                    );
-
-                    # reset
-                    %SearchParams = ();
-                }
-            }
-            if ( $SearchType eq 'AND' ) {
-                my %SearchResult = $Kernel::OM->Get('Contact')->ContactSearch(
-                    %SearchParams,
-                    Valid => 0,
-                    Limit => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
-                );
-                @SearchTypeResult = %SearchResult ? @{[keys %SearchResult]} : ();
-            }
-
-            if ( !@ContactList ) {
-                @ContactList = @SearchTypeResult;
-            } else {
-
-                # combine both results (OR and AND)
-                # remove all IDs from type result that we don't have in this search
-                @ContactList = $Kernel::OM->Get('Main')->GetCombinedList(
-                    ListA => \@SearchTypeResult,
-                    ListB => \@ContactList
-                );
-            }
-        }
-    } else {
-
-        # get full contact list
-        my %ContactList = $Kernel::OM->Get('Contact')->ContactList(
-            Valid => 0
-        );
-        @ContactList = %ContactList ? @{[keys %ContactList]} : ();
-    }
+    @ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{Contact}      || {},
+        Limit      => $Self->{SearchLimit}->{Contact} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Contact}        || $Self->{DefaultSort}->{Contact},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
+        Debug      => $Param{Data}->{debug} || 0
+    );
 
     if ( IsArrayRefWithData( \@ContactList ) ) {
 
@@ -170,7 +89,7 @@ sub Run {
             OperationType            => 'V1::Contact::ContactGet',
             SuppressPermissionErrors => 1,
             Data          => {
-                ContactID                   => join( ',', sort @ContactList ),
+                ContactID                   => join( q{,}, @ContactList ),
                 NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
             }
         );

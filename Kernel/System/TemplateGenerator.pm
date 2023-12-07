@@ -71,9 +71,7 @@ sub new {
 
     $Self->{RichText} = $Kernel::OM->Get('Config')->Get('Frontend::RichText');
 
-    # KIX4OTRS-capeIT
     $Self->{UserLanguage} = $Param{UserLanguage};
-    # EO KIX4OTRS-capeIT
 
     return $Self;
 }
@@ -380,7 +378,6 @@ sub NotificationEvent {
         }
     }
 
-    # KIX4OTRS-capeIT
     # get customer article data for replacing
     # (KIX_COMMENT and KIX_CUSTOMER_BODY and KIX_CUSTOMER_EMAIL could be the same)
     $Param{CustomerMessageParams}->{CustomerBody} = $Article{Body} || '';
@@ -391,8 +388,6 @@ sub NotificationEvent {
     {
         $Param{CustomerMessageParams}->{CustomerBody} =~ s/(^>.+|.{4,86})(?:\s|\z)/$1\n/gm;
     }
-
-    # EO KIX4OTRS-capeIT
 
     # fill up required attributes
     for my $Text (qw(Subject Body)) {
@@ -453,11 +448,7 @@ sub NotificationEvent {
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
-
-        # KIX4OTRS-capeIT
         ArticleID => $Param{ArticleID} || '',
-
-        # EO KIX4OTRS-capeIT
     );
     $Notification{Subject} = $Self->_Replace(
         RichText  => 0,
@@ -469,11 +460,7 @@ sub NotificationEvent {
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
-
-        # KIX4OTRS-capeIT
         ArticleID => $Param{ArticleID} || '',
-
-        # EO KIX4OTRS-capeIT
     );
 
     my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
@@ -497,8 +484,6 @@ sub NotificationEvent {
 
     return %Notification;
 }
-
-# KIX4OTRS-capeIT
 
 =item ReplacePlaceHolder()
     just a wrapper for external access to sub _Replace
@@ -541,8 +526,6 @@ sub ReplacePlaceHolder {
         %Param,
     );
 }
-
-# EO KIX4OTRS-capeIT
 
 =begin Internal:
 
@@ -625,6 +608,13 @@ sub _Replace {
         $Param{ObjectType} = 'Ticket';
         $Param{ObjectID}   = $Param{TicketID};
     }
+    elsif (
+        defined $Param{Data}
+        && IsHashRefWithData($Param{Data}->{Ticket})
+    ) {
+        %Ticket = %{$Param{Data}->{Ticket}};
+        $Param{ObjectType} = 'Ticket';
+    }
 
     # translate ticket values if needed
     if ( $Param{Language} ) {
@@ -635,6 +625,7 @@ sub _Replace {
 
         # Translate the different values.
         for my $Field (qw(Type State StateType Lock Priority)) {
+            next if !defined $Ticket{$Field};
             $Ticket{$Field} = $LanguageObject->Translate( $Ticket{$Field} );
         }
 

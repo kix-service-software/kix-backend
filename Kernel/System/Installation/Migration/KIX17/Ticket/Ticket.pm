@@ -315,11 +315,21 @@ sub _AssignContact {
         }
     }
 
-    my $ContactObject = $Kernel::OM->Get('Contact');
-
     # lookup contact
-    my @ContactIDs = $ContactObject->ContactSearch(
-        LoginEquals => $Param{Ticket}->{customer_user_id},
+    my @ContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Login',
+                    Operator => 'EQ',
+                    Value    => $Param{Ticket}->{customer_user_id}
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
     my $ContactID = IsArrayRefWithData(\@ContactIDs) ? $ContactIDs[0] : undef;
 
@@ -341,17 +351,17 @@ sub _AssignContact {
             return;
         }
 
-        my @NameChunks = split(' ', $ContactEmailRealname);
-        $ContactID = $ContactObject->ContactLookup(
+        my @NameChunks = split(q{ }, $ContactEmailRealname);
+        $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $ContactEmail,
             Silent => 1,
         );
 
         if ( !$ContactID ) {
             # create a new contact
-            $ContactID = $ContactObject->ContactAdd(
+            $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
                 Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                Lastname              => (@NameChunks) ? join(q{ }, splice(@NameChunks, 1)) : $ContactEmail,
                 Email                 => $ContactEmail,
                 PrimaryOrganisationID => $Param{Ticket}->{organisation_id},
                 ValidID               => 1,

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -20,6 +20,7 @@ our @ObjectDependencies = (
     'CheckItem',
     'Crypt::SMIME',
     'Contact',
+    'ObjectSearch',
 );
 
 sub Configure {
@@ -116,19 +117,31 @@ sub Run {
     my $ContactObject = $Kernel::OM->Get('Contact');
 
     # Check customer user for UserSMIMECertificate property
-    my %Contacts = $ContactObject->ContactSearch(
-        Email => '*',
+    my @Contacts = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Emails',
+                    Operator => 'LIKE',
+                    Value    => q{*}
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     CONTACT:
-    for my $ContactID ( sort keys %Contacts ) {
-        my %Contact = $ContactObject->ContactGet(
+    for my $ContactID ( @Contacts ) {
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $ContactID,
         );
 
         next CONTACT if !$Contact{UserSMIMECertificate};
 
-        $Self->Print("  Searching SMIME certificates for <yellow>$Contacts{$ContactID}</yellow>...");
+        $Self->Print("  Searching SMIME certificates for <yellow>$Contact{Email}</yellow>...");
 
         if ( $ListOfCertificates->{ $Contact{UserSMIMECertificate} } ) {
             $Self->Print(" Already added\n");
