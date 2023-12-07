@@ -172,18 +172,13 @@ sub Run {
     # get customer id if X-KIX-Organisation is given
     if ( $GetParam{'X-KIX-Organisation'} ) {
 
-        # get organisation object
-        my $OrgObject = $Kernel::OM->Get('Organisation');
-
-        # search organisation based on X-KIX-Organisation
-        my %OrgList = $OrgObject->OrganisationSearch(
-            Number => $GetParam{'X-KIX-Organisation'},
-            Limit  => 1,
-            Valid  => 0
+        # check if it is a valid Organisation
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            Number => $GetParam{'X-KIX-Organisation'}
         );
 
-        if (%OrgList) {
-            $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
+        if ($ID) {
+            $GetParam{'X-KIX-Organisation'}  = $ID;
         }
     }
 

@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::TicketTimes;
+package Kernel::System::ObjectSearch::Database::Organisation::Times;
 
 use strict;
 use warnings;
@@ -16,13 +16,12 @@ use base qw(
 );
 
 our @ObjectDependencies = qw(
-    Config
     Log
 );
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::TicketTimes - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Organisation::Times - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -52,30 +51,16 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        'Age'            => {
+        CreateTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
         },
-        'CreateTime'     => {
+        ChangeTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
-        },
-        'PendingTime'    => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
-        },
-        'LastChangeTime' => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
-        },
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+        }
     };
 
     return $Self->{Supported};
@@ -97,60 +82,50 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my $Value;
+    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Age             => 'st.create_time_unix',
-        CreateTime      => 'st.create_time_unix',
-        PendingTime     => 'st.until_time',
-        LastChangeTime  => 'st.change_time',
+        CreateTime => 'o.create_time',
+        ChangeTime => 'o.change_time',
     );
 
-    my $Type = 'NUMERIC';
-    my $Value;
-    if ( $Param{Search}->{Field} eq 'Age' ) {
-        # calculate unixtime
-        $Value = $Kernel::OM->Get('Time')->SystemTime() - $Param{Search}->{Value};
-    }
-    else {
-        # convert to unix time and check
-        $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $Param{Search}->{Value},
-            Silent => 1,
+    return q{} if !$Param{Search}->{Value};
+
+    # calculate relative times
+    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => $Param{Search}->{Value}
+    );
+
+    if ( !$SystemTime ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
         );
-        if ( !$Value ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Invalid Date '$Param{Search}->{Value}'!",
-            );
-
-            return;
-        }
-
-        if ( $Param{Search}->{Field} eq 'LastChangeTime' ) {
-            # convert back to timestamp (relative calculations have been done above)
-            $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-                SystemTime => $Value
-            );
-            $Type = 'STRING';
-        }
+        return;
     }
 
-    my @SQLWhere;
+    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $SystemTime
+    );
+
+    # quote
+    $Value = $Kernel::OM->Get('DB')->Quote( $Value );
+
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Value,
-        Type      => $Type,
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
     return if !@Where;
 
-    push( @SQLWhere, @Where);
+    push( @SQLWhere, @Where );
 
     return {
         Where => \@SQLWhere,
@@ -180,10 +155,8 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Age                    => 'st.create_time_unix',
-        CreateTime             => 'st.create_time_unix',
-        PendingTime            => 'st.until_time',
-        LastChangeTime         => 'st.change_time',
+        CreateTime => 'o.create_time',
+        ChangeTime => 'o.change_time',
     );
 
     return {
@@ -193,7 +166,6 @@ sub Sort {
         OrderBy => [
             $AttributeMapping{$Param{Attribute}}
         ],
-        OrderBySwitch => ($Param{Attribute} eq 'Age') ? 1 : undef
     };
 }
 

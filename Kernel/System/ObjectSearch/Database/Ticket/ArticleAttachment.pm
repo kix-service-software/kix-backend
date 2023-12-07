@@ -85,13 +85,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
     if ( $StorageModule !~ /::ArticleStorageDB$/ ) {

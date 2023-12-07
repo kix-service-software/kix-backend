@@ -116,13 +116,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my @Where;
     my $Field;
@@ -154,7 +148,6 @@ sub Search {
         Column     => 'xst.xml_content_value',
         Value      => $Param{Search}->{Value},
         Type       => 'STRING',
-        IsOR       => 1,
         Supplement => [' AND ' . $KeyWhere[0]],
         Supported  => $Self->{Supported}->{$Field}->{Operators}
     );

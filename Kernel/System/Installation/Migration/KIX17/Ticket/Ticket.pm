@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -274,11 +274,27 @@ sub _AssignOrganisation {
     }
     if ( !$OrgID ) {
         # organisation with that number doesn't exist, lookup by name
-        my %OrgList = $OrganisationObject->OrganisationSearch(
-            Name   => $Param{Ticket}->{customer_id},
+        my @OrgList = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Organisation',
+            Result     => 'ARRAY',
+            Search => {
+                AND => [
+                    {
+                        Field => 'Name',
+                        Type  => 'EQ',
+                        Type  => 'STRING',
+                        Value => $Param{Ticket}->{customer_id}
+                    }
+                ]
+            },
+            UserType => 'Agent',
+            UserID   => 1
         );
-        if ( IsHashRefWithData(%OrgList) && scalar(keys %OrgList) == 1) {
-            $OrgID = (keys %OrgList)[0];
+        if (
+            @OrgList
+            && scalar(@OrgList) == 1
+        ) {
+            $OrgID = $OrgList[0];
         }
     }
 
@@ -950,7 +966,7 @@ sub _MigrateChecklist {
             'object_id',
             'field_id'
         ],
-        NoCache => 1,  
+        NoCache => 1,
     );
 
     if ( !$ID ) {

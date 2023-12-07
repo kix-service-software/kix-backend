@@ -90,13 +90,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my $Assigned = $Param{Search}->{Field};
     $Assigned =~ s/Assigned//sm;

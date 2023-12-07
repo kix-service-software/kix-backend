@@ -80,13 +80,7 @@ sub Search {
     my ( $Self, %Param ) = @_;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my @SQLWhere;
     my @Where = $Self->GetOperation(
@@ -123,13 +117,12 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
     return {
-        Select => [
-            'st.tn'
-        ],
-        OrderBy => [
-            'st.tn'
-        ],
+        Select  => ['st.tn'],
+        OrderBy => ['st.tn'],
     };
 }
 

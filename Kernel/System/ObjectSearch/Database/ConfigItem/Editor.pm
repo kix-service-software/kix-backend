@@ -88,13 +88,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    if ( !$Param{Search} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
+    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my %AttributeMapping = (
         'CreateBy' => 'ci.create_by',
@@ -136,18 +130,30 @@ run this module and return the SQL extensions
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
     my %AttributeMapping = (
-        'CreateBy' => 'ci.create_by',
-        'ChangeBy' => 'ci.change_by',
+        CreateBy => ['ccr.lastname', 'ccr.firstname'],
+        ChangeBy => ['cch.lastname', 'cch.firstname'],
     );
 
+    my %Join;
+    if ( $Param{Attribute} eq 'CreateBy' ) {
+        $Join{Join} = [
+            'INNER JOIN contact ccr ON ccr.user_id = ci.create_by'
+        ];
+    }
+    elsif ( $Param{Attribute} eq 'ChangeBy' ) {
+        $Join{Join} = [
+            'INNER JOIN contact cch ON cch.user_id = ci.change_by'
+        ];
+    }
+
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
+        Select   => $AttributeMapping{$Param{Attribute}},
+        OrderBy  => $AttributeMapping{$Param{Attribute}},
+        %Join
     };
 }
 

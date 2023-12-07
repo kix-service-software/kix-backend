@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -31,8 +31,11 @@ sub Run {
     $Self->Print("<yellow>Listing organisations...</yellow>\n");
 
     # get all organisations
-    my %Organisations = $Kernel::OM->Get('Organisation')->OrganisationSearch(
-        Valid => 0,
+    my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Organisation',
+        Result     => 'ARRAY',
+        UserType   => 'Agent',
+        UserID     => 1,
     );
 
     my %ValidStr = (
@@ -44,7 +47,7 @@ sub Run {
     $Self->Print("    ID Number                                   Name                                                         Valid\n");
     $Self->Print("------ ---------------------------------------- ------------------------------------------------------------ --------\n");
 
-    foreach my $ID ( sort { $Organisations{$a} cmp $Organisations{$b} } keys %Organisations ) {
+    foreach my $ID ( @OrganisationIDs ) {
         my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
             ID => $ID
         );

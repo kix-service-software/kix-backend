@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Ticket::Lock;
+package Kernel::System::ObjectSearch::Database::Ticket::Editor;
 
 use strict;
 use warnings;
@@ -14,16 +14,14 @@ use warnings;
 use base qw(
     Kernel::System::ObjectSearch::Database::Common
 );
-use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
-    Config
     Log
 );
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Ticket::Lock - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Ticket::Editor - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -41,9 +39,9 @@ defines the list of attributes this module is supporting
 
     $Result = {
         Property => {
-            IsSortable     => 0|1,
+            IsSortable   => 0|1,
             IsSearchable => 0|1,
-            Operators     => []
+            Operators    => []
         },
     };
 
@@ -53,17 +51,18 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     $Self->{Supported} = {
-        'LockID' => {
+        CreateBy => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE'],
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN'],
             ValueType    => 'Integer'
         },
-        'Lock' => {
-            IsSearchable => 0,
-            IsSortable   => 1,
-            Operators    => []
-        },
+        ChangeBy => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'Integer'
+        }
     };
 
     return $Self->{Supported};
@@ -86,23 +85,20 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
+    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if (
-        IsArrayRefWithData($Param{Search}->{Value})
-        && $Param{Search}->{Operator} !~ /IN/sm
-    ) {
-        $Param{Search}->{Operator} = 'IN';
-    }
+    my %AttributeMapping = (
+        'CreateBy' => 'st.create_by',
+        'ChangeBy' => 'st.change_by',
+    );
 
-    my @SQLWhere;
     my @Where = $Self->GetOperation(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'st.ticket_lock_id',
+        Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        Type      => 'NUMERIC',
         Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
@@ -112,51 +108,6 @@ sub Search {
 
     return {
         Where => \@SQLWhere,
-    };
-}
-
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Lock    => 'tlt.name',
-        LockID  => 'st.ticket_lock_id',
-    );
-
-    my %Join;
-    if ( $Param{Attribute} eq 'Lock' ) {
-        $Join{Join} = [
-            'INNER JOIN ticket_lock_type tlt ON tlt.id = st.ticket_lock_id'
-        ];
-    }
-    return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        %Join
     };
 }
 
