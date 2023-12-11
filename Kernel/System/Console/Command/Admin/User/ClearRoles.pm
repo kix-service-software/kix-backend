@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -53,7 +53,7 @@ sub Run {
 
     $Self->Print("<yellow>Removing all role assignments of the user $Self->{UserLogin}...</yellow>\n");
 
-    my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
+    my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
         UserID  => $Self->{UserID},
     );
 

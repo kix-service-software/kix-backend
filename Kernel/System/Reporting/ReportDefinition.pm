@@ -276,7 +276,7 @@ sub ReportDefinitionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'ReportDefinition',
         ObjectID  => $ID,
@@ -389,7 +389,7 @@ sub ReportDefinitionUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'ReportDefinition',
         ObjectID  => $Param{ID},
@@ -536,7 +536,7 @@ sub ReportDefinitionDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'ReportDefinition',
         ObjectID  => $Param{ID},

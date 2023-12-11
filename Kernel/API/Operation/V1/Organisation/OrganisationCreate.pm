@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -96,10 +96,12 @@ sub Run {
     );
 
     # check Number exists
-    my %OrganisationSearch = $Kernel::OM->Get('Organisation')->OrganisationSearch(
+    my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
         Number => $Organisation->{Number},
+        Silent => 1,
     );
-    if ( %OrganisationSearch ) {
+
+    if ( $ID ) {
         return $Self->_Error(
             Code    => 'Object.AlreadyExists',
             Message => 'Cannot create organisation. Another organisation with same number already exists.',

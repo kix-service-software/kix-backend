@@ -131,7 +131,7 @@ sub ProfileAdd {
     return if !$ID;
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'OAuth2Profile',
         ObjectID  => $ID
@@ -307,7 +307,7 @@ sub ProfileUpdate {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'DELETE',
             Namespace => 'OAuth2ProfileAuth',
             ObjectID  => $Param{ID},
@@ -331,7 +331,7 @@ sub ProfileUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'OAuth2Profile',
         ObjectID  => $Param{ID},
@@ -513,7 +513,7 @@ sub ProfileDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'OAuth2Profile',
         ObjectID  => $Param{ID},
@@ -878,7 +878,7 @@ sub RequestAccessToken {
         && $Param{Code}
     ) {
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'OAuth2ProfileAuth',
             ObjectID  => $Param{ProfileID},
@@ -886,7 +886,7 @@ sub RequestAccessToken {
     }
     else {
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'OAuth2ProfileAuth',
             ObjectID  => $Param{ProfileID},

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -421,10 +421,11 @@ for my $Module (qw(StaticDB RuntimeDB)) {
             );
             push( @SearchData, @{ $Test->{Search} } );
 
-            my @FoundTicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Result  => 'ARRAY',
-                Limit   => 2,
-                Search  => {
+            my @FoundTicketIDs =  $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Result     => 'ARRAY',
+                Limit      => 2,
+                Search     => {
                     AND => \@SearchData,
                 },
                 Sort       => [
@@ -435,7 +436,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
                 ],
                 UserType   => $Test->{UserType},
                 UserID     => 1,
-                Permission => 'rw',
             );
 
             @FoundTicketIDs = sort @FoundTicketIDs;

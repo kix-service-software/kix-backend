@@ -473,7 +473,7 @@ sub UserAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'User',
         ObjectID  => $UserID,
@@ -577,7 +577,7 @@ sub UserUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
@@ -600,6 +600,7 @@ to search users
         ValidID         => 2                          # optional - if given "Valid" is ignored
         Valid           => 1                          # optional - if omitted, 1 is used
         UserIDs         => [1,2,3]                    # optional
+        SearchUserID    => 1                          # optional
         HasPermission   => {...}                      # optional
     );
 
@@ -927,7 +928,7 @@ sub SetPassword {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $User{UserID},
@@ -1286,7 +1287,7 @@ sub PermissionList {
     return %{$Cache} if $Cache;
 
     # get all role ids of this user and usage context
-    my @RoleIDs = $Self->RoleList(
+    my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
         Valid        => $Valid
@@ -1366,86 +1367,6 @@ sub PermissionList {
     return %Result;
 }
 
-=item RoleList()
-
-return a list of all roles of a given user
-
-    my @RoleIDs = $UserObject->RoleList(
-        UserID       => 123,                    # required
-        UsageContext => 'Agent'|'Customer'      # optional, if not given, all assigned roles will be returned
-        Valid        => 1,                      # optional
-    );
-
-=cut
-
-sub RoleList {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # set default value
-    my $Valid = $Param{Valid} ? 1 : 0;
-
-    # check cache
-    my $CacheKey = 'RoleList::' . $Param{UserID} . '::' . $Valid . '::' . ($Param{UsageContext} || '');
-    my $Cache    = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return @{$Cache} if $Cache;
-
-    # get user data
-    my %UserData = $Self->GetUserData(
-        UserID => $Param{UserID},
-    );
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-    my @Bind     = ();
-    push @Bind, \$Param{UserID};
-
-    # create sql
-    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
-
-    if ( $Valid ) {
-        $SQL .= ' AND valid_id = 1';
-    }
-
-    # get data
-    return if !$DBObject->Prepare(
-        SQL  => $SQL,
-        Bind => \@Bind,
-    );
-
-    # fetch the result
-    my @Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        # check if this role is valid for the given usage context
-        next if ( $Param{UsageContext} && ($Row[1] & Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}) != Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})} );
-
-        push(@Result, $Row[0]);
-    }
-
-    # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@Result,
-    );
-
-    return @Result;
-}
-
 =item CheckResourcePermission()
 
 returns true if the requested permission is granted
@@ -1490,7 +1411,7 @@ sub CheckResourcePermission {
 
     if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
         # get all roles the user is assigned to
-        my @UserRoleList = $Self->RoleList(
+        my @UserRoleList = $Kernel::OM->Get('Role')->UserRoleList(
             UserID       => $Param{UserID},
             UsageContext => $Param{UsageContext},
             Valid        => 1,
@@ -1830,7 +1751,7 @@ sub SetPreferences {
     my $Result = $PreferencesObject->SetPreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -1908,7 +1829,7 @@ sub DeletePreferences {
     my $Result = $PreferencesObject->DeletePreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -2169,7 +2090,7 @@ sub UpdateCounters {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
     );
@@ -2194,7 +2115,7 @@ sub DeleteCounters {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.Counters',
     );
@@ -2240,7 +2161,7 @@ sub GetUserCounters {
 add a user counter entry
 
     my $Success = $UserObject->AddUserCounterObject(
-        Category => 'Ticket'
+        Category => 'Ticket',
         Counter  => '...',
         ObjectID => 123,
         UserID   => 123,
@@ -2262,16 +2183,24 @@ sub AddUserCounterObject {
         }
     }
 
+    my $SQL = "INSERT INTO user_counter (user_id, category, counter, object_id) VALUES (?, ?, ?, ?)";
+    if ( $Kernel::OM->Get('DB')->{'DB::Type'} eq 'postgresql' ) {
+        $SQL .= ' ON CONFLICT DO NOTHING'
+    }
+    elsif ($Kernel::OM->Get('DB')->{'DB::Type'} eq 'mysql' ) {
+        $SQL .= ' ON DUPLICATE KEY UPDATE user_id = user_id'
+    }
+
     # sql
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => "INSERT INTO user_counter (user_id, category, counter, object_id) VALUES (?, ?, ?, ?)",
+        SQL  => $SQL,
         Bind => [
             \$Param{UserID}, \$Param{Category}, \$Param{Counter}, \$Param{ObjectID},
         ],
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
         UserID    => $Param{UserID},
@@ -2333,7 +2262,7 @@ sub DeleteUserCounterObject {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
         UserID    => ($Param{UserID} || ''),
@@ -2410,7 +2339,7 @@ sub _AssignRolesByContext {
     my %SystemRolesReverse = reverse %SystemRoles;
 
     # get user roles
-    my %UserRoleList = map {$_ => 1} ( $Self->RoleList(
+    my %UserRoleList = map {$_ => 1} ( $Kernel::OM->Get('Role')->UserRoleList(
         UserID => $Param{UserID},
         Valid  => 1,
     ) );

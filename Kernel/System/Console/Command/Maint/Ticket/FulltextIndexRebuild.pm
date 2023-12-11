@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -17,9 +17,10 @@ use Time::HiRes();
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Config',
-    'Ticket',
+our @ObjectDependencies = qw(
+    Config
+    Ticket
+    ObjectSearch
 );
 
 sub Configure {
@@ -48,14 +49,18 @@ sub Run {
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get all tickets
-    my @TicketIDs = $TicketObject->TicketSearch(
-        ArchiveFlags => [ 'y', 'n' ],
-        OrderBy      => 'Down',
-        SortBy       => 'Age',
-        Result       => 'ARRAY',
-        Limit        => 100_000_000,
-        Permission   => 'ro',
-        UserID       => 1,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UserType   => 'Agent',
+        Limit      => 100_000_000,
+        Sort       => [
+            {
+                Field     => 'Age',
+                Direction => 'DESCENDING'
+            }
+        ]
     );
 
     my $Count      = 0;
@@ -86,7 +91,9 @@ sub Run {
             );
         }
 
-        Time::HiRes::usleep($MicroSleep) if $MicroSleep;
+        if ( $MicroSleep ) {
+            Time::HiRes::usleep($MicroSleep);
+        }
     }
 
     $Self->Print("<green>Done.</green>\n");
@@ -94,9 +101,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 

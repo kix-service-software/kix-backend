@@ -80,7 +80,6 @@ sub new {
     #  these settings are used by the CLI version         #
     # --------------------------------------------------- #
     $Self->{QueueDefaults} = {
-        Calendar            => '',
         UnlockTimeout       => 0,
         FirstResponseTime   => 0,
         FirstResponseNotify => 0,
@@ -412,7 +411,6 @@ add queue with attributes
     $QueueObject->QueueAdd(
         Name                => 'Some::Queue',
         ValidID             => 1,
-        Calendar            => 'Calendar1', # (optional)
         UnlockTimeout       => 480,         # (optional)
         FollowUpID          => 3,           # possible (1), reject (2) or new ticket (3) (optional, default 0)
         FollowUpLock        => 0,           # yes (1) or no (0) (optional, default 0)
@@ -431,7 +429,7 @@ sub QueueAdd {
     # check if this request is from web and not from command line
     if ( !$Param{NoDefaultValues} ) {
         for (
-            qw(UnlockTimeout FollowUpLock SystemAddressID Signature FollowUpID FollowUpLock DefaultSignKey Calendar)
+            qw(UnlockTimeout FollowUpLock SystemAddressID Signature FollowUpID FollowUpLock DefaultSignKey)
             )
         {
 
@@ -486,14 +484,14 @@ sub QueueAdd {
 
     return if !$DBObject->Do(
         SQL => 'INSERT INTO queue (name, unlock_timeout, system_address_id, '
-            . ' calendar_name, default_sign_key, signature, follow_up_id, '
+            . ' default_sign_key, signature, follow_up_id, '
             . ' follow_up_lock, valid_id, comments, create_time, create_by, '
             . ' change_time, change_by) VALUES '
-            . ' (?, ?, ?, ?, ?, ?, ?, ?, ?, '
+            . ' (?, ?, ?, ?, ?, ?, ?, ?, '
             . ' ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name},     \$Param{UnlockTimeout}, \$Param{SystemAddressID},
-            \$Param{Calendar}, \$Param{DefaultSignKey}, \$Param{Signature},
+            \$Param{DefaultSignKey}, \$Param{Signature},
             \$Param{FollowUpID},        \$Param{FollowUpLock},        \$Param{ValidID},
             \$Param{Comment},           \$Param{UserID},              \$Param{UserID},
         ],
@@ -530,7 +528,7 @@ sub QueueAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue',
         ObjectID  => $QueueID,
@@ -592,7 +590,7 @@ sub QueueGet {
     my $SQL = 'SELECT q.id, q.name, q.unlock_timeout, '
         . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
         . 'q.follow_up_id, q.follow_up_lock, '
-        . 'q.default_sign_key, q.calendar_name, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
+        . 'q.default_sign_key, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
         . 'system_address sa WHERE q.system_address_id = sa.id AND ';
 
     if ( $Param{ID} ) {
@@ -627,11 +625,10 @@ sub QueueGet {
             FollowUpID          => $Data[7],
             FollowUpLock        => $Data[8],
             DefaultSignKey      => $Data[9],
-            Calendar            => $Data[10] || '',
-            CreateBy            => $Data[11],
-            CreateTime          => $Data[12],
-            ChangeBy            => $Data[13],
-            ChangeTime          => $Data[14],
+            CreateBy            => $Data[10],
+            CreateTime          => $Data[11],
+            ChangeBy            => $Data[12],
+            ChangeTime          => $Data[13],
         );
     }
 
@@ -698,7 +695,7 @@ sub QueueListGet {
     my $SQL = 'SELECT q.id, q.name, q.unlock_timeout, '
         . 'q.system_address_id, q.signature, q.comments, q.valid_id, '
         . 'q.follow_up_id, q.follow_up_lock, '
-        . 'q.default_sign_key, q.calendar_name, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
+        . 'q.default_sign_key, q.create_by, q.create_time, q.change_by, q.change_time FROM queue q, '
         . 'system_address sa WHERE q.system_address_id = sa.id AND q.id IN ('.(join( ',', map { '?' } @{$Param{IDs}})).')';
 
     # get database object
@@ -713,7 +710,7 @@ sub QueueListGet {
     my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [
             'QueueID', 'Name', 'UnlockTimeout', 'SystemAddressID', 'Signature', 'Comment', 'ValidID',
-            'FollowUpID', 'FollowUpLock', 'DefaultSignKey', 'Calendar', 'CreateBy', 'CreateTime', 'ChangeBy', 'ChangeTime'
+            'FollowUpID', 'FollowUpLock', 'DefaultSignKey', 'CreateBy', 'CreateTime', 'ChangeBy', 'ChangeTime'
         ],
     );
 
@@ -736,7 +733,6 @@ update queue attributes
         QueueID             => 123,
         Name                => 'Some::Queue',
         ValidID             => 1,
-        Calendar            => '1', # (optional) default ''
         SystemAddressID     => 1,
         Signature           => '',
         UserID              => 123,
@@ -779,9 +775,6 @@ sub QueueUpdate {
 
     # DefaultSignKey   '' || 'string'
     $Param{DefaultSignKey} = $Param{DefaultSignKey} || '';
-
-    # Calendar string  '', '1', '2', '3', '4', '5'  default ''
-    $Param{Calendar} ||= '';
 
     # cleanup queue name
     $Param{Name} =~ s/(\n|\r)//g;
@@ -827,14 +820,14 @@ sub QueueUpdate {
             UPDATE queue
             SET name = ?, comments = ?, unlock_timeout = ?, follow_up_id = ?,
                 follow_up_lock = ?, system_address_id = ?,
-                calendar_name = ?, default_sign_key = ?, signature = ?,
-                valid_id = ?, change_time = current_timestamp, change_by = ?
+                default_sign_key = ?, signature = ?, valid_id = ?,
+                change_time = current_timestamp, change_by = ?
             WHERE id = ?',
         Bind => [
-            \$Param{Name}, \$Param{Comment}, \$Param{UnlockTimeout},
-            \$Param{FollowUpID},        \$Param{FollowUpLock},        \$Param{SystemAddressID},
-            \$Param{Calendar},          \$Param{DefaultSignKey},      \$Param{Signature},
-            \$Param{ValidID},           \$Param{UserID},              \$Param{QueueID},
+            \$Param{Name},           \$Param{Comment},      \$Param{UnlockTimeout},
+            \$Param{FollowUpID},     \$Param{FollowUpLock}, \$Param{SystemAddressID},
+            \$Param{DefaultSignKey}, \$Param{Signature},    \$Param{ValidID},
+            \$Param{UserID},         \$Param{QueueID},
         ],
     );
 
@@ -887,7 +880,7 @@ sub QueueUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},
@@ -991,7 +984,7 @@ sub QueuePreferencesSet {
     my $Result = $Self->{PreferencesObject}->QueuePreferencesSet(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue.Preference',
         ObjectID  => $Param{QueueID}.'::'.$Param{Key},
@@ -1084,7 +1077,7 @@ sub QueueDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},

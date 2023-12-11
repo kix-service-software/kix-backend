@@ -30,9 +30,9 @@ sub Run {
 
     $Self->Print("<yellow>Sending client notifications...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('ClientRegistration')->NotificationSend();
+    my $Result = $Kernel::OM->Get('ClientNotification')->NotificationSend();
     if ( !$Result ) {
-        $Self->PrintError("Unable to send notifications.\n");
+        $Self->PrintError("Unable to send client notifications.\n");
     }
     else {
         my $Message = $Kernel::OM->Get('Log')->GetLogEntry(

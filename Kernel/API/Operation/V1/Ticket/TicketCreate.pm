@@ -354,6 +354,27 @@ sub _TicketCreate {
         );
     }
 
+    if ( !$StateID ) {
+        # get default ticket state
+        my $DefaultTicketState = $Kernel::OM->Get('Config')->Get('Ticket::State::Default');
+
+        # check if default ticket state exists
+        my %AllTicketStates = reverse $StateObject->StateList( UserID => 1);
+
+        if ( $AllTicketStates{$DefaultTicketState} ) {
+            $StateID = $AllTicketStates{$DefaultTicketState};
+        }
+        else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
+            $StateID = 1;
+        }
+    }
+
     %StateData = $StateObject->StateGet(
         ID => $StateID,
     );

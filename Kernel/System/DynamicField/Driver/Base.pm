@@ -103,17 +103,14 @@ sub AllValuesDelete {
     return $Success;
 }
 
-sub HasBehavior {
+sub GetProperty {
     my ( $Self, %Param ) = @_;
 
     # return fail if Behaviors hash does not exists
-    return if !IsHashRefWithData( $Self->{Behaviors} );
+    return if !IsHashRefWithData( $Self->{Properties} );
 
-    # return success if the dynamic field has the expected behavior
-    return 1 if IsPositiveInteger( $Self->{Behaviors}->{ $Param{Behavior} } );
-
-    # otherwise return fail
-    return;
+    # return requested Property
+    return $Self->{Properties}->{ $Param{Property} };
 }
 
 sub HTMLDisplayValueRender {
@@ -147,11 +144,10 @@ sub DFValueObjectReplace {
         if ($Param{Placeholder} =~ m/_Object_(\d+)_(.+)/) {
             if (($1 || $1 == 0) && $2 && $Param{Value}->[$1]) {
                 return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                    %Param,
                     Text        => "<KIX_$Self->{ReferencePlaceholderParameter}->{Prefix}\_$2>",
                     ObjectType  => $Self->{ReferencePlaceholderParameter}->{ObjectType},
-                    ObjectID    => $Param{Value}->[$1],
-                    UserID      => $Param{UserID},
-                    Language    => $Param{Language}
+                    ObjectID    => $Param{Value}->[$1]
                 );
             }
         }

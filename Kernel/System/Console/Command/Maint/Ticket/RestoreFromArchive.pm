@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -17,9 +17,10 @@ use Time::HiRes();
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Config',
-    'Ticket',
+our @ObjectDependencies = qw(
+    Config
+    Ticket
+    ObjectSearch
 );
 
 sub Configure {
@@ -55,13 +56,28 @@ sub Run {
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # get all tickets with an archive flag and an open statetype
-    my @TicketIDs = $TicketObject->TicketSearch(
-        StateType    => [ 'new', 'open', 'pending reminder', 'pending auto' ],
-        ArchiveFlags => ['y'],
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'StateType',
+                    Operator => 'IN',
+                    Type     => 'STRING',
+                    Value    => [ 'new', 'open', 'pending reminder', 'pending auto' ]
+                },
+                {
+                    Field    => 'ArchiveFlags',
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => [ 'y' ]
+                }
+            ]
+        },
+        ObjectType   => 'Ticket',
         Result       => 'ARRAY',
         Limit        => 100_000_000,
         UserID       => 1,
-        Permission   => 'ro',
+        UserType     => 'Agent'
     );
 
     my $TicketNumber = scalar @TicketIDs;
@@ -88,7 +104,9 @@ sub Run {
 
         $Count++;
 
-        Time::HiRes::usleep($MicroSleep) if $MicroSleep;
+        if ( $MicroSleep ) {
+            Time::HiRes::usleep($MicroSleep);
+        }
     }
 
     $Self->Print("<green>Done ($TicketNumber tickets restored).</green>\n");

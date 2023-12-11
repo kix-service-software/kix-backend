@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,9 +15,10 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'GeneralCatalog',
-    'ITSMConfigItem',
+our @ObjectDependencies = qw(
+    GeneralCatalog
+    ITSMConfigItem
+    ObjectSearch
 );
 
 sub Configure {
@@ -42,8 +43,21 @@ sub Run {
     my @ValidClassIDs = sort keys %{$ClassList};
 
     # get all config items ids form all valid classes
-    my $ConfigItemsIDsRef = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-        ClassIDs => \@ValidClassIDs,
+    my $ConfigItemsIDsRef = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'ClassIDs',
+                    Operator => 'IN',
+                    Type     => 'NUMERIC',
+                    Value    => \@ValidClassIDs
+                }
+            ]
+        },
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # get number of config items
