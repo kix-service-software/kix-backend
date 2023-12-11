@@ -235,7 +235,7 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8304" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8304" Required="0" Valid="0">
         <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'Ticket' objects using the 'ParentChild' link type.</Description>
         <Group>FAQ</Group>
         <SubGroup>Core::LinkObject</SubGroup>

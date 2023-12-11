@@ -415,15 +415,18 @@ sub ProcessRequest {
         $EncodeObject->EncodeInput( \$Content );
     }
 
-    my $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
-        Data => $Content,
-    );
-
-    if ( !$ContentDecoded ) {
-        return $Self->_Error(
-            Code    => 'Transport.REST.InvalidJSON',
-            Message => 'Error while decoding request content.',
+    my $ContentDecoded = $Content;
+    if ( $ENV{'CONTENT_TYPE'} =~ /^application\/json/ ) {
+        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Content,
         );
+
+        if ( !$ContentDecoded ) {
+            return $Self->_Error(
+                Code    => 'Transport.REST.InvalidJSON',
+                Message => 'Error while decoding request content.',
+            );
+        }
     }
 
     my $ReturnData;

@@ -363,7 +363,7 @@ sub PatternAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $ID,
@@ -431,7 +431,7 @@ sub PatternUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $Param{ID},
@@ -483,7 +483,7 @@ sub PatternDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Pattern',
         ObjectID  => $Param{ID},
@@ -569,7 +569,7 @@ sub TranslationLanguageAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -835,7 +835,7 @@ sub TranslationLanguageUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -880,7 +880,7 @@ sub TranslationLanguageDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Language',
         ObjectID  => $Param{PatternID}.'::'.$Param{Language},
@@ -996,7 +996,7 @@ sub CleanUp {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Translation.Pattern',
     );

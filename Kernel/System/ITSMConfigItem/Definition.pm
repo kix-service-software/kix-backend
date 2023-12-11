@@ -367,7 +367,7 @@ sub DefinitionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.Class.Definition',
         ObjectID  => $Param{ClassID}.'::'.$DefinitionID,
@@ -612,7 +612,7 @@ sub DefinitionDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.Class.Definition',
         ObjectID  => $Definition->{ClassID}.'::'.$Param{DefinitionID},

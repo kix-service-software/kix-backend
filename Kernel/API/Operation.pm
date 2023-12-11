@@ -167,7 +167,7 @@ sub new {
         qw(
             Authorization RequestURI RequestMethod Operation OperationType
             OperationConfig OperationRouteMapping ParentMethodOperationMapping
-            AvailableMethods IgnorePermissions SuppressPermissionErrors
+            AvailableMethods IgnorePermissions SuppressPermissionErrors HandleSortInCORE
         )
     ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};

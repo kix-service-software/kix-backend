@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="dynamic_field_value">
+        <ColumnAdd Name="first_value" Required="false" Type="SMALLINT"/>
+
+        <IndexCreate Name="dynamic_field_first_value">
+            <IndexColumn Name="field_id"/>
+            <IndexColumn Name="first_value"/>
+        </IndexCreate>
+    </TableAlter>
+
+</database>

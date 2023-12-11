@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,12 +81,24 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    my %Result = $ContactObject->ContactSearch(
-        Email => $Test->{Email},
+    my $Result = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Emails',
+                    Operator => 'EQ',
+                    Value    => $Test->{Email}
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'COUNT',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     $Self->Is(
-        scalar keys %Result,
+        $Result,
         $Test->{ResultCount},
         $Test->{Name},
     );

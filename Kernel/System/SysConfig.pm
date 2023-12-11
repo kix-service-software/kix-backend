@@ -421,7 +421,7 @@ sub OptionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -569,7 +569,7 @@ sub OptionUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -653,7 +653,7 @@ sub OptionDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -821,7 +821,7 @@ sub CleanUp {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SysConfigOption',
     );
@@ -990,7 +990,7 @@ sub _RebuildFromFile {
     }
 
     # Now process the entries in init order and assign them to the xml entry list.
-     for my $Init (qw(Framework Application Config Changes Unkown)) {
+     for my $Init (qw(Framework Application Config Changes Unknown)) {
         for my $Option ( @{ $XMLConfigTMP{$Init} } ) {
             push(
                 @{ $Self->{XMLConfig} },
@@ -1048,6 +1048,7 @@ sub _RebuildFromFile {
             Name            => $OptionRaw->{Name},
             Description     => $OptionRaw->{Description}->{content} || '',
             AccessLevel     => $OptionRaw->{AccessLevel},
+            Context         => $OptionRaw->{Context},
             ExperienceLevel => $OptionRaw->{ExperienceLevel},
             Type            => $Type,
             Group           => $OptionRaw->{Group},

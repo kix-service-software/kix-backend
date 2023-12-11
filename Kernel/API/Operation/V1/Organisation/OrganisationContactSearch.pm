@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -28,6 +28,16 @@ Kernel::API::Operation::Organisation::OrganisationContactSearch - API Organisati
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item ParameterDefinition()
 
@@ -83,18 +93,30 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform contact search
-    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
-        OrganisationID => $Param{Data}->{OrganisationID},
-        Valid          => 0,
+    my @ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EQ',
+                    Type     => 'NUMERIC',
+                    Value    => $Param{Data}->{OrganisationID}
+                }
+            ]
+        },
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType}
     );
 
-    if (IsHashRefWithData(\%ContactList)) {
+    if (@ContactList) {
 
         # get already prepared Contact data from ContactGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::Contact::ContactGet',
             Data          => {
-                ContactID => join(',', sort keys %ContactList),
+                ContactID => join(q{,}, @ContactList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
@@ -103,13 +125,15 @@ sub Run {
 
         my @ResultList;
         if ( defined $GetResult->{Data}->{Contact} ) {
-            @ResultList = IsArrayRef($GetResult->{Data}->{Contact}) ? @{$GetResult->{Data}->{Contact}} : ( $GetResult->{Data}->{Contact} );
+            @ResultList = IsArrayRef($GetResult->{Data}->{Contact})
+                ? @{$GetResult->{Data}->{Contact}}
+                : ( $GetResult->{Data}->{Contact} );
         }
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Contact => \@ResultList,
-            )
+            );
         }
     }
 

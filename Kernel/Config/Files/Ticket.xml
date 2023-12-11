@@ -562,235 +562,7 @@
             <String Regex="">Kernel::System::Ticket::Custom</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::SearchBackend" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/Ticket/TicketSearch/*.pm" SelectedID="Kernel::System::Ticket::TicketSearch::Database">
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###ArchiveFlag" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::ArchiveFlag</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Article" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Article</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###ArticleAttachment" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::ArticleAttachment</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###ArticleFlag" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::ArticleFlag</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Contact" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Contact</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::DynamicField</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###History" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::History</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Lock" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Lock</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Organisation" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Organisation</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###OwnerResponsible" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::OwnerResponsible</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###PendingReminder" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::PendingReminder</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Priority" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Priority</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Queue" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Queue</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###State" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::State</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###TicketFlag" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::TicketFlag</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###TicketID" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::TicketID</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###TicketNumber" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::TicketNumber</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###TicketTimes" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::TicketTimes</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Title" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Title</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Type" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Type</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###Watcher" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::Watcher</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketSearch::Database::Module###AccountedTime" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::TicketSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::TicketSearch::Database::AccountedTime</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="Ticket::SearchIndexModule" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Helps to extend your articles full-text search (From, To, Cc, Subject and Body search). Runtime will do full-text searches on live data (it works fine for up to 50.000 tickets). StaticDB will strip all articles and will build an index after article creation, increasing fulltext searches about 50%. To create an initial index use "bin/kix.Console.pl Maint::Ticket::FulltextIndexRebuild".</Description>
         <Group>Ticket</Group>
@@ -1828,7 +1600,6 @@
                 <Item Key="FollowUp" Translatable="1">FollowUp for [%s]. %s</Item>
                 <Item Key="Forward" Translatable="1">Forwarded to "%s".</Item>
                 <Item Key="Lock" Translatable="1">Locked ticket.</Item>
-                <Item Key="LoopProtection" Translatable="1">Loop-Protection! No auto-response sent to "%s".</Item>
                 <Item Key="Misc" Translatable="1">%s</Item>
                 <Item Key="Move" Translatable="1">Ticket moved into Queue "%s" (%s) from Queue "%s" (%s).</Item>
                 <Item Key="NewTicket" Translatable="1">New Ticket [%s] created (Q=%s;P=%s;S=%s).</Item>
@@ -2169,22 +1940,6 @@
             <String Regex="^[0-9]{1,3}$">20</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LoopProtectionModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Default loop protection module.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/PostMaster/LoopProtection/*.pm" SelectedID="Kernel::System::PostMaster::LoopProtection::DB"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LoopProtectionLog" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Path for the log file (it only applies if "FS" was selected for LoopProtectionModule and it is mandatory).</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/LoopProtection</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostmasterAutoHTML2Text" Required="1" Valid="1">
         <Description Translatable="1">Converts HTML mails into text messages.</Description>
         <Group>Ticket</Group>
@@ -2294,7 +2049,6 @@
                 <Item>X-KIX-OwnerID</Item>
                 <Item>X-KIX-Responsible</Item>
                 <Item>X-KIX-ResponsibleID</Item>
-                <Item>X-KIX-Loop</Item>
                 <Item>X-KIX-Priority</Item>
                 <Item>X-KIX-Queue</Item>
                 <Item>X-KIX-Lock</Item>
@@ -2331,6 +2085,7 @@
                 <Item>X-KIX-FollowUp-SenderType</Item>
                 <Item>X-KIX-FollowUp-Channel</Item>
                 <Item>X-KIX-FollowUp-Subject</Item>
+                <Item>X-KIX-FollowUp-CustomerVisible</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlanBegin</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlanEnd</Item>
                 <Item>X-KIX-FollowUp-DynamicField-PlannedEffort</Item>
@@ -2711,7 +2466,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="0">
         <Description Translatable="1">Links ticket with an FAQArticle using a "ParentChild" type link.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::LinkObject</SubGroup>
@@ -3122,17 +2877,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###9-SystemMonitoringAcknowledgeX" Required="1" Valid="1">
-        <Description Translatable="1">Ticket event module to send an acknowledge to registered system monitoring tools.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Ticket::Event::SystemMonitoringAcknowledgeX</Item>
-                <Item Key="Event">TicketLockUpdate</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
         <Description Translatable="1">Sends all agent's notifications to its configured out of office substitute while agent is out of office.</Description>
         <Group>Ticket</Group>
@@ -3177,6 +2921,28 @@ Thanks for your help!
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::DFTypeObjectReferenceAddLink</Item>
                 <Item Key="Event">DynamicFieldUpdate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-ArticleCustomerVisibleByRecipient" Required="0" Valid="1">
+        <Description Translatable="1">Is executed when an article is created in the "Email" channel. Checks whether at least one of the recipient addresses (To, Cc or Bcc) is assigned to the ticket contact. If Yes: The visibility of the article in the SSP is automatically activated (regardless of the agent's setting). If No: The visibility selected by the agent is not changed.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::ArticleCustomerVisibleByRecipient</Item>
+                <Item Key="Event">ArticleCreate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###910-ArticleCustomerVisibleByReferences" Required="0" Valid="1">
+        <Description Translatable="1">Is executed when an article is created in the "Email" channel. Checks whether at least one email reference (References and InReplyTo) is a message-id of a customer visible article at the same ticket. If Yes: The visibility of the article in the SSP is automatically activated (regardless of the agent's setting). If No: The visibility selected by the agent is not changed.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::ArticleCustomerVisibleByReferences</Item>
+                <Item Key="Event">ArticleCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -28,6 +28,16 @@ Kernel::API::Operation::Contact::ContactTicketSearch - API Contact Ticket Search
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item ParameterDefinition()
 
@@ -83,8 +93,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ticket search
-    my @TicketList = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => [
                 {
                     Field    => 'ContactID',
@@ -93,7 +104,8 @@ sub Run {
                 }
             ]
         },
-        UserID => $Self->{Authorization}->{UserID},
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
         Result => 'ARRAY',
     );
 

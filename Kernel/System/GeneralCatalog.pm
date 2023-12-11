@@ -181,7 +181,7 @@ sub ClassRename {
     return if !$Result;
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'GeneralCatalog.Class',
         ObjectID  => $Param{ClassOld}.'::'.$Param{ClassNew},
@@ -407,10 +407,7 @@ sub ItemGet {
 
     # check item
     if ( !$ItemData{ItemID} ) {
-        if (
-            !defined $Param{Silent}
-            || !$Param{Silent}
-        ) {
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => 'Item not found in database!',
@@ -572,7 +569,7 @@ sub ItemAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $ItemID,
@@ -716,7 +713,7 @@ sub ItemUpdate {
     return if !$Result;
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $Param{ItemID},
@@ -871,7 +868,7 @@ sub GeneralCatalogItemDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'GeneralCatalog',
         ObjectID  => $Param{ItemID},

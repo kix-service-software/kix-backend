@@ -128,7 +128,7 @@ sub SystemDataSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemData',
         ObjectID  => $Param{Key},
@@ -245,7 +245,7 @@ sub SystemDataDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemData',
         ObjectID  => $Param{Key},

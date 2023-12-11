@@ -49,14 +49,11 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $MainObject   = $Kernel::OM->Get('Main');
 
-    # set field behaviors
-    $Self->{Behaviors} = {
-        'IsACLReducible'               => 0,
-        'IsNotificationEventCondition' => 0,
-        'IsSortable'                   => 0,
-        'IsFilterable'                 => 0,
-        'IsStatsCondition'             => 0,
-        'IsCustomerInterfaceCapable'   => 1,
+    # set field properties
+    $Self->{Properties} = {
+        'IsSearchable'    => 1,
+        'IsSortable'      => 0,
+        'SearchOperators' => ['EQ','GT','GTE','LT','LTE']
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -83,12 +80,12 @@ sub new {
             }
         }
 
-        # check if extension contains more behaviors
-        if ( IsHashRefWithData( $Extension->{Behaviors} ) ) {
+        # check if extension contains more properties
+        if ( IsHashRefWithData( $Extension->{Properties} ) ) {
 
-            %{ $Self->{Behaviors} } = (
-                %{ $Self->{Behaviors} },
-                %{ $Extension->{Behaviors} }
+            %{ $Self->{Properties} } = (
+                %{ $Self->{Properties} },
+                %{ $Extension->{Properties} }
             );
         }
     }

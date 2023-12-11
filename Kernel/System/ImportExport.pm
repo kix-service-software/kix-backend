@@ -325,7 +325,7 @@ sub TemplateAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'ImportExportTemplate',
         ObjectID  => $TemplateID,
@@ -449,7 +449,7 @@ sub TemplateUpdate {
 
     # push client callback event
     if ($Success) {
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'ImportExportTemplate',
             ObjectID  => $Param{TemplateID},
@@ -557,7 +557,7 @@ sub TemplateDelete {
     # push client callback event
     if ($Success) {
         for my $TemplateID ( @{$Param{TemplateID}} ) {
-            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'ImportExportTemplate',
                 ObjectID  => $TemplateID
@@ -2748,7 +2748,7 @@ sub _ClearCacheAndNotify {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => $Param{UPDATE} ? 'UPDATE' : 'CREATE',
         Namespace => 'ImportExportTemplate.ImportExportTemplateRun',
         ObjectID  => $Param{TemplateID}.'::'.$Param{RunID},

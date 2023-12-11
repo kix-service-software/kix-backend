@@ -73,7 +73,6 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 ParentID            => 123,
                 Comment             => '...',     # (optional)
                 ValidID             => '...',     # (optional)
-                Calendar            => '...',     # (optional)
                 UnlockTimeout       => '...',,    # (optional)
                 FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
@@ -163,7 +162,6 @@ sub Run {
     my $Success = $Kernel::OM->Get('Queue')->QueueUpdate(
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
-        Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
         UnlockTimeout       => exists $Queue->{UnlockTimeout} ? $Queue->{UnlockTimeout} : $QueueData{UnlockTimeout},
         FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
         FollowUpLock        =>

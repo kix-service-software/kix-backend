@@ -240,7 +240,7 @@ sub FilterAdd {
     return if !$Self->_addProperties( %Param, FilterID => $FilterID );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'MailFilter',
         ObjectID  => $FilterID
@@ -359,7 +359,7 @@ sub FilterUpdate {
     return if !$Self->_addProperties( %Param, FilterID => $Param{ID} );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'MailFilter',
         ObjectID  => $Param{ID}
@@ -410,7 +410,7 @@ sub FilterDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'MailFilter',
         ObjectID  => $Param{ID}

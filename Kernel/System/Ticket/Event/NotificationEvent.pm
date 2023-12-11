@@ -446,10 +446,13 @@ sub _NotificationFilter {
     }
 
     # do the search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result => 'ARRAY',
-        Search => $Filter,
-        Limit  => 1
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Filter,
+        Limit      => 1,
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};

@@ -29,6 +29,16 @@ Kernel::API::Operation::V1::Ticket::TicketSearch - API Ticket Search Operation b
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item Run()
 
 perform TicketSearch Operation. This will return a ticket list.
@@ -94,13 +104,14 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my @TicketIndex = $TicketObject->TicketSearch(
-        Result   => 'ARRAY',
-        Search   => $Self->{Search}->{Ticket},
-        Limit    => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
-        Sort     => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
-        UserType => $Self->{Authorization}->{UserType},
-        UserID   => $Self->{Authorization}->{UserID}
+    my @TicketIndex = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{Ticket},
+        Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
    if ( @TicketIndex ) {
