@@ -27,6 +27,7 @@ Autostart                                                                     = 
 Cache                                                                         = Kernel::System::Cache
 Channel                                                                       = Kernel::System::Channel
 CheckItem                                                                     = Kernel::System::CheckItem
+ClientNotification                                                            = Kernel::System::ClientNotification
 ClientRegistration                                                            = Kernel::System::ClientRegistration
 Console                                                                       = Kernel::System::Console
 Console::BaseCommand                                                          = Kernel::System::Console::BaseCommand

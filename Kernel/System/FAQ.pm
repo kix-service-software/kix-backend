@@ -609,7 +609,7 @@ sub FAQAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $ID,
@@ -757,7 +757,7 @@ sub FAQUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -903,7 +903,7 @@ sub AttachmentAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Attachment',
         ObjectID  => $Param{ItemID}.'::'.$AttachmentID,
@@ -1033,7 +1033,7 @@ sub AttachmentDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Attachment',
         ObjectID  => $Param{ItemID}.'::'.$Param{FileID},
@@ -1078,7 +1078,7 @@ sub AttachmentInlineDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.InlineAttachment',
         ObjectID  => $Param{ItemID},
@@ -1317,7 +1317,7 @@ sub FAQDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -1367,7 +1367,7 @@ sub FAQHistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1531,7 +1531,7 @@ sub FAQHistoryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1834,7 +1834,7 @@ sub FAQLogAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Log',
         ObjectID  => $Param{ItemID},
@@ -1880,7 +1880,7 @@ sub FAQLogDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Log',
         ObjectID  => $Param{ItemID},
@@ -2058,7 +2058,7 @@ sub FAQContentTypeSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'FAQ.Article',
             ObjectID  => $ItemID,
@@ -2397,7 +2397,7 @@ sub _FAQApprovalUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},

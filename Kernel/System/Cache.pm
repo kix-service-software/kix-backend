@@ -627,7 +627,7 @@ sub CleanUp {
 
     if ( $Result && $NotifyClients ) {
         # send notification to clients
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CLEAR_CACHE',
             Namespace => 'Migration',
         );

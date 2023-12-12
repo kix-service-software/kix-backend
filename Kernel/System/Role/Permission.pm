@@ -507,7 +507,7 @@ sub PermissionAdd {
     $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Role.Permission',
         ObjectID  => $Param{RoleID}.'::'.$ID,
@@ -620,7 +620,7 @@ sub PermissionUpdate {
     $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Role.Permission',
         ObjectID  => $Data{RoleID}.'::'.$Param{ID},
@@ -806,7 +806,7 @@ sub PermissionDelete {
     $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role.Permission',
         ObjectID  => $Data{RoleID}.'::'.$Param{ID},

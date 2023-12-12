@@ -528,7 +528,7 @@ sub QueueAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue',
         ObjectID  => $QueueID,
@@ -880,7 +880,7 @@ sub QueueUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},
@@ -984,7 +984,7 @@ sub QueuePreferencesSet {
     my $Result = $Self->{PreferencesObject}->QueuePreferencesSet(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Queue.Preference',
         ObjectID  => $Param{QueueID}.'::'.$Param{Key},
@@ -1077,7 +1077,7 @@ sub QueueDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Queue',
         ObjectID  => $Param{QueueID},

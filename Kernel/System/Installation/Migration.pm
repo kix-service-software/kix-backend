@@ -290,7 +290,7 @@ sub _MigrationStart {
     $Kernel::OM->Get('ClientRegistration')->{DisableClientNotifications} = 0;
 
     # send notification to clients
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CLEAR_CACHE',
         Namespace => 'Migration',
     );

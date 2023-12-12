@@ -299,7 +299,7 @@ sub ReportCreate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'ReportDefinition.Report',
         ObjectID  => $Param{DefinitionID} . '::' . $ID,
@@ -493,7 +493,7 @@ sub ReportDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Report',
         ObjectID  => $Param{ID},

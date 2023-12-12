@@ -92,7 +92,7 @@ END
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Role.User',
         ObjectID  => $Param{RoleID}.'::'.$Param{AssignUserID},
@@ -384,7 +384,7 @@ sub RoleUserDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Role.User',
         ObjectID  => ($Param{RoleID} || 'ALL').'::'.($Param{UserID} || 'ALL'),

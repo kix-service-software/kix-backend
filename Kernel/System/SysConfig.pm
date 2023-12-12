@@ -421,7 +421,7 @@ sub OptionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -569,7 +569,7 @@ sub OptionUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -653,7 +653,7 @@ sub OptionDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SysConfigOption',
         ObjectID  => $Param{Name},
@@ -821,7 +821,7 @@ sub CleanUp {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SysConfigOption',
     );

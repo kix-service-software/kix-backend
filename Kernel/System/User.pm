@@ -473,7 +473,7 @@ sub UserAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'User',
         ObjectID  => $UserID,
@@ -577,7 +577,7 @@ sub UserUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
@@ -928,7 +928,7 @@ sub SetPassword {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $User{UserID},
@@ -1751,7 +1751,7 @@ sub SetPreferences {
     my $Result = $PreferencesObject->SetPreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -1829,7 +1829,7 @@ sub DeletePreferences {
     my $Result = $PreferencesObject->DeletePreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -2090,7 +2090,7 @@ sub UpdateCounters {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
     );
@@ -2115,7 +2115,7 @@ sub DeleteCounters {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.Counters',
     );
@@ -2200,7 +2200,7 @@ sub AddUserCounterObject {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
         UserID    => $Param{UserID},
@@ -2262,7 +2262,7 @@ sub DeleteUserCounterObject {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
         UserID    => ($Param{UserID} || ''),

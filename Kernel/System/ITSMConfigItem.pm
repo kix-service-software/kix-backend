@@ -578,7 +578,7 @@ sub ConfigItemAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event      => 'CREATE',
         Namespace  => 'CMDB.ConfigItem',
         ObjectID   => $ConfigItemID,
@@ -647,7 +647,7 @@ sub ConfigItemUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event      => 'UPDATE',
         Namespace  => 'CMDB.ConfigItem',
         ObjectID   => $Param{ConfigItemID},
@@ -777,7 +777,7 @@ sub ConfigItemDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event      => 'DELETE',
         Namespace  => 'CMDB.ConfigItem',
         ObjectID   => $Param{ConfigItemID},
@@ -2539,7 +2539,7 @@ sub UpdateCounters {
             }
 
             # push client callback event
-            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
                 Event      => 'UPDATE',
                 Namespace  => 'CMDB.Class.Counters',
                 ObjectID   => $ClassID,

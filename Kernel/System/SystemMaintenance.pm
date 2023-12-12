@@ -137,7 +137,7 @@ sub SystemMaintenanceAdd {
     return if !$ID;
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $ID,
@@ -191,7 +191,7 @@ sub SystemMaintenanceDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $Param{ID},
@@ -341,7 +341,7 @@ sub SystemMaintenanceUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SystemMaintenance',
         ObjectID  => $Param{ID},

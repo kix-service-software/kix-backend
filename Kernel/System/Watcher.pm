@@ -364,7 +364,7 @@ sub WatcherAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$Param{WatchUserID},
@@ -446,7 +446,7 @@ sub WatcherDelete {
             }
 
             # push client callback event
-            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'Watcher',
                 ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$WatchUserID,
@@ -477,7 +477,7 @@ sub WatcherDelete {
         }
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'DELETE',
             Namespace => 'Watcher',
             ObjectID  => $WatcherData{Object}.'::'.$WatcherData{ObjectID}.'::'.$WatcherData{WatchUserID},
@@ -502,7 +502,7 @@ sub WatcherDelete {
         }
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'DELETE',
             Namespace => 'Watcher',
             ObjectID  => $Param{Object}.'::'.$Param{ObjectID}.'::'.$Param{WatchUserID},
@@ -575,12 +575,12 @@ sub WatcherTransfer {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{SourceObjectID},
     );
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Watcher',
         ObjectID  => $Param{Object}.'::'.$Param{TargetObjectID},

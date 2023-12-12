@@ -564,7 +564,7 @@ sub ArticleCreate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
         UserID    => $Param{UserID},
@@ -2134,7 +2134,7 @@ sub ArticleUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         UserID    => $Param{UserID},
@@ -2223,7 +2223,7 @@ sub ArticleBounce {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -2312,7 +2312,7 @@ sub ArticleFlagSet {
 
     # push client callback event
     if (!$Param{Silent}) {
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
             UserID    => $Param{UserID},
@@ -2417,7 +2417,7 @@ sub ArticleFlagDelete {
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
         UserID    => $Param{UserID},
@@ -2713,7 +2713,7 @@ sub ArticleAccountedTimeDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},

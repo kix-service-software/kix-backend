@@ -309,7 +309,7 @@ sub MacroActionAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Macro.MacroAction',
         ObjectID  => $Param{MacroID}.'::'.$ID,
@@ -454,7 +454,7 @@ sub MacroActionUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'MacroAction',
         ObjectID  => $Param{ID},
@@ -615,7 +615,7 @@ sub MacroActionDelete {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'MacroAction',
         ObjectID  => $Param{ID},

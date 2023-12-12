@@ -248,7 +248,7 @@ sub ImageAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.ConfigItem.Image',
         ObjectID  => $Param{ConfigItemID}.'::'.$Filename,
@@ -309,7 +309,7 @@ sub ImageDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.Image',
         ObjectID  => $Param{ConfigItemID}.'::'.$Param{ImageID},

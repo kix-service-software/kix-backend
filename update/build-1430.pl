@@ -109,7 +109,7 @@ sub _RemoveDuplicatePermissions {
     $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CLEAR_CACHE',
         Namespace => 'Role.Permission'
     );

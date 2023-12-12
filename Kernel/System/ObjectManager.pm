@@ -489,8 +489,8 @@ sub ObjectsDiscard {
     delete $Self->{EventHandlers};
 
     # send all outstanding notifications to the registered clients
-    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-        $Self->Get('ClientRegistration')->NotificationSend();
+    if ( $Self->Get('ClientNotification')->NotificationCount() > 0) {
+        $Self->Get('ClientNotification')->NotificationSend();
     }
 
     # destroy objects before their dependencies are destroyed

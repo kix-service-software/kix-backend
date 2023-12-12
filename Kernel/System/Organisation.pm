@@ -173,7 +173,7 @@ sub OrganisationAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Organisation',
         ObjectID  => $OrgID,
@@ -529,7 +529,7 @@ sub OrganisationUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
@@ -611,7 +611,7 @@ sub OrganisationDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
@@ -721,7 +721,7 @@ sub SetPreferences {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Customer.Preference',
         ObjectID  => $Param{UserID}.'::'.$Param{Key},

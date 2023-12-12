@@ -119,7 +119,7 @@ END
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Vote',
         ObjectID  => $Param{ItemID},
@@ -178,7 +178,7 @@ END
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Vote',
         ObjectID  => $Vote{ItemID} . q{::} . $Param{VoteID},

@@ -304,7 +304,7 @@ sub ContactAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Contact',
             ObjectID  => $ContactID,
@@ -992,7 +992,7 @@ sub ContactUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
@@ -1099,7 +1099,7 @@ sub ContactDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
@@ -1159,7 +1159,7 @@ sub SetPreferences {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Contact.Preference',
         ObjectID  => $Param{ContactID}.'::'.$Param{Key},

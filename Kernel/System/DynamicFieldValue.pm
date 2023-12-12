@@ -202,7 +202,7 @@ sub ValueSet {
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID}.q{::}.$Param{ObjectID},
@@ -366,7 +366,7 @@ sub ValueDelete {
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
@@ -414,7 +414,7 @@ sub AllValuesDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID},
