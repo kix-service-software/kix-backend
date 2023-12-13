@@ -513,6 +513,9 @@ sub ReplacePlaceHolder {
         }
     }
 
+    # return if text is not a string
+    return $Param{Text} if ( ref( $Param{Text} ) ne '' );
+
     $Param{Translate} //= 1;
 
     if ( $Param{Translate} && (!defined $Param{Language} || !$Param{Language}) ) {
@@ -584,17 +587,7 @@ sub _Replace {
     }egx;
 
     # return if no placeholders included
-    if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/) {
-        # convert any html to ascii
-        if ( !$Param{RichText} ) {
-            $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-                String            => $Param{Text},
-                NoURLGlossar      => 1,
-                NoForcedLinebreak => 1,
-            );
-        }
-        return $Param{Text};
-    }
+    return $Param{Text} if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/);
 
     # TODO: move ticket specific handling
     $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
@@ -690,15 +683,6 @@ sub _Replace {
                 Ticket => \%Ticket
             );
         }
-    }
-
-    # convert any html to ascii
-    if ( !$Param{RichText} && !$KeepValueAsIs ) {
-        $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-            String            => $Param{Text},
-            NoURLGlossar      => 1,
-            NoForcedLinebreak => 1,
-        );
     }
 
     return $Param{Text};
