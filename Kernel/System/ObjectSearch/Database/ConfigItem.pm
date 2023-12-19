@@ -31,14 +31,14 @@ Kernel::System::ObjectSearch::Database::ConfigItem::Base - object type module fo
 
 =cut
 
-=item Init()
-
-### TODO ###
-
-=cut
-
 sub Init {
     my ( $Self, %Param ) = @_;
+
+    # init join map as empty hash
+    $Param{Flags}->{JoinMap} = {};
+
+    # init translation join counter with 0
+    $Param{Flags}->{TranslationJoinCounter} = 0;
 
     # extract flags from fields
     $Self->_CheckFields(
@@ -51,21 +51,17 @@ sub Init {
             AssignedContact       => 1
         }
     );
+
     return 1;
 }
-
-=item GetBase()
-
-### TODO ###
-
-=cut
 
 sub GetBaseDef {
     my ( $Self, %Param ) = @_;
 
     return {
-        Select => ['ci.id', 'ci.configitem_number'],
-        From   => ['configitem ci'],
+        Select  => ['ci.id', 'ci.configitem_number'],
+        From    => ['configitem ci'],
+        OrderBy => ['ci.id ASC']
     };
 }
 
@@ -165,7 +161,6 @@ sub _CheckFields {
 =cut
 
 1;
-
 
 =back
 

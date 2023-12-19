@@ -51,6 +51,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###FAQArticle" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::FAQArticle</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <!-- TICKET OBJECTSEARCH ATTRIBUTES -->
     <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###ArchiveFlag" Required="1" Valid="1" ConfigLevel="200">
@@ -150,16 +160,6 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###PendingReminder" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
-        <Group>ObjectSearch</Group>
-        <SubGroup>Core::ObjectSearch</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::PendingReminder</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -573,4 +573,137 @@
         </Setting>
     </ConfigItem>
     <!-- EO CONTACT OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- FAQ OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###FAQArticleID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::FAQArticleID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Category" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Category</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Field" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Field</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Fulltext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Fulltext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Vote" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Vote</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Visibility" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Visibility</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Approved" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Approved</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Assigned" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Assigned</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO FAQ OBJECTSEARCH ATTRIBUTES -->
 </kix_config>

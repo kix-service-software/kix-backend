@@ -78,8 +78,9 @@ sub new {
         $Self->{PreferencesObject} = $GeneratorModule->new();
     }
 
-    $Self->{CacheType} = 'Contact';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+    $Self->{CacheType}   = 'Contact';
+    $Self->{OSCacheType} = 'ObjectSearch_Contact';
+    $Self->{CacheTTL}    = 60 * 60 * 24 * 20;
 
     # init of event handler
     $Self->EventHandlerInit(
@@ -291,6 +292,11 @@ sub ContactAdd {
         # reset cache
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
+        );
+
+        # reset cache object search
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{OSCacheType},
         );
 
         # trigger event
@@ -978,6 +984,11 @@ sub ContactUpdate {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # trigger event

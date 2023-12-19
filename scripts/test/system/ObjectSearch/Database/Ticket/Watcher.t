@@ -44,8 +44,8 @@ $Self->IsDeeply(
         WatcherUserID => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -130,10 +130,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id = 1'
+                'tw_left.user_id = 1'
             ]
         }
     },
@@ -147,10 +147,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id <> 1'
+                '(tw_left.user_id <> 1 OR tw_left.user_id IS NULL)'
             ]
         }
     },
@@ -164,27 +164,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id < 1'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Operator GT / BoolOperator AND',
-        Search       => {
-            Field    => 'WatcherUserID',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        BoolOperator => 'AND',
-        Expected     => {
-            'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
-            ],
-            'Where' => [
-                'tw.user_id > 1'
+                'tw_left.user_id < 1'
             ]
         }
     },
@@ -198,10 +181,27 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id <= 1'
+                'tw_left.user_id <= 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Operator GT / BoolOperator AND',
+        Search       => {
+            Field    => 'WatcherUserID',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        BoolOperator => 'AND',
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
+            ],
+            'Where' => [
+                'tw_left.user_id > 1'
             ]
         }
     },
@@ -215,10 +215,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id >= 1'
+                'tw_left.user_id >= 1'
             ]
         }
     },
@@ -232,10 +232,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id IN (1)'
+                'tw_left.user_id IN (1)'
             ]
         }
     },
@@ -249,10 +249,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join' => [
-                'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw.user_id NOT IN (1)'
+                'tw_left.user_id NOT IN (1)'
             ]
         }
     },
@@ -266,12 +266,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id = 1',
-                'tw_right.user_id = 1'
+                'tw_left.user_id = 1'
             ]
         }
     },
@@ -285,12 +283,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id <> 1',
-                'tw_right.user_id <> 1'
+                '(tw_left.user_id <> 1 OR tw_left.user_id IS NULL)'
             ]
         }
     },
@@ -304,31 +300,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id < 1',
-                'tw_right.user_id < 1'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Operator GT / BoolOperator OR',
-        Search       => {
-            Field    => 'WatcherUserID',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        BoolOperator => 'OR',
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
-            ],
-            'Where' => [
-                'tw_left.user_id > 1',
-                'tw_right.user_id > 1'
+                'tw_left.user_id < 1'
             ]
         }
     },
@@ -342,12 +317,27 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id <= 1',
-                'tw_right.user_id <= 1'
+                'tw_left.user_id <= 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Operator GT / BoolOperator OR',
+        Search       => {
+            Field    => 'WatcherUserID',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        BoolOperator => 'OR',
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
+            ],
+            'Where' => [
+                'tw_left.user_id > 1'
             ]
         }
     },
@@ -361,12 +351,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id >= 1',
-                'tw_right.user_id >= 1'
+                'tw_left.user_id >= 1'
             ]
         }
     },
@@ -380,12 +368,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id IN (1)',
-                'tw_right.user_id IN (1)'
+                'tw_left.user_id IN (1)'
             ]
         }
     },
@@ -399,12 +385,10 @@ my @SearchTests = (
         BoolOperator => 'OR',
         Expected     => {
             'Join' => [
-                'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'',
-                'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\''
+                'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\''
             ],
             'Where' => [
-                'tw_left.user_id NOT IN (1)',
-                'tw_right.user_id NOT IN (1)'
+                'tw_left.user_id NOT IN (1)'
             ]
         }
     }
@@ -413,6 +397,7 @@ for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         BoolOperator => $Test->{BoolOperator},
+        UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -443,6 +428,7 @@ my @SortTests = (
 for my $Test ( @SortTests ) {
     my $Result = $AttributeObject->Sort(
         Attribute => $Test->{Attribute},
+        Language  => 'en',
         Silent    => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -585,6 +571,11 @@ my $WatcherAdd3 = $Kernel::OM->Get('Watcher')->WatcherAdd(
 $Self->True(
     $WatcherAdd3,
     'Watcher added for third ticket'
+);
+
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
 );
 
 # test Search

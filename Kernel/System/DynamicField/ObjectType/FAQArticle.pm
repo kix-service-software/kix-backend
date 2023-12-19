@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::DynamicField::ObjectType::FAQ;
+package Kernel::System::DynamicField::ObjectType::FAQArticle;
 
 use strict;
 use warnings;
@@ -25,11 +25,11 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::DynamicField::ObjectType::FAQ
+Kernel::System::DynamicField::ObjectType::FAQArticle
 
 =head1 SYNOPSIS
 
-FAQ object handler for DynamicFields
+FAQArticle object handler for DynamicFields
 
 =head1 PUBLIC INTERFACE
 
@@ -38,7 +38,7 @@ FAQ object handler for DynamicFields
 =item new()
 
 usually, you want to create an instance of this
-by using Kernel::System::DynamicField::ObjectType::FAQ->new();
+by using Kernel::System::DynamicField::ObjectType::FAQArticle->new();
 
 =cut
 

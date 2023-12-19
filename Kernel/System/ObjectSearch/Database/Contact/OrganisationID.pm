@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -52,40 +52,46 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         OrganisationID => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Contact.OrganisationIDs'
+            ValueType    => 'NUMERIC'
         },
         OrganisationIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Contact.OrganisationIDs'
+            ValueType    => 'NUMERIC'
         },
         Organisation => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
-            ValueType    => 'Organisation.Name'
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        },
+        OrganisationNumber => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Contact.PrimaryOrganisationID'
+            ValueType    => 'NUMERIC'
         },
         PrimaryOrganisation => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
-            ValueType    => 'Organisation.Name'
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        },
+        PrimaryOrganisationNumber => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
     };
-
-    return $Self->{Supported};
 }
 
 
@@ -105,20 +111,19 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
     my @SQLJoin;
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
-    my $TableAlias = 'cor';
+    my $TableAlias = $Param{Flags}->{OrganisationJoin}->{$Param{Search}->{Field}} // 'cor';
     if ( !$Param{Flags}->{OrganisationJoin}->{$Param{Search}->{Field}} ) {
         my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
         $TableAlias .= $Count;
 
         push(
             @SQLJoin,
-            "INNER JOIN contact_organisation $TableAlias ON $TableAlias.contact_id = c.id"
+            "LEFT JOIN contact_organisation $TableAlias ON $TableAlias.contact_id = c.id"
         );
 
         if ( $Param{Search}->{Field} =~ m/^Primary/sm ) {
@@ -139,37 +144,38 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        OrganisationID        => "$TableAlias.org_id",
-        OrganisationIDs       => "$TableAlias.org_id",
-        Organisation          => 'o.name',
-        PrimaryOrganisationID => "$TableAlias.org_id",
-        PrimaryOrganisation   => 'o.name',
+        OrganisationID            => "$TableAlias.org_id",
+        OrganisationIDs           => "$TableAlias.org_id",
+        Organisation              => 'o.name',
+        OrganisationNumber        => 'o.number',
+        PrimaryOrganisationID     => "$TableAlias.org_id",
+        PrimaryOrganisation       => 'o.name',
+        PrimaryOrganisationNumber => 'o.number'
     );
 
     # map search attributes to type attributes
     my %AttributeTypeMapping = (
-        OrganisationID        => 'NUMERIC',
-        OrganisationIDs       => 'NUMERIC',
-        Organisation          => 'STRING',
-        PrimaryOrganisationID => 'NUMERIC',
-        PrimaryOrganisation   => 'STRING',
+        OrganisationID            => 'NUMERIC',
+        OrganisationIDs           => 'NUMERIC',
+        Organisation              => 'STRING',
+        OrganisationNumber        => 'STRING',
+        PrimaryOrganisationID     => 'NUMERIC',
+        PrimaryOrganisation       => 'STRING',
+        PrimaryOrganisationNumber => 'STRING'
     );
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        Type      => $AttributeTypeMapping{$Param{Search}->{Field}},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        ValueType => $AttributeTypeMapping{$Param{Search}->{Field}}
     );
 
-    return {} if !@Where;
 
-    push( @SQLWhere, @Where);
 
     return {
-        Where => \@SQLWhere,
         Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
 
@@ -192,30 +198,21 @@ sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if !$Self->_CheckSortParams(%Param);
+    return if !$Self->_CheckSortParams( %Param );
 
     my @SQLJoin    = ();
-    my $TableAlias = $Param{Flags}->{OrganisationJoin}->{$Param{Attribute}} || 'cor';
+    my $TableAlias = $Param{Flags}->{OrganisationJoin}->{ $Param{Attribute} } || 'cor';
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        OrganisationID        => "$TableAlias.org_id",
-        OrganisationIDs       => "$TableAlias.org_id",
-        Organisation          => 'o.name',
-        PrimaryOrganisationID => "$TableAlias.org_id",
-        PrimaryOrganisation   => 'o.name',
-    );
-
-    if ( !$Param{Flags}->{OrganisationJoin}->{$Param{Attribute}} ) {
+    if ( !$Param{Flags}->{OrganisationJoin}->{ $Param{Attribute} } ) {
         my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
         $TableAlias .= $Count;
 
         push(
             @SQLJoin,
-            "INNER JOIN contact_organisation $TableAlias ON $TableAlias.contact_id = c.id"
+            "LEFT JOIN contact_organisation $TableAlias ON $TableAlias.contact_id = c.id"
         );
 
-        if ( $Param{Attribute} =~ /^Primary/sm ) {
+        if ( $Param{Attribute} =~ m/^Primary/sm ) {
             push(
                 @SQLJoin,
                 "AND $TableAlias.is_primary = 1"
@@ -228,12 +225,23 @@ sub Sort {
                 "INNER JOIN organisation o ON $TableAlias.org_id = o.id"
             );
         }
-        $Param{Flags}->{OrganisationJoin}->{$Param{Attribute}} = $TableAlias;
+        $Param{Flags}->{OrganisationJoin}->{ $Param{Attribute} } = $TableAlias;
     }
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        OrganisationID            => "$TableAlias.org_id",
+        OrganisationIDs           => "$TableAlias.org_id",
+        Organisation              => 'o.name',
+        OrganisationNumber        => 'o.number',
+        PrimaryOrganisationID     => "$TableAlias.org_id",
+        PrimaryOrganisation       => 'o.name',
+        PrimaryOrganisationNumber => 'o.number',
+    );
+
     return {
-        Select  => [$AttributeMapping{$Param{Attribute}}],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}],
+        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ],
         Join    => \@SQLJoin
     };
 }

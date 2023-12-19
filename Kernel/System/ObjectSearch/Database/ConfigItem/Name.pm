@@ -14,12 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -33,132 +31,61 @@ Kernel::System::ObjectSearch::Database::Ticket::TicketNumber - attribute module 
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         Name => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $TablePrefix = 'ci';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Flags}->{PreviousVersionSearch} ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersion} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id' );
 
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
+            $Param{Flags}->{JoinMap}->{ConfigItemVersion} = 1;
         }
     }
 
-    my @Where = $Self->GetOperation(
-        Operator      => $Param{Search}->{Operator},
-        Column        => "$TablePrefix.name",
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1,
-        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => $Param{Flags}->{PreviousVersionSearch} ? 'civ.name' : 'ci.name',
+        Value           => $Param{Search}->{Value},
+        CaseInsensitive => 1,
+        Silent          => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    my @SQLJoin;
-    my $TablePrefix = 'ci';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
-
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
-        }
-    }
-
+    # return sort def
     return {
-        Select => [
-            "$TablePrefix.name"
-        ],
-        OrderBy => [
-            "$TablePrefix.name"
-        ],
-        Join => \@SQLJoin
+        Select  => [ 'ci.name' ],
+        OrderBy => [ 'LOWER(ci.name)' ],
     };
 }
 

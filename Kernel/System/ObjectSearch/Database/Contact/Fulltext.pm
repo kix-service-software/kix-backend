@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -50,15 +50,13 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
     };
-
-    return $Self->{Supported};
 }
 
 =item Search()
@@ -80,11 +78,6 @@ sub Search {
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
-
-    return if !$Self->_CheckOperators(
-        Operator  => $Param{Search}->{Operator},
-        Supported => $Self->{Supported}->{Fulltext}->{Operators}
-    );
 
     # prepare value for query condition
     my $Value;

@@ -12,13 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -32,67 +29,34 @@ Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible - attribute mod
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'OwnerID'       => {
+    return {
+        OwnerID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
-        'Owner'         => {
-            IsSearchable => 0,
-            IsSortable   => 1,
-            Operators    => []
-        },
-        'ResponsibleID' => {
+        Owner => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'Responsible'    => {
-            IsSearchable => 0,
+        ResponsibleID => {
+            IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
+        Responsible => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -100,79 +64,120 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # init mapping
     my %AttributeMapping = (
-        'OwnerID'       => 'st.user_id',
-        'ResponsibleID' => 'st.responsible_user_id',
+        OwnerID       => {
+            Column    => 'st.user_id',
+            ValueType => 'NUMERIC'
+        },
+        Owner         => {
+            Column    => 'tou.login'
+        },
+        ResponsibleID => {
+            Column    => 'st.responsible_user_id',
+            ValueType => 'NUMERIC'
+        },
+        Responsible   => {
+            Column    => 'tru.login'
+        }
     );
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'Owner' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
+            push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
+        }
+    }
+    elsif ( $Param{Search}->{Field} eq 'Responsible' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
+            push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
+        }
+    }
+
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
         Value     => $Param{Search}->{Value},
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Silent    => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'Owner' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
+            push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketOwnerContact} = 1;
+        }
+    }
+    if ( $Param{Attribute} eq 'Responsible' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
+            push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketResponsibleContact} = 1;
+        }
+    }
+
+    # init mapping
     my %AttributeMapping = (
-        Owner         => ['co.lastname', 'co.firstname'],
-        Responsible   => ['cr.lastname', 'cr.firstname'],
-        OwnerID       => ['st.user_id'],
-        ResponsibleID => ['st.responsible_user_id'],
+        OwnerID       => {
+            Select  => ['st.user_id'],
+            OrderBy => ['st.user_id']
+        },
+        Owner         => {
+            Select  => ['touc.lastname','touc.firstname','tou.login'],
+            OrderBy => ['LOWER(touc.lastname)','LOWER(touc.firstname)','LOWER(tou.login)']
+        },
+        ResponsibleID => {
+            Select  => ['st.responsible_user_id'],
+            OrderBy => ['st.responsible_user_id']
+        },
+        Responsible   => {
+            Select  => ['truc.lastname','truc.firstname','tru.login'],
+            OrderBy => ['LOWER(truc.lastname)','LOWER(truc.firstname)','LOWER(tru.login)']
+        }
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'Owner' ) {
-        $Join{Join} = [
-            'INNER JOIN contact co ON co.user_id = st.user_id'
-        ];
-    }
-    elsif ( $Param{Attribute} eq 'Responsible' ) {
-        $Join{Join} = [
-            'INNER JOIN contact cr ON cr.user_id = st.responsible_user_id'
-        ];
-    }
-
+    # return sort def
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

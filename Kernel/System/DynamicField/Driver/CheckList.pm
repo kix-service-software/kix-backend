@@ -17,10 +17,10 @@ use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::DynamicField::Driver::BaseText);
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicFieldValue',
-    'Main',
+our @ObjectDependencies = qw(
+    Config
+    DynamicFieldValue
+    Main
 );
 
 =head1 NAME
@@ -58,9 +58,9 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
-        'IsSearchable'    => 1,
+        'IsSearchable'    => 0,
         'IsSortable'      => 0,
-        'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE']
+        'SearchOperators' => []
     };
 
     # get the Dynamic Field Backend custom extensions

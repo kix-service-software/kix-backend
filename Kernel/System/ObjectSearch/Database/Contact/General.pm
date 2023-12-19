@@ -12,12 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -31,26 +29,10 @@ Kernel::System::ObjectSearch::Database::Contact::General - attribute module for 
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         Title => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -101,38 +83,16 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
-        Url => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
-        },
         Comment => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
@@ -152,37 +112,20 @@ sub Search {
         Comment   => 'c.comments',
     );
 
-    my @Where = $Self->GetOperation(
-        Operator      => $Param{Search}->{Operator},
-        Column        => $AttributeMapping{$Param{Search}->{Field}},
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1,
-        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{$Param{Search}->{Field}},
+        Value           => $Param{Search}->{Value},
+        CaseInsensitive => 1,
+        NULLValue       => 1
     );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
+    return if ( !$Condition );
 
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
@@ -192,22 +135,22 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Title     => 'c.title',
-        Firstname => 'c.firstname',
-        Lastname  => 'c.lastname',
-        Mobile    => 'c.mobile',
-        Phone     => 'c.phone',
-        Fax       => 'c.fax',
-        Street    => 'c.street',
-        City      => 'c.city',
-        Zip       => 'c.zip',
-        Country   => 'c.country',
-        Comment   => 'c.comments',
+        Title     => 'LOWER(c.title)',
+        Firstname => 'LOWER(c.firstname)',
+        Lastname  => 'LOWER(c.lastname)',
+        Mobile    => 'LOWER(COALESCE(c.mobile,\'\'))',
+        Phone     => 'LOWER(COALESCE(c.phone,\'\'))',
+        Fax       => 'LOWER(COALESCE(c.fax,\'\'))',
+        Street    => 'LOWER(COALESCE(c.street,\'\'))',
+        City      => 'LOWER(COALESCE(c.city,\'\'))',
+        Zip       => 'LOWER(COALESCE(c.zip,\'\'))',
+        Country   => 'LOWER(COALESCE(c.country,\'\'))',
+        Comment   => 'LOWER(COALESCE(c.comments,\'\'))',
     );
 
     return {
-        Select  => [$AttributeMapping{$Param{Attribute}}],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}]
+        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ]
     };
 }
 

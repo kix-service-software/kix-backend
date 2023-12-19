@@ -298,34 +298,30 @@ sub _GetContactData {
     }
 
     # include assigned user if requested (and existing)
-
-    #FIXME: workaround KIX2018-3308####################
-    $Self->AddCacheDependency(Type => 'User');
-    my $UserData;
-    if ($ContactData{AssignedUserID}) {
-        $UserData = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
-            Data          => {
-                UserID => $ContactData{AssignedUserID},
-            }
-        );
-    }
-    $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
-    #######################
-
-    #comment back in when 3308 is resolved properly
     if ($Param{Data}->{include}->{User}) {
-        # $Self->AddCacheDependency( Type => 'User' );
-        # $ContactData{User} = undef;
-        # if ($ContactData{AssignedUserID}) {
-        #     my $UserData = $Self->ExecOperation(
-        #         OperationType => 'V1::User::UserGet',
-        #         Data          => {
-        #             UserID => $ContactData{AssignedUserID},
-        #         }
-        #     );
-            $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-        # }
+        $Self->AddCacheDependency( Type => 'User' );
+        my $UserData = {};
+        if ($ContactData{AssignedUserID}) {
+            $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $ContactData{AssignedUserID},
+                }
+            );
+        }
+        $ContactData{User}  = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+    }
+
+    # else get only user login (KIX2018-3308)
+    else {
+        $ContactData{Login} = undef;
+        if ($ContactData{AssignedUserID}) {
+            $ContactData{Login} = $Kernel::OM->Get('User')->UserLookup(
+                UserID => $ContactData{AssignedUserID},
+                Silent => 1
+            );
+        }
     }
 
     # include assigned config items if requested

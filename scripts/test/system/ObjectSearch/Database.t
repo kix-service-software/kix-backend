@@ -97,46 +97,6 @@ $Self->Is(
 # begin transaction on database
 $Helper->BeginWork();
 
-# get general catalog entry for class 'Hardware'
-my $ClassDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-    Class => 'ITSM::ConfigItem::Class',
-    Name  => 'Hardware',
-);
-
-# get general catalog entry for deployment state 'Production'
-my $DeplStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-    Class => 'ITSM::ConfigItem::DeploymentState',
-    Name  => 'Production',
-);
-
-# get general catalog entry for incident state 'Operational'
-my $InciStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-    Class => 'ITSM::Core::IncidentState',
-    Name  => 'Operational',
-);
-
-# get priority with ID 1
-my %Priority = $Kernel::OM->Get('Priority')->PriorityGet(
-    PriorityID => 1,
-    UserID     => 1,
-);
-
-# get queue with ID 1
-my %Queue = $Kernel::OM->Get('Queue')->QueueGet(
-    ID => 1,
-);
-
-# get queue with ID 1
-my %State = $Kernel::OM->Get('State')->StateGet(
-    ID => 1,
-);
-
-# create test asset
-my $AssetID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
-    ClassID => $ClassDataRef->{ItemID},
-    UserID  => 1,
-);
-
 # process registered object types for backend database
 for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
     my $SupportedAttributes = $ObjectSearch->GetSupportedAttributes(
@@ -176,64 +136,48 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
         );
 
         if ( $Entry->{IsSearchable} ) {
-            if ( @{ $Entry->{Operators} } ) {
-                for my $Operator ( @{ $Entry->{Operators} } ) {
-                    my $SearchValue;
-                    if ( $Entry->{ValueType} eq 'Integer' ) {
-                        $SearchValue = 1;
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Date' ) {
-                        $SearchValue = '1990-01-01';
-                    }
-                    elsif ( $Entry->{ValueType} eq 'DateTime' ) {
-                        $SearchValue = '1990-01-01 00:00:00';
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Class.ID' ) {
-                        $SearchValue = $ClassDataRef->{ItemID};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Class.Name' ) {
-                        $SearchValue = $ClassDataRef->{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'DeploymentState.ID' ) {
-                        $SearchValue = $DeplStateDataRef->{ItemID};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'DeploymentState.Name' ) {
-                        $SearchValue = $DeplStateDataRef->{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'IncidentState.ID' ) {
-                        $SearchValue = $InciStateDataRef->{ItemID};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'IncidentState.Name' ) {
-                        $SearchValue = $InciStateDataRef->{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Flag.ArrayOfHashes' ) {
-                        $SearchValue = [
-                            {
-                                Flag  => 'Seen',
-                                Value => 1
-                            }
-                        ];
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Priority.Name' ) {
-                        $SearchValue = $Priority{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Queue.Name' ) {
-                        $SearchValue = $Queue{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'State.Name' ) {
-                        $SearchValue = $State{Name};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'StateType.Name' ) {
-                        $SearchValue = $State{TypeName};
-                    }
-                    elsif ( $Entry->{ValueType} eq 'Asset.ID' ) {
-                        $SearchValue = $AssetID;
-                    }
-                    else {
-                        $SearchValue = 'Test';
-                    }
+            $Self->True(
+                scalar( @{ $Entry->{Operators} } ),
+                'ObjectSearch > GetSupportedAttributes: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable and has Operators'
+            );
 
-                    my $Result = $ObjectSearch->Search(
+            for my $Operator ( @{ $Entry->{Operators} } ) {
+                my $SearchValue;
+                if ( $Entry->{ValueType} eq 'NUMERIC' ) {
+                    $SearchValue = 1;
+                }
+                elsif ( $Entry->{ValueType} eq 'DATE' ) {
+                    $SearchValue = '1990-01-01';
+                }
+                elsif ( $Entry->{ValueType} eq 'DATETIME' ) {
+                    $SearchValue = '1990-01-01 00:00:00';
+                }
+                else {
+                    $SearchValue = 'Test';
+                }
+
+                my $Result = $ObjectSearch->Search(
+                    ObjectType => $ObjectType,
+                    UserID     => 1,
+                    Search     => {
+                        AND => [
+                            {
+                                Field    => $Entry->{Property},
+                                Operator => $Operator,
+                                Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
+                            }
+                        ]
+                    }
+                );
+                $Self->Is(
+                    defined( $Result ),
+                    '1',
+                    'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator
+                );
+
+                if ( $Operator =~ m/^[!]?IN$/ ) {
+
+                    $Result = $ObjectSearch->Search(
                         ObjectType => $ObjectType,
                         UserID     => 1,
                         Search     => {
@@ -241,7 +185,7 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                                 {
                                     Field    => $Entry->{Property},
                                     Operator => $Operator,
-                                    Value    => $SearchValue
+                                    Value    => []
                                 }
                             ]
                         }
@@ -249,52 +193,9 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                     $Self->Is(
                         defined( $Result ),
                         '1',
-                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array'
                     );
-
-                    if ( $Operator =~ m/IN/ ) {
-                        $Result = $ObjectSearch->Search(
-                            ObjectType => $ObjectType,
-                            UserID     => 1,
-                            Search     => {
-                                AND => [
-                                    {
-                                        Field    => $Entry->{Property},
-                                        Operator => $Operator,
-                                        Value    => [ $SearchValue, $SearchValue ]
-                                    }
-                                ]
-                            }
-                        );
-                        $Self->Is(
-                            defined( $Result ),
-                            '1',
-                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / value array'
-                        );
-
-                        $Result = $ObjectSearch->Search(
-                            ObjectType => $ObjectType,
-                            UserID     => 1,
-                            Search     => {
-                                AND => [
-                                    {
-                                        Field    => $Entry->{Property},
-                                        Operator => $Operator,
-                                        Value    => []
-                                    }
-                                ]
-                            }
-                        );
-                        $Self->Is(
-                            defined( $Result ),
-                            '1',
-                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array'
-                        );
-                    }
                 }
-            }
-            else {
-
             }
         }
 

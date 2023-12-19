@@ -12,14 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
-use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -33,56 +29,23 @@ Kernel::System::ObjectSearch::Database::Ticket::Lock - attribute module for data
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'LockID' => {
+    return {
+        LockID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','NE','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
-        'Lock' => {
-            IsSearchable => 0,
+        Lock => {
+            IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
-        },
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -90,78 +53,94 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if (
-        IsArrayRefWithData($Param{Search}->{Value})
-        && $Param{Search}->{Operator} !~ /IN/sm
-    ) {
-        $Param{Search}->{Operator} = 'IN';
+    # init mapping
+    my %AttributeMapping = (
+        LockID => {
+            Column    => 'st.ticket_lock_id',
+            ValueType => 'NUMERIC'
+        },
+        Lock   => {
+            Column    => 'tl.name'
+        }
+    );
+
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'Lock' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketLock} ) {
+            push( @SQLJoin, 'INNER JOIN ticket_lock_type tl ON tl.id = st.ticket_lock_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketLock} = 1;
+        }
     }
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
-        Column    => 'st.ticket_lock_id',
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
         Value     => $Param{Search}->{Value},
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Silent    => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
+    # check for needed joins
+    my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationTicketLock} // '' );
+    my $TableAliasTL  = 'tl' . ( $Param{Flags}->{JoinMap}->{TranslationTicketLock} // '' );
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'Lock' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketLock} ) {
+            push( @SQLJoin, 'INNER JOIN ticket_lock_type tl ON tl.id = st.ticket_lock_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketLock} = 1;
+        }
+
+        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketLock} ) ) {
+            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+            $TableAliasTLP .= $Count;
+            $TableAliasTL  .= $Count;
+
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tl.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+
+            $Param{Flags}->{JoinMap}->{TranslationTicketLock} = $Count;
+        }
+    }
+
+    # init mapping
     my %AttributeMapping = (
-        Lock    => 'tlt.name',
-        LockID  => 'st.ticket_lock_id',
+        LockID => {
+            Select  => ['st.ticket_lock_id'],
+            OrderBy => ['st.ticket_lock_id']
+        },
+        Lock   => {
+            Select  => ["LOWER(COALESCE($TableAliasTL.value, tl.name)) AS TranslateLock"],
+            OrderBy => ['TranslateLock']
+        }
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'Lock' ) {
-        $Join{Join} = [
-            'INNER JOIN ticket_lock_type tlt ON tlt.id = st.ticket_lock_id'
-        ];
-    }
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

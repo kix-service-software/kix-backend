@@ -15,12 +15,12 @@ use base qw(Kernel::System::DynamicField::Driver::Base);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicFieldValue',
-    'Log',
-    'Main',
-    'JSON'
+our @ObjectDependencies = qw(
+    Config
+    DynamicFieldValue
+    Log
+    Main
+    JSON
 );
 
 =head1 NAME
@@ -51,9 +51,9 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
-        'IsSearchable'    => 1,
+        'IsSearchable'    => 0,
         'IsSortable'      => 0,
-        'SearchOperators' => ['EQ','GT','GTE','LT','LTE']
+        'SearchOperators' => []
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -246,44 +246,21 @@ sub ValueIsDifferent {
     );
 }
 
-sub SearchSQLGet {
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
+    return {
+        Column => "$Param{TableAlias}.value_text"
+    };
+}
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+sub SearchSQLSortFieldGet {
+    my ( $Self, %Param ) = @_;
 
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
-        $SQL .= $DBObject->Quote( $Param{SearchTerm} ) . "' ";
-        return $SQL;
-    }
-
-    if ( $Param{Operator} eq 'Like' ) {
-
-        my $SQL = $DBObject->QueryCondition(
-            Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
-        );
-
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
+    return {
+        Select  => ["$Param{TableAlias}.value_text"],
+        OrderBy => ["$Param{TableAlias}.value_text"]
+    };
 }
 
 sub ReadableValueRender {

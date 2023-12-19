@@ -12,13 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -32,118 +29,67 @@ Kernel::System::ObjectSearch::Database::Ticket::ArticleAttachment - attribute mo
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'AttachmentName' => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-        },
-    };
+    my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
+    if ( $StorageModule =~ /::ArticleStorageDB$/ ) {
+        return {
+            AttachmentName => {
+                IsSearchable => 1,
+                IsSortable   => 0,
+                Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            }
+        };
+    }
 
-    return $Self->{Supported};
+    return {};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
-    );
-
-    $Result = {
-        Join    => [ ],
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
-    if ( $StorageModule !~ /::ArticleStorageDB$/ ) {
-        # we can only search article attachments if they are stored in the DB
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Attachments cannot be searched if articles are not stored in the database!",
-        );
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( !$Param{Flags}->{JoinMap}->{Article} ) {
+        my $JoinString = 'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id';
 
-        return;
-    }
-
-    # check if we have to add a join
-    if (
-        !$Param{Flags}->{ArticleAttJoined}
-        || !$Param{Flags}->{ArticleAttJoined}->{$Param{BoolOperator}}
-    ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN article art_for_att_left ON st.id = art_for_att_left.ticket_id' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN article art_for_att_right ON st.id = art_for_att_right.ticket_id' );
-            push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att_left.id OR att.article_id = art_for_att_right.id' );
-        } else {
-            push( @SQLJoin, 'INNER JOIN article art_for_att ON st.id = art_for_att.ticket_id' );
-            push( @SQLJoin, 'INNER JOIN article_attachment att ON att.article_id = art_for_att.id' );
+        # restrict search from customers to customer visible articles
+        if ( $Param{UserType} eq 'Customer' ) {
+            $JoinString .= ' AND ta.customer_visible = 1';
         }
-        $Param{Flags}->{ArticleAttJoined}->{$Param{BoolOperator}} = 1;
+        push( @SQLJoin, $JoinString );
+
+        $Param{Flags}->{JoinMap}->{Article} = 1;
+    }
+    if ( !$Param{Flags}->{JoinMap}->{ArticleAttachment} ) {
+        push( @SQLJoin, 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id' );
+
+        $Param{Flags}->{JoinMap}->{ArticleAttachment} = 1;
     }
 
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'att.filename',
-        Value     => $Param{Search}->{Value},
-        Prepare   => 1,
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => 'att.filename',
+        Value           => $Param{Search}->{Value},
+        CaseInsensitive => 1,
+        NULLValue       => 1,
+        Silent          => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
-    # restrict search from customers to only customer articles
-    if ( $Param{UserType} eq 'Customer' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLWhere, 'art_for_att_left.customer_visible = 1' );
-            push( @SQLWhere, 'art_for_att_right.customer_visible = 1' );
-        } else {
-            push( @SQLWhere, 'art_for_att.customer_visible = 1' );
-        }
-    }
-
+    # return search def
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 
 1;
-
 
 =back
 

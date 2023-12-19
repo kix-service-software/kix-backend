@@ -11,16 +11,11 @@ package Kernel::System::ObjectSearch::Database::Ticket::TicketFlag;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,145 +29,57 @@ Kernel::System::ObjectSearch::Database::Ticket::TicketFlag - attribute module fo
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'TicketFlag' => {
+    return {
+        'TicketFlag.Seen' => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'Flag.ArrayOfHashes'
+            Operators    => ['EQ','NE']
         },
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
-    );
-
-    $Result = {
-        Join    => [ ],
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if ( !IsArrayRefWithData($Param{Search}->{Value}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid Search value!",
-        );
-        return;
+    # get requested flag
+    my $Flag = $Param{Search}->{Field};
+    $Flag =~ s/^TicketFlag\.//;
+
+    # check for needed joins
+    my $TableAlias = 'tf_left' . ( $Param{Flags}->{JoinMap}->{ 'TicketFlag_' . $Flag } // '' );
+    my @SQLJoin = ();
+    if ( !defined( $Param{Flags}->{JoinMap}->{ 'TicketFlag_' . $Flag } ) ) {
+        my $Count = $Param{Flags}->{TicketFlagJoinCounter}++;
+        $TableAlias .= $Count;
+        push( @SQLJoin, "LEFT OUTER JOIN ticket_flag $TableAlias ON $TableAlias.ticket_id = st.id AND $TableAlias.ticket_key = \'$Flag\' AND tf_left0.create_by = $Param{UserID}" );
+
+        $Param{Flags}->{JoinMap}->{ 'TicketFlag_' . $Flag } = $Count;
     }
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        my $Index = 1;
-        foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
-            if ( !IsHashRefWithData($SearchValue) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search value!",
-                );
-                return;
-            }
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator   => $Param{Search}->{Operator},
+        Column     => "$TableAlias.ticket_value",
+        Value      => $Param{Search}->{Value},
+        NULLValue  => 1,
+        Silent     => $Param{Silent}
+    );
+    return if ( !$Condition );
 
-            if ( !$Param{Search}->{Not} ) {
-                if ( $Param{BoolOperator} eq 'OR') {
-                    push( @SQLJoin, "LEFT OUTER JOIN ticket_flag tf$Index\_left ON st.id = tf$Index\_left.ticket_id" );
-                    push( @SQLJoin, "RIGHT OUTER JOIN ticket_flag tf$Index\_right ON st.id = tf$Index\_right.ticket_id" );
-                    push( @SQLWhere, "tf$Index\_left.ticket_key = '$SearchValue->{Flag}'" );
-                    push( @SQLWhere, "tf$Index\_right.ticket_key = '$SearchValue->{Flag}'" );
-                } else {
-                    push( @SQLJoin, "INNER JOIN ticket_flag tf$Index ON st.id = tf$Index.ticket_id" );
-                    push( @SQLWhere, "tf$Index.ticket_key = '$SearchValue->{Flag}'" );
-                }
-            }
-            else {
-                push( @SQLJoin, "LEFT JOIN ticket_flag ntf$Index ON st.id = ntf$Index.ticket_id" );
-                push( @SQLJoin, "AND ntf$Index.ticket_key = '$SearchValue->{Flag}'" );
-            }
-
-            # add value restriction if given
-            if ( $SearchValue->{Value} ) {
-                if ( !$Param{Search}->{Not} ) {
-                    if ( $Param{BoolOperator} eq 'OR') {
-                        push( @SQLWhere, "tf$Index\_left.ticket_value = '$SearchValue->{Value}'" );
-                        push( @SQLWhere, "tf$Index\_right.ticket_value = '$SearchValue->{Value}'" );
-                    } else {
-                        push( @SQLWhere, "tf$Index.ticket_value = '$SearchValue->{Value}'" );
-                    }
-                }
-                else {
-                    push( @SQLWhere, "(ntf$Index.ticket_value IS NULL OR ntf$Index.ticket_value <> '$SearchValue->{Value}')" );
-                }
-            }
-
-            # add user restriction if given
-            if ( $SearchValue->{UserID} ) {
-                if ( !$Param{Search}->{Not} ) {
-                    if ( $Param{BoolOperator} eq 'OR') {
-                        push( @SQLWhere, "tf$Index\_left.create_by = $SearchValue->{UserID}" );
-                        push( @SQLWhere, "tf$Index\_right.create_by = $SearchValue->{UserID}" );
-                    } else {
-                        push( @SQLWhere, "tf$Index.create_by = $SearchValue->{UserID}" );
-                    }
-                }
-                else {
-                    push( @SQLJoin, " AND ntf$Index.create_by = $SearchValue->{UserID}" );
-                }
-            }
-            $Index++;
-        }
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
-
+    # return search def
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 
 1;
-
 
 =back
 

@@ -12,12 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -31,134 +29,158 @@ Kernel::System::ObjectSearch::Database::ConfigItem::Editor - attribute module fo
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable   => 0|1,
-            IsSearchable => 0|1,
-            Operators    => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
+        CreateByID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
+        },
         CreateBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ChangeByID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
         ChangeBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # init mapping
     my %AttributeMapping = (
-        'CreateBy' => 'ci.create_by',
-        'ChangeBy' => 'ci.change_by',
+        CreateByID => {
+            Column          => 'ci.create_by',
+            ValueType       => 'NUMERIC'
+        },
+        CreateBy   => {
+            Column          => 'cicru.login',
+            CaseInsensitive => 1
+        },
+        ChangeByID => {
+            Column          => 'ci.change_by',
+            ValueType       => 'NUMERIC'
+        },
+        ChangeBy   => {
+            Column          => 'cichu.login',
+            CaseInsensitive => 1
+        }
     );
 
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemCreateBy} ) {
+            push( @SQLJoin, 'INNER JOIN users cicru ON cicru.id = ci.create_by' );
+
+            $Param{Flags}->{JoinMap}->{ConfigItemCreateBy} = 1;
+        }
+    }
+    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemChangeBy} ) {
+            push( @SQLJoin, 'INNER JOIN users cichu ON cichu.id = ci.change_by' );
+
+            $Param{Flags}->{JoinMap}->{ConfigItemChangeBy} = 1;
+        }
+    }
+
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+        Value           => $Param{Search}->{Value},
+        Silent          => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'CreateBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemCreateBy} ) {
+            push( @SQLJoin, 'INNER JOIN users cicru ON cicru.id = ci.create_by' );
+
+            $Param{Flags}->{JoinMap}->{ConfigItemCreateBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{TicketCreateByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact cicruc ON cicruc.user_id = cicru.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketCreateByContact} = 1;
+        }
+    }
+    if ( $Param{Attribute} eq 'ChangeBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemChangeBy} ) {
+            push( @SQLJoin, 'INNER JOIN users cichu ON cichu.id = ci.change_by' );
+
+            $Param{Flags}->{JoinMap}->{ConfigItemChangeBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{TicketChangeByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact cichuc ON cichuc.user_id = cichu.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketChangeByContact} = 1;
+        }
+    }
+
+    # init mapping
     my %AttributeMapping = (
-        CreateBy => ['ccr.lastname', 'ccr.firstname'],
-        ChangeBy => ['cch.lastname', 'cch.firstname'],
+        CreateByID => {
+            Select  => ['ci.create_by'],
+            OrderBy => ['ci.create_by']
+        },
+        CreateBy   => {
+            Select  => ['cicruc.lastname','cicruc.firstname','cicru.login'],
+            OrderBy => ['LOWER(cicruc.lastname)','LOWER(cicruc.firstname)','LOWER(cicru.login)']
+        },
+        ChangeByID => {
+            Select  => ['ci.change_by'],
+            OrderBy => ['ci.change_by']
+        },
+        ChangeBy   => {
+            Select  => ['cichuc.lastname','cichuc.firstname','cichu.login'],
+            OrderBy => ['LOWER(cichuc.lastname)','LOWER(cichuc.firstname)','LOWER(cichu.login)']
+        }
     );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'CreateBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = ci.create_by'
-        ];
-    }
-    elsif ( $Param{Attribute} eq 'ChangeBy' ) {
-        $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = ci.change_by'
-        ];
-    }
-
+    # return sort def
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy  => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

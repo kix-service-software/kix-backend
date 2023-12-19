@@ -11,16 +11,11 @@ package Kernel::System::ObjectSearch::Database::Ticket::TicketID;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,55 +29,24 @@ Kernel::System::ObjectSearch::Database::Ticket::TicketID - attribute module for 
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Search => {
-            'Propery' => [ ]   # Each property has its own supported operators
-        },
-        Sort   => [ ],
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         TicketID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'NUMERIC'
         },
         ID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -90,38 +54,21 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.id',
         Value     => $Param{Search}->{Value},
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        ValueType => 'NUMERIC',
+        Silent    => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
@@ -129,14 +76,14 @@ sub Sort {
     # check params
     return if ( !$Self->_CheckSortParams(%Param) );
 
+    # return sort def
     return {
         Select  => ['st.id'],
-        OrderBy => ['st.id'],
+        OrderBy => ['st.id']
     };
 }
 
 1;
-
 
 =back
 

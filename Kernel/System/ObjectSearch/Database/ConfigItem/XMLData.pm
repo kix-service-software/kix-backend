@@ -14,12 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -33,83 +31,58 @@ Kernel::System::ObjectSearch::Database::ConfigItem::XMLData - attribute module f
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {};
-
     # check cache
-    my $CacheKey = "GetSupportedAttributes::XMLData";
-    my $Data = $Kernel::OM->Get('Cache')->Get(
+    my $CacheKey  = "GetSupportedAttributes::XMLData";
+    my $CacheData = $Kernel::OM->Get('Cache')->Get(
         Type => 'ITSMConfigurationManagement',
         Key  => $CacheKey,
     );
+    return $CacheData if ( IsHashRefWithData( $CacheData ) );
 
-    if (
-        $Data
-        && ref $Data eq 'HASH'
-    ) {
-        $Self->{Supported} = $Data;
-        return $Self->{Supported};
-    }
-
+    # get valid config item
     my $ClassIDs = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-        Class => 'ITSM::ConfigItem::Class'
+        Class => 'ITSM::ConfigItem::Class',
+        Valid => 1
     );
 
-    for my $ClassID ( sort keys %{$ClassIDs} ) {
+    # init hash ref for supported attributes
+    my $AttributesRef = {};
+
+    # process classes in order to get predictable result
+    for my $ClassID ( sort( keys( %{ $ClassIDs } ) ) ) {
+        # get current class definition
         my $Definition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
             ClassID => $ClassID
         );
+        next if (
+            !IsHashRefWithData( $Definition )
+            || !IsArrayRefWithData( $Definition->{DefinitionRef} )
+        );
 
+        # get supported attributes for current class
         $Self->_XMLAttributeGet(
             DefinitionRef => $Definition->{DefinitionRef},
             ClassID       => $ClassID,
             Class         => $Definition->{Class},
-            Key           => 'CurrentVersion.Data'
+            Key           => 'CurrentVersion.Data',
+            AttributesRef => $AttributesRef
         );
     }
 
+    # cache supported attributes
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'ITSMConfigurationManagement',
         TTL   => 60 * 60 * 24 * 20,
         Key   => $CacheKey,
-        Value => $Self->{Supported},
+        Value => $AttributesRef,
     );
 
-    return $Self->{Supported};
+    # return supported attributes
+    return $AttributesRef;
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -118,7 +91,6 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @Where;
     my $Field;
 
     my $SearchKey = "[1]{'Version'}[1]";
@@ -134,35 +106,35 @@ sub Search {
     }
     $SearchKey .= "{'Content'}";
 
-    my @KeyWhere = $Self->GetOperation(
+    my $KeyCondition = $Self->_GetCondition(
         Operator         => 'LIKE',
         Column           => 'xst.xml_content_key',
-        Value            => $SearchKey,
-        Type             => 'STRING',
-        LikeEscapeString => 1,
-        Supported        => ['LIKE']
+        Value            => $SearchKey
     );
 
-    @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator   => $Param{Search}->{Operator},
         Column     => 'xst.xml_content_value',
         Value      => $Param{Search}->{Value},
         Type       => 'STRING',
-        Supplement => [' AND ' . $KeyWhere[0]],
-        Supported  => $Self->{Supported}->{$Field}->{Operators}
+        Supplement => [ $KeyCondition ]
     );
 
-    return if !@Where;
+    return if ( !$Condition );
 
     my @SQLJoin = $Self->_GetJoin(%Param);
 
-    push( @SQLWhere, @Where);
+
 
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
+
+=begin Internal:
+
+=cut
 
 sub _GetJoin {
     my ($Self, %Param) = @_;
@@ -180,7 +152,7 @@ sub _GetJoin {
             }
             push (@Types, 'ITSM::ConfigItem::' . $ClassID)
         }
-        @JoinAND = $Self->GetOperation(
+        @JoinAND = $Self->_GetCondition(
             Operator  => 'IN',
             Column    => 'xst.xml_type',
             Value     => \@Types,
@@ -225,34 +197,25 @@ sub _GetJoin {
 sub _XMLAttributeGet {
     my ($Self, %Param) = @_;
 
-    return if !$Param{DefinitionRef};
-    return if ref $Param{DefinitionRef} ne 'ARRAY';
-
+    # process definition
     for my $Attr ( @{$Param{DefinitionRef}} ) {
-        my $Key = ($Param{Key} || 'Data') . ".$Attr->{Key}";
+        my $Key = $Param{Key} . ".$Attr->{Key}";
 
-        if ( $Self->{Supported}->{$Key} ) {
-            push(
-                @{$Self->{Supported}->{$Key}->{Class}},
-                $Param{Class}
-            );
-            push(
-                @{$Self->{Supported}->{$Key}->{ClassID}},
-                $Param{ClassID}
-            );
+        if ( defined( $Param{AttributesRef}->{ $Key } ) ) {
+            push( @{ $Param{AttributesRef}->{ $Key }->{Class} }, $Param{Class} );
+            push( @{ $Param{AttributesRef}->{ $Key }->{ClassID} }, $Param{ClassID} );
         }
         else {
-            $Self->{Supported}->{$Key} = {
+            $Param{AttributesRef}->{$Key} = {
                 IsSearchable => $Attr->{Searchable} || 0,
                 IsSortable   => 0,
-                Class        => [$Param{Class}],
-                ClassID      => [$Param{ClassID}],
-                Operators    => $Attr->{Searchable} ? ['EQ','NE','LT','LTE','GT','GTE','CONTAINS','ENDSWITH','STARTSWITH'] : []
+                Class        => [ $Param{Class} ],
+                ClassID      => [ $Param{ClassID} ],
+                Operators    => $Attr->{Searchable} ? ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'] : []
             };
         }
 
-
-        if ( $Attr->{Sub} ) {
+        if ( IsArrayRefWithData( $Attr->{Sub} ) ) {
             $Self->_XMLAttributeGet(
                 %Param,
                 DefinitionRef => $Attr->{Sub},
@@ -264,8 +227,11 @@ sub _XMLAttributeGet {
     return 1;
 }
 
-1;
+=end Internal:
 
+=cut
+
+1;
 
 =back
 

@@ -1047,13 +1047,13 @@ sub DynamicFieldListGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     my @Data;
-    my $SQL = 'SELECT id, name FROM dynamic_field WHERE ';
+    my $SQL = 'SELECT id, name FROM dynamic_field';
     my @SQLWhere;
 
     if ($Valid) {
         push (
             @SQLWhere,
-            ' valid_id IN ('
+            'valid_id IN ('
                 . join( q{, } , $Kernel::OM->Get('Valid')->ValidIDsGet())
                 . q{)}
         );
@@ -1066,7 +1066,7 @@ sub DynamicFieldListGet {
         ) {
             push (
                 @SQLWhere,
-                " object_type = '"
+                "object_type = '"
                     . $DBObject->Quote( $Param{ObjectType} )
                     . q{'}
             );
@@ -1077,7 +1077,7 @@ sub DynamicFieldListGet {
 
             push (
                 @SQLWhere,
-                " object_type IN ($ObjectTypeString)"
+                "object_type IN ($ObjectTypeString)"
             );
         }
     }
@@ -1089,7 +1089,7 @@ sub DynamicFieldListGet {
         ) {
             push (
                 @SQLWhere,
-                " field_type = '"
+                "field_type = '"
                     . $DBObject->Quote( $Param{FieldType} )
                     . q{'}
             );
@@ -1100,16 +1100,14 @@ sub DynamicFieldListGet {
 
             push (
                 @SQLWhere,
-                " field_type IN ($FieldTypeString)"
+                "field_type IN ($FieldTypeString)"
             );
         }
     }
 
     if ( @SQLWhere ) {
-        $SQL .= join ( ' AND ', @SQLWhere );
-    }
-    else {
-        $SQL .= ' 1=1 ';
+        $SQL .= ' WHERE '
+            . join ( ' AND ', @SQLWhere );
     }
 
     $SQL .= " ORDER BY id";

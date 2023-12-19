@@ -14,13 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,313 +31,259 @@ Kernel::System::ObjectSearch::Database::Ticket::Article - attribute module for d
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
-    $Self->{Supported} = {
-        'ArticleID'         => {
+
+    return {
+        ArticleID         => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
-        'ChannelID'         => {
+        ChannelID         => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-            ValueType    => 'Integer'
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
-        'SenderTypeID'      => {
+        Channel           => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-            ValueType    => 'Integer'
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'CustomerVisible'   => {
+        SenderTypeID      => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE','IN','!IN','NE'],
-            ValueType    => 'Integer'
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
-        'From'              => {
+        SenderType        => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'To'                => {
+        CustomerVisible   => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
-        'Cc'                => {
+        From              => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'Subject'           => {
+        To                => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'Body'              => {
+        Cc                => {
             IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        'ArticleCreateTime' => {
+        Subject           => {
             IsSearchable => 1,
-            IsSortable   => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        Body              => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ArticleCreateTime => {
+            IsSearchable => 1,
+            IsSortable   => 0,
             Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
-        },
+            ValueType    => 'DATETIME'
+        }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
-    );
-
-    $Result = {
-        Join    => [ ],
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        'ArticleID'         => 'id',
-        'ChannelID'         => 'channel_id',
-        'SenderTypeID'      => 'article_sender_type_id',
-        'CustomerVisible'   => 'customer_visible',
-        'From'              => 'a_from',
-        'To'                => 'a_to',
-        'Cc'                => 'a_cc',
-        'Subject'           => 'a_subject',
-        'Body'              => 'a_body',
-    );
-
+    # check if search for ArticleID is used
     my $HasArticleIDSearch = 0;
-    if (IsArrayRefWithData($Param{WholeSearch})) {
-        foreach my $Search ( @{$Param{WholeSearch}} ) {
-            if ($Search->{Field} eq 'ArticleID') {
+    if ( IsArrayRefWithData( $Param{WholeSearch} ) ) {
+        for my $SearchEntry ( @{ $Param{WholeSearch} } ) {
+            if ($SearchEntry->{Field} eq 'ArticleID') {
                 $HasArticleIDSearch = 1;
+
                 last;
             }
         }
     }
 
+    # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active
     my $IsStaticSearch = 0;
-
-    # if no articl ID is search is given, use static search (if active),
-    # else use all data (e.g. to match articles with very short bodies, too (WordLengthMin for article index))
-    if (!$HasArticleIDSearch) {
+    if ( !$HasArticleIDSearch ) {
         my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
         if ( $SearchIndexModule =~ /::StaticDB$/ ) {
             $IsStaticSearch = 1;
         }
     }
 
-    # check if we have to add a join
-    if (
-        !$Param{Flags}->{ArticleJoined}
-        || !$Param{Flags}->{ArticleJoined}->{$Param{BoolOperator}}
-    ) {
-        # use appropriate table for selected search index module
-        my $ArticleSearchTable = 'article';
-        if ( $IsStaticSearch ) {
-            $ArticleSearchTable = 'article_search';
+    # check for needed joins
+    my @SQLJoin = ();
+    my $TableAliasPrefix = '';
+    if ( $IsStaticSearch ) {
+        $TableAliasPrefix = 's_';
+        if ( !$Param{Flags}->{JoinMap}->{StaticArticle} ) {
+            my $JoinString = 'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id';
+
+            # restrict search from customers to customer visible articles
+            if ( $Param{UserType} eq 'Customer' ) {
+                $JoinString .= ' AND s_ta.customer_visible = 1';
+            }
+            push( @SQLJoin, $JoinString );
+
+            $Param{Flags}->{JoinMap}->{StaticArticle} = 1;
         }
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN '.$ArticleSearchTable.' art_left ON st.id = art_left.ticket_id ' );
-        } else {
-            push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id ' );
+        if ( $Param{Search}->{Field} eq 'Channel' ) {
+            if ( !$Param{Flags}->{JoinMap}->{StaticArticleChannel} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id' );
+
+                $Param{Flags}->{JoinMap}->{StaticArticleChannel} = 1;
+            }
         }
-        $Param{Flags}->{ArticleJoined}->{$Param{BoolOperator}} = 1;
-    }
+        if ( $Param{Search}->{Field} eq 'SenderType' ) {
+            if ( !$Param{Flags}->{JoinMap}->{StaticArticleSenderType} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id' );
 
-    if ( $Param{Search}->{Field} eq 'ArticleCreateTime' ) {
-        # convert to unix time
-        my $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $Param{Search}->{Value},
-            Silent => 1,
-        );
-        if ( !$Value ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Invalid Date '$Param{Search}->{Value}'!",
-            );
-
-            return;
+                $Param{Flags}->{JoinMap}->{StaticArticleSenderType} = 1;
+            }
         }
-
-        my @Where = $Self->GetOperation(
-            Operator  => $Param{Search}->{Operator},
-            Column    => $Param{BoolOperator} eq 'OR' ? 'rt_left.incoming_time' : 'art.incoming_time',
-            Value     => $Value,
-            Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
-        );
-
-        return if !@Where;
-
-        push( @SQLWhere, @Where);
-    }
-    elsif ( $Param{Search}->{Field} =~ /ArticleID|ChannelID|SenderTypeID|CustomerVisible/ ) {
-        my $Column = 'art.';
-        if ( $Param{BoolOperator} eq 'OR') {
-            $Column = 'art_left.';
-        }
-        $Column .= $AttributeMapping{$Param{Search}->{Field}};
-
-        my @Where = $Self->GetOperation(
-            Operator  => $Param{Search}->{Operator},
-            Column    => $Column,
-            Value     => $Param{Search}->{Value},
-            Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
-        );
-
-        return if !@Where;
-
-        push( @SQLWhere, @Where);
     }
     else {
-        my $Field      = $AttributeMapping{$Param{Search}->{Field}};
-        my $FieldValue = $Param{Search}->{Value};
-        my $Prefix;
-        my $Supplement;
+        if ( !$Param{Flags}->{JoinMap}->{Article} ) {
+            my $JoinString = 'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id';
 
-        if ( $Param{BoolOperator} eq 'OR') {
-            $Prefix = 'art_left.';
+            # restrict search from customers to customer visible articles
             if ( $Param{UserType} eq 'Customer' ) {
-                $Supplement = [
-                    'AND art_left.customer_visible = 1'
-                ];
+                $JoinString .= ' AND ta.customer_visible = 1';
             }
-        } else {
-            $Prefix = 'art.';
-            if ( $Param{UserType} eq 'Customer' ) {
-                $Supplement = [
-                    'AND art.customer_visible = 1'
-                ];
+            push( @SQLJoin, $JoinString );
+
+            $Param{Flags}->{JoinMap}->{Article} = 1;
+        }
+        if ( $Param{Search}->{Field} eq 'Channel' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ArticleChannel} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id' );
+
+                $Param{Flags}->{JoinMap}->{ArticleChannel} = 1;
             }
         }
+        if ( $Param{Search}->{Field} eq 'SenderType' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ArticleSenderType} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id' );
 
-        my @Where = $Self->GetOperation(
-            Operator       => $Param{Search}->{Operator},
-            Column         => $Prefix.$Field,
-            Value          => $FieldValue,
-            Prepare        => 1,
-            Supported      => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
-            Supplement     => $Supplement,
-            IsStaticSearch => $IsStaticSearch
-        );
-
-        return if !@Where;
-
-        push( @SQLWhere, @Where);
+                $Param{Flags}->{JoinMap}->{ArticleSenderType} = 1;
+            }
+        }
     }
+
+    # init mapping
+    my %AttributeMapping = (
+        ArticleID         => {
+            Column          => $TableAliasPrefix . 'ta.id',
+            ValueType       => 'NUMERIC'
+        },
+        ChannelID         => {
+            Column          => $TableAliasPrefix . 'ta.channel_id',
+            ValueType       => 'NUMERIC'
+        },
+        Channel           => {
+            Column          => $TableAliasPrefix . 'tac.name',
+            CaseInsensitive => 1
+        },
+        SenderTypeID      => {
+            Column          => $TableAliasPrefix . 'ta.article_sender_type_id',
+            ValueType       => 'NUMERIC'
+        },
+        SenderType        => {
+            Column          => $TableAliasPrefix . 'tast.name',
+            CaseInsensitive => 1
+        },
+        CustomerVisible   => {
+            Column          => $TableAliasPrefix . 'ta.customer_visible',
+            ValueType       => 'NUMERIC'
+        },
+        From              => {
+            Column          => $TableAliasPrefix . 'ta.a_from',
+            CaseInsensitive => 1,
+            IsStaticSearch  => $IsStaticSearch
+        },
+        To                => {
+            Column          => $TableAliasPrefix . 'ta.a_to',
+            CaseInsensitive => 1,
+            IsStaticSearch  => $IsStaticSearch
+        },
+        Cc                => {
+            Column          => $TableAliasPrefix . 'ta.a_cc',
+            CaseInsensitive => 1,
+            IsStaticSearch  => $IsStaticSearch
+        },
+        Subject           => {
+            Column          => $TableAliasPrefix . 'ta.a_subject',
+            CaseInsensitive => 1,
+            IsStaticSearch  => $IsStaticSearch
+        },
+        Body              => {
+            Column          => $TableAliasPrefix . 'ta.a_body',
+            CaseInsensitive => 1,
+            IsStaticSearch  => $IsStaticSearch
+        },
+        ArticleCreateTime => {
+            Column          => $TableAliasPrefix . 'ta.incoming_time',
+            ValueType       => 'NUMERIC'
+        }
+    );
+
+    # prepare given values as array ref and convert if required
+    my $Values = [];
+    if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
+        push( @{ $Values },  $Param{Search}->{Value}  );
+    }
+    else {
+        $Values =  $Param{Search}->{Value} ;
+    }
+
+    # special handling for ArticleCreateTime
+    if ( $Param{Search}->{Field} eq 'ArticleCreateTime' ) {
+        for my $Value ( @{ $Values } ) {
+            $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                String => $Value
+            );
+        }
+    }
+
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+        IsStaticSearch  => $AttributeMapping{ $Param{Search}->{Field} }->{IsStaticSearch},
+        Value           => $Values,
+        NULLValue       => 1,
+        Silent          => $Param{Silent}
+    );
+    return if ( !$Condition );
 
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
-    };
-}
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        'ArticleID'         => 'art.id',
-        'ChannelID'         => 'art.channel_id',
-        'SenderTypeID'      => 'art.article_sender_type_id',
-        'CustomerVisible'   => 'art.customer_visible',
-        'From'              => 'art.a_from',
-        'To'                => 'art.a_to',
-        'Cc'                => 'art.a_cc',
-        'Subject'           => 'art.a_subject',
-        'Body'              => 'art.a_body',
-        'ArticleCreateTime' => 'art.incoming_time',
-    );
-
-    # check if we have to add a join
-    my @SQLJoin;
-    if (
-        !$Param{Flags}->{ArticleJoined}
-        || !$Param{Flags}->{ArticleJoined}->{AND}
-    ) {
-
-        # use appropriate table for selected search index module
-        my $ArticleSearchTable = 'article';
-        my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
-        if ( $SearchIndexModule =~ /::StaticDB$/ ) {
-            $ArticleSearchTable = 'article_search';
-        }
-
-        push( @SQLJoin, 'INNER JOIN '.$ArticleSearchTable.' art ON st.id = art.ticket_id' );
-    }
-
-    return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        Join  => \@SQLJoin
+        Where => [ $Condition ]
     };
 }
 
 1;
-
 
 =back
 

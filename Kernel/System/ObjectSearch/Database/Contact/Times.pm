@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -50,20 +50,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         CreateTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         },
         ChangeTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         }
     };
-
-    return $Self->{Supported};
 }
 
 =item Search()
@@ -86,7 +86,7 @@ sub Search {
     my @SQLWhere;
 
     # check params
-    return if !$Self->_CheckSearchParams(%Param);
+    return if !$Self->_CheckSearchParams( %Param );
 
     # map search attributes to table attributes
     my %AttributeMapping = (
@@ -116,19 +116,18 @@ sub Search {
     # quote
     $Value = $Kernel::OM->Get('DB')->Quote( $Value );
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Value,
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Value     => $Value
     );
 
-    return if !@Where;
+    return if ( !$Condition );
 
-    push( @SQLWhere, @Where );
+
 
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 

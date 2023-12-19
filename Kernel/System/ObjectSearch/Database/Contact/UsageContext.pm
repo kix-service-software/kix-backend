@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -52,20 +52,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         IsAgent => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE']
+            Operators    => ['EQ','NE'],
+            ValueType    => 'NUMERIC'
         },
         IsCustomer => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE']
+            Operators    => ['EQ','NE'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
 
 
@@ -85,13 +85,12 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
-    my @SQLJoin;
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
     my $TableAlias = $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} // 'u';
+    my @SQLJoin;
     if ( !$Param{Flags}->{UserJoin}->{$Param{BoolOperator}} ) {
         my $Count = $Param{Flags}->{UserCounter}++;
         $TableAlias .= $Count;
@@ -108,21 +107,17 @@ sub Search {
         IsCustomer => "$TableAlias.is_customer"
     );
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
-        Type      => 'NUMERIC'
+        ValueType      => 'NUMERIC'
     );
-
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
+    return if ( !$Condition );
 
     return {
-        Where => \@SQLWhere,
-        Join  => \@SQLJoin
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
 

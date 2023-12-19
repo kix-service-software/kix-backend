@@ -36,25 +36,39 @@ for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     );
 }
 
+# make sure config 'Ticket::ArchiveSystem' is inactive
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'Ticket::ArchiveSystem',
+    Value => 0
+);
+
 # check GetSupportedAttributes
-my $AttributeList = $AttributeObject->GetSupportedAttributes();
+my $InactiveAttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList,
-    {
-        Archived => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
-        }
-    },
-    'GetSupportedAttributes provides expected data'
+    $InactiveAttributeList,
+    {},
+    'GetSupportedAttributes provides expected data when "Ticket::ArchiveSystem" is inactive'
 );
 
 # make sure config 'Ticket::ArchiveSystem' is active
 $Kernel::OM->Get('Config')->Set(
     Key   => 'Ticket::ArchiveSystem',
     Value => 1
+);
+
+# check GetSupportedAttributes
+my $ActiveAttributeList = $AttributeObject->GetSupportedAttributes();
+$Self->IsDeeply(
+    $ActiveAttributeList,
+    {
+        Archived => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
+        }
+    },
+    'GetSupportedAttributes provides expected data when "Ticket::ArchiveSystem" is active'
 );
 
 # check Search
@@ -106,7 +120,7 @@ my @SearchTests = (
         Search   => {
             Field    => undef,
             Operator => 'EQ',
-            Value    => 'y'
+            Value    => '1'
         },
         Expected => undef
     },
@@ -115,7 +129,7 @@ my @SearchTests = (
         Search   => {
             Field    => 'Test',
             Operator => 'EQ',
-            Value    => 'y'
+            Value    => '1'
         },
         Expected => undef
     },
@@ -124,7 +138,7 @@ my @SearchTests = (
         Search   => {
             Field    => 'Archived',
             Operator => undef,
-            Value    => 'y'
+            Value    => '1'
         },
         Expected => undef
     },
@@ -133,7 +147,7 @@ my @SearchTests = (
         Search   => {
             Field    => 'Archived',
             Operator => 'Test',
-            Value    => 'y'
+            Value    => '1'
         },
         Expected => undef
     },
@@ -160,160 +174,6 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator EQ / Value flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => 'y'
-        },
-        Expected => {
-            Where => ['st.archive_flag = 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => 'n'
-        },
-        Expected => {
-            Where => ['st.archive_flag = 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => 'Y'
-        },
-        Expected => {
-            Where => ['st.archive_flag = 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => 'N'
-        },
-        Expected => {
-            Where => ['st.archive_flag = 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array 1',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => [1]
-        },
-        Expected => {
-            Where => ['st.archive_flag = 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array 0',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => [0]
-        },
-        Expected => {
-            Where => ['st.archive_flag = 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array 1 and 0',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => [1,0]
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['y']
-        },
-        Expected => {
-            Where => ['st.archive_flag = 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['n']
-        },
-        Expected => {
-            Where => ['st.archive_flag = 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "y" and "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['y','n']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['Y']
-        },
-        Expected => {
-            Where => ['st.archive_flag = 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['N']
-        },
-        Expected => {
-            Where => ['st.archive_flag = 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array flag "Y" and "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => ['Y','N']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator EQ / Value array 1 and flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'EQ',
-            Value    => [1,'n']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
         Name     => 'Search: valid search / Operator NE / Value 1',
         Search   => {
             Field    => 'Archived',
@@ -333,160 +193,6 @@ my @SearchTests = (
         },
         Expected => {
             Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => 'y'
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => 'n'
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => 'Y'
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => 'N'
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array 1',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => [1]
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array 0',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => [0]
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array 1 and 0',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => [1,0]
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['y']
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['n']
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "y" and "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['y','n']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['Y']
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 1']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['N']
-        },
-        Expected => {
-            Where => ['st.archive_flag <> 0']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array flag "Y" and "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => ['Y','N']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator NE / Value array 1 and flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'NE',
-            Value    => [1,'n']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
         }
     },
     {
@@ -530,84 +236,7 @@ my @SearchTests = (
             Value    => [1,0]
         },
         Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['y']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['n']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "y" and "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['y','n']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['Y']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['N']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array flag "Y" and "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => ['Y','N']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator IN / Value array 1 and flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => 'IN',
-            Value    => [1,'n']
-        },
-        Expected => {
-            Where => ['st.archive_flag IN (0,1)']
+            Where => ['st.archive_flag IN (1,0)']
         }
     },
     {
@@ -651,91 +280,20 @@ my @SearchTests = (
             Value    => [1,0]
         },
         Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
+            Where => ['st.archive_flag NOT IN (1,0)']
         }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['y']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['n']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "y" and "n"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['y','n']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "Y"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['Y']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['N']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array flag "Y" and "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => ['Y','N']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
-    {
-        Name     => 'Search: valid search / Operator !IN / Value array 1 and flag "N"',
-        Search   => {
-            Field    => 'Archived',
-            Operator => '!IN',
-            Value    => [1,'n']
-        },
-        Expected => {
-            Where => ['st.archive_flag NOT IN (0,1)']
-        }
-    },
+    }
 );
 for my $Test ( @SearchTests ) {
+    # make sure config 'Ticket::ArchiveSystem' is active
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'Ticket::ArchiveSystem',
+        Value => 1
+    );
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         BoolOperator => 'AND',
+        UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -769,6 +327,7 @@ my @SortTests = (
 for my $Test ( @SortTests ) {
     my $Result = $AttributeObject->Sort(
         Attribute => $Test->{Attribute},
+        Language  => 'en',
         Silent    => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -878,55 +437,60 @@ $Self->True(
     'Created third ticket without explicit flag set'
 );
 
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field Archived / Operator EQ / Value "y"',
+        Name     => 'Search: Field Archived / Operator EQ / Value 1',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Archived',
                     Operator => 'EQ',
-                    Value    => 'y'
+                    Value    => 1
                 }
             ]
         },
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field Archived / Operator NE / Value "y"',
+        Name     => 'Search: Field Archived / Operator NE / Value 1',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Archived',
                     Operator => 'NE',
-                    Value    => 'y'
+                    Value    => 1
                 }
             ]
         },
         Expected => [$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Archived / Operator IN / Value "y"',
+        Name     => 'Search: Field Archived / Operator IN / Value 1',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Archived',
                     Operator => 'IN',
-                    Value    => 'y'
+                    Value    => [1]
                 }
             ]
         },
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field Archived / Operator !IN / Value "y"',
+        Name     => 'Search: Field Archived / Operator !IN / Value 1',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Archived',
                     Operator => '!IN',
-                    Value    => 'y'
+                    Value    => [1]
                 }
             ]
         },
@@ -1011,21 +575,24 @@ my $InactiveSearchResult = $AttributeObject->Search(
         Operator => 'EQ',
         Value    => 1
     },
-    BoolOperator => 'AND'
+    BoolOperator => 'AND',
+    Silent       => 1
 );
 $Self->IsDeeply(
     $InactiveSearchResult,
-    {},
+    undef,
     'Search: "Ticket::ArchiveSystem" inactive'
 );
 
 # check sort
 my $InactiveSortResult = $AttributeObject->Sort(
-    Attribute => 'Archived'
+    Attribute => 'Archived',
+    Language  => 'en',
+    Silent    => 1
 );
 $Self->IsDeeply(
     $InactiveSortResult,
-    {},
+    undef,
     'Sort: "Ticket::ArchiveSystem" inactive'
 );
 

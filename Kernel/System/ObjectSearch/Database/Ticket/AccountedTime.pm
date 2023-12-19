@@ -11,10 +11,8 @@ package Kernel::System::ObjectSearch::Database::Ticket::AccountedTime;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our $ObjectManagerDisabled = 1;
@@ -31,50 +29,18 @@ Kernel::System::ObjectSearch::Database::Ticket::AccountedTime - attribute module
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        'Property' => {
-            IsSearchable => 0|1,
-            IsSortable   => 0|1,
-            Operators    => []
-        }
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         AccountedTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -82,53 +48,26 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if ( $Param{Search}->{Value} !~ m/^-?\d+$/sm ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid search value ($Param{Search}->{Value})!",
-            );
-        }
-        return;
-    }
-
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => 'st.accounted_time',
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        ValueType => 'NUMERIC',
+        NULLValue => 1,
         Silent    => $Param{Silent}
     );
-    return if !@Where;
-
-    push( @SQLWhere, @Where );
+    return if ( !$Condition );
 
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select  => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
     return {
         Select  => [ 'st.accounted_time' ],

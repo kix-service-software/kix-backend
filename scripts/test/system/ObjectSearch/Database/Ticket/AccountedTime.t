@@ -44,8 +44,8 @@ $Self->IsDeeply(
         AccountedTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -121,7 +121,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => {
-            Where => ['st.accounted_time = \'1\'']
+            Where => ['st.accounted_time = 1']
         }
     },
     {
@@ -132,7 +132,40 @@ my @SearchTests = (
             Value    => '-1'
         },
         Expected => {
-            Where => ['st.accounted_time = \'-1\'']
+            Where => ['st.accounted_time = -1']
+        }
+    },
+    {
+        Name     => 'Search: valid search / Operator NE',
+        Search   => {
+            Field    => 'AccountedTime',
+            Operator => 'NE',
+            Value    => '1'
+        },
+        Expected => {
+            Where => ['(st.accounted_time <> 1 OR st.accounted_time IS NULL)']
+        }
+    },
+    {
+        Name     => 'Search: valid search / Operator IN',
+        Search   => {
+            Field    => 'AccountedTime',
+            Operator => 'IN',
+            Value    => ['1']
+        },
+        Expected => {
+            Where => ['st.accounted_time IN (1)']
+        }
+    },
+    {
+        Name     => 'Search: valid search / Operator !IN',
+        Search   => {
+            Field    => 'AccountedTime',
+            Operator => '!IN',
+            Value    => ['1']
+        },
+        Expected => {
+            Where => ['st.accounted_time NOT IN (1)']
         }
     },
     {
@@ -143,7 +176,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => {
-            Where => ['st.accounted_time < \'1\'']
+            Where => ['st.accounted_time < 1']
         }
     },
     {
@@ -154,7 +187,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => {
-            Where => ['st.accounted_time > \'1\'']
+            Where => ['st.accounted_time > 1']
         }
     },
     {
@@ -165,7 +198,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => {
-            Where => ['st.accounted_time <= \'1\'']
+            Where => ['st.accounted_time <= 1']
         }
     },
     {
@@ -176,7 +209,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => {
-            Where => ['st.accounted_time >= \'1\'']
+            Where => ['st.accounted_time >= 1']
         }
     }
 );
@@ -184,6 +217,7 @@ for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         BoolOperator => 'AND',
+        UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -217,6 +251,7 @@ my @SortTests = (
 for my $Test ( @SortTests ) {
     my $Result = $AttributeObject->Sort(
         Attribute => $Test->{Attribute},
+        Language  => 'en',
         Silent    => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -329,6 +364,11 @@ $Self->True(
     'Accounted time for third ticket'
 );
 
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 # test Search
 my @IntegrationSearchTests = (
     {
@@ -343,6 +383,19 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field AccountedTime / Operator EQ / Value 2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'NE',
+                    Value    => '2'
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID3]
     },
     {
         Name     => 'Search: Field AccountedTime / Operator LT / Value 2',

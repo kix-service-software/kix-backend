@@ -11,16 +11,11 @@ package Kernel::System::ObjectSearch::Database::Ticket::ArticleFlag;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,144 +29,68 @@ Kernel::System::ObjectSearch::Database::Ticket::ArticleFlag - attribute module f
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'ArticleFlag' => {
+    return {
+        'ArticleFlag.Seen' => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'Flag.ArrayOfHashes'
+            Operators    => ['EQ','NE']
         },
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
-    );
-
-    $Result = {
-        Join    => [ ],
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if ( !IsArrayRefWithData($Param{Search}->{Value}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid Search value!",
-        );
-        return;
-    }
+    # get requested flag
+    my $Flag = $Param{Search}->{Field};
+    $Flag =~ s/^ArticleFlag\.//;
 
-    if ( $Param{Search}->{Operator} eq 'EQ' ) {
-        my $Index = 1;
-        foreach my $SearchValue ( sort @{ $Param{Search}->{Value} } ) {
-            if ( !IsHashRefWithData($SearchValue) ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search value!",
-                );
-                return;
-            }
+    # check for needed joins
+    my $TableAlias = 'af_left' . ( $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } // '' );
+    my @SQLJoin = ();
+    if ( !$Param{Flags}->{JoinMap}->{Article} ) {
+        my $JoinString = 'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id';
 
-            if ( !$Param{Search}->{Not} ) {
-                if ( $Param{BoolOperator} eq 'OR') {
-                    push( @SQLJoin, "LEFT OUTER JOIN article art_for_aflag$Index\_left ON st.id = art_for_aflag$Index\_left.ticket_id" );
-                    push( @SQLJoin, "RIGHT OUTER JOIN article art_for_aflag$Index\_right ON st.id = art_for_aflag$Index\_right.ticket_id" );
-                    push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag\_left$Index.id = af$Index.article_id OR art_for_aflag\_right$Index.id = af$Index.article_id" );
-                    push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
-                } else {
-                    push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
-                    push( @SQLJoin, "INNER JOIN article_flag af$Index ON art_for_aflag$Index.id = af$Index.article_id" );
-                    push( @SQLWhere, "af$Index.article_key = '$SearchValue->{Flag}'" );
-                }
-            }
-            else {
-                if ( $Param{BoolOperator} eq 'OR') {
-                    push( @SQLJoin, "LEFT OUTER JOIN article art_for_aflag$Index\_left ON st.id = art_for_aflag$Index\_left.ticket_id" );
-                    push( @SQLJoin, "RIGHT OUTER JOIN article art_for_aflag$Index\_right ON st.id = art_for_aflag$Index\_right.ticket_id" );
-                    push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag\_left$Index.id = naf$Index.article_id OR art_for_aflag\_right$Index.id = naf$Index.article_id" );
-                    push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
-                } else {
-                    push( @SQLJoin, "INNER JOIN article art_for_aflag$Index ON st.id = art_for_aflag$Index.ticket_id" );
-                    push( @SQLJoin, "LEFT JOIN article_flag naf$Index ON art_for_aflag$Index.id = naf$Index.article_id" );
-                    push( @SQLWhere, "naf$Index.article_key = '$SearchValue->{Flag}'" );
-                }
-            }
-
-            # add value restriction if given
-            if ( $SearchValue->{Value} ) {
-                if ( !$Param{Search}->{Not} ) {
-                    push( @SQLWhere, "af$Index.article_value = '$SearchValue->{Value}'" );
-                }
-                else {
-                    push( @SQLWhere, "(naf$Index.article_value IS NULL OR naf$Index.article_value <> '$SearchValue->{Value}')" );
-                }
-            }
-
-            # add user restriction if given
-            if ( $SearchValue->{UserID} ) {
-                if ( !$Param{Search}->{Not} ) {
-                    push( @SQLWhere, "af$Index.create_by = $SearchValue->{UserID}" );
-                }
-                else {
-                    push( @SQLWhere, "naf$Index.create_by = $SearchValue->{UserID}" );
-                }
-            }
-            $Index++;
+        # restrict search from customers to customer visible articles
+        if ( $Param{UserType} eq 'Customer' ) {
+            $JoinString .= ' AND ta.customer_visible = 1';
         }
+        push( @SQLJoin, $JoinString );
+
+        $Param{Flags}->{JoinMap}->{Article} = 1;
     }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
+    if ( !defined( $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } ) ) {
+        my $Count = $Param{Flags}->{ArticleFlagJoinCounter}++;
+        $TableAlias .= $Count;
+        push( @SQLJoin, "LEFT OUTER JOIN article_flag $TableAlias ON $TableAlias.article_id = ta.id AND $TableAlias.article_key = \'$Flag\' AND af_left0.create_by = $Param{UserID}" );
+
+        $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } = $Count;
     }
 
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator   => $Param{Search}->{Operator},
+        Column     => "$TableAlias.article_value",
+        Value      => $Param{Search}->{Value},
+        NULLValue  => 1,
+        Silent     => $Param{Silent}
+    );
+    return if ( !$Condition );
+
+    # return search def
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 
 1;
-
 
 =back
 

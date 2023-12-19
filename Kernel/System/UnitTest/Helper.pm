@@ -243,6 +243,13 @@ sub TestUserCreate {
     );
     $Self->{UnitTestObject}->True( 1, "Set user UserLanguage to $UserLanguage" );
 
+    if (
+        defined( $Param{Result} )
+        && $Param{Result} eq 'ID'
+    ) {
+        return $TestUserID;
+    }
+
     return $TestUserLogin;
 }
 

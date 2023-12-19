@@ -12,13 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -32,49 +29,17 @@ Kernel::System::ObjectSearch::Database::Ticket::Title - attribute module for dat
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'Title' => {
+    return {
+        Title => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-        },
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -82,61 +47,36 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $Column = $Param{Search}->{Field};
-    if ( $Param{Search}->{Operator} =~ /^(?:STARTSWITH|ENDSWITH|CONTAINS|LIKE)$/sm ) {
-        $Column = 'st.title';
-    }
-    elsif ( $Param{Search}->{Operator} =~ /IN/sm ) {
-        $Column = 'st.tn';
-    }
-
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $Column,
-        Value     => $Param{Search}->{Value},
-        Prepare   => 1,
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => 'st.title',
+        Value           => $Param{Search}->{Value},
+        CaseInsensitive => 1,
+        Silent          => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
+    # return sort def
     return {
         Select  => ['st.title'],
-        OrderBy => ['st.title'],
+        OrderBy => ['LOWER(st.title)']
     };
 }
 
 1;
-
 
 =back
 

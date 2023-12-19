@@ -61,8 +61,8 @@ sub new {
     $Self->{Properties} = {
         'IsSearchable'    => 1,
         'IsSortable'      => 0,
-        'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE'],
-        'SearchValueType' => 'Asset.ID'
+        'SearchOperators' => ['EQ','NE','IN','!IN'],
+        'SearchValueType' => 'NUMERIC'
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -83,8 +83,7 @@ sub new {
             # check if module can be loaded
             if (
                 !$Kernel::OM->Get('Main')->RequireBaseClass( $Extension->{Module} )
-                )
-            {
+            ) {
                 die "Can't load dynamic fields backend module"
                     . " $Extension->{Module}! $@";
             }
@@ -192,50 +191,18 @@ sub ValueValidate {
     return 1;
 }
 
-sub SearchSQLGet {
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
-        $SQL .= $DBObject->Quote( $Param{SearchTerm} ) . "' ";
-        return $SQL;
-    }
-
-    if ( $Param{Operator} eq 'Like' ) {
-
-        my $SQL = $DBObject->QueryCondition(
-            Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
-        );
-
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
+    return {
+        Column => "$Param{TableAlias}.value_text",
+    };
 }
 
-sub SearchSQLOrderFieldGet {
+sub SearchSQLSortFieldGet {
     my ( $Self, %Param ) = @_;
 
-    return "$Param{TableAlias}.value_text";
+    return;
 }
 
 sub ReadableValueRender {

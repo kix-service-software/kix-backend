@@ -366,8 +366,12 @@ sub _GetTicketData {
     }
 
     #FIXME: workaround KIX2018-3308
-    $TicketData{ContactID}      = "" . $TicketData{ContactID};
-    $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
+    if ($TicketData{ContactID}) {
+        $TicketData{ContactID}      = "" . $TicketData{ContactID};
+    }
+    if ($TicketData{OrganisationID}) {
+        $TicketData{OrganisationID} = "" . $TicketData{OrganisationID};
+    }
 
     delete $TicketData{Age};
 

@@ -111,9 +111,9 @@ sub _MailDomain {
 
     # search for relevant organisations
     my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectSearch => 'Organisation',
-        Result       => 'ARRAY',
-        Search       => {
+        ObjectType => 'Organisation',
+        Result     => 'ARRAY',
+        Search     => {
             AND => [
                 {
                     Operator => 'IN',

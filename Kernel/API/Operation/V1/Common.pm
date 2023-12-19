@@ -1651,7 +1651,7 @@ sub _ValidateFilter {
             foreach my $Filter ( @{ $FilterDef->{$Object}->{$BoolOperator} } ) {
                 $Filter->{Operator} = uc( $Filter->{Operator} || q{} );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
-                
+
                 # handle negated operators
                 if ( $Filter->{Operator} =~ /^!(.*?)$/ ) {
                     $Filter->{Operator} = $1;
@@ -3940,13 +3940,23 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserType   => $Self->{Authorization}->{UserType},
                 );
             } elsif ($Param{ObjectType} eq 'FAQArticle') {
-                return $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
-                    %Param,
-                    ObjectType => 'Contact',
-                    Object     => \%ContactData,
+                my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    Search => {
+                        AND => [
+                            {
+                                Field => 'AssignedContact',
+                                Operator => 'EQ',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{ID}
+                            }
+                        ]
+                    },
+                    Result     => 'ARRAY',
+                    ObjectType => 'FAQArticle',
                     UserID     => $Self->{Authorization}->{UserID},
-                    UserType   => $Self->{Authorization}->{UserType},
+                    UserType   => $Self->{Authorization}->{UserType}
                 );
+                return scalar(@IDs) ? \@IDs : [];
             }
         }
     }
