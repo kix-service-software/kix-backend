@@ -31,44 +31,34 @@ Kernel::System::ObjectSearch::Database::Ticket - object type module for object s
 
 =cut
 
-=item Init()
-
-### TODO ###
-
-=cut
-
 sub Init {
     my ( $Self, %Param ) = @_;
 
-    # init dynamic field join map as empty hash
-    $Param{Flags}->{DynamicFieldJoin} = {};
+    # init join map as empty hash
+    $Param{Flags}->{JoinMap} = {};
+
+    # init flag join counter with 0
+    $Param{Flags}->{ArticleFlagJoinCounter} = 0;
+    $Param{Flags}->{TicketFlagJoinCounter} = 0;
 
     # init dynamic field join counter with 0
     $Param{Flags}->{DynamicFieldJoinCounter} = 0;
 
+    # init translation join counter with 0
+    $Param{Flags}->{TranslationJoinCounter} = 0;
+
     return 1;
 }
-
-=item GetBase()
-
-### TODO ###
-
-=cut
 
 sub GetBaseDef {
     my ( $Self, %Param ) = @_;
 
     return {
-        Select => ['st.id', 'st.tn'],
-        From   => ['ticket st'],
+        Select  => ['st.id', 'st.tn'],
+        From    => ['ticket st'],
+        OrderBy => ['st.id ASC']
     };
 }
-
-=item GetPermissionDef()
-
-### TODO ###
-
-=cut
 
 sub GetPermissionDef {
     my ( $Self, %Param ) = @_;
@@ -82,8 +72,7 @@ sub GetPermissionDef {
 
     if ( IsArrayRefWithData( $QueueIDs ) ) {
         return {
-            Join  => [ 'INNER JOIN queue q ON q.id = st.queue_id' ],
-            Where => [ 'q.id IN (' . join( q{,}, @{ $QueueIDs } ) . q{)} ]
+            Where => [ 'st.queue_id IN (' . join( q{,}, @{ $QueueIDs } ) . q{)} ]
         };
     }
     else {
@@ -94,7 +83,6 @@ sub GetPermissionDef {
 }
 
 1;
-
 
 =back
 

@@ -11,15 +11,11 @@ package Kernel::System::ObjectSearch::Database::ConfigItem::InciState;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -33,199 +29,143 @@ Kernel::System::ObjectSearch::Database::ConfigItem::InciState - attribute module
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         InciStateID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'IncidentState.ID'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
         InciStateIDs => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'IncidentState.ID'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
         InciState => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'IncidentState.Name'
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @InciStateIDs;
-    if ( $Param{Search}->{Field} eq 'InciState' ) {
-        my %States = reverse(
-            %{$Kernel::OM->Get('GeneralCatalog')->ItemList(
-                Class => 'ITSM::Core::IncidentState',
-            )}
-        );
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Flags}->{PreviousVersionSearch} ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersion} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id' );
 
-        my @StateList = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @StateList = @{$Param{Search}->{Value}}
+            $Param{Flags}->{JoinMap}->{ConfigItemVersion} = 1;
         }
-        foreach my $State ( @StateList ) {
-            if ( !$States{$State} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown incident state $State!",
-                );
-                return;
+
+        if ( $Param{Search}->{Field} eq 'InciState' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersionInciState} ) {
+                push( @SQLJoin, 'INNER JOIN general_catalog civis ON civis.id = civ.inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
+
+                $Param{Flags}->{JoinMap}->{ConfigItemVersionInciState} = 1;
             }
-
-            push( @InciStateIDs, $States{$State} );
         }
     }
-    else {
-        @InciStateIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @InciStateIDs = @{$Param{Search}->{Value}}
-        }
-    }
+    elsif ( $Param{Search}->{Field} eq 'InciState' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemInciState} ) {
+            push( @SQLJoin, 'INNER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
 
-    my $TablePrefix = 'ci';
-    my $ColPrefix   = 'cur_';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
-        $ColPrefix   = q{};
-
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
+            $Param{Flags}->{JoinMap}->{ConfigItemInciState} = 1;
         }
     }
 
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $TablePrefix . q{.} . $ColPrefix . 'inci_state_id',
-        Value     => \@InciStateIDs,
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # init mapping
+    my %AttributeMapping = (
+        InciStateID  => {
+            Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civ.inci_state_id' : 'ci.cur_inci_state_id',
+            ValueType => 'NUMERIC'
+        },
+        InciStateIDs => {
+            Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civ.inci_state_id' : 'ci.cur_inci_state_id',
+            ValueType => 'NUMERIC'
+        },
+        InciState    => {
+            Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civis.name' : 'ciis.name'
+        }
     );
 
-    return if !@Where;
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value     => $Param{Search}->{Value},
+        Silent    => $Param{Silent}
+    );
+    return if ( !$Condition );
 
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
         Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    my @SQLJoin;
-    my $TablePrefix = 'ci';
-    my $ColPrefix   = 'cur_';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
-        $ColPrefix   = q{};
+    # check for needed joins
+    my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationConfigItemInciState} // '' );
+    my $TableAliasTL  = 'tl' . ( $Param{Flags}->{JoinMap}->{TranslationConfigItemInciState} // '' );
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'InciState' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemInciStateSort} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
 
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                ' LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
+            $Param{Flags}->{JoinMap}->{ConfigItemInciStateSort} = 1;
+        }
+
+        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationConfigItemInciState} ) ) {
+            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+            $TableAliasTLP .= $Count;
+            $TableAliasTL  .= $Count;
+
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = ciis.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+
+            $Param{Flags}->{JoinMap}->{TranslationConfigItemInciState} = $Count;
         }
     }
 
-    # map search attributes to table attributes
+    # init mapping
     my %AttributeMapping = (
-        InciState    => 'gci.name',
-        InciStateID  => $TablePrefix .q{.} . $ColPrefix . 'inci_state_id',
-        InciStateIDs => $TablePrefix .q{.} . $ColPrefix . 'inci_state_id',
+        InciStateID  => {
+            Select  => ['ci.cur_inci_state_id'],
+            OrderBy => ['ci.cur_inci_state_id']
+        },
+        InciStateIDs => {
+            Select  => ['ci.cur_inci_state_id'],
+            OrderBy => ['ci.cur_inci_state_id']
+        },
+        InciState    => {
+            Select  => ["LOWER(COALESCE($TableAliasTL.value, ciis.name)) AS TranslateInciState"],
+            OrderBy => ['TranslateInciState']
+        }
     );
 
-    if ( $Param{Attribute} eq 'InciState' ) {
-        push(
-            @SQLJoin,
-            ' INNER JOIN general_catalog gci ON gci.id = '
-                . $TablePrefix
-                . q{.}
-                . $ColPrefix
-                . 'inci_state_id'
-        );
-    }
-
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        Join => \@SQLJoin
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 

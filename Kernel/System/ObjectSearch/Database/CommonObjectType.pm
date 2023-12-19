@@ -84,7 +84,7 @@ sub Init {
     return 1;
 }
 
-=item GetBase()
+=item GetBaseDef()
 
 ### TODO ###
 
@@ -123,6 +123,7 @@ sub GetSearchDef {
         From    => [],
         Join    => [],
         Where   => [],
+        Having  => [],
         OrderBy => []
     );
 
@@ -140,7 +141,8 @@ sub GetSearchDef {
             return;
         }
 
-        my @SQLWhereOR = ();
+        my @SQLWhereOR  = ();
+        my @SQLHavingOR = ();
 
         # process search entries
         for my $SearchEntry ( @{ $Param{Search}->{ $BoolOperator } } ) {
@@ -225,6 +227,13 @@ sub GetSearchDef {
                 ) {
                     push( @SQLWhereOR, @{ $AttributeDef->{ $Key } } );
                 }
+                # special handling for having statement, when boolean is 'OR'
+                elsif (
+                    $BoolOperator eq 'OR'
+                    && $Key eq 'Having'
+                ) {
+                    push( @SQLHavingOR, @{ $AttributeDef->{ $Key } } );
+                }
                 else {
                     push( @{ $SQLDef{ $Key } }, @{ $AttributeDef->{ $Key } } );
                 }
@@ -238,6 +247,15 @@ sub GetSearchDef {
 
             # add to where statements
             push( @{ $SQLDef{Where} }, $StatementOR );
+        }
+
+        # handle collected statements for 'OR'
+        if ( @SQLHavingOR ) {
+            # combine
+            my $StatementOR = q{(} . join( ' OR ', @SQLHavingOR ) . q{)};
+
+            # add to where statements
+            push( @{ $SQLDef{Having} }, $StatementOR );
         }
     }
 
@@ -259,8 +277,19 @@ sub GetSortDef {
         From    => [],
         Join    => [],
         Where   => [],
+        Having  => [],
         OrderBy => []
     );
+
+    my $Language;
+    if ( $Param{Language} ) {
+        $Language = $Param{Language};
+    }
+    else {
+        $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+            UserID => $Param{UserID}
+        ) || 'en';
+    }
 
     for my $SortEntry ( @{ $Param{Sort} } ) {
         # get attribute
@@ -282,10 +311,6 @@ sub GetSortDef {
 
         # get object for attribute
         my $AttributeModule = $Self->{AttributeMapping}->{ $Attribute }->{Object};
-
-        my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
-            UserID => $Param{UserID}
-        ) || 'en';
 
         # execute attribute module to prepare SQL
         my $AttributeDef = $AttributeModule->Sort(
@@ -351,7 +376,7 @@ sub GetSupportedAttributes {
                 IsSearchable    => $AttributeRef->{IsSearchable} || 0,
                 IsSortable      => $AttributeRef->{IsSortable}   || 0,
                 Operators       => $AttributeRef->{Operators}    || [],
-                ValueType       => $AttributeRef->{ValueType}    || ''
+                ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL'
             }
         );
     }

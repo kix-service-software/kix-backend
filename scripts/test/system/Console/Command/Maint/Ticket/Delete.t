@@ -81,7 +81,7 @@ $Self->Is(
 );
 
 my %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-    ObjectSearch => 'Ticket',
+    ObjectType   => 'Ticket',
     Result       => 'HASH',
     Search       => {
         AND => [
@@ -116,7 +116,7 @@ $Self->Is(
 );
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-    ObjectSearch => 'Ticket',
+    ObjectType   => 'Ticket',
     Result       => 'HASH',
     Search       => {
         AND => [

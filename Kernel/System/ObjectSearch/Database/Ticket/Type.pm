@@ -11,16 +11,11 @@ package Kernel::System::ObjectSearch::Database::Ticket::Type;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,55 +29,23 @@ Kernel::System::ObjectSearch::Database::Ticket::Type - attribute module for data
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'TypeID' => {
+    return {
+        TypeID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
-        'Type' => {
+        Type => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
-        },
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -90,105 +53,94 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @TypeIDs;
-    if ( $Param{Search}->{Field} eq 'Type' ) {
-        my @TypeList = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @TypeList = @{$Param{Search}->{Value}}
+    # init mapping
+    my %AttributeMapping = (
+        TypeID => {
+            Column    => 'st.type_id',
+            ValueType => 'NUMERIC'
+        },
+        Type   => {
+            Column    => 'tt.name'
         }
-        foreach my $Type ( @TypeList ) {
-            my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
-                Type => $Type,
-            );
-            if ( !$TypeID ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown Type $Type!",
-                );
-                return;
-            }
-
-            push( @TypeIDs, $TypeID );
-        }
-    }
-    else {
-        @TypeIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @TypeIDs = @{$Param{Search}->{Value}}
-        }
-    }
-
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.type_id',
-        Value     => \@TypeIDs,
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
-    return if !@Where;
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'Type' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketType} ) {
+            push( @SQLJoin, 'INNER JOIN ticket_type tt ON tt.id = st.type_id' );
 
-    push( @SQLWhere, @Where);
+            $Param{Flags}->{JoinMap}->{TicketType} = 1;
+        }
+    }
 
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value     => $Param{Search}->{Value},
+        Silent    => $Param{Silent}
+    );
+    return if ( !$Condition );
+
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Type    => 'COALESCE(tl.value, tt.name) AS TranslateType',
-        TypeID  => 'st.type_id',
-    );
-
-    my %OrderMapping = (
-        Type    => 'TranslateType',
-        TypeID  => 'st.type_id',
-    );
-
-    my %Join;
+    # check for needed joins
+    my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationTicketType} // '' );
+    my $TableAliasTL  = 'tl' . ( $Param{Flags}->{JoinMap}->{TranslationTicketType} // '' );
+    my @SQLJoin = ();
     if ( $Param{Attribute} eq 'Type' ) {
-        $Join{Join} = [
-            'INNER JOIN ticket_type tt ON tt.id = st.type_id',
-	        'LEFT OUTER JOIN translation_pattern tlp ON tlp.value = tt.name',
-            "LEFT OUTER JOIN translation_language tl ON tl.pattern_id = tlp.id AND tl.language = '$Param{Language}'"
-        ];
+        if ( !$Param{Flags}->{JoinMap}->{TicketType} ) {
+            push( @SQLJoin, 'INNER JOIN ticket_type tt ON tt.id = st.type_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketType} = 1;
+        }
+
+        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketType} ) ) {
+            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+            $TableAliasTLP .= $Count;
+            $TableAliasTL  .= $Count;
+
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tt.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+
+            $Param{Flags}->{JoinMap}->{TranslationTicketType} = $Count;
+        }
     }
+
+    # init mapping
+    my %AttributeMapping = (
+        TypeID => {
+            Select  => ['st.type_id'],
+            OrderBy => ['st.type_id']
+        },
+        Type   => {
+            Select  => ["LOWER(COALESCE($TableAliasTL.value, tt.name)) AS TranslateType"],
+            OrderBy => ['TranslateType']
+        }
+    );
+
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $OrderMapping{$Param{Attribute}}
-        ],
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

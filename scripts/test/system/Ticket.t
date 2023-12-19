@@ -1150,7 +1150,7 @@ $Self->True(
     'TicketLockSet()',
 );
 
-# Test CreatedUserIDs
+# Test CreateByID
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
     Result     => 'HASH',
@@ -1158,7 +1158,7 @@ $Self->True(
     Search     => {
         AND => [
             {
-                Field    => 'CreatedUserID',
+                Field    => 'CreateByID',
                 Value    => [ 1, 455, 32 ],
                 Operator => 'IN',
             },
@@ -1175,7 +1175,7 @@ $Self->True(
 );
 $Self->True(
     $TicketIDs{$TicketID},
-    'TicketSearch() (HASH:CreatedUserID IN)',
+    'TicketSearch() (HASH:CreateByID IN)',
 );
 
 # Test CreatedPriorityIDs

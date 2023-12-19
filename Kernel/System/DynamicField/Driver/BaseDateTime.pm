@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -174,48 +174,24 @@ sub ValueValidate {
     return $Success;
 }
 
-sub SearchSQLGet {
+
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
-
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SearchTerm = $Param{SearchTerm};
-
-        # calculate relative times
-        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $SearchTerm
-        );
-        $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $SystemTime
-        );
-
-        my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
-        $SQL .= $Kernel::OM->Get('DB')->Quote( $SearchTerm ) . "' ";
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
+    return {
+        Column => "$Param{TableAlias}.value_date"
+    };
 }
 
-sub SearchSQLOrderFieldGet {
+sub SearchSQLSortFieldGet {
     my ( $Self, %Param ) = @_;
 
-    return "$Param{TableAlias}.value_date";
+    return {
+        Select  => ["$Param{TableAlias}.value_date"],
+        OrderBy => ["$Param{TableAlias}.value_date"]
+    };
 }
+
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 

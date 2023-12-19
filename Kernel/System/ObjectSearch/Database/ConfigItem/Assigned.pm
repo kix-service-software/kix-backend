@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -52,24 +52,21 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         AssignedContact => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ'],
-            ValueType    => 'Integer'
+            ValueType    => 'NUMERIC'
         },
         AssignedOrganisation => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','IN'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
-
 
 =item Search()
 
@@ -131,8 +128,7 @@ sub Search {
                         @{$Search{OR}},
                         {
                             Field    => "CurrentVersion.Data.$Attr",
-                            Operator => 'EQ',
-                            Type     => 'STRING',
+                            Operator => IsArrayRef($SearchParams->{$Attr}) ? 'IN' : 'EQ',
                             Value    => $SearchParams->{$Attr}
                         }
                     );
@@ -143,12 +139,12 @@ sub Search {
                         {
                             Field    => $Attr,
                             Operator => IsArrayRef($SearchParams->{$Attr}) ? 'IN' : 'EQ',
-                            Type     => 'STRING',
                             Value    => $SearchParams->{$Attr}
                         }
                     );
                 }
             }
+
             my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
                 ObjectType => 'ConfigItem',
                 Result     => 'ARRAY',
@@ -163,19 +159,19 @@ sub Search {
         }
     }
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => 'IN',
         Column    => 'ci.id',
         Value     => \@Values,
         Supported => ['IN']
     );
 
-    return if !@Where;
+    return if ( !$Condition );
 
-    push( @SQLWhere, @Where );
+    
 
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 

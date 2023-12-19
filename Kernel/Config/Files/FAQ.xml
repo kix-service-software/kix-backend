@@ -307,8 +307,8 @@ Your KIX Notification Master
         <SubGroup>DynamicFields::ObjectType::Registration</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="DisplayName" Translatable="1">FAQ</Item>
-                <Item Key="Module">Kernel::System::DynamicField::ObjectType::FAQ</Item>
+                <Item Key="DisplayName" Translatable="1">FAQArticle</Item>
+                <Item Key="Module">Kernel::System::DynamicField::ObjectType::FAQArticle</Item>
                 <Item Key="Prio">200</Item>
             </Hash>
         </Setting>

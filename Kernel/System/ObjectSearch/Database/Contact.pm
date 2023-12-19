@@ -31,23 +31,29 @@ Kernel::System::ObjectSearch::Database::Contact - object type module for object 
 
 =cut
 
-=item GetBase()
+sub Init {
+    my ( $Self, %Param ) = @_;
 
-### TODO ###
+    # init join map as empty hash
+    $Param{Flags}->{JoinMap} = {};
 
-=cut
+    # init dynamic field join counter with 0
+    $Param{Flags}->{DynamicFieldJoinCounter} = 0;
+
+    return 1;
+}
 
 sub GetBaseDef {
     my ( $Self, %Param ) = @_;
 
     return {
-        Select => ['c.id', 'c.email'],
-        From   => ['contact c'],
+        Select  => ['c.id', 'c.email'],
+        From    => ['contact c'],
+        OrderBy => ['c.id ASC']
     };
 }
 
 1;
-
 
 =back
 

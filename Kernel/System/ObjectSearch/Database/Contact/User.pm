@@ -14,12 +14,10 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -33,35 +31,21 @@ Kernel::System::ObjectSearch::Database::Contact::User - attribute module for dat
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         UserID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
         },
         AssignedUserID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
         },
         Login => {
             IsSearchable => 1,
@@ -74,87 +58,52 @@ sub GetSupportedAttributes {
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
     my @SQLJoin;
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
     my %GetParams = (
-        Column => 'c.user_id',
-        Type   => 'NUMERIC'
+        Column    => 'c.user_id',
+        ValueType => 'NUMERIC'
     );
+
+    my $TableAlias = $Param{Flags}->{UserJoin} // 'u';
     if ( $Param{Search}->{Field} =~ m/Login$/sm ){
-        my $TableAlias = 'u';
-        if ( !$Param{Flags}->{UserJoin}->{$Param{BoolOperator}} ) {
+        if ( !$Param{Flags}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
             $TableAlias .= $Count;
             push(
                 @SQLJoin,
                 "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
             );
-            $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} = $TableAlias;
+            $Param{Flags}->{UserJoin} = $TableAlias;
         }
         %GetParams = (
-            Column        => "$TableAlias.login",
-            Type          => 'STRING',
-            Prepare       => 1,
-            CaseSensitive => 1,
+            Column          => "$TableAlias.login",
+            ValueType       => 'STRING',
+            CaseInsensitive => 1,
         );
     }
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Value     => $Param{Search}->{Value},
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators},
+        NULLValue => 1,
         %GetParams
     );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
+    return if ( !$Condition );
 
     return {
-        Where => \@SQLWhere,
         Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
@@ -163,16 +112,16 @@ sub Sort {
     return if !$Self->_CheckSortParams(%Param);
 
     my @SQLJoin;
-    my $TableAlias = $Param{Flags}->{UserJoin}->{AND} // 'u';
+    my $TableAlias = $Param{Flags}->{UserJoin} // 'u';
     if ( $Param{Attribute} =~ m/Login$/sm ){
-        if ( !$Param{Flags}->{UserJoin}->{AND} ) {
+        if ( !$Param{Flags}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
             $TableAlias .= $Count;
             push(
                 @SQLJoin,
                 "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
             );
-            $Param{Flags}->{UserJoin}->{AND} = $TableAlias;
+            $Param{Flags}->{UserJoin} = $TableAlias;
         }
     }
 
@@ -192,7 +141,6 @@ sub Sort {
 }
 
 1;
-
 
 =back
 

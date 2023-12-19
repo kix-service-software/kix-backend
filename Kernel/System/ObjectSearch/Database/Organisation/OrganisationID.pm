@@ -14,7 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -52,20 +52,20 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         OrganisationID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
         },
         ID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
 
 
@@ -90,20 +90,19 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
         Column    => 'o.id',
         Value     => $Param{Search}->{Value},
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        ValueType      => 'NUMERIC',
     );
 
-    return if !@Where;
+    return if ( !$Condition );
 
-    push( @SQLWhere, @Where);
+
 
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 

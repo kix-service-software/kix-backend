@@ -35,6 +35,7 @@ our @ObjectDependencies = qw(
     Role
     Time
     Valid
+    ObjectSearch
 );
 
 =head1 NAME
@@ -736,7 +737,7 @@ sub UserSearch {
         }
 
         # join the relevant permission tables
-        $SQL .= ' JOIN role_user ru 
+        $SQL .= ' JOIN role_user ru
                       ON ru.user_id = u.id
                   JOIN role_permission as rp
                       ON ru.role_id=rp.role_id
@@ -745,8 +746,8 @@ sub UserSearch {
 
         foreach my $PermissionValue ( @PermissionValues ) {
             my $WhereSQL = "(
-                (pt.name='Base::Ticket' AND rp.target IN ('*', ?) AND (rp.value & ?) = ?) 
-                OR 
+                (pt.name='Base::Ticket' AND rp.target IN ('*', ?) AND (rp.value & ?) = ?)
+                OR
                 (pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?)
             )";
 
@@ -2070,12 +2071,14 @@ sub UpdateCounters {
         my %CounterData;
         foreach my $Counter ( sort keys %Counters ) {
             # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
+            my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
                 Search => {
                     AND => $Counters{$Counter}
                 },
-                UserID => $UserID,
-                Result => 'ARRAY',
+                ObjectType => 'Ticket',
+                UserID     => $UserID,
+                UserType   => 'Agent',
+                Result     => 'ARRAY',
             );
 
             foreach my $TicketID ( @TicketIDs ) {
@@ -2245,11 +2248,11 @@ sub DeleteUserCounterObject {
         $Param{Counter} =~ s/\*/%/g;
         $SQL .= ' AND counter LIKE ?';
         push @Bind, \$Param{Counter};
-    }    
+    }
     if ( $Param{UserID} ) {
         $SQL .= ' AND user_id = ?';
         push @Bind, \$Param{UserID};
-    }    
+    }
     if ( $Param{Category} ) {
         $SQL .= ' AND category = ?';
         push @Bind, \$Param{Category};

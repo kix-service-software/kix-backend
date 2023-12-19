@@ -213,7 +213,7 @@ my @Tests = (
             'IsSearchable'    => 1,
             'IsSortable'      => 1,
             'SearchOperators' => ['EQ','GT','GTE','LT','LTE'],
-            'SearchValueType' => 'DateTime'
+            'SearchValueType' => 'DATETIME'
         },
         Success => 1,
     },
@@ -226,7 +226,7 @@ my @Tests = (
             'IsSearchable'    => 1,
             'IsSortable'      => 1,
             'SearchOperators' => ['EQ','GT','GTE','LT','LTE'],
-            'SearchValueType' => 'Date'
+            'SearchValueType' => 'DATE'
         },
         Success => 1,
     },

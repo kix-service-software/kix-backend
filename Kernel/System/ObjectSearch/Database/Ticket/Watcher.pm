@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our $ObjectManagerDisabled = 1;
@@ -29,52 +29,18 @@ Kernel::System::ObjectSearch::Database::Ticket::Watcher - attribute module for d
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable   => 0|1,
-            IsSearchable => 0|1,
-            Operators    => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         WatcherUserID => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','IN','!IN','NE','GT','GTE','LT','LTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        BoolOperator => 'AND' | 'OR',
-        Search       => {}
-    );
-
-    $Result = {
-        Join  => [...],
-        Where => [...],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -82,74 +48,33 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    if ( ref( $Param{Search}->{Value} ) eq 'ARRAY' ) {
-        for my $Entry ( @{ $Param{Search}->{Value} } ) {
-            if ( $Entry !~ m/^\d+$/sm ) {
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Invalid search value ($Entry)!",
-                    );
-                }
-                return;
-            }
-        }
-    }
-    elsif ( $Param{Search}->{Value} !~ m/^\d+$/sm ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid search value ($Param{Search}->{Value})!",
-            );
-        }
-        return;
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( !$Param{Flags}->{JoinMap}->{TicketWatcher} ) {
+        push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON tw_left.object_id = st.id AND tw_left.object = \'Ticket\'' );
+
+        $Param{Flags}->{JoinMap}->{TicketWatcher} = 1;
     }
 
-
-    # check if we have to add a join
-    my @SQLJoin;
-    if (
-        !$Param{Flags}->{WatcherJoined}
-        || !$Param{Flags}->{WatcherJoined}->{ $Param{BoolOperator} }
-    ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, 'LEFT OUTER JOIN watcher tw_left ON st.id = tw_left.object_id AND tw_left.object = \'Ticket\'' );
-            push( @SQLJoin, 'RIGHT OUTER JOIN watcher tw_right ON st.id = tw_right.object_id AND tw_right.object = \'Ticket\'' );
-        } else {
-            push( @SQLJoin, 'INNER JOIN watcher tw ON st.id = tw.object_id AND tw.object = \'Ticket\'' );
-        }
-        $Param{Flags}->{WatcherJoined}->{ $Param{BoolOperator} } = 1;
-    }
-
-    my $Column;
-    if ( $Param{BoolOperator} eq 'OR' ) {
-        $Column = [
-            'tw_left.user_id',
-            'tw_right.user_id'
-        ];
-    } else {
-        $Column = 'tw.user_id';
-    }
-
-    my @SQLWhere = $Self->GetOperation(
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
-        Column    => $Column,
+        Column    => 'tw_left.user_id',
         Value     => $Param{Search}->{Value},
-        Prepare   => 1,
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{ $Param{Search}->{Field} }->{Operators},
+        ValueType => 'NUMERIC',
+        NULLValue => 1,
         Silent    => $Param{Silent}
     );
-    return if ( !@SQLWhere );
+    return if ( !$Condition );
 
+    # return search def
     return {
         Join  => \@SQLJoin,
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
 
 1;
-
 
 =back
 

@@ -56,7 +56,7 @@ sub new {
     $Self->{Properties} = {
         'IsSearchable'    => 1,
         'IsSortable'      => 1,
-        'SearchOperators' => ['EQ','GT','GTE','LT','LTE','LIKE','STARTSWITH','ENDSWITH']
+        'SearchOperators' => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
     };
 
     # get the Dynamic Field Backend custom extensions

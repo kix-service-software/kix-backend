@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -173,9 +173,20 @@ sub _CheckCategory {
         return %Param;
     }
 
-    my @ArticleIDs = $FAQObject->FAQSearch(
-        CategoryIDs => [ $ParentID ],
-        UserID      => $Self->{Authorization}->{UserID},
+    my @ArticleIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'CategoryID',
+                    Operator => 'IN',
+                    Value    => [ $ParentID ]
+                }
+            ]
+        },
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID}
     );
 
     if ( scalar @ArticleIDs ) {

@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
 our @ObjectDependencies = qw(
@@ -50,7 +50,7 @@ defines the list of attributes this module is supporting
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
+    return {
         Valid => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -59,11 +59,10 @@ sub GetSupportedAttributes {
         ValidID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            Operators    => ['EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
         }
     };
-
-    return $Self->{Supported};
 }
 
 =item Search()
@@ -103,20 +102,19 @@ sub Search {
         $Param{Flags}->{ValidJoin} = 1;
     }
 
-    my @Where = $Self->GetOperation(
+    my $Condition = $Self->_GetCondition(
         Operator      => $Param{Search}->{Operator},
         Column        => $AttributeMapping{$Param{Search}->{Field}},
-        Value         => $Param{Search}->{Value},
-        Supported     => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Value         => $Param{Search}->{Value}
     );
 
-    return if !@Where;
+    return if ( !$Condition );
 
-    push( @SQLWhere, @Where);
+
 
     return {
-        Where => \@SQLWhere,
-        Join  => \@SQLJoin
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
 

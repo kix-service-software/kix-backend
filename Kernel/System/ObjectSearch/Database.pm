@@ -92,6 +92,7 @@ search for objects in backend
         Sort       => [ ... ],              # Optional. ArrayRef of hashes with SortParams
         Limit      => 100,                  # Optional. Limit provided resultes. Use '0' to search without limit
         CacheTTL   => 60,                   # Optional. Default: 240; Time is seconds the result will be cached. Use '0' if result should not be cached.
+        Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
     );
@@ -159,6 +160,7 @@ sub Search {
         Backend  => $ObjectTypeBackend,
         Search   => $Param{Search},
         Sort     => $Param{Sort},
+        Language => $Param{Language},
         UserType => $Param{UserType},
         UserID   => $Param{UserID},
         Silent   => $Param{Silent}
@@ -170,6 +172,7 @@ sub Search {
         SQLDef => $SQLDef,
         Silent => $Param{Silent}
     );
+    return if ( !$SQL );
 
     if ( $Param{Debug} ) {
         $Kernel::OM->Get('Log')->Log(
@@ -181,12 +184,9 @@ END
         );
     }
 
-    return if ( !$SQL );
-
     # prepare database query
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => $SQL,
-        Limit => $Param{Limit}
+        SQL => $SQL
     );
 
     my %Objects;
@@ -195,6 +195,11 @@ END
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
         $Objects{ $Row[0] } = $Row[1];
+
+        last if (
+            $Param{Limit}
+            && $Param{Limit} == scalar( @ObjectIDs )
+        );
     }
 
     # return COUNT
@@ -260,7 +265,7 @@ sub GetSupportedAttributes {
 
 
 
-=item _PrepareSQLDef()
+=item _GetObjectTypeBackend()
 
 ### TODO ###
 
@@ -301,6 +306,8 @@ sub _PrepareSQLDef {
         From    => [],
         Join    => [],
         Where   => [],
+        GroupBy => [],
+        Having  => [],
         OrderBy => []
     );
 
@@ -322,8 +329,15 @@ sub _PrepareSQLDef {
     return if ( ref( $BaseDef ) ne 'HASH' );
 
     # add base def to sql def
+    my $BaseOrderBy;
     for my $Key ( keys %{ $BaseDef } ) {
-        push( @{ $SQLDef{ $Key } }, @{ $BaseDef->{ $Key } } );
+        # remember OrderBy of base in separate variable
+        if ( $Key eq 'OrderBy' ) {
+            $BaseOrderBy = $BaseDef->{ $Key };
+        }
+        else {
+            push( @{ $SQLDef{ $Key } }, @{ $BaseDef->{ $Key } } );
+        }
     }
 
     # check permission if UserID given and prepare relevant part of SQL statement (not needed for user with id 1)
@@ -356,7 +370,7 @@ sub _PrepareSQLDef {
         }
     }
 
-    # check if search parameter has data
+    # check if sort parameter has data
     if ( IsArrayRefWithData( $Param{Sort} ) ) {
         # get sort def from backend
         my $SortDef = $Param{Backend}->GetSortDef(
@@ -370,6 +384,29 @@ sub _PrepareSQLDef {
             push( @{ $SQLDef{ $Key } }, @{ $SortDef->{ $Key } } );
         }
     }
+
+    # add OrderBy from base
+    if ( IsArrayRefWithData( $BaseOrderBy ) ) {
+        push( @{ $SQLDef{OrderBy} }, @{ $BaseOrderBy } );
+    }
+
+    # make sure every field is only sorted in one direction
+    my @OrderByList   = ();
+    my %OrderByFields = ();
+    for my $OrderByEntry ( @{ $SQLDef{OrderBy} } ) {
+        # split entry in field and direction
+        my ($OrderByField, $OrderByDirection) = split( ' ', $OrderByEntry );
+
+        # skip known fields
+        next if ( $OrderByFields{ $OrderByField } );
+
+        # add entry to list
+        push( @OrderByList, $OrderByEntry );
+
+        # remember field
+        $OrderByFields{ $OrderByField } = 1;
+    }
+    $SQLDef{OrderBy} = \@OrderByList;
 
     # return ref of result
     return \%SQLDef;
@@ -388,7 +425,7 @@ sub _PrepareSQLStatement {
     my @SQLPartsDef = (
         {
             Name        => 'Select',
-            BeginWith   => 'SELECT',
+            BeginWith   => 'SELECT ',
             JoinBy      => q{, },
             JoinPreFix  => q{},
             JoinPostFix => q{},
@@ -396,7 +433,7 @@ sub _PrepareSQLStatement {
         },
         {
             Name        => 'From',
-            BeginWith   => 'FROM',
+            BeginWith   => 'FROM ',
             JoinBy      => q{, },
             JoinPreFix  => q{},
             JoinPostFix => q{},
@@ -412,7 +449,23 @@ sub _PrepareSQLStatement {
         },
         {
             Name        => 'Where',
-            BeginWith   => 'WHERE',
+            BeginWith   => 'WHERE ',
+            JoinBy      => ' AND ',
+            JoinPreFix  => q{(},
+            JoinPostFix => q{)},
+            Required    => 0,
+        },
+        {
+            Name        => 'GroupBy',
+            BeginWith   => 'GROUP BY ',
+            JoinBy      => q{, },
+            JoinPreFix  => q{},
+            JoinPostFix => q{},
+            Required    => 0,
+        },
+        {
+            Name        => 'Having',
+            BeginWith   => 'HAVING ',
             JoinBy      => ' AND ',
             JoinPreFix  => q{(},
             JoinPostFix => q{)},
@@ -420,7 +473,7 @@ sub _PrepareSQLStatement {
         },
         {
             Name        => 'OrderBy',
-            BeginWith   => 'ORDER BY',
+            BeginWith   => 'ORDER BY ',
             JoinBy      => q{, },
             JoinPreFix  => q{},
             JoinPostFix => q{},
@@ -453,9 +506,8 @@ sub _PrepareSQLStatement {
         }
 
         $SQL .= $SQLPart->{BeginWith}
-            . q{ }
             . $SQLPart->{JoinPreFix}
-            . join( $SQLPart->{JoinBy}, @{ $Param{SQLDef}->{ $SQLPart->{Name} } } )
+            . join( $SQLPart->{JoinBy}, $Kernel::OM->Get('Main')->GetUnique( @{ $Param{SQLDef}->{ $SQLPart->{Name} } } ) )
             . $SQLPart->{JoinPostFix};
     }
 

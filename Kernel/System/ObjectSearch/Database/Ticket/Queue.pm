@@ -11,16 +11,11 @@ package Kernel::System::ObjectSearch::Database::Ticket::Queue;
 use strict;
 use warnings;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -34,57 +29,23 @@ Kernel::System::ObjectSearch::Database::Ticket::Queue - attribute module for dat
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'Queue'   => {
+    return {
+        QueueID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Queue.Name'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
-        'QueueID' => {
+        Queue => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','IN','!IN','NE','LT','LTE','GT','GTE'],
-            ValueType    => 'Integer'
-        },
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -92,99 +53,95 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @QueueIDs;
-    if ( $Param{Search}->{Field} eq 'Queue' ) {
-        my @QueueList = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @QueueList = @{$Param{Search}->{Value}}
+    # init mapping
+    my %AttributeMapping = (
+        QueueID => {
+            Column    => 'st.queue_id',
+            ValueType => 'NUMERIC'
+        },
+        Queue   => {
+            Column    => 'tq.name'
         }
-        foreach my $Queue ( @QueueList ) {
-            my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
-                Queue => $Queue,
-            );
-            if ( !$QueueID ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown queue $Queue!",
-                );
-                return;
-            }
-
-            push( @QueueIDs, $QueueID );
-        }
-    }
-    else {
-        @QueueIDs = ( $Param{Search}->{Value} );
-        if ( IsArrayRef($Param{Search}->{Value}) ) {
-            @QueueIDs = @{$Param{Search}->{Value}}
-        }
-    }
-
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.queue_id',
-        Value     => \@QueueIDs,
-        Type      => 'NUMERIC',
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
     );
 
-    return if !@Where;
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'Queue' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketQueue} ) {
+            push( @SQLJoin, 'INNER JOIN queue tq ON tq.id = st.queue_id' );
 
-    push( @SQLWhere, @Where);
+            $Param{Flags}->{JoinMap}->{TicketQueue} = 1;
+        }
+    }
 
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value     => $Param{Search}->{Value},
+        Silent    => $Param{Silent}
+    );
+    return if ( !$Condition );
+
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Queue    => 'sq.name',
-        QueueID  => 'st.queue_id',
-    );
-
-    my %Join;
+    # check for needed joins
+    my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationTicketQueue} // '' );
+    my $TableAliasTL  = 'tl' . ( $Param{Flags}->{JoinMap}->{TranslationTicketQueue} // '' );
+    my @SQLJoin = ();
     if ( $Param{Attribute} eq 'Queue' ) {
-        $Join{Join} = [
-            'INNER JOIN queue sq ON sq.id = st.queue_id'
-        ];
+        if ( !$Param{Flags}->{JoinMap}->{TicketQueue} ) {
+            push( @SQLJoin, 'INNER JOIN queue tq ON tq.id = st.queue_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketQueue} = 1;
+        }
+
+        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketQueue} ) ) {
+            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+            $TableAliasTLP .= $Count;
+            $TableAliasTL  .= $Count;
+
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tq.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+
+            $Param{Flags}->{JoinMap}->{TranslationTicketQueue} = $Count;
+        }
     }
 
+    # init mapping
+    my %AttributeMapping = (
+        QueueID => {
+            Select  => ['st.queue_id'],
+            OrderBy => ['st.queue_id']
+        },
+        Queue   => {
+            Select  => ["LOWER(COALESCE($TableAliasTL.value, tq.name)) AS TranslateQueue"],
+            OrderBy => ['TranslateQueue']
+        }
+    );
+
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

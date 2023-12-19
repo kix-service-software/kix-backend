@@ -12,13 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -32,56 +29,28 @@ Kernel::System::ObjectSearch::Database::Ticket::Organisation - attribute module 
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'OrganisationID' => {
+    return {
+        OrganisationID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType    => 'NUMERIC'
         },
-        'Organisation' => {
-            IsSearchable => 0,
+        Organisation => {
+            IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        OrganisationNumber => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
     };
-
-    return $Self->{Supported};
 }
-
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -89,71 +58,96 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.organisation_id',
-        Value     => $Param{Search}->{Value},
-        Prepare   => 1,
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+    # init mapping
+    my %AttributeMapping = (
+        OrganisationID     => {
+            Column    => 'st.organisation_id',
+            ValueType => 'NUMERIC'
+        },
+        Organisation       => {
+            Column    => 'torg.name'
+        },
+        OrganisationNumber => {
+            Column    => 'torg.number'
+        }
     );
 
-    return if !@Where;
+    # check for needed joins
+    my @SQLJoin = ();
+    if (
+        $Param{Search}->{Field} eq 'Organisation'
+        || $Param{Search}->{Field} eq 'OrganisationNumber'
+    ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketOrganisation} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id' );
 
-    push( @SQLWhere, @Where);
+            $Param{Flags}->{JoinMap}->{TicketOrganisation} = 1;
+        }
+    }
 
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value     => $Param{Search}->{Value},
+        NULLValue => 1,
+        Silent    => $Param{Silent}
+    );
+    return if ( !$Condition );
+
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
+
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Organisation    => 'o.name',
-        OrganisationID  => 'st.organisation_id',
-    );
+    # check for needed joins
+    my @SQLJoin = ();
+    if (
+        $Param{Attribute} eq 'Organisation'
+        || $Param{Attribute} eq 'OrganisationNumber'
+    ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketOrganisation} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id' );
 
-    my %Join;
-    if ( $Param{Attribute} eq 'Organisation' ) {
-        $Join{Join} = [
-            'INNER JOIN organisation o ON o.id = st.organisation_id'
-        ];
+            $Param{Flags}->{JoinMap}->{TicketOrganisation} = 1;
+        }
     }
 
+    # init mapping
+    my %AttributeMapping = (
+        OrganisationID     => {
+            Select  => ['st.organisation_id'],
+            OrderBy => ['st.organisation_id']
+        },
+        Organisation       => {
+            Select  => ['torg.name'],
+            OrderBy => ['LOWER(torg.name)']
+        },
+        OrganisationNumber => {
+            Select  => ['torg.number'],
+            OrderBy => ['LOWER(torg.number)']
+        }
+    );
+
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 
 1;
-
 
 =back
 

@@ -77,6 +77,7 @@ search for objects
         Sort       => [ ... ],              # Optional. ArrayRef of hashes with SortParams
         Limit      => 100,                  # Optional. Limit provided resultes. Use '0' to search without limit
         CacheTTL   => 60,                   # Optional. Default: 240; Time is seconds the result will be cached. Use '0' if result should not be cached.
+        Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
     );
@@ -172,6 +173,9 @@ sub Search {
     if ( !defined( $Param{CacheTTL} ) ) {
         $Param{CacheTTL} = 60 * 4;
     }
+    if ( !defined( $Param{Language} ) ) {
+        $Param{Language} = '';
+    }
 
     # prepare result ref map
     my %ResultRefMap = (
@@ -245,6 +249,7 @@ sub Search {
         Search   => $Param{Search},
         Sort     => $Param{Sort},
         Limit    => $Param{Limit},
+        Language => $Param{Language},
         UserType => $Param{UserType},
         UserID   => $Param{UserID},
     };

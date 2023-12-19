@@ -116,12 +116,12 @@ my @Tests = (
         ExpectedTicketIDs => [ $TicketIDs[0], ],
     },
     {
-        Name   => "CreatedUserIDs",
+        Name   => "CreateByID",
         Config => {
             Search => {
                 AND => [
                     {
-                        Field    => 'CreatedUserIDs',
+                        Field    => 'CreateByID',
                         Operator => 'IN',
                         Type     => 'NUMERIC',
                         Value    => [ 1 ]

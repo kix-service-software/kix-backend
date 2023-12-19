@@ -12,13 +12,12 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::Common
+    Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Config
-    Log
-);
+use Kernel::System::VariableCheck qw(:all);
+
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -32,68 +31,36 @@ Kernel::System::ObjectSearch::Database::Ticket::TicketTimes - attribute module f
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    $Self->{Supported} = {
-        'Age'            => {
+    return {
+        Age            => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'Integer'
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
-        'CreateTime'     => {
+        CreateTime     => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         },
-        'PendingTime'    => {
+        PendingTime    => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         },
-        'LastChangeTime' => {
+        LastChangeTime => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DateTime'
-        },
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
+        }
     };
-
-    return $Self->{Supported};
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -101,104 +68,89 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # map search attributes to table attributes
+    # init mapping
     my %AttributeMapping = (
-        Age             => 'st.create_time_unix',
-        CreateTime      => 'st.create_time_unix',
-        PendingTime     => 'st.until_time',
-        LastChangeTime  => 'st.change_time',
+        Age            => {
+            Column    => 'st.create_time_unix',
+            ValueType => 'NUMERIC',
+            Convert   => 'Age'
+        },
+        CreateTime     => {
+            Column    => 'st.create_time_unix',
+            ValueType => 'NUMERIC',
+            Convert   => 'TimeStamp2SystemTime'
+        },
+        PendingTime    => {
+            Column    => 'st.until_time',
+            ValueType => 'NUMERIC',
+            Convert   => 'TimeStamp2SystemTime'
+        },
+        LastChangeTime => {
+            Column    => 'st.change_time',
+        }
     );
 
-    my $Type = 'NUMERIC';
-    my $Value;
-    if ( $Param{Search}->{Field} eq 'Age' ) {
-        # calculate unixtime
-        $Value = $Kernel::OM->Get('Time')->SystemTime() - $Param{Search}->{Value};
+    # prepare given values as array ref and convert if required
+    my $Values = [];
+    if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
+        push( @{ $Values },  $Param{Search}->{Value}  );
     }
     else {
-        # convert to unix time and check
-        $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $Param{Search}->{Value},
-            Silent => 1,
-        );
-        if ( !$Value ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "Invalid Date '$Param{Search}->{Value}'!",
-            );
-
-            return;
-        }
-
-        if ( $Param{Search}->{Field} eq 'LastChangeTime' ) {
-            # convert back to timestamp (relative calculations have been done above)
-            $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-                SystemTime => $Value
-            );
-            $Type = 'STRING';
+        $Values =  $Param{Search}->{Value} ;
+    }
+    if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} ) {
+        for my $Value ( @{ $Values } ) {
+            if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'Age' ) {
+                # calculate unixtime
+                $Value = $Kernel::OM->Get('Time')->SystemTime() - $Value;
+            }
+            elsif ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'TimeStamp2SystemTime' ) {
+                $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                    String => $Value
+                );
+            }
         }
     }
 
-    my @SQLWhere;
-    my @Where = $Self->GetOperation(
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
         Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Value,
-        Type      => $Type,
-        Supported => $Self->{Supported}->{$Param{Search}->{Field}}->{Operators}
+        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value     => $Values,
+        Silent    => $Param{Silent}
     );
+    return if ( !$Condition );
 
-    return if !@Where;
-
-    push( @SQLWhere, @Where);
-
+    # return search def
     return {
-        Where => \@SQLWhere,
+        Where => [ $Condition ]
     };
 }
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
 
 sub Sort {
     my ( $Self, %Param ) = @_;
 
     # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
+    # init mapping
     my %AttributeMapping = (
-        Age                    => 'st.create_time_unix',
-        CreateTime             => 'st.create_time_unix',
-        PendingTime            => 'st.until_time',
-        LastChangeTime         => 'st.change_time',
+        Age            => 'st.create_time_unix',
+        CreateTime     => 'st.create_time_unix',
+        PendingTime    => 'st.until_time',
+        LastChangeTime => 'st.change_time'
     );
 
+    # return sort def
     return {
-        Select => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBy => [
-            $AttributeMapping{$Param{Attribute}}
-        ],
-        OrderBySwitch => ($Param{Attribute} eq 'Age') ? 1 : undef
+        Select        => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy       => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBySwitch => ( $Param{Attribute} eq 'Age' ) ? 1 : undef
     };
 }
 
 1;
-
 
 =back
 

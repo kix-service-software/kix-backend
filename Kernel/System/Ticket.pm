@@ -377,16 +377,24 @@ sub TicketCreate {
 
     # QueueID/Queue lookup!
     if ( !$Param{QueueID} && $Param{Queue} ) {
-        $Param{QueueID} = $QueueObject->QueueLookup( Queue => $Param{Queue} );
+        $Param{QueueID} = $QueueObject->QueueLookup(
+            Queue  => $Param{Queue},
+            Silent => $Param{Silent}
+        );
     }
     elsif ( !$Param{Queue} ) {
-        $Param{Queue} = $QueueObject->QueueLookup( QueueID => $Param{QueueID} );
+        $Param{Queue} = $QueueObject->QueueLookup(
+            QueueID => $Param{QueueID},
+            Silent  => $Param{Silent}
+        );
     }
     if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No QueueID for '$Param{Queue}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No QueueID for '$Param{Queue}'!",
+            );
+        }
         return;
     }
 
