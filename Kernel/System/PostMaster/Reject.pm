@@ -81,6 +81,7 @@ sub Run {
         HistoryType      => 'FollowUp',
         HistoryComment   => "\%\%$Param{Tn}\%\%$Comment",
         OrigHeader       => \%GetParam,
+        DoNotSendEmail   => 1
     );
     if ( !$ArticleID ) {
         return;

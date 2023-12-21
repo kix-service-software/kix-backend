@@ -533,6 +533,7 @@ sub Run {
         HistoryComment   => "\%\%$Comment",
         OrigHeader       => \%GetParam,
         Queue            => $Queue,
+        DoNotSendEmail   => 1
     );
 
     # close ticket if article create failed!

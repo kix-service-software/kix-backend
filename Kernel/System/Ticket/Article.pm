@@ -55,6 +55,8 @@ create an article
         MessageID        => '<asdasdasd.123@example.com>',          # not required but useful
         InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
         References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
+        DoNotSendEmail   => 0|1,                                    # optional, prevent system from sending an email
+        PlainEmail       => 'plain email content',                  # optional, only used for channel 'email', when article is NOT send by the system
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
         HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
@@ -318,24 +320,8 @@ sub ArticleCreate {
             }
         }
 
-        $Param{ToOrig}      = $Param{To}          || '';
+        $Param{ToOrig} = $Param{To}          || '';
         $Param{Loop}        = $Param{Loop}        || 0;
-        $Param{HistoryType} = $Param{HistoryType} || 'SendAnswer';
-
-        if ( !$Param{Channel} && !$Param{ChannelID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need Channel or ChannelID!',
-            );
-            return;
-        }
-        if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need SenderType or SenderTypeID!',
-            );
-            return;
-        }
 
         # map ReplyTo into Reply-To if present
         if ( $Param{ReplyTo} ) {
@@ -707,7 +693,11 @@ sub ArticleCreate {
     }
 
     # send article through email channel if it was created by an agent
-    if ( $Param{Channel} eq 'email' && $Param{SenderType} eq 'agent' ) {
+    if (
+        !$Param{DoNotSendEmail}
+        && $Param{Channel} eq 'email'
+        && $Param{SenderType} eq 'agent'
+    ) {
 
         # prepare body and charset
         my $Body = $Kernel::OM->Get('Output::HTML::Layout')->RichTextDocumentComplete(
@@ -715,7 +705,6 @@ sub ArticleCreate {
         );
 
         my $Charset = $Param{Charset};
-        $Charset =~ s/plain/html/i;
 
         # send mail
         my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Email')->Send(
@@ -748,7 +737,7 @@ sub ArticleCreate {
             return $ArticleID;
         }
 
-        # write article to fs
+        # write plain article to fs
         my $Plain = $Self->ArticleWritePlain(
             ArticleID => $ArticleID,
             Email     => ${$HeadRef} . "\n" . ${$BodyRef},
@@ -777,6 +766,26 @@ sub ArticleCreate {
             },
             UserID => $Param{UserID},
         );
+    }
+    # handel plain email if provided
+    elsif (
+        $Param{PlainEmail}
+        && $Param{Channel} eq 'email'
+    ) {
+
+        # write plain article to fs
+        my $Plain = $Self->ArticleWritePlain(
+            ArticleID => $ArticleID,
+            Email     => $Param{PlainEmail},
+            UserID    => $Param{UserID}
+        );
+        if ( !$Plain ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to write plain article for ArticleID $ArticleID.",
+            );
+            return;
+        }
     }
 
     # return ArticleID

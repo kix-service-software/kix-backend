@@ -641,11 +641,13 @@ sub ArticlePlain {
     }
 
     if ( !$Data ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Can't open $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt: $!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message =>
+                    "Can't open $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/plain.txt: $!",
+            );
+        }
         return;
     }
 
