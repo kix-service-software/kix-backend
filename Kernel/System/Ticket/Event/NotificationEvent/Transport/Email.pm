@@ -790,12 +790,12 @@ sub CreateArticle {
 
     my $Channel = 'note';
     if ( IsArrayRefWithData( $Param{Notification}->{Data}->{Channel} ) ) {
-        $Channel = $Param{Notification}->{Data}->{Channel}->[0],
+        $Channel = $Param{Notification}->{Data}->{Channel}->[0];
     }
 
     my $VisibleForCustomer = 0;
     if ( IsArrayRefWithData( $Param{Notification}->{Data}->{VisibleForCustomer} ) ) {
-        $VisibleForCustomer = $Param{Notification}->{Data}->{VisibleForCustomer}->[0],
+        $VisibleForCustomer = $Param{Notification}->{Data}->{VisibleForCustomer}->[0];
     }
 
     my $ArticleID = $TicketObject->ArticleCreate(

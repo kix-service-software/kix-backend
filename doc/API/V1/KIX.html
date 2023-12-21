@@ -20382,6 +20382,10 @@ pre code {
             "CustomerVisible" : {
                "type" : "integer"
             },
+            "DoNotSendEmail" : {
+               "description" : "Prevent system from sending this article as email",
+               "type" : "integer"
+            },
             "DynamicFields" : {
                "description" : "list of dynamic field values to be set",
                "type" : "array",
@@ -20416,8 +20420,14 @@ pre code {
             "HistoryType" : {
                "type" : "string"
             },
+            "InReplyTo" : {
+               "type" : "string"
+            },
             "IncomingTime" : {
                "description" : "date time sting as \"YYYY-MM-DD HH24:MM:SS\"",
+               "type" : "string"
+            },
+            "MessageID" : {
                "type" : "string"
             },
             "MimeType" : {
@@ -20426,6 +20436,13 @@ pre code {
             },
             "NoAgentNotify" : {
                "type" : "integer"
+            },
+            "PlainEmail" : {
+               "description" : "Only used for channel &#39;email&#39; and when article is NOT send by system.",
+               "type" : "string"
+            },
+            "References" : {
+               "type" : "string"
             },
             "ReplyTo" : {
                "type" : "string"
@@ -22186,6 +22203,10 @@ pre code {
             "CustomerVisible" : {
                "type" : "integer"
             },
+            "DoNotSendEmail" : {
+               "description" : "Prevent system from sending this article as email",
+               "type" : "integer"
+            },
             "DynamicFields" : {
                "description" : "list of dynamic field values to be set",
                "type" : "array",
@@ -22220,8 +22241,14 @@ pre code {
             "HistoryType" : {
                "type" : "string"
             },
+            "InReplyTo" : {
+               "type" : "string"
+            },
             "IncomingTime" : {
                "description" : "date time sting as \"YYYY-MM-DD HH24:MM:SS\"",
+               "type" : "string"
+            },
+            "MessageID" : {
                "type" : "string"
             },
             "MimeType" : {
@@ -22230,6 +22257,13 @@ pre code {
             },
             "NoAgentNotify" : {
                "type" : "integer"
+            },
+            "PlainEmail" : {
+               "description" : "Only used for channel &#39;email&#39; and when article is NOT send by system.",
+               "type" : "string"
+            },
+            "References" : {
+               "type" : "string"
             },
             "ReplyTo" : {
                "type" : "string"

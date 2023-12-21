@@ -219,6 +219,222 @@ for my $Test (@ArticleTests) {
     );
 }
 
+my @DoNotSendArticleTests = (
+    {
+        Name        => 'DoNotSendEmail article',
+        ArticleData => {
+            Channel        => 'email',
+            SenderType     => 'agent',
+            From           => 'Some Agent <email@example.com>',
+            To             => 'Some Customer A <customer-a@example.com>',
+            DoNotSendEmail => 1,
+            Subject        => 'some short description',
+            Body           => 'the message text',
+            Charset        => 'iso-8859-15',
+            MimeType       => 'text/plain',
+            Loop           => 0,
+            HistoryType    => 'AddNote',
+            HistoryComment => 'Some free text!',
+            UserID         => 1,
+        }
+    }
+);
+TEST:
+for my $Test (@DoNotSendArticleTests) {
+
+    $Success = $TestEmailObject->CleanUp();
+    $Self->True(
+        $Success,
+        $Test->{Name} . ' - Cleanup Email backend',
+    );
+
+    $Self->IsDeeply(
+        $TestEmailObject->EmailsGet(),
+        [],
+        $Test->{Name} . ' - Test backend empty after cleanup',
+    );
+
+    # create article
+    $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID => $TicketID,
+        %{ $Test->{ArticleData} },
+    );
+
+    $Self->True(
+        $ArticleID,
+        $Test->{Name} . ' - ArticleCreate()',
+    );
+
+    # check that email was sent
+    $Emails = $TestEmailObject->EmailsGet();
+
+    # because of cleanup before (see above), there is no email
+    $Self->Is(
+        scalar @{$Emails},
+        0,
+        $Test->{Name} . ' - EmailsGet()',
+    );
+
+    # check article count
+    $ArticleCount++;
+    $Self->Is(
+        $Kernel::OM->Get('Ticket')->ArticleCount( TicketID => $TicketID ),
+        $ArticleCount,
+        $Test->{Name} . ' - ArticleCount',
+    );
+
+    # check article content
+    %Article = $Kernel::OM->Get('Ticket')->ArticleGet( ArticleID => $ArticleID );
+
+    $Self->True(
+        $Article{From} eq $Test->{ArticleData}->{From},
+        $Test->{Name} . ' - ArticleGet()',
+    );
+}
+
+my @DoNotSendArticleTests = (
+    {
+        Name        => 'PlainEmail article - Use plain email of system if email is send',
+        ArticleData => {
+            Channel        => 'email',
+            SenderType     => 'agent',
+            From           => 'Some Agent <email@example.com>',
+            To             => 'Some Customer A <customer-a@example.com>',
+            Subject        => 'some short description',
+            Body           => 'the message text',
+            PlainEmail     => 'Plain Email of UnitTest',
+            Charset        => 'iso-8859-15',
+            MimeType       => 'text/plain',
+            Loop           => 0,
+            HistoryType    => 'AddNote',
+            HistoryComment => 'Some free text!',
+            UserID         => 1,
+        },
+        UnexpectedPlainEmail => 'Plain unit test'
+    },
+    {
+        Name        => 'PlainEmail article - Use given PlainEmail if DoNotSendEmail is set',
+        ArticleData => {
+            Channel        => 'email',
+            SenderType     => 'agent',
+            From           => 'Some Agent <email@example.com>',
+            To             => 'Some Customer A <customer-a@example.com>',
+            DoNotSendEmail => 1,
+            PlainEmail     => 'Plain unit test',
+            Subject        => 'some short description',
+            Body           => 'the message text',
+            Charset        => 'iso-8859-15',
+            MimeType       => 'text/plain',
+            Loop           => 0,
+            HistoryType    => 'AddNote',
+            HistoryComment => 'Some free text!',
+            UserID         => 1,
+        },
+        ExpectedPlainEmail => 'Plain unit test'
+    },
+    {
+        Name        => 'PlainEmail article - Use given PlainEmail if email is not send by system',
+        ArticleData => {
+            Channel        => 'email',
+            SenderType     => 'external',
+            From           => 'Some Customer A <customer-a@example.com>',
+            To             => 'Some Agent <email@example.com>',
+            PlainEmail     => 'Plain unit test',
+            Subject        => 'some short description',
+            Body           => 'the message text',
+            Charset        => 'iso-8859-15',
+            MimeType       => 'text/plain',
+            Loop           => 0,
+            HistoryType    => 'AddNote',
+            HistoryComment => 'Some free text!',
+            UserID         => 1,
+        },
+        ExpectedPlainEmail => 'Plain unit test'
+    },
+    {
+        Name        => 'PlainEmail article - Ignore given PlainEmail if article is not an email',
+        ArticleData => {
+            Channel        => 'note',
+            SenderType     => 'agent',
+            From           => 'Some Agent <email@example.com>',
+            To             => 'Some Customer A <customer-a@example.com>',
+            PlainEmail     => 'Plain unit test',
+            Subject        => 'some short description',
+            Body           => 'the message text',
+            Charset        => 'iso-8859-15',
+            MimeType       => 'text/plain',
+            Loop           => 0,
+            HistoryType    => 'AddNote',
+            HistoryComment => 'Some free text!',
+            UserID         => 1,
+        },
+        ExpectedPlainEmail => undef
+    }
+);
+TEST:
+for my $Test (@DoNotSendArticleTests) {
+
+    $Success = $TestEmailObject->CleanUp();
+    $Self->True(
+        $Success,
+        $Test->{Name} . ' - Cleanup Email backend',
+    );
+
+    $Self->IsDeeply(
+        $TestEmailObject->EmailsGet(),
+        [],
+        $Test->{Name} . ' - Test backend empty after cleanup',
+    );
+
+    # create article
+    $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID => $TicketID,
+        %{ $Test->{ArticleData} },
+    );
+
+    $Self->True(
+        $ArticleID,
+        $Test->{Name} . ' - ArticleCreate()',
+    );
+
+    # check article count
+    $ArticleCount++;
+    $Self->Is(
+        $Kernel::OM->Get('Ticket')->ArticleCount( TicketID => $TicketID ),
+        $ArticleCount,
+        $Test->{Name} . ' - ArticleCount',
+    );
+
+    # check article content
+    %Article = $Kernel::OM->Get('Ticket')->ArticleGet( ArticleID => $ArticleID );
+
+    $Self->True(
+        $Article{From} eq $Test->{ArticleData}->{From},
+        $Test->{Name} . ' - ArticleGet()',
+    );
+
+    # check article plain
+    my $ArticlePlain = $Kernel::OM->Get('Ticket')->ArticlePlain(
+        ArticleID => $ArticleID,
+        Silent    => 1
+    );
+
+    if ( $Test->{UnexpectedPlainEmail} ) {
+        $Self->IsNot(
+            $ArticlePlain,
+            $Test->{UnexpectedPlainEmail},
+            $Test->{Name} . ' - Article Plain'
+        );
+    }
+    else {
+        $Self->Is(
+            $ArticlePlain,
+            $Test->{ExpectedPlainEmail},
+            $Test->{Name} . ' - Article Plain'
+        );
+    }
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 

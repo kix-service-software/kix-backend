@@ -482,10 +482,12 @@ sub ArticlePlain {
     }
 
     # log info
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'error',
-        Message  => "No plain article (article id $Param{ArticleID}) in database!",
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No plain article (article id $Param{ArticleID}) in database!",
+        );
+    }
     return;
 }
 
