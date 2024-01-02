@@ -1513,11 +1513,14 @@ sub RecalculateCurrentIncidentState {
         next CONFIGITEMID if (
             $NewIncidentState->{InciStateType}
             && $NewIncidentState->{InciStateType} eq 'incident'
+            && !$Param{Simulate}
         );
 
         my $CurInciStateID;
-        if ( $InciStateType eq 'warning' ) {
-
+        if( $Param{Simulate} && $InciStateType eq 'incident' ) {
+            $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{incident};
+        }
+        elsif ( $InciStateType eq 'warning' ) {
             $CurInciStateID = $Self->{RelevantIncidentStateIDForType}->{warning};
         }
         else {
