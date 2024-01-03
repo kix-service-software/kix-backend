@@ -240,18 +240,21 @@ sub MacroActionAdd {
 
     $Param{Parameters} = $Param{Parameters} || {};
     my $IsValid = $BackendObject->ValidateConfig(
-        Config => $Param{Parameters}
+        Config => $Param{Parameters},
+        Silent => $Param{Silent}
     );
 
     if ( !$IsValid ) {
-        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
-            Type => 'error',
-            What => 'Message',
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "MacroAction config is invalid ($LogMessage)!"
-        );
+        if ( !$Param{Silent} ) {
+            my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                Type => 'error',
+                What => 'Message',
+            );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "MacroAction config is invalid ($LogMessage)!"
+            );
+        }
         return;
     }
 

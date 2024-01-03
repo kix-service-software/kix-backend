@@ -866,7 +866,7 @@ sub ContactUpdate {
         }
     }
 
-    # if assigned user ist given, check associated user exists
+    # if assigned user is given, check associated user exists
     my %ExistingUser;
     if ($Param{AssignedUserID}) {
         %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
