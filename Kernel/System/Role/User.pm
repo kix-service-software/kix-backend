@@ -87,9 +87,7 @@ END
     );
 
     # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -379,9 +377,7 @@ sub RoleUserDelete {
     );
 
     # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
