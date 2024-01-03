@@ -730,7 +730,10 @@ sub UserSearch {
         push(@Bind, \$Param{SearchUserID});
     }
 
+    my @UnionWhere;
+
     if ( IsHashRefWithData($Param{HasPermission}) ) {
+
         my @PermissionValues;
         foreach my $Permission ( split(/,/, $Param{HasPermission}->{Permission}) ) {
             push @PermissionValues, Kernel::System::Role::Permission::PERMISSION->{$Permission};
@@ -744,19 +747,53 @@ sub UserSearch {
                   JOIN permission_type as pt
                       ON pt.id=rp.type_id';
 
-        foreach my $PermissionValue ( @PermissionValues ) {
-            my $WhereSQL = "(
-                (pt.name='Base::Ticket' AND rp.target IN ('*', ?) AND (rp.value & ?) = ?)
-                OR
-                (pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?)
-            )";
+        # part 1 - in case ticket base permissions exist for the relevant users
+        my @WherePart1 = ( 
+            "EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+        );
 
-            push(@Where, $WhereSQL);
+        # safe our current bind data
+        my @OrgBind = @Bind;
+
+        foreach my $PermissionValue ( @PermissionValues ) {
+            push @WherePart1, "EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket' AND rp1.target IN ('*', ?) AND (rp1.value & ?) = ?)";
+            push @WherePart1, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
+
             push(@Bind, ( \$Param{HasPermission}->{ObjectID}, \$PermissionValue, \$PermissionValue, \$PermissionValue, \$PermissionValue ));
         }
+
+        push @UnionWhere, \@WherePart1;
+
+        # part 2 - in case ticket base permissions do not exist for the relevant users
+        my @WherePart2 = ( 
+            "NOT EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+        );
+
+        # add the original bind data to the second union part
+        push @Bind, @OrgBind;
+
+        foreach my $PermissionValue ( @PermissionValues ) {
+            push @WherePart2, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
+
+            push(@Bind, ( \$PermissionValue, \$PermissionValue ));
+        }
+
+        push @UnionWhere, \@WherePart2;
     }
 
-    if (@Where) {
+    if ( @UnionWhere ) {
+        my $UnionSQL;
+        do {
+            my $WherePart = shift @UnionWhere;
+            $UnionSQL .= $SQL . ' WHERE ' . join(' AND ', (@Where, @{$WherePart}) );
+            $UnionSQL .= ' UNION ' if @UnionWhere;
+        }
+        while ( @UnionWhere );
+
+        $SQL = $UnionSQL;
+        $SQL .= ' ORDER BY ' . join(',', @OrderBy);
+    }
+    elsif ( @Where ) {
         $SQL .= ' WHERE ' . join(' AND ', @Where) . ' ORDER BY ' . join(',', @OrderBy);
     }
 
