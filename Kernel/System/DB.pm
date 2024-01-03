@@ -500,8 +500,7 @@ sub Do {
                 $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                    Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : '' ),
                 );
                 return;
             }
@@ -721,8 +720,7 @@ sub Prepare {
                     $Kernel::OM->Get('Log')->Log(
                         Caller   => 1,
                         Priority => 'Error',
-                        Message  => 'No SCALAR param in Bind! Bind: ' .
-                            ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : '' ),
                     );
                 }
                 return;
