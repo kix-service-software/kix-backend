@@ -1116,7 +1116,7 @@ sub _ReplaceResultVariables {
         my $VariableFilterValueIndex = 0;
 
         # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xms ) {
+        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xs ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
@@ -1147,11 +1147,11 @@ sub _ReplaceResultVariables {
                     $Self->{MacroResults}->{VariableFilterValue}->{ $VariableFilterValueIndex } = $Value;
 
                     # replace current variable with variable filter value
-                    $Param{Data} =~ s/\Q$Expression\E/<VariableFilterValue$VariableFilterValueIndex>/gmx;
+                    $Param{Data} =~ s/\Q$Expression\E/<VariableFilterValue$VariableFilterValueIndex>/gxs;
                 }
                 # replace value as string
                 else {
-                    $Param{Data} =~ s/\Q$Expression\E/$Value/gmx;
+                    $Param{Data} =~ s/\Q$Expression\E/$Value/gxs;
                 }
             }
             else {

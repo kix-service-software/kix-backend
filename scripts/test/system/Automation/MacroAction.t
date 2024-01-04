@@ -540,6 +540,22 @@ END
             Dummy => ['Test1.1','Test1.2','Test2.1','Test2.2'],
         }
     },
+    {
+        Name => 'Multiple line data without leading or trailing content on line with variable',
+        MacroResults => {
+            Test1 => 'Variable: 1',
+        },
+        Data => {
+            Dummy => 'Static: 1
+${Test1}
+Static: 2'
+        },
+        Expected => {
+            Dummy => 'Static: 1
+Variable: 1
+Static: 2',
+        }
+    },
 );
 
 # load additional filter
