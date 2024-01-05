@@ -246,6 +246,9 @@ sub ImageAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -306,6 +309,9 @@ sub ImageDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # push client callback event

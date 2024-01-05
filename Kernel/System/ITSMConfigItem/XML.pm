@@ -447,6 +447,9 @@ sub _XMLVersionAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     return $XMLID if !$MoveVersion;
 
@@ -508,6 +511,9 @@ sub _XMLVersionDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     return 1;

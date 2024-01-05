@@ -308,6 +308,9 @@ sub HistoryAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # insert history entry
     return if !$Kernel::OM->Get('DB')->Do(
@@ -366,6 +369,9 @@ sub HistoryDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # delete history for given config item
     return if !$Kernel::OM->Get('DB')->Do(
@@ -414,6 +420,9 @@ sub HistoryEntryDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # delete single entry
