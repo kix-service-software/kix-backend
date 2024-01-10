@@ -76,8 +76,9 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{CacheType} = 'ITSMConfigurationManagement';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+    $Self->{CacheType}   = 'ITSMConfigurationManagement';
+    $Self->{OSCacheType} = 'ObjectSearch_ConfigItem';
+    $Self->{CacheTTL}    = 60 * 60 * 24 * 20;
 
     @ISA = qw(
         Kernel::System::ITSMConfigItem::AttachmentStorage
@@ -566,6 +567,9 @@ sub ConfigItemAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # trigger ConfigItemCreate
     $Self->EventHandler(
@@ -634,7 +638,9 @@ sub ConfigItemUpdate {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
-
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # trigger ConfigItemUpdate
     $Self->EventHandler(
@@ -775,6 +781,9 @@ sub ConfigItemDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -834,6 +843,9 @@ sub ConfigItemAttachmentAdd {
         # clear cache
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
+        );
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{OSCacheType},
         );
 
         # trigger AttachmentAdd-Event
@@ -901,6 +913,9 @@ sub ConfigItemAttachmentDelete {
         # clear cache
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType},
+        );
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{OSCacheType},
         );
 
         # trigger AttachmentDeletePost-Event
@@ -1577,6 +1592,9 @@ sub RecalculateCurrentIncidentState {
             # clear cache
             $Kernel::OM->Get('Cache')->CleanUp(
                 Type => $Self->{CacheType},
+            );
+            $Kernel::OM->Get('Cache')->CleanUp(
+                Type => $Self->{OSCacheType},
             );
         }
     }
@@ -2553,6 +2571,9 @@ sub UpdateCounters {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     return 1;
