@@ -1,8 +1,8 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
-# Copyright (C) 2001-2023 OTRS AG, https://otrs.com/
-# Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/
+# Copyright (C) 2001-2024 OTRS AG, https://otrs.com/
+# Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. This program is
 # licensed under the AGPL-3.0 with code licensed under the GPL-3.0.
@@ -76,9 +76,9 @@ adds a new mail account
         DispatchingBy => 'Queue', # PostmasterDefaultQueue|From|Queue
         QueueID       => 12,
         UserID        => 123,
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         OAuth2_ProfileID => 'Custom1',
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     );
 
 =cut
@@ -86,7 +86,7 @@ adds a new mail account
 sub MailAccountAdd {
     my ( $Self, %Param ) = @_;
 
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     if ( $Param{Type} && $Param{Type} =~ m/_OAuth2$/xmsi ) {
         if ( !$Param{OAuth2_ProfileID} ) {
             $Kernel::OM->Get('Log')->Log(
@@ -97,7 +97,7 @@ sub MailAccountAdd {
         }
         $Param{Password} = '-';
     }
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     else {
         # set value to undef/NULL to prevent database errors
         $Param{OAuth2_ProfileID} = undef;
@@ -164,19 +164,19 @@ sub MailAccountAdd {
     return if !$DBObject->Do(
         SQL =>
             'INSERT INTO mail_account (login, pw, host, account_type, valid_id, comments, queue_id, '
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #            . ' imap_folder, trusted, create_time, create_by, change_time, change_by)'
 #            . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
             . ' imap_folder, oauth2_profile_id, trusted, create_time, create_by, change_time, change_by)'
             . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         Bind => [
             \$Param{Login},   \$Param{Password}, \$Param{Host},    \$Param{Type},
             \$Param{ValidID}, \$Param{Comment},  \$Param{QueueID}, \$Param{IMAPFolder},
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #            \$Param{Trusted}, \$Param{UserID},   \$Param{UserID},
             \$Param{OAuth2_ProfileID}, \$Param{Trusted}, \$Param{UserID},   \$Param{UserID},
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         ],
     );
 
@@ -208,10 +208,10 @@ returns a hash of mail account data
         ID => 123,
     );
 
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #(returns: ID, Login, Password, Host, Type, QueueID, Trusted, IMAPFolder, Comment, DispatchingBy, ValidID)
 (returns: ID, Login, Password, Host, Type, QueueID, Trusted, IMAPFolder, OAuth2_Profile, Comment, DispatchingBy, ValidID)
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 
 =cut
 
@@ -234,10 +234,10 @@ sub MailAccountGet {
     return if !$DBObject->Prepare(
         SQL =>
             'SELECT login, pw, host, account_type, queue_id, imap_folder, trusted, comments, valid_id, '
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #            . ' create_by, create_time, change_by, change_time FROM mail_account WHERE id = ?',
             . ' create_by, create_time, change_by, change_time, oauth2_profile_id FROM mail_account WHERE id = ?',
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         Bind => [ \$Param{ID} ],
     );
 
@@ -258,9 +258,9 @@ sub MailAccountGet {
             CreateTime => $Data[10],
             ChangeBy   => $Data[11],
             ChangeTime => $Data[12],
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
             OAuth2_ProfileID => $Data[13],
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         );
     }
     if ( $Data{ID} ) {
@@ -307,9 +307,9 @@ update a new mail account
         DispatchingBy => 'Queue', # PostmasterDefaultQueue|From|Queue
         QueueID       => 12,
         UserID        => 123,
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         OAuth2_ProfileID => 'Custom1',
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     );
 
 =cut
@@ -317,7 +317,7 @@ update a new mail account
 sub MailAccountUpdate {
     my ( $Self, %Param ) = @_;
 
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     if ( $Param{Type} && $Param{Type} =~ m/_OAuth2$/xmsi ) {
         if ( !$Param{OAuth2_ProfileID} ) {
             $Kernel::OM->Get('Log')->Log(
@@ -328,7 +328,7 @@ sub MailAccountUpdate {
         }
         $Param{Password} = '-';
     }
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     else {
         # set value to undef/NULL to prevent database errors
         $Param{OAuth2_ProfileID} = undef;
@@ -392,17 +392,17 @@ sub MailAccountUpdate {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE mail_account SET login = ?, pw = ?, host = ?, account_type = ?, '
             . ' comments = ?, imap_folder = ?, trusted = ?, valid_id = ?, change_time = current_timestamp, '
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #            . ' change_by = ?, queue_id = ? WHERE id = ?',
             . ' oauth2_profile_id = ?, change_by = ?, queue_id = ? WHERE id = ?',
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         Bind => [
             \$Param{Login},   \$Param{Password},   \$Param{Host},    \$Param{Type},
             \$Param{Comment}, \$Param{IMAPFolder}, \$Param{Trusted}, \$Param{ValidID},
-### Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 #            \$Param{UserID},  \$Param{QueueID},    \$Param{ID},
             \$Param{OAuth2_ProfileID}, \$Param{UserID},  \$Param{QueueID},    \$Param{ID},
-### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2023 Rother OSS GmbH, https://otobo.de/ ###
+### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
         ],
     );
 
