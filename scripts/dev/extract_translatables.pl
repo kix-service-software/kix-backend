@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -31,7 +31,7 @@ GetOptions(
 # check if directory is given
 if ( $Options{Help} ) {
     print "extract_translatables - Extract translatable patterns to a POT file.\n";
-    print "Copyright (C) 2006-2022 c.a.p.e. IT GmbH, http//www.cape-it.de/\n";
+    print "Copyright (C) 2006-2024 KIX Service Software GmbH, http//www.kixdesk.com/\n";
     print "\n";
     print "Required Options:\n";
     print "  --directory - The base directory to extract from. If omitted, the current working directory will be used.\n";
