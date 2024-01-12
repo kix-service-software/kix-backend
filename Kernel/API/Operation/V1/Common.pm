@@ -175,6 +175,9 @@ sub RunOperation {
             }
         }
 
+        # keep it for varable replacement in permission conditions
+        $Self->{RelevantOrganisationID} = $Param{Data}->{RelevantOrganisationID};
+
         # check if we have permission for this object
         my $StartTime = Time::HiRes::time();
         my $Result =  $Self->_CheckObjectPermission(
@@ -1384,6 +1387,17 @@ helper function to execute another operation to work with its result.
 
 sub ExecOperation {
     my ( $Self, %Param ) = @_;
+
+    # add relevant orga id to data if given
+    if ( IsHashRefWithData($Self->{RequestData}) && $Self->{RequestData}->{RelevantOrganisationID} ) {
+        if (IsHashRefWithData($Param{Data})) {
+            $Param{Data}->{RelevantOrganisationID} = $Self->{RequestData}->{RelevantOrganisationID};
+        } else {
+            $Param{Data} = {
+                RelevantOrganisationID => $Self->{RequestData}->{RelevantOrganisationID}
+            };
+        }
+    }
 
     # check needed stuff
     for my $Needed (qw(OperationType)) {
@@ -3505,6 +3519,7 @@ sub _ReplaceVariablesInPermission {
         );
 
         if ( %User ) {
+
             # get contact for user
             my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Self->{Authorization}->{UserID},
@@ -3518,6 +3533,24 @@ sub _ReplaceVariablesInPermission {
                     if ( %Organisation ) {
                         $Contact{PrimaryOrganisation} = \%Organisation;
                     }
+                }
+
+                $Self->{RelevantOrganisationID} ||= $Contact{PrimaryOrganisationID};
+                if (
+                    $Self->{RelevantOrganisationID} &&
+                    (grep {$Self->{RelevantOrganisationID} == $_} @{$Contact{OrganisationIDs} || []})
+                ) {
+                    $Contact{RelevantOrganisationID} = $Self->{RelevantOrganisationID};
+                    if ( $Contact{RelevantOrganisationID} ) {
+                        my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                            ID => $Contact{RelevantOrganisationID},
+                        );
+                        if ( %Organisation ) {
+                            $Contact{RelevantOrganisation} = \%Organisation;
+                        }
+                    }
+                } else {
+                    $Contact{RelevantOrganisationID} = 'NOT_ALLOWED';
                 }
 
                 $User{Contact} = \%Contact;
@@ -3555,8 +3588,8 @@ sub _ResolveVariableValue {
         return;
     }
 
-    # return undef if we have no data to work through
-    return if exists $Param{Data} && !$Param{Data};
+    # return "no value" if we have no data to work through
+    return 'NO_VALUE' if exists $Param{Data} && (!$Param{Data});
 
     my $Data = $Param{Data};
 
@@ -3570,7 +3603,9 @@ sub _ResolveVariableValue {
     }
 
     # get the value of $Attribute
-    $Data = $Data->{$Attribute};
+    if (IsHashRefWithData($Param{Data})) {
+        $Data = $Data->{$Attribute};
+    }
 
     if ( defined $ArrayIndex && IsArrayRef($Data) ) {
         $Data = $Data->[$ArrayIndex];

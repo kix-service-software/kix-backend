@@ -255,6 +255,8 @@
 "Customer";"Resource";"/system/templates/categories/*";;"x";;;
 "Customer";"Base::Ticket";"*";"x";"x";"x";"x";
 "Customer";"Resource";"/objectsearch";;"x";;;
+"Customer";"Resource";"/contacts";;"x";;;
+"Customer";"Object";"/contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}";;;;;
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;

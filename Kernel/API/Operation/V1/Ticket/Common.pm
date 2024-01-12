@@ -140,23 +140,6 @@ sub ValidatePendingTime {
     return 1;
 }
 
-sub ExecOperation {
-    my ( $Self, %Param ) = @_;
-
-    # add relevant orga id to data if given
-    if ( IsHashRefWithData($Self->{RequestData}) && $Self->{RequestData}->{RelevantOrganisationID} ) {
-        if (IsHashRefWithData($Param{Data})) {
-            $Param{Data}->{RelevantOrganisationID} = $Self->{RequestData}->{RelevantOrganisationID};
-        } else {
-            $Param{Data} = {
-                RelevantOrganisationID => $Self->{RequestData}->{RelevantOrganisationID}
-            };
-        }
-    }
-
-    return $Self->SUPER::ExecOperation(%Param);
-}
-
 sub GetBasePermissionObjectIDs {
     my ( $Self, %Param ) = @_;
 
