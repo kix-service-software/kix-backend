@@ -2872,7 +2872,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::ITSMConfigItemLinkAdd</Item>
-                <Item Key="Event">(TicketDynamicFieldUpdate_AffectedAsset)</Item>
+                <Item Key="Event">(TicketDynamicFieldUpdate_AffectedAsset|TicketDynamicFieldUpdate_AffectedServices)</Item>
                 <Item Key="LinkType">RelevantTo</Item>
             </Hash>
         </Setting>
