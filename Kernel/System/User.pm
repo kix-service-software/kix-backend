@@ -2305,8 +2305,8 @@ sub DeleteUserCounterObject {
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.Counters',
-        UserID    => ($Param{UserID} || ''),
-        ObjectID  => ( $Param{Category} || '').'.'.($Param{Counter} || ''),
+        UserID    => ($Param{UserID} || '*'),
+        ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
     );
 
     return 1
