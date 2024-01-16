@@ -23,6 +23,8 @@ our @ObjectDependencies = (
     'HTMLUtils',
     'Log',
     'Ticket',
+    'Config',
+    'Main'
 );
 
 =head1 NAME
@@ -186,14 +188,17 @@ sub _ReplaceArticlePlaceholders {
     for my $Attribute ( qw(Subject Body) ) {
         my $Tag = $Param{Tag} . $Attribute;
 
-        if ( $Param{Text} =~ /$Tag\_(.+?)$Self->{End}/g ) {
-            my $CharLength = $1;
+        my @Matches = $Param{Text} =~ /$Tag\_\d+?$Self->{End}/g;
+        for my $Match (@Matches) {
             my $AttributeValue = $Param{Article}->{$Attribute};
             next if !defined $AttributeValue;
 
+            my $CharLength = $Match;
+            $CharLength =~ s/.+_(\d+).+/$1/;
+
             $AttributeValue =~ s/^(.{$CharLength}).*$/$1 [...]/;
 
-            $Param{Text}    =~ s/$Tag\_.+?$Self->{End}/$AttributeValue/g;
+            $Param{Text} =~ s/$Match/$AttributeValue/g;
         }
     }
 
@@ -208,31 +213,33 @@ sub _ReplaceArticlePlaceholders {
     }
 
     # add html body content if necessary
-    if ( $Param{Text} =~ /$Param{Tag}BodyRichtext$Self->{End}/g ) {
-        $Param{Article}->{BodyRichtext} = $Self->_GetBodyRichtext(
+    if ( $Param{Text} =~ /$Param{Tag}BodyRichtext_?\d*?$Self->{End}/g ) {
+        $Param{Text} = $Self->_ReplaceBodyRichtext(
+            Tag        => "$Param{Tag}BodyRichtext",
+            Text       => $Param{Text},
             Article    => $Param{Article},
             UserID     => $Param{UserID},
             WithInline => 1
         );
     }
-    if ( $Param{Text} =~ /$Param{Tag}BodyRichtextNoInline$Self->{End}/g ) {
-        $Param{Article}->{BodyRichtextNoInline} = $Self->_GetBodyRichtext(
+    if ( $Param{Text} =~ /$Param{Tag}BodyRichtextNoInline_?\d*?$Self->{End}/g ) {
+        $Param{Text} = $Self->_ReplaceBodyRichtext(
+            Tag     => "$Param{Tag}BodyRichtextNoInline",
+            Text    => $Param{Text},
             Article => $Param{Article},
             UserID  => $Param{UserID}
         );
-
-        # remove not replaced images
-        $Param{Article}->{BodyRichtextNoInline} =~ s/<img.+?src="cid:.+?>//g;
     }
 
     # replace it
     return $Self->_HashGlobalReplace( $Param{Text}, $Param{Tag}, %{$Param{Article}} );
 }
 
-sub _GetBodyRichtext {
+sub _ReplaceBodyRichtext {
     my ( $Self, %Param ) = @_;
 
-    my $BodyRichtext = '';
+    my $BodyRichtext = $Param{Article}->{Body};
+    my @InlineAttachments;
 
     my %AttachmentIndex = $Self->{TicketObject}->ArticleAttachmentIndex(
         ContentPath                => $Param{Article}->{ContentPath},
@@ -242,8 +249,6 @@ sub _GetBodyRichtext {
     );
 
     if (IsHashRefWithData(\%AttachmentIndex)) {
-        my @InlineAttachments;
-
         for my $AttachmentID ( keys %AttachmentIndex ) {
 
             # only inline attachments relevant
@@ -283,6 +288,11 @@ sub _GetBodyRichtext {
                         String => $Body,
                     );
                     $BodyRichtext = $Body;
+
+                    if (!$Param{WithInline}) {
+                        # remove inline images
+                        $BodyRichtext =~ s/<img.+?src="cid:.+?>//g;
+                    }
                 }
             } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
                 my %Attachment = $Self->{TicketObject}->ArticleAttachment(
@@ -295,8 +305,11 @@ sub _GetBodyRichtext {
                 }
             }
         }
+    }
 
-        if ($BodyRichtext && scalar @InlineAttachments) {
+    if ($BodyRichtext) {
+        my %PreparedInline;
+        if (scalar @InlineAttachments) {
             for my $Attachment ( @InlineAttachments ) {
                 my $Content = MIME::Base64::encode_base64( $Attachment->{Content}, '' );
 
@@ -307,17 +320,101 @@ sub _GetBodyRichtext {
 
                 # remove < and > arround id (eg. <123456> ==> 1323456)
                 my $ContentID = substr($Attachment->{ContentID}, 1, -1);
-                $BodyRichtext =~ s/cid:$ContentID/$ReplaceString/g;
+                $PreparedInline{$ContentID} = $ReplaceString;
+            }
+        }
+
+        my @Matches = $Param{Text} =~ /$Param{Tag}_?\d*?$Self->{End}/g;
+        @Matches = $Kernel::OM->Get('Main')->GetUnique(@Matches);
+
+        for my $Match (@Matches) {
+
+            # if line count is given in placeholder
+            if ($Match =~ /_(\d+)/) {
+                my $LineCount = $1;
+                my $PreparedBody = $Self->_GetPreparedBody(
+                    Body      => $BodyRichtext,
+                    Inline    => \%PreparedInline,
+                    LineCount => $LineCount
+                );
+                $Param{Text} =~ s/$Param{Tag}_$LineCount$Self->{End}/$PreparedBody/g;
+            }
+            # else use config
+            else {
+                my $LineCount = $Kernel::OM->Get('Config')->Get('Ticket::Placeholder::BodyRichtext::DefaultLineCount') || 0;
+                my $PreparedBody = $Self->_GetPreparedBody(
+                    Body      => $BodyRichtext,
+                    Inline    => \%PreparedInline,
+                    LineCount => $LineCount
+                );
+                $Param{Text} =~ s/$Param{Tag}$Self->{End}/$PreparedBody/g;
+
             }
         }
     }
 
-    # fallback, if no html body given
-    if ( !$BodyRichtext ) {
-        $BodyRichtext = $Param{Article}->{Body};
+    return $Param{Text};
+}
+
+sub _GetPreparedBody {
+    my ( $Self, %Param ) = @_;
+
+    my $PreparedBody = $Param{Body};
+
+    # do nothing (full body, no limit) if undefined or 0
+    if ($Param{LineCount} && $Param{LineCount} =~ /^\d+$/ && $Param{LineCount} > 0) {
+        my @Lines = split(/\n/, $Param{Body});
+
+        if (scalar @Lines > $Param{LineCount}) {
+            $PreparedBody = $Self->_CloseTags(
+                Body => join("\n",splice(@Lines,0,$Param{LineCount}))
+            );
+            $PreparedBody .= "\n[...]";
+        }
     }
 
-    return $BodyRichtext;
+    # add images if needed and given
+    if ($PreparedBody =~ /<img.+?src="cid:.+?>/ && IsHashRefWithData($Param{Inline})) {
+        for my $ContentID ( keys %{$Param{Inline}} ) {
+            $PreparedBody =~ s/cid:$ContentID/$Param{Inline}->{$ContentID}/g;
+        }
+    }
+
+    return $PreparedBody;
+}
+
+sub _CloseTags {
+    my ( $Self, %Param ) = @_;
+
+    # get all opening and closing tags but not self closing ones and ignore some specific
+    # e.g. <div>, <p class...> but not <br /> or <img src... />
+    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/]+?)>|<([^!\s\/]+)\s+.+?\s*[^\/]>)/g;
+    my @EndTags   = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /<\/(.+?)>/g;
+
+    my @ReversedStartTags = reverse @StartTags;
+
+    # rember only opening tags with no closing counterpart
+    if (@EndTags) {
+
+        # remove now closed tags (start with last opened)
+        for my $Tag (reverse @EndTags) {
+            my $Index = -1;
+            for my $OpenedTag (@ReversedStartTags) {
+                $Index++;
+                last if ($OpenedTag eq $Tag);
+            }
+            if ($Index != -1) {
+                splice(@ReversedStartTags,$Index,1);
+            }
+        }
+    }
+
+    # add closing tags if needed (start with last - use reversed)
+    for my $Tag (@ReversedStartTags) {
+        $Param{Body} .= "\n</$Tag>";
+    }
+
+    return $Param{Body};
 }
 
 1;
