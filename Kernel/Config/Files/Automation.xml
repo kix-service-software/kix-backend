@@ -210,6 +210,14 @@
             <String>Kernel::System::Automation::VariableFilter::DateUtil</String>
         </Setting>
     </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###XMLUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::XMLUtil</String>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerAutomationTaskManager" Required="1" Valid="1">
         <Description Translatable="1">The daemon registration for the scheduler automation task manager.</Description>
