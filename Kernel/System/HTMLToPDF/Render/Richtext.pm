@@ -80,7 +80,6 @@ sub Run {
                 RichText => 1
             );
 
-            $TmpValue =~ s/<\/?div[^>]*>//gsmx;
             $TmpValue =~ s{<p>(<img\salt=""\ssrc=".*\"\s\/>)<\/p>}{$1}gsmx;
 
             if ( $Block->{Translate} ) {
@@ -109,7 +108,6 @@ sub Run {
             RichText => 1
         );
 
-        $Value =~ s/<\/?div[^>]*>//gsmx;
         $Value =~ s{<p>(<img\salt=""\ssrc=".*\"\s\/>)<\/p>}{$1}gsmx;
     }
 
