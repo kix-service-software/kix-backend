@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -176,46 +176,74 @@ END
     );
 
     # get visible faq articles
-    my $VisibleArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $VisibleArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    # );
+    my @VisibleArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$VisibleArticleIDList}),
+        scalar(@VisibleArticleIDList),
         1,
         'Article list should contain 1 article (visible = 1)',
     );
     $Self->ContainedIn(
         $TestData{VisibleFAQID},
-        $VisibleArticleIDList,
+        \@VisibleArticleIDList,
         'List should contain visible articles (visible = 1)',
     );
     $Self->NotContainedIn(
         $TestData{NotVisibleFAQID},
-        $VisibleArticleIDList,
+        \@VisibleArticleIDList,
         'List should NOT contain not visible articles (visible = 1)',
     );
 
     # get visible faq articles (without article ids given - can be more articles)
-    my $VisibleArticleIDListWithout = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # my $VisibleArticleIDListWithout = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    my @VisibleArticleIDListWithout = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->True(
-        (scalar(@{$VisibleArticleIDListWithout}) >= 1) ? 1 : 0,
+        (scalar(@VisibleArticleIDListWithout) >= 1) ? 1 : 0,
         'Article list should contain at least 1 article (visible = 1, without ids)',
     );
     $Self->ContainedIn(
         $TestData{VisibleFAQID},
-        $VisibleArticleIDListWithout,
+        \@VisibleArticleIDListWithout,
         'List should contain visible articles (visible = 1, without ids)',
     );
     $Self->NotContainedIn(
         $TestData{NotVisibleFAQID},
-        $VisibleArticleIDListWithout,
+        \@VisibleArticleIDListWithout,
         'List should NOT contain not visible articles (visible = 1, without ids)',
     );
 
@@ -237,26 +265,40 @@ END
     );
 
     # get not visible faq articles
-    my $NotVisibleArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $NotVisibleArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    # );
+    my @NotVisibleArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$NotVisibleArticleIDList}),
+        scalar(@NotVisibleArticleIDList),
         1,
         'Article list should contain 1 article (visible = 0)',
     );
     $Self->ContainedIn(
         $TestData{NotVisibleFAQID},
-        $NotVisibleArticleIDList,
+        \@NotVisibleArticleIDList,
         'List should contain not visible articles (visible = 0)',
     );
     $Self->NotContainedIn(
         $TestData{VisibleFAQID},
-        $NotVisibleArticleIDList,
+        \@NotVisibleArticleIDList,
         'List should NOT contain visible articles (visible = 0)',
     );
 
@@ -278,26 +320,40 @@ END
     );
 
     # get not visible faq articles
-    my $AllArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $AllArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    # );
+    my @AllArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$AllArticleIDList}),
+        scalar(@AllArticleIDList),
         2,
         'Article list should contain 2 article (visible = 0 OR 1)',
     );
     $Self->ContainedIn(
         $TestData{VisibleFAQID},
-        $AllArticleIDList,
+        \@AllArticleIDList,
         'List should contain visible articles (visible = 0 OR 1)',
     );
     $Self->ContainedIn(
         $TestData{NotVisibleFAQID},
-        $AllArticleIDList,
+        \@AllArticleIDList,
         'List should contain not visible articles (visible = 0 OR 1)',
     );
 
@@ -324,26 +380,40 @@ END
     );
 
     # get relevant category faq articles
-    my $CategoryAArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $CategoryAArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{FAQOfAID}, $TestData{FAQOfBID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{FAQOfAID}, $TestData{FAQOfBID} ]
+    # );
+    my @CategoryAArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$CategoryAArticleIDList}),
+        scalar(@CategoryAArticleIDList),
         1,
         'Article list should contain 1 article (category A)',
     );
     $Self->ContainedIn(
         $TestData{FAQOfAID},
-        $CategoryAArticleIDList,
+        \@CategoryAArticleIDList,
         'List should contain articles of category A (category A)',
     );
     $Self->NotContainedIn(
         $TestData{FAQOfBID},
-        $CategoryAArticleIDList,
+        \@CategoryAArticleIDList,
         'List should NOT contain articles of category B (category A)',
     );
 
@@ -365,26 +435,40 @@ END
     );
 
     # get relevant categories faq articles
-    my $CategoryAAndBArticleList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $CategoryAAndBArticleList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{VisibleFAQID}, $TestData{NotVisibleFAQID} ]
+    # );
+    my @CategoryAAndBArticleList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$CategoryAAndBArticleList}),
+        scalar(@CategoryAAndBArticleList),
         2,
         'Article list should contain 2 article (category A OR B)',
     );
     $Self->ContainedIn(
         $TestData{NotVisibleFAQID},
-        $CategoryAAndBArticleList,
+        \@CategoryAAndBArticleList,
         'List should contain articles of category A (category A OR B)',
     );
     $Self->ContainedIn(
         $TestData{VisibleFAQID},
-        $CategoryAAndBArticleList,
+        \@CategoryAAndBArticleList,
         'List should contain articles of category B (category A OR B)',
     );
 
@@ -411,26 +495,40 @@ END
     );
 
     # get english faq articles
-    my $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # my $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
+    # );
+    my @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$EnglishArticleIDList}),
+        scalar(@EnglishArticleIDList),
         1,
         'Article list should contain 1 article (english)',
     );
     $Self->ContainedIn(
         $TestData{EnglishFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should contain english articles (english)',
     );
     $Self->NotContainedIn(
         $TestData{GermanFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should NOT contain german articles (english)',
     );
 
@@ -452,46 +550,74 @@ END
     );
 
     # get english and german faq articles
-    $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
+    # $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
 
-        # consider only test articles
-        ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
+    #     # consider only test articles
+    #     ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
+    # );
+    my @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$EnglishArticleIDList}),
+        scalar(@EnglishArticleIDList),
         2,
         'Article list should contain 2 article (english and german)',
     );
     $Self->ContainedIn(
         $TestData{EnglishFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should contain english articles (english and german)',
     );
     $Self->ContainedIn(
         $TestData{GermanFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should contain german articles (english and german)',
     );
 
     # get english and german faq articles (without article ids given - can be more articles)
-    $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # $EnglishArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->True(
-        (scalar(@{$EnglishArticleIDList}) >= 2) ? 1 : 0,
+        (scalar(@EnglishArticleIDList) >= 2) ? 1 : 0,
         'Article list should contain at least 2 article (english and german, without ids)',
     );
     $Self->ContainedIn(
         $TestData{EnglishFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should contain english articles (english and german, without ids)',
     );
     $Self->ContainedIn(
         $TestData{GermanFAQID},
-        $EnglishArticleIDList,
+        \@EnglishArticleIDList,
         'List should contain german articles (english and german, without ids)',
     );
 
@@ -518,18 +644,32 @@ END
     );
 
     # get faq articles
-    my $DFRelevantArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # my $DFRelevantArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    my @DFRelevantArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$DFRelevantArticleIDList}),
+        scalar(@DFRelevantArticleIDList),
         1,
         'Article list should contain 1 article (df relevant)',
     );
     $Self->ContainedIn(
         $TestData{DFFAQID},
-        $DFRelevantArticleIDList,
+        \@DFRelevantArticleIDList,
         'List should contain df relevant articles',
     );
 
@@ -555,19 +695,28 @@ sub _CheckTitleConfig {
 END
     );
 
-    # get faq articles
-    my $TitleArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    my @TitleArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$TitleArticleIDList}),
+        scalar(@TitleArticleIDList),
         1,
         'Article list should contain 1 article (title)',
     );
     $Self->ContainedIn(
         $TestData{TitleFAQID},
-        $TitleArticleIDList,
+        \@TitleArticleIDList,
         'List should contain articles (title)',
     );
 
@@ -593,12 +742,27 @@ sub _DoNegativeTests {
 }
 END
     );
-    my $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # my $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    my @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Silent => 1
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'FAQ article list should be empty (unknown attribute)',
     );
@@ -620,12 +784,23 @@ END
 }
 END
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Silent => 1
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (missing faq article config)',
     );
@@ -641,12 +816,26 @@ END
 }
 END
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (empty faq article config)',
     );
@@ -664,12 +853,27 @@ END
 }
 END
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Silent => 1
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (empty attribute)',
     );
@@ -689,12 +893,26 @@ END
 }
 END
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        }
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (empty value)',
     );
@@ -704,12 +922,27 @@ END
         'negative (empty config)',
         q{}
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1
+    # $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1
+    # );
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Silent => 1
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (empty config)',
     );
@@ -731,13 +964,28 @@ END
 }
 END
     );
-    $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        UserID       => 1,
-        Silent       => 1
+    # $ArticleIDList = $FAQObject->GetAssignedFAQArticlesForObject(
+    #     ObjectType   => 'Contact',
+    #     UserID       => 1,
+    #     Silent       => 1
+    # );
+    @ArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        Search     => {
+            AND => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Silent => 1
     );
     $Self->Is(
-        scalar(@{$ArticleIDList}),
+        scalar(@ArticleIDList),
         0,
         'Article list should be empty (invalid config)',
     );
@@ -770,6 +1018,10 @@ sub _SetConfig {
             "AssignedObjectsMapping - mapping is new value",
         );
     }
+
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_FAQArticle'
+    );
 
     return 1;
 }

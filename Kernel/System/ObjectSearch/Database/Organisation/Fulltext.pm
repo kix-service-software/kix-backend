@@ -15,9 +15,7 @@ use base qw(
     Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -31,22 +29,6 @@ Kernel::System::ObjectSearch::Database::Organisation::Fulltext - attribute modul
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
@@ -55,23 +37,9 @@ sub GetSupportedAttributes {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-        },
+        }
     };
 }
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
 
 sub Search {
     my ( $Self, %Param ) = @_;
@@ -79,7 +47,12 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my %Search;
+    # init search parameter for fulltext search
+    my %Search = (
+        OR => []
+    );
+
+    # OR-combine relevant fields with requested operator and value
     for my $Field (
         qw(
             Name Number Street
@@ -87,23 +60,22 @@ sub Search {
         )
     ) {
         push (
-            @{$Search{OR}},
+            @{ $Search{OR} },
             {
                 Field    => $Field,
                 Operator => $Param{Search}->{Operator},
-                Type     => 'STRING',
                 Value    => $Param{Search}->{Value}
             }
         );
     }
 
+    # return search def
     return {
         Search => \%Search,
     };
 }
 
 1;
-
 
 =back
 

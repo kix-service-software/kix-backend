@@ -58,6 +58,20 @@ sub Search {
         Assigned => $Assigned
     );
 
+    my %LikeAttributes = (
+        Title      => 1,
+        Keywords   => 1,
+        Field1     => 1,
+        Field2     => 1,
+        Field3     => 1,
+        Field4     => 1,
+        Field5     => 1,
+        Field6     => 1,
+        Language   => 1,
+        Number     => 1,
+        Visibility => 1
+    );
+
     my @Values;
     if ( IsHashRefWithData($SearchParams) ) {
         for my $Attribute ( sort keys %{$SearchParams} ) {
@@ -65,7 +79,7 @@ sub Search {
 
             my %Search;
             if ( $Attribute eq 'CustomerVisible' ) {
-                for my $Value ( @{$SearchParams->{$Attribute}} ){
+                for my $Value ( @{$SearchParams->{$Attribute}} ) {
                     push(
                         @{$Search{OR}},
                         {
@@ -76,6 +90,16 @@ sub Search {
                     );
                 }
             }
+            elsif ( $LikeAttributes{$Attribute} ) {
+                push(
+                    @{$Search{AND}},
+                    {
+                        Field    => $Attribute,
+                        Operator => 'LIKE',
+                        Value    => $SearchParams->{$Attribute}
+                    }
+                );
+            }
             else {
                 push(
                     @{$Search{AND}},
@@ -84,7 +108,7 @@ sub Search {
                         Operator => IsArrayRef($SearchParams->{$Attribute}) ? 'IN' : 'EQ',
                         Value    => $SearchParams->{$Attribute}
                     }
-                )
+                );
             }
 
             my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -92,7 +116,8 @@ sub Search {
                 Result     => 'ARRAY',
                 UserID     => $Param{UserID},
                 UserType   => $Param{UserType},
-                Search     => \%Search
+                Search     => \%Search,
+                Silent     => $Param{Silent}
             );
 
             if ( scalar(@IDs) ) {
@@ -104,7 +129,8 @@ sub Search {
     my $Condition = $Self->_GetCondition(
         Operator  => 'IN',
         Column    => 'f.id',
-        Value     => \@Values
+        Value     => \@Values,
+        ValueType => 'NUMERIC'
     );
 
     return if ( !$Condition );
@@ -134,7 +160,6 @@ sub _GetAssigendParams {
     }
 
     return if !%ObjectData;
-
 
     # prepare search data
     %Result = $Self->_GetAssignedSearchData(
@@ -209,7 +234,12 @@ sub _GetAssignedSearchDataStatic {
 
     for my $SearchStatic ( @{$Param{SearchStatics}} ) {
         next if ( !defined $SearchStatic );
-        push ( @{ $Param{SearchData}->{$Param{SearchAttribute}} }, $SearchStatic );
+        if ( IsArrayRef($SearchStatic) ) {
+            push ( @{ $Param{SearchData}->{$Param{SearchAttribute}} }, @{$SearchStatic} );
+        }
+        else {
+            push ( @{ $Param{SearchData}->{$Param{SearchAttribute}} }, $SearchStatic );
+        }
     }
 
     return 1;

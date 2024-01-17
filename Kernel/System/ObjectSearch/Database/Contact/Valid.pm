@@ -82,7 +82,6 @@ run this module and return the SQL extensions
 sub Search {
     my ( $Self, %Param ) = @_;
 
-    my @SQLWhere;
     my @SQLJoin;
 
     # check params
@@ -90,27 +89,32 @@ sub Search {
 
     # map search attributes to table attributes
     my %AttributeMapping = (
-        Valid   => 'v.name',
-        ValidID => 'c.valid_id',
+        ValidID => {
+            Column    => 'c.valid_id',
+            ValueType => 'NUMERIC'
+        },
+        Valid   => {
+            Column    => 'cv.name'
+        }
     );
 
     if (
         $Param{Search}->{Field} eq 'Valid'
-        && !$Param{Flags}->{ValidJoin}
+        && !$Param{Flags}->{JoinMap}->{ContactValid}
     ) {
-        push( @SQLJoin, 'INNER JOIN valid v ON c.valid_id = v.id' );
-        $Param{Flags}->{ValidJoin} = 1;
+        push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
+        $Param{Flags}->{JoinMap}->{ContactValid} = 1;
     }
 
     my $Condition = $Self->_GetCondition(
-        Operator      => $Param{Search}->{Operator},
-        Column        => $AttributeMapping{$Param{Search}->{Field}},
-        Value         => $Param{Search}->{Value}
+        Operator  => $Param{Search}->{Operator},
+        Column    => $AttributeMapping{$Param{Search}->{Field}}->{Column},
+        ValueType => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
+        Value     => $Param{Search}->{Value},
+        Silent    => $Param{Silent}
     );
 
     return if ( !$Condition );
-
-
 
     return {
         Join  => \@SQLJoin,
@@ -139,25 +143,46 @@ sub Sort {
     # check params
     return if !$Self->_CheckSortParams(%Param);
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Valid   => 'v.name',
-        ValidID => 'c.valid_id',
-    );
+    # check for needed joins
+    my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationContactValid} // '' );
+    my $TableAliasTL  = 'tl' . ( $Param{Flags}->{JoinMap}->{TranslationContactValid} // '' );
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'Valid' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ContactValid} ) {
+            push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
 
-    my %Join;
-    if (
-        $Param{Attribute} eq 'Valid'
-        && !$Param{Flags}->{ValidJoin}
-    ) {
-        $Join{Join} = ['INNER JOIN valid v ON c.valid_id = v.id'];
-        $Param{Flags}->{ValidJoin} = 1;
+            $Param{Flags}->{JoinMap}->{ContactValid} = 1;
+        }
+
+        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationContactValid} ) ) {
+            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+            $TableAliasTLP .= $Count;
+            $TableAliasTL  .= $Count;
+
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = cv.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+
+            $Param{Flags}->{JoinMap}->{TranslationContactValid} = $Count;
+        }
     }
 
+    # init mapping
+    my %AttributeMapping = (
+        ValidID => {
+            Select  => ['c.valid_id'],
+            OrderBy => ['c.valid_id']
+        },
+        Valid   => {
+            Select  => ["LOWER(COALESCE($TableAliasTL.value, cv.name)) AS TranslateValid"],
+            OrderBy => ['TranslateValid']
+        }
+    );
+
+    # return sort def
     return {
-        Select  => [$AttributeMapping{$Param{Attribute}}],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}],
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 

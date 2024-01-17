@@ -86,46 +86,66 @@ sub GetSupportedAttributes {
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $Field;
+    # check for needed joins
+    my $TableAlias = 'xst_left' . ( $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } // '' );
+    my @SQLJoin = ();
+    if ( !defined( $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } ) ) {
+        my $Count = $Param{Flags}->{XMLStorageJoinCounter}++;
+        $TableAlias .= $Count;
 
-    my $SearchKey = "[1]{'Version'}[1]";
-    my @Parts     = split(/[.]/sm, $Param{Search}->{Field});
+        # init column for storage join
+        my $XMLStorageJoinColumn = 'ci.last_version_id';
+        if ( $Param{Flags}->{PreviousVersionSearch} ) {
+            $XMLStorageJoinColumn = 'civ.id';
 
-    if ( scalar( @Parts ) > 1 ) {
-        $Field = 'CurrentVersion.Data';
+            if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersion} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id' );
+
+                $Param{Flags}->{JoinMap}->{ConfigItemVersion} = 1;
+            }
+        }
+
+        # get parts of fields
+        my @FieldParts = split(/\./, $Param{Search}->{Field});
+
+        # remove first to parts (always CurrentVersion and Data)
+        splice( @FieldParts, 0, 2 );
+
+        # prepare supplement value
+        my $JoinRestrictionValue = '[1]{\'Version\'}[1]';
+        for my $Part ( @FieldParts ) {
+            $JoinRestrictionValue .= "{'$Part'}[%]";
+        }
+        $JoinRestrictionValue .= '{\'Content\'}';
+
+        # prepare supplement
+        my $JoinRestriction = $Self->_GetCondition(
+            Column   => "$TableAlias.xml_content_key",
+            Operator => 'LIKE',
+            Value    => $JoinRestrictionValue
+        );
+
+        # add join for xml storage
+        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS BIGINT) = $XMLStorageJoinColumn AND $JoinRestriction" );
+
+        $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;
     }
 
-    foreach my $Part ( @Parts[2..$#Parts] ) {
-        $SearchKey .= "{'$Part'}[%]";
-        $Field     .= ".$Part";
-    }
-    $SearchKey .= "{'Content'}";
-
-    my $KeyCondition = $Self->_GetCondition(
-        Operator         => 'LIKE',
-        Column           => 'xst.xml_content_key',
-        Value            => $SearchKey
-    );
-
+    # prepare condition
     my $Condition = $Self->_GetCondition(
-        Operator   => $Param{Search}->{Operator},
-        Column     => 'xst.xml_content_value',
-        Value      => $Param{Search}->{Value},
-        Type       => 'STRING',
-        Supplement => [ $KeyCondition ]
+        Operator  => $Param{Search}->{Operator},
+        Column    => "$TableAlias.xml_content_value",
+        Value     => $Param{Search}->{Value},
+        NULLValue => 1,
+        Silent    => $Param{Silent}
     );
-
     return if ( !$Condition );
 
-    my @SQLJoin = $Self->_GetJoin(%Param);
-
-
-
+    # return search def
     return {
         Join  => \@SQLJoin,
         Where => [ $Condition ]
@@ -135,64 +155,6 @@ sub Search {
 =begin Internal:
 
 =cut
-
-sub _GetJoin {
-    my ($Self, %Param) = @_;
-
-    my @JoinAND;
-    if (
-        $Param{Flags}->{ClassIDs}
-        && !$Param{Flags}->{JoinXML}
-    ) {
-
-        my @Types;
-        for my $ClassID ( @{$Param{Flags}->{ClassIDs}}) {
-            if ( $Param{Flags}->{PreviousVersion} ) {
-                push (@Types, 'ITSM::ConfigItem::Archiv::' . $ClassID);
-            }
-            push (@Types, 'ITSM::ConfigItem::' . $ClassID)
-        }
-        @JoinAND = $Self->_GetCondition(
-            Operator  => 'IN',
-            Column    => 'xst.xml_type',
-            Value     => \@Types,
-            Type      => 'STRING',
-            Supported => ['IN']
-        );
-    }
-    my @SQLJoin;
-    my $TablePrefix = 'ci';
-    if ( $Param{Flags}->{PreviousVersion} ) {
-        $TablePrefix = 'vr';
-
-        if ( !$Param{Flags}->{JoinVersion} ) {
-            push(
-                @SQLJoin,
-                'LEFT OUTER JOIN configitem_version vr on ci.id = vr.configitem_id'
-            );
-            $Param{Flags}->{JoinVersion} = 1;
-        }
-        if ( !$Param{Flags}->{JoinXML} ) {
-
-            push(
-                @SQLJoin,
-                'LEFT OUTER JOIN xml_storage xst on vr.id = CAST(xst.xml_key AS BIGINT)'
-                . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
-            );
-            $Param{Flags}->{JoinXML} = 1;
-        }
-    }
-    elsif ( !$Param{Flags}->{JoinXML} ) {
-        push(
-            @SQLJoin,
-            'LEFT OUTER JOIN xml_storage xst on ci.last_version_id = CAST(xst.xml_key AS BIGINT)'
-            . (@JoinAND ? ' AND ' . $JoinAND[0] : q{})
-        );
-        $Param{Flags}->{JoinXML} = 1;
-    }
-
-    return @SQLJoin;
-}
 
 sub _XMLAttributeGet {
     my ($Self, %Param) = @_;

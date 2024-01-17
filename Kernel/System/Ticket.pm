@@ -6950,6 +6950,7 @@ sub GetAssignedTicketsForObject {
             },
             UserID   => $Param{UserID},
             UserType => $Param{UserType},
+            Silent   => $Param{Silent}
         );
 
         if ( IsArrayRefWithData(\@AssignedTicketIDs) ) {

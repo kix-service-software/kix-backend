@@ -178,11 +178,16 @@ sub ContactAdd {
             ID => $Param{PrimaryOrganisationID},
         );
 
-        if (!%OrgData || $OrgData{ValidID} != 1) {
+        if (
+            !%OrgData
+            || $OrgData{ValidID} != 1
+        ) {
             return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'No valid organisation found for primary organisation ID "' . $Param{PrimaryOrganisationID} . '".',
+                Message  => 'No valid organisation found for primary organisation ID "'
+                    . $Param{PrimaryOrganisationID}
+                    . q{".},
             );
             return;
         }
@@ -190,21 +195,37 @@ sub ContactAdd {
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
         # check if primary OrganisationID is contained in assigned OrganisationIDs
-        if (!grep /$Param{PrimaryOrganisationID}/, @{$Param{OrganisationIDs}}) {
+        if (
+            defined $Param{PrimaryOrganisationID}
+            && $Param{PrimaryOrganisationID}
+            && !grep( {/$Param{PrimaryOrganisationID}/} @{$Param{OrganisationIDs}})
+        ) {
             push(@{$Param{OrganisationIDs}}, $Param{PrimaryOrganisationID});
         }
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
-            if (!%OrgData || $OrgData{ValidID} != 1) {
+            if (
+                !%OrgData
+                || $OrgData{ValidID} != 1
+            ) {
                 return if $Param{Silent};
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => 'No valid organisation found for assigned organisation ID "' . $OrgID . '".',
+                    Message  => 'No valid organisation found for assigned organisation ID "'
+                        . $OrgID
+                        . q{".},
                 );
                 return;
             }
+        }
+
+        if (
+            !$Param{PrimaryOrganisationID}
+            && $Param{OrganisationIDs}->[0]
+        ) {
+            $Param{PrimaryOrganisationID} = $Param{OrganisationIDs}->[0];
         }
     }
     else {
@@ -925,8 +946,11 @@ sub ContactUpdate {
     }
 
     $ChangeRequired = 1 if (
-        $Param{PrimaryOrganisationID} &&
-        (!$Contact{PrimaryOrganisationID} || $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID})
+        $Param{PrimaryOrganisationID}
+        && (
+            !$Contact{PrimaryOrganisationID}
+            || $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID}
+        )
     );
 
     $ChangeRequired = 1 if (@DeleteOrgIDs || @InsertOrgIDs);
@@ -1447,147 +1471,6 @@ sub _ContactFullname {
             . ' ' . $Param{Firstname};
     }
     return $ContactFullname;
-}
-
-sub _SearchInDynamicField {
-    my ( $Self, %Param ) = @_;
-
-    # get needed object
-    my $LogObject                 = $Kernel::OM->Get('Log');
-    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-    my @SQLJoin;
-    my @SQLWhere;
-
-    # check params
-    if ( !$Param{Search} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
-
-    # validate operator
-    my %OperatorMap = (
-        'EQ'         => 'Equals',
-        'LIKE'       => 'Like',
-        'GT'         => 'GreaterThan',
-        'GTE'        => 'GreaterThanEquals',
-        'LT'         => 'SmallerThan',
-        'LTE'        => 'SmallerThanEquals',
-        'IN'         => 'Like',
-        'CONTAINS'   => 'Like',
-        'STARTSWITH' => 'StartsWith',
-        'ENDSWITH'   => 'EndsWith',
-    );
-    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
-
-    if ( !$Self->{DynamicFields} ) {
-
-        # get all configured dynamic fields
-        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-            ObjectType => ['Contact'],
-        );
-        if ( !IsArrayRefWithData($DynamicFieldList) ) {
-            # we don't have any  DFs
-            return {
-                SQLJoin  => [],
-                SQLWhere => [],
-            };
-        }
-        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
-    }
-
-    my $DFName = $Param{Search}->{Field};
-    $DFName =~ s/DynamicField_//gsm;
-
-    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
-
-    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-        $LogObject->Log(
-            Priority => 'notice',
-            Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
-        );
-        # return empty result
-        return {
-            SQLJoin  => [],
-            SQLWhere => [],
-        };
-    }
-
-    my $Value = $Param{Search}->{Value};
-    if ( !IsArrayRefWithData($Value) ) {
-        $Value = [ $Value ];
-    }
-    foreach my $ValueItem ( @{$Value} ) {
-        $Value =~ s/\*/%/g;
-    }
-
-    # increase count
-    my $Count = $Param{JoinCounter}++;
-
-    # join tables
-    my $JoinTable = "dfv$Count";
-    if ( $DynamicFieldConfig->{ObjectType} eq 'Contact' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, "LEFT JOIN dynamic_field_value $JoinTable ON (CAST(c.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        } else {
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(c.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        }
-    }
-
-    my $DynamicFieldSQL;
-    foreach my $ValueItem ( @{$Value} ) {
-        # validate data type
-        my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            Value              => $ValueItem,
-            SearchValidation   => 1,
-            UserID             => 1,
-        );
-
-        if ( !$ValidateSuccess ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  =>
-                    "Search not executed due to invalid value '"
-                    . $ValueItem
-                    . "' on field '"
-                    . $DFName
-                    . "'!",
-            );
-            return;
-        }
-
-        # get field specific SQL
-        my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            TableAlias         => $JoinTable,
-            Operator           => $OperatorMap{$Param{Search}->{Operator}},
-            SearchTerm         => $ValueItem,
-        );
-
-        if ( $DynamicFieldSQL ) {
-            $DynamicFieldSQL .= " OR ";
-        }
-        $DynamicFieldSQL .= "($SQL)";
-    }
-
-    # add field specific SQL
-    push( @SQLWhere, "($DynamicFieldSQL)" );
-
-    return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
-    };
 }
 
 =end Internal

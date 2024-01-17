@@ -366,15 +366,13 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{ID}
                 },
                 {
-                    Field    => 'AssignedOrganisation'.
+                    Field    => 'AssignedOrganisation',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
                         || $TestData{CustomerContact}->{PrimaryOrganisationID}
                 }
@@ -386,7 +384,7 @@ END
     $Self->Is(
         scalar(@ContactOrgaCIIDList),
         2,
-        'Article list should contain 2 article [contact/orga]',
+        'List should contain 2 CIs [contact/orga]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -434,15 +432,13 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{ID}
                 },
                 {
-                    Field    => 'AssignedOrganisation'.
+                    Field    => 'AssignedOrganisation',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
                         || $TestData{CustomerContact}->{PrimaryOrganisationID}
                 }
@@ -454,7 +450,7 @@ END
     $Self->Is(
         scalar(@ContactCIIDList),
         2,
-        'Article list should contain 2 article [contact]',
+        'List should contain 2 CIs [contact]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -514,15 +510,13 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{ID}
                 },
                 {
-                    Field    => 'AssignedOrganisation'.
+                    Field    => 'AssignedOrganisation',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
                     Value    => $TestData{CustomerContact}->{RelevantOrganisationID}
                         || $TestData{CustomerContact}->{PrimaryOrganisationID}
                 }
@@ -534,7 +528,7 @@ END
     $Self->Is(
         scalar(@ContactCIIDList),
         1,
-        'Article list should contain 2 article [contact v2]',
+        'List should contain 2 CIs [contact v2]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -582,10 +576,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -595,7 +588,7 @@ END
     $Self->Is(
         scalar(@ContactCIIDList),
         2,
-        'Article list should contain 2 article [contact static]',
+        'List should contain 2 CIs [contact static]',
     );
     $Self->ContainedIn(
         $TestData{ContactOrgaCIID},
@@ -639,10 +632,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -652,7 +644,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [unknown attribute]',
+        'List should be empty [unknown attribute]',
     );
 
     # negative (known attribute but wrong class / wrong structure) ---------------------------
@@ -678,10 +670,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -691,7 +682,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [known attribute but wrong class / wrong structure]',
+        'List should be empty [known attribute but wrong class / wrong structure]',
     );
 
     # negative (known attribute but unknown class) ---------------------------
@@ -717,10 +708,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -730,7 +720,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [known attribute but unknwon class]',
+        'List should be empty [known attribute but unknwon class]',
     );
 
     # negative (missing object type) ---------------------------
@@ -756,10 +746,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -769,7 +758,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [missing object type]',
+        'List should be empty [missing object type]',
     );
 
     # negative (empty object type config) ---------------------------
@@ -787,10 +776,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -800,7 +788,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [empty object type config]',
+        'List should be empty [empty object type config]',
     );
 
     # negative (empty class config) ---------------------------
@@ -820,10 +808,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -833,7 +820,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [empty class config]',
+        'List should be empty [empty class config]',
     );
 
     # negative (empty attribute) ---------------------------
@@ -855,10 +842,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -868,7 +854,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [empty attribute]',
+        'List should be empty [empty attribute]',
     );
 
     # negative (empty value) ---------------------------
@@ -892,10 +878,9 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
@@ -905,7 +890,7 @@ END
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [empty value]',
+        'List should be empty [empty value]',
     );
 
     # negative (empty config) ---------------------------
@@ -919,20 +904,20 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UsertType  => 'Agent',
+        Silent     => 1
     );
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [empty config]',
+        'List should be empty [empty config]',
     );
 
     # negative (invalid config, missing " and unnecessary ,) ---------------------------
@@ -958,20 +943,20 @@ END
         Search     => {
             OR => [
                 {
-                    Field    => 'AssignedContact'.
+                    Field    => 'AssignedContact',
                     Operator => 'EQ',
-                    Type     => 'NUMERIC',
-                    Value    => q{}
+                    Value    => $TestData{CustomerContact}->{ID}
                 }
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UsertType  => 'Agent',
+        Silent     => 1
     );
     $Self->Is(
         scalar(@CIIDList),
         0,
-        'Article list should be empty [invalid config]',
+        'List should be empty [invalid config]',
     );
 }
 
@@ -982,6 +967,8 @@ sub _SetConfig {
         Key   => 'AssignedConfigItemsMapping',
         Value => $Config,
     );
+
+    $Kernel::OM->Get('Cache')->CleanUp( Type => 'ObjectSearch_ConfigItem' );
 
     # check config
     if ($DoCheck) {

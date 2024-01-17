@@ -89,16 +89,16 @@ sub Search {
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
-    my $TableAlias = $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} // 'u';
+    my $TableAlias = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
     my @SQLJoin;
-    if ( !$Param{Flags}->{UserJoin}->{$Param{BoolOperator}} ) {
+    if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
         my $Count = $Param{Flags}->{UserCounter}++;
         $TableAlias .= $Count;
         push(
             @SQLJoin,
             "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
         );
-        $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} = $TableAlias;
+        $Param{Flags}->{JoinMap}->{UserJoin} = $TableAlias;
     }
 
     # map search attributes to table attributes
@@ -111,7 +111,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        ValueType      => 'NUMERIC'
+        ValueType => 'NUMERIC'
     );
     return if ( !$Condition );
 
@@ -143,15 +143,15 @@ sub Sort {
     return if !$Self->_CheckSortParams(%Param);
 
     my @SQLJoin;
-    my $TableAlias = $Param{Flags}->{UserJoin}->{AND} // 'u';
-    if ( !$Param{Flags}->{UserJoin}->{AND} ) {
+    my $TableAlias = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
+    if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
         my $Count = $Param{Flags}->{UserCounter}++;
         $TableAlias .= $Count;
         push(
             @SQLJoin,
             "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
         );
-        $Param{Flags}->{UserJoin}->{AND} = $TableAlias;
+        $Param{Flags}->{JoinMap}->{UserJoin} = $TableAlias;
     }
 
     # map search attributes to table attributes

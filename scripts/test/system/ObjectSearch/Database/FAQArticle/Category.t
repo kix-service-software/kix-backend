@@ -394,13 +394,20 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 $Helper->BeginWork();
 
 ## prepare faq categories ##
-my $Category1   = 'Misc';
-my $CategoryID1 = 1;
+my $Number      = $Helper->GetRandomID();
+my $Category1   = "Test-$Number-001";
+my $CategoryID1 = $Kernel::OM->Get('FAQ')->CategoryAdd(
+    Name     => $Category1,
+    Comment  => 'UnitTest FAQ Category',
+    ParentID => 0,
+    ValidID  => 1,
+    UserID   => 1,
+);
 $Self->True(
     $CategoryID1,
     'Created first faq category'
 );
-my $Category2   = $Helper->GetRandomID();
+my $Category2   = "test-$Number-002";
 my $CategoryID2 = $Kernel::OM->Get('FAQ')->CategoryAdd(
     Name     => $Category2,
     Comment  => 'UnitTest FAQ Category',
@@ -412,7 +419,7 @@ $Self->True(
     $CategoryID2,
     'Created second faq category'
 );
-my $Category3   = $Helper->GetRandomID();
+my $Category3   = "Test-$Number-003";
 my $CategoryID3 = $Kernel::OM->Get('FAQ')->CategoryAdd(
     Name     => $Category3,
     Comment  => 'UnitTest FAQ Category',
@@ -589,17 +596,17 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID2]
     },
     {
-        Name     => "Search: Field Category / Operator STARTSWITH / Value substr(\$Category2,0,4)",
+        Name     => "Search: Field Category / Operator STARTSWITH / Value substr(\$Category1,0,4)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Category',
                     Operator => 'STARTSWITH',
-                    Value    => substr($Category2,0,4)
+                    Value    => substr($Category1,0,4)
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID3]
     },
     {
         Name     => "Search: Field Category / Operator ENDSWITH / Value \$Category2",
@@ -651,7 +658,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => "Search: Field Category / Operator LIKE / Value \$Category1",
@@ -667,17 +674,17 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID1]
     },
     {
-        Name     => "Search: Field Category / Operator LIKE / Value \$Category1,0,2)*",
+        Name     => "Search: Field Category / Operator LIKE / Value \$Category2,0,2)*",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Category',
                     Operator => 'LIKE',
-                    Value    => substr($Category1,0,2) . q{*}
+                    Value    => substr($Category2,0,2) . q{*}
                 }
             ]
         },
-        Expected => [$FAQArticleID1]
+        Expected => [$FAQArticleID2]
     }
 );
 
@@ -738,7 +745,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
     },
     {
         Name     => 'Sort: Field Category / Direction ascending',
@@ -749,7 +756,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
     },
     {
         Name     => 'Sort: Field Category / Direction descending',
@@ -760,7 +767,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

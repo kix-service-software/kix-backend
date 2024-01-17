@@ -174,6 +174,22 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator NE / Value empty string',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'NE',
+            Value    => ''
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = f.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_text != \'\''
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator IN',
         Search       => {
             Field    => 'DynamicField_UnitTest',
@@ -202,22 +218,6 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_text NOT IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator NE / Value empty string',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'NE',
-            Value    => ''
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = f.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text != \'\''
             ]
         }
     },

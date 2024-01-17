@@ -274,7 +274,7 @@ sub _ReplaceDynamicFieldPlaceholder {
             my @Values;
             if ( ref $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } eq 'ARRAY' ) {
                 @Values = @{ $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } };
-            } else {
+            } elsif ( defined $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } ) {
                 @Values = ( $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } );
             }
 
