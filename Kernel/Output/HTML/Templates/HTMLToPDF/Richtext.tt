@@ -29,7 +29,6 @@
 [% END %]
     }
     .[% Data.ID %] > p {
-        display:inline;
         padding: 1px 0 0 0;
     }
     .[% Data.ID %] > img {
