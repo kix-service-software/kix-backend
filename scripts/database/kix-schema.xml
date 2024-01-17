@@ -93,6 +93,32 @@
     </ForeignKey>
 </Table>
 
+<Table Name="user_counter">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER" />
+    <Column Name="user_id" Required="true" Type="INTEGER" />
+    <Column Name="category" Required="true" Size="50" Type="VARCHAR" />
+    <Column Name="counter" Required="true" Size="255" Type="VARCHAR" />
+    <Column Name="object_id" Required="true" Type="BIGINT" />
+    <Unique Name="user_counter_unique">
+        <UniqueColumn Name="user_id"/>
+        <UniqueColumn Name="category"/>
+        <UniqueColumn Name="counter"/>
+        <UniqueColumn Name="object_id"/>
+    </Unique>
+    <Index Name="user_counter_user_id">
+        <IndexColumn Name="user_id"/>
+    </Index>
+    <Index Name="user_counter_category">
+        <IndexColumn Name="category"/>
+    </Index>
+    <Index Name="user_counter_counter">
+        <IndexColumn Name="counter"/>
+    </Index>
+    <ForeignKey ForeignTable="users">
+        <Reference Local="user_id" Foreign="id" />
+    </ForeignKey>
+</Table>
+
 <!-- role - all roles -->
 <Table Name="roles">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
@@ -266,7 +292,6 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="unlock_timeout" Required="false" Type="INTEGER"/>
     <Column Name="system_address_id" Required="true" Type="SMALLINT"/>
-    <Column Name="calendar_name" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="default_sign_key" Required="false" Size="100" Type="VARCHAR"/>
     <Column Name="signature" Required="false"  Size="10000" Type="VARCHAR"/>
     <Column Name="follow_up_id" Required="true" Type="SMALLINT"/>
@@ -1623,6 +1648,7 @@
     <Column Name="value_text" Required="false" Type="VARCHAR" Size="1800000"/>
     <Column Name="value_date" Required="false" Type="DATE" />
     <Column Name="value_int" Required="false" Type="BIGINT" />
+    <Column Name="first_value" Required="false" Type="SMALLINT" />
 
     <!-- search objects with certain field content -->
     <Index Name="dynamic_field_value_search_date">
@@ -1637,6 +1663,10 @@
     <Index Name="dynamic_field_value_field_values">
         <IndexColumn Name="object_id"/>
         <IndexColumn Name="field_id"/>
+    </Index>
+    <Index Name="dynamic_field_first_value">
+        <IndexColumn Name="field_id"/>
+        <IndexColumn Name="first_value"/>
     </Index>
     <ForeignKey ForeignTable="dynamic_field">
         <Reference Local="field_id" Foreign="id"/>

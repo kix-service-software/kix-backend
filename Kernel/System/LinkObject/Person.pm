@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -217,28 +217,46 @@ sub ObjectSearch {
     }
 
     my %FoundPersons;
-    my $Limit =
-        ( $Param{SearchParams}->{Limit} && $Param{SearchParams}->{Limit}[0] )
+    my $Limit = (
+        $Param{SearchParams}->{Limit}
+        && $Param{SearchParams}->{Limit}[0]
+    )
         ? $Param{SearchParams}->{Limit}[0]
         : 100;
-    my $PersonType =
-        (
+    my $PersonType = (
         $Param{SearchParams}->{PersonType}
-            && $Param{SearchParams}->{PersonType}[0]
-        )
+        && $Param{SearchParams}->{PersonType}[0]
+    )
         ? $Param{SearchParams}->{PersonType}[0]
         : 'Customer';
+
     if ( $PersonType eq 'Customer' ) {
 
         # search customer
-        my %Contacts = $Self->{ContactObject}->ContactSearch(
-            Search => $Param{SearchParams}->{PersonAttributes},
-            Valid  => 1,
-            Limit  => $Limit,
+        my @ContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Fulltext',
+                        Operator => 'EQ',
+                        Value    => $Param{SearchParams}->{PersonAttributes}
+                    },
+                    {
+                        Field    => 'Valid',
+                        Operator => 'EQ',
+                        Value    => 'valid'
+                    }
+                ]
+            },
+            Limit      => $Limit,
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            UserID     => 1,
+            UserType   => 'Agent'
         );
-        for my $ID ( keys %Contacts ) {
-            my %ContactData =
-                $Self->{ContactObject}->ContactGet( ID => $ID, );
+
+        for my $ID ( @ContactIDs ) {
+            my %ContactData    = $Self->{ContactObject}->ContactGet( ID => $ID, );
             $ContactData{Type} = 'Customer';
             $FoundPersons{NOTLINKED}->{Source}->{$ID} = \%ContactData;
         }

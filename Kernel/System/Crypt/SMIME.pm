@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -678,7 +678,7 @@ sub FetchFromCustomer {
 
     # Check customer users for userSMIMECertificate
     my $ContactObject = $Kernel::OM->Get('Contact');
-    my %Contacts;
+    my @Contacts;
     if ( $Param{Search} ) {
 
         my $ValidEmail = $Kernel::OM->Get('CheckItem')->CheckEmail(
@@ -687,8 +687,20 @@ sub FetchFromCustomer {
 
         # If valid email address, only do a email search
         if ($ValidEmail) {
-            %Contacts = $ContactObject->ContactSearch(
-                Email => $Param{Search},
+            @Contacts = $Kernel::OM->Get('ObjectSearch')->Search(
+                Search => {
+                    AND => [
+                        {
+                            Field    => 'Emails',
+                            Operator => 'LIKE',
+                            Value    => $Param{Search}
+                        }
+                    ]
+                },
+                ObjectType => 'Contact',
+                Result     => 'ARRAY',
+                UserID     => 1,
+                UserType   => 'Agent',
             );
         }
     }
@@ -696,7 +708,7 @@ sub FetchFromCustomer {
     my @CertFileList;
 
     # Check found Contacts
-    for my $ContactID ( sort keys %Contacts ) {
+    for my $ContactID ( @Contacts ) {
         my %Contact = $ContactObject->ContactGet(
             ID => $ContactID,
         );

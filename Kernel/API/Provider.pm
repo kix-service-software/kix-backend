@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -79,7 +79,9 @@ web service.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->{RequestStartTime} = Time::HiRes::time();
+    $Self->{Metric} = $Kernel::OM->Get('Metric')->MetricInit(
+        Type => 'API',
+    );
 
     #
     # First, we need to locate the desired webservice and load its configuration data.
@@ -97,6 +99,14 @@ sub Run {
                 Message  => "Could not determine WebserviceName from query string $RequestURI",
             );
         }
+
+        $Self->_MetricAdd(
+            Response => {
+                ContentLength => 0,
+                Code          => 500,
+            }
+        );
+
         return;    # bail out without Transport, plack will generate 500 Error
     }
 
@@ -114,6 +124,14 @@ sub Run {
                 Message  => "Could not load web service configuration for web service at $RequestURI",
             );
         }
+
+        $Self->_MetricAdd(
+            Response => {
+                ContentLength => 0,
+                Code          => 500,
+            }
+        );
+
         return;    # bail out, this will generate 500 Error
     }
 
@@ -125,6 +143,14 @@ sub Run {
                 Message  => "Web service '$Webservice->{Name}' is not valid and can not be loaded",
             );
         }
+
+        $Self->_MetricAdd(
+            Response => {
+                ContentLength => 0,
+                Code          => 500,
+            }
+        );
+
         return;    # bail out, this will generate 500 Error
     }
 
@@ -140,6 +166,11 @@ sub Run {
 
     # read request content
     my $ProcessedRequest = $Self->ProcessRequest();
+    
+    # save for metrics and later use
+    $Self->{ProcessedRequest} = $ProcessedRequest;
+    $Self->{RequestMethod}    = $Self->{ProcessedRequest}->{RequestMethod};
+    $Self->{RequestURI}       = $Self->{ProcessedRequest}->{RequestURI};
 
     if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
         use Data::Dumper;
@@ -154,15 +185,12 @@ sub Run {
         );
     }
 
-    # save for later use
-    $Self->{RequestMethod} = $ProcessedRequest->{RequestMethod};
-
     # check authorization if needed
     my $Authorization;
     my $AuthorizationResult = $Self->CheckAuthorization();
 
     if (
-        $ProcessedRequest->{RequestMethod} ne 'OPTIONS' &&
+        $Self->{RequestMethod} ne 'OPTIONS' &&
         !$AuthorizationResult->{Success} &&
         !$Self->{ProviderConfig}->{Operation}->{$ProcessedRequest->{Operation}}->{NoAuthorizationNeeded}
     ) {
@@ -220,7 +248,8 @@ sub Run {
             else {
                 # don't execute GET operation on collections
                 # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
-                if ( $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /Search$/ || $Method ne 'GET' ) {
+                # (Serialization is something we need to handle as well here, even if it comes with Pro)
+                if ( $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /(Serialization|Search)$/ || $Method ne 'GET' ) {
                     my $OperationResult = $OperationObject->Run(
                         Data                => $ProcessedRequest->{Data},
                         PermissionCheckOnly => 1
@@ -350,6 +379,8 @@ sub Run {
             $OperationObject->{OperationConfig}->{DoNotSortAttributes} : 0
     );
 
+    $Self->_MetricAdd();
+
     if ( !$GeneratedResponse->{Success} ) {
         $Self->_Error(
             Code    => 'Provider.InternalError',
@@ -358,7 +389,7 @@ sub Run {
         );
     }
 
-    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, (time() - $Self->{RequestStartTime}) * 1000);
+    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, TimeDiff($Self->{Metric}->{StartTime}));
 
     return;
 }
@@ -368,6 +399,7 @@ sub Run {
 returns an error message to the client.
 
     $ProviderObject->_GenerateErrorResponse(
+        Metric  => $Metric,
         Code    => $ReturnCode,
         Message => $ErrorMessage,
     );
@@ -381,6 +413,11 @@ sub _GenerateErrorResponse {
         %Param,
         Success => 0,
     );
+
+    $Self->_MetricAdd(
+        Metric   => $Param{Metric},
+        Response => $FunctionResult, 
+    );  
 
     return;
 }

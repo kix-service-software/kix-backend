@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -57,7 +57,7 @@ sub new {
 
     # Get objects in constructor to save performance.
     $Self->{CacheObject}              = $Kernel::OM->Get('Cache');
-    $Self->{ClientRegistrationObject} = $Kernel::OM->Get('ClientRegistration');
+    $Self->{ClientNotificationObject} = $Kernel::OM->Get('ClientNotification');
 
     # Get the NodeID from the SysConfig settings, this is used on High Availability systems.
     $Self->{NodeID} = $Kernel::OM->Get('Config')->Get('NodeID') || 1;
@@ -105,7 +105,7 @@ sub Run {
 
     foreach my $Job ( @Jobs ) {
         # send the notifications
-        $Self->{ClientRegistrationObject}->NotificationSendWorker(
+        $Self->{ClientNotificationObject}->NotificationSendWorker(
             %{$Job}
         );
     }

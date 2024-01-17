@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,6 +58,7 @@ sub _Run {
 
     # extend the filter with the ArticleID or TicketID
     if ( IsHashRefWithData($Param{Data}) && $Param{Data}->{ArticleID} ) {
+
         # add ArticleID to filter
         $Filters = $Self->_ExtendFilter(
             Filters => $Filters,
@@ -69,6 +70,7 @@ sub _Run {
         );
     }
     elsif ( IsHashRefWithData($Param{Data}) && $Param{Data}->{TicketID} ) {
+
         # add TicketID to filter
         $Filters = $Self->_ExtendFilter(
             Filters => $Filters,
@@ -85,18 +87,22 @@ sub _Run {
     # do the search
     if (IsArrayRefWithData($Filters)) {
         for my $Search ( @{$Filters} ) {
-            my @TicketIDsPart = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Result => 'ARRAY',
-                Search => $Search,
-                UserID => 1
+            my @TicketIDsPart = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Result     => 'ARRAY',
+                Search     => $Search,
+                UserID     => 1,
+                UserType   => 'Agent'
             );
             push(@TicketIDs, @TicketIDsPart);
         }
         @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
     } else {
-        @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Result => 'ARRAY',
-            UserID => 1
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            UserID     => 1,
+            UserType   => 'Agent'
         );
     }
 

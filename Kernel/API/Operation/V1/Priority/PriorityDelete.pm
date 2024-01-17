@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -84,7 +84,8 @@ sub Run {
     foreach my $PriorityID ( @{$Param{Data}->{PriorityID}} ) {
 
         # search ticket
-        my $ResultTicketSearch = $Kernel::OM->Get('Ticket')->TicketSearch(
+        my $ResultTicketSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType   => 'Ticket',
             Result       => 'COUNT',
             Limit        => 1,
             Search       => {
@@ -96,8 +97,8 @@ sub Run {
                     },
                 ]
             },
-            UserID       => 1,
-            Permission   => 'ro',
+            UserID   => 1,
+            UserType => 'Agent',
         );
 
         if ( $ResultTicketSearch ) {

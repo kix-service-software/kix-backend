@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -491,7 +491,8 @@ END
         ObjectType   => 'Contact',
         Object       => $TestData{CustomerContact},
         UserID       => 1,
-        ObjectIDList => \@TicketIDs  # consider only test tickets
+        ObjectIDList => \@TicketIDs,  # consider only test tickets
+        Silent       => 1
     );
     $Self->Is(
         scalar(@{$TicketIDList}),

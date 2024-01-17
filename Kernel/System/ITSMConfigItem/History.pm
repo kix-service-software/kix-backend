@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -308,6 +308,9 @@ sub HistoryAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # insert history entry
     return if !$Kernel::OM->Get('DB')->Do(
@@ -322,7 +325,7 @@ sub HistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $Param{ConfigItemID}.'::'.$Param{HistoryTypeID},
@@ -366,6 +369,9 @@ sub HistoryDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # delete history for given config item
     return if !$Kernel::OM->Get('DB')->Do(
@@ -374,7 +380,7 @@ sub HistoryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $Param{ConfigItemID},
@@ -415,6 +421,9 @@ sub HistoryEntryDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # delete single entry
     return if !$Kernel::OM->Get('DB')->Do(
@@ -423,7 +432,7 @@ sub HistoryEntryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'CMDB.ConfigItem.History',
         ObjectID  => $HistoryEntry->{ConfigItemID}.'::'.$Param{HistoryEntryID},

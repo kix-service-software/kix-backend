@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -104,13 +104,15 @@ sub _ExtendFilter {
     if (!IsArrayRef($Filters)) {
         $Filters = [];
     }
-    if (!scalar(@{$Filters})) {
+    if ( !scalar(@{$Filters}) || (scalar(@{$Filters}) == 1 && !IsHashRef($Filters->[0])) ) {
         $Filters->[0] = {};
     }
 
     for my $Filter ( @{$Filters} ) {
-        $Filter->{AND} //= [];
-        push( @{$Filter->{AND}}, $Param{Extend} );
+        if (IsHashRef($Filter)) {
+            $Filter->{AND} //= [];
+            push( @{$Filter->{AND}}, $Param{Extend} );
+        }
     }
     return $Filters;
 }

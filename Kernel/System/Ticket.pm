@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -22,7 +22,6 @@ use Kernel::Language qw(Translatable);
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
 use Kernel::System::Ticket::TicketIndex;
-use Kernel::System::Ticket::TicketSearch;
 use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EmailParser;
@@ -43,7 +42,6 @@ our @ObjectDependencies = (
     'Lock',
     'Log',
     'Main',
-    'PostMaster::LoopProtection',
     'Priority',
     'Queue',
     'State',
@@ -94,7 +92,6 @@ sub new {
     @ISA = qw(
         Kernel::System::Ticket::Article
         Kernel::System::Ticket::TicketIndex
-        Kernel::System::Ticket::TicketSearch
         Kernel::System::Ticket::BasePermission
         Kernel::System::EventHandler
         Kernel::System::PerfLog
@@ -326,6 +323,13 @@ sub TicketCreate {
             $Param{Type} = $DefaultTicketType;
         }
         else {
+            if ( $DefaultTicketType ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default type \"$DefaultTicketType\" in config setting Ticket::Type::Default!",
+                );
+            }
+
             $Param{TypeID} = 1;
         }
     }
@@ -360,22 +364,37 @@ sub TicketCreate {
             $Param{Queue} = $DefaultTicketQueue;
         }
         else {
+            if ( $DefaultTicketQueue ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default queue \"$DefaultTicketQueue\" in config setting Ticket::Queue::Default!",
+                );
+            }
+
             $Param{QueueID} = 1;
         }
     }
 
     # QueueID/Queue lookup!
     if ( !$Param{QueueID} && $Param{Queue} ) {
-        $Param{QueueID} = $QueueObject->QueueLookup( Queue => $Param{Queue} );
+        $Param{QueueID} = $QueueObject->QueueLookup(
+            Queue  => $Param{Queue},
+            Silent => $Param{Silent}
+        );
     }
     elsif ( !$Param{Queue} ) {
-        $Param{Queue} = $QueueObject->QueueLookup( QueueID => $Param{QueueID} );
+        $Param{Queue} = $QueueObject->QueueLookup(
+            QueueID => $Param{QueueID},
+            Silent  => $Param{Silent}
+        );
     }
     if ( !$Param{QueueID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No QueueID for '$Param{Queue}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No QueueID for '$Param{Queue}'!",
+            );
+        }
         return;
     }
 
@@ -394,6 +413,12 @@ sub TicketCreate {
             $Param{State} = $DefaultTicketState;
         }
         else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
             $Param{StateID} = 1;
         }
     }
@@ -446,6 +471,12 @@ sub TicketCreate {
             $Param{Priority} = $DefaultTicketPriority;
         }
         else {
+            if ( $DefaultTicketPriority ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default priority \"$DefaultTicketPriority\" in config setting Ticket::Priority::Default!",
+                );
+            }
             $Param{PriorityID} = 1;
         }
     }
@@ -680,13 +711,14 @@ sub TicketCreate {
     $Self->EventHandler(
         Event => 'TicketCreate',
         Data  => {
-            TicketID => $TicketID
+            TicketID => $TicketID,
+            OwnerID  => $Param{OwnerID},
         },
         UserID => $Param{UserID},
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket',
         ObjectID  => $TicketID,
@@ -722,6 +754,11 @@ sub TicketDelete {
             return;
         }
     }
+
+    # get the ticket data
+    my %Ticket = $Self->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
@@ -813,6 +850,7 @@ sub TicketDelete {
         Event => 'TicketDelete',
         Data  => {
             TicketID => $Param{TicketID},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
@@ -821,7 +859,7 @@ sub TicketDelete {
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
@@ -1471,7 +1509,7 @@ sub _TicketCacheClear {
 
     # cleanup search cache
     $CacheObject->CleanUp(
-        Type => "TicketSearch",
+        Type => "ObjectSearch_Ticket",
     );
 
     # cleanup index cache
@@ -1793,7 +1831,7 @@ sub TicketTitleUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
@@ -1867,7 +1905,7 @@ sub TicketUnlockTimeoutUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
@@ -2070,7 +2108,7 @@ sub TicketQueueSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Queue',
         ObjectID  => $Param{TicketID}.'::'.$Ticket{QueueID}.'::'.$Param{QueueID},
@@ -2311,7 +2349,7 @@ sub TicketTypeSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Type',
         ObjectID  => $Param{TicketID}.'::'.$Ticket{TypeID}.'::'.$Param{TypeID},
@@ -2418,7 +2456,7 @@ sub TicketCustomerSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'Ticket.Organisation',
             ObjectID  => $Param{TicketID}.'::'.$Ticket{OrganisationID}.'::'.$Param{OrganisationID},
@@ -2434,7 +2472,7 @@ sub TicketCustomerSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'Ticket.Contact',
             ObjectID  => $Param{TicketID}.'::'.$Ticket{ContactID}.'::'.$Param{ContactID},
@@ -2776,7 +2814,7 @@ sub TicketPendingTimeSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.PendingTime',
         ObjectID  => $Param{TicketID},
@@ -2973,12 +3011,14 @@ sub TicketLockSet {
         Event => 'TicketLockUpdate',
         Data  => {
             TicketID => $Param{TicketID},
+            Lock     => lc $Param{Lock},
+            OwnerID  => $Ticket{OwnerID},
         },
         UserID => $Param{UserID},
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Lock',
         ObjectID  => $Param{TicketID}.'::'.(lc $Param{Lock}).'::'.$Param{UserID},
@@ -3105,7 +3145,7 @@ sub TicketArchiveFlagSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
@@ -3278,13 +3318,14 @@ sub TicketStateSet {
         Event => 'TicketStateUpdate',
         Data  => {
             TicketID      => $Param{TicketID},
+            State         => \%State,
             OldTicketData => \%Ticket,
         },
         UserID => $Param{UserID},
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.State',
         ObjectID  => $Param{TicketID}.'::'.$Ticket{StateID}.'::'.$State{ID},
@@ -3636,13 +3677,15 @@ sub TicketOwnerSet {
     $Self->EventHandler(
         Event => 'TicketOwnerUpdate',
         Data  => {
-            TicketID => $Param{TicketID},
+            TicketID        => $Param{TicketID},
+            OwnerID         => $Param{NewUserID},
+            PreviousOwnerID => $OwnerID,
         },
         UserID => $Param{UserID},
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Owner',
         ObjectID  => $Param{TicketID}.'::'.$OwnerID.'::'.$Param{NewUserID},
@@ -3868,7 +3911,7 @@ sub TicketResponsibleSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Responsible',
         ObjectID  => $Param{TicketID}.'::'.$Ticket{ResponsibleID}.'::'.$Param{NewUserID},
@@ -4149,7 +4192,7 @@ sub TicketPrioritySet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Priority',
         ObjectID  => $Param{TicketID}.'::'.$Ticket{PriorityID}.'::'.$Param{PriorityID},
@@ -4792,7 +4835,7 @@ sub HistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.History',
         ObjectID  => $Param{TicketID}.'::'.$Param{HistoryTypeID}.'::'.$Param{CreateUserID},
@@ -4938,7 +4981,7 @@ sub HistoryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.History',
         ObjectID  => $Param{TicketID},
@@ -5090,7 +5133,7 @@ sub TicketAccountTime {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket',
         ObjectID  => $Param{TicketID},
@@ -5177,9 +5220,10 @@ sub TicketFlagSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -5297,9 +5341,10 @@ sub TicketFlagDelete {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$Param{Key},
     );
 
@@ -6262,14 +6307,14 @@ sub ArticleMove {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -6495,7 +6540,7 @@ sub ArticleCreateDateUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -6568,7 +6613,7 @@ sub ArticleFlagDataSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'Ticket.Article.Flag',
             ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
@@ -6588,7 +6633,7 @@ sub ArticleFlagDataSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
             ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
@@ -6663,7 +6708,7 @@ sub ArticleFlagDataDelete {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -6777,14 +6822,18 @@ sub TicketFulltextIndexRebuild {
     my ( $Self, %Param ) = @_;
 
     # get all tickets
-    my @TicketIDs = $Self->TicketSearch(
-        ArchiveFlags => [ 'y', 'n' ],
-        OrderBy      => 'Down',
-        SortBy       => 'Age',
-        Result       => 'ARRAY',
-        Limit        => 100_000_000,
-        Permission   => 'ro',
-        UserID       => 1,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Sort => [
+            {
+                Field     => 'Age',
+                Direction => 'DESCENDING'
+            }
+        ],
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Limit      => 100_000_000,
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     $Kernel::OM->Get('Log')->Log(
@@ -6860,76 +6909,6 @@ sub _CalcStringDistance {
     return $d{$len1}{$len2};
 }
 
-=item TicketCalendarGet()
-
-get the relevant calendar for the ticket
-
-    my $Calendar = $TicketObject->TicketCalendarGet(
-        TicketID  => 123     # or
-        TicketIDs => []      # or
-        Ticket    => {}
-    );
-
-returns calendar number or empty string for default calendar (in case of "TicketIDs" it returns a HashRef of TicketIDs with Calendar)
-
-=cut
-
-sub TicketCalendarGet {
-    my ( $Self, %Param ) = @_;
-
-    my $Result;
-
-    if ( $Param{TicketID} ) {
-        $Param{TicketIDs} = [ $Param{TicketID} ];
-    }
-
-    if ( IsHashRefWithData($Param{Ticket}) ) {
-        # get queue specific calendar
-        my %QueueData = $Kernel::OM->Get('Queue')->QueueGet(
-            ID => $Param{Ticket}->{QueueID},
-        );
-        $Result = $QueueData{Calendar} || '';
-    }
-    elsif ( IsArrayRefWithData($Param{TicketIDs}) ) {
-        # get database object
-        my $DBObject = $Kernel::OM->Get('DB');
-
-        my @TicketIDs = @{$Param{TicketIDs}};
-        foreach my $TicketID ( @TicketIDs ) {
-            $TicketID = $DBObject->Quote( $TicketID, 'Integer' );
-        }
-
-        my $SQL = 'SELECT t.id, q.calendar_name FROM ticket t, queue q WHERE t.queue_id = q.id AND t.id IN ('.(join(',', @TicketIDs)).')';
-
-        if ( IsArrayRefWithData($Param{OnlyCalendars}) ) {
-            my @Calendars;
-            foreach my $Calendar ( @{$Param{OnlyCalendars}} ) {
-                push @Calendars, "'" . $DBObject->Quote( $Calendar ) . "'";
-            }
-
-            $SQL .= ' AND (q.calendar_name IS null OR q.calendar_name IN (null, '.(join(',', @Calendars)).'))';
-        }
-
-        # db query
-        return if !$DBObject->Prepare(
-            SQL => $SQL,
-        );
-
-        $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-            Columns => [ 'TicketID', 'Calendar' ]
-        );
-    }
-    else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID or TicketIDs or Ticket!'
-        );
-        return;
-    }
-
-    return $Result;
-}
-
 =item GetAssignedTicketsForObject()
 
 return all assigned ticket IDs
@@ -6962,7 +6941,8 @@ sub GetAssignedTicketsForObject {
         }
 
         my @ORSearch = map { { Field => $_, Operator => 'IN', Value => $SearchData{$_} } } keys %SearchData;
-        @AssignedTicketIDs = $Self->TicketSearch(
+        @AssignedTicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
             Result     => 'ARRAY',
             Search     => {
                 %Search,
@@ -6970,6 +6950,7 @@ sub GetAssignedTicketsForObject {
             },
             UserID   => $Param{UserID},
             UserType => $Param{UserType},
+            Silent   => $Param{Silent}
         );
 
         if ( IsArrayRefWithData(\@AssignedTicketIDs) ) {

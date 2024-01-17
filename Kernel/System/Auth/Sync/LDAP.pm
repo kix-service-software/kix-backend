@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -192,8 +192,7 @@ sub Sync {
                     $AttributeNames = [$AttributeNames];
                 }
 
-
-              ATTRIBUTE_NAME:
+                ATTRIBUTE_NAME:
                 for my $AttributeName ( @{$AttributeNames} ) {
                     # set a fixed value...
                     if ( $AttributeName =~ /^SET:/i ) {
@@ -212,10 +211,26 @@ sub Sync {
                             $Value =~s/\{(.+?)\}/$ValuePart/;
                         }
                     }
+                    # set a value concatenation of multiple attributes with joined values of array attributes
+                    # LDAP attributes are marked with curly brackets
+                    # joi separator is written in square brackets after ARRAYJOIN
+                    elsif ( $AttributeName =~ /^ARRAYJOIN\[(.+)\]\:(.+)$/i ) {
+                        my $SepStrg = $1;
+                        $Value      = $2;
+                        $Value      =~ s/^\s+|\s+$//g;
+                        while ( $Value =~ /\{(.+?)\}/) {
+                            $AttributeName = $1;
+                            my @ValuePartArray = $Entry->get_value($AttributeName);
+                            my $ValuePart = join( $SepStrg, @ValuePartArray ) || '';
+                            $ValuePart =~ s/^\s+|\s+$//g;
+                            $Value =~s/\{(.+?)\}/$ValuePart/;
+                        }
+                    }
                     # just set the attribute...
                     elsif ( $Entry->get_value($AttributeName) ) {
-                        $Value = $Entry->get_value($AttributeName);
-                        $Value =~ s/^\s+|\s+$//g;
+                        @ValueArr = $Entry->get_value($AttributeName);
+                        $Value    = $Entry->get_value($AttributeName);
+                        $Value    =~ s/^\s+|\s+$//g;
                     }
                     # set empty if no value can be retrieved or the attribute is not available..
                     else {
@@ -223,7 +238,37 @@ sub Sync {
                     }
 
                     # ensure proper encoding, i.e. utf-8
-                    $Value = $Self->_ConvertFrom( $Value, 'utf-8', );
+                    $Value = $Self->_ConvertFrom( $Value, 'utf-8' );
+
+                    # "special treatment"
+                    # if there's multiple mail values, automatically set Email, Email1..5
+                    if (
+                        $Key eq 'Email'
+                        && scalar(@ValueArr) > 1
+                    ) {
+                        # init counter
+                        my $Counter = 0;
+                        EMAIL:
+                        for my $CurrEmail ( @ValueArr ) {
+                            # prepare value
+                            $CurrEmail =~ s/^\s+|\s+$//g;
+                            $CurrEmail = $Self->_ConvertFrom( $CurrEmail, 'utf-8' );
+
+                            # skip empty entries
+                            next EMAIL if ( !$CurrEmail );
+
+                            if( $Counter == 0) {
+                                $SyncContact{'Email'} = $CurrEmail;
+                            } 
+                            else {
+                                $SyncContact{ 'Email' . $Counter } = $CurrEmail;
+                            } 
+
+                            # increment counter
+                            $Counter++;
+                        }
+                        last ATTRIBUTE_NAME;
+                    }
 
                     # "special treatment"
                     # do we have to look up organisation id?
@@ -263,7 +308,10 @@ sub Sync {
                 }
 
                 # NOTE this is already OR because it might work for array DFs one day
-                if ( $Key eq "OrganisationIDs" || ref($Self->{ContactUserSync}->{$Key}) eq 'ARRAY' ) {
+                if (
+                    $Key eq "OrganisationIDs"
+                    || ref( $Self->{ContactUserSync}->{ $Key } ) eq 'ARRAY'
+                ) {
                     $SyncContact{$Key} = \@ValueArr;
                 }
 
@@ -289,10 +337,12 @@ sub Sync {
                 );
             }
 
-            my %ContactData = $ContactObject->ContactGet(
-                ID     => $ContactID,
-                Silent => 1,
-            );
+            my %ContactData;
+            if ( $ContactID ) {
+                %ContactData = $ContactObject->ContactGet(
+                    ID => $ContactID,
+                );
+            }
 
             # if the UserLogin was changed, we cannot find the user by UserLogin. We had to look the user up by email.
             # this only works with enabled EmailUniqueCheck!
@@ -646,6 +696,33 @@ sub Sync {
             return;
         }
 
+        # assign user to contact
+        if ( $ContactID ) {
+            my %ContactData = $ContactObject->ContactGet(
+                ID => $ContactID,
+            );
+            my $Result = $ContactObject->ContactUpdate(
+                %ContactData,
+                ID             => $ContactID,
+                AssignedUserID => $UserID,
+                UserID         => 1
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+                    Priority  => 'error',
+                    Message   => "Unable to assign contact to user \"$Param{User}\" ($UserDN)!",
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
+                    Priority  => 'notice',
+                    Message   => "Assigned contact to user \"$Param{User}\" ($UserDN) in RDBMS.",
+                );
+            }
+        }
+
         $Kernel::OM->Get('Log')->Log(
             LogPrefix => 'Kernel::System::Auth::Sync::LDAP',
             Priority  => 'notice',
@@ -664,9 +741,8 @@ sub Sync {
     );
 
     if ( %User ) {
-
-    # remove UserPw to avoid overwrite
-    $User{UserPw} = undef if defined $User{UserPw};
+        # remove UserPw to avoid overwrite
+        $User{UserPw} = undef if defined $User{UserPw};
 
     # set UserLogin from LDAP
     # (at this point, user was either successfully identified by email or newly created )
@@ -709,7 +785,7 @@ sub Sync {
         }
 
         ROLEID:
-        foreach my $RoleID ( sort keys %RolesFromLDAP ) {
+        foreach my $RoleID ( sort( keys( %RolesFromLDAP ) ) ) {
             next ROLEID if !$RolesFromLDAP{$RoleID};
 
             $Kernel::OM->Get('Log')->Log(

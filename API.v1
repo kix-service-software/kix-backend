@@ -252,6 +252,7 @@
 /links/:LinkID                                                                             | DELETE           | V1::Link::LinkDelete                             |
 /links/:LinkID                                                                             | GET              | V1::Link::LinkGet                                |
 /links/types                                                                               | GET              | V1::Link::LinkTypeSearch                         |
+/objectsearch/:ObjectType                                                                  | GET              | V1::ObjectSearch::SupportedAttributesGet         |
 /organisations                                                                             | GET              | V1::Organisation::OrganisationSearch             |
 /organisations                                                                             | POST             | V1::Organisation::OrganisationCreate             |
 /organisations/:OrganisationID                                                             | DELETE           | V1::Organisation::OrganisationDelete             |
@@ -279,6 +280,8 @@
 /session                                                                                   | GET              | V1::Session::SessionGet                          |
 /session/user                                                                              | GET              | V1::Session::UserGet                             |
 /session/user                                                                              | PATCH            | V1::Session::UserUpdate                          |
+/session/user/counters                                                                     | GET              | V1::Session::UserCountersGet                     |
+/session/user/tickets                                                                      | GET              | V1::Session::UserTicketsGet                      |
 /session/user/preferences                                                                  | GET              | V1::Session::UserPreferenceSearch                |
 /session/user/preferences                                                                  | POST             | V1::Session::UserPreferenceCreate                |
 /session/user/preferences/:UserPreferenceID                                                | DELETE           | V1::Session::UserPreferenceDelete                |

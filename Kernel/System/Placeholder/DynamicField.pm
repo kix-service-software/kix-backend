@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -274,17 +274,28 @@ sub _ReplaceDynamicFieldPlaceholder {
             my @Values;
             if ( ref $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } eq 'ARRAY' ) {
                 @Values = @{ $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } };
-            } else {
+            } elsif ( defined $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } ) {
                 @Values = ( $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } );
             }
+
+            # return object value if text is just "_ObjectValue" placeholder (no surrounding text)
+            my $ReturnObjectValue;
+            if ($Param{Text} =~ m/^$Param{Tag}(\S+?)ObjectValue$Self->{End}$/gixms) {
+
+                # but not (now) if _Object_ is included => handle sub object value
+                if ($Param{Text} !~ m/_Object_/) {
+                    return \@Values;
+                }
+
+                $ReturnObjectValue = 1;
+            }
+
             my $Index = 0;
             for my $ObjectValue (@Values) {
-                if ($Index == 0) {
-                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = $ObjectValue;
-                }
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue_' . $Index } = $ObjectValue;
                 $Index++;
             }
+            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = join(',',@Values);
 
             # get the display values for each dynamic field
             my $DisplayValueStrg = $Self->{DynamicFieldBackendObject}->DisplayValueRender(
@@ -347,12 +358,15 @@ sub _ReplaceDynamicFieldPlaceholder {
                         Value              => $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
                         Placeholder        => $ObjectPlaceholder,
                         UserID             => $Param{UserID},
-                        Language           => $Param{Language}
+                        Language           => $Param{Language},
+                        KeepValueAsIs      => $Param{KeepValueAsIs}
                     );
                     if ( $ObjectValueStrg ) {
-                        $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . $ObjectPlaceholder }
-                            = $ObjectValueStrg;
+                        $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . $ObjectPlaceholder } = $ObjectValueStrg;
                     }
+
+                    # return value - no text replacement
+                    return $ObjectValueStrg if ($ReturnObjectValue);
                 }
             }
         }

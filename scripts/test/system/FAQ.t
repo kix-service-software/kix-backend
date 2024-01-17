@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -26,6 +26,16 @@ my $CacheObject = $Kernel::OM->Get('Cache');
 my $AddignedUser  = $Helper->GetRandomID();
 my $AddignedUser2 = $Helper->GetRandomID();
 
+my $ItemID = $Kernel::OM->Get('FAQ')->FAQLookup(
+    Number => '123807670',
+    Silent => 1
+);
+
+$Self->Is(
+    $ItemID,
+    undef,
+    "FAQLookup() - Get ItemID with unknown number - should be undef"
+);
 
 my $FAQID = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title       => 'Some Text',
@@ -44,11 +54,21 @@ $Self->IsNot(
     "FAQAdd() - 1",
 );
 
+my $FAQNumber = $Kernel::OM->Get('FAQ')->FAQLookup(
+    FAQArticleID  => $FAQID,
+);
+
+$Self->True(
+    $FAQNumber,
+    "FAQLookup() - Get number for ItemID '$FAQID'"
+);
+
 my %FAQ = $Kernel::OM->Get('FAQ')->FAQGet(
     ItemID     => $FAQID,
     ItemFields => 1,
     UserID     => 1,
 );
+my $FAQNumber1 = $FAQ{Number};
 
 my %FAQTest = (
     Title       => 'Some Text',
@@ -219,6 +239,28 @@ for my $Test ( @TestVotes ) {
     $Count++;
 }
 
+my $FAQID15 = $Kernel::OM->Get('FAQ')->FAQAdd(
+    Title       => 'Title',
+    Visibility  => 'internal',
+    CategoryID  => 1,
+    Language    => 'en',
+    Keywords    => q{},
+    Field1      => 'Problem Description 1...',
+    Field2      => 'Solution not found1...',
+    ContentType => 'text/html',
+    UserID      => 1,
+    Number      => $FAQNumber1,
+    Silent      => 1
+);
+
+$Self->Is(
+    $FAQID15,
+    undef,
+    "FAQAdd() - 1.5 don't create FAQ with existing number - should be undef",
+);
+
+
+my $FAQNumber2 = $Helper->GetRandomNumber();
 my $FAQID2 = $Kernel::OM->Get('FAQ')->FAQAdd(
     Title       => 'Title',
     Visibility  => 'internal',
@@ -229,11 +271,22 @@ my $FAQID2 = $Kernel::OM->Get('FAQ')->FAQAdd(
     Field2      => 'Solution not found1...',
     ContentType => 'text/html',
     UserID      => 1,
+    Number      => $FAQNumber2
 );
 
 $Self->True(
     $FAQID2,
     "FAQAdd() - 2",
+);
+
+my $ItemID2 = $Kernel::OM->Get('FAQ')->FAQLookup(
+    Number  => $FAQNumber2,
+);
+
+$Self->Is(
+    $ItemID2,
+    $FAQID2,
+    "FAQLookup() - Get ItemID with number '$FAQNumber2'"
 );
 
 my $Home            = $Kernel::OM->Get('Config')->Get('Home');

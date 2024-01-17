@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -59,13 +59,6 @@ sub Configure {
         HasValue    => 1,
         ValueRegex  => qr/\d/smx,
     );
-    $Self->AddOption(
-        Name        => 'calendar',
-        Description => 'Name of the calendar for the new queue.',
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-    );
 
     return;
 }
@@ -105,7 +98,6 @@ sub Run {
         SystemAddressID   => $SystemAddressID || $Self->GetOption('system-address-id') || undef,
         Comment           => $Self->GetOption('comment'),
         UnlockTimeout     => $Self->GetOption('unlock-timeout'),
-        Calendar          => $Self->GetOption('calendar'),
         ValidID           => 1,
         UserID            => 1,
     );

@@ -1221,12 +1221,12 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="TicketStateWorkflow::PostmasterFollowUpCheckCustomerIDFrom" Required="0" Valid="1">
-        <Description Translatable="1">Checks if the sender of a follow-up message is contained in customer database an has an identical customer-ID as the ticket. If so, the email is considered as email-external, otherwise it is considered as email-internal. Default KIX behavior if disabled.</Description>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckFromOrganisation" Required="0" Valid="1">
+        <Description Translatable="1">Checks if the sender of a follow-up message is contained in contact database an has an identical organisation as the ticket. If so, the email is visible in the self service portal.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
-            <Option SelectedID="1">
+            <Option SelectedID="0">
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
@@ -1480,7 +1480,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1520,7 +1519,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1560,7 +1558,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1600,7 +1597,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1640,7 +1636,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1680,7 +1675,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1720,7 +1714,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1760,7 +1753,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1800,7 +1792,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1840,7 +1831,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1880,7 +1870,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1920,7 +1909,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -1960,7 +1948,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -2000,7 +1987,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -2040,7 +2026,6 @@
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
                 <Item Key="DynamicFieldContent::Article"></Item>
 
-                <Item Key="AcknowledgeName">Nagios1</Item>
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
 
@@ -2067,115 +2052,6 @@
                 <Item Key="CloseTicketRegExp">OK|UP</Item>
                 <Item Key="CloseActionState">closed</Item>
                 <Item Key="ClosePendingTime">172800</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::Registration" Required="1" Valid="1">
-        <Description Translatable="1">Registration for possible system monitoring tool acknowledge. Content is used as allocation in following config options. Key must be some of AcknowledgeName-value, used in PostMasterFilter.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Array>
-                <Item>Nagios1</Item>
-                <Item>Nagios2</Item>
-            </Array>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::RegistrationAllocation" Required="1" Valid="1">
-        <Description Translatable="1">Set Dynamic Field, which contains allocation for system monitoring acknowledge.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <String Regex="">AcknowledgeName</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::DynamicField::Host" Required="1" Valid="1">
-        <Description Translatable="1">Name of Dynamic Field for Host.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">SysMonXHost</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::DynamicField::Address" Required="1" Valid="1">
-        <Description Translatable="1">Name of Dynamic Field for Address.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">SysMonXAddress</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::DynamicField::Service" Required="1" Valid="1">
-        <Description Translatable="1">Name of Dynamic Field for Service.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">SysMonXService</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::Type" Required="0" Valid="1">
-        <Description Translatable="1">Define Tool (Nagios) acknowledge type.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">pipe</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::NamedPipe::Host" Required="0" Valid="1">
-        <Description Translatable="1">Named pipe acknowledge format for host.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">[&lt;UNIXTIME&gt;] ACKNOWLEDGE_HOST_PROBLEM;&lt;HOST_NAME&gt;;1;1;1;&lt;LOGIN&gt;;&lt;a href="&lt;CONFIG_HttpType&gt;://&lt;CONFIG_FQDN&gt;/&lt;CONFIG_ScriptAlias&gt;index.pl?Action=AgentTicketZoom&amp;TicketID=&lt;TicketID&gt;"&gt;&lt;CONFIG_Ticket::Hook&gt;&lt;TicketNumber&gt;&lt;/a&gt;</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::NamedPipe::Service" Required="0" Valid="1">
-        <Description Translatable="1">Named pipe acknowledge format for service.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">[&lt;UNIXTIME&gt;] ACKNOWLEDGE_SVC_PROBLEM;&lt;HOST_NAME&gt;;&lt;SERVICE_NAME&gt;;1;1;1;&lt;LOGIN&gt;;&lt;a href="&lt;CONFIG_HttpType&gt;://&lt;CONFIG_FQDN&gt;/&lt;CONFIG_ScriptAlias&gt;index.pl?Action=AgentTicketZoom&amp;TicketID=&lt;TicketID&gt;"&gt;&lt;CONFIG_Ticket::Hook&gt;&lt;TicketNumber&gt;&lt;/a&gt;</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::HTTP::URL" Required="0" Valid="1">
-        <Description Translatable="1">The http acknowledge url.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">http://nagios.example.com/nagios/cgi-bin/cmd.cgi?cmd_typ=&lt;CMD_TYP&gt;&amp;cmd_mod=2&amp;host=&lt;HOST_NAME&gt;&amp;service=&lt;SERVICE_NAME&gt;&amp;sticky_ack=on&amp;send_notification=on&amp;persistent=on&amp;com_data=&lt;TicketNumber&gt;&amp;btnSubmit=Commit</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Tool::Acknowledge::HTTP::User" Required="0" Valid="1">
-        <Description Translatable="1">The http acknowledge user.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">John</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="confidential" Name="Tool::Acknowledge::HTTP::Password" Required="0" Valid="1">
-        <Description Translatable="1">The http acknowledge password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Tool::Acknowledge</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Nagios1">some_pass</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2547,7 +2423,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::SMTP"></Option>
+            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::DoNotSendEmail"></Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailModule::CMD" Required="1" Valid="1" ConfigLevel="200">
@@ -9629,13 +9505,6 @@ You can log in via the following URL:
             <String>Kernel::System::Automation</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###100-DateUtil" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a variable filter module.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <String>Kernel::System::Automation::VariableFilter::DateUtil</String>
-        </Setting>
-    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="Reporting::DataSource###GenericSQL" Required="0" Valid="1">
         <Description Translatable="1">Registration of a report type for reporting.</Description>
@@ -9776,13 +9645,53 @@ You can log in via the following URL:
 
     <ConfigItem AccessLevel="internal" Name="Frontend::Output::FilterText###AAAURL" Required="0" Valid="1">
         <Description Translatable="1">Defines the filter that processes text in order to highlight URLs.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Web</SubGroup>
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::Output::HTML::FilterText::URL</Item>
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="SupportData" Required="0" Valid="1">
+        <Description Translatable="1">Defines the parameters for the SupportData collection and sending.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="SendTo">support@kixdesk.com</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###SendSupportData" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Send the Support Data.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">SendSupportData</Item>
+                <Item Key="Schedule">0 4 * * 1</Item> <!-- default every monday at 04:00 AM -->
+                <Item Key="Module">Kernel::System::SupportData</Item>
+                <Item Key="Function">SupportDataSend</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+
+    <ConfigItem AccessLevel="internal" Name="Metrics::Active" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable or disable metrics.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="API">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Metrics::DaysToKeep" Required="0" Valid="1">
+        <Description Translatable="1">Defines the number of days to keep the metric files.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="API">30</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 
 </kix_config>

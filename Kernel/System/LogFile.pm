@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::LogFile;
 
 use strict;
 use warnings;
+
+use String::ShellQuote;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -137,10 +139,19 @@ sub LogFileGet {
     elsif ( $Param{Tail} ) {
         if ( IsArrayRefWithData($Param{Categories}) ) {
             my $Categories = join('|', @{$Param{Categories}});
-            $LogFile{Content} = `grep -a -E '\\[$Categories\\]' $LogDir/$LogFileList{$Param{ID}} | tail -n $Param{Tail}`;
+
+            # prepare system call
+            my $SystemCall = 'grep -a -E ' . shell_quote('\\[' . $Categories . '\\]') . ' ' .  shell_quote( $LogDir . '/' . $LogFileList{$Param{ID}} ) . ' | tail -n ' . shell_quote( $Param{Tail} );
+
+            # execute system call
+            $LogFile{Content} = `$SystemCall`;
         }
         else {
-            $LogFile{Content} = `tail -n $Param{Tail} $LogDir/$LogFileList{$Param{ID}}`;
+            # prepare system call
+            my $SystemCall = 'tail -n ' . shell_quote( $Param{Tail} ) . ' ' . shell_quote( $LogDir . '/' . $LogFileList{$Param{ID}} );
+
+            # execute system call
+            $LogFile{Content} = `$SystemCall`;
         }
     }
 

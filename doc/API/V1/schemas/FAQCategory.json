@@ -272,11 +272,21 @@
                "type" : "string",
                "readOnly" : true
             },
+            "Rating" : {
+               "description" : "added via include \"Rating\"",
+               "type" : "number",
+               "readOnly" : true
+            },
             "Title" : {
                "type" : "string",
                "readOnly" : true
             },
             "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "VoteCount" : {
+               "description" : "added via include \"Rating\"",
                "type" : "integer",
                "readOnly" : true
             },

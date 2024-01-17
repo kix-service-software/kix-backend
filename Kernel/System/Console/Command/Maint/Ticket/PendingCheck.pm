@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,12 +15,12 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Config',
-    'State',
-    'Ticket',
-    'Time',
-    'User',
+our @ObjectDependencies = qw(
+    Config
+    Daemon::SchedulerDB
+    ObjectSearch
+    State
+    Ticket
 );
 
 sub Configure {
@@ -36,37 +36,43 @@ sub Run {
 
     $Self->Print("<yellow>Process pending tickets...</yellow>\n");
 
-    # get needed objects
-    my $StateObject  = $Kernel::OM->Get('State');
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my @TicketIDs;
-
-    my @PendingAutoStateIDs = $StateObject->StateGetStatesByType(
+    my @PendingAutoStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
         Type   => 'PendingAuto',
+        Result => 'ID',
+    );
+    my @PendingReminderStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
+        Type   => 'PendingReminder',
         Result => 'ID',
     );
 
     if (@PendingAutoStateIDs) {
 
         # do ticket auto jobs
-        @TicketIDs = $TicketObject->TicketSearch(
-            Result   => 'ARRAY',
-            Search => {
+        my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            Search     => {
                 AND => [
                     {
-                        Field    => 'StateIDs',
+                        Field    => 'StateID',
                         Operator => 'IN',
                         Value    => \@PendingAutoStateIDs,
                     },
                     {
                         Field    => 'PendingTime',
-                        Operator => 'LT',
+                        Operator => 'LTE',
                         Value    => '+0s',
                     },
                 ]
             },
-            UserID   => 1,
+            Sort       => [
+                {
+                    Field     => 'PendingTime',
+                    Direction => 'ascending'
+                }
+            ],
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
 
         my $States = $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') || {};
@@ -75,7 +81,7 @@ sub Run {
         for my $TicketID (@TicketIDs) {
 
             # get ticket data
-            my %Ticket = $TicketObject->TicketGet(
+            my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                 TicketID      => $TicketID,
                 UserID        => 1,
                 DynamicFields => 0,
@@ -94,7 +100,7 @@ sub Run {
             );
 
             # set new state
-            my $Success = $TicketObject->TicketStateSet(
+            my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
                 TicketID => $TicketID,
                 State    => $NewState,
                 UserID   => 1,
@@ -107,13 +113,13 @@ sub Run {
             }
 
             # get state type for new state
-            my %State = $StateObject->StateGet(
+            my %State = $Kernel::OM->Get('State')->StateGet(
                 Name => $States->{$Ticket{State}},
             );
             if ( $State{TypeName} eq 'closed' ) {
 
                 # set new ticket lock
-                $TicketObject->TicketLockSet(
+                $Kernel::OM->Get('Ticket')->TicketLockSet(
                     TicketID     => $TicketID,
                     Lock         => 'unlock',
                     UserID       => 1,
@@ -129,51 +135,64 @@ sub Run {
 
     my %CronTaskSummary = map { $_->{Name} => $_ } @{( $Kernel::OM->Get('Daemon::SchedulerDB')->CronTaskSummary() )[0]->{Data}} ;
 
-    # look for pending reminder tickets with PendingTime in the past
-    my %Tickets = $TicketObject->TicketSearch(
-        Result    => 'HASH',
-        Search => {
-            AND => [
-                {
-                    Field    => 'StateType',
-                    Operator => 'EQ',
-                    Value    => 'pending reminder',
-                },
-                {
-                    Field    => 'PendingReminderRequired',
-                    Operator => 'EQ',
-                    Value    => '1',
-                },
-            ]
-        },
-        UserID => 1,
-    );
-
-    my $NotificationCount = 0;
-
-    my @PreparedTicketList;
-    foreach my $TicketID ( sort keys %Tickets ) {
-        push @PreparedTicketList, {
-            TicketID              => $TicketID,
-            CustomerMessageParams => {
-                TicketNumber => $Tickets{TicketID},
+    if ( @PendingReminderStateIDs ) {
+        # look for pending reminder tickets with PendingTime in the past
+        my %Tickets = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'HASH',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'StateID',
+                        Operator => 'IN',
+                        Value    => \@PendingReminderStateIDs,
+                    },
+                    {
+                        Field    => 'PendingTime',
+                        Operator => 'LTE',
+                        Value    => '+0s',
+                    },
+                ]
             },
-        };
-        $NotificationCount++;
-    }
-
-    if ( @PreparedTicketList ) {
-        # trigger notification event
-        $TicketObject->EventHandler(
-            Event => 'NotificationPendingReminder',
-            Data  => {
-                TicketList => \@PreparedTicketList
-            },
-            UserID => 1,
+            Sort       => [
+                {
+                    Field     => 'PendingTime',
+                    Direction => 'ascending'
+                }
+            ],
+            UserID     => 1,
+            UsertType  => 'Agent'
         );
-    }
 
-    $Self->Print("Triggered $NotificationCount reminder notification(s).\n");
+        my $NotificationCount = 0;
+
+        my @PreparedTicketList;
+        foreach my $TicketID ( sort keys %Tickets ) {
+            push @PreparedTicketList, {
+                TicketID              => $TicketID,
+                CustomerMessageParams => {
+                    TicketNumber => $Tickets{TicketID},
+                },
+            };
+            $NotificationCount++;
+        }
+
+        if ( @PreparedTicketList ) {
+            # trigger notification event
+            $Kernel::OM->Get('Ticket')->EventHandler(
+                Event => 'NotificationPendingReminder',
+                Data  => {
+                    TicketList => \@PreparedTicketList
+                },
+                UserID => 1,
+            );
+        }
+
+        $Self->Print("Triggered $NotificationCount reminder notification(s).\n");
+    }
+    else {
+        $Self->Print(" No pending reminder StateIDs found!\n");
+    }
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

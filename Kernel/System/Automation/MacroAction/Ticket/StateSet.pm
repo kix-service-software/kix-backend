@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,6 +13,8 @@ package Kernel::System::Automation::MacroAction::Ticket::StateSet;
 use strict;
 use warnings;
 use utf8;
+
+use String::ShellQuote;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -160,9 +162,11 @@ sub Run {
 
         my $PendingTime;
         if ( defined $Param{Config}->{PendingTimeDiff} ) {
+            # prepare system call
+            my $SystemCall = 'echo ' . shell_quote( $Param{Config}->{PendingTimeDiff} ) . ' | bc 2>&1';
 
-            # calculate if necessary
-            my $PendingTimeDiffResult = `echo "$Param{Config}->{PendingTimeDiff}" | bc 2>&1`;
+            # calculate if necessary - execute system call with quoted arguments
+            my $PendingTimeDiffResult = `$SystemCall`;
             chomp $PendingTimeDiffResult;
 
             if ( !IsNumber($PendingTimeDiffResult) ) {

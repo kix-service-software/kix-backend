@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -65,8 +65,9 @@ sub new {
         $Self->{PreferencesObject} = $GeneratorModule->new();
     }
 
-    $Self->{CacheType} = 'Organisation';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+    $Self->{OSCacheType} = 'ObjectSearch_Organisation';
+    $Self->{CacheType}   = 'Organisation';
+    $Self->{CacheTTL}    = 60 * 60 * 24 * 20;
 
     # init of event handler
     $Self->EventHandlerInit(
@@ -156,6 +157,11 @@ sub OrganisationAdd {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # trigger event
     $Self->EventHandler(
         Event => 'OrganisationAdd',
@@ -167,7 +173,7 @@ sub OrganisationAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Organisation',
         ObjectID  => $OrgID,
@@ -506,6 +512,11 @@ sub OrganisationUpdate {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # trigger event
     $Self->EventHandler(
         Event => 'OrganisationUpdate',
@@ -518,217 +529,13 @@ sub OrganisationUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
     );
 
     return 1;
-}
-
-=item OrganisationSearch()
-
-search organisations
-
-    my %List = $OrganisationObject->OrganisationSearch();
-
-    my %List = $OrganisationObject->OrganisationSearch(
-        Valid => 0,
-        Limit => 0,     # optional, override configured search result limit (0 means unlimited)
-    );
-
-    my %List = $OrganisationObject->OrganisationSearch(
-        Search => 'somecompany',
-    );
-
-    my %List = $OrganisationObject->OrganisationSearch(
-        Number => '1234567',
-    );
-
-    my %List = $OrganisationObject->OrganisationSearch(
-        Name => 'somename',
-    );
-
-Returns:
-
-%List = {
-          1 => 'example.com Customer Inc.',
-          2 => 'acme.com Acme, Inc.'
-        };
-
-=cut
-
-sub OrganisationSearch {
-    my ( $Self, %Param ) = @_;
-
-    # get needed objects
-    my $CacheObject = $Kernel::OM->Get('Cache');
-    my $ValidObject = $Kernel::OM->Get('Valid');
-    my $DBObject    = $Kernel::OM->Get('DB');
-
-    # check needed stuff
-    my $Valid = 1;
-    if ( !$Param{Valid} && defined( $Param{Valid} ) ) {
-        $Valid = 0;
-    }
-
-    # check cache
-    my $CacheKey = "OrganisationSearch::${Valid}::";
-    foreach my $Key (
-        qw(
-            Search Limit Number Name DynamicField
-        )
-    ) {
-        if (
-            $Key eq 'DynamicField'
-            && ref( $Param{ $Key } ) eq 'HASH'
-        ) {
-            my $CacheStrg = ( $Param{ $Key }->{Field} // '' )
-                        . q{;}
-                        . ( $Param{ $Key }->{Operator} // '' )
-                        . q{;};
-            if ( defined( $Param{ $Key }->{Value} ) ) {
-                $CacheStrg .= $Kernel::OM->Get('JSON')->Encode(
-                    Data => $Param{ $Key }->{Value},
-                );
-            }
-
-            $CacheKey .= q{::} . $CacheStrg;
-        }
-        else {
-            $CacheKey .= q{::} . ($Param{$Key} || q{});
-        }
-    }
-
-    my $Data = $CacheObject->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return %{$Data} if ref $Data eq 'HASH';
-
-    # add valid option if required
-    my $Where;
-    my @Bind;
-    my $Join = q{};
-
-    if ($Valid) {
-        $Where .= "o.valid_id IN ( ${\(join ', ', $ValidObject->ValidIDsGet())} )";
-    }
-
-    # where
-    if ( $Param{Search} ) {
-
-        my @Parts = split /\+/, $Param{Search}, 6;
-        for my $Part (@Parts) {
-            $Part =~ s/\*/%/g;
-            $Part =~ s/%%/%/g;
-
-            if ( defined $Where ) {
-                $Where .= " AND ";
-            }
-
-            my @SQLParts;
-            for my $Field ( qw(number name street zip city country url) ) {
-                if ( $Self->{CaseSensitive} ) {
-                    push(@SQLParts, "o.$Field LIKE ?");
-                    push(@Bind, \$Part);
-                }
-                else {
-                    push(@SQLParts, "LOWER(o.$Field) LIKE LOWER(?)");
-                    push(@Bind, \$Part);
-                }
-            }
-            if (@SQLParts) {
-                $Where .= '(' . join( ' OR ', @SQLParts ) . ')';
-            }
-        }
-    }
-    elsif ( $Param{Number} ) {
-
-        if ( defined $Where ) {
-            $Where .= " AND ";
-        }
-
-        my $Number = $Param{Number};
-        $Number =~ s/\*/%/g;
-        $Number =~ s/%%/%/g;
-
-        if ( $Self->{CaseSensitive} ) {
-            $Where .= "o.number LIKE ?";
-            push(@Bind, \$Number);
-        }
-        else {
-            $Where .= "LOWER(o.number) LIKE LOWER(?)";
-            push(@Bind, \$Number);
-        }
-    }
-    elsif ( $Param{Name} ) {
-
-        if ( defined $Where ) {
-            $Where .= " AND ";
-        }
-
-        my $Name = $Param{Name};
-        $Name =~ s/\*/%/g;
-        $Name =~ s/%%/%/g;
-
-        if ( $Self->{CaseSensitive} ) {
-            $Where .= "o.name LIKE ?";
-            push(@Bind, \$Name);
-        }
-        else {
-            $Where .= "LOWER(o.name) LIKE LOWER(?)";
-            push(@Bind, \$Name);
-        }
-    }
-    elsif (
-        $Param{DynamicField}
-        && IsHashRefWithData($Param{DynamicField})
-    ) {
-        if ( defined $Where ) {
-            $Where .= " AND ";
-        }
-
-        my $SQLReturn = $Self->_SearchInDynamicField(
-           Search       => $Param{DynamicField},
-            BoolOperator => 'AND',
-            JoinCounter  => '0'
-        );
-
-        $Join  .= join( q{ }, @{$SQLReturn->{SQLJoin}});
-        $Where .= join( ' AND ', @{$SQLReturn->{SQLWhere}});
-    }
-
-    my $SQL = "SELECT o.id, o.name FROM organisation o $Join ";
-    if ( $Where ) {
-        $SQL .= "WHERE ".$Where;
-    }
-
-    $SQL .= ' ORDER BY o.name, o.number';
-
-    # ask database
-    $DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Bind,
-        Limit => $Param{Limit},
-    );
-
-    # fetch the result
-    my %List;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $List{$Row[0]} = $Row[1];
-    }
-
-    # cache request
-    $CacheObject->Set(
-        Type  => $Self->{CacheType},
-        Key   => $CacheKey,
-        Value => \%List,
-        TTL   => $Self->{CacheTTL},
-    );
-
-    return %List;
 }
 
 =item OrganisationDelete()
@@ -789,6 +596,11 @@ sub OrganisationDelete {
         Type => $Self->{CacheType}
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # trigger event
     $Self->EventHandler(
         Event => 'OrganisationDelete',
@@ -799,7 +611,7 @@ sub OrganisationDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Organisation',
         ObjectID  => $Param{ID},
@@ -909,154 +721,13 @@ sub SetPreferences {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Customer.Preference',
         ObjectID  => $Param{UserID}.'::'.$Param{Key},
     );
 
     return $Result;
-}
-
-sub _SearchInDynamicField {
-    my ( $Self, %Param ) = @_;
-
-    # get needed object
-    my $LogObject                 = $Kernel::OM->Get('Log');
-    my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
-    my @SQLJoin;
-    my @SQLWhere;
-
-    # check params
-    if ( !$Param{Search} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Need Search!",
-        );
-        return;
-    }
-
-    # validate operator
-    my %OperatorMap = (
-        'EQ'         => 'Equals',
-        'LIKE'       => 'Like',
-        'GT'         => 'GreaterThan',
-        'GTE'        => 'GreaterThanEquals',
-        'LT'         => 'SmallerThan',
-        'LTE'        => 'SmallerThanEquals',
-        'IN'         => 'Like',
-        'CONTAINS'   => 'Like',
-        'STARTSWITH' => 'StartsWith',
-        'ENDSWITH'   => 'EndsWith',
-    );
-    if ( !$OperatorMap{$Param{Search}->{Operator}} ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => "Unsupported Operator $Param{Search}->{Operator}!",
-        );
-        return;
-    }
-
-    if ( !$Self->{DynamicFields} ) {
-
-        # get all configured dynamic fields
-        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-            ObjectType => ['Organisation'],
-        );
-        if ( !IsArrayRefWithData($DynamicFieldList) ) {
-            # we don't have any  DFs
-            return {
-                SQLJoin  => [],
-                SQLWhere => [],
-            };
-        }
-        $Self->{DynamicFields} = { map { $_->{Name} => $_ } @{$DynamicFieldList} };
-    }
-
-    my $DFName = $Param{Search}->{Field};
-    $DFName =~ s/DynamicField_//gsm;
-
-    my $DynamicFieldConfig = $Self->{DynamicFields}->{$DFName};
-
-    if ( !IsHashRefWithData($DynamicFieldConfig) ) {
-        $LogObject->Log(
-            Priority => 'notice',
-            Message  => "DynamicField '$DFName' doesn't exist or is disabled. Ignoring it.",
-        );
-        # return empty result
-        return {
-            SQLJoin  => [],
-            SQLWhere => [],
-        };
-    }
-
-    my $Value = $Param{Search}->{Value};
-    if ( !IsArrayRefWithData($Value) ) {
-        $Value = [ $Value ];
-    }
-    foreach my $ValueItem ( @{$Value} ) {
-        $Value =~ s/\*/%/g;
-    }
-
-    # increase count
-    my $Count = $Param{JoinCounter}++;
-
-    # join tables
-    my $JoinTable = "dfv$Count";
-    if ( $DynamicFieldConfig->{ObjectType} eq 'Organisation' ) {
-        if ( $Param{BoolOperator} eq 'OR') {
-            push( @SQLJoin, "LEFT JOIN dynamic_field_value $JoinTable ON (CAST(o.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        } else {
-            push( @SQLJoin, "INNER JOIN dynamic_field_value $JoinTable ON (CAST(o.id AS char(255)) = CAST($JoinTable.object_id AS char(255)) AND $JoinTable.field_id = " . $DynamicFieldConfig->{ID} . ") " );
-        }
-    }
-
-    my $DynamicFieldSQL;
-    foreach my $ValueItem ( @{$Value} ) {
-        # validate data type
-        my $ValidateSuccess = $DynamicFieldBackendObject->ValueValidate(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            Value              => $ValueItem,
-            SearchValidation   => 1,
-            UserID             => 1,
-        );
-
-        if ( !$ValidateSuccess ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  =>
-                    "Search not executed due to invalid value '"
-                    . $ValueItem
-                    . "' on field '"
-                    . $DFName
-                    . "'!",
-            );
-            return;
-        }
-
-        # get field specific SQL
-        my $SQL = $DynamicFieldBackendObject->SearchSQLGet(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            TableAlias         => $JoinTable,
-            Operator           => $OperatorMap{$Param{Search}->{Operator}},
-            SearchTerm         => $ValueItem,
-        );
-
-        if ( $DynamicFieldSQL ) {
-            $DynamicFieldSQL .= " OR ";
-        }
-        $DynamicFieldSQL .= "($SQL)";
-    }
-
-    # add field specific SQL
-    push( @SQLWhere, "($DynamicFieldSQL)" );
-
-    return {
-        SQLJoin  => \@SQLJoin,
-        SQLWhere => \@SQLWhere,
-    };
 }
 
 sub DESTROY {

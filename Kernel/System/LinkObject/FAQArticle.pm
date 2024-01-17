@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,10 +11,11 @@ package Kernel::System::LinkObject::FAQArticle;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'FAQ',
-    'Log',
+our @ObjectDependencies = qw(
+    Config
+    FAQ
+    Log
+    ObjectSearch
 );
 
 =head1 NAME
@@ -197,7 +198,18 @@ Return
     };
 
     $SearchList = $LinkObjectBackend->ObjectSearch(
-        SearchParams => $HashRef,  # (optional)
+        Search       => {
+            AND => [
+                {}
+            ]
+            OR  => [
+                {}
+            ]
+        },                         # (optional)
+        Sort         => [
+            {}
+        ],                         # (optional)
+        UserType     => 1,
         UserID       => 1,
     );
 
@@ -216,32 +228,13 @@ sub ObjectSearch {
         return;
     }
 
-    # set default params
-    $Param{SearchParams} ||= {};
-
-    # add wild-cards
-    my %Search;
-    if ( $Param{SearchParams}->{Title} ) {
-        $Search{Title} = '*' . $Param{SearchParams}->{Title} . '*';
-    }
-    if ( $Param{SearchParams}->{Number} ) {
-        $Search{Number} = '*' . $Param{SearchParams}->{Number} . '*';
-    }
-    if ( $Param{SearchParams}->{What} ) {
-        $Search{What} = '*' . $Param{SearchParams}->{What} . '*';
-    }
-
-    # get FAQ object
-    my $FAQObject = $Kernel::OM->Get('FAQ');
-
-    # search the FAQs
-    my @FAQIDs = $FAQObject->FAQSearch(
-        %{ $Param{SearchParams} },
-        %Search,
-        Order  => 'Created',
-        Sort   => 'down',
-        Limit  => 50,
-        UserID => $Param{UserID},
+    my @FAQIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        %Param,
+        ObjectType => 'FAQArticle',
+        Result     => 'ARRAY',
+        Limit      => 50,
+        UserID     => $Param{UserID},
+        UserType   => $Param{UserType}
     );
 
     my %SearchList;
@@ -249,7 +242,7 @@ sub ObjectSearch {
     for my $FAQID (@FAQIDs) {
 
         # get FAQ data
-        my %FAQData = $FAQObject->FAQGet(
+        my %FAQData = $Kernel::OM->Get('FAQ')->FAQGet(
             ItemID     => $FAQID,
             ItemFields => 1,
             UserID     => $Param{UserID},

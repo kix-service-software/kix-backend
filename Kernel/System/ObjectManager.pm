@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -489,8 +489,8 @@ sub ObjectsDiscard {
     delete $Self->{EventHandlers};
 
     # send all outstanding notifications to the registered clients
-    if ( $Self->Get('ClientRegistration')->NotificationCount() > 0) {
-        $Self->Get('ClientRegistration')->NotificationSend();
+    if ( $Self->Get('ClientNotification')->NotificationCount() > 0) {
+        $Self->Get('ClientNotification')->NotificationSend();
     }
 
     # destroy objects before their dependencies are destroyed
@@ -698,6 +698,9 @@ sub _PerfLogMethodWrapper {
 
 sub CleanUp {
     my ($Self, %Param) = @_;
+
+    # export unhandled metrics
+    $Self->Get('Metric')->Export(Type => 'API');
 
     # discard all objects
     $Self->ObjectsDiscard();

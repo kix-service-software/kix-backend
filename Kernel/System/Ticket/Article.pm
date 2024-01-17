@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -55,6 +55,8 @@ create an article
         MessageID        => '<asdasdasd.123@example.com>',          # not required but useful
         InReplyTo        => '<asdasdasd.12@example.com>',           # not required but useful
         References       => '<asdasdasd.1@example.com> <asdasdasd.12@example.com>', # not required but useful
+        DoNotSendEmail   => 0|1,                                    # optional, prevent system from sending an email
+        PlainEmail       => 'plain email content',                  # optional, only used for channel 'email', when article is NOT send by the system
         ContentType      => 'text/plain; charset=ISO-8859-15',      # or optional Charset & MimeType
         HistoryType      => 'OwnerUpdate',                          # EmailCustomer|Move|AddNote|PriorityUpdate|...
         HistoryComment   => 'Some free text!',
@@ -318,31 +320,8 @@ sub ArticleCreate {
             }
         }
 
-        if (!defined $Param{CustomerVisible} || $Param{CustomerVisible} eq '') {
-            $Param{CustomerVisible} = $Self->_HandleCustomerVisible(
-                Article => \%Param,
-                Ticket  => \%OldTicketData,
-            )
-        }
-
-        $Param{ToOrig}      = $Param{To}          || '';
+        $Param{ToOrig} = $Param{To}          || '';
         $Param{Loop}        = $Param{Loop}        || 0;
-        $Param{HistoryType} = $Param{HistoryType} || 'SendAnswer';
-
-        if ( !$Param{Channel} && !$Param{ChannelID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need Channel or ChannelID!',
-            );
-            return;
-        }
-        if ( !$Param{SenderType} && !$Param{SenderTypeID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need SenderType or SenderTypeID!',
-            );
-            return;
-        }
 
         # map ReplyTo into Reply-To if present
         if ( $Param{ReplyTo} ) {
@@ -375,8 +354,13 @@ sub ArticleCreate {
             }
             $Param{MessageID} = "<$Time.$Random\@$FQDN>";
         }
-    } else {
-        $Param{CustomerVisible} = (defined $Param{CustomerVisible} && $Param{CustomerVisible} ne '') ? $Param{CustomerVisible} : 0;
+    }
+
+    if (
+        !defined( $Param{CustomerVisible} )
+        || $Param{CustomerVisible} eq ''
+    ) {
+        $Param{CustomerVisible} = 0;
     }
 
     # prepare IncomingTime if given
@@ -566,9 +550,10 @@ sub ArticleCreate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article',
+        UserID    => $Param{UserID},
         ObjectID  => $Param{TicketID}.'::'.$ArticleID,
     );
 
@@ -708,7 +693,11 @@ sub ArticleCreate {
     }
 
     # send article through email channel if it was created by an agent
-    if ( $Param{Channel} eq 'email' && $Param{SenderType} eq 'agent' ) {
+    if (
+        !$Param{DoNotSendEmail}
+        && $Param{Channel} eq 'email'
+        && $Param{SenderType} eq 'agent'
+    ) {
 
         # prepare body and charset
         my $Body = $Kernel::OM->Get('Output::HTML::Layout')->RichTextDocumentComplete(
@@ -716,7 +705,6 @@ sub ArticleCreate {
         );
 
         my $Charset = $Param{Charset};
-        $Charset =~ s/plain/html/i;
 
         # send mail
         my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Email')->Send(
@@ -749,7 +737,7 @@ sub ArticleCreate {
             return $ArticleID;
         }
 
-        # write article to fs
+        # write plain article to fs
         my $Plain = $Self->ArticleWritePlain(
             ArticleID => $ArticleID,
             Email     => ${$HeadRef} . "\n" . ${$BodyRef},
@@ -778,6 +766,26 @@ sub ArticleCreate {
             },
             UserID => $Param{UserID},
         );
+    }
+    # handel plain email if provided
+    elsif (
+        $Param{PlainEmail}
+        && $Param{Channel} eq 'email'
+    ) {
+
+        # write plain article to fs
+        my $Plain = $Self->ArticleWritePlain(
+            ArticleID => $ArticleID,
+            Email     => $Param{PlainEmail},
+            UserID    => $Param{UserID}
+        );
+        if ( !$Plain ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to write plain article for ArticleID $ArticleID.",
+            );
+            return;
+        }
     }
 
     # return ArticleID
@@ -1490,6 +1498,15 @@ certain views)
         UserID              => 123,
     );
 
+returns articles in array / hash by given ticket id but
+only requested message-ids
+
+    my @ArticleIndex = $TicketObject->ArticleGet(
+        TicketID  => 123,
+        MessageID => \@MessageIDs,
+        UserID    => 123,
+    );
+
 to get extended ticket attributes, use param Extended - see TicketGet() for extended attributes -
 
     my @ArticleIndex = $TicketObject->ArticleGet(
@@ -1568,6 +1585,9 @@ sub ArticleGet {
     if ( $Param{CustomerVisible} ) {
         $CustomerVisibleSQL = " AND sa.customer_visible = 1";
     }
+    elsif ( defined( $Param{CustomerVisible} ) ) {
+        $CustomerVisibleSQL = " AND sa.customer_visible = 0";
+    }
 
     # sender type lookup
     my $SenderTypeSQL = '';
@@ -1635,6 +1655,19 @@ sub ArticleGet {
     }
     if ($SenderTypeIDSQL) {
         $SQL .= $SenderTypeIDSQL;
+    }
+
+    # add message id
+    my $MessageIDSQL;
+    if ( IsArrayRefWithData( $Param{MessageID} ) ) {
+        $SQL .= ' AND sa.a_message_id_md5 IN (' . join( ',', map {'?'} @{ $Param{MessageID} } ) . ')';
+
+        for my $MessageID ( @{ $Param{MessageID} } ) {
+            my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $MessageID );
+            push( @Bind, \$MD5 );
+        }
+
+        $MessageIDSQL = 1;
     }
 
     # set order
@@ -1756,7 +1789,13 @@ sub ArticleGet {
     if ( !@Content ) {
 
         # Log an error only if a specific article was requested and there is no filter active.
-        if ( $Param{ArticleID} && !$ChannelSQL && !$SenderTypeSQL ) {
+        if (
+            $Param{ArticleID}
+            && !$ChannelSQL
+            && !$SenderTypeSQL
+            && !$CustomerVisibleSQL
+            && !$MessageIDSQL
+        ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such article for ArticleID ($Param{ArticleID})!",
@@ -2104,10 +2143,11 @@ sub ArticleUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
-        ObjectID  => $Param{TicketID}.q{::}.$Param{ArticleID},
+        UserID    => $Param{UserID},
+        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2192,7 +2232,7 @@ sub ArticleBounce {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
@@ -2281,10 +2321,11 @@ sub ArticleFlagSet {
 
     # push client callback event
     if (!$Param{Silent}) {
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key}.'::'.$Param{UserID},
+            UserID    => $Param{UserID},
+            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -2385,9 +2426,10 @@ sub ArticleFlagDelete {
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
+        UserID    => $Param{UserID},
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
     );
 
@@ -2680,7 +2722,7 @@ sub ArticleAccountedTimeDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -3080,73 +3122,6 @@ sub GetAssignedArticlesForObject {
     }
 
     return \@AssignedArticleIDs;
-}
-
-sub _HandleCustomerVisible {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(Ticket Article)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_"
-            );
-            return 0;
-        }
-    }
-
-    return 0 if !$Param{Ticket}->{OrganisationID};
-
-    # get mail addresses of receivers
-    my %ReceiverMailAddresses;
-    for my $Property ( qw(To Cc Bcc) ) {
-        next if ( !$Param{Article}->{$Property} );
-
-        my @PropertyAddresses = split(',', $Param{Article}->{$Property});
-
-        for my $Address (@PropertyAddresses) {
-
-            # get plain address and trim
-            $Address =~ s/.+ <(.+)>/$1/;
-            $Address =~ s/^\s+|\n|\s+$//g;
-
-            if ( !$ReceiverMailAddresses{$Address} ) {
-                $ReceiverMailAddresses{$Address} = 1;
-            }
-        }
-    }
-
-    return 0 if (!scalar keys %ReceiverMailAddresses);
-
-    # get mail addresses of contacts of organisation
-    my %ContactList = $Kernel::OM->Get('Contact')->ContactSearch(
-        OrganisationID => $Param{Ticket}->{OrganisationID},
-        Valid          => 0
-    );
-
-    return 0 if ( !IsHashRefWithData(\%ContactList) );
-
-    my %ContactMailAddresses;
-    for my $ContactMail (values %ContactList) {
-        if ($ContactMail) {
-
-            # get plain address
-            $ContactMail =~ s/.+ <(.+)>/$1/;
-
-            if ( !$ContactMailAddresses{$ContactMail} ) {
-                $ContactMailAddresses{$ContactMail} = 1;
-            }
-        }
-    }
-
-    return 0 if (!scalar keys %ContactMailAddresses);
-
-    for my $Address (keys %ContactMailAddresses) {
-        return 1 if ($ReceiverMailAddresses{$Address});
-    }
-
-    return 0;
 }
 
 # TODO: move to a "common" module (used in other modules too)

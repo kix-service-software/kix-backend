@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -94,7 +94,7 @@ This returns something like:
         'ID'                => 2,
         'Type'              => 'Ticket',
         'Name'              => 'Test',
-        'Filter'            => {},
+        'Filter'            => [],
         'IsAsynchronous'    => 0|1,
         'Comment'           => '...',
         'LastExecutionTime' => '2019-10-21 12:00:00',
@@ -156,7 +156,7 @@ sub JobGet {
             $Result{Filter} = $Kernel::OM->Get('JSON')->Decode(
                 Data => $Result{Filter}
             );
-            if (!IsArrayRefWithData($Result{Filter})) {
+            if (!IsArrayRef($Result{Filter})) {
                 $Result{Filter} = [$Result{Filter}];
             }
         }
@@ -243,7 +243,7 @@ sub JobAdd {
     # prepare filter as JSON
     my $Filter;
     if ( $Param{Filter} ) {
-        if ( !IsArrayRefWithData($Param{Filter}) ) {
+        if ( !IsArrayRef($Param{Filter}) ) {
             $Param{Filter} = [$Param{Filter}];
         }
         $Filter = $Kernel::OM->Get('JSON')->Encode(
@@ -286,7 +286,7 @@ sub JobAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job',
         ObjectID  => $ID,
@@ -356,7 +356,7 @@ sub JobUpdate {
     # set default value
     $Param{Comment} ||= '';
 
-    if ( $Param{Filter} && !IsArrayRefWithData($Param{Filter}) ) {
+    if ( $Param{Filter} && !IsArrayRef($Param{Filter}) ) {
         $Param{Filter} = [$Param{Filter}];
     }
 
@@ -415,7 +415,7 @@ sub JobUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -600,7 +600,7 @@ sub JobDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -775,7 +775,7 @@ sub JobMacroAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.Macro',
             ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -822,7 +822,7 @@ sub JobMacroDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.Macro',
         ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -997,7 +997,7 @@ sub JobExecPlanAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.ExecPlan',
             ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -1044,7 +1044,7 @@ sub JobExecPlanDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.ExecPlan',
         ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -1314,7 +1314,7 @@ sub _JobExecute {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job.JobRun',
         ObjectID  => $Param{ID}.'::'.$RunID,
@@ -1745,7 +1745,7 @@ sub _JobLastExecutionTimeSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},

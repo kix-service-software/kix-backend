@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -378,10 +378,12 @@ sub VersionGet {
 
     # check needed stuff
     if ( !$Param{VersionID} && !$Param{ConfigItemID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need VersionID or ConfigItemID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need VersionID or ConfigItemID!',
+            );
+        }
         return;
     }
 
@@ -446,10 +448,12 @@ sub VersionGet {
 
     # check version
     if ( !$Version{VersionID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No such config item version!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'No such config item version!',
+            );
+        }
         return;
     }
 
@@ -477,10 +481,12 @@ sub VersionGet {
 
     # check config item data
     if ( !$ConfigItem || ref $ConfigItem ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Can't get config item $Version{ConfigItemID}!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Can't get config item $Version{ConfigItemID}!",
+            );
+        }
         return;
     }
 
@@ -1109,6 +1115,9 @@ sub VersionAdd {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     if ($AddVersion) {
         # trigger VersionCreate event
@@ -1186,13 +1195,13 @@ sub VersionAdd {
 
     # push client callback event
     if ($AddVersion) {
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'CMDB.ConfigItem.Version',
             ObjectID  => $Param{ConfigItemID}.'::'.$VersionID,
         );
     } else {
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event      => 'UPDATE',
             Namespace  => 'CMDB.ConfigItem',
             ObjectID   => $Param{ConfigItemID},
@@ -1329,7 +1338,7 @@ sub VersionDelete {
             );
 
             # push client callback event
-            $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
                 Event     => 'DELETE',
                 Namespace => 'CMDB.ConfigItem.Version',
                 ObjectID  => $ConfigItemID.'::'.$VersionID,
@@ -1340,6 +1349,9 @@ sub VersionDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     return $Success;

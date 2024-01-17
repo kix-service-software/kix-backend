@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -13,10 +13,11 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Organisation',
-    'Log'
+our @ObjectDependencies = qw(
+    Config
+    Organisation
+    Log
+    ObjectSearch
 );
 
 =head1 NAME
@@ -68,13 +69,13 @@ get the xml data of a version
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    return '' if !$Param{Value};
+    return q{} if !$Param{Value};
 
     my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationGet(
         ID => $Param{Value},
     );
 
-    my $OrganisationDataStr = '';
+    my $OrganisationDataStr = q{};
     my $CustOrganisationMapRef =
         $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::OrganisationBackendMapping');
 
@@ -82,7 +83,7 @@ sub ValueLookup {
 
         for my $MappingField ( sort( keys( %{$CustOrganisationMapRef} ) ) ) {
             if ( $OrganisationSearchList{ $CustOrganisationMapRef->{$MappingField} } ) {
-                $OrganisationDataStr .= ' '
+                $OrganisationDataStr .= q{ }
                     . $OrganisationSearchList{ $CustOrganisationMapRef->{$MappingField} };
             }
         }
@@ -202,17 +203,28 @@ sub ImportSearchValuePrepare {
     return if !defined $Param{Value};
 
     # search for name....
-    my %OrganisationSearch = $Self->{OrganisationObject}->OrganisationSearch(
-        Search => '*' . $Param{Value} . '*',
+    my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Organisation',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'CONTAINS',
+                    Type     => 'STRING',
+                    Value    => $Param{Value}
+                }
+            ]
+        },
+        UserType => 'Agent',
+        UserID   => 1
     );
 
     if (
-        %OrganisationSearch
-        && ( scalar( keys %OrganisationSearch ) == 1 )
-        )
-    {
-        my @Result = keys %OrganisationSearch;
-        return $Result[0];
+        @OrganisationIDs
+        && ( scalar( @OrganisationIDs ) == 1 )
+    ) {
+        return $OrganisationIDs[0];
     }
 
     return $Param{Value};
@@ -239,9 +251,9 @@ sub ImportValuePrepare {
 
     return $Param{Value} if ( !$CustOrganisationContent );
 
-    my $OrganisationDataStr = '';
+    my $OrganisationDataStr = q{};
 
-    if ($Param{Value} ne '') {
+    if ($Param{Value} ne q{}) {
         if ( $CustOrganisationContent eq 'ID') {
 
             # check if it is a valid Organisation
@@ -264,14 +276,13 @@ sub ImportValuePrepare {
             }
         } elsif ( $CustOrganisationContent eq 'Name') {
 
-            # search for Organisation
-            my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationSearch(
-                Name  => $Param{Value},
-                Limit => 1,
+            # check if it is a valid Organisation
+            my $ID = $Self->{OrganisationObject}->OrganisationLookup(
+                Name => $Param{Value}
             );
 
-            if (IsHashRefWithData(\%OrganisationSearchList)) {
-                $OrganisationDataStr = [keys %OrganisationSearchList]->[0];
+            if ($ID) {
+                $OrganisationDataStr = $ID;
             }
         }
     }

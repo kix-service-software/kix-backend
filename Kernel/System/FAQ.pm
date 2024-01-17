@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -18,7 +18,6 @@ use MIME::Base64 qw();
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
-    Kernel::System::FAQ::Search
     Kernel::System::FAQ::Category
     Kernel::System::FAQ::Vote
     Kernel::System::EventHandler
@@ -82,8 +81,9 @@ sub new {
     $Self->{Voting} = $ConfigObject->Get('FAQ::Voting');
 
     # init cache settings
-    $Self->{CacheType} = 'FAQ';
-    $Self->{CacheTTL}  = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
+    $Self->{CacheType}   = 'FAQ';
+    $Self->{OSCacheType} = 'ObjectSearch_FAQArticle';
+    $Self->{CacheTTL}    = int( $ConfigObject->Get('FAQ::CacheTTL') || 60 * 60 * 24 * 2 );
 
     # init of event handler
     # currently there are no FAQ event modules but is needed to initialize otherwise errors are
@@ -178,12 +178,13 @@ sub FAQGet {
     else {
 
         return if !$DBObject->Prepare(
-            SQL => '
-                SELECT id, f_name, language, f_subject, created, created_by, changed,
-                    changed_by, category_id, visibility, f_keywords,
-                    approved, valid_id, content_type, f_number
-                FROM faq_item
-                WHERE id = ?',
+            SQL => <<'END',
+SELECT id, f_name, language, f_subject, created, created_by, changed,
+    changed_by, category_id, visibility, f_keywords,
+    approved, valid_id, content_type, f_number
+FROM faq_item
+WHERE id = ?
+END
             Bind  => [ \$Param{ItemID} ],
             Limit => 1,
         );
@@ -345,17 +346,20 @@ sub ItemFieldGet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    my $Column = $FieldLookup{ $Param{Field} };
     return if !$DBObject->Prepare(
-        SQL => 'SELECT ' . $FieldLookup{ $Param{Field} } . '
-            FROM faq_item
-            WHERE id = ?',
+        SQL => <<"END",
+SELECT $Column
+FROM faq_item
+WHERE id = ?
+END
         Bind  => [ \$Param{ItemID} ],
         Limit => 1,
     );
 
     my $Field;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Field = $Row[0] || '';
+        $Field = $Row[0] || q{};
     }
 
     if ( ref $Cache eq 'HASH' ) {
@@ -418,12 +422,19 @@ sub FAQAdd {
     my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
-    for my $Argument (qw(CategoryID Visibility Language Title UserID ContentType)) {
+    for my $Argument (
+        qw(
+            CategoryID Visibility Language
+            Title UserID ContentType
+        )
+    ) {
         if ( !$Param{$Argument} ) {
-            $LogObject->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $LogObject->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
 
             return;
         }
@@ -439,17 +450,48 @@ sub FAQAdd {
     }
 
     # check name
-    # FIXME: needed?
-    if ( !$Param{Name} ) {
-        $Param{Name} = time() . '-' . rand(100);
+    if (
+        !defined $Param{Name}
+        || !$Param{Name}
+    ) {
+        $Param{Name} = time() . q{-} . rand(100);
     }
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check number
-    if ( !$Param{Number} ) {
-        $Param{Number} = $ConfigObject->Get('SystemID') . rand(100);
+    if (
+        !defined $Param{Number}
+        || !$Param{Number}
+    ) {
+        $Param{Number} = $Self->_FAQNumberCreate();
+
+        if ( !$Param{Number} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "The number could not be generated!"
+                );
+            }
+            return;
+        }
+    }
+    else {
+        my $Exists = $Self->FAQLookup(
+            Number => $Param{Number},
+            Silent => $Param{Silent} // 1
+        );
+
+        if ( $Exists ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "FAQArticle with number '$Param{Number}' already exists!"
+                );
+            }
+            return;
+        }
     }
 
     # if approval feature is not activated, a new FAQ item is always approved
@@ -469,17 +511,18 @@ sub FAQAdd {
     }
 
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            INSERT INTO faq_item
-                (f_number, f_name, language, f_subject,
-                category_id, visibility, f_keywords, approved, valid_id, content_type,
-                f_field1, f_field2, f_field3, f_field4, f_field5, f_field6,
-                created, created_by, changed, changed_by)
-            VALUES
-                (?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?,
-                current_timestamp, ?, current_timestamp, ?)',
+        SQL => <<'END',
+INSERT INTO faq_item
+    (f_number, f_name, language, f_subject,
+    category_id, visibility, f_keywords, approved, valid_id, content_type,
+    f_field1, f_field2, f_field3, f_field4, f_field5, f_field6,
+    created, created_by, changed, changed_by)
+VALUES
+    (?, ?, ?, ?,
+    ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?, ?, ?,
+    current_timestamp, ?, current_timestamp, ?)
+END
         Bind => [
             \$Param{Number},     \$Param{Name},    \$Param{Language}, \$Param{Title},
             \$Param{CategoryID}, \$Param{Visibility}, \$Param{Keywords},   \$Param{Approved},
@@ -491,42 +534,39 @@ sub FAQAdd {
     );
 
     # build SQL to get the id of the newly inserted FAQ article
-    my $SQL = '
-        SELECT id FROM faq_item
-        WHERE f_number = ?
-            AND f_name = ?
-            AND language = ?
-            AND category_id = ?
-            AND visibility = ?
-            AND approved = ?
-            AND valid_id = ?
-            AND created_by = ?
-            AND changed_by = ?';
+    my $SQL = <<'END';
+SELECT id, f_number FROM faq_item
+WHERE f_number = ?
+    AND f_name = ?
+    AND language = ?
+    AND category_id = ?
+    AND visibility = ?
+    AND approved = ?
+    AND valid_id = ?
+    AND created_by = ?
+    AND changed_by = ?
+END
 
     # handle the title
     if ( $Param{Title} ) {
-        $SQL .= '
-            AND f_subject = ? ';
+        $SQL .= ' AND f_subject = ? ';
     }
 
     # additional SQL for the case that the title is an empty string
     # and the database is oracle, which treats empty strings as NULL
     else {
-        $SQL .= '
-            AND ((f_subject = ?) OR (f_subject IS NULL)) ';
+        $SQL .= ' AND ((f_subject = ?) OR (f_subject IS NULL)) ';
     }
 
     # handle the keywords
     if ( $Param{Keywords} ) {
-        $SQL .= '
-            AND f_keywords = ? ';
+        $SQL .= ' AND f_keywords = ? ';
     }
 
     # additional SQL for the case that keywords is an empty string
     # and the database is oracle, which treats empty strings as NULL
     else {
-        $SQL .= '
-            AND ((f_keywords = ?) OR (f_keywords IS NULL)) ';
+        $SQL .= ' AND ((f_keywords = ?) OR (f_keywords IS NULL)) ';
     }
 
     # get database object
@@ -551,24 +591,29 @@ sub FAQAdd {
         Limit => 1,
     );
 
-    my $ID;
+    my %FAQ;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $ID = $Row[0];
+        %FAQ = (
+            FAQArticleID => $Row[0],
+            Number       => $Row[1]
+        );
     }
 
-    # update number
-    my $Number = $ConfigObject->Get('SystemID') . '00' . $ID;
-
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE faq_item SET f_number = ? WHERE id = ?',
-        Bind => [ \$Number, \$ID ],
-    );
+    if ( !%FAQ ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "FAQArticle couldn't be created!"
+            );
+        }
+        return;
+    }
 
     # add converted attachments
     for my $Attachment (@AttachmentConvert) {
         $Self->AttachmentAdd(
             %{$Attachment},
-            ItemID => $ID,
+            ItemID => $FAQ{FAQArticleID},
             UserID => $Param{UserID},
         );
     }
@@ -576,7 +621,7 @@ sub FAQAdd {
     # add history
     $Self->FAQHistoryAdd(
         Name   => 'Created',
-        ItemID => $ID,
+        ItemID => $FAQ{FAQArticleID},,
         UserID => $Param{UserID},
     );
 
@@ -585,22 +630,31 @@ sub FAQAdd {
         Type => $Self->{CacheType}
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # check if approval feature is enabled
     if ( $ConfigObject->Get('FAQ::ApprovalRequired') && !$Param{Approved} ) {
 
         # create new approval ticket
         my $Success = $Self->_FAQApprovalTicketCreate(
-            ItemID     => $ID,
+            ItemID     => $FAQ{FAQArticleID},
             CategoryID => $Param{CategoryID},
             Language   => $Param{Language},
-            FAQNumber  => $Number,
+            FAQNumber  => $FAQ{Number},
             Title      => $Param{Title},
             Visibility => $Param{Visibility},
             UserID     => $Param{UserID},
+            Silent     => $Param{Silent}
         );
 
         # check error
-        if ( !$Success ) {
+        if (
+            !$Success
+            && !$Param{Silent}
+        ) {
             $LogObject->Log(
                 Priority => 'error',
                 Message  => 'Could not create approval ticket!',
@@ -609,13 +663,13 @@ sub FAQAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article',
-        ObjectID  => $ID,
+        ObjectID  => $FAQ{FAQArticleID},
     );
 
-    return $ID;
+    return $FAQ{FAQArticleID};
 }
 
 =item FAQUpdate()
@@ -654,13 +708,45 @@ sub FAQUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(ItemID CategoryID Visibility Language Title ValidID UserID ContentType)) {
+    for my $Argument (
+        qw(
+            ItemID CategoryID Visibility
+            Language Title ValidID
+            UserID ContentType
+        )
+    ) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
 
+            return;
+        }
+    }
+
+    # check number
+    if (
+        defined $Param{Number}
+        && $Param{Number}
+    ) {
+        my $FAQArticleID = $Self->FAQLookup(
+            Number => $Param{Number},
+            Silent => $Param{Silent} // 1
+        );
+
+        if (
+            $FAQArticleID
+            && $FAQArticleID ne $Param{ItemID}
+        ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "FAQArticle with number '$Param{Number}' already exists!"
+                );
+            }
             return;
         }
     }
@@ -677,16 +763,17 @@ sub FAQUpdate {
     }
 
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            UPDATE faq_item SET
-                f_name = ?, language = ?, f_subject = ?, category_id = ?,
-                visibility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
-                f_field1 = ?, f_field2 = ?,
-                f_field3 = ?, f_field4 = ?,
-                f_field5 = ?, f_field6 = ?,
-                changed = current_timestamp,
-                changed_by = ?
-            WHERE id = ?',
+        SQL => <<'END',
+UPDATE faq_item SET
+    f_name = ?, language = ?, f_subject = ?, category_id = ?,
+    visibility = ?, f_keywords = ?, valid_id = ?, content_type = ?,
+    f_field1 = ?, f_field2 = ?,
+    f_field3 = ?, f_field4 = ?,
+    f_field5 = ?, f_field6 = ?,
+    changed = current_timestamp,
+    changed_by = ?
+WHERE id = ?
+END
         Bind => [
             \$Param{Name},    \$Param{Language}, \$Param{Title},   \$Param{CategoryID},
             \$Param{Visibility}, \$Param{Keywords},   \$Param{ValidID}, \$Param{ContentType},
@@ -717,6 +804,11 @@ sub FAQUpdate {
         Type => $Self->{CacheType}
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
@@ -744,6 +836,11 @@ sub FAQUpdate {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
+
+        # reset cache object search
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{OSCacheType},
+        );
     }
 
     # check if history entry should be added
@@ -757,13 +854,99 @@ sub FAQUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
     );
 
     return 1;
+}
+
+=item FAQLookup()
+
+get id or number for faq article
+
+    my $Number = $FAQObject->FAQLookup(
+        FAQArticleID => $FAQArticleID,
+        Silent       => 0|1              # optional - do not log if not found (defautl 0)
+    );
+
+    my $FAQArticleID = $FAQObject->FAQLookup(
+        Number => $Number,
+        Silent => 0|1               # optional - do not log if not found (defautl 0)
+    );
+
+=cut
+
+sub FAQLookup {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if (
+        !$Param{Number}
+        && !$Param{FAQArticleID}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Number or FAQArticleID!'
+            );
+        }
+        return;
+    }
+
+    my @Bind;
+    my $SQL = <<'END';
+SELECT id, f_number
+FROM faq_item
+WHERE
+END
+
+    if ( $Param{Number} ) {
+        $SQL .= ' f_number = ?';
+        push (
+            @Bind,
+            \$Param{Number}
+        );
+    }
+    else {
+        $SQL .= ' id = ?';
+
+        push (
+            @Bind,
+            \$Param{FAQArticleID}
+        );
+    }
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => $SQL,
+        Bind  => \@Bind,
+        Limit => 1
+    );
+
+    my $Number;
+    my $FAQArticleID;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $FAQArticleID = $Row[0];
+        $Number       = $Row[1];
+    }
+
+    if ( !$FAQArticleID ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "FAQ doesn't exists!",
+            );
+        }
+        return;
+    }
+
+    if ( $Param{Number} ) {
+        return $FAQArticleID;
+    }
+
+    return $Number;
 }
 
 =item AttachmentAdd()
@@ -805,14 +988,14 @@ sub AttachmentAdd {
     if ( $Param{ContentID} ) {
         $Param{ContentID} =~ s/^([^<].*[^>])$/<$1>/;
     }
-    $Param{ContentID} //= '';
+    $Param{ContentID} //= q{};
 
     my $Disposition;
     my $Filename;
     if ( $Param{Disposition} ) {
-        ( $Disposition, $Filename ) = split ';', $Param{Disposition};
+        ( $Disposition, $Filename ) = split(/[;]/sm, $Param{Disposition});
     }
-    $Disposition //= '';
+    $Disposition //= q{};
 
     # get attachment size
     {
@@ -903,10 +1086,12 @@ sub AttachmentAdd {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Attachment',
-        ObjectID  => $Param{ItemID}.'::'.$AttachmentID,
+        ObjectID  => $Param{ItemID}
+            . q{::}
+            . $AttachmentID,
     );
 
     return $AttachmentID;
@@ -1033,10 +1218,12 @@ sub AttachmentDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Attachment',
-        ObjectID  => $Param{ItemID}.'::'.$Param{FileID},
+        ObjectID  => $Param{ItemID}
+            . q{::}
+            . $Param{FileID},
     );
 
     return 1;
@@ -1078,7 +1265,7 @@ sub AttachmentInlineDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.InlineAttachment',
         ObjectID  => $Param{ItemID},
@@ -1317,7 +1504,7 @@ sub FAQDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -1367,7 +1554,7 @@ sub FAQHistoryAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1414,10 +1601,11 @@ sub FAQHistoryGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT id, item_id, name, created, created_by
-            FROM faq_history
-            WHERE id = ?',
+        SQL => <<'END',
+SELECT id, item_id, name, created, created_by
+FROM faq_history
+WHERE id = ?
+END
         Bind => [ \$Param{ID} ],
     );
 
@@ -1480,11 +1668,12 @@ sub FAQHistoryList {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL => '
-            SELECT id
-            FROM faq_history
-            WHERE item_id = ?
-            ORDER BY created, id',
+        SQL => <<'END',
+SELECT id
+FROM faq_history
+WHERE item_id = ?
+ORDER BY created, id
+END
         Bind => [ \$Param{ItemID} ],
     );
 
@@ -1531,7 +1720,7 @@ sub FAQHistoryDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.History',
         ObjectID  => $Param{ItemID},
@@ -1680,7 +1869,7 @@ sub KeywordList {
 
         my $KeywordList = lc $Row[0];
 
-        for my $Keyword ( split /\s/, $KeywordList ) {
+        for my $Keyword ( split( /\s/sm, $KeywordList )) {
             # increase keyword counter
             $Data{$Keyword}++;
         }
@@ -1834,7 +2023,7 @@ sub FAQLogAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'FAQ.Article.Log',
         ObjectID  => $Param{ItemID},
@@ -1880,7 +2069,7 @@ sub FAQLogDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'FAQ.Article.Log',
         ObjectID  => $Param{ItemID},
@@ -1903,7 +2092,7 @@ strip/clean up a FAQ article title
 sub FAQArticleTitleClean {
     my ( $Self, %Param ) = @_;
 
-    my $Title = $Param{Title} || '';
+    my $Title = $Param{Title} || q{};
 
     # get config options
     my $TitleSize = $Param{Size};
@@ -1949,7 +2138,7 @@ sub FAQContentTypeSet {
     # Get config object.
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-    my $ContentType = $Param{ContentType} || '';
+    my $ContentType = $Param{ContentType} || q{};
 
     # Get default content type from the config if it was not given.
     if ( !$ContentType ) {
@@ -1961,9 +2150,10 @@ sub FAQContentTypeSet {
     }
 
     # SQL to set the content type (default or given).
-    my $SQL = '
-        UPDATE faq_item
-        SET content_type = ?';
+    my $SQL = <<'END';
+UPDATE faq_item
+SET content_type = ?
+END
 
     # Get FAQ item IDs from the param.
     my @FAQItemIDs = @{ $Param{FAQItemIDs} // [] };
@@ -1971,10 +2161,9 @@ sub FAQContentTypeSet {
     # Restrict to only given FAQ item IDs (if any).
     if (@FAQItemIDs) {
 
-        my $IDString = join ',', @FAQItemIDs;
+        my $IDString = join( q{,}, @FAQItemIDs);
 
-        $SQL .= "
-            WHERE id IN ($IDString)";
+        $SQL .= " WHERE id IN ($IDString)";
     }
 
     # Get DB object.
@@ -2004,10 +2193,11 @@ sub FAQContentTypeSet {
     # Get all FAQIDs (if no faq item was given).
     if ( !@FAQItemIDs ) {
         return if !$DBObject->Prepare(
-            SQL => '
-                SELECT DISTINCT(faq_item.id)
-                FROM faq_item
-                ORDER BY id ASC',
+            SQL => <<'END'
+SELECT DISTINCT(faq_item.id)
+FROM faq_item
+ORDER BY id ASC
+END
         );
 
         while ( my @Row = $DBObject->FetchrowArray() ) {
@@ -2034,10 +2224,8 @@ sub FAQContentTypeSet {
 
             # if field content seams to be HTML set the content type to HTML
             if (
-                $FieldContent
-                =~ m{(?: <br\s*/> | </li> | </ol> | </ul> | </table> | </tr> | </td> | </div> | </o> | </i> | </span> | </h\d> | </p> | </pre> )}msx
-                )
-            {
+                $FieldContent =~ m{(?: <br\s*/> | </(?:li|ol|ul|table|tr|td|div|[oip]|span|h\d|pre)> )}msx
+            ) {
                 $DeterminedContentType = 'text/html';
                 last FIELD;
             }
@@ -2047,10 +2235,11 @@ sub FAQContentTypeSet {
 
         # Set the content type according to the field content.
         return if !$DBObject->Do(
-            SQL => '
-                UPDATE faq_item
-                SET content_type = ?
-                WHERE id =?',
+            SQL => <<'END',
+UPDATE faq_item
+SET content_type = ?
+WHERE id =?
+END
             Bind => [
                 \$DeterminedContentType,
                 \$ItemID,
@@ -2058,7 +2247,7 @@ sub FAQContentTypeSet {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'FAQ.Article',
             ObjectID  => $ItemID,
@@ -2071,244 +2260,6 @@ sub FAQContentTypeSet {
     );
 
     return 1;
-}
-
-=item GetAssignedFAQArticlesForObject()
-
-return all assigned faq article IDs
-
-    my $TicketIDList = $TicketObject->GetAssignedFAQArticlesForObject(
-        ObjectType   => 'Contact',
-        Object       => $ContactHashRef,                # (optional)
-        ObjectIDList => $ObjectIDListArrayRef,          # (optional)
-        UserID       => 1
-    );
-
-=cut
-
-sub GetAssignedFAQArticlesForObject {
-    my ( $Self, %Param ) = @_;
-
-    my @AssignedFAQArticleIDs = ();
-
-    my %SearchData = $Self->_GetAssignedSearchParams(
-        %Param,
-        AssignedObjectType => 'FAQArticle'
-    );
-
-    if (IsHashRefWithData(\%SearchData)) {
-        my %IDSearch;
-        if (IsArrayRefWithData($Param{ObjectIDList})) {
-            $IDSearch{ArticleIDs} = $Param{ObjectIDList};
-        }
-
-        for my $Attribute ( keys %SearchData ) {
-
-            my %Search;
-
-            # TODO: extend possibilities
-            if ( $Attribute eq 'CustomerVisible' && IsArrayRefWithData($SearchData{$Attribute}) ) {
-                my @Visibility;
-                for my $VisibleValue ( @{ $SearchData{$Attribute} } ) {
-                    if ($VisibleValue) {
-                        push(@Visibility, ('external', 'public'));
-                    } else {
-                        push(@Visibility, 'internal');
-                    }
-                }
-                if (@Visibility) {
-                    $Search{Visibility} = \@Visibility;
-                }
-            } elsif ($Attribute eq 'Languages' || $Attribute eq 'Language') {
-                $Search{Languages} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute} : [ $SearchData{$Attribute} ];
-            } elsif ($Attribute eq 'CategoryIDs' || $Attribute eq 'CategoryID') {
-                $Search{CategoryIDs} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute} : [ $SearchData{$Attribute} ];
-            } elsif ($Attribute =~ m/^DynamicField_/) {
-                $Search{$Attribute} = {
-                    Like => $SearchData{$Attribute}
-                };
-            } elsif ($Attribute eq 'Title') {
-                $Search{$Attribute} = IsArrayRefWithData($SearchData{$Attribute}) ? $SearchData{$Attribute}->[0] : $SearchData{$Attribute};
-            }
-
-            if (keys %Search) {
-                my @FoundIDs = $Self->FAQSearch(
-                    %IDSearch,
-                    %Search,
-                    UserID => $Param{UserID},
-                );
-
-                @AssignedFAQArticleIDs = $Self->_GetCombinedList(
-                    ListA => \@AssignedFAQArticleIDs,
-                    ListB => \@FoundIDs,
-                    Union => 1
-                );
-            }
-        }
-
-        if ( IsArrayRefWithData(\@AssignedFAQArticleIDs) ) {
-            @AssignedFAQArticleIDs = map { 0 + $_ } @AssignedFAQArticleIDs;
-        }
-    }
-
-    return \@AssignedFAQArticleIDs;
-}
-
-# TODO: move to a "common" module (used in other modules too)
-=item _GetCombinedList()
-
-combines two arrays (intersect or union)
-
-    my @CombinedList = $Self->_GetCombinedList(
-        ListA   => $ListAArrayRef,
-        ListB   => $ListBArrayRef,
-        Union   => 1                # (optional) default 0
-    );
-
-    e.g.
-        ListA = [ 1, 2, 3, 4 ]
-        ListB = [ 2, 4, 5 ]
-
-        as union = [1, 2, 3, 4, 5 ]
-        as intersect = [ 2, 4 ]
-
-=cut
-
-sub _GetCombinedList {
-    my ( $Self, %Param ) = @_;
-
-    my %Union;
-    my %Isect;
-    for my $E ( @{ $Param{ListA} }, @{ $Param{ListB} } ) {
-        $Union{$E}++ && $Isect{$E}++
-    }
-
-    return $Param{Union} ? keys %Union : keys %Isect;
-}
-
-# TODO: move to a "common" module (used in other modules too)
-=item _GetAssignedSearchParams()
-
-prepares and transform config from AssignedObjectsMapping to a simple hash
-
-    my %SearchData = $Self->_GetAssignedSearchParams(
-        ObjectType         => 'Contact',
-        Object             => $ContactHash,      # (optional)
-        AssignedObjectType => 'Ticket'
-    );
-
-    e.g. if AssignedObjectType is 'Ticket'
-
-    %SearchData = (
-        ContactID      => 1,
-        OrganisationID => 2,
-        ...
-    );
-
-=cut
-
-sub _GetAssignedSearchParams {
-    my ( $Self, %Param ) = @_;
-
-    for ( qw(AssignedObjectType ObjectType) ) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
-
-    my %SearchData;
-    if ( IsStringWithData($MappingString) ) {
-
-        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data   => $MappingString,
-            Silent => $Param{Silent} || 0
-        );
-
-        if ( !IsHashRefWithData($Mapping) ) {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
-                );
-            }
-        } elsif (
-            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
-            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
-        ) {
-            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
-
-            # prepare search data
-            for my $SearchAttribute ( keys %SearchAttributes ) {
-                next if (!$SearchAttribute);
-
-                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
-                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
-                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
-                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
-
-                $SearchAttribute =~ s/^\s+//g;
-                $SearchAttribute =~ s/\s+$//g;
-
-                next if (!$SearchAttribute);
-
-                $SearchData{$SearchAttribute} = [];
-
-                # get attributes search data
-                if (IsHashRefWithData( $Param{Object} )) {
-                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                        my $Value;
-
-                        # check if value from sub-object (e.g. User of Contact)
-                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                        } else {
-                            $Value = $Param{Object}->{$ObjectSearchAttribute};
-                        }
-
-                        next if ( !defined $Value );
-
-                        push (
-                            @{ $SearchData{$SearchAttribute} },
-                            IsArrayRefWithData($Value) ? @{$Value} : $Value
-                        );
-                    }
-                }
-
-                # get static search data
-                for my $SearchStatic ( @{$SearchStatics} ) {
-                    next if ( !defined $SearchStatic );
-                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
-                }
-
-                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
-                    delete $SearchData{$SearchAttribute};
-                }
-            }
-        } else {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'info',
-                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
-                );
-            }
-        }
-    }
-
-    return %SearchData;
 }
 
 =begin Internal:
@@ -2397,7 +2348,7 @@ sub _FAQApprovalUpdate {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'FAQ.Article',
         ObjectID  => $Param{ItemID},
@@ -2428,10 +2379,12 @@ sub _FAQApprovalTicketCreate {
     # check needed stuff
     for my $Argument (qw(ItemID CategoryID FAQNumber Title Visibility UserID)) {
         if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Argument!",
+                );
+            }
 
             return;
         }
@@ -2443,17 +2396,30 @@ sub _FAQApprovalTicketCreate {
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');
 
-#rbo - T2016121190001552 - added KIX placeholders
     # get subject
     my $Subject = $ConfigObject->Get('FAQ::ApprovalTicketSubject');
     $Subject =~ s{ <KIX_FAQ_NUMBER> }{$Param{FAQNumber}}xms;
 
     # check if we can find existing open approval tickets for this FAQ article
-    my @TicketIDs = $TicketObject->TicketSearch(
-        Result    => 'ARRAY',
-        Title     => $Subject,
-        StateType => 'Open',
-        UserID    => 1,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search => {
+            AND => [
+                {
+                    Field    => 'Title',
+                    Operator => 'EQ',
+                    Value    => $Subject
+                },
+                {
+                    Field    => 'StateType',
+                    Operator => 'IN',
+                    Value    => 'Open'
+                }
+            ]
+        },
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UsertType  => 'Agent'
     );
 
     # we don't need to create another approval ticket if there is still at least one ticket open
@@ -2461,7 +2427,7 @@ sub _FAQApprovalTicketCreate {
     return 1 if @TicketIDs;
 
     # get ticket type from SysConfig
-    my $TicketType = $ConfigObject->Get('FAQ::ApprovalTicketType') || '';
+    my $TicketType = $ConfigObject->Get('FAQ::ApprovalTicketType') || q{};
 
     # validate ticket type if any
     if ($TicketType) {
@@ -2472,7 +2438,7 @@ sub _FAQApprovalTicketCreate {
 
         # set $TicketType to empty if TickeyType does not appear in the lookup table. If set to
         #    empty TicketCreate() will use as default TypeID = 1, no matter if it is valid or not.
-        $TicketType = $TypeLookup{$TicketType} ? $TicketType : '';
+        $TicketType = $TypeLookup{$TicketType} ? $TicketType : q{};
     }
 
     # create ticket
@@ -2485,6 +2451,7 @@ sub _FAQApprovalTicketCreate {
         Type     => $TicketType,
         OwnerID  => 1,
         UserID   => 1,
+        Silent   => $Param{Silent}
     );
 
     if ($TicketID) {
@@ -2510,7 +2477,7 @@ sub _FAQApprovalTicketCreate {
             last CATEGORY if !$Category{ParentID};
             $CategoryID = $Category{ParentID};
         }
-        my $Category = join('::', reverse @CategoryNames);
+        my $Category = join( q{::}, reverse @CategoryNames);
 
         # get body from config
         my $Body = $ConfigObject->Get('FAQ::ApprovalTicketBody');
@@ -2548,10 +2515,37 @@ sub _FAQApprovalTicketCreate {
                 HistoryComment =>
                     $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryComment}
                         || '%%Note',
+                Silent         => $Param{Silent}
             );
 
             return $ArticleID;
         }
+    }
+
+    return;
+}
+
+sub _FAQNumberCreate {
+    my ( $Self, %Param ) = @_;
+
+    # get system id
+    my $SystemID = $Kernel::OM->Get('Config')->Get('SystemID');
+
+    INDEX:
+    for my $Index ( 1 .. 1_000_000_000 ) {
+
+        # create new number
+        my $Number = $SystemID . sprintf( "%08d", $Index );
+
+        # find existing number
+        my $Duplicate = $Self->FAQLookup(
+            Number => $Number,
+            Silent => $Param{Silent} // 1
+        );
+
+        next INDEX if $Duplicate;
+
+        return $Number;
     }
 
     return;

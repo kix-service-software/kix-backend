@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -19,7 +19,6 @@ use Data::Dumper;
 use Time::HiRes;
 
 use Kernel::System::Role;
-use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
 
@@ -36,6 +35,7 @@ our @ObjectDependencies = qw(
     Role
     Time
     Valid
+    ObjectSearch
 );
 
 =head1 NAME
@@ -79,6 +79,7 @@ sub new {
     $Self->{UserTableUser}   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
 
     $Self->{CacheType} = 'User';
+    $Self->{CacheTypeCounters} = 'UserCounters';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
 
     # set lower if database is case sensitive
@@ -473,7 +474,7 @@ sub UserAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'User',
         ObjectID  => $UserID,
@@ -577,7 +578,7 @@ sub UserUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
@@ -600,6 +601,8 @@ to search users
         ValidID         => 2                          # optional - if given "Valid" is ignored
         Valid           => 1                          # optional - if omitted, 1 is used
         UserIDs         => [1,2,3]                    # optional
+        SearchUserID    => 1                          # optional
+        HasPermission   => {...}                      # optional
     );
 
 Returns hash of UserID, Login pairs:
@@ -626,11 +629,13 @@ sub UserSearch {
         && !$Param{IsAgent}
         && !$Param{IsCustomer}
         && !$Param{ValidID}
-        && !IsArrayRef$Param{UserIDs}
+        && !$Param{SearchUserID}
+        && !IsArrayRef{$Param{UserIDs}}
+        && !IsHashRefWithData($Param{HasPermission})
     ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID - else use UserList!',
+            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID or SearchUserID or HasPermission - else use UserList!',
         );
         return;
     }
@@ -644,7 +649,9 @@ sub UserSearch {
         . ( $Param{Valid} || '' ) . '::'
         . ( $Param{ValidID} || '' ) . '::'
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
-        . ( $Param{Limit} || '' );
+        . ( $Param{Limit} || '' ) . '::'
+        . ( $Param{SearchUserID} || '') . '::'
+        . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' );
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -660,9 +667,10 @@ sub UserSearch {
     my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
-    my $SQL = "SELECT u.$Self->{UserTableUserID}, u.login FROM $Self->{UserTable} u";
+    my $SQL = "SELECT DISTINCT(u.$Self->{UserTableUserID}), u.login FROM $Self->{UserTable} u";
     my @Where;
     my @Bind;
+    my @OrderBy = ( 'id' );
 
     if ( $Param{Search} ) {
 
@@ -717,8 +725,76 @@ sub UserSearch {
         push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
     }
 
-    if (@Where) {
-        $SQL .= ' WHERE ' . join(' AND ', @Where);
+    if ( $Param{SearchUserID} ) {
+        push(@Where, "u.id = ?");
+        push(@Bind, \$Param{SearchUserID});
+    }
+
+    my @UnionWhere;
+
+    if ( IsHashRefWithData($Param{HasPermission}) ) {
+
+        my @PermissionValues;
+        foreach my $Permission ( split(/,/, $Param{HasPermission}->{Permission}) ) {
+            push @PermissionValues, Kernel::System::Role::Permission::PERMISSION->{$Permission};
+        }
+
+        # join the relevant permission tables
+        $SQL .= ' JOIN role_user ru
+                      ON ru.user_id = u.id
+                  JOIN role_permission as rp
+                      ON ru.role_id=rp.role_id
+                  JOIN permission_type as pt
+                      ON pt.id=rp.type_id';
+
+        # part 1 - in case ticket base permissions exist for the relevant users
+        my @WherePart1 = ( 
+            "EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+        );
+
+        # safe our current bind data
+        my @OrgBind = @Bind;
+
+        foreach my $PermissionValue ( @PermissionValues ) {
+            push @WherePart1, "EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket' AND rp1.target IN ('*', ?) AND (rp1.value & ?) = ?)";
+            push @WherePart1, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
+
+            push(@Bind, ( \$Param{HasPermission}->{ObjectID}, \$PermissionValue, \$PermissionValue, \$PermissionValue, \$PermissionValue ));
+        }
+
+        push @UnionWhere, \@WherePart1;
+
+        # part 2 - in case ticket base permissions do not exist for the relevant users
+        my @WherePart2 = ( 
+            "NOT EXISTS (SELECT rp1.id FROM role_user ru1, role_permission rp1, permission_type pt1 WHERE ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+        );
+
+        # add the original bind data to the second union part
+        push @Bind, @OrgBind;
+
+        foreach my $PermissionValue ( @PermissionValues ) {
+            push @WherePart2, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
+
+            push(@Bind, ( \$PermissionValue, \$PermissionValue ));
+        }
+
+        push @UnionWhere, \@WherePart2;
+    }
+
+    if ( @UnionWhere ) {
+        my $UnionSQL;
+        do {
+            my $WherePart = shift @UnionWhere;
+            $UnionSQL .= $SQL . ' WHERE ' . join(' AND ', (@Where, @{$WherePart}) );
+            $UnionSQL .= ' UNION ' if @UnionWhere;
+        }
+        while ( @UnionWhere );
+
+        $SQL = $UnionSQL;
+        $SQL .= ' ORDER BY ' . join(',', @OrderBy);
+    }
+    elsif ( @Where ) {
+        $SQL .= ' WHERE ' . join(' AND ', @Where) . ' ORDER BY ' . join(',', @OrderBy);
     }
 
     # get data
@@ -890,7 +966,7 @@ sub SetPassword {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User',
         ObjectID  => $User{UserID},
@@ -1249,7 +1325,7 @@ sub PermissionList {
     return %{$Cache} if $Cache;
 
     # get all role ids of this user and usage context
-    my @RoleIDs = $Self->RoleList(
+    my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
         UserID       => $Param{UserID},
         UsageContext => $Param{UsageContext},
         Valid        => $Valid
@@ -1329,86 +1405,6 @@ sub PermissionList {
     return %Result;
 }
 
-=item RoleList()
-
-return a list of all roles of a given user
-
-    my @RoleIDs = $UserObject->RoleList(
-        UserID       => 123,                    # required
-        UsageContext => 'Agent'|'Customer'      # optional, if not given, all assigned roles will be returned
-        Valid        => 1,                      # optional
-    );
-
-=cut
-
-sub RoleList {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # set default value
-    my $Valid = $Param{Valid} ? 1 : 0;
-
-    # check cache
-    my $CacheKey = 'RoleList::' . $Param{UserID} . '::' . $Valid . '::' . ($Param{UsageContext} || '');
-    my $Cache    = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return @{$Cache} if $Cache;
-
-    # get user data
-    my %UserData = $Self->GetUserData(
-        UserID => $Param{UserID},
-    );
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-    my @Bind     = ();
-    push @Bind, \$Param{UserID};
-
-    # create sql
-    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
-
-    if ( $Valid ) {
-        $SQL .= ' AND valid_id = 1';
-    }
-
-    # get data
-    return if !$DBObject->Prepare(
-        SQL  => $SQL,
-        Bind => \@Bind,
-    );
-
-    # fetch the result
-    my @Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        # check if this role is valid for the given usage context
-        next if ( $Param{UsageContext} && ($Row[1] & Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}) != Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})} );
-
-        push(@Result, $Row[0]);
-    }
-
-    # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \@Result,
-    );
-
-    return @Result;
-}
-
 =item CheckResourcePermission()
 
 returns true if the requested permission is granted
@@ -1453,7 +1449,7 @@ sub CheckResourcePermission {
 
     if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
         # get all roles the user is assigned to
-        my @UserRoleList = $Self->RoleList(
+        my @UserRoleList = $Kernel::OM->Get('Role')->UserRoleList(
             UserID       => $Param{UserID},
             UsageContext => $Param{UsageContext},
             Valid        => 1,
@@ -1793,7 +1789,7 @@ sub SetPreferences {
     my $Result = $PreferencesObject->SetPreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -1871,7 +1867,7 @@ sub DeletePreferences {
     my $Result = $PreferencesObject->DeletePreferences(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.UserPreference',
         ObjectID  => $Param{UserID} . '::' . $Param{Key},
@@ -1986,6 +1982,380 @@ sub TokenCheck {
     return;
 }
 
+=item UpdateCounters()
+
+update the users counters for all users
+
+    my $Success = $UserObject->UpdateCounters();
+
+=cut
+
+sub UpdateCounters {
+    my ( $Self, %Param ) = @_;
+
+    my $BaseTicketFilter = {
+        Field    => 'StateType',
+        Operator => 'EQ',
+        Value    => 'Open',
+    };
+
+    # cleanup existing counters
+    $Self->DeleteCounters();
+
+    my %UserList = $Self->UserSearch(
+        IsAgent => 1,
+        Valid   => 0,
+    );
+
+    foreach my $UserID ( sort keys %UserList ) {
+        my %Counters = (
+            Owned => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                }
+            ],
+            OwnedAndLocked =>  [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 2,
+                }
+            ],
+            OwnedAndUnseen => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Not      => 1,
+                    Value    => [
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $UserID,
+                        }
+                    ]
+                }
+            ],
+            OwnedAndLockedAndUnseen => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 2,
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Not      => 1,
+                    Value    => [
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $UserID,
+                        }
+                    ]
+                }
+            ],
+            Watched => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                }
+            ],
+            WatchedAndUnseen => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $UserID,
+                },
+                {
+                    Field    => 'TicketFlag',
+                    Operator => 'EQ',
+                    Not      => 1,
+                    Value    => [
+                        {
+                            Flag   => 'Seen',
+                            Value  => '1',
+                            UserID => $UserID,
+                        }
+                    ]
+                }
+            ]
+        );
+
+        my %CounterData;
+        foreach my $Counter ( sort keys %Counters ) {
+            # execute ticket search
+            my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                Search => {
+                    AND => $Counters{$Counter}
+                },
+                ObjectType => 'Ticket',
+                UserID     => $UserID,
+                UserType   => 'Agent',
+                Result     => 'ARRAY',
+            );
+
+            foreach my $TicketID ( @TicketIDs ) {
+                $Self->AddUserCounterObject(
+                    Category => 'Ticket',
+                    ObjectID => $TicketID,
+                    Counter  => $Counter,
+                    UserID   => $UserID,
+                );
+            }
+        }
+    }
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User.Counters',
+    );
+
+    return 1;
+}
+
+=item DeleteCounters()
+
+delete all counters
+
+    my $Success = $UserObject->DeleteCounters();
+
+=cut
+
+sub DeleteCounters {
+    my ( $Self, %Param ) = @_;
+
+    # sql
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => 'DELETE FROM user_counter',
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'User.Counters',
+    );
+
+    return 1
+}
+
+=item GetUserCounters()
+
+get the users counters
+
+    my %Counters = $UserObject->GetUserCounters(
+        UserID => 123,
+    );
+
+=cut
+
+sub GetUserCounters {
+    my ( $Self, %Param ) = @_;
+
+    return if (!$Param{UserID});
+
+    # ask database
+    my $Success = $Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT category, counter, count(object_id) FROM user_counter WHERE user_id = ? GROUP BY category, counter",
+        Bind  => [
+            \$Param{UserID},
+        ],
+    );
+    return if !$Success;
+
+    # fetch the result
+    my %Counters;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Counters{$Row[0]}->{$Row[1]} = $Row[2];
+    }
+
+    return %Counters;
+}
+
+=item AddUserCounterObject()
+
+add a user counter entry
+
+    my $Success = $UserObject->AddUserCounterObject(
+        Category => 'Ticket',
+        Counter  => '...',
+        ObjectID => 123,
+        UserID   => 123,
+    );
+
+=cut
+
+sub AddUserCounterObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Category Counter ObjectID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $SQL = "INSERT INTO user_counter (user_id, category, counter, object_id) VALUES (?, ?, ?, ?)";
+    if ( $Kernel::OM->Get('DB')->{'DB::Type'} eq 'postgresql' ) {
+        $SQL .= ' ON CONFLICT DO NOTHING'
+    }
+    elsif ($Kernel::OM->Get('DB')->{'DB::Type'} eq 'mysql' ) {
+        $SQL .= ' ON DUPLICATE KEY UPDATE user_id = user_id'
+    }
+
+    # sql
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => $SQL,
+        Bind => [
+            \$Param{UserID}, \$Param{Category}, \$Param{Counter}, \$Param{ObjectID},
+        ],
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User.Counters',
+        UserID    => $Param{UserID},
+        ObjectID  => $Param{Category}.'.'.$Param{Counter},
+    );
+
+    return 1
+}
+
+=item DeleteUserCounterObject()
+
+delete a user counter entry
+
+    my $Success = $UserObject->DeleteUserCounterObject(
+        Category => 'Ticket'
+        Counter  => '...',              # optional, if not given, all relevant counters will be deleted, wildcard '*' supported
+        ObjectID => 123,
+        UserID   => 123,                # optional, if not given, all relevant counters for all users will be deleted
+    );
+
+=cut
+
+sub DeleteUserCounterObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Category ObjectID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $SQL = 'DELETE FROM user_counter WHERE object_id = ?';
+    my @Bind = (
+        \$Param{ObjectID},
+    );
+    if ( $Param{Counter} ) {
+        $Param{Counter} =~ s/\*/%/g;
+        $SQL .= ' AND counter LIKE ?';
+        push @Bind, \$Param{Counter};
+    }
+    if ( $Param{UserID} ) {
+        $SQL .= ' AND user_id = ?';
+        push @Bind, \$Param{UserID};
+    }
+    if ( $Param{Category} ) {
+        $SQL .= ' AND category = ?';
+        push @Bind, \$Param{Category};
+    }
+
+    # sql
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => $SQL,
+        Bind => \@Bind,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'User.Counters',
+        UserID    => ($Param{UserID} || '*'),
+        ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
+    );
+
+    return 1
+}
+
+=item GetObjectIDsForCounter()
+
+get the list of ObjectIDs for a specific user counter
+
+    my @ObjectIDs = $UserObject->GetObjectIDsForCounter(
+        UserID   => 123,                        # required
+        Category => 'Ticket',                   # required
+        Counter  => 'OwnedAndUnseen',           # required
+    );
+
+=cut
+
+sub GetObjectIDsForCounter {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Category Counter UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # ask database
+    my $Success = $Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT object_id FROM user_counter WHERE user_id = ? AND category = ? AND counter = ?",
+        Bind  => [
+            \$Param{UserID}, \$Param{Category}, \$Param{Counter},
+        ],
+    );
+    return if !$Success;
+
+    # fetch the result
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
+        Columns => [ 'ObjectID' ]
+    );
+    my @TicketIDs = map { $_->{ObjectID} } @{$Data};
+
+    return @TicketIDs;
+}
+
 sub _AssignRolesByContext {
     my ( $Self, %Param ) = @_;
 
@@ -2009,7 +2379,7 @@ sub _AssignRolesByContext {
     my %SystemRolesReverse = reverse %SystemRoles;
 
     # get user roles
-    my %UserRoleList = map {$_ => 1} ( $Self->RoleList(
+    my %UserRoleList = map {$_ => 1} ( $Kernel::OM->Get('Role')->UserRoleList(
         UserID => $Param{UserID},
         Valid  => 1,
     ) );

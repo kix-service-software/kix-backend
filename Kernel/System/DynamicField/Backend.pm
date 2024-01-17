@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -972,77 +972,7 @@ dynamic field. The table must already be joined.
 
 =cut
 
-sub SearchSQLGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig TableAlias Operator)) {
-        if ( !$Param{$Needed} ) {
-            return if $Param{Silent};
-
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # Ignore empty searches
-    return if ( !defined $Param{SearchTerm} || $Param{SearchTerm} eq '' );
-
-    # check DynamicFieldConfig (general)
-    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
-        return if $Param{Silent};
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "The field configuration is invalid",
-        );
-        return;
-    }
-
-    # check DynamicFieldConfig (internally)
-    for my $Needed (qw(ID FieldType ObjectType)) {
-        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
-            return if $Param{Silent};
-
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed in DynamicFieldConfig!",
-            );
-            return;
-        }
-    }
-
-    # set the dynamic field specific backend
-    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
-
-    if ( !$Self->{$DynamicFieldBackend} ) {
-        return if $Param{Silent};
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
-        );
-        return;
-    }
-
-    return $Self->{$DynamicFieldBackend}->SearchSQLGet(%Param);
-}
-
-=item SearchSQLOrderFieldGet()
-
-returns the SQL field needed for ordering based on a dynamic field.
-
-    my $SQL = $BackendObject->SearchSQLOrderFieldGet(
-        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
-        TableAlias         => $TableAlias,              # the alias of the already joined dynamic_field_value table to use
-    );
-
-=cut
-
-sub SearchSQLOrderFieldGet {
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -1095,7 +1025,74 @@ sub SearchSQLOrderFieldGet {
         return;
     }
 
-    return $Self->{$DynamicFieldBackend}->SearchSQLOrderFieldGet(%Param);
+    return $Self->{$DynamicFieldBackend}->SearchSQLSearchFieldGet(%Param);
+}
+
+=item SearchSQLSortFieldGet()
+
+returns the SQL field needed for ordering based on a dynamic field.
+
+    my $SQL = $BackendObject->SearchSQLSortFieldGet(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        TableAlias         => $TableAlias,              # the alias of the already joined dynamic_field_value table to use
+    );
+
+=cut
+
+sub SearchSQLSortFieldGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(DynamicFieldConfig TableAlias)) {
+        if ( !$Param{$Needed} ) {
+            return if $Param{Silent};
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # check DynamicFieldConfig (general)
+    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
+        return if $Param{Silent};
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "The field configuration is invalid",
+        );
+        return;
+    }
+
+    # check DynamicFieldConfig (internally)
+    for my $Needed (qw(ID FieldType ObjectType)) {
+        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
+            return if $Param{Silent};
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed in DynamicFieldConfig!",
+            );
+            return;
+        }
+    }
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        return if $Param{Silent};
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    return $Self->{$DynamicFieldBackend}->SearchSQLSortFieldGet(%Param);
 }
 
 =item EditFieldValueGet()
@@ -1548,35 +1545,26 @@ sub ValueLookup {
     return $Self->{$DynamicFieldBackend}->ValueLookup(%Param);
 }
 
-=item HasBehavior()
+=item GetProperty()
 
-checks if the dynamic field as an specified behavior
+checks if the dynamic field as an specified property
 
-    my $Success = $BackendObject->HasBehavior(
+    my $Success = $BackendObject->GetProperty(
         DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
-        Behavior           => 'Some Behavior',           # 'IsNotificationEventCondition' to be used
-                                                         #     in the notification events as a
-                                                         #     ticket condition
-                                                         # 'IsSortable' to sort by this field in
-                                                         #     "Small" overviews
-                                                         # 'IsStatsCondition' to be used in
-                                                         #     Statistics as a condition
-                                                         # 'IsCustomerInterfaceCapable' to make
-                                                         #     the field usable in the customer
-                                                         #     interface
+        Property           => 'Some Property',           # 'IsSearchable','IsSortable','SearchOperators','SearchValueType'
     );
 
     Returns:
 
-    $Success = 1;                # or undefined (if the dynamic field does not have that behavior)
+    $Success = 1;                # or undefined (if the dynamic field does not have that property)
 
 =cut
 
-sub HasBehavior {
+sub GetProperty {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(DynamicFieldConfig Behavior)) {
+    for my $Needed (qw(DynamicFieldConfig Property)) {
         if ( !$Param{$Needed} ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -1626,16 +1614,15 @@ sub HasBehavior {
     }
 
     # verify if function is available
-    return if !$Self->{$DynamicFieldBackend}->can('HasBehavior');
+    return if !$Self->{$DynamicFieldBackend}->can('GetProperty');
 
-    # call HasBehavior on the specific backend
-    return $Self->{$DynamicFieldBackend}->HasBehavior(%Param);
+    # call GetProperty on the specific backend
+    return $Self->{$DynamicFieldBackend}->GetProperty(%Param);
 }
 
-=head2 Functions For IsNotificationEventCondition Behavior
+=head2 Functions For Serialization
 
-The following functions should be only used if the dynamic field has IsNotificationEventCondition
-behavior
+The following functions are used to de-/serialize the dynamic field
 
 =over 4
 

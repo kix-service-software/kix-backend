@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -500,8 +500,7 @@ sub Do {
                 $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                    Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : '' ),
                 );
                 return;
             }
@@ -721,8 +720,7 @@ sub Prepare {
                     $Kernel::OM->Get('Log')->Log(
                         Caller   => 1,
                         Priority => 'Error',
-                        Message  => 'No SCALAR param in Bind! Bind: ' .
-                            ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : '' ),
                     );
                 }
                 return;

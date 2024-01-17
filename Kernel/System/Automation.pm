@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -12,6 +12,8 @@ use strict;
 use warnings;
 
 use Time::HiRes qw(time);
+
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::System::Automation::ExecPlan
@@ -62,7 +64,45 @@ sub new {
 
     $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Automation::Debug') || 0;
 
-    $Self->{'DumpConfig'} = $Kernel::OM->Get('Config')->Get('Automation::DumpConfig') || { Indent => '  ' };
+    $Self->{DumpConfig} = $Kernel::OM->Get('Config')->Get('Automation::DumpConfig') || { Indent => '  ' };
+    
+    $Self->{MinimumLogLevel} = $Param{MinimumLogLevel} || $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel');
+
+    # load all logging backends
+    my $LogHandlers = $Kernel::OM->Get('Config')->Get('Automation::Logging');
+    if ( !IsHashRefWithData($LogHandlers) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No log handlers available!',
+        );
+        return;
+    }
+    foreach my $Type ( keys %{$LogHandlers} ) {
+        my $HandlerObject = $Kernel::OM->Get(
+            $LogHandlers->{$Type}->{Module}
+        );
+        if ( !$HandlerObject ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to load handler backend for $Type!",
+            );
+            next;
+        }
+
+        $HandlerObject->{Config} = $LogHandlers->{$Type};
+
+        foreach my $Key ( keys %{$HandlerObject->{Config}} ) {
+            # replace placeholders
+            $HandlerObject->{Config}->{$Key} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                Text     => $HandlerObject->{Config}->{$Key},
+                Data     => {},
+                RichText => 0,
+                UserID   => 1,
+            );
+        }
+
+        $Self->{LogHandler}->{$Type} = $HandlerObject;
+    }
 
     return $Self;
 }
@@ -255,65 +295,58 @@ sub _Log {
 
     # check desired log level
     my $LogObject = $Kernel::OM->Get('Log');
-    my $MinimumLogLevel = $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel') || 'error';
+    my $MinimumLogLevel = $Self->{MinimumLogLevel} || 'error';
     my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
     my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
     return 1 if $PriorityNum < $MinimumLogLevelNum;
 
-    my %Reference;
+    my %LogData;
     foreach my $ReferenceID ( qw(JobID RunID MacroID MacroActionID ObjectID) ) {
-        $Reference{$ReferenceID} = ($Param{Referrer} ? $Param{Referrer}->{$ReferenceID} : undef) || $Self->{$ReferenceID};
+        $LogData{$ReferenceID} = ($Param{Referrer} ? $Param{Referrer}->{$ReferenceID} : undef) || $Self->{$ReferenceID};
     }
 
-    my $ObjectID = $Reference{ObjectID};
+    my $ObjectID = $LogData{ObjectID};
     if ( ref $ObjectID ) {
         $ObjectID = $Kernel::OM->Get('JSON')->Encode(
             Data => $ObjectID
         );
     }
 
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
-            . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
-        Bind => [
-            \$Reference{JobID}, \$Reference{RunID}, \$Reference{MacroID}, \$Reference{MacroActionID}, \$ObjectID, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
-        ],
-    );
-
     # get job info
-    my $JobInfo = '-';
-    if ( $Reference{JobID} ) {
-        my %Job = $Self->JobGet(
-            ID => $Reference{JobID}
-        );
-        $JobInfo = "$Job{Name} ($Reference{JobID})";
+    $LogData{JobInfo} = '-';
+    if ( $LogData{JobID} ) {
+        $LogData{Job} = { $Self->JobGet(
+            ID => $LogData{JobID}
+        ) };
+        $LogData{JobInfo} = "$LogData{Job}->{Name} ($LogData{Job}->{ID})";
     }
 
     # get macro info
-    my $MacroInfo = '-';
-    if ( $Reference{MacroID} ) {
-        my %Macro = $Self->MacroGet(
-            ID => $Reference{MacroID}
-        );
-        $MacroInfo = "$Macro{Name} ($Reference{MacroID})";
+    $LogData{MacroInfo} = '-';
+    if ( $LogData{MacroID} ) {
+        $LogData{Macro} = { $Self->MacroGet(
+            ID => $LogData{MacroID}
+        ) };
+        $LogData{MacroInfo} = "$LogData{Macro}->{Name} ($LogData{Macro}->{ID})";
     }
 
     # get macro info
-    my $MacroActionInfo = '-';
-    if ( $Reference{MacroActionID} ) {
-        my %MacroAction = $Self->MacroActionGet(
-            ID => $Reference{MacroActionID}
-        );
-        $MacroActionInfo = "$MacroAction{Type} ($Reference{MacroActionID})";
+    $LogData{MacroActionInfo} = '-';
+    if ( $LogData{MacroActionID} ) {
+        $LogData{MacroAction} = { $Self->MacroActionGet(
+            ID => $LogData{MacroActionID}
+        ) };
+        $LogData{MacroActionInfo} = "$LogData{MacroAction}->{Type} ($LogData{MacroAction}->{ID})";
     }
 
-    # log in system log
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => $Param{Priority},
-            Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $JobInfo, $Reference{RunID} || '', $MacroInfo, $MacroActionInfo),
-        );
-    }
+    my $Type = $LogData{Job}->{Type} || $LogData{Macro}->{Type} || 'Default';
+
+    # execute logging handler
+    my $LogHandler = $Self->{LogHandler}->{$Type} || $Self->{LogHandler}->{Default};
+    my $Success = $LogHandler->Log(
+        LogData => \%LogData,
+        %Param,
+    );
 
     return 1;
 }

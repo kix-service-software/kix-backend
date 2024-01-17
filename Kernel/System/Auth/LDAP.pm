@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -151,10 +151,8 @@ sub Auth {
         return;
     }
 
-    # user quote
-    my $Filter = "($Self->{AuthAttr}=" . escape_filter_value( $Param{User} ) . ')';
-
     # prepare filter
+    my $Filter = "($Self->{AuthAttr}=" . escape_filter_value( $Param{User} ) . ')';
     if ( $Self->{AlwaysFilter} ) {
         $Filter = "(&$Filter$Self->{AlwaysFilter})";
     }
@@ -165,14 +163,45 @@ sub Auth {
         filter => $Filter,
         attrs  => [ $Self->{UID} ],
     );
+
     if ( $Result->code() ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
-        );
-        $LDAP->unbind();
-        $LDAP->disconnect();
-        return;
+        if ( $Self->{AuthAttr} ne $Self->{UID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "AuthAttr Search failed. " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\"). Retry Search with UID",
+            );
+
+            # prepare filter with uid
+            $Filter = "($Self->{UID}=" . escape_filter_value( $Param{User} ) . ')';
+            if ( $Self->{AlwaysFilter} ) {
+                $Filter = "(&$Self->{AlwaysFilter}$Filter)";
+            }
+
+            # perform user search
+            $Result = $LDAP->search(
+                base   => $Self->{BaseDN},
+                filter => $Filter,
+                attrs  => [ $Self->{UID} ],
+            );
+            if ( $Result->code() ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                );
+                $LDAP->unbind();
+                $LDAP->disconnect();
+                return;
+            }
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "AuthAttr Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            );
+            $LDAP->unbind();
+            $LDAP->disconnect();
+            return;
+        }
     }
 
     # get whole user dn
@@ -185,18 +214,66 @@ sub Auth {
 
     # log if there is no LDAP user entry
     if ( !$UserDN || !$User ) {
+        if ( $Self->{AuthAttr} ne $Self->{UID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "User: $Param{User} authentication failed, no LDAP entry with AuthAttr found! "
+                    . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\"). Retry Search with UID",
+            );
 
-        # failed login note
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "User: $Param{User} authentication failed, no LDAP entry found! "
-                . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
-        );
+            # prepare filter with uid
+            $Filter = "($Self->{UID}=" . escape_filter_value( $Param{User} ) . ')';
+            if ( $Self->{AlwaysFilter} ) {
+                $Filter = "(&$Self->{AlwaysFilter}$Filter)";
+            }
 
-        # take down session
-        $LDAP->unbind();
-        $LDAP->disconnect();
-        return;
+            # perform user search
+            $Result = $LDAP->search(
+                base   => $Self->{BaseDN},
+                filter => $Filter,
+                attrs  => [ $Self->{UID} ],
+            );
+            if ( $Result->code() ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                );
+                $LDAP->unbind();
+                $LDAP->disconnect();
+                return;
+            }
+
+            for my $Entry ( $Result->all_entries() ) {
+                $UserDN = $Entry->dn();
+                $User   = $Entry->get_value( $Self->{UID} );
+            }
+            if ( !$UserDN || !$User ) {
+                # failed login note
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "User: $Param{User} authentication failed, no LDAP entry with UID found! "
+                        . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                );
+
+                # take down session
+                $LDAP->unbind();
+                $LDAP->disconnect();
+                return;
+            }
+        }
+        else {
+            # failed login note
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "User: $Param{User} authentication failed, no LDAP entry with AuthAttr found! "
+                    . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            );
+
+            # take down session
+            $LDAP->unbind();
+            $LDAP->disconnect();
+            return;
+        }
     }
 
     $User = $Self->_ConvertTo($User, $Self->{DestCharset});
@@ -291,6 +368,7 @@ sub Auth {
     # take down session
     $LDAP->unbind();
     $LDAP->disconnect();
+
     return $User;
 }
 

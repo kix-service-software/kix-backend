@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -218,8 +218,18 @@ Return
     };
 
     $SearchList = $LinkObjectBackend->ObjectSearch(
-        SubObject    => 'Bla',     # (optional)
-        SearchParams => $HashRef,  # (optional)
+        Search       => {
+            AND => [
+                {}
+            ]
+            OR  => [
+                {}
+            ]
+        },                         # (optional)
+        Sort         => [
+            {}
+        ],                         # (optional)
+        UserType     => 1,
         UserID       => 1,
     );
 
@@ -229,61 +239,24 @@ sub ObjectSearch {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!',
-        );
-        return;
-    }
-
-    # set default params
-    $Param{SearchParams} ||= {};
-
-    # set focus
-    my %Search;
-    if ( $Param{SearchParams}->{TicketFulltext} ) {
-        %Search = (
-            From          => '*' . $Param{SearchParams}->{TicketFulltext} . '*',
-            To            => '*' . $Param{SearchParams}->{TicketFulltext} . '*',
-            Cc            => '*' . $Param{SearchParams}->{TicketFulltext} . '*',
-            Subject       => '*' . $Param{SearchParams}->{TicketFulltext} . '*',
-            Body          => '*' . $Param{SearchParams}->{TicketFulltext} . '*',
-            ContentSearch => 'OR',
-        );
-    }
-    if ( $Param{SearchParams}->{TicketTitle} ) {
-        $Search{Title} = '*' . $Param{SearchParams}->{TicketTitle} . '*';
-    }
-
-    if ( IsArrayRefWithData( $Param{SearchParams}->{ArchiveID} ) ) {
-        if ( $Param{SearchParams}->{ArchiveID}->[0] eq 'AllTickets' ) {
-            $Search{ArchiveFlags} = [ 'y', 'n' ];
-        }
-        elsif ( $Param{SearchParams}->{ArchiveID}->[0] eq 'NotArchivedTickets' ) {
-            $Search{ArchiveFlags} = ['n'];
-        }
-        elsif ( $Param{SearchParams}->{ArchiveID}->[0] eq 'ArchivedTickets' ) {
-            $Search{ArchiveFlags} = ['y'];
+    for my $Needed ( qw(UserID UserType) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+            return;
         }
     }
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     # search the tickets
-    my @TicketIDs = $TicketObject->TicketSearch(
-        %{ $Param{SearchParams} },
-        %Search,
-        Limit               => 50,
-        Result              => 'ARRAY',
-        ConditionInline     => 1,
-        ContentSearchPrefix => '*',
-        ContentSearchSuffix => '*',
-        FullTextIndex       => 1,
-        OrderBy             => 'Down',
-        SortBy              => 'Age',
-        UserID              => $Param{UserID},
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        %Param,
+        Limit      => 50,
+        Result     => 'ARRAY',
+        ObjectType => 'Ticket',
+        UserID     => $Param{UserID},
+        UserType   => $Param{UserType}
     );
 
     my %SearchList;
@@ -291,7 +264,7 @@ sub ObjectSearch {
     for my $TicketID (@TicketIDs) {
 
         # get ticket data
-        my %TicketData = $TicketObject->TicketGet(
+        my %TicketData = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $TicketID,
             UserID        => $Param{UserID},
             DynamicFields => 0,

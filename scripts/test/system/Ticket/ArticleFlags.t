@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -325,10 +325,12 @@ my @FlagSearchTests = (
 );
 
 for my $Test (@FlagSearchTests) {
-    my $Found = $Kernel::OM->Get('Ticket')->TicketSearch(
-        TicketID => $TicketID,
-        Result   => 'COUNT',
-        UserID   => 1,
+    my $Found = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'COUNT',
+        UserType   => 'Agent',
+        UserID     => 1,
+#        TicketID => $TicketID,  ????
         Search   => $Test->{Search},
     );
 
