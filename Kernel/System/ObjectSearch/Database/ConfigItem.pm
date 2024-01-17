@@ -37,6 +37,9 @@ sub Init {
     # init join map as empty hash
     $Param{Flags}->{JoinMap} = {};
 
+    # init xml storage join counter with 0
+    $Param{Flags}->{XMLStorageJoinCounter} = 0;
+
     # init translation join counter with 0
     $Param{Flags}->{TranslationJoinCounter} = 0;
 

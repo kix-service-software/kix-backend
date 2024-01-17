@@ -62,7 +62,6 @@ sub GetSupportedAttributes {
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
@@ -94,32 +93,39 @@ sub Sort {
     # check params
     return if ( !$Self->_CheckSortParams( %Param ) );
 
-    my %AttributeMapping = (
-        CreateBy           => ['ccr.lastname', 'ccr.firstname'],
-        CreatedUserIDs     => ['ccr.lastname', 'ccr.firstname'],
-        ChangeBy           => ['cch.lastname', 'cch.firstname'],
-        LastChangedUserIDs => ['cch.lastname', 'cch.firstname'],
-    );
-
     my %Join;
+    my $TableAlias = $Param{Flags}->{FlagMap}->{ContactJoin} // 'c';
     if (
         $Param{Attribute} =~ m/^Create(?:By|dUserIDs)$/sm
-        && !$Param{EditorCreateJoin}
+        && !$Param{Flags}->{FlagMap}->{ContactJoin}
     ) {
+        my $Count = $Param{Flags}->{ContactJoinCounter}++;
+        $TableAlias .= $Count;
+
         $Join{Join} = [
-            'INNER JOIN contact ccr ON ccr.user_id = f.created_by'
+            "INNER JOIN contact $TableAlias ON $TableAlias.user_id = f.created_by"
         ];
-        $Param{EditorCreateJoin} = 1;
+        $Param{Flags}->{FlagMap}->{ContactJoin} = $TableAlias;
     }
     elsif (
         $Param{Attribute} =~ m/^(?:Last|)Change(?:By|dUserIDs)$/sm
-        && !$Param{EditorChangeJoin}
+        && !$Param{Flags}->{FlagMap}->{ContactJoin}
     ) {
+        my $Count = $Param{Flags}->{ContactJoinCounter}++;
+        $TableAlias .= $Count;
+
         $Join{Join} = [
-            'INNER JOIN contact cch ON cch.user_id = f.changed_by'
+            "INNER JOIN contact $TableAlias ON $TableAlias.user_id = f.changed_by"
         ];
-        $Param{EditorChangeJoin} = 1;
+        $Param{Flags}->{FlagMap}->{ContactJoin} = $TableAlias;
     }
+
+    my %AttributeMapping = (
+        CreateBy           => ["$TableAlias.lastname", "$TableAlias.firstname"],
+        CreatedUserIDs     => ["$TableAlias.lastname", "$TableAlias.firstname"],
+        ChangeBy           => ["$TableAlias.lastname", "$TableAlias.firstname"],
+        LastChangedUserIDs => ["$TableAlias.lastname", "$TableAlias.firstname"],
+    );
 
     return {
         Select   => $AttributeMapping{$Param{Attribute}},

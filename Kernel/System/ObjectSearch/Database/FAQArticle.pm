@@ -43,6 +43,15 @@ sub Init {
     # init dynamic field join counter with 0
     $Param{Flags}->{DynamicFieldJoinCounter} = 0;
 
+    # init vote join counter with 0
+    $Param{Flags}->{VoteJoinCounter} = 0;
+
+    # init valid join counter with 0
+    $Param{Flags}->{ValidJoinCounter} = 0;
+
+    # init contact join counter with 0
+    $Param{Flags}->{ContactJoinCounter} = 0;
+
     return 1;
 }
 

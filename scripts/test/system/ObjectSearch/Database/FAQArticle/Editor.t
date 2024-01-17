@@ -375,13 +375,13 @@ my @SortTests = (
         Attribute => 'CreateBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact ccr ON ccr.user_id = f.created_by'
+                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
             ],
             'OrderBy' => [
-                'ccr.lastname', 'ccr.firstname'
+                'c0.lastname', 'c0.firstname'
             ],
             'Select'  => [
-                'ccr.lastname', 'ccr.firstname'
+                'c0.lastname', 'c0.firstname'
             ]
         }
     },
@@ -390,13 +390,13 @@ my @SortTests = (
         Attribute => 'CreatedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact ccr ON ccr.user_id = f.created_by'
+                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
             ],
             'OrderBy' => [
-                'ccr.lastname', 'ccr.firstname'
+                'c0.lastname', 'c0.firstname'
             ],
             'Select'  => [
-                'ccr.lastname', 'ccr.firstname'
+                'c0.lastname', 'c0.firstname'
             ]
         }
     },
@@ -405,13 +405,13 @@ my @SortTests = (
         Attribute => 'ChangeBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact cch ON cch.user_id = f.changed_by'
+                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
             ],
             'OrderBy' => [
-                'cch.lastname', 'cch.firstname'
+                'c0.lastname', 'c0.firstname'
             ],
             'Select'  => [
-                'cch.lastname', 'cch.firstname'
+                'c0.lastname', 'c0.firstname'
             ]
         }
     },
@@ -420,13 +420,13 @@ my @SortTests = (
         Attribute => 'LastChangedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact cch ON cch.user_id = f.changed_by'
+                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
             ],
             'OrderBy' => [
-                'cch.lastname', 'cch.firstname'
+                'c0.lastname', 'c0.firstname'
             ],
             'Select'  => [
-                'cch.lastname', 'cch.firstname'
+                'c0.lastname', 'c0.firstname'
             ]
         }
     }

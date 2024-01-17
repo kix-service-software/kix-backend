@@ -1164,6 +1164,12 @@ $Self->True(
     $TicketID1,
     'Created first ticket'
 );
+
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 # second ticket
 $Helper->FixedTimeAddSeconds(60);
 my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
@@ -1183,6 +1189,12 @@ $Self->True(
     $TicketID2,
     'Created second ticket'
 );
+
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 $Helper->FixedTimeAddSeconds(60);
 my $CloseTicket2 = $Kernel::OM->Get('Ticket')->TicketStateSet(
     State     => 'closed',
@@ -1193,6 +1205,12 @@ $Self->True(
     $CloseTicket2,
     'Closed second ticket'
 );
+
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 # third ticket
 $Helper->FixedTimeAddSeconds(60);
 my $TicketID3 = $Kernel::OM->Get('Ticket')->TicketCreate(

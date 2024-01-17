@@ -40,6 +40,9 @@ sub Init {
     # init dynamic field join counter with 0
     $Param{Flags}->{DynamicFieldJoinCounter} = 0;
 
+    # init translation join counter with 0
+    $Param{Flags}->{TranslationJoinCounter} = 0;
+
     return 1;
 }
 

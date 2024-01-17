@@ -54,7 +54,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
     };
 }
@@ -100,69 +100,77 @@ sub Search {
             . q{)};
     }
 
-    my $Prefix = q{};
-    my $Suffix = q{};
-
-    if ( $Param{Search}->{Operator} eq 'CONTAINS' ) {
-        $Prefix = q{*};
-        $Suffix = q{*};
-    } elsif ( $Param{Search}->{Operator} eq 'STARTSWITH' ) {
-        $Suffix = q{*};
-    } elsif ( $Param{Search}->{Operator} eq 'ENDSWITH' ) {
-        $Prefix = q{*};
-    } elsif ( $Param{Search}->{Operator} eq 'LIKE' ) {
-        $Suffix = q{*};
-        # just prefix needed as config, because some DB do not use indices with leading wildcard - performance!
-        if( $Kernel::OM->Get('Config')->Get('ContactSearch::UseWildcardPrefix') ) {
-            $Prefix = q{*};
-        }
-    }
+    my %SearchMapping = (
+        CONTAINS => {
+            SearchPrefix => q{*},
+            SearchSuffix => q{*}
+        },
+        ENDSWITH => {
+            SearchPrefix => q{*}
+        },
+        STARTSWITH => {
+            SearchSuffix => q{*}
+        },
+        LIKE => {}
+    );
 
     my @SQLJoin;
-    my $Count     = $Param{Flags}->{FulltextJoin} ? $Param{Flags}->{OrganisationJoinCounter}++ : q{};
-    my $UserTable = $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} // 'u';
-    if ( !$Param{Flags}->{FulltextJoin} ) {
-        $Count = $Param{Flags}->{OrganisationJoinCounter}++;
-
-        if ( !$Param{Flags}->{UserJoin}->{$Param{BoolOperator}} ) {
-            my $UserCount = $Param{Flags}->{UserCounter}++;
-            $UserTable .= $UserCount;
-            push(
-                @SQLJoin,
-                "LEFT JOIN users $UserTable ON c.user_id = $UserTable.id",
-            );
-            $Param{Flags}->{UserJoin}->{$Param{BoolOperator}} = $UserTable;
-        }
+    my $UserTable        = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
+    my $OrgaTable        = $Param{Flags}->{JoinMap}->{OrgansiationJoin} // 'o';
+    my $OrgaContactTable = $Param{Flags}->{JoinMap}->{OrgansiationContactJoin} // 'co';
+    if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
+        my $Count = $Param{Flags}->{UserJoinCounter}++;
+        $UserTable .= $Count;
 
         push(
             @SQLJoin,
-            "LEFT JOIN contact_organisation cor$Count ON c.id = cor$Count.contact_id",
-            "LEFT JOIN organisation o$Count ON o$Count.id = cor$Count.org_id"
+            "LEFT JOIN users $UserTable ON c.user_id = $UserTable.id",
         );
-        $Param{Flags}->{FulltextJoin} = 1;
+        $Param{Flags}->{JoinMap}->{UserJoin} = $UserTable;
     }
 
-    my $Query = $Kernel::OM->Get('DB')->QueryCondition(
+    if ( !$Param{Flags}->{JoinMap}->{OrgansiationContactJoin} ) {
+        my $Count = $Param{Flags}->{OrgansiationContactJoinCounter}++;
+        $OrgaContactTable .= $Count;
+
+        push(
+            @SQLJoin,
+            "LEFT JOIN contact_organisation $OrgaContactTable ON c.id = $OrgaContactTable.contact_id"
+        );
+
+        $Param{Flags}->{JoinMap}->{OrgansiationContactJoin} = $OrgaContactTable;
+    }
+
+    if ( !$Param{Flags}->{JoinMap}->{OrgansiationJoin} ) {
+        my $Count = $Param{Flags}->{OrgansiationJoinCounter}++;
+        $OrgaTable .= $Count;
+
+        push(
+            @SQLJoin,
+            "LEFT JOIN organisation $OrgaTable ON $OrgaTable.id = $OrgaContactTable.org_id"
+        );
+        $Param{Flags}->{JoinMap}->{OrgansiationJoin} = $OrgaTable;
+    }
+
+    my $Condition = $Kernel::OM->Get('DB')->QueryCondition(
         Key => [
             'c.firstname', 'c.lastname',
             'c.email','c.email1','c.email2','c.email3','c.email4','c.email5',
             'c.title','c.phone','c.fax','c.mobile',
             'c.street','c.city','c.zip','c.country',
-            "$UserTable.login","o$Count.number","o$Count.name"
+            "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
         ],
-        SearchPrefix => $Prefix,
-        SearchSuffix => $Suffix,
-        Value        => $Value
+        %{$SearchMapping{$Param{Search}->{Operator}}},
+        Value => $Value
     );
 
     return {
-        Where => [$Query],
+        Where => [$Condition],
         Join  => \@SQLJoin
     };
 }
 
 1;
-
 
 =back
 

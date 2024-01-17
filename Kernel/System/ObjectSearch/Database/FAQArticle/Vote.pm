@@ -58,9 +58,27 @@ sub Search {
     my @SQLGroupBy;
     my @SQLHaving;
 
+    my $TableAlias = $Param{Flags}->{FlagMap}->{VoteJoin} // 'fv';
+    if ( !$Param{Flags}->{FlagMap}->{VoteJoin} ) {
+        my $Count = $Param{Flags}->{VoteJoinCounter}++;
+        $TableAlias .= $Count;
+
+        push(
+            @SQLJoin,
+            "LEFT JOIN faq_voting $TableAlias ON $TableAlias.item_id = f.id"
+        );
+
+        push(
+            @SQLGroupBy,
+            'f.id'
+        );
+
+        $Param{Flags}->{FlagMap}->{VoteJoin} = $TableAlias;
+    }
+
     my %AttributeMapping = (
-        Rating => 'AVG(COALESCE(fv.rate,-1))',
-        Votes  => 'COUNT(fv.item_id)'
+        Rating => "AVG(COALESCE($TableAlias.rate,-1))",
+        Votes  => "COUNT($TableAlias.item_id)"
     );
 
     my @Having = $Self->_GetCondition(
@@ -73,20 +91,6 @@ sub Search {
     return if !@Having;
 
     push( @SQLHaving, @Having );
-
-    if ( !$Param{Flags}->{VoteJoin} ) {
-        push(
-            @SQLJoin,
-            'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
-        );
-
-        push(
-            @SQLGroupBy,
-            'f.id'
-        );
-
-        $Param{Flags}->{VoteJoin} = 1;
-    }
 
     return {
         Join    => \@SQLJoin,
@@ -104,20 +108,14 @@ sub Sort {
     my @SQLJoin;
     my @SQLGroupBy;
 
-    my %AttributeMapping = (
-        Rating => ['AVG(COALESCE(fv.rate,-1)) AS rates'],
-        Votes  => ['COUNT(fv.item_id) AS votes'],
-    );
+    my $TableAlias = $Param{Flags}->{FlagMap}->{VoteJoin} // 'fv';
+    if ( !$Param{Flags}->{FlagMap}->{VoteJoin} ) {
+        my $Count = $Param{Flags}->{VoteJoinCounter}++;
+        $TableAlias .= $Count;
 
-    my %AttributeOrderMapping = (
-        Rating => ['rates'],
-        Votes  => ['votes']
-    );
-
-    if ( !$Param{Flags}->{VoteJoin} ) {
         push(
             @SQLJoin,
-            'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+            "LEFT JOIN faq_voting $TableAlias ON $TableAlias.item_id = f.id"
         );
 
         push(
@@ -125,8 +123,18 @@ sub Sort {
             'f.id'
         );
 
-        $Param{Flags}->{VoteJoin} = 1;
+        $Param{Flags}->{FlagMap}->{VoteJoin} = $TableAlias;
     }
+
+    my %AttributeMapping = (
+        Rating => ["AVG(COALESCE($TableAlias.rate,-1)) AS rates"],
+        Votes  => ["COUNT($TableAlias.item_id) AS votes"],
+    );
+
+    my %AttributeOrderMapping = (
+        Rating => ['rates'],
+        Votes  => ['votes']
+    );
 
     return {
         Select  => $AttributeMapping{$Param{Attribute}},

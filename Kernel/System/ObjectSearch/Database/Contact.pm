@@ -40,6 +40,18 @@ sub Init {
     # init dynamic field join counter with 0
     $Param{Flags}->{DynamicFieldJoinCounter} = 0;
 
+    # init translation join counter with 0
+    $Param{Flags}->{TranslationJoinCounter} = 0;
+
+    # init organisation join counter with 0
+    $Param{Flags}->{OrganisationJoinCounter} = 0;
+
+    # init organisation contact join counter with 0
+    $Param{Flags}->{OrganisationContactJoinCounter} = 0;
+
+    # init user join counter with 0
+    $Param{Flags}->{IserJoinCounter} = 0;
+
     return 1;
 }
 

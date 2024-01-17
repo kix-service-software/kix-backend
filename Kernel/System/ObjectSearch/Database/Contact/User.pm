@@ -72,9 +72,9 @@ sub Search {
         ValueType => 'NUMERIC'
     );
 
-    my $TableAlias = $Param{Flags}->{UserJoin} // 'u';
+    my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
     if ( $Param{Search}->{Field} =~ m/Login$/sm ){
-        if ( !$Param{Flags}->{UserJoin} ) {
+        if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
             $TableAlias .= $Count;
             push(
@@ -112,9 +112,9 @@ sub Sort {
     return if !$Self->_CheckSortParams(%Param);
 
     my @SQLJoin;
-    my $TableAlias = $Param{Flags}->{UserJoin} // 'u';
+    my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
     if ( $Param{Attribute} =~ m/Login$/sm ){
-        if ( !$Param{Flags}->{UserJoin} ) {
+        if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
             $TableAlias .= $Count;
             push(

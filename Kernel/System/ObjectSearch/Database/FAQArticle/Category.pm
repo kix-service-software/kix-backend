@@ -57,9 +57,9 @@ sub Search {
     return if !$Self->_CheckSearchParams(%Param);
 
     my $ValueType  = q{};
-    my $TableAlias = $Param{Flags}->{CategoryJoin} // 'fc';
+    my $TableAlias = $Param{Flags}->{FlagMap}->{CategoryJoin} // 'fc';
     if (
-        !$Param{Flags}->{CategoryJoin}
+        !$Param{Flags}->{FlagMap}->{CategoryJoin}
         && $Param{Search}->{Field} eq 'Category'
     ) {
         my $Count = $Param{Flags}->{CategoryJoinCounter}++;
@@ -103,9 +103,9 @@ sub Sort {
     return if !$Self->_CheckSortParams(%Param);
 
     my @SQLJoin;
-    my $TableAlias = $Param{Flags}->{CategoryJoin} // 'fc';
+    my $TableAlias = $Param{Flags}->{FlagMap}->{CategoryJoin} // 'fc';
     if (
-        !$Param{Flags}->{CategoryJoin}
+        !$Param{Flags}->{FlagMap}->{CategoryJoin}
         && $Param{Attribute} eq 'Category'
     ) {
         my $Count = $Param{Flags}->{CategoryJoinCounter}++;
@@ -114,7 +114,7 @@ sub Sort {
             @SQLJoin,
             "INNER JOIN faq_category $TableAlias ON $TableAlias.id = f.category_id"
         );
-        $Param{Flags}->{CategoryJoin}->{AND} = 1;
+        $Param{Flags}->{FlagMap}->{CategoryJoin} = $TableAlias;
     }
 
     my %AttributeMapping = (

@@ -122,10 +122,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) = 1'
+                'AVG(COALESCE(fv0.rate,-1)) = 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -141,10 +141,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) <> 1'
+                'AVG(COALESCE(fv0.rate,-1)) <> 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -160,10 +160,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) < 1'
+                'AVG(COALESCE(fv0.rate,-1)) < 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -179,10 +179,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) > 1'
+                'AVG(COALESCE(fv0.rate,-1)) > 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -198,10 +198,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) <= 1'
+                'AVG(COALESCE(fv0.rate,-1)) <= 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -217,10 +217,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) >= 1'
+                'AVG(COALESCE(fv0.rate,-1)) >= 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -236,10 +236,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) = 1'
+                'AVG(COALESCE(fv0.rate,-1)) = 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -255,10 +255,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) <> 1'
+                'AVG(COALESCE(fv0.rate,-1)) <> 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -274,10 +274,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) < 1'
+                'AVG(COALESCE(fv0.rate,-1)) < 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -293,10 +293,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) > 1'
+                'AVG(COALESCE(fv0.rate,-1)) > 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -312,10 +312,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) <= 1'
+                'AVG(COALESCE(fv0.rate,-1)) <= 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     },
@@ -331,10 +331,10 @@ my @SearchTests = (
                 'f.id'
             ],
             'Having' => [
-                'AVG(COALESCE(fv.rate,-1)) >= 1'
+                'AVG(COALESCE(fv0.rate,-1)) >= 1'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ]
         }
     }
@@ -373,13 +373,13 @@ my @SortTests = (
                 'f.id'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ],
             'OrderBy' => [
                 'votes'
             ],
             'Select' => [
-                'COUNT(fv.item_id) AS votes'
+                'COUNT(fv0.item_id) AS votes'
             ]
         }
     },
@@ -391,13 +391,13 @@ my @SortTests = (
                 'f.id'
             ],
             'Join' => [
-                'LEFT JOIN faq_voting fv ON fv.item_id = f.id'
+                'LEFT JOIN faq_voting fv0 ON fv0.item_id = f.id'
             ],
             'OrderBy' => [
                 'rates'
             ],
             'Select' => [
-                'AVG(COALESCE(fv.rate,-1)) AS rates'
+                'AVG(COALESCE(fv0.rate,-1)) AS rates'
             ]
         }
     }

@@ -47,6 +47,12 @@ sub Init {
     # init translation join counter with 0
     $Param{Flags}->{TranslationJoinCounter} = 0;
 
+    # init sla join counter with 0
+    $Param{Flags}->{SLAJoinCounter} = 0;
+
+    # init sla criterion join counter with 0
+    $Param{Flags}->{SLACriterionJoinCounter} = 0;
+
     return 1;
 }
 

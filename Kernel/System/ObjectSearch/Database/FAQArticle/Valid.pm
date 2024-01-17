@@ -55,29 +55,35 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Valid   => 'v.name',
-        ValidID => 'f.valid_id',
-    );
-
+    my $TableAlias = $Param{Flags}->{FlagMap}->{ValidJoin} // 'v';
     if (
         $Param{Search}->{Field} eq 'Valid'
-        && !$Param{Flags}->{ValidJoin}
+        && !$Param{Flags}->{FlagMap}->{ValidJoin}
     ) {
-        push( @SQLJoin, 'INNER JOIN valid v ON f.valid_id = v.id' );
-        $Param{Flags}->{ValidJoin} = 1;
+        my $Count = $Param{Flags}->{ValidJoinCounter}++;
+        $TableAlias .= $Count;
+
+        push( @SQLJoin, "INNER JOIN valid $TableAlias ON f.valid_id = $TableAlias.id" );
+
+        $Param{Flags}->{FlagMap}->{ValidJoin} = $TableAlias;
     }
 
-    my $ValueType = q{};
-    if ( $Param{Search}->{Field} eq 'ValidID' ) {
-        $ValueType = 'NUMERIC';
-    }
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Valid   => {
+            Column => "$TableAlias.name"
+        },
+        ValidID => {
+            Column    => 'f.valid_id',
+            ValueType => 'NUMERIC'
+        }
+    );
+
     my $Condition = $Self->_GetCondition(
         Operator      => $Param{Search}->{Operator},
-        Column        => $AttributeMapping{$Param{Search}->{Field}},
+        Column        => $AttributeMapping{$Param{Search}->{Field}}->{Column},
         Value         => $Param{Search}->{Value},
-        ValueType     => $ValueType
+        ValueType     => $AttributeMapping{$Param{Search}->{Field}}->{ValueType}
     );
 
     return if ( !$Condition );
@@ -94,20 +100,25 @@ sub Sort {
     # check params
     return if ( !$Self->_CheckSortParams( %Param ) );
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Valid   => 'v.name',
-        ValidID => 'f.valid_id',
-    );
-
     my %Join;
+    my $TableAlias = $Param{Flags}->{FlagMap}->{ValidJoin} // 'v';
     if (
         $Param{Attribute} eq 'Valid'
-        && !$Param{Flags}->{ValidJoin}
+        && !$Param{Flags}->{FlagMap}->{ValidJoin}
     ) {
-        $Join{Join} = ['INNER JOIN valid v ON f.valid_id = v.id'];
-        $Param{Flags}->{ValidJoin} = 1;
+        my $Count = $Param{Flags}->{ValidJoinCounter}++;
+        $TableAlias .= $Count;
+
+        $Join{Join} = ["INNER JOIN valid $TableAlias ON f.valid_id = $TableAlias.id"];
+
+        $Param{Flags}->{FlagMap}->{ValidJoin} = $TableAlias;
     }
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Valid   => "$TableAlias.name",
+        ValidID => 'f.valid_id',
+    );
 
     return {
         Select => [

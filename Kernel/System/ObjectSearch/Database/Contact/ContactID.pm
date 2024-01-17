@@ -56,13 +56,13 @@ sub GetSupportedAttributes {
         ContactID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType    => 'NUMERIC'
         },
         ID => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType    => 'NUMERIC'
         }
     };
@@ -85,7 +85,6 @@ run this module and return the SQL extensions
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
@@ -94,12 +93,10 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => 'c.id',
         Value     => $Param{Search}->{Value},
-        ValueType      => 'NUMERIC'
+        ValueType => 'NUMERIC'
     );
 
     return if ( !$Condition );
-
-
 
     return {
         Where => [ $Condition ]

@@ -32,7 +32,7 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . '"'
+        'Attribute object can "' . $Method . q{"}
     );
 }
 

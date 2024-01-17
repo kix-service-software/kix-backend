@@ -184,10 +184,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'  => [
-                'INNER JOIN valid v ON f.valid_id = v.id'
+                'INNER JOIN valid v0 ON f.valid_id = v0.id'
             ],
             'Where' => [
-                'v.name = \'valid\''
+                'v0.name = \'valid\''
             ]
         }
     },
@@ -200,10 +200,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'  => [
-                'INNER JOIN valid v ON f.valid_id = v.id'
+                'INNER JOIN valid v0 ON f.valid_id = v0.id'
             ],
             'Where' => [
-                'v.name != \'valid\''
+                'v0.name != \'valid\''
             ]
         }
     },
@@ -217,10 +217,10 @@ my @SearchTests = (
         BoolOperator => 'AND',
         Expected     => {
             'Join'  => [
-                'INNER JOIN valid v ON f.valid_id = v.id'
+                'INNER JOIN valid v0 ON f.valid_id = v0.id'
             ],
             'Where' => [
-                'v.name IN (\'valid\')'
+                'v0.name IN (\'valid\')'
             ]
         }
     },
@@ -233,10 +233,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'  => [
-                'INNER JOIN valid v ON f.valid_id = v.id'
+                'INNER JOIN valid v0 ON f.valid_id = v0.id'
             ],
             'Where' => [
-                'v.name NOT IN (\'valid\')'
+                'v0.name NOT IN (\'valid\')'
             ]
         }
     },
@@ -284,13 +284,13 @@ my @SortTests = (
         Attribute => 'Valid',
         Expected  => {
             'Join' => [
-                'INNER JOIN valid v ON f.valid_id = v.id'
+                'INNER JOIN valid v0 ON f.valid_id = v0.id'
             ],
             'OrderBy' => [
-                'v.name'
+                'v0.name'
             ],
             'Select'  => [
-                'v.name'
+                'v0.name'
             ]
         }
     }

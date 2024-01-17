@@ -491,7 +491,8 @@ END
         ObjectType   => 'Contact',
         Object       => $TestData{CustomerContact},
         UserID       => 1,
-        ObjectIDList => \@TicketIDs  # consider only test tickets
+        ObjectIDList => \@TicketIDs,  # consider only test tickets
+        Silent       => 1
     );
     $Self->Is(
         scalar(@{$TicketIDList}),
