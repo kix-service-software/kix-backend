@@ -690,9 +690,9 @@ sub _Output {
         printf STDERR "\nAPI ERROR: ProcessID: %i Time: %s\n\n%11s: %s\n%11s: %s\n%11s: %i ms\n%11s: %s%s\n\n",
             $$,
             $Kernel::OM->Get('Time')->CurrentTimestamp(),
-            'Method', $Self->{RequestMethod},
-            'Resource', $ENV{REQUEST_URI},
-            'Duration', TimeDiff($Self->{RequestStartTime}),
+            'Method', $Self->{ProcessedRequest}->{RequestMethod},
+            'Resource', $Self->{ProcessedRequest}->{RequestURI},
+            'Duration', TimeDiff($Self->{Metric}->{StartTime}),
             'HTTPStatus', $HTTPCode.' '.$StatusMessage,
             $Message
     }
@@ -706,6 +706,12 @@ sub _Output {
 
     # calculate content length (based on the bytes length not on the characters length)
     my $ContentLength = bytes::length( $Content );
+
+    # update metric
+    if ( $Self->{Metric} ) {
+        $Self->{Metric}->{HTTPCode} = $HTTPCode;
+        $Self->{Metric}->{OutBytes} = $ContentLength;
+    }
 
     # set keep-alive
     my $Connection = $Self->{KeepAlive} ? 'Keep-Alive' : 'close';
