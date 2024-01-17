@@ -695,7 +695,8 @@ sub ValueGet {
 Get the value of all (valid) SysConfig option
 
     my %AllOptions = $SysConfigObject->ValueGetAll(
-        Valid => 0|1
+        Valid    => 0|1,        # default: 0
+        Modified => 0|1,        # default: 0
     );
 
 =cut
@@ -704,7 +705,7 @@ sub ValueGetAll {
     my ( $Self, %Param ) = @_;
 
     # check cache
-    my $CacheKey = 'ValueGetAll::'.($Param{Valid} || '');
+    my $CacheKey = 'ValueGetAll::'.($Param{Valid} || '').'::'.($Param{Modified} || '');
     my $CacheResult = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey
@@ -715,14 +716,22 @@ sub ValueGetAll {
     if ( $Param{Valid} ) {
         $Where = 'WHERE valid_id = 1'
     }
+    if ( $Param{Modified} ) {
+        if ( $Where ) {
+            $Where .= ' AND is_modified = 1';
+        }
+        else {
+            $Where = 'WHERE is_modified = 1';
+        }
+    }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => "SELECT name, type, default_value, value FROM sysconfig ".$Where
+        SQL  => "SELECT name, type, default_value, value, valid_id FROM sysconfig ".$Where
     );
 
     # fetch the result
     my $FetchResult = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-        Columns => [ 'Name', 'Type', 'Default', 'Value' ]
+        Columns => [ 'Name', 'Type', 'Default', 'Value', 'ValidID' ]
     );
 
     # no data found...

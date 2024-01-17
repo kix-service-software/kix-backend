@@ -699,6 +699,9 @@ sub _PerfLogMethodWrapper {
 sub CleanUp {
     my ($Self, %Param) = @_;
 
+    # export unhandled metrics
+    $Self->Get('Metric')->Export(Type => 'API');
+
     # discard all objects
     $Self->ObjectsDiscard();
 }
