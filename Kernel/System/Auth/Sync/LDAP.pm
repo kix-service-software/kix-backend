@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Config',
     'Encode',
     'Log',
+    'Role',
     'User',
 );
 
@@ -185,8 +186,8 @@ sub Sync {
             ATTRIBUTE_KEY:
             for my $Key ( sort keys %{$Self->{ContactUserSync}} ) {
 
-                my @ValueArr = qw{};
-                my $Value = "";
+                my @KeyValues = ();
+                my $Value     = "";
                 my $AttributeNames = $Self->{ContactUserSync}->{$Key};
                 if ( ref $AttributeNames ne 'ARRAY' ) {
                     $AttributeNames = [$AttributeNames];
@@ -194,6 +195,7 @@ sub Sync {
 
                 ATTRIBUTE_NAME:
                 for my $AttributeName ( @{$AttributeNames} ) {
+                    my @AttributeValues = ();
                     # set a fixed value...
                     if ( $AttributeName =~ /^SET:/i ) {
                         $Value = substr( $AttributeName, 4 );
@@ -213,7 +215,7 @@ sub Sync {
                     }
                     # set a value concatenation of multiple attributes with joined values of array attributes
                     # LDAP attributes are marked with curly brackets
-                    # joi separator is written in square brackets after ARRAYJOIN
+                    # join separator is written in square brackets after ARRAYJOIN
                     elsif ( $AttributeName =~ /^ARRAYJOIN\[(.+)\]\:(.+)$/i ) {
                         my $SepStrg = $1;
                         $Value      = $2;
@@ -228,9 +230,9 @@ sub Sync {
                     }
                     # just set the attribute...
                     elsif ( $Entry->get_value($AttributeName) ) {
-                        @ValueArr = $Entry->get_value($AttributeName);
-                        $Value    = $Entry->get_value($AttributeName);
-                        $Value    =~ s/^\s+|\s+$//g;
+                        @AttributeValues = $Entry->get_value($AttributeName);
+                        $Value           = $Entry->get_value($AttributeName);
+                        $Value           =~ s/^\s+|\s+$//g;
                     }
                     # set empty if no value can be retrieved or the attribute is not available..
                     else {
@@ -244,12 +246,12 @@ sub Sync {
                     # if there's multiple mail values, automatically set Email, Email1..5
                     if (
                         $Key eq 'Email'
-                        && scalar(@ValueArr) > 1
+                        && scalar( @AttributeValues ) > 1
                     ) {
                         # init counter
                         my $Counter = 0;
                         EMAIL:
-                        for my $CurrEmail ( @ValueArr ) {
+                        for my $CurrEmail ( @AttributeValues ) {
                             # prepare value
                             $CurrEmail =~ s/^\s+|\s+$//g;
                             $CurrEmail = $Self->_ConvertFrom( $CurrEmail, 'utf-8' );
@@ -298,7 +300,7 @@ sub Sync {
                     # enforce array structure for attribute OrganisationIDs...
                     # (NOTE: that might work for array DFs one day)
                     if ( $Key eq "OrganisationIDs" ) {
-                        push(@ValueArr, $Value);
+                        push( @KeyValues, $Value );
                         last ATTRIBUTE_NAME if ( ref($Self->{ContactUserSync}->{$Key}) ne 'ARRAY' );
                     }
                     else {
@@ -312,7 +314,7 @@ sub Sync {
                     $Key eq "OrganisationIDs"
                     || ref( $Self->{ContactUserSync}->{ $Key } ) eq 'ARRAY'
                 ) {
-                    $SyncContact{$Key} = \@ValueArr;
+                    $SyncContact{$Key} = \@KeyValues;
                 }
 
             }
@@ -387,6 +389,9 @@ sub Sync {
                 # update existing contact
 
                 $ContactID = $ContactData{ID};
+
+                # synced contacts are always valid
+                $SyncContact{ValidID} = 1;
 
                 # check for changes on contact
                 my $AttributeChange = 0;
@@ -744,9 +749,9 @@ sub Sync {
         # remove UserPw to avoid overwrite
         $User{UserPw} = undef if defined $User{UserPw};
 
-    # set UserLogin from LDAP
-    # (at this point, user was either successfully identified by email or newly created )
-    $User{UserLogin} = $SyncContact{UserLogin}  ? $SyncContact{UserLogin} : $User{UserLogin};
+        # set UserLogin from LDAP
+        # (at this point, user was either successfully identified by email or newly created )
+        $User{UserLogin} = $SyncContact{UserLogin}  ? $SyncContact{UserLogin} : $User{UserLogin};
 
         my $Success = $UserObject->UserUpdate(
             %User,

@@ -35,7 +35,7 @@ $Self->True(
 );
 my $OrganisationID2 =  $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => 'capeIT',
-    Name    => 'KIX Service Software GmbH',
+    Name    => 'c.a.p.e. IT GmbH',
     ValidID => 1,
     UserID  => 1
 );
@@ -70,7 +70,7 @@ my $SyncConfig = {
         'Lastname'            => 'sn',
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
-            'SET:' . $OrganisationID2
+            'ou'
         ],
         'PrimaryOrganisationID' => 'SET:' . $OrganisationID1,
         'City'                  => 'l',
@@ -88,6 +88,7 @@ my %TestUsers = (
     'uid=user1,ou=users,dc=example,dc=com' => [
         objectClass => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
         uid         => 'syncuser1',
+        ou          => 'capeIT',
         givenName   => 'Max',
         sn          => 'Mustermann',
         mail        => [
