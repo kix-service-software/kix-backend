@@ -72,7 +72,7 @@ sub Run {
                 }
             ],
             UserID     => 1,
-            UsertType  => 'Agent'
+            UserType   => 'Agent'
         );
 
         my $States = $Kernel::OM->Get('Config')->Get('Ticket::StateAfterPending') || {};
@@ -161,7 +161,7 @@ sub Run {
                 }
             ],
             UserID     => 1,
-            UsertType  => 'Agent'
+            UserType   => 'Agent'
         );
 
         my $NotificationCount = 0;

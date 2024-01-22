@@ -57,7 +57,7 @@ sub Run {
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
 
     # get number of config items

@@ -373,7 +373,7 @@ sub _TicketSearch {
             %Query,
             ObjectType => 'Ticket',
             UserID     => 1,
-            UsertType  => 'Agent'
+            UserType   => 'Agent'
         );
         if (@TicketIDs) {
             $TicketID = shift( @TicketIDs );
@@ -563,7 +563,7 @@ sub _TicketCreate {
                     ]
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
             if ( @ConfigItemIDs ) {
                 if ( scalar @ConfigItemIDs > 1 ) {
@@ -593,7 +593,7 @@ sub _TicketCreate {
                         ]
                     },
                     UserID     => 1,
-                    UsertType  => 'Agent'
+                    UserType   => 'Agent'
                 );
 
                 if ( @ConfigItemIDs ) {

@@ -195,7 +195,7 @@ sub Run {
         %Query,
         ObjectType => 'Ticket',
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
 
     # get the first and only ticket id
