@@ -561,7 +561,7 @@ my @GetOperationTests = (
             Value     => '1',
             ValueType => 'NUMERIC'
         },
-        Expected  => 'CAST(test AS VARCHAR) LIKE \'1%\''
+        Expected  => 'CAST(test AS CHAR(20)) LIKE \'1%\''
     },
     {
         Name      => '_GetCondition: single column / Operator STARTSWITH / text array value',
@@ -580,7 +580,7 @@ my @GetOperationTests = (
             Value     => ['1','2'],
             ValueType => 'NUMERIC'
         },
-        Expected  => '(CAST(test AS VARCHAR) LIKE \'1%\' OR CAST(test AS VARCHAR) LIKE \'2%\')'
+        Expected  => '(CAST(test AS CHAR(20)) LIKE \'1%\' OR CAST(test AS CHAR(20)) LIKE \'2%\')'
     },
     {
         Name      => '_GetCondition: single column / Operator STARTSWITH / empty value',
@@ -647,7 +647,7 @@ my @GetOperationTests = (
             Value     => '1',
             ValueType => 'NUMERIC'
         },
-        Expected  => 'CAST(test AS VARCHAR) LIKE \'%1\''
+        Expected  => 'CAST(test AS CHAR(20)) LIKE \'%1\''
     },
     {
         Name      => '_GetCondition: single column / Operator ENDSWITH / text array value',
@@ -666,7 +666,7 @@ my @GetOperationTests = (
             Value     => ['1','2'],
             ValueType => 'NUMERIC'
         },
-        Expected  => '(CAST(test AS VARCHAR) LIKE \'%1\' OR CAST(test AS VARCHAR) LIKE \'%2\')'
+        Expected  => '(CAST(test AS CHAR(20)) LIKE \'%1\' OR CAST(test AS CHAR(20)) LIKE \'%2\')'
     },
     {
         Name      => '_GetCondition: single column / Operator ENDSWITH / empty value',
@@ -733,7 +733,7 @@ my @GetOperationTests = (
             Value     => '1',
             ValueType => 'NUMERIC'
         },
-        Expected  => 'CAST(test AS VARCHAR) LIKE \'%1%\''
+        Expected  => 'CAST(test AS CHAR(20)) LIKE \'%1%\''
     },
     {
         Name      => '_GetCondition: single column / Operator CONTAINS / text array value',
@@ -752,7 +752,7 @@ my @GetOperationTests = (
             Value     => ['1','2'],
             ValueType => 'NUMERIC'
         },
-        Expected  => '(CAST(test AS VARCHAR) LIKE \'%1%\' OR CAST(test AS VARCHAR) LIKE \'%2%\')'
+        Expected  => '(CAST(test AS CHAR(20)) LIKE \'%1%\' OR CAST(test AS CHAR(20)) LIKE \'%2%\')'
     },
     {
         Name      => '_GetCondition: single column / Operator CONTAINS / empty value',
@@ -828,7 +828,7 @@ my @GetOperationTests = (
             Value     => '1',
             ValueType => 'NUMERIC'
         },
-        Expected  => 'CAST(test AS VARCHAR) LIKE \'1\''
+        Expected  => 'CAST(test AS CHAR(20)) LIKE \'1\''
     },
     {
         Name      => '_GetCondition: single column / Operator LIKE / text array value',
@@ -847,7 +847,7 @@ my @GetOperationTests = (
             Value     => ['1','2'],
             ValueType => 'NUMERIC'
         },
-        Expected  => '(CAST(test AS VARCHAR) LIKE \'1\' OR CAST(test AS VARCHAR) LIKE \'2\')'
+        Expected  => '(CAST(test AS CHAR(20)) LIKE \'1\' OR CAST(test AS CHAR(20)) LIKE \'2\')'
     },
     {
         Name      => '_GetCondition: single column / Operator LIKE / empty value',

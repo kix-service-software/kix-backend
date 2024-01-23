@@ -129,8 +129,17 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
+        my $BigIntCast  = 'BIGINT';
+        my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
+        if (
+            ref( $CastMapping ) eq 'HASH'
+            && $CastMapping->{BIGINT}
+        ) {
+            $BigIntCast = $CastMapping->{BIGINT};
+        }
+
         # add join for xml storage
-        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS BIGINT) = $XMLStorageJoinColumn AND $JoinRestriction" );
+        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS $BigIntCast) = $XMLStorageJoinColumn AND $JoinRestriction" );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;
     }

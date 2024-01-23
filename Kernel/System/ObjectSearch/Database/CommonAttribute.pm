@@ -700,7 +700,7 @@ sub _PrepareColumnAndValue {
             && $Param{ValueType}
             && $Param{ValueType} eq 'NUMERIC'
         ) {
-            $Column = 'CAST(' . $Column . ' AS VARCHAR)';
+            $Column = 'CAST(' . $Column . ' AS CHAR(20))';
         }
 
         # cast lower for case insensitive searches, if its not a static search
