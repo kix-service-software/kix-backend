@@ -262,7 +262,7 @@ sub ImportSearchValuePrepare {
 
             # get class id
             my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-                ClasUserType SM::ConfigItem::Class',
+                Class  => 'ITSM::ConfigItem::Class',
                 Name   => $ClassName,
                 Silent => 1,
             );
@@ -321,7 +321,7 @@ sub ImportSearchValuePrepare {
                     ClassID => $ClassID,
                 );
 
-                # preparUserType params
+                # prepare search params
                 my %SearchData   = (
                     $SearchAttr => $Param{Value},
                 );
@@ -430,7 +430,7 @@ sub ImportSearchValuePrepare {
         for my $ClassName ( @CIClassNames ) {
             next CLASS if ( !$ClassName );
 
-            # geUserType d
+            # get class id
             my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
                 Class  => 'ITSM::ConfigItem::Class',
                 Name   => $ClassName,
@@ -530,7 +530,7 @@ sub ImportValuePrepare {
 
             # get class id
             my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
-                ClasUserType SM::ConfigItem::Class',
+                Class  => 'ITSM::ConfigItem::Class',
                 Name   => $ClassName,
                 Silent => 1,
             );
@@ -587,7 +587,7 @@ sub ImportValuePrepare {
                 # get current definition of the asset class
                 my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
                     ClassID => $ClassID,
-                );UserType 
+                );
 
                 # prepare search params
                 my %SearchData   = (
@@ -695,7 +695,7 @@ sub ImportValuePrepare {
         for my $ClassName ( @CIClassNames ) {
             next CLASS if ( !$ClassName );
 
-            # geUserType d
+            # get class id
             my $ItemDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
                 Class  => 'ITSM::ConfigItem::Class',
                 Name   => $ClassName,
