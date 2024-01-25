@@ -890,7 +890,7 @@ sub ContactUpdate {
     # if assigned user is given, check associated user exists
     my %ExistingUser;
     if ($Param{AssignedUserID}) {
-        %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
+        my %ExistingUser = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Param{AssignedUserID}
         );
         if (!IsHashRefWithData(\%ExistingUser)) {
@@ -911,6 +911,19 @@ sub ContactUpdate {
                 );
                 return;
             }
+        }
+
+        # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
+        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
+        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
+            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
+        if ($NewUserValid != $ExistingUser{ValidID}) {
+            delete $ExistingUser{UserPw};
+            my $Success = $Kernel::OM->Get('User')->UserUpdate(
+                %ExistingUser,
+                ValidID      => $NewUserValid,
+                ChangeUserID => 1
+            );
         }
     }
 
@@ -1032,21 +1045,6 @@ sub ContactUpdate {
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
     );
-
-    # update user valid if necessary (user is no agent/customer or contact is invalid = user is invalid)
-    if (IsHashRefWithData(\%ExistingUser)) {
-        my @ValidList = $Kernel::OM->Get('Valid')->ValidIDsGet();
-        my $NewUserValid = (!$ExistingUser{IsAgent} && !$ExistingUser{IsCustomer})
-            || (!grep { $Param{ValidID} == $_ } @ValidList) ? 2 : 1;
-        if ($NewUserValid != $ExistingUser{ValidID}) {
-            delete $ExistingUser{UserPw};
-            my $Success = $Kernel::OM->Get('User')->UserUpdate(
-                %ExistingUser,
-                ValidID      => $NewUserValid,
-                ChangeUserID => 1,
-            );
-        }
-    }
 
     return 1;
 }
