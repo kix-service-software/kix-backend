@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # Copyright (C) 2019–2021 Efflux GmbH, https://efflux.de/
@@ -82,10 +82,33 @@ sub Connect {
         SSL_verify_mode => 0,
     );
 
-    # auth via SASL XOAUTH2
-    my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
-    $PopObject->command( 'AUTH', 'XOAUTH2' )->response();
-    my $NOM = $PopObject->command($SASLXOAUTH2)->response();
+    # try it 2 times to authenticate with the SMTP server
+    my $NOM;
+    TRY:
+    for my $Try ( 1 .. 2 ) {
+        # auth via SASL XOAUTH2
+        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
+        $PopObject->command( 'AUTH', 'XOAUTH2' )->response();
+        $NOM = $PopObject->command($SASLXOAUTH2)->response();
+
+        last TRY if ( defined $NOM );
+
+        # sleep 0,3 seconds;
+        sleep( 0.3 );
+
+        # get a new access token
+        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestAccessToken(
+            ProfileID => $Param{OAuth2_ProfileID},
+            GrantType => 'refresh_token'
+        );
+        if ( !$AccessToken ) {
+            $PopObject->quit();
+            return (
+                Successful => 0,
+                Message    => $Type . ': Could not request access token for ' . $Param{Login} . '/' . $Param{Host} . '. The refresh token could be expired or invalid.'
+            );
+        }
+    }
 
     if ( !defined $NOM ) {
         $PopObject->quit();
