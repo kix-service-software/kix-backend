@@ -83,6 +83,12 @@ sub LoadPreferences {
         $Self->{'DB::Connect'} = 'SET NAMES utf8';
     }
 
+    # add mapping for CAST
+    # BIGINT has to be handled as UNSIGNED
+    $Self->{'DB::CastMapping'} = {
+        'BIGINT' => 'UNSIGNED'
+    };
+
     return 1;
 }
 
