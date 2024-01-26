@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-1-26 15:22+0000\n"
+"POT-Creation-Date: 2024-1-26 15:23+0000\n"
 "PO-Revision-Date: 2023-11-13 11:37+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -4738,6 +4738,10 @@ msgid "Defines which type of ticket can affect the status of a linked CI."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Enable or diable the automatic incident state propagation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
 "Enables/disables the functionality to check ConfigItems for unique names. "
 "Before enabling this option you should check your system for already "
@@ -4795,6 +4799,12 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
 "Set the incident state of a CI automatically when a Ticket is Linked to a CI."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid ""
+"Set the maximum link depth to follow during the automatic incident state "
+"propagation. Default: 0 (no limit)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
