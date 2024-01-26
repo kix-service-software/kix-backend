@@ -3934,6 +3934,10 @@ sub _GetCustomerUserVisibleObjectIds {
             }
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
 
+            # inform API caching about a new dependency
+            my $CacheObjectType = $Param{ObjectType} eq 'TicketArticle' ? 'Ticket' : $Param{ObjectType};
+            $Self->AddCacheDependency(Type => 'ObjectSearch_' . $CacheObjectType);
+
             if ($Param{ObjectType} eq 'ConfigItem') {
                 my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
                     Search => {

@@ -9134,34 +9134,6 @@ You can log in via the following URL:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SysConfigChangeLog::LogModule" Required="1" Valid="1">
-        <Description Translatable="1">Log module for the SysConfig. "File" writes all messages in a given logfile, "SysLog" uses the syslog daemon of the system, e.g. syslogd.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Log</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/SysConfigChangeLog/*.pm" SelectedID="Kernel::System::SysConfigChangeLog::File"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SysConfigChangeLog::LogModule::SysLog::Facility" Required="1" Valid="1">
-        <Description Translatable="1">If "SysLog" was selected for LogModule, you can specify a special log facility.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Log</SubGroup>
-        <Setting>
-            <String Regex="">user</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SysConfigChangeLog::LogModule::SysLog::Charset" Required="1" Valid="1">
-        <Description Translatable="1">If "SysLog" was selected for LogModule, you can specify the charset that should be used for logging.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Log</SubGroup>
-        <Setting>
-            <Option SelectedID="iso-8859-1">
-                <Item Key="iso-8859-1">iso-8859-1</Item>
-                <Item Key="iso-8859-15">iso-8859-15</Item>
-                <Item Key="utf-8">utf-8</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SysConfigChangeLog::LogModule::LogFile" Required="1" Valid="1">
         <Description Translatable="1">If "file" was selected for LogModule, you have to specify a logfile. The file will be created by the system, if it doesn't exist.</Description>
         <Group>Framework</Group>
@@ -9603,6 +9575,17 @@ You can log in via the following URL:
     }
 }
             </String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="SysConfig::EventModulePost###005-AssignedMappingChanged" Required="0" Valid="1">
+        <Description Translatable="1">Removes relevant caches if assigned objects/configitems mapping is changed.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Log</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::SysConfig::Event::AssignedMappingChanged</Item>
+                <Item Key="Event">SysConfigOptionUpdate</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 

@@ -17,6 +17,8 @@ use File::Basename;
 use XML::Simple;
 
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::EventHandler;
+
 use vars qw(@ISA);
 
 our @ObjectDependencies = qw(
@@ -56,6 +58,15 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    @ISA = qw(
+        Kernel::System::EventHandler
+    );
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'SysConfig::EventModulePost',
+    );
 
     $Self->{CacheType} = 'SysConfig';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 30;   # 30 days
@@ -481,7 +492,7 @@ sub OptionUpdate {
         return;
     }
 
-    my %OptionData = $Self->OptionGet(
+    my %OldOptionData = $Self->OptionGet(
         Name => $Param{Name},
     );
 
@@ -490,16 +501,17 @@ sub OptionUpdate {
     KEY:
     for my $Key (qw(Name Context ContextMetadata Description AccessLevel ExperienceLevel Type Group IsRequired Setting Default Value Comment DefaultValidID ValidID)) {
 
-        next KEY if defined $OptionData{$Key} && $OptionData{$Key} eq $Param{$Key};
+        next KEY if defined $OldOptionData{$Key} && $OldOptionData{$Key} eq $Param{$Key};
 
         $ChangeRequired = 1;
 
         last KEY;
     }
+    return 1 if (!$ChangeRequired);
 
-    $Param{Default} = $Param{Default} // $OptionData{Default};
+    $Param{Default} = $Param{Default} // $OldOptionData{Default};
 
-    $Param{DefaultValidID} = !defined $Param{DefaultValidID} ? $OptionData{DefaultValidID} : $Param{DefaultValidID} == 1 ? 1 : 2;
+    $Param{DefaultValidID} = !defined $Param{DefaultValidID} ? $OldOptionData{DefaultValidID} : $Param{DefaultValidID} == 1 ? 1 : 2;
 
     # determine if this option has been modified
     my $IsModified = 0;
@@ -525,13 +537,13 @@ sub OptionUpdate {
         );
     }
     if ( $Param{Default} && ref $Param{Default} ) {
-        my $Type = $Param{Type} || $OptionData{Type};
+        my $Type = $Param{Type} || $OldOptionData{Type};
         $Param{Default} = $Self->{OptionTypeModules}->{$Type}->Encode(
             Data => $Param{Default}
         )
     }
     if ( $Param{Value} && ref $Param{Value} ) {
-        my $Type = $Param{Type} || $OptionData{Type};
+        my $Type = $Param{Type} || $OldOptionData{Type};
         $Param{Value} = $Self->{OptionTypeModules}->{$Type}->Encode(
             Data => $Param{Value}
         )
@@ -566,6 +578,20 @@ sub OptionUpdate {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    my %OptionData = $Self->OptionGet(
+        Name => $Param{Name},
+    );
+
+    $Self->EventHandler(
+        Event => 'SysConfigOptionUpdate',
+        Data  => {
+            Name      => $Param{Name},
+            OldOption => \%OldOptionData,
+            NewOption => \%OptionData
+        },
+        UserID => $Param{UserID} || 1,
     );
 
     # push client callback event
