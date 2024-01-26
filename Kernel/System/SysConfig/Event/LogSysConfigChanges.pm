@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::SysConfig::Event::LogSysConfigChanges;
 
 use strict;
 use warnings;
+
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Log',
@@ -60,15 +62,18 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Event Data Config UserID)) {
-        if ( !$Param{$_} ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+    for my $Needed (qw(Event Data UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $Needed!" );
             return;
         }
     }
-    for (qw(Key ChangeType)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_ in Data!" );
+    for my $Needed (qw(Name OldOption NewOption)) {
+        if ( !$Param{Data}->{$Needed} ) {
+            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $Needed in Data!" );
+            return;
+        } elsif ($Needed ne 'Name' && !IsHashRefWithData($Param{Data}->{$Needed})) {
+            $Self->{LogObject}->Log( Priority => 'error', Message => "Data->$Needed has no data!" );
             return;
         }
     }
@@ -77,45 +82,47 @@ sub Run {
     my %UserData = $Self->{UserObject}->GetUserData(
         UserID => $Param{UserID},
     );
+    if (!IsHashRefWithData(\%UserData)) {
+        $Self->{LogObject}->Log( Priority => 'error', Message => "Could not load user data!" );
+        return;
+    }
 
-    if ( $Param{Data}->{ChangeType} == 1 ) {
-
-        # write SysConfig changelog
+    if ( $Param{Data}->{OldOption}->{ValidID} != $Param{Data}->{NewOption}->{ValidID} ) {
+        my $Enabled = $Param{Data}->{NewOption}->{ValidID} == 1 ? 'enabled' : 'disabled';
         $Self->{SysConfigChangeLogObject}->Log(
             Priority => 'notice',
-            Message  => "User $UserData{UserLogin} enabled option '$Param{Data}->{Key}'",
+            Message  => "User $UserData{UserLogin} $Enabled option '$Param{Data}->{Name}'",
         );
     }
-    elsif ( $Param{Data}->{ChangeType} == 2 ) {
-
-        # write SysConfig changelog
-        $Self->{SysConfigChangeLogObject}->Log(
-            Priority => 'notice',
-            Message  => "User $UserData{UserLogin} disabled option '$Param{Data}->{Key}'",
-        );
-    }
-    elsif ( $Param{Data}->{ChangeType} == 3 ) {
+    if (
+        DataIsDifferent(
+            Data1 => $Param{Data}->{OldOption}->{Value} || \(''),
+            Data2 => $Param{Data}->{NewOption}->{Value} || \('')
+        )
+    ) {
         use Data::Dumper;
-        my $OldValueDump = Dumper( $Param{Data}->{OldValue} );
-        $OldValueDump =~ s/\$VAR1 = (.*?);/$1/g;
-        my $NewValueDump = Dumper( $Param{Data}->{NewValue} );
-        $NewValueDump =~ s/\$VAR1 = (.*?);/$1/g;
+        my $OldValueDump = !defined $Param{Data}->{OldOption}->{Value} ?
+            "(DEFAULT) " . Dumper( $Param{Data}->{OldOption}->{Default} ) :
+            Dumper( $Param{Data}->{OldOption}->{Value} );
+        $OldValueDump =~ s/\$VAR1 = //g;
+        my $NewValueDump = !defined $Param{Data}->{NewOption}->{Value} ?
+            "(DEFAULT) " . Dumper( $Param{Data}->{NewOption}->{Default} ) :
+            Dumper( $Param{Data}->{NewOption}->{Value} );
+        $NewValueDump =~ s/\$VAR1 = //g;
 
         # write SysConfig changelog
         $Self->{SysConfigChangeLogObject}->Log(
             Priority => 'notice',
-            Message  => "User $UserData{UserLogin} changed option '$Param{Data}->{Key}'\nOLD: "
+            Message  => "User $UserData{UserLogin} changed option '$Param{Data}->{Name}'\nOLD: "
                 . $OldValueDump . "NEW: "
                 . $NewValueDump,
         );
     }
-    return;
+
+    return 1;
 }
 
 1;
-
-
-
 
 =back
 
