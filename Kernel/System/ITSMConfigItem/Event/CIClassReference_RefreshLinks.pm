@@ -102,22 +102,26 @@ sub Run {
 #                                 'ReferencedCIClassLinkDirection' => '',
 #                               }
 #                             ]
-    # relelvant attributes for the old version
+    # relevant attributes for the old version
     %RelAttrNewVersion = $Self->_CreateCIReferencesHash(
         XMLData       => $NewVersionData->{XMLData}->[1]->{Version}->[1],
         XMLDefinition => $XMLDefinition->{DefinitionRef},
     );
-    # relelvant attributes for the new version
+
+    # relevant attributes for the new version
     %RelAttrOldVersion = $Self->_CreateCIReferencesHash(
         XMLData       => $OldVersionData->{XMLData}->[1]->{Version}->[1],
         XMLDefinition => $XMLDefinition->{DefinitionRef},
     );
 
-    my $CIReferenceAttrDataRef = \();
-
     #---------------------------------------------------------------------------
     # update ConfigItem-links...
     if ( $NewVersionData && $XMLDefinition && %RelAttrNewVersion ) {
+
+        my $CIReferenceAttrDataRef = \();
+
+        my %ConfigItemsToDelete;
+        my %ConfigItemsToAdd;
 
         #-----------------------------------------------------------------------
         #  delete links most likely created from previous version of this attribute...
@@ -126,31 +130,22 @@ sub Run {
 
                 next if ( !$RelAttrOldVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType} );
 
-                my $LastLinkType
-                    = $RelAttrOldVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType};
+                my $LastLinkType = $RelAttrOldVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType};
 
                 # NOTE: result looks like {<$CurrKeyname> => [ <CIID1>, <CIID2>, ...]}
                 $CIReferenceAttrDataRef = $Self->_GetAttributeDataByKey(
                     XMLData       => $OldVersionData->{XMLData}->[1]->{Version}->[1],
                     XMLDefinition => $XMLDefinition->{DefinitionRef},
                     KeyName       => $CurrKeyname,
-                    Content => 1,    #need the CI-ID, not the shown value
+                    Content       => 1,    #need the CI-ID, not the shown value
                 );
 
                 if (
                     $CIReferenceAttrDataRef->{$CurrKeyname}
                     && ref( $CIReferenceAttrDataRef->{$CurrKeyname} ) eq 'ARRAY'
-                    )
-                {
-                    for my $CurrPrevPartnerID ( @{ $CIReferenceAttrDataRef->{$CurrKeyname} } ) {
-                        $Self->{LinkObject}->LinkDelete(
-                            Object1 => 'ConfigItem',
-                            Key1    => $Param{ConfigItemID},
-                            Object2 => 'ConfigItem',
-                            Key2    => $CurrPrevPartnerID,
-                            Type    => $LastLinkType,
-                            UserID  => 1,
-                        );
+                ) {
+                    for my $CurrPrevPartnerID ( @{ $CIReferenceAttrDataRef->{ $CurrKeyname } } ) {
+                        $ConfigItemsToDelete{ $LastLinkType }->{ $CurrPrevPartnerID } = 1;
                     }
                 }
             }    #EO for my $CurrKeyname ( keys( %RelAttrOldVersion ))
@@ -166,6 +161,8 @@ sub Run {
                 KeyName       => $CurrKeyname,
                 Content => 1,    #need the CI-ID, not the shown value
             );
+
+            my $CurrLinkType = $RelAttrOldVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType};
 
             #-----------------------------------------------------------------------
             # create all links from available data...
@@ -184,27 +181,10 @@ sub Run {
                             ->{ReferencedCIClassLinkDirection} eq 'Reverse'
                             )
                         {
-                            $Self->{LinkObject}->LinkAdd(
-                                SourceObject => 'ConfigItem',
-                                SourceKey    => $CurrCIReferenceID,
-                                TargetObject => 'ConfigItem',
-                                TargetKey    => $Param{ConfigItemID},
-                                Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
-                                    ->{ReferencedCIClassLinkType},
-                                UserID => 1,
-                            );
-
+                            $ConfigItemsToAdd{ $CurrLinkType }->{ $CurrCIReferenceID } = 'Source';
                         }
                         else {
-                            $Self->{LinkObject}->LinkAdd(
-                                TargetObject => 'ConfigItem',
-                                TargetKey    => $CurrCIReferenceID,
-                                SourceObject => 'ConfigItem',
-                                SourceKey    => $Param{ConfigItemID},
-                                Type         => $RelAttrNewVersion{$CurrKeyname}->[0]
-                                    ->{ReferencedCIClassLinkType},
-                                UserID => 1,
-                            );
+                            $ConfigItemsToAdd{ $CurrLinkType }->{ $CurrCIReferenceID } = 'Target';
                         }
 
                     }    #EO if( $CurrCIReferenceID && $Param{ConfigItemID})
@@ -215,7 +195,58 @@ sub Run {
 
         }    #EO for my $CurrKeyname ( keys( %RelAttrNewVersion ))
 
+        LINKTYPE:
+        for my $LinkType ( sort( keys( %ConfigItemsToDelete ) ) ) {
+            CONFIGITEM:
+            for my $ConfigItemID ( sort( keys( %{ $ConfigItemsToDelete{ $LinkType } } ) ) ) {
+                # we don't need to delete a link we are going to add again with same type
+                next CONFIGITEM if ( $ConfigItemsToAdd{ $LinkType }->{ $ConfigItemID } );
+
+                $Self->{LinkObject}->LinkDelete(
+                    Object1 => 'ConfigItem',
+                    Key1    => $Param{ConfigItemID},
+                    Object2 => 'ConfigItem',
+                    Key2    => $ConfigItemID,
+                    Type    => $LinkType,
+                    UserID  => 1,
+                );
+            }
+        }
+
+        LINKTYPE:
+        for my $LinkType ( sort( keys( %ConfigItemsToAdd ) ) ) {
+            CONFIGITEM:
+            for my $ConfigItemID ( sort( keys( %{ $ConfigItemsToAdd{ $LinkType } } ) ) ) {
+                # we don't need to add a link we already have with the correct type
+                next CONFIGITEM if ( $ConfigItemsToDelete{ $LinkType }->{ $ConfigItemID } );
+
+                my $Direction = $ConfigItemsToAdd{ $LinkType }->{ $ConfigItemID };
+
+                if ( $Direction eq 'Source' ) {
+                    $Self->{LinkObject}->LinkAdd(
+                        SourceObject => 'ConfigItem',
+                        SourceKey    => $ConfigItemID,
+                        TargetObject => 'ConfigItem',
+                        TargetKey    => $Param{ConfigItemID},
+                        Type         => $LinkType,
+                        UserID       => 1,
+                    );
+                }
+                elsif ( $Direction eq 'Target' ) {
+                    $Self->{LinkObject}->LinkAdd(
+                        TargetObject => 'ConfigItem',
+                        TargetKey    => $ConfigItemID,
+                        SourceObject => 'ConfigItem',
+                        SourceKey    => $Param{ConfigItemID},
+                        Type         => $LinkType,
+                        UserID       => 1,
+                    );
+                }
+            }
+        }
+
     }    #EO if ( $NewVersionData && $XMLDefinition && %RelAttrNewVersion)
+
     return;
 }
 

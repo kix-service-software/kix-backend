@@ -436,6 +436,7 @@ sub LinkAddPost {
     # recalculate the current incident state of this CI
     $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
         ConfigItemID => $Param{Key},
+        Event        => 'LinkAdd',
     );
 
     # trigger LinkAdd event
@@ -537,6 +538,7 @@ sub LinkDeletePost {
     # recalculate the current incident state of this CI
     $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
         ConfigItemID => $Param{Key},
+        Event        => 'LinkDelete',
     );
 
     # trigger LinkDelete event

@@ -1166,6 +1166,12 @@ sub VersionAdd {
 
     # trigger incident state update event
     if ( $Events->{IncidentStateUpdate} ) {
+        # recalculate the current incident state of all linked config items
+        $Self->RecalculateCurrentIncidentState(
+            ConfigItemID => $Param{ConfigItemID},
+            Event        => 'IncidentStateUpdate'
+        );
+
         $Self->EventHandler(
             Event => 'IncidentStateUpdate',
             Data  => {
@@ -1187,11 +1193,6 @@ sub VersionAdd {
             UserID => $Param{UserID},
         );
     }
-
-    # recalculate the current incident state of all linked config items
-    $Self->RecalculateCurrentIncidentState(
-        ConfigItemID => $Param{ConfigItemID}
-    );
 
     # push client callback event
     if ($AddVersion) {
