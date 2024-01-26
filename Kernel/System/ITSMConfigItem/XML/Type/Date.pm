@@ -65,48 +65,6 @@ sub ValueLookup {
     return $Param{Value} || '';
 }
 
-=item StatsAttributeCreate()
-
-create a attribute array for the stats framework
-
-    my $Attribute = $BackendObject->StatsAttributeCreate();
-
-=cut
-
-sub StatsAttributeCreate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Key Name Item)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!",
-            );
-            return;
-        }
-    }
-
-    # create attribute
-    my $Attribute = [
-        {
-            Name             => $Param{Name},
-            UseAsXvalue      => 1,
-            UseAsValueSeries => 1,
-            UseAsRestriction => 1,
-            Element          => $Param{Key},
-            TimePeriodFormat => 'DateInputFormat',
-            Block            => 'Time',
-            Values           => {
-                TimeStart => $Param{Key} . 'NewerDate',
-                TimeStop  => $Param{Key} . 'OlderDate',
-            },
-        },
-    ];
-
-    return $Attribute;
-}
-
 =item ExportSearchValuePrepare()
 
 prepare search value for export
