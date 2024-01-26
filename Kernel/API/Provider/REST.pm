@@ -56,16 +56,13 @@ sub CheckAuthorization {
     my ( $Self, %Param ) = @_;
 
     # check authentication header
-    my $cgi = CGI->new;
-    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-
-    if ( !$Headers{HTTP_AUTHORIZATION} ) {
+    if ( !$ENV{HTTP_AUTHORIZATION} ) {
         return $Self->_Error(
             Code => 'Authorization.NoHeader'
         );
     }
 
-    my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
+    my %Authorization = split(/\s+/, $ENV{HTTP_AUTHORIZATION});
 
     if ( !$Authorization{Token} ) {
         return $Self->_Error(
@@ -143,6 +140,20 @@ sub ProcessRequest {
 
     my $Operation;
     my %URIData;
+    
+    my %Headers;
+    HEADER:
+    foreach my $Key ( keys %ENV ) {
+        next HEADER if $Key !~ /^HTTP_/; 
+        next HEADER if $Key =~ /^HTTP_(PROXY|HOST)/;
+        my $Header = $Key;
+        $Header =~ s/^HTTP_//g;
+        $Header =~ s/_/-/g;
+        $Header = ucfirst lc $Header;
+        $Headers{$Header} = $ENV{$Key};
+    }
+    $Headers{'Content-type'} = $ENV{CONTENT_TYPE};
+
     my $RequestURI = $ENV{REQUEST_URI};
     $RequestURI =~ s{(\/.*)$}{$1}xms;
     # remove any query parameter form the URL
@@ -371,6 +382,7 @@ sub ProcessRequest {
             RequestMethod  => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             ParentMethodOperationMapping => \%ParentMethodOperationMapping,
+            Headers   => \%Headers,
             Data      => {
                 %URIData,
             },
@@ -473,6 +485,7 @@ sub ProcessRequest {
         RequestMethod                 => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
         ParentMethodOperationMapping  => \%ParentMethodOperationMapping,
+        Headers                       => \%Headers,
         Data                          => $ReturnData,
     );
 }

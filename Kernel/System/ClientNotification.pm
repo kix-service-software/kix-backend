@@ -100,9 +100,7 @@ sub NotifyClients {
     my $Timestamp = Time::HiRes::time();
 
     # get RequestID
-    my $cgi = CGI->new;
-    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    my $RequestID = $Headers{HTTP_KIX_REQUEST_ID} || '';
+    my $RequestID = $ENV{HTTP_KIX_REQUEST_ID} || '';
 
     $Self->{CacheObject}->Set(
         Type          => 'ClientNotification',
