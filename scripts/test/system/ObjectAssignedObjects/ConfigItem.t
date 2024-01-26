@@ -958,6 +958,104 @@ END
         0,
         'List should be empty [invalid config]',
     );
+
+    # negative (valid config, not matching depl state) ---------------------------
+    _SetConfig(
+        'not matching deployment state',
+        <<"END",
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "SectionOwner::OwnerOrganisation": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID"
+                ]
+            },
+            "DeploymentState": {
+                "SearchStatic": [
+                    "Planned"
+                ]
+            }
+        }
+    }
+}
+END
+    );
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => $TestData{CustomerContact}->{ID}
+                }
+            ]
+        },
+        UserID     => 1,
+        UserType   => 'Agent',
+        Silent     => 1
+    );
+    $Self->Is(
+        scalar(@CIIDList),
+        0,
+        'List should be empty [not matching deployment state]',
+    );
+
+    # negative (valid config, not matching depl state) ---------------------------
+    _SetConfig(
+        'not matching incident state',
+        <<"END",
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "SectionOwner::OwnerOrganisation": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID"
+                ]
+            },
+            "IncidentState": {
+                "SearchStatic": [
+                    "Warning"
+                ]
+            }
+        }
+    }
+}
+END
+    );
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => $TestData{CustomerContact}->{ID}
+                }
+            ]
+        },
+        UserID     => 1,
+        UserType   => 'Agent',
+        Silent     => 1
+    );
+    $Self->Is(
+        scalar(@CIIDList),
+        0,
+        'List should be empty [not matching incident state]',
+    );
 }
 
 sub _SetConfig {
