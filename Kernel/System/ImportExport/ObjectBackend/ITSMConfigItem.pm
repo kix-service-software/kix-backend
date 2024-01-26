@@ -1003,7 +1003,7 @@ sub ImportDataSave {
         );
 
         # search existing config item with the same identifiers
-        my $ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
+        my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'ConfigItem',
             Result     => 'ARRAY',
             Search     => {
@@ -1014,7 +1014,7 @@ sub ImportDataSave {
             Silent         => $Param{Silent}
         );
 
-        if ( scalar @{$ConfigItemList} > 1 ) {
+        if ( scalar(@ConfigItemList) > 1 ) {
             return if $Param{Silent};
 
             $Kernel::OM->Get('Log')->Log(
@@ -1026,7 +1026,7 @@ sub ImportDataSave {
             return;
         }
 
-        $ConfigItemID = $ConfigItemList->[0];
+        $ConfigItemID = $ConfigItemList[0];
     }
 
     # get version data of the config item
