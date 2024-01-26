@@ -428,6 +428,18 @@ sub ProcessRequest {
             );
         }
     }
+    # no content-type is provided, assume its json
+    elsif ( !$ENV{'CONTENT_TYPE'} ) {
+        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+            Data   => $Content,
+            Silent => 1
+        );
+
+        # content could not be decoded as json, use provided content
+        if ( !$ContentDecoded ) {
+            $ContentDecoded = $Content;
+        }
+    }
 
     my $ReturnData;
     if ( IsHashRefWithData($ContentDecoded) ) {
