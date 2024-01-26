@@ -65,41 +65,6 @@ sub XMLValueLookup {
     return $Value;
 }
 
-=item XMLStatsAttributeCreate()
-
-create a attribute array for the stats framework
-
-    my $Value = $ConfigItemObject->XMLStatsAttributeCreate(
-        Item => $ItemRef,
-    );
-
-=cut
-
-sub XMLStatsAttributeCreate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{Item} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Item!',
-        );
-        return;
-    }
-
-    # load backend
-    my $BackendObject = $Kernel::OM->Get(
-        'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type}
-    );
-
-    return if !$BackendObject;
-
-    # create stats attribute array
-    my $Attribute = $BackendObject->StatsAttributeCreate(%Param);
-
-    return $Attribute;
-}
-
 =item XMLExportSearchValuePrepare()
 
 prepare xml search data for export

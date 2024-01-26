@@ -78,24 +78,6 @@ sub ValueLookup {
     return $TypeName;
 }
 
-=item StatsAttributeCreate()
-
-create a attribute array for the stats framework
-
-    my $Attribute = $BackendObject->StatsAttributeCreate(
-        Key => 'Key::Subkey',
-        Name => 'Name',
-        Item => $ItemRef,
-    );
-
-=cut
-
-sub StatsAttributeCreate {
-    my ( $Self, %Param ) = @_;
-
-    return;
-}
-
 =item ExportSearchValuePrepare()
 
 prepare search value for export

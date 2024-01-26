@@ -58,6 +58,15 @@ sub Run {
     # bail out if we don't have something to todo
     return if !IsArrayRefWithData($SourceData);
 
+    my %CategoryListSource = map { $_->{id} => $_ } @{$SourceData};
+
+    # get category list
+    my %CategoryList = reverse %{
+        $Kernel::OM->Get('FAQ')->CategoryTreeList(
+            UserID => 1,
+        )
+    };
+
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
     my %CategoryReferenceMapping;
@@ -75,14 +84,17 @@ sub Run {
         }
 
         # check if this item already exists (i.e. some initial data)
-        my $ID = $Self->Lookup(
-            Table        => 'faq_category',
-            PrimaryKey   => 'id',
-            Item         => $Item,
-            RelevantAttr => [
-                'name'
-            ]
-        );
+        # we can't use our Lookup method here, since we need to look at the (virtual) fullname
+        my @NamePartsSource;
+        my $TmpItem = $Item;
+        while ( $TmpItem) {
+
+            push @NamePartsSource, $TmpItem->{name};
+            $TmpItem = $CategoryListSource{$TmpItem->{parent_id}};
+        }
+        my $SourceName = join('::', reverse @NamePartsSource);
+
+        my $ID = $CategoryList{$SourceName};
 
         # insert row
         if ( !$ID ) {
@@ -95,10 +107,21 @@ sub Run {
                 AutoPrimaryKey => 1,
             );
 
+            # add the new category to the lookup list
+            $CategoryList{$SourceName} = $ID;
+
             # build the mapping for later
             $CategoryReferenceMapping{$ID} = {
                 parent_id => $ParentID,
             };
+        }
+        else {
+            # create OID mapping
+            $Self->CreateOIDMapping(
+                ObjectType     => 'faq_category',
+                ObjectID       => $ID,
+                SourceObjectID => $Item->{id},
+            );
         }
 
         if ( $ID ) {
