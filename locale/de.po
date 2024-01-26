@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-1-25 21:45+0000\n"
+"POT-Creation-Date: 2024-1-26 08:06+0000\n"
 "PO-Revision-Date: 2023-11-13 11:37+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -3680,18 +3680,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"If \"SysLog\" was selected for LogModule, you can specify a special log "
-"facility."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"If \"SysLog\" was selected for LogModule, you can specify the charset that "
-"should be used for logging."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "If \"file\" was selected for LogModule, a logfile must be specified. If the "
 "file doesn't exist, it will be created by the system."
 msgstr ""
@@ -3914,12 +3902,6 @@ msgid "List of all contact events."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Log module for the SysConfig. \"File\" writes all messages in a given "
-"logfile, \"SysLog\" uses the syslog daemon of the system, e.g. syslogd."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Logs the configuration changes of SysConfig options."
 msgstr ""
 
@@ -4089,6 +4071,11 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Relevant to"
 msgstr "Relevant für"
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"Removes relevant caches if assigned objects/configitems mapping is changed."
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
