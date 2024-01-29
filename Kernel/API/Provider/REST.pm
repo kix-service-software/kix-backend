@@ -229,9 +229,12 @@ sub ProcessRequest {
         #         Other    => 2,
         #     );
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
-        next ROUTE if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next ROUTE if !(
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        );
 
         # import URI params
         my %URIParams;
@@ -279,14 +282,20 @@ sub ProcessRequest {
 
         my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
         my $Base = $RouteMapping{Route};
         $Base =~ s{(/:[^\/]+)}{}xmsg;
 
-        next if !( $Base =~ m{^ $BaseRoute }xms );
+        next if !( 
+            eval { qr/^ $BaseRoute /xms }
+            && $Base =~ m{^ $BaseRoute }xms
+        );
 
-        next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next if !( 
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        );
         
         # only add if we didn't have a match upto now
         next if exists $AvailableMethods{$RouteMapping{RequestMethod}->[0]};

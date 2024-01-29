@@ -1452,7 +1452,7 @@ sub ExecOperation {
 
         my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$Op} || {} };
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
         if ( $ParentObjectRoute ) {
             # ignore anything that has nothing to do with the parent Ops route
@@ -1468,7 +1468,10 @@ sub ExecOperation {
             }
         }
 
-        if ( $RequestURI =~ m{^ $RouteRegEx $}xms ) {
+        if (
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        ) {
             $AvailableMethods{ $RouteMapping{RequestMethod}->[0] } = {
                 Operation => $Op,
                 Route     => $RouteMapping{Route}
