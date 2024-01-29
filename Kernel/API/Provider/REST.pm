@@ -452,6 +452,22 @@ sub ProcessRequest {
             $ContentDecoded = $Content;
         }
     }
+    # workaround for fieldservice-app
+    elsif (
+        $ENV{'CONTENT_TYPE'} eq 'text/plain; charset=utf-8'
+        && $ENV{HTTP_USER_AGENT} eq 'Dart/3.2 (dart:io)'
+    ) {
+        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Content,
+        );
+
+        if ( !$ContentDecoded ) {
+            return $Self->_Error(
+                Code    => 'Transport.REST.InvalidJSON',
+                Message => 'Error while decoding request content.',
+            );
+        }
+    }
 
     my $ReturnData;
     if ( IsHashRefWithData($ContentDecoded) ) {
