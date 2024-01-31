@@ -155,7 +155,10 @@ sub GetSourceData {
     my $Description = $Self->Describe();
     if ( IsArrayRefWithData($Data) && ((IsHashRefWithData($Description) && IsHashRefWithData($Description->{Depends})) || IsHashRefWithData($Param{References})) ) {
         my %Deps = %{$Param{References} || $Description->{Depends}};
+        DATA:
         foreach my $Item ( @{$Data} ) {
+            next DATA if !IsHashRefWithData($Item);
+
             foreach my $Dep ( sort keys %Deps ) {
                 next if !$Item->{$Dep};
 
