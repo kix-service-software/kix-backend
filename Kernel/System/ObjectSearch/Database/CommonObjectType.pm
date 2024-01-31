@@ -124,7 +124,7 @@ sub GetSearchDef {
         Join    => [],
         Where   => [],
         Having  => [],
-        OrderBy => []
+        OrderBy => [],
     );
 
     # generate SQL from attribute modules
@@ -233,6 +233,11 @@ sub GetSearchDef {
                     && $Key eq 'Having'
                 ) {
                     push( @SQLHavingOR, @{ $AttributeDef->{ $Key } } );
+                }
+                elsif ( $Key eq 'IsRelative' ) {
+                    if ( $AttributeDef->{ $Key } ) {
+                        $SQLDef{ $Key } = $AttributeDef->{ $Key };
+                    }
                 }
                 else {
                     push( @{ $SQLDef{ $Key } }, @{ $AttributeDef->{ $Key } } );

@@ -155,6 +155,9 @@ sub Search {
     }
     return if ( !$ObjectTypeBackend );
 
+    # init relative flag
+    my $IsRelative;
+
     # prepare sql defintion
     my $SQLDef = $Self->_PrepareSQLDef(
         Backend  => $ObjectTypeBackend,
@@ -166,6 +169,8 @@ sub Search {
         Silent   => $Param{Silent}
     );
     return if ( ref( $SQLDef ) ne 'HASH' );
+
+    $IsRelative = delete( $SQLDef->{IsRelative} );
 
     # generate SQL statement
     my $SQL = $Self->_PrepareSQLStatement(
@@ -204,15 +209,15 @@ END
 
     # return COUNT
     if ( $Param{Result} eq 'COUNT' ) {
-        return scalar(@ObjectIDs);
+        return ( scalar(@ObjectIDs), $IsRelative );
     }
     # return HASH
     elsif ( $Param{Result} eq 'HASH' ) {
-        return \%Objects;
+        return ( \%Objects, $IsRelative );
     }
     # return ARRAY
     else {
-        return \@ObjectIDs;
+        return ( \@ObjectIDs, $IsRelative );
     }
 }
 
@@ -302,13 +307,14 @@ sub _PrepareSQLDef {
 
     # init sql def hash
     my %SQLDef = (
-        Select  => [],
-        From    => [],
-        Join    => [],
-        Where   => [],
-        GroupBy => [],
-        Having  => [],
-        OrderBy => []
+        Select     => [],
+        From       => [],
+        Join       => [],
+        Where      => [],
+        GroupBy    => [],
+        Having     => [],
+        OrderBy    => [],
+        IsRelative => 0
     );
 
     # init flags
@@ -366,7 +372,14 @@ sub _PrepareSQLDef {
 
         # add search def to sql def
         for my $Key ( keys %{ $SearchDef } ) {
-            push( @{ $SQLDef{ $Key } }, @{ $SearchDef->{ $Key } } );
+            if ( $Key eq 'IsRelative' ) {
+                if ( $SearchDef->{ $Key } ) {
+                    $SQLDef{ $Key } = $SearchDef->{ $Key };
+                }
+            }
+            else {
+                push( @{ $SQLDef{ $Key } }, @{ $SearchDef->{ $Key } } );
+            }
         }
     }
 

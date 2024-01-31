@@ -126,8 +126,9 @@ sub Search {
 
     # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Join       => \@SQLJoin,
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 

@@ -148,7 +148,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created = \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -174,7 +175,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created != \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -200,7 +202,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created < \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -226,7 +229,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created > \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -252,7 +256,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created <= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -278,7 +283,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.created >= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -304,7 +310,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed = \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -330,7 +337,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed != \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -356,7 +364,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed < \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -382,7 +391,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed > \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -408,7 +418,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed <= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -434,7 +445,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'f.changed >= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     }
 );
@@ -973,6 +985,60 @@ for my $Test ( @IntegrationSortTests ) {
         $Test->{Name}
     );
 }
+
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:02:00',
+    'Timestamp before first relative search'
+);
+my @FirstResult = $ObjectSearch->Search(
+    ObjectType => 'FAQArticle',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'ChangeTime',
+                Operator => 'LTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@FirstResult,
+    [$FAQArticleID1, $FAQArticleID2],
+    'Result of first relative search'
+);
+$Helper->FixedTimeAddSeconds(60);
+$TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:03:00',
+    'Timestamp before second relative search'
+);
+my @SecondResult = $ObjectSearch->Search(
+    ObjectType => 'FAQArticle',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'ChangeTime',
+                Operator => 'LTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@SecondResult,
+    [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3],
+    'Result of second relative search'
+);
 
 # reset fixed time
 $Helper->FixedTimeUnset();

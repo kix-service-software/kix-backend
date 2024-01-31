@@ -71,7 +71,8 @@ sub Search {
 
     # return search def
     return {
-        Where => [ $Condition ]
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 
