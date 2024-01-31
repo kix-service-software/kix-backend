@@ -238,7 +238,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix = 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -264,7 +265,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix <> 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -290,7 +292,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix < 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -316,7 +319,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix > 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -342,7 +346,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix <= 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -368,7 +373,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.create_time_unix >= 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -394,7 +400,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time = 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -420,7 +427,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time <> 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -446,7 +454,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time < 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -472,7 +481,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time > 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -498,7 +508,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time <= 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -524,7 +535,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.until_time >= 1388581200'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -550,7 +562,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time = \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -576,7 +589,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time != \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -602,7 +616,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time < \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -628,7 +643,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time > \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -654,7 +670,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time <= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -680,7 +697,8 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'st.change_time >= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     }
 );
@@ -1572,6 +1590,60 @@ for my $Test ( @IntegrationSortTests ) {
         $Test->{Name}
     );
 }
+
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:02:00',
+    'Timestamp before first relative search'
+);
+my @FirstResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'LastChangeTime',
+                Operator => 'LTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@FirstResult,
+    [$TicketID1,$TicketID2],
+    'Result of first relative search'
+);
+$Helper->FixedTimeAddSeconds(60);
+$TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:03:00',
+    'Timestamp before second relative search'
+);
+my @SecondResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'LastChangeTime',
+                Operator => 'LTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@SecondResult,
+    [$TicketID1,$TicketID2,$TicketID3],
+    'Result of second relative search'
+);
 
 # reset fixed time
 $Helper->FixedTimeUnset();
