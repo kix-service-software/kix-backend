@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -81,11 +81,24 @@ sub Run {
     # start loop
     foreach my $GeneralCatalogItemID ( @{$Param{Data}->{GeneralCatalogItemID}} ) {
 
-        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-            ClassIDs     => [$GeneralCatalogItemID],
+        my @ConfigItemID = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'ClassID',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => [$GeneralCatalogItemID]
+                    }
+                ]
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
-        if ( $ConfigItemID->[0] ) {
+        if ( $ConfigItemID[0] ) {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete GeneralCatalogItem. A ConfigItem with this GeneralCatalogItem already exists.',

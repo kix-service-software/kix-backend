@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,7 +41,7 @@ our %TypeMapping = (
     'GeneralCatalog'      => 'GeneralCatalog',
     'Integer'             => 'Text',
     'QueueReference'      => 'Text',
-    'ServiceReference'    => 'CIClassReference',
+    'ServiceReference'    => 'Text',
     'SLAReference'        => 'Text',
     'TextArea'            => 'TextArea',
     'TextLink'            => 'Text',

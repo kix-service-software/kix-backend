@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -352,6 +352,27 @@ sub _TicketCreate {
         $StateID = $StateObject->StateLookup(
             State => $Ticket->{State},
         );
+    }
+
+    if ( !$StateID ) {
+        # get default ticket state
+        my $DefaultTicketState = $Kernel::OM->Get('Config')->Get('Ticket::State::Default');
+
+        # check if default ticket state exists
+        my %AllTicketStates = reverse $StateObject->StateList( UserID => 1);
+
+        if ( $AllTicketStates{$DefaultTicketState} ) {
+            $StateID = $AllTicketStates{$DefaultTicketState};
+        }
+        else {
+            if ( $DefaultTicketState ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown default state \"$DefaultTicketState\" in config setting Ticket::State::Default!",
+                );
+            }
+            $StateID = 1;
+        }
     }
 
     %StateData = $StateObject->StateGet(

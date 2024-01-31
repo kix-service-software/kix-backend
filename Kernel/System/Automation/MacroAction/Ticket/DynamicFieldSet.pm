@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -150,34 +150,15 @@ sub _PrepareValue {
 
     my @NewValue;
     if (defined $Param{Config}->{DynamicFieldValue}) {
-        if ($Param{Config}->{DynamicFieldValue} =~ m/^<KIX_TICKET_DynamicField_(\w+?)>$/) {
-            my $DFName = $1;
-            $DFName =~ s/(\w+?)_.+/$1/;
-
-            if ($DFName) {
-                my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-                    Name => $DFName,
-                );
-
-                if ( IsHashRefWithData( $DynamicFieldConfig ) ) {
-                    my $ReplaceValue = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
-                        DynamicFieldConfig => $DynamicFieldConfig,
-                        ObjectID           => $Self->{RootObjectID} || $Param{TicketID},
-                    );
-                    if ($ReplaceValue) {
-                        if (IsArrayRefWithData($ReplaceValue)) {
-                            @NewValue = @{ $ReplaceValue };
-                        } else {
-                            @NewValue = ( $ReplaceValue );
-                        }
-                    }
-                }
-            }
-        } else {
-            my $Value = $Self->_ReplaceValuePlaceholder(
-                %Param,
-                Value => $Param{Config}->{DynamicFieldValue}
-            );
+        my $Value = $Self->_ReplaceValuePlaceholder(
+            %Param,
+            Translate                => 1,
+            Value                    => $Param{Config}->{DynamicFieldValue},
+            HandleKeyLikeObjectValue => 1,
+        );
+        if (IsArrayRefWithData($Value)) {
+            @NewValue = @{$Value};
+        } elsif (defined $Value) {
             @NewValue = ($Value);
         }
     }

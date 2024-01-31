@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -806,7 +806,7 @@ sub Send {
 
     # don't push notification for email at the moment
     # # push client callback event
-    # $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    # $Kernel::OM->Get('ClientNotification')->NotifyClients(
     #     Event     => 'CREATE',
     #     Namespace => 'Email',
     #     ObjectID  => $MessageID,

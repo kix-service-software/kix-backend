@@ -17,6 +17,7 @@
 "Agent User";"Resource";"/i18n";;"x";;;
 "Agent User";"Object";"/system/config/*{SysConfigOption.AccessLevel EQ confidential}";;;;;
 "Agent User";"Object";"/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}";;;;;
+"Agent User";"Resource";"/objectsearch";;"x";;;
 "Ticket Reader";"Resource";"/tickets";;"x";;;
 "Ticket Reader";"Resource";"/tickets/*/articles/*/flags";"x";"x";"x";"x";
 "Ticket Reader";"Resource";"/system/ticket/*";;;;;
@@ -251,8 +252,11 @@
 "Customer";"Object";"/system/config/*{SysConfigOption.AccessLevel NE external}";;;;;
 "Customer";"Property";"/tickets/*/articles{Article.[!*,TimeUnit]}";;;;;"x"
 "Customer";"Resource";"/system/templates/categories ";;"x";;;
-"Customer";"Resource";"/system/templates/categories/* ";;"x";;;
+"Customer";"Resource";"/system/templates/categories/*";;"x";;;
 "Customer";"Base::Ticket";"*";"x";"x";"x";"x";
+"Customer";"Resource";"/objectsearch";;"x";;;
+"Customer";"Resource";"/contacts";;"x";;;
+"Customer";"Object";"/contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}";;;;;
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;

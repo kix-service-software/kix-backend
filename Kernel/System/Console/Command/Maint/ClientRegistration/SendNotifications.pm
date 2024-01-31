@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -30,9 +30,9 @@ sub Run {
 
     $Self->Print("<yellow>Sending client notifications...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('ClientRegistration')->NotificationSend();
+    my $Result = $Kernel::OM->Get('ClientNotification')->NotificationSend();
     if ( !$Result ) {
-        $Self->PrintError("Unable to send notifications.\n");
+        $Self->PrintError("Unable to send client notifications.\n");
     }
     else {
         my $Message = $Kernel::OM->Get('Log')->GetLogEntry(

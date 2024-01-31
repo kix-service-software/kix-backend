@@ -1,5 +1,7 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# based on the original work of:
+# Copyright (C) 2001-2024 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -16,6 +18,7 @@ use Carp ();
 our @ObjectDependencies = (
     'Config',
     'Encode',
+    'Main'
 );
 
 =head1 NAME
@@ -69,12 +72,12 @@ sub new {
     $Self->{LogPrefix} .= '-' . $SystemID;
 
     # load log backend
-    # KIX4OTRS-capeIT
-    my $GenericModule = $ConfigObject->Get('SysConfigChangeLog::LogModule')
-        || 'Kernel::System::SysConfigChangeLog::SysLog';
+    my $GenericModule = 'Kernel::System::SysConfigChangeLog::File';
 
-    # EO KIX4OTRS-capeIT
-    if ( !eval "require $GenericModule" ) {    ## no critic
+    # get main object
+    my $MainObject = $Kernel::OM->Get('Main');
+
+    if ( !$MainObject->Require( $GenericModule ) ) {
         die "Can't load log backend module $GenericModule! $@";
     }
 
@@ -82,26 +85,6 @@ sub new {
     $Self->{Backend} = $GenericModule->new(
         %Param,
     );
-
-    return $Self if !eval "require IPC::SysV";    ## no critic
-
-    # create the IPC options
-    $Self->{IPC}     = 1;
-    $Self->{IPCKey}  = '444423' . $SystemID;
-
-    # KIX4OTRS-capeIT
-    # $Self->{IPCSize} = $ConfigObject->Get('LogSystemCacheSize') || 32 * 1024;
-    $Self->{IPCSize} = $ConfigObject->Get('SysConfigChangeLog::LogSystemCacheSize')
-        || 32 * 1024;
-
-    # EO KIX4OTRS-capeIT
-
-    # init session data mem
-    if ( !eval { $Self->{Key} = shmget( $Self->{IPCKey}, $Self->{IPCSize}, oct(1777) ) } ) {
-        $Self->{Key} = shmget( $Self->{IPCKey}, 1, oct(1777) );
-        $Self->CleanUp();
-        $Self->{Key} = shmget( $Self->{IPCKey}, $Self->{IPCSize}, oct(1777) );
-    }
 
     return $Self;
 }
@@ -133,6 +116,38 @@ Normal but significant condition; events that are unusual but not error conditio
 Error conditions. Non-urgent failures, should be relayed to developers or admins, each item must be resolved.
 
 =back
+
+    $LogObject->Log(
+        Priority => 'error',
+        Message  => "Need something!",
+    );
+
+=cut
+
+sub Log {
+    my ( $Self, %Param ) = @_;
+
+    my $Priority = lc( $Param{Priority} ) || 'debug';
+    my $Message  = $Param{MSG}            || $Param{Message} || '???';
+    my $Caller   = $Param{Caller}         || 0;
+
+    # returns the context of the current subroutine and sub-subroutine!
+    my ( $Package1, $Filename1, $Line1, $Subroutine1 ) = caller( $Caller + 0 );
+    my ( $Package2, $Filename2, $Line2, $Subroutine2 ) = caller( $Caller + 1 );
+
+    $Subroutine2 ||= $0;
+
+    # log backend
+    $Self->{Backend}->Log(
+        Priority  => $Priority,
+        Message   => $Message,
+        LogPrefix => $Self->{LogPrefix},
+        Module    => $Subroutine2,
+        Line      => $Line1,
+    );
+
+    return 1;
+}
 
 =head1 TERMS AND CONDITIONS
 

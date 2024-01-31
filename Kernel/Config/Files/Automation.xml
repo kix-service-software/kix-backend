@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="Automation::MinimumLogLevel" Required="1" Valid="1">
+        <Description Translatable="1">Set minimum loglevel for the automation layer. If you select 'error', just errors are logged. With 'debug' you get all logging messages.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Option SelectedID="error">
+                <Item Key="error" Translatable="1">error</Item>
+                <Item Key="notice" Translatable="1">notice</Item>
+                <Item Key="info" Translatable="1">info</Item>
+                <Item Key="debug" Translatable="1">debug</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::Logging###Default" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a logging module for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Automation::Logging::Default</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable Automation debugging.</Description>
+        <Group>Automation</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Synchronisation" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Synchronisation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Reporting" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Reporting</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Reporting</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Contact" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a job type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Contact</Item>
+                <Item Key="Module">Kernel::System::Automation::Job::Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Synchronisation" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Synchronisation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Reporting" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Reporting</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Reporting</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Contact" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Contact</Item>
+                <Item Key="Module">Kernel::System::Automation::Macro::Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanType###EventBased" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Event Based</Item>
+                <Item Key="Module">Kernel::System::Automation::ExecPlan::EventBased</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanType###TimeBased" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Time Based</Item>
+                <Item Key="Module">Kernel::System::Automation::ExecPlan::TimeBased</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###Loop" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Loop</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Loop</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExecuteMacro" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Execute Macro</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExecuteMacro</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExtractText" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Extract Text</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExtractText</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###AssembleObject" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Assemble Object</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::AssembleObject</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###CreateReport" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Create Report</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::CreateReport</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###VariableSet" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Set Variable</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::VariableSet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###Conditional" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Conditional</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Conditional</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroReferenceObject###Job" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a object (module) which uses macros.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanReferenceObject###Job" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a object (module) which uses exec plans.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation</String>
+        </Setting>
+    </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###100-DateUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::DateUtil</String>
+        </Setting>
+    </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###XMLUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::XMLUtil</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerAutomationTaskManager" Required="1" Valid="1">
+        <Description Translatable="1">The daemon registration for the scheduler automation task manager.</Description>
+        <Group>Automation</Group>
+
+        <SubGroup>Core::Daemon::ModuleRegistration</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Daemon::DaemonModules::SchedulerAutomationTaskManager</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile1" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationFile1</Item>
+                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--configuration-module</Item>
+                        <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile2" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationFile2</Item>
+                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--configuration-module</Item>
+                        <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile3" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationFile3</Item>
+                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--configuration-module</Item>
+                        <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile4" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationFile4</Item>
+                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--configuration-module</Item>
+                        <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile5" Required="0" Valid="0" ConfigLevel="100">
+        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationFile5</Item>
+                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--configuration-module</Item>
+                        <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

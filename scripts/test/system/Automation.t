@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -12,9 +12,6 @@ use utf8;
 
 use vars (qw($Self));
 
-# get Job object
-my $AutomationObject = $Kernel::OM->Get('Automation');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -24,7 +21,7 @@ $Helper->BeginWork();
 # create test job
 my $JobName  = 'job-'.$Helper->GetRandomID();
 
-my $JobID = $AutomationObject->JobAdd(
+my $JobID = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => $JobName,
     Type    => 'Ticket',
     ValidID => 1,
@@ -39,7 +36,7 @@ $Self->True(
 # create test macro
 my $MacroName  = 'macro-'.$Helper->GetRandomID();
 
-my $MacroID = $AutomationObject->MacroAdd(
+my $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
     Name    => $MacroName,
     Type    => 'Ticket',
     ValidID => 1,
@@ -54,7 +51,7 @@ $Self->True(
 my $Result;
 
 # no parameters
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     Silent => 1,
 );
 
@@ -64,7 +61,7 @@ $Self->False(
 );
 
 # no UserID
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     Message => 'test',
     Silent  => 1,
 );
@@ -75,7 +72,7 @@ $Self->False(
 );
 
 # no Message
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     UserID => 1,
     Silent => 1,
 );
@@ -86,7 +83,7 @@ $Self->False(
 );
 
 # with Message and UserID
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     Message => 'test',
     UserID  => 1,
     Silent  => 1,
@@ -98,7 +95,7 @@ $Self->True(
 );
 
 # with Referrer (JobID)
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     Referrer => {
         JobID => $JobID,
     },
@@ -113,7 +110,7 @@ $Self->True(
 );
 
 # with Referrer (JobID+MacroID)
-$Result = $AutomationObject->LogError(
+$Result = $Kernel::OM->Get('Automation')->LogError(
     Referrer => {
         JobID   => $JobID,
         MacroID => $MacroID,
@@ -128,8 +125,6 @@ $Self->True(
     'LogError() without Referrer (JobID+MacroID)',
 );
 
-my $LogObject = $Kernel::OM->Get('Log');
-
 # check logging
 foreach my $MinimumLogLevel ( qw( error notice info debug) ) {
     # set in Config
@@ -142,16 +137,21 @@ foreach my $MinimumLogLevel ( qw( error notice info debug) ) {
         "Set Automation::MinimumLogLevel to \"$MinimumLogLevel\"",
     );
 
+    # discard object after changing minimum log level
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Automation'],
+    );
+
     my $MinimumLogLevel = $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel') || 'error';
-    my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
+    my $MinimumLogLevelNum = $Kernel::OM->Get('Log')->GetNumericLogLevel( Priority => $MinimumLogLevel);
 
     foreach my $Priority ( qw( error notice info debug) ) {
 
-        my $LogCountBefore = $AutomationObject->GetLogCount();
+        my $LogCountBefore = $Kernel::OM->Get('Automation')->GetLogCount();
 
-        my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Priority );
+        my $PriorityNum = $Kernel::OM->Get('Log')->GetNumericLogLevel( Priority => $Priority );
 
-        my $Result = $AutomationObject->_Log(
+        my $Result = $Kernel::OM->Get('Automation')->_Log(
             Message  => "logging with priority \"$Priority\" and MinLogLevel \"$MinimumLogLevel\"",
             Priority => $Priority,
             UserID   => 1,
@@ -161,7 +161,7 @@ foreach my $MinimumLogLevel ( qw( error notice info debug) ) {
             "_Log() with priority \"$Priority\" returns 1",
         );
 
-        my $LogCount = $AutomationObject->GetLogCount();
+        my $LogCount = $Kernel::OM->Get('Automation')->GetLogCount();
 
         if ( $PriorityNum >= $MinimumLogLevelNum ) {
             $Self->True(

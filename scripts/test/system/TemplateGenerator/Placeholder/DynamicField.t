@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -117,6 +117,12 @@ for my $Field ( sort keys %DFFields ) {
                 Test      => "<KIX_TICKET_DynamicField_" . $Field . "_ObjectValue_0>",
                 Expection => $Expection{All},
             },
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "!>",
+                Expection => $Expection{All},
+            },
         )
     }
     else {
@@ -134,6 +140,15 @@ for my $Field ( sort keys %DFFields ) {
                 }
             )
         }
+        push (
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "!>",
+                Expection => $Expection{ObjectValue}->{undef},
+            }
+        )
     }
 }
 
@@ -155,11 +170,20 @@ sub _TestRun {
 
         );
 
-        $Self->Is(
-            $Result,
-            $Test->{Expection},
-            $Test->{TestName}
-        );
+        if ( IsStringWithData($Test->{Expection}) ) {
+            $Self->Is(
+                $Result,
+                $Test->{Expection},
+                $Test->{TestName}
+            );
+        }
+        else {
+            $Self->IsDeeply(
+                $Result,
+                $Test->{Expection},
+                $Test->{TestName}
+            );
+        }
     }
 
     return 1;
@@ -275,6 +299,11 @@ sub _CreateDynamicField {
             Value                => 'Unit Test Text',
             Expection            => {
                 All => 'Unit Test Text',
+                ObjectValue => {
+                    undef => [
+                        'Unit Test Text',
+                    ]
+                },
             }
         },
         {
@@ -298,6 +327,16 @@ Unit
 Test
 TextArea
 END
+                HTML => 'Unit<br>Test<br>TextArea<br>',
+                ObjectValue => {
+                    undef => [
+<<'END',
+Unit
+Test
+TextArea
+END
+                    ],
+                }
             }
         },
         {
@@ -329,7 +368,10 @@ END
                 Value       => 'Kunde, Service Provider',
                 HTML        => 'Kunde, Service Provider',
                 ObjectValue => {
-                    undef => 'customer',
+                    undef => [
+                        'customer',
+                        'service provider'
+                    ],
                     0     => 'customer',
                     1     => 'service provider'
                 }
@@ -353,7 +395,9 @@ END
                 Key         => "CheckList$Number<br />- task 1: -<br />- task 2: -<br />- task 3: -<br /><br />",
                 HTML        => "<h3>CheckList$Number</h3><table style=\"border:none; width:90%\"><thead><tr><th style=\"padding:10px 15px;\">Action</th><th style=\"padding:10px 15px;\">State</th><tr></thead><tbody><tr><td style=\"padding:10px 15px;\">task 1</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 2</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 3</td><td style=\"padding:10px 15px;\">-</td></tr></tbody></table>",
                 ObjectValue => {
-                    undef => '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
+                    undef => [
+                        '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
+                    ],
                     0     => '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
                 }
             }
@@ -376,7 +420,9 @@ END
             Expection            => {
                 All         => $DateTime,
                 ObjectValue => {
-                    undef => $CurrTime
+                    undef => [
+                        $CurrTime
+                    ]
                 }
             }
         },
@@ -398,7 +444,9 @@ END
             Expection            => {
                 All         => $Date,
                 ObjectValue => {
-                    undef => $CurrDate
+                    undef => [
+                        $CurrDate
+                    ]
                 }
             }
         },
@@ -425,7 +473,9 @@ END
                 Key         => $Param{ConfigItemID},
                 Short       => $Version->{Name},
                 ObjectValue => {
-                    undef => $Param{ConfigItemID},
+                    undef => [
+                        $Param{ConfigItemID},
+                    ],
                     0     => $Param{ConfigItemID},
                 }
             }
@@ -478,7 +528,9 @@ END
 </table>
 END
                 ObjectValue => {
-                    undef => '[["Value 1.0","","Value 3.0"],["Value 1.1","Value 2.1",""],["","Value 2.2",""]]',
+                    undef => [
+                        '[["Value 1.0","","Value 3.0"],["Value 1.1","Value 2.1",""],["","Value 2.2",""]]',
+                    ],
                     0     => '[["Value 1.0","","Value 3.0"],["Value 1.1","Value 2.1",""],["","Value 2.2",""]]',
                 }
             }

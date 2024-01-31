@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,11 +15,12 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'Config',
-    'PID',
-    'Ticket',
-    'Time',
+our @ObjectDependencies = qw(
+    Config
+    PID
+    Ticket
+    Time
+    ObjectSearch
 );
 
 sub Configure {
@@ -110,10 +111,20 @@ sub Run {
     my %SearchParams;
 
     if ( $Self->GetOption('tickets-closed-before-date') ) {
-        %SearchParams = (
-            StateType                => 'Closed',
-            TicketCloseTimeOlderDate => $Self->GetOption('tickets-closed-before-date'),
-        );
+        $SearchParams{Search}->{AND} = [
+            {
+                Field    => 'StateType',
+                Operator => 'EQ',
+                Type     => 'STRING',
+                Value    => 'Closed'
+            },
+            {
+                Field    => 'CloseTime',
+                Operator => 'LTE',
+                Type     => 'STRING',
+                Value    => $Self->GetOption('tickets-closed-before-date')
+            }
+        ];
     }
     elsif ( $Self->GetOption('tickets-closed-before-days') ) {
         my $Seconds = $Self->GetOption('tickets-closed-before-days') * 60 * 60 * 24;
@@ -122,22 +133,28 @@ sub Run {
         $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $TimeStamp,
         );
-
-        %SearchParams = (
-            StateType                => 'Closed',
-            TicketCloseTimeOlderDate => $TimeStamp,
-        );
+        $SearchParams{Search}->{AND} = [
+            {
+                Field    => 'StateType',
+                Operator => 'EQ',
+                Type     => 'STRING',
+                Value    => 'Closed'
+            },
+            {
+                Field    => 'CloseTime',
+                Operator => 'LTE',
+                Type     => 'STRING',
+                Value    => $TimeStamp
+            }
+        ];
     }
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my @TicketIDs = $TicketObject->TicketSearch(
-        %SearchParams,
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'ARRAY',
-        OrderBy    => 'Up',
-        Limit      => 1_000_000_000,
         UserID     => 1,
-        Permission => 'ro',
+        UserType   => 'Agent',
+        %SearchParams
     );
 
     my $Count      = 0;
@@ -159,7 +176,7 @@ sub Run {
 
         $Self->Print("$Count/$CountTotal (TicketID:$TicketID)\n");
 
-        my $Success = $TicketObject->TicketArticleStorageSwitch(
+        my $Success = $Kernel::OM->Get('Ticket')->TicketArticleStorageSwitch(
             TicketID    => $TicketID,
             Source      => $Target2Source{$Target},
             Destination => $Target,
@@ -168,7 +185,9 @@ sub Run {
 
         return $Self->ExitCodeError() if !$Tolerant && !$Success;
 
-        Time::HiRes::usleep($MicroSleep) if ($MicroSleep);
+        if ( $MicroSleep ) {
+            Time::HiRes::usleep($MicroSleep);
+        }
     }
 
     $Self->Print("<green>Done.</green>\n");

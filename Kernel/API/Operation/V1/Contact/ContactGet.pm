@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -175,7 +175,7 @@ sub _GetContactData {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $ContactData{$Attribute} ) {
-                    
+
                     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                         Name => $1,
                     );
@@ -227,8 +227,9 @@ sub _GetContactData {
         # execute ticket searches
         my %TicketStats;
         # new tickets
-        $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{NewCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',
@@ -242,12 +243,14 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
         # open tickets
-        $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{OpenCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',
@@ -261,12 +264,14 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
         # pending tickets
-        $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-            Search => {
+        $TicketStats{PendingReminderCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Search     => {
                 AND => [
                     {
                         Field    => 'ContactID',
@@ -280,8 +285,9 @@ sub _GetContactData {
                     },
                 ]
             },
-            UserID => $Self->{Authorization}->{UserID},
-            Result => 'COUNT',
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType},
+            Result   => 'COUNT',
         );
 
         $ContactData{TicketStats} = \%TicketStats;
@@ -292,61 +298,56 @@ sub _GetContactData {
     }
 
     # include assigned user if requested (and existing)
-
-    #FIXME: workaround KIX2018-3308####################
-    $Self->AddCacheDependency(Type => 'User');
-    my $UserData;
-    if ($ContactData{AssignedUserID}) {
-        $UserData = $Self->ExecOperation(
-            OperationType => 'V1::User::UserGet',
-            Data          => {
-                UserID => $ContactData{AssignedUserID},
-            }
-        );
-    }
-    $ContactData{Login} = ($UserData && $UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
-    #######################
-
-    #comment back in when 3308 is resolved properly
     if ($Param{Data}->{include}->{User}) {
-        # $Self->AddCacheDependency( Type => 'User' );
-        # $ContactData{User} = undef;
-        # if ($ContactData{AssignedUserID}) {
-        #     my $UserData = $Self->ExecOperation(
-        #         OperationType => 'V1::User::UserGet',
-        #         Data          => {
-        #             UserID => $ContactData{AssignedUserID},
-        #         }
-        #     );
-            $ContactData{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-        # }
+        $Self->AddCacheDependency( Type => 'User' );
+        my $UserData = {};
+        if ($ContactData{AssignedUserID}) {
+            $UserData = $Self->ExecOperation(
+                OperationType => 'V1::User::UserGet',
+                Data          => {
+                    UserID => $ContactData{AssignedUserID},
+                }
+            );
+        }
+        $ContactData{User}  = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
+        $ContactData{Login} = ($UserData->{Success}) ? $UserData->{Data}->{User}->{UserLogin} : undef;
+    }
+
+    # else get only user login (KIX2018-3308)
+    else {
+        $ContactData{Login} = undef;
+        if ($ContactData{AssignedUserID}) {
+            $ContactData{Login} = $Kernel::OM->Get('User')->UserLookup(
+                UserID => $ContactData{AssignedUserID},
+                Silent => 1
+            );
+        }
     }
 
     # include assigned config items if requested
     if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
-        # add user data for
-        my %CIContact = %ContactData;
-        if (!$CIContact{User} && $CIContact{AssignedUserID}) {
-            my $UserData = $Self->ExecOperation(
-                OperationType => 'V1::User::UserGet',
-                Data          => {
-                    UserID => $CIContact{AssignedUserID},
-                }
-            );
-            $CIContact{User} = ($UserData->{Success}) ? $UserData->{Data}->{User} : undef;
-            $Self->AddCacheDependency(Type => 'User');
-        }
-
-        my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-            ObjectType => 'Contact',
-            Object     => \%CIContact
+        my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'AssignedContact',
+                        Operator => 'EQ',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{ID}
+                    },
+                ]
+            },
+            UserID   => $Self->{Authorization}->{UserID},
+            UserType => $Self->{Authorization}->{UserType}
         );
 
         # filter for customer assigned config items if necessary
         my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
             ObjectType   => 'ConfigItem',
-            ObjectIDList => $ItemIDs
+            ObjectIDList => \@ItemIDs
         );
 
         $ContactData{AssignedConfigItems} = \@ConfigItemIDList;

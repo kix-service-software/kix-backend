@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -28,6 +28,16 @@ Kernel::API::Operation::Organisation::OrganisationTicketSearch - API Organisatio
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item ParameterDefinition()
 
@@ -83,8 +93,9 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform ticket search
-    my @TicketList = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Search => {
+    my @TicketList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Search     => {
             AND => [
                 {
                     Field    => 'OrganisationID',
@@ -93,29 +104,33 @@ sub Run {
                 }
             ]
         },
-        UserID => $Self->{Authorization}->{UserID},
-        Result => 'ARRAY',
+        UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
+        Result   => 'ARRAY',
     );
 
-    if (IsArrayRefWithData(\@TicketList)) {
+    if (@TicketList) {
 
         # get already prepared Ticket data from TicketGet operation
         my $TicketGetResult = $Self->ExecOperation(
             OperationType => 'V1::Ticket::TicketGet',
             Data          => {
-                TicketID => [ sort @TicketList ],
+                TicketID => join(q{,}, @TicketList),
             }
         );
+
         if ( !IsHashRefWithData($TicketGetResult) || !$TicketGetResult->{Success} ) {
             return $TicketGetResult;
         }
 
-        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket}) ? @{$TicketGetResult->{Data}->{Ticket}} : ( $TicketGetResult->{Data}->{Ticket} );
+        my @ResultList = IsArrayRef($TicketGetResult->{Data}->{Ticket})
+            ? @{$TicketGetResult->{Data}->{Ticket}}
+            : ( $TicketGetResult->{Data}->{Ticket} );
 
         if ( IsArrayRefWithData(\@ResultList) ) {
             return $Self->_Success(
                 Ticket => \@ResultList,
-            )
+            );
         }
     }
 

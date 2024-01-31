@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -81,6 +81,7 @@ sub Run {
         HistoryType      => 'FollowUp',
         HistoryComment   => "\%\%$Param{Tn}\%\%$Comment",
         OrigHeader       => \%GetParam,
+        DoNotSendEmail   => 1
     );
     if ( !$ArticleID ) {
         return;
@@ -134,9 +135,25 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
-        my $Key = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
 
-        if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
+        my $Key;
+        my $CheckKey  = 'X-KIX-FollowUp-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey2 = 'X-KIX-FollowUp-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
+
+        if (
+            defined( $GetParam{ $CheckKey } )
+            && length( $GetParam{ $CheckKey } )
+        ) {
+            $Key = $CheckKey;
+        }
+        elsif (
+            defined( $GetParam{ $CheckKey2 } )
+            && length( $GetParam{ $CheckKey2 } )
+        ) {
+            $Key = $CheckKey2;
+        }
+
+        if ( $Key ) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(

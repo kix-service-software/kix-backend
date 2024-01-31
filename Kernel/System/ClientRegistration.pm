@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -33,7 +33,7 @@ Kernel::System::ClientRegistration
 
 =head1 SYNOPSIS
 
-Add address book functions.
+Add client registration functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -60,7 +60,6 @@ sub new {
 
     # get needed objects
     $Self->{ConfigObject} = $Kernel::OM->Get('Config');
-    $Self->{DBObject}     = $Kernel::OM->Get('DB');
     $Self->{LogObject}    = $Kernel::OM->Get('Log');
 
     $Self->{CacheType} = 'ClientRegistration';
@@ -105,7 +104,7 @@ sub ClientRegistrationGet {
     );
     return %{$Cache} if $Cache;
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => "SELECT client_id, notification_url, notification_authorization, additional_data FROM client_registration WHERE client_id = ?",
         Bind => [ \$Param{ClientID} ],
     );
@@ -113,7 +112,7 @@ sub ClientRegistrationGet {
     my %Data;
 
     # fetch the result
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         %Data = (
             ClientID                  => $Row[0],
             NotificationURL           => $Row[1],
@@ -189,7 +188,7 @@ sub ClientRegistrationAdd {
     );
 
     # do the db insert...
-    my $Result = $Self->{DBObject}->Do(
+    my $Result = $Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO client_registration (client_id, notification_url, notification_authorization, additional_data) VALUES (?, ?, ?, ?)",
         Bind => [
             \$Param{ClientID},
@@ -251,12 +250,12 @@ sub ClientRegistrationList {
         $SQL .= ' WHERE notification_url IS NOT NULL'
     }
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL,
     );
 
     my @Result;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Data[0]);
     }
 
@@ -316,277 +315,16 @@ sub ClientRegistrationDelete {
 
 =item NotifyClients()
 
-Pushes a notification event to inform the clients
-
-    my $Result = $ClientRegistrationObject->NotifyClients(
-        Event     => 'CREATE|UPDATE|DELETE',             # required
-        Namespace => 'Ticket.Article',                   # required
-        ObjectID  => '...'                               # optional
-    );
+This method has been moved to ClientNotification and this is only a fallback
 
 =cut
 
 sub NotifyClients {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    for (qw(Event Namespace)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
+    print STDERR "ATTENTION: call to obsolete ClientRegistration::NotifyClients!\n";
 
-    return if $Self->{DisableClientNotifications};
-
-    my $Timestamp = Time::HiRes::time();
-
-    # get RequestID
-    my $cgi = CGI->new;
-    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    my $RequestID = $Headers{HTTP_KIX_REQUEST_ID} || '';
-
-    $Kernel::OM->Get('Cache')->Set(
-        Type          => 'ClientNotification',
-        Key           => $$.'_'.$Timestamp.'_'.$RequestID,
-        Value         => {
-            ID => $$.'_'.$Timestamp.'_'.$RequestID,
-            %Param,
-        },
-        NoStatsUpdate => 1,
-    );
-
-    $Self->{NotificationCount}++;
-
-    return 1;
-}
-
-=item NotificationCount()
-
-return the number of outstanding client notifications
-
-    my $Count = $ClientRegistrationObject->NotificationCount();
-
-=cut
-
-sub NotificationCount {
-    my ( $Self, %Param ) = @_;
-
-    return 0 if $Self->{DisableClientNotifications};
-
-    return $Self->{NotificationCount};
-}
-
-=item NotificationSend()
-
-send notifications to all clients who want to receive notifications
-
-    my $Result = $ClientRegistrationObject->NotificationSend(
-        Async => 0|1,       # optional, default 0
-    );
-
-=cut
-
-sub NotificationSend {
-    my ( $Self, %Param ) = @_;
-
-    return if $Self->{DisableClientNotifications};
-
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
-    # get cached events
-    my @Keys = $CacheObject->GetKeysForType(
-        Type => 'ClientNotification',
-    );
-    return 1 if !@Keys;
-
-    my @EventList = $CacheObject->GetMulti(
-        Type          => 'ClientNotification',
-        Keys          => \@Keys,
-        UseRawKey     => 1,
-        NoStatsUpdate => 1,
-    );
-    return 1 if !@EventList;
-    
-    # delete the cached events we sent
-    foreach my $Key ( @Keys ) {
-        $CacheObject->Delete(
-            Type          => 'ClientNotification',
-            Key           => $Key,
-            UseRawKey     => 1,
-            NoStatsUpdate => 1,
-        );
-    }
-
-
-    # get list of clients that requested to be notified
-    my @ClientIDs = $Self->ClientRegistrationList(
-        Notifiable => 1
-    );
-    return if !@ClientIDs;
-
-    # inform the daemon worker of the work to be done
-    $Kernel::OM->Get('Cache')->Set(
-        Type          => 'ClientNotificationToSend',
-        Key           => $$.Time::HiRes::time(),
-        Value         => {
-            EventList => \@EventList,
-            ClientIDs => \@ClientIDs
-        },
-        NoStatsUpdate => 1,
-    );
-
-    return 1;
-}
-
-sub NotificationSendWorker {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ClientIDs EventList)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    my %Stats;
-    my @PreparedEventList;
-    foreach my $Item ( @{$Param{EventList}} ) {
-        next if !$Item->{Event};
-        push @PreparedEventList, $Item;
-        $Stats{lc($Item->{Event})}++;
-    }
-    my @StatsParts;
-    foreach my $Event ( sort keys %Stats ) {
-        push(@StatsParts, "$Stats{$Event} $Event".'s');
-    }
-
-    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "[ClientNotification] sending client notifications: ".Data::Dumper::Dumper(\%Param)
-        );
-    }
-
-    foreach my $ClientID ( @{$Param{ClientIDs}} ) {
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').'
-        );
-
-        $Self->_NotificationSendToClient(
-            ClientID  => $ClientID,
-            EventList => \@PreparedEventList,
-        );
-    }
-
-    return 1;
-}
-
-sub _NotificationSendToClient {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ClientID EventList)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # get the registration of the client
-    my %ClientRegistration = $Self->ClientRegistrationGet(
-        ClientID => $Param{ClientID}
-    );
-
-    # don't use Crypt::SSLeay but IO::Socket::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
-
-    if ( !$Self->{UserAgent} ) {
-        my $ConfigObject       = $Kernel::OM->Get('Config');
-        my $WebUserAgentObject = $Kernel::OM->Get('WebUserAgent');
-
-        # create user agent with short timeout
-        $Self->{UserAgent} = LWP::UserAgent->new(timeout => 10);
-
-        # set user agent
-        $Self->{UserAgent}->agent(
-            $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
-        );
-
-        # set timeout
-        $Self->{UserAgent}->timeout( $WebUserAgentObject->{Timeout} );
-
-        # disable SSL host verification
-        if ( $ConfigObject->Get('WebUserAgent::DisableSSLVerification') ) {
-            $Self->{UserAgent}->ssl_opts(
-                verify_hostname => 0,
-            );
-        }
-
-        # set proxy
-        if ( $WebUserAgentObject->{Proxy} ) {
-            $Self->{UserAgent}->proxy( [ 'http', 'https', 'ftp' ], $WebUserAgentObject->{Proxy} );
-        }
-    }
-
-    my $Request = HTTP::Request->new('POST', $ClientRegistration{NotificationURL});
-    $Request->header('Content-Type' => 'application/json');
-    if ( $ClientRegistration{Authorization} ) {
-        $Request->header('Authorization' => $ClientRegistration{Authorization});
-    }
-
-    my $JSON = $Kernel::OM->Get('JSON')->Encode(
-        Data => $Param{EventList},
-    );
-    $Request->content($JSON);
-    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "[ClientNotification] executing request to client: ".$Request->as_string()
-        );
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "[ClientNotification] LWP object: ".Data::Dumper::Dumper($Self->{UserAgent})
-        );
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "[ClientNotification] ENV: ".Data::Dumper::Dumper(\%ENV)
-        );
-    }
-    my $Response = $Self->{UserAgent}->request($Request);
-
-    if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
-            Priority => 'debug',
-            Message  => "[ClientNotification] client response: ".$Response->as_string()
-        );
-    }
-
-    if ( !$Response->is_success ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with error ".$Response->status_line.".",
-        );
-        return 0;
-    }
-
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'debug',
-        Message  => "Client \"$Param{ClientID}\" ($ClientRegistration{NotificationURL}) responded with success ".$Response->status_line.".",
-    );
-
-    return 1;
+    return $Kernel::OM->Get('ClientNotification')->NotifyClients(%Param);
 }
 
 1;

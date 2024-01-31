@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -142,15 +142,6 @@ sub Run {
         );
         if ( $SLA{Calendar} ) {
             $Ticket{Calendar} = $SLA{Calendar};
-        }
-    }
-
-    if ( !$Ticket{Calendar} && $Ticket{QueueID} ) {
-        my %Queue = $Self->{QueueObject}->QueueGet(
-            ID => $Ticket{QueueID},
-        );
-        if ( $Queue{Calendar} ) {
-            $Ticket{Calendar} = $Queue{Calendar};
         }
     }
 

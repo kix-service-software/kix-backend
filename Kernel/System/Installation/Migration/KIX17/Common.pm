@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -155,7 +155,10 @@ sub GetSourceData {
     my $Description = $Self->Describe();
     if ( IsArrayRefWithData($Data) && ((IsHashRefWithData($Description) && IsHashRefWithData($Description->{Depends})) || IsHashRefWithData($Param{References})) ) {
         my %Deps = %{$Param{References} || $Description->{Depends}};
+        DATA:
         foreach my $Item ( @{$Data} ) {
+            next DATA if !IsHashRefWithData($Item);
+
             foreach my $Dep ( sort keys %Deps ) {
                 next if !$Item->{$Dep};
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -84,6 +84,36 @@ sub Describe {
         Name        => 'Bcc',
         Label       => Kernel::Language::Translatable('Bcc'),
         Description => Kernel::Language::Translatable('(Optional) The email addresses of the Bcc receiver of the new article.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'ReplyTo',
+        Label       => Kernel::Language::Translatable('ReplyTo'),
+        Description => Kernel::Language::Translatable('(Optional) The email address an answer should be send to of the new article.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'DoNotSendEmail',
+        Label       => Kernel::Language::Translatable('DoNotSendEmail'),
+        Description => Kernel::Language::Translatable('(Optional) Prevent sending of the new article by the system.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'MessageID',
+        Label       => Kernel::Language::Translatable('MessageID'),
+        Description => Kernel::Language::Translatable('(Optional) The message id of the new article.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'InReplyTo',
+        Label       => Kernel::Language::Translatable('InReplyTo'),
+        Description => Kernel::Language::Translatable('(Optional) A message id the new article is a reply to.'),
+        Required    => 0,
+    );
+    $Self->AddOption(
+        Name        => 'References',
+        Label       => Kernel::Language::Translatable('References'),
+        Description => Kernel::Language::Translatable('(Optional) Message ids of references of the new article.'),
         Required    => 0,
     );
     $Self->AddOption(

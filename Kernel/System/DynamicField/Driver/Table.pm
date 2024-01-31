@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -15,12 +15,12 @@ use base qw(Kernel::System::DynamicField::Driver::Base);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'DynamicFieldValue',
-    'Log',
-    'Main',
-    'JSON'
+our @ObjectDependencies = qw(
+    Config
+    DynamicFieldValue
+    Log
+    Main
+    JSON
 );
 
 =head1 NAME
@@ -49,14 +49,11 @@ sub new {
     my $ConfigObject = $Kernel::OM->Get('Config');
     my $MainObject   = $Kernel::OM->Get('Main');
 
-    # set field behaviors
-    $Self->{Behaviors} = {
-        'IsACLReducible'               => 0,
-        'IsNotificationEventCondition' => 0,
-        'IsSortable'                   => 0,
-        'IsFilterable'                 => 0,
-        'IsStatsCondition'             => 0,
-        'IsCustomerInterfaceCapable'   => 1,
+    # set field properties
+    $Self->{Properties} = {
+        'IsSearchable'    => 0,
+        'IsSortable'      => 0,
+        'SearchOperators' => []
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -83,12 +80,12 @@ sub new {
             }
         }
 
-        # check if extension contains more behaviors
-        if ( IsHashRefWithData( $Extension->{Behaviors} ) ) {
+        # check if extension contains more properties
+        if ( IsHashRefWithData( $Extension->{Properties} ) ) {
 
-            %{ $Self->{Behaviors} } = (
-                %{ $Self->{Behaviors} },
-                %{ $Extension->{Behaviors} }
+            %{ $Self->{Properties} } = (
+                %{ $Self->{Properties} },
+                %{ $Extension->{Properties} }
             );
         }
     }
@@ -249,44 +246,21 @@ sub ValueIsDifferent {
     );
 }
 
-sub SearchSQLGet {
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
+    return {
+        Column => "$Param{TableAlias}.value_text"
+    };
+}
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+sub SearchSQLSortFieldGet {
+    my ( $Self, %Param ) = @_;
 
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
-        $SQL .= $DBObject->Quote( $Param{SearchTerm} ) . "' ";
-        return $SQL;
-    }
-
-    if ( $Param{Operator} eq 'Like' ) {
-
-        my $SQL = $DBObject->QueryCondition(
-            Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
-        );
-
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
+    return {
+        Select  => ["$Param{TableAlias}.value_text"],
+        OrderBy => ["$Param{TableAlias}.value_text"]
+    };
 }
 
 sub ReadableValueRender {

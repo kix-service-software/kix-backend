@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -59,20 +59,6 @@ sub ValueLookup {
     my $Self = shift;
 
     return '';
-}
-
-=item StatsAttributeCreate()
-
-create a attribute array for the stats framework
-
-    my $Attribute = $BackendObject->StatsAttributeCreate();
-
-=cut
-
-sub StatsAttributeCreate {
-    my $Self = shift;
-
-    return;
 }
 
 =item ExportSearchValuePrepare()

@@ -105,7 +105,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SysConfig::SysConfigOptionDefinitionDelete" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SysConfigOptionDefinitionDelete</Item>

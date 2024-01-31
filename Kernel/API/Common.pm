@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -94,6 +94,44 @@ sub _Error {
         %Param,
     };
 }
+
+=item _MetricAdd()
+
+add a new metric
+
+    $ProviderObject->_MetricAdd(
+        Response => $FunctionResult,
+    );
+
+=cut
+
+sub _MetricAdd {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->{Metric};
+
+    $Self->{Metric}->{RequestMethod} = $Self->{ProcessedRequest}->{RequestMethod};
+    $Self->{Metric}->{Resource}      = $Self->{ProcessedRequest}->{RequestURI};
+
+    if ( $Param{Response} && $Param{Response}->{ContentLength} ) {
+        $Self->{Metric}->{OutBytes} = $Param{Response}->{ContentLength};
+    }
+
+    if ( $Param{Response} && $Param{Response}->{Code} ) {
+        $Self->{Metric}->{HTTPCode} = $Param{Response}->{Code};
+    }
+
+    if ( $Self->{ProcessedRequest}->{RequestMethod} eq 'OPTIONS' || $Self->{ProcessedRequest}->{RequestMethod} eq 'GET' ) {
+        $Self->{Metric}->{Parameters} = $Self->{ProcessedRequest}->{Data};
+    }
+
+    # add the metric
+    $Kernel::OM->Get('Metric')->MetricAdd(
+        Metric => $Self->{Metric}
+    );
+
+    return;
+}     
 
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -138,23 +138,6 @@ sub ValidatePendingTime {
     return if !$SystemTime;
 
     return 1;
-}
-
-sub ExecOperation {
-    my ( $Self, %Param ) = @_;
-
-    # add relevant orga id to data if given
-    if ( IsHashRefWithData($Self->{RequestData}) && $Self->{RequestData}->{RelevantOrganisationID} ) {
-        if (IsHashRefWithData($Param{Data})) {
-            $Param{Data}->{RelevantOrganisationID} = $Self->{RequestData}->{RelevantOrganisationID};
-        } else {
-            $Param{Data} = {
-                RelevantOrganisationID => $Self->{RequestData}->{RelevantOrganisationID}
-            };
-        }
-    }
-
-    return $Self->SUPER::ExecOperation(%Param);
 }
 
 sub GetBasePermissionObjectIDs {

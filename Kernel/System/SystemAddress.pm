@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -116,7 +116,7 @@ sub SystemAddressAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'SystemAddress',
         ObjectID  => $ID,
@@ -252,7 +252,7 @@ sub SystemAddressUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'SystemAddress',
         ObjectID  => $Param{ID},
@@ -571,7 +571,7 @@ sub SystemAddressDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemAddress',
         ObjectID  => $Param{ID},

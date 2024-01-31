@@ -2,7 +2,7 @@
 <kix_config version="1.0" init="Framework">
 
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherSearch" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherSearch</Item>
@@ -15,7 +15,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherGet" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherGet</Item>
@@ -29,7 +29,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherCreate" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherCreate</Item>
@@ -41,7 +41,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Watcher::WatcherDelete" Required="0" Valid="1">
-        <Description TranWatchertable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">WatcherDelete</Item>

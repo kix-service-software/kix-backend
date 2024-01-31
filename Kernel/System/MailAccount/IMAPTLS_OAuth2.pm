@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2019–2021 Efflux GmbH, https://efflux.de/
 # Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/
@@ -75,20 +75,43 @@ sub Connect {
         Ignoresizeerrors => 1,
     );
 
-# KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# KIX-kix, Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
     if ( !$IMAPObject ) {
         return (
             Successful => 0,
             Message    => "$Type: Can't connect to $Param{Host}: $!!"
         );
     }
-# EO KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# EO KIX-kix, Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 
-    # auth via SASL XOAUTH2
-    my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
-    $IMAPObject->authenticate( 'XOAUTH2', sub { return $SASLXOAUTH2 } );
+    # try it 2 times to authenticate with the IMAP server
+    TRY:
+    for my $Try ( 1 .. 2 ) {
+        # auth via SASL XOAUTH2
+        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
+        $IMAPObject->authenticate( 'XOAUTH2', sub { return $SASLXOAUTH2 } );
+
+        last TRY if ( $IMAPObject->IsAuthenticated() );
+
+        # sleep 0,3 seconds;
+        sleep( 0.3 );
+
+        # get a new access token
+        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestAccessToken(
+            ProfileID => $Param{OAuth2_ProfileID},
+            GrantType => 'refresh_token'
+        );
+        if ( !$AccessToken ) {
+            $IMAPObject->close();
+            return (
+                Successful => 0,
+                Message    => $Type . ': Could not request access token for ' . $Param{Login} . '/' . $Param{Host} . '. The refresh token could be expired or invalid.'
+            );
+        }
+    }
 
     if ( !$IMAPObject->IsAuthenticated() ) {
+        $IMAPObject->close();
         return (
             Successful => 0,
             Message    => "$Type: Auth for user $Param{Login}/$Param{Host} failed!"
@@ -98,9 +121,9 @@ sub Connect {
     return (
         Successful => 1,
         IMAPObject => $IMAPObject,
-# KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# KIX-kix, Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
         Type       => $Type,
-# EO KIX-capeIT, Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# EO KIX-kix, Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
     );
 ### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
 }

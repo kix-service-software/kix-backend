@@ -501,6 +501,7 @@
                "readOnly" : true
             },
             "LinkCount" : {
+               "description" : "added via include \"LinkCount\"",
                "type" : "integer",
                "readOnly" : true
             },
@@ -593,6 +594,7 @@
                "readOnly" : true
             },
             "Unseen" : {
+               "description" : "added via include \"Unseen\"",
                "type" : "integer",
                "readOnly" : true
             },
@@ -601,7 +603,7 @@
                "readOnly" : true
             },
             "WatcherID" : {
-               "description" : "the ID of the watcher, if the current user is watching this ticket",
+               "description" : "the ID of the watcher, if the current user is watching this ticket, added via include \"WatcherID\"",
                "type" : "integer",
                "readOnly" : true
             },

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -87,7 +87,7 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
                     $UserSearch{$SearchType} //= [];
                     push @{$UserSearch{$SearchType}}, $SearchItem;
                 }

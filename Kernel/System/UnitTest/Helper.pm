@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -119,6 +119,27 @@ sub GetRandomNumber {
     return $Prefix . $GetRandomNumberPrevious{$Prefix}++ || 0;
 }
 
+=item GetRandomCaseString()
+
+randomizes the case of single letters in a given string
+
+my $RandomCaseString = $Helper->GetRandomCaseString(
+    String => 'Test'
+);
+
+=cut
+
+sub GetRandomCaseString {
+    my ( $Self, %Param ) = @_;
+
+    my $RandomCaseString = $Param{String}     || '';
+    my $Percentage       = $Param{Percentage} || 30;
+
+    $RandomCaseString =~ s/(\w)/rand(100) < $Percentage ? uc("$1") : lc("$1")/egx;
+
+    return $RandomCaseString;
+}
+
 =item TestUserCreate()
 
 creates a test user that can be used in tests. It will
@@ -222,6 +243,13 @@ sub TestUserCreate {
     );
     $Self->{UnitTestObject}->True( 1, "Set user UserLanguage to $UserLanguage" );
 
+    if (
+        defined( $Param{Result} )
+        && $Param{Result} eq 'ID'
+    ) {
+        return $TestUserID;
+    }
+
     return $TestUserLogin;
 }
 
@@ -277,6 +305,7 @@ sub TestContactCreate {
             Login                 => $TestContactLogin,
             Password              => $TestContactLogin,
             Email                 => $TestContactLogin . '@localunittest.com',
+            Email1                => $TestContactLogin . '@sub.localunittest.com',
             AssignedUserID        => $TestContactUserID,
             ValidID               => 1,
             UserID                => 1,

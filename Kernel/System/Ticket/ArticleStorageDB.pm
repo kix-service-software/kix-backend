@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -145,7 +145,7 @@ sub ArticleDelete {
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -180,7 +180,7 @@ sub ArticleDeletePlain {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Plain',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -237,7 +237,7 @@ sub ArticleDeleteAttachment {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
@@ -411,7 +411,7 @@ sub ArticleWriteAttachment {
     }
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Filename},
@@ -482,10 +482,12 @@ sub ArticlePlain {
     }
 
     # log info
-    $Kernel::OM->Get('Log')->Log(
-        Priority => 'error',
-        Message  => "No plain article (article id $Param{ArticleID}) in database!",
-    );
+    if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No plain article (article id $Param{ArticleID}) in database!",
+        );
+    }
     return;
 }
 

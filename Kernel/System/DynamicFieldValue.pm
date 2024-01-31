@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -178,28 +178,34 @@ sub ValueSet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    $Counter = 0;
     for my $Value (@Values) {
-
+        my $FirstValue;
+        if ( !$Counter ) {
+            $FirstValue = 1;
+        }
         # create a new value entry
         return if !$DBObject->Do(
             SQL =>
-                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int)'
-                . ' VALUES (?, ?, ?, ?, ?)',
+                'INSERT INTO dynamic_field_value (field_id, object_id, value_text, value_date, value_int, first_value)'
+                . ' VALUES (?, ?, ?, ?, ?, ?)',
             Bind => [
                 \$Param{FieldID}, \$Param{ObjectID},
                 \$Value->{ValueText}, \$Value->{ValueDateTime}, \$Value->{ValueInt},
+                \$FirstValue
             ],
         );
+        $Counter++;
     }
 
     # delete cache
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'DynamicField.Value',
-        ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
+        ObjectID  => $Param{FieldID}.q{::}.$Param{ObjectID},
     );
 
     return 1;
@@ -360,7 +366,7 @@ sub ValueDelete {
     $Self->_DeleteFromCache(%Param);
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID}.'::'.$Param{ObjectID},
@@ -408,7 +414,7 @@ sub AllValuesDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'DynamicField.Value',
         ObjectID  => $Param{FieldID},

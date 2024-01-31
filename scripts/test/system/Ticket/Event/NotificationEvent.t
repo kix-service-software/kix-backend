@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -306,6 +306,33 @@ my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
 $Self->True(
     $ArticleID,
     "ArticleCreate() successful for Article ID $ArticleID",
+);
+
+# create article with html body
+my $HTMLArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    TicketID        => $TicketID,
+    Channel         => 'note',
+    SenderType      => 'external',
+    Charset         => 'utf-8',
+    ContentType     => 'text/html',
+    CustomerVisible => 1,
+    From            => 'test@example.com',
+    To              => 'test123@example.com',
+    Subject         => 'article subject test',
+    Body            => <<'END',
+<p>...text here...</p>
+<p>this is a URL: <a href="https://kixdesk.com">KIXDesk</a></p>
+<p>...and here...</p>
+END
+    HistoryType     => 'NewTicket',
+    HistoryComment  => q{%%},
+    UserID          => $UserID,
+);
+
+# sanity check
+$Self->True(
+    $HTMLArticleID,
+    "ArticleCreate() successful for Article ID $HTMLArticleID with html body",
 );
 
 # Create test ticket dynamic field of type text.
@@ -968,7 +995,7 @@ my @Tests = (
             AND => [
                 # Filter by text dynamic field value. Note that the search value (-1) is
                 #   different than the match value (0). See bug#12257 for more information.
-                { Field => 'Ticket::DynamicField_DFT1' . $RandomID, Operator => 'EQ', Value => 0 }
+                { Field => 'DynamicField_DFT1' . $RandomID, Operator => 'EQ', Value => 0 }
             ]
         },
         Config => {
@@ -1193,8 +1220,10 @@ my @Tests = (
     {
         Name => 'create article - plain notification with HTML article body',
         Data => {
-            Events             => [ 'ArticleCreate' ],
-            Recipients         => ['Customer']
+            Events        => [ 'ArticleCreate' ],
+            Recipients    => ['Customer'],
+            CreateArticle => [1],
+            Transports    => ['Email'],
         },
         Filter => {
             AND => [
@@ -1205,8 +1234,8 @@ my @Tests = (
         Config => {
             Event => 'ArticleCreate',
             Data  => {
-                TicketID => $TicketID,
-                ArticleID => $ArticleID
+                TicketID  => $TicketID,
+                ArticleID => $HTMLArticleID
             },
             Config => {},
             UserID => 1,
@@ -1215,30 +1244,29 @@ my @Tests = (
             en => {
                 Subject     => 'Subject = article subject',
                 Body        => "someone wrote:
-<p>...text here...</p>
-<p>this is a URL: <a href=\"https://kixdesk.com\">https://kixdesk.com</a></p>
-<p>...and here...</p>",
+<KIX_ARTICLE_Body>",
                 ContentType => 'text/plain',
             },
             de => {
                 Subject     => 'Subject = article subject',
                 Body        => "someone wrote:
-<p>...text here...</p>
-<p>this is a URL: <a href=\"https://kixdesk.com\">https://kixdesk.com</a></p>
-<p>...and here...</p>",
+<KIX_ARTICLE_Body>",
                 ContentType => 'text/plain',
             },
         },
         ExpectedResults => [
             {
-                Body    => "someone wrote:=20
+                Body    => "someone wrote:
 
 ...text here...
 
-this is a URL: https://kixdesk.com
+this is a URL: [1]KIXDesk
 
 ...and here...
 
+=20
+
+[1] https://kixdesk.com
 ",
                 ToArray => [$Contact{Email}],
             },

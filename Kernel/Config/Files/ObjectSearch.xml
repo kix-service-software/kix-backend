@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Backend" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for objects.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Ticket" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::Ticket</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###ConfigItem" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::ConfigItem</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Organisation" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::Organisation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Contact" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###FAQArticle" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::FAQArticle</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <!-- TICKET OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###ArchiveFlag" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::ArchiveFlag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Article" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Article</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###ArticleAttachment" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::ArticleAttachment</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###ArticleFlag" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::ArticleFlag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Contact" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Contact</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###History" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::History</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Lock" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Lock</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Organisation" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Organisation</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###OwnerResponsible" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::OwnerResponsible</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Priority" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Priority</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Queue" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###State" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::State</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###TicketFlag" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::TicketFlag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###TicketID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::TicketID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###TicketNumber" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::TicketNumber</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###TicketTimes" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::TicketTimes</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Title" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Title</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Type" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Type</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Watcher" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Watcher</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###AccountedTime" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::AccountedTime</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for tickets.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Ticket::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EQ TICKET OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- CONFIGITEM OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###ConfigItemID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::ConfigItemID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Name" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Name</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Number" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Number</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###DeplState" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::DeplState</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###InciState" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::InciState</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Class" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Class</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###XMLData" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::XMLData</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ConfigItem::Module###Assigned" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for confg items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::ConfigItem::Assigned</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO CONFIGITEM OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- ORGANISATION OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###OrganisationID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::OrganisationID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Organisation::Module###Fulltext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for organisations.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Organisation::Fulltext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO ORGANISATION OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- CONTACT OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###ContactID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::ContactID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###OrganisationID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::OrganisationID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###Email" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::Email</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###Fulltext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::Fulltext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###User" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::User</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Contact::Module###UsageContext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for contacts.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Contact::UsageContext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO CONTACT OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- FAQ OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###FAQArticleID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::FAQArticleID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Category" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Category</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Field" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Field</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###DynamicField" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::DynamicField</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Fulltext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Fulltext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Vote" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Vote</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Visibility" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Visibility</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Approved" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Approved</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::FAQArticle::Module###Assigned" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for faq articles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::FAQArticle::Assigned</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO FAQ OBJECTSEARCH ATTRIBUTES -->
+</kix_config>

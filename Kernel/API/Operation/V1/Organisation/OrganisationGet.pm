@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -174,8 +174,9 @@ sub Run {
             # execute ticket searches
             my %TicketStats;
             # new tickets
-            $TicketStats{NewCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
+            $TicketStats{NewCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Search     => {
                     AND => [
                         {
                             Field    => 'OrganisationID',
@@ -189,12 +190,14 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
             # open tickets
-            $TicketStats{OpenCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
+            $TicketStats{OpenCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Search     => {
                     AND => [
                         {
                             Field    => 'OrganisationID',
@@ -208,12 +211,14 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
             # pending tickets
-            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('Ticket')->TicketSearch(
-                Search => {
+            $TicketStats{PendingReminderCount} = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Search     => {
                     AND => [
                         {
                             Field    => 'OrganisationID',
@@ -227,8 +232,9 @@ sub Run {
                         },
                     ]
                 },
-                UserID => $Self->{Authorization}->{UserID},
-                Result => 'COUNT',
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType},
+                Result   => 'COUNT',
             );
 
             $OrganisationData{TicketStats} = \%TicketStats;
@@ -242,15 +248,27 @@ sub Run {
         # include assigned config items if requested
         if ( $Param{Data}->{include}->{AssignedConfigItems} ) {
 
-            my $ItemIDs = $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                ObjectType => 'Organisation',
-                Object     => \%OrganisationData
+            my @ItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'ConfigItem',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'AssignedOrganisation',
+                            Operator => 'EQ',
+                            Type     => 'NUMERIC',
+                            Value    => $OrganisationData{ID}
+                        }
+                    ]
+                },
+                UserID   => $Self->{Authorization}->{UserID},
+                UserType => $Self->{Authorization}->{UserType}
             );
 
             # filter for customer assigned config items if necessary
             my @ConfigItemIDList = $Self->_FilterCustomerUserVisibleObjectIds(
                 ObjectType   => 'ConfigItem',
-                ObjectIDList => $ItemIDs
+                ObjectIDList => \@ItemIDs
             );
 
             $OrganisationData{AssignedConfigItems} = \@ConfigItemIDList;

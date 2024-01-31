@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -71,10 +71,6 @@ $Self->True(
     'QueueGet() - ValidID',
 );
 $Self->True(
-    $QueueGet{Calendar} eq '',
-    'QueueGet() - Calendar',
-);
-$Self->True(
     $QueueGet{Comment} eq 'Some Comment',
     'QueueGet() - Comment',
 );
@@ -100,7 +96,6 @@ my $QueueUpdate2 = $QueueObject->QueueUpdate(
     Name            => $QueueRand . "2",
     ValidID         => 1,
     GroupID         => 1,
-    Calendar        => '',
     SystemAddressID => 1,
     FollowUpID      => 1,
     UserID          => 1,
@@ -122,7 +117,6 @@ my $QueueUpdate1     = $QueueObject->QueueUpdate(
     Name            => $QueueUpdate1Name,
     ValidID         => 2,
     GroupID         => 1,
-    Calendar        => '1',
     SystemAddressID => 1,
     FollowUpID      => 1,
     UserID          => 1,
@@ -363,10 +357,6 @@ $Self->True(
 $Self->True(
     $QueueGet{ValidID} eq 2,
     'QueueGet() - ValidID',
-);
-$Self->True(
-    $QueueGet{Calendar} eq 1,
-    'QueueGet() - Calendar',
 );
 $Self->True(
     $QueueGet{Comment} eq 'Some Comment1',

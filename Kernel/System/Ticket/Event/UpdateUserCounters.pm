@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -103,10 +103,11 @@ sub Run {
         };
 
         if ( !$Self->{ViewableStates}->{$Ticket{StateType}} ) {
-            # delete all user counters for this object for all users and leave
+            # delete all user counters for this object for the ticket owner and leave
             $Kernel::OM->Get('User')->DeleteUserCounterObject(
                 Category => 'Ticket',
                 ObjectID => $Param{Data}->{TicketID},
+                UserID   => $Ticket{OwnerID}
             );
             return 1;
         }
@@ -370,6 +371,13 @@ sub HandleTicketOwnerUpdate {
 
 sub HandleTicketSubscribe {
     my ($Self, %Param) = @_;
+
+    my $IsWatched = $Kernel::OM->Get('Watcher')->WatcherLookup(
+        Object      => 'Ticket',
+        ObjectID    => $Param{Ticket}->{TicketID},
+        WatchUserID => $Param{Data}->{WatchUserID}
+    );
+    return if !$IsWatched;
 
     $Kernel::OM->Get('User')->AddUserCounterObject(
         Category => 'Ticket',
