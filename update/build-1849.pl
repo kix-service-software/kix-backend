@@ -22,7 +22,7 @@ use Kernel::System::Role::Permission;
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1819',
+        LogPrefix => 'framework_update-to-build-1849',
     },
 );
 
