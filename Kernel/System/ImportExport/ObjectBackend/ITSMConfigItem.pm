@@ -1519,7 +1519,7 @@ sub _ExportXMLSearchDataPrepare {
         if ($Values) {
 
             # create search key
-            my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{} ) . $Key;
+            my $SearchKey = 'CurrentVersion.Data.' . $Key;
             $SearchKey =~ s/::/./gsm;
 
             # create search hash

@@ -1946,6 +1946,109 @@ my @ExportDataTests = (
             ],
         ],
     },
+
+    # 23 all required values are given (XML data sub element search check)
+    {
+        SourceExportData => {
+            ObjectData => {
+                ClassID => $ConfigItemClassIDs[1],
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Number',
+                },
+                {
+                    Key => 'Name',
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub2::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub2::2',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub1::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub2::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub2::2',
+                },
+            ],
+            SearchData => {
+                Number           => $ConfigItemNumbers[2],
+                Main1Sub1SubSub1 => 'Main1 (1) Sub1 (1) SubSub1 (1)',
+            },
+            ExportDataGet => {
+                TemplateID => $TemplateIDs[7],
+                UserID     => 1,
+            },
+        },
+        ReferenceExportData => [
+            [
+                $ConfigItemNumbers[2],
+                'UnitTest - ConfigItem 3 Version 1',
+                'Production',
+                'Operational',
+                'Main1 (1)',
+                'Main1 (1) Sub1 (1)',
+                'Main1 (1) Sub1 (1) SubSub1 (1)',
+                'Main1 (1) Sub1 (1) SubSub1 (2)',
+                'Main1 (1) Sub1 (1) SubSub1 (3)',
+                'Main1 (1) Sub1 (1) SubSub2 (1)',
+                'Main1 (1) Sub1 (2)',
+                'Main1 (1) Sub1 (2) SubSub1 (1)',
+                'Main1 (1) Sub1 (2) SubSub2 (1)',
+                'Main1 (1) Sub1 (2) SubSub2 (2)',
+                'Main1 (1) Sub2 (1)',
+                'Main1 (1) Sub2 (2)',
+                'Main2 (1)',
+                'Main2 (1) Sub1 (1)',
+                'Main2 (1) Sub2 (1)',
+                'Main2 (1) Sub2 (2)',
+            ],
+        ],
+    },
 );
 
 # ------------------------------------------------------------ #
