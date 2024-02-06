@@ -647,7 +647,7 @@ sub _ExecUpdateScript {
     if ($ExitCode) {
         $Kernel::OM->Get('Log')->Log(
             Priority => "error",
-            Message  => "Unable to execute $OrgType update script!",
+            Message  => "Unable to execute $OrgType update script \"$ScriptFile\"!",
         );
         return;
     }
