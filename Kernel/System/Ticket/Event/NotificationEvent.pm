@@ -71,7 +71,10 @@ sub Run {
     }
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
-    if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
+    if (
+        !$Param{Data}->{TicketID}
+        && !IsArrayRefWithData($Param{Data}->{TicketList})
+    ) {
         return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -98,9 +101,12 @@ sub Run {
 
     my $Result;
 
-    if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+    if (
+        !$ENV{IsDaemon}
+        && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously')
+    ) {
         my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
-        my $Result = $Self->AsyncCall(
+        $Result = $Self->AsyncCall(
             FunctionName             => '_Run',
             FunctionParams           => \%Param,
             MaximumParallelInstances => $MaximumParallelInstances
@@ -197,10 +203,11 @@ sub _HandleTicket {
         # add attachments only on ArticleCreate or ArticleSend event
         my @Attachments;
         if (
-            ( ( $Param{Event} eq 'ArticleCreate' ) || ( $Param{Event} eq 'ArticleSend' ) )
-            && $Param{Data}->{ArticleID}
-            )
-        {
+            (
+                $Param{Event} eq 'ArticleCreate'
+                || $Param{Event} eq 'ArticleSend'
+            ) && $Param{Data}->{ArticleID}
+        ) {
 
             # add attachments to notification
             if ( $Notification{Data}->{ArticleAttachmentInclude}->[0] ) {
@@ -230,11 +237,10 @@ sub _HandleTicket {
                         next FILE_ID if !%Attachment;
 
                         # remove HTML-Attachments (HTML-Emails)
-                        next
-                            if (
+                        next if (
                             $Index{$FileID}->{Filename} =~ /^file-[12]$/
                             && $Index{$FileID}->{ContentType} =~ /text\/html/i
-                            );
+                        );
 
                         push @Attachments, \%Attachment;
                     }
@@ -332,8 +338,7 @@ sub _HandleTicket {
                         defined $Notification{Data}->{VisibleForAgent}->[0]
                         && !$Notification{Data}->{VisibleForAgent}->[0]
                     )
-                    )
-                {
+                ) {
                     $AgentSendNotification = 1;
                 }
 
@@ -343,8 +348,7 @@ sub _HandleTicket {
                     && $Notification{Data}->{VisibleForAgent}->[0]
                     && $Bundle->{Recipient}->{Type} eq 'Agent'
                     && !$AgentSendNotification
-                    )
-                {
+                ) {
                     next BUNDLE;
                 }
 
@@ -352,8 +356,7 @@ sub _HandleTicket {
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'
                     && $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
-                    )
-                {
+                ) {
                     # No UserID means it's not a mapped customer.
                     next BUNDLE if !$Bundle->{Recipient}->{UserID};
                 }
@@ -382,6 +385,7 @@ sub _HandleTicket {
             my @TransportRecipients = $TransportObject->GetTransportRecipients(
                 Notification => \%Notification,
                 TicketID     => $Param{Data}->{TicketID},
+                ArticleID    => $Param{Data}->{ArticleID}
             );
 
             next TRANSPORT if !@TransportRecipients;
@@ -501,8 +505,7 @@ sub _RecipientsGet {
             if (
                 $Recipient
                 =~ /^Agent(Owner|Responsible|Watcher|ReadPermissions|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|)$/
-                )
-            {
+            ) {
 
                 if ( $Recipient eq 'AgentOwner' ) {
                     push @{ $Notification{Data}->{RecipientAgents} }, $Ticket{OwnerID};
@@ -616,8 +619,7 @@ sub _RecipientsGet {
                 if (
                     $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
                     && !$Ticket{ContactID}
-                    )
-                {
+                ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'info',
                         Message  => 'Send no customer notification because no customer is set!',
@@ -645,11 +647,13 @@ sub _RecipientsGet {
                         $Recipient{UserLanguage} = $Language;
                     }
 
-                    $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
+                    $Recipient{Realname} = $Contact{Firstname}
+                        . q{ }
+                        . $Contact{Lastname};
                 }
 
                 if ( !$Recipient{Realname} ) {
-                    $Recipient{Realname} = $Article{From} || '';
+                    $Recipient{Realname} = $Article{From} || q{};
                     $Recipient{Realname} =~ s/<.*>|\(.*\)|\"|;|,//g;
                     $Recipient{Realname} =~ s/( $)|(  $)//g;
                 }
@@ -777,8 +781,7 @@ sub _RecipientsGet {
             !$ConfigObject->Get('AgentSelfNotifyOnAction')
             && $User{UserID} == $Param{UserID}
             && !$PrecalculatedUserIDs{ $Param{UserID} }
-            )
-        {
+        ) {
             next RECIPIENT;
         }
 
