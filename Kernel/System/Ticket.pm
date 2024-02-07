@@ -2669,6 +2669,14 @@ or use a time stamp:
         UserID   => 23,
     );
 
+or use a diff with zero:
+
+    my $Success = $TicketObject->TicketPendingTimeSet(
+        Diff     => 0,
+        TicketID => 123,
+        UserID   => 23,
+    );
+
 Events:
     TicketPendingTimeUpdate
 
@@ -2678,7 +2686,7 @@ sub TicketPendingTimeSet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{String} && !$Param{Diff} ) {
+    if ( !$Param{String} && !defined $Param{Diff} ) {
         for my $Needed (qw(Year Month Day Hour Minute TicketID UserID)) {
             if ( !defined $Param{$Needed} ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -2718,7 +2726,10 @@ sub TicketPendingTimeSet {
 
     # check if we need to null the PendingTime
     my $PendingTimeNull;
-    if ( $Param{String} && $Param{String} eq '0000-00-00 00:00:00' ) {
+    if (
+        ($Param{String} && $Param{String} eq '0000-00-00 00:00:00') ||
+        (defined $Param{Diff} && $Param{Diff} == 0)
+    ) {
         $PendingTimeNull = 1;
         $Param{Sec}      = 0;
         $Param{Minute}   = 0;
