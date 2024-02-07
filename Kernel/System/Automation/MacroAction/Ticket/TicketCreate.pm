@@ -181,7 +181,7 @@ sub Run {
     # collect ticket params (organisation have to be before contact)
     my %TicketParam;
     for my $Attribute (
-        qw(OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Team Type)
+        qw(OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Team Type PendingTimeDiff)
     ) {
         if ( defined $Param{Config}->{$Attribute} ) {
 
@@ -248,6 +248,8 @@ sub Run {
                 $TicketParam{ContactID} = $ContactID || $Param{Config}->{ContactEmailOrID};
             } elsif ($Attribute eq 'Team') {
                 $TicketParam{Queue} = $Param{Config}->{Team};
+            } elsif ( $Attribute eq 'PendingTimeDiff' ) {
+                # ignore PendingTimeDiff as ticket param
             } else {
                 $TicketParam{$Attribute} = $Param{Config}->{$Attribute}
             }
@@ -305,18 +307,20 @@ sub Run {
             Lock     => 'unlock',
             UserID   => $Param{UserID},
         );
-    } elsif ( %StateData && $StateData{TypeName} =~ m{\A pending}msxi ) {
-        $Param{Config}->{PendingTimeDiff} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{PendingTimeDiff}
-        );
-
+    } elsif ( %StateData && $StateData{TypeName} =~ m{\A pending}msxi && $Param{Config}->{PendingTimeDiff}) {
         # set pending time
-        $TicketObject->TicketPendingTimeSet(
-            UserID   => $Param{UserID},
-            TicketID => $TicketID,
-            Diff     => $Param{Config}->{PendingTimeDiff},
-        );
+        if (IsNumber( $Param{Config}->{PendingTimeDiff} )) {
+            $TicketObject->TicketPendingTimeSet(
+                UserID   => $Param{UserID},
+                TicketID => $TicketID,
+                Diff     => ($Param{Config}->{PendingTimeDiff} || 0) / 60, # expects minutes
+            );
+        } elsif ($Param{Config}->{PendingTimeDiff}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not set pending time of ticket ($TicketID) with value of diff ($Param{Config}->{PendingTimeDiff})."
+            );
+        }
     }
 
     $Self->_SetDynamicFields(%Param, NewTicketID => $TicketID);
@@ -385,7 +389,11 @@ sub ValidateConfig {
         );
 
         if (%State) {
-            if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
+            if (
+                $State{TypeName} =~ m{\A pending}msxi &&
+                $Param{Config}->{PendingTimeDiff} !~ m/<KIX_/ &&
+                !IsNumber( $Param{Config}->{PendingTimeDiff} || 0 )
+            ) {
                 if ( !$Param{Silent} ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
@@ -480,7 +488,10 @@ sub _CheckTicketParams {
             return;
         }
 
-        if ( $State{TypeName} =~ m{\A pending}msxi && !IsNumber( $Param{PendingTimeDiff} ) ) {
+        if (
+            $State{TypeName} =~ m{\A pending}msxi &&
+            !IsNumber( $Param{PendingTimeDiff} || 0 )
+        ) {
             $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
                 Message  => "Couldn't create new ticket - \"PendingTimeDiff\" value ($Param{PendingTimeDiff}) is not valid!",
