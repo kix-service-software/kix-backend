@@ -125,21 +125,33 @@ sub _AddNewPermissions {
 sub _SetFlagFirstValue {
     my ( $Self, %Param ) = @_;
 
-    return if $Kernel::OM->Get('DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => <<'END'
-UPDATE dynamic_field_value
-SET first_value = 1
-WHERE id IN (
-    SELECT dfv.id
-    FROM dynamic_field_value dfv
-    WHERE dfv.id = (
-        SELECT MIN(dfv1.id)
-        FROM dynamic_field_value dfv1
-        WHERE dfv1.object_id = dfv.object_id AND dfv1.field_id = dfv.field_id
-    )
-)
+SELECT MIN(id)
+FROM dynamic_field_value
+GROUP BY object_id, field_id
 END
     );
+
+    # fetch the result
+    my @IDs;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(
+            @IDs,
+            $Row[0]
+        );
+    }
+
+    if ( scalar(@IDs) ) {
+        my $IDStr = join( q{,}, @IDs );
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL => <<"END"
+UPDATE dynamic_field_value
+SET first_value = 1
+WHERE id IN ($IDStr)
+END
+        );
+    }
 
     return 1;
 }
