@@ -143,12 +143,32 @@ END
     }
 
     if ( scalar(@IDs) ) {
-        my $IDStr = join( q{,}, @IDs );
+
+        my @Conditions;
+        # split IN statement with more than 900 elements in more statements combined with OR
+        # because Oracle doesn't support more than 1000 elements for one IN statement.
+        while ( @IDs ) {
+            # remove section in the array
+            my @IDPart = splice( @IDs, 0, 900 );
+
+            # add condition part
+            push(
+                @Conditions,
+                (
+                    'id IN (' .
+                    join( q{,}, @IDPart )
+                    . ')'
+                )
+            );
+        }
+
+        my $Condition = join( q{ OR }, @Conditions );
+
         return if !$Kernel::OM->Get('DB')->Do(
             SQL => <<"END"
 UPDATE dynamic_field_value
 SET first_value = 1
-WHERE id IN ($IDStr)
+WHERE $Condition
 END
         );
     }
