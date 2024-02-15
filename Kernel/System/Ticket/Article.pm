@@ -252,7 +252,8 @@ sub ArticleCreate {
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
             $Param{Body} = $HTMLUtilsObject->ToAscii(
-                String => $Param{Body},
+                String            => $Param{Body},
+                NoForcedLinebreak => 1
             );
         }
         elsif ( $Param{MimeType} && $Param{MimeType} eq "application/json" ) {
