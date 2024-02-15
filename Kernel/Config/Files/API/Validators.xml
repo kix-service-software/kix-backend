@@ -352,4 +352,15 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###VersionValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::VersionValidator</Item>
+                <Item Key="Validates">ConfigItemVersion,Version</Item>
+                <Item Key="ConsiderOperationRegEx">ConfigItem(?:Version|)(?:Create|Update)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>
