@@ -203,6 +203,7 @@
 /system/valid/:ValidID                                                                     | GET              | V1::Valid::ValidGet                              |
 #                                                                                          |                  |                                                  |
 # non-system level resources                                                               |                  |                                                  |
+/auth                                                                                      | GET              | V1::Sessions::AuthGet                            | NoAuthorizationNeeded: 1
 /auth                                                                                      | POST             | V1::Sessions::SessionCreate                      | NoAuthorizationNeeded: 1
 /clientregistrations                                                                       | GET              | V1::ClientRegistration::ClientRegistrationSearch |
 /clientregistrations                                                                       | POST             | V1::ClientRegistration::ClientRegistrationCreate |
