@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -118,6 +118,12 @@ sub _CheckMailFilter {
                 return $Self->_Error(
                     Code    => 'BadRequest',
                     Message => "Email header '$Set->{Key}' is not supported!"
+                );
+            }
+            if ( length($Set->{Value}) == 0 || $Set->{Value} =~ m/^\s+$/ ) {
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Email header '$Set->{Key}' has no usable value (just spaces or empty string is not allowed)!"
                 );
             }
             $Index++;
