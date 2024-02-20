@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "AuthMethod.json",
+    "type": "object",
+    "description": "Auth methods.",
+    "properties": {
+        "Type": {
+            "type": "string",
+            "description": "type of auth method",
+            "readOnly": true
+        },
+        "PreAuth": {
+            "type": "integer",
+            "description": "auth method supports a PreAuthRequest",
+            "readOnly": true
+        },
+        "Data": {
+            "type": "object",
+            "description": "additional data for auth method",
+            "readOnly": true
+        }
+    },
+    "required": [
+        "Type",
+        "PreAuth"
+    ]
+}

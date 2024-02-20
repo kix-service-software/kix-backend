@@ -6,7 +6,7 @@
     "properties": {
         "UserLogin": {
             "type": "string",
-            "description": "required if no NegitiationToken is given"
+            "description": "required if no PreAuthRequest, NegitiationToken, or state is given"
         },
         "UserType": {
             "type": "string",
@@ -17,10 +17,29 @@
         },
         "Password": {
             "type": "string",
-            "description": "required if no NegitiationToken is given"
+            "description": "required if UserLogin is given"
+        },
+        "code": {
+            "type": "string",
+            "description": "required if state is given"
         },
         "NegotiationToken": {
             "type": "string"
+        },
+        "PreAuthRequest": {
+            "type": "object",
+            "properties": {
+                "Type": {
+                  "type": "string"
+                },
+                "Data": {
+                  "type": "object"
+                }
+            },
+            "required": [
+              "Type",
+              "Data"
+            ]
         }
     },
     "required": [

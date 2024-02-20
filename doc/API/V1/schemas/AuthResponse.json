@@ -4,12 +4,15 @@
    "description" : "The auth response.",
    "type" : "object",
    "properties" : {
+      "Data" : {
+         "description" : "response if PreAuthRequest is given. Content depends on PreAuthRequest",
+         "type" : "object",
+         "readOnly" : true
+      },
       "Token" : {
+         "description" : "response if UserLogin, NegitiationToken, or state is given",
          "type" : "string",
          "readOnly" : true
       }
-   },
-   "required" : [
-      "Token"
-   ]
+   }
 }
