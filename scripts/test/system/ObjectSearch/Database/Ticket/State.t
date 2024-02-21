@@ -700,7 +700,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5)'
+                '(st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5))'
             ]
         }
     },
@@ -717,7 +717,7 @@ my @SearchTests = (
                 'INNER JOIN ticket_state_type tst ON tst.id = ts.type_id'
             ],
             'Where' => [
-                'st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5) OR tst.name LIKE \'Test%\''
+                '(st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5) OR tst.name LIKE \'Test%\')'
             ]
         }
     }

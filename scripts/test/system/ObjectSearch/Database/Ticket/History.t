@@ -178,7 +178,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'th.create_time = \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -210,7 +211,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'th.create_time < \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -242,7 +244,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'th.create_time > \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -274,7 +277,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'th.create_time <= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -306,7 +310,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'th.create_time >= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -344,7 +349,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'thcl.create_time = \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -382,7 +388,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'thcl.create_time < \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -420,7 +427,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'thcl.create_time > \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -458,7 +466,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'thcl.create_time <= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -496,7 +505,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'thcl.create_time >= \'2014-01-01 13:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -1969,6 +1979,60 @@ for my $Test ( @IntegrationSearchTests ) {
 
 # test Sort
 # attributes of this backend are not sortable
+
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:03:00',
+    'Timestamp before first relative search'
+);
+my @FirstResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'CloseTime',
+                Operator => 'GTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@FirstResult,
+    [$TicketID2],
+    'Result of first relative search'
+);
+$Helper->FixedTimeAddSeconds(60);
+$TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 12:04:00',
+    'Timestamp before second relative search'
+);
+my @SecondResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'CloseTime',
+                Operator => 'GTE',
+                Value    => '-1m'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@SecondResult,
+    [],
+    'Result of second relative search'
+);
 
 # reset fixed time
 $Helper->FixedTimeUnset();

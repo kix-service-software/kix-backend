@@ -700,7 +700,7 @@ sub _PrepareColumnAndValue {
             && $Param{ValueType}
             && $Param{ValueType} eq 'NUMERIC'
         ) {
-            $Column = 'CAST(' . $Column . ' AS VARCHAR)';
+            $Column = 'CAST(' . $Column . ' AS CHAR(20))';
         }
 
         # cast lower for case insensitive searches, if its not a static search
@@ -911,25 +911,34 @@ sub _CheckSearchParams {
     }
 
     # check value type
+    my $IsRelative;
     if ( IsArrayRef( $Param{Search}->{Value} ) ) {
         for my $Value ( @{ $Param{Search}->{Value} } ) {
-            $Value = $Self->_ValidateValueType(
+            ( $Value, $IsRelative ) = $Self->_ValidateValueType(
                 Field         => $Param{Search}->{Field},
                 Value         => $Value,
                 AttributeList => $AttributeList,
                 Silent        => $Param{Silent}
             );
             return if ( !defined( $Value ) );
+
+            if ( $IsRelative ) {
+                $Param{Search}->{IsRelative} = 1;
+            }
         }
     }
     else {
-        $Param{Search}->{Value} = $Self->_ValidateValueType(
+        ( $Param{Search}->{Value}, $IsRelative ) = $Self->_ValidateValueType(
             Field         => $Param{Search}->{Field},
             Value         => $Param{Search}->{Value},
             AttributeList => $AttributeList,
             Silent        => $Param{Silent}
         );
         return if ( !defined( $Param{Search}->{Value} ) );
+
+        if ( $IsRelative ) {
+            $Param{Search}->{IsRelative} = 1;
+        }
     }
 
     return 1;
@@ -937,6 +946,8 @@ sub _CheckSearchParams {
 
 sub _ValidateValueType {
     my ($Self, %Param) = @_;
+
+    my $IsRelative = 0;
 
     if ( !defined( $Param{Value} ) ) {
         if ( !$Param{Silent} ) {
@@ -977,6 +988,9 @@ sub _ValidateValueType {
             || $Param{AttributeList}->{ $Param{Field} }->{ValueType} eq 'DATETIME'
         )
     ) {
+        # remember initial value
+        my $InitialValue = $Param{Value};
+
         # convert to unix time and check
         my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
             String => $Param{Value},
@@ -987,8 +1001,8 @@ sub _ValidateValueType {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => 'Invalid value "' . $Param{Value}
-                              . '" for valuetype "' . $Param{AttributeList}->{ $Param{Search}->{Field} }->{ValueType}
-                              . '" for search field "' . $Param{Search}->{Field} . '"!'
+                              . '" for valuetype "' . $Param{AttributeList}->{ $Param{Field} }->{ValueType}
+                              . '" for search field "' . $Param{Field} . '"!'
                 );
             }
             return;
@@ -998,9 +1012,14 @@ sub _ValidateValueType {
         $Param{Value} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
             SystemTime => $SystemTime
         );
+
+        # check for changed value
+        if ( $InitialValue ne $Param{Value} ) {
+            $IsRelative = 1;
+        }
     }
 
-    return $Param{Value};
+    return ( $Param{Value}, $IsRelative );
 }
 
 sub _CheckSortParams {

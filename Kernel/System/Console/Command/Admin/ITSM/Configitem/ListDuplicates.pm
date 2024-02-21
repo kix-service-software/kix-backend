@@ -129,7 +129,7 @@ sub Run {
             AND => $Self->{SearchCriteria}
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
 
     # get number of config items

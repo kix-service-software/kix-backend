@@ -278,8 +278,9 @@ sub Search {
     return if ( !$Condition );
 
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Join       => \@SQLJoin,
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 

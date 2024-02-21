@@ -21,8 +21,9 @@ $Helper->BeginWork();
 # sets a fix time to get no problem with age check.
 $Helper->FixedTimeSet();
 
-my $TestUser    = $Helper->TestUserCreate(
-    Roles => [
+my $TestUser = $Helper->TestUserCreate(
+    Language => 'de',
+    Roles    => [
         'Ticket Agent'
     ]
 );
@@ -31,7 +32,9 @@ my %User = $Kernel::OM->Get('User')->GetUserData(
     User  => $TestUser
 );
 
-my $TestContactID = $Helper->TestContactCreate();
+my $TestContactID = $Helper->TestContactCreate(
+    Language => 'de',
+);
 
 my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $TestContactID
@@ -57,6 +60,16 @@ for my $Attribute ( sort keys %Ticket ) {
     elsif ( !defined $Ticket{$Attribute} ) {
         $Expection = q{-};
     }
+    elsif ( $Attribute =~ /^(State|Type|Priority|StateType|Lock)$/ ) {
+        $Expection = $Kernel::OM->Get('Language')->Translate($Ticket{$Attribute});
+    }
+    elsif ( $Attribute =~ /^(Changed|Created)$/ ) {
+        $Expection = $Kernel::OM->Get('Language')->FormatTimeString(
+            $Ticket{$Attribute},
+            'DateFormat',
+            'NoSeconds',
+        );
+    }
 
     push(
         @UnitTests,
@@ -65,6 +78,12 @@ for my $Attribute ( sort keys %Ticket ) {
             TicketID  => $Ticket{TicketID},
             Test      => "<KIX_TICKET_$Attribute>",
             Expection => $Expection,
+        },
+        {
+            TestName  => "Placeholder: <KIX_TICKET_$Attribute!>",
+            TicketID  => $Ticket{TicketID},
+            Test      => "<KIX_TICKET_$Attribute!>",
+            Expection => defined $Ticket{$Attribute} ? $Ticket{$Attribute} : '-',
         }
     );
 }
@@ -129,7 +148,7 @@ sub _TestRun {
             Text      => $Test->{Test},
             Data      => {},
             TicketID  => $Test->{TicketID} || undef,
-            Translate => 0,
+            Translate => 1,
             UserID    => 1,
 
         );

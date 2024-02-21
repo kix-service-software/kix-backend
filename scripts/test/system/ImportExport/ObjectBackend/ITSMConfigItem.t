@@ -1946,6 +1946,109 @@ my @ExportDataTests = (
             ],
         ],
     },
+
+    # 23 all required values are given (XML data sub element search check)
+    {
+        SourceExportData => {
+            ObjectData => {
+                ClassID => $ConfigItemClassIDs[1],
+            },
+            MappingObjectData => [
+                {
+                    Key => 'Number',
+                },
+                {
+                    Key => 'Name',
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Main1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub1::3',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::1::Main1Sub1SubSub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub1::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub1::2::Main1Sub1SubSub2::2',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub2::1',
+                },
+                {
+                    Key => 'Main1::1::Main1Sub2::2',
+                },
+                {
+                    Key => 'Main2::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub1::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub2::1',
+                },
+                {
+                    Key => 'Main2::1::Main2Sub2::2',
+                },
+            ],
+            SearchData => {
+                Number           => $ConfigItemNumbers[2],
+                Main1Sub1SubSub1 => 'Main1 (1) Sub1 (1) SubSub1 (1)',
+            },
+            ExportDataGet => {
+                TemplateID => $TemplateIDs[7],
+                UserID     => 1,
+            },
+        },
+        ReferenceExportData => [
+            [
+                $ConfigItemNumbers[2],
+                'UnitTest - ConfigItem 3 Version 1',
+                'Production',
+                'Operational',
+                'Main1 (1)',
+                'Main1 (1) Sub1 (1)',
+                'Main1 (1) Sub1 (1) SubSub1 (1)',
+                'Main1 (1) Sub1 (1) SubSub1 (2)',
+                'Main1 (1) Sub1 (1) SubSub1 (3)',
+                'Main1 (1) Sub1 (1) SubSub2 (1)',
+                'Main1 (1) Sub1 (2)',
+                'Main1 (1) Sub1 (2) SubSub1 (1)',
+                'Main1 (1) Sub1 (2) SubSub2 (1)',
+                'Main1 (1) Sub1 (2) SubSub2 (2)',
+                'Main1 (1) Sub2 (1)',
+                'Main1 (1) Sub2 (2)',
+                'Main2 (1)',
+                'Main2 (1) Sub1 (1)',
+                'Main2 (1) Sub2 (1)',
+                'Main2 (1) Sub2 (2)',
+            ],
+        ],
+    },
 );
 
 # ------------------------------------------------------------ #
@@ -2606,7 +2709,7 @@ my @ImportDataTests = (
                     'Operational',
                     'UnitTest',
                     '2008-06-05',
-                    '2008-08-05 04:50',
+                    '2008-08-05 04:50:00',
                     'Test3',
                     '3',
                     'Test3 Text3 Test3',
@@ -2623,7 +2726,7 @@ my @ImportDataTests = (
                 InciState            => 'Operational',
                 'Customer1::1'       => 'UnitTest',
                 'Date1::1'           => '2008-06-05',
-                'DateTime1::1'       => '2008-08-05 04:50',
+                'DateTime1::1'       => '2008-08-05 04:50:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test3},
                 'Integer1::1'        => '3',
                 'Text1::1'           => 'Test3 Text3 Test3',
@@ -2678,7 +2781,7 @@ my @ImportDataTests = (
                     'Operational',
                     'UnitTest',
                     '2008-09-05',
-                    '2008-12-05 04:50',
+                    '2008-12-05 04:50:00',
                     'Test4',
                     '4',
                     'Test4 Text4 Test4',
@@ -2695,7 +2798,7 @@ my @ImportDataTests = (
                 InciState            => 'Operational',
                 'Customer1::1'       => 'UnitTest',
                 'Date1::1'           => '2008-09-05',
-                'DateTime1::1'       => '2008-12-05 04:50',
+                'DateTime1::1'       => '2008-12-05 04:50:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test4},
                 'Integer1::1'        => '4',
                 'Text1::1'           => 'Test4 Text4 Test4',
@@ -2755,7 +2858,7 @@ my @ImportDataTests = (
                     'Incident',
                     'UnitTest',
                     '2008-02-02',
-                    '2008-02-02 03:59',
+                    '2008-02-02 03:59:00',
                     'Test2',
                     '2',
                     'Test Text UPDATE1 Test',
@@ -2772,7 +2875,7 @@ my @ImportDataTests = (
                 InciState            => 'Incident',
                 'Customer1::1'       => 'UnitTest',
                 'Date1::1'           => '2008-02-02',
-                'DateTime1::1'       => '2008-02-02 03:59',
+                'DateTime1::1'       => '2008-02-02 03:59:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test2},
                 'Integer1::1'        => '2',
                 'Text1::1'           => 'Test Text UPDATE1 Test',
@@ -2832,7 +2935,7 @@ my @ImportDataTests = (
                     'Operational',
                     'UnitTest',
                     '2008-02-03',
-                    '2008-02-03 03:59',
+                    '2008-02-03 03:59:00',
                     'Test3',
                     '3',
                     'Test Text UPDATE2 Test',
@@ -2849,7 +2952,7 @@ my @ImportDataTests = (
                 InciState            => 'Operational',
                 'Customer1::1'       => 'UnitTest',
                 'Date1::1'           => '2008-02-03',
-                'DateTime1::1'       => '2008-02-03 03:59',
+                'DateTime1::1'       => '2008-02-03 03:59:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test3},
                 'Integer1::1'        => '3',
                 'Text1::1'           => 'Test Text UPDATE2 Test',
@@ -3843,6 +3946,7 @@ my @ImportDataTests = (
                 },
                 {
                     Key => 'Main1::2::Main1Sub1::5::Main1Sub1SubSub1::3',
+                    Identifier => 1,
                 },
                 {
                     Key => 'Main2::1',

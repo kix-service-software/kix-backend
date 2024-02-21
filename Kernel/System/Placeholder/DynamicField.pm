@@ -233,15 +233,16 @@ sub _ReplaceDynamicFieldPlaceholder {
         # <KIX_TICKET_DynamicField_NameX_Key> returns the stored key for select fields (multiselect, reference)
         # <KIX_TICKET_DynamicField_NameX_HTML> returns a special HTML display value (e.g. checklist) or default display value
         # <KIX_TICKET_DynamicField_NameX_Short> returns a short display value (e.g. checklist) or default display value
-        # <KIX_TICKET_DynamicField_NameX_ObjectValue...> returns the raw value(s) - with position ("_0" at the end) a certain value can be used, wihtout the value with index 0 is used
+        # <KIX_TICKET_DynamicField_NameX_ObjectValue...> returns the raw value(s) - with position ("_0" at the end) a certain value can be used, without position the array of values will be returned
         # <KIX_TICKET_DynamicField_NameX_Object...> returns the value of the corresponding object (for reference types) - something like "_0_Name" is needed (would be the name of the first object)
+        # <KIX_TICKET_DynamicField_NameX!> same as _ObjectValue
 
         my %DynamicFields;
         my %DynamicFieldsObject;
 
         # For systems with many Dynamic fields we do not want to load them all unless needed
         # Find what Dynamic Field Values are requested
-        while ( $Param{Text} =~ m/$Param{Tag}(\S+?)(_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?|_Object_\d+.+?)?$Self->{End}/gixms ) {
+        while ( $Param{Text} =~ m/$Param{Tag}(\S+?)(!|_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?|_Object_\d+.+?)?$Self->{End}/gixms ) {
                 my $DFName = $1;
                 my $Type = $2;
                 $DynamicFields{$DFName} = 1;
@@ -280,7 +281,7 @@ sub _ReplaceDynamicFieldPlaceholder {
 
             # return object value if text is just "_ObjectValue" placeholder (no surrounding text)
             my $ReturnObjectValue;
-            if ($Param{Text} =~ m/^$Param{Tag}(\S+?)ObjectValue$Self->{End}$/gixms) {
+            if ($Param{Text} =~ m/^$Param{Tag}(\S+?)(ObjectValue|!)$Self->{End}$/gixms) {
 
                 # but not (now) if _Object_ is included => handle sub object value
                 if ($Param{Text} !~ m/_Object_/) {
@@ -296,6 +297,7 @@ sub _ReplaceDynamicFieldPlaceholder {
                 $Index++;
             }
             $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = join(',',@Values);
+            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '!' } = join(',',@Values);
 
             # get the display values for each dynamic field
             my $DisplayValueStrg = $Self->{DynamicFieldBackendObject}->DisplayValueRender(

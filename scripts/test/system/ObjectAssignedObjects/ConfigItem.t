@@ -81,7 +81,7 @@ sub _PrepareData {
     my $Class_A_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_A_ID,
         UserID     => 1,
-        UsertType  => 'Agent',
+        UserType   => 'Agent',
         Definition => <<'END'
 [
     {
@@ -141,7 +141,7 @@ END
     my $Class_B_Def_ID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
         ClassID    => $Class_B_ID,
         UserID     => 1,
-        UsertType  => 'Agent',
+        UserType   => 'Agent',
         Definition => <<'END'
 [
     {
@@ -379,7 +379,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@ContactOrgaCIIDList),
@@ -445,7 +445,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -523,7 +523,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -583,7 +583,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@ContactCIIDList),
@@ -639,7 +639,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -677,7 +677,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -715,7 +715,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -753,7 +753,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -783,7 +783,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -815,7 +815,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -849,7 +849,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -885,7 +885,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
     $Self->Is(
         scalar(@CIIDList),
@@ -911,7 +911,7 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent',
+        UserType   => 'Agent',
         Silent     => 1
     );
     $Self->Is(
@@ -950,13 +950,111 @@ END
             ]
         },
         UserID     => 1,
-        UsertType  => 'Agent',
+        UserType   => 'Agent',
         Silent     => 1
     );
     $Self->Is(
         scalar(@CIIDList),
         0,
         'List should be empty [invalid config]',
+    );
+
+    # negative (valid config, not matching depl state) ---------------------------
+    _SetConfig(
+        'not matching deployment state',
+        <<"END",
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "SectionOwner::OwnerOrganisation": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID"
+                ]
+            },
+            "DeploymentState": {
+                "SearchStatic": [
+                    "Planned"
+                ]
+            }
+        }
+    }
+}
+END
+    );
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => $TestData{CustomerContact}->{ID}
+                }
+            ]
+        },
+        UserID     => 1,
+        UserType   => 'Agent',
+        Silent     => 1
+    );
+    $Self->Is(
+        scalar(@CIIDList),
+        0,
+        'List should be empty [not matching deployment state]',
+    );
+
+    # negative (valid config, not matching depl state) ---------------------------
+    _SetConfig(
+        'not matching incident state',
+        <<"END",
+{
+    "Contact": {
+        "$TestData{ClassAName}": {
+            "SectionOwner::OwnerContact": {
+                "SearchAttributes": [
+                    "ID"
+                ]
+            },
+            "SectionOwner::OwnerOrganisation": {
+                "SearchAttributes": [
+                    "PrimaryOrganisationID"
+                ]
+            },
+            "IncidentState": {
+                "SearchStatic": [
+                    "Warning"
+                ]
+            }
+        }
+    }
+}
+END
+    );
+    @CIIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Result     => 'ARRAY',
+        Search     => {
+            OR => [
+                {
+                    Field    => 'AssignedContact',
+                    Operator => 'EQ',
+                    Value    => $TestData{CustomerContact}->{ID}
+                }
+            ]
+        },
+        UserID     => 1,
+        UserType   => 'Agent',
+        Silent     => 1
+    );
+    $Self->Is(
+        scalar(@CIIDList),
+        0,
+        'List should be empty [not matching incident state]',
     );
 }
 

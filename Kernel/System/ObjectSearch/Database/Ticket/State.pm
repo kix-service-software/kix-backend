@@ -210,10 +210,18 @@ sub Search {
         push( @Conditions, $Condition );
     }
 
+    my $Condition;
+    if ( scalar( @Conditions ) > 1 ) {
+        $Condition = '(' . join( ' OR ', @Conditions ) . ')';
+    }
+    else {
+        $Condition = $Conditions[0];
+    }
+
     # return search def
     return {
         Join  => \@SQLJoin,
-        Where => [ join( ' OR ', @Conditions ) ],
+        Where => [ $Condition ],
     };
 }
 

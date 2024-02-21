@@ -61,6 +61,7 @@ sub new {
     $Self->{Debug} = $Kernel::OM->Get('Config')->Get('API::Debug');
     $Self->{LogRequestContent}  = $Kernel::OM->Get('Config')->Get('API::Debug::LogRequestContent');
     $Self->{LogResponseContent} = $Kernel::OM->Get('Config')->Get('API::Debug::LogResponseContent');
+    $Self->{LogRequestHeaders}  = $Kernel::OM->Get('Config')->Get('API::Debug::LogRequestHeaders');
 
     return $Self;
 }
@@ -171,6 +172,11 @@ sub Run {
     $Self->{ProcessedRequest} = $ProcessedRequest;
     $Self->{RequestMethod}    = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{RequestURI}       = $Self->{ProcessedRequest}->{RequestURI};
+
+    if ( $Self->{Debug} && $Self->{LogRequestHeaders} ) {
+        use Data::Dumper;
+        $Self->_Debug('', "Request Headers: ".Data::Dumper::Dumper($ProcessedRequest->{Headers}));
+    }
 
     if ( $Self->{Debug} && $Self->{LogRequestContent} ) {
         use Data::Dumper;

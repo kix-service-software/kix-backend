@@ -56,16 +56,13 @@ sub CheckAuthorization {
     my ( $Self, %Param ) = @_;
 
     # check authentication header
-    my $cgi = CGI->new;
-    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-
-    if ( !$Headers{HTTP_AUTHORIZATION} ) {
+    if ( !$ENV{HTTP_AUTHORIZATION} ) {
         return $Self->_Error(
             Code => 'Authorization.NoHeader'
         );
     }
 
-    my %Authorization = split(/\s+/, $Headers{HTTP_AUTHORIZATION});
+    my %Authorization = split(/\s+/, $ENV{HTTP_AUTHORIZATION});
 
     if ( !$Authorization{Token} ) {
         return $Self->_Error(
@@ -143,6 +140,20 @@ sub ProcessRequest {
 
     my $Operation;
     my %URIData;
+    
+    my %Headers;
+    HEADER:
+    foreach my $Key ( keys %ENV ) {
+        next HEADER if $Key !~ /^HTTP_/; 
+        next HEADER if $Key =~ /^HTTP_(PROXY|HOST)/;
+        my $Header = $Key;
+        $Header =~ s/^HTTP_//g;
+        $Header =~ s/_/-/g;
+        $Header = ucfirst lc $Header;
+        $Headers{$Header} = $ENV{$Key};
+    }
+    $Headers{'Content-type'} = $ENV{CONTENT_TYPE};
+
     my $RequestURI = $ENV{REQUEST_URI};
     $RequestURI =~ s{(\/.*)$}{$1}xms;
     # remove any query parameter form the URL
@@ -218,9 +229,12 @@ sub ProcessRequest {
         #         Other    => 2,
         #     );
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
-        next ROUTE if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next ROUTE if !(
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        );
 
         # import URI params
         my %URIParams;
@@ -268,14 +282,20 @@ sub ProcessRequest {
 
         my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$CurrentOperation} || {} };
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
         my $Base = $RouteMapping{Route};
         $Base =~ s{(/:[^\/]+)}{}xmsg;
 
-        next if !( $Base =~ m{^ $BaseRoute }xms );
+        next if !( 
+            eval { qr/^ $BaseRoute /xms }
+            && $Base =~ m{^ $BaseRoute }xms
+        );
 
-        next if !( $RequestURI =~ m{^ $RouteRegEx $}xms );
+        next if !( 
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        );
         
         # only add if we didn't have a match upto now
         next if exists $AvailableMethods{$RouteMapping{RequestMethod}->[0]};
@@ -371,6 +391,7 @@ sub ProcessRequest {
             RequestMethod  => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
             ParentMethodOperationMapping => \%ParentMethodOperationMapping,
+            Headers   => \%Headers,
             Data      => {
                 %URIData,
             },
@@ -428,6 +449,34 @@ sub ProcessRequest {
             );
         }
     }
+    # no content-type is provided, assume its json
+    elsif ( !$ENV{'CONTENT_TYPE'} ) {
+        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+            Data   => $Content,
+            Silent => 1
+        );
+
+        # content could not be decoded as json, use provided content
+        if ( !$ContentDecoded ) {
+            $ContentDecoded = $Content;
+        }
+    }
+    # workaround for fieldservice-app
+    elsif (
+        $ENV{'CONTENT_TYPE'} eq 'text/plain; charset=utf-8'
+        && $ENV{HTTP_USER_AGENT} eq 'Dart/3.0 (dart:io)'
+    ) {
+        $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Content,
+        );
+
+        if ( !$ContentDecoded ) {
+            return $Self->_Error(
+                Code    => 'Transport.REST.InvalidJSON',
+                Message => 'Error while decoding request content.',
+            );
+        }
+    }
 
     my $ReturnData;
     if ( IsHashRefWithData($ContentDecoded) ) {
@@ -461,6 +510,7 @@ sub ProcessRequest {
         RequestMethod                 => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
         ParentMethodOperationMapping  => \%ParentMethodOperationMapping,
+        Headers                       => \%Headers,
         Data                          => $ReturnData,
     );
 }

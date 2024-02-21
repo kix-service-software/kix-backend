@@ -498,12 +498,10 @@ sub ExportDataGet {
     }
 
     # add all XML data to the search params
-    my @SearchParamsWhat;
     $Self->_ExportXMLSearchDataPrepare(
         XMLDefinition => $DefinitionData->{DefinitionRef},
         What          => \@SearchParams,
-        SearchData    => $SearchData,
-        Prefix        => 'CurrentVersion.Data'
+        SearchData    => $SearchData
     );
 
     push(
@@ -984,12 +982,10 @@ sub ImportDataSave {
         }
 
         # add all XML data to the search params
-        my @SearchParamsWhat;
         $Self->_ImportXMLSearchDataPrepare(
             XMLDefinition => $DefinitionData->{DefinitionRef},
             What          => \@SearchParams,
-            Identifier    => \%Identifier,
-            Prefix        => 'CurrentVersion.Data'
+            Identifier    => \%Identifier
         );
 
         push (
@@ -1003,7 +999,7 @@ sub ImportDataSave {
         );
 
         # search existing config item with the same identifiers
-        my $ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
+        my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'ConfigItem',
             Result     => 'ARRAY',
             Search     => {
@@ -1014,7 +1010,7 @@ sub ImportDataSave {
             Silent         => $Param{Silent}
         );
 
-        if ( scalar @{$ConfigItemList} > 1 ) {
+        if ( scalar(@ConfigItemList) > 1 ) {
             return if $Param{Silent};
 
             $Kernel::OM->Get('Log')->Log(
@@ -1026,7 +1022,7 @@ sub ImportDataSave {
             return;
         }
 
-        $ConfigItemID = $ConfigItemList->[0];
+        $ConfigItemID = $ConfigItemList[0];
     }
 
     # get version data of the config item
@@ -1512,7 +1508,7 @@ sub _ExportXMLSearchDataPrepare {
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . q{.} . $Item->{Key} : $Item->{Key};
+        my $Key = $Param{Prefix} ? $Param{Prefix} . q{::} . $Item->{Key} : $Item->{Key};
 
         # prepare value
         my $Values = $Kernel::OM->Get('ITSMConfigItem')->XMLExportSearchValuePrepare(
@@ -1523,7 +1519,8 @@ sub _ExportXMLSearchDataPrepare {
         if ($Values) {
 
             # create search key
-            my $SearchKey = $Key;
+            my $SearchKey = 'CurrentVersion.Data.' . $Key;
+            $SearchKey =~ s/::/./gsm;
 
             # create search hash
             my $SearchHash = {
@@ -1636,7 +1633,7 @@ sub _ImportXMLSearchDataPrepare {
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         # create key
-        my $Key = $Param{Prefix} ? $Param{Prefix} . '::\d+::' . $Item->{Key} : $Item->{Key};
+        my $Key = $Param{Prefix} ? $Param{Prefix} . '::' . $Item->{Key} : $Item->{Key};
         $Key .= '::\d+';
 
         my $IdentifierKey;
@@ -1658,23 +1655,17 @@ sub _ImportXMLSearchDataPrepare {
 
             if ($Value) {
 
-                # prepare key
-                my $Counter = 0;
-                while ( $IdentifierKey =~ m{ :: }xms ) {
-
-                    if ( $Counter % 2 ) {
-                        $IdentifierKey =~ s{ :: }{]\{'}xms;
-                    }
-                    else {
-                        $IdentifierKey =~ s{ :: }{'\}[}xms;
-                    }
-
-                    $Counter++;
-                }
+                # create search key
+                my $SearchKey = 'CurrentVersion.Data.' . $IdentifierKey;
+                $SearchKey =~ s/::\d+::/./gsm;
+                $SearchKey =~ s/::\d+//gsm;
 
                 # create search hash
                 my $SearchHash = {
-                    '[1]{\'Version\'}[1]{\'' . $IdentifierKey . ']{\'Content\'}' => $Value,
+                    Field    => $SearchKey,
+                    Operator => 'EQ',
+                    Type     => 'STRING',
+                    Value    => $Value
                 };
 
                 push @{ $Param{What} }, $SearchHash;

@@ -144,9 +144,6 @@ sub Request {
 
     my $Response;
 
-    # don't use Crypt::SSLeay but IO::Socket::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
-
     # init agent
     my $UserAgent = LWP::UserAgent->new();
 

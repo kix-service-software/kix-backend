@@ -169,7 +169,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_date = \'2014-01-01 01:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -201,7 +202,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 '(dfv_left0.value_date != \'2014-01-01 01:00:00\' OR dfv_left0.value_date IS NULL)'
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -233,7 +235,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_date < \'2014-01-01 01:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -265,7 +268,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_date > \'2014-01-01 01:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -297,7 +301,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_date <= \'2014-01-01 01:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -329,7 +334,8 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_date >= \'2014-01-01 01:00:00\''
-            ]
+            ],
+            'IsRelative' => 1
         }
     }
 );
@@ -699,6 +705,60 @@ for my $Test ( @IntegrationSortTests ) {
         $Test->{Name}
     );
 }
+
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 00:00:00',
+    'Timestamp before first relative search'
+);
+my @FirstResult = $ObjectSearch->Search(
+    ObjectType => 'Organisation',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GTE',
+                Value    => '+1d'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@FirstResult,
+    [$OrganisationID2],
+    'Result of first relative search'
+);
+$Helper->FixedTimeAddSeconds(60);
+$TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 00:01:00',
+    'Timestamp before second relative search'
+);
+my @SecondResult = $ObjectSearch->Search(
+    ObjectType => 'Organisation',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GTE',
+                Value    => '+1d'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@SecondResult,
+    [],
+    'Result of second relative search'
+);
 
 # reset fixed time
 $Helper->FixedTimeUnset();

@@ -111,578 +111,649 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data for searchable sub attribute'
 );
 
-# check Search
-my @SearchTests = (
-    {
-        Name         => 'Search: undef search',
-        Search       => undef,
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: Value undef',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'EQ',
-            Value    => undef
+# backup backend of db
+my $BackupDBBackend = $Kernel::OM->Get('DB')->{Backend};
 
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: Field undef',
-        Search       => {
-            Field    => undef,
-            Operator => 'EQ',
-            Value    => '1'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: Field invalid',
-        Search       => {
-            Field    => 'Test',
-            Operator => 'EQ',
-            Value    => '1'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: Operator undef',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => undef,
-            Value    => '1'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: Operator invalid',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'Test',
-            Value    => '1'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'EQ',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value = \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / Value empty string',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'EQ',
-            Value    => ''
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'NE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / Value empty string',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'NE',
-            Value    => ''
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value != \'\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator IN',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator !IN',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => '!IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value NOT IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LT',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LT',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value < \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LTE',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LTE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value <= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GT',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'GT',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value > \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GTE',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'GTE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value >= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator STARTSWITH',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator ENDSWITH',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'%Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator CONTAINS',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'%Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LIKE',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join'  => [
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'EQ',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value = \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / PreviousVersionSearch / Value empty string',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'EQ',
-            Value    => ''
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'NE',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / PreviousVersionSearch / Value empty string',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'NE',
-            Value    => ''
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value != \'\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator IN / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'IN',
-            Value    => ['Test']
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator !IN / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => '!IN',
-            Value    => ['Test']
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value NOT IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LT / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LT',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value < \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LTE / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LTE',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value <= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GT / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'GT',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value > \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GTE / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'GTE',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value >= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator STARTSWITH / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator ENDSWITH / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'%Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator CONTAINS / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'%Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LIKE / PreviousVersionSearch',
-        Search       => {
-            Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Flags        => {
-            PreviousVersionSearch => 1
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS BIGINT) = civ.id AND xst_left0.xml_content_key LIKE \'[1]{\'\'Version\'\'}[1]{\'\'NotSearchable\'\'}[%]{\'\'UnitTest\'\'}[%]{\'\'Content\'\'}\''
-            ],
-            'Where' => [
-                'xst_left0.xml_content_value LIKE \'Test\''
-            ]
-        }
+# run test for database type postgresql and mysql to check CAST
+for my $DatabaseType ( qw( postgresql mysql ) ) {
+
+    # overwrite backend of db object
+    my $GenericModule = $Kernel::OM->GetModuleFor('DB::' . $DatabaseType);
+    if ( !$Kernel::OM->Get('Main')->Require($GenericModule) ) {
+        $Self->False(
+            1,
+            'Unable to require module for database type ' . $DatabaseType
+        );
+        next;
     }
-);
-for my $Test ( @SearchTests ) {
-    my $Result = $AttributeObject->Search(
-        Search       => $Test->{Search},
-        Flags        => $Test->{Flags},
-        BoolOperator => 'AND',
-        UserID       => 1,
-        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    $Kernel::OM->Get('DB')->{Backend} = $GenericModule->new( %{$Kernel::OM->Get('DB')} );
+    $Kernel::OM->Get('DB')->{Backend}->LoadPreferences();
+
+    $Self->Is(
+        ref( $Kernel::OM->Get('DB')->{Backend} ),
+        'Kernel::System::DB::' . $DatabaseType,
+        'DatabaseType ' . $DatabaseType . ' / Backend'
     );
-    $Self->IsDeeply(
-        $Result,
-        $Test->{Expected},
-        $Test->{Name}
+
+    my $BigIntCast  = 'BIGINT';
+    my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
+    if (
+        ref( $CastMapping ) eq 'HASH'
+        && $CastMapping->{BIGINT}
+    ) {
+        $BigIntCast = $CastMapping->{BIGINT};
+    }
+    if ( $DatabaseType eq 'mysql' ) {
+        $Self->Is(
+            $BigIntCast,
+            'UNSIGNED',
+            'DatabaseType ' . $DatabaseType . ' / BigIntCast'
+        );
+    }
+    else {
+        $Self->Is(
+            $BigIntCast,
+            'BIGINT',
+            'DatabaseType ' . $DatabaseType . ' / BigIntCast'
+        );
+    }
+    
+    my $QuoteSingle   = '';
+    my $DBQuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+    if ( $DBQuoteSingle ) {
+        $QuoteSingle = $DBQuoteSingle;
+    }
+    if ( $DatabaseType eq 'mysql' ) {
+        $Self->Is(
+            $QuoteSingle,
+            '\\',
+            'DatabaseType ' . $DatabaseType . ' / QuoteSingle'
+        );
+    }
+    else {
+        $Self->Is(
+            $QuoteSingle,
+            '\'',
+            'DatabaseType ' . $DatabaseType . ' / QuoteSingle'
+        );
+    }
+
+    # check Search
+    my @SearchTests = (
+        {
+            Name         => 'Search: undef search',
+            Search       => undef,
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: Value undef',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EQ',
+                Value    => undef
+
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: Field undef',
+            Search       => {
+                Field    => undef,
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: Field invalid',
+            Search       => {
+                Field    => 'Test',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: Operator undef',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => undef,
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: Operator invalid',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'Test',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value = \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / Value empty string',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / Value empty string',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator IN',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value IN (\'Test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator !IN',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value NOT IN (\'Test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LT',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LT',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value < \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LTE',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LTE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value <= \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GT',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'GT',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value > \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GTE',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'GTE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value >= \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator STARTSWITH',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'Test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator ENDSWITH',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'%Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator CONTAINS',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'%Test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LIKE',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join'  => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value = \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / PreviousVersionSearch / Value empty string',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator NE / PreviousVersionSearch / Value empty string',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator IN / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value IN (\'Test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator !IN / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value NOT IN (\'Test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LT / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LT',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value < \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LTE / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LTE',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value <= \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GT / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'GT',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value > \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator GTE / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'GTE',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value >= \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator STARTSWITH / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'Test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator ENDSWITH / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'%Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator CONTAINS / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'%Test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator LIKE / PreviousVersionSearch',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON CAST(xst_left0.xml_key AS ' . $BigIntCast . ') = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value LIKE \'Test\''
+                ]
+            }
+        }
     );
+    for my $Test ( @SearchTests ) {
+        my $Result = $AttributeObject->Search(
+            Search       => $Test->{Search},
+            Flags        => $Test->{Flags},
+            BoolOperator => 'AND',
+            UserID       => 1,
+            Silent       => defined( $Test->{Expected} ) ? 0 : 1
+        );
+        $Self->IsDeeply(
+            $Result,
+            $Test->{Expected},
+            'DatabaseType ' . $DatabaseType . ' / ' . $Test->{Name}
+        );
+    }
 }
+
+# restore backend of db
+$Kernel::OM->Get('DB')->{Backend} = $BackupDBBackend;
 
 # check Sort
 my @SortTests = (

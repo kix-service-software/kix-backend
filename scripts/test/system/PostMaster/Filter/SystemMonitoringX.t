@@ -468,7 +468,7 @@ if (
                     ]
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
             $Self->True(
                 scalar(@ConfigItemIDs) || 0,

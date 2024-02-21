@@ -100,9 +100,7 @@ sub NotifyClients {
     my $Timestamp = Time::HiRes::time();
 
     # get RequestID
-    my $cgi = CGI->new;
-    my %Headers = map { $_ => $cgi->http($_) } $cgi->http();
-    my $RequestID = $Headers{HTTP_KIX_REQUEST_ID} || '';
+    my $RequestID = $ENV{HTTP_KIX_REQUEST_ID} || '';
 
     $Self->{CacheObject}->Set(
         Type          => 'ClientNotification',
@@ -278,9 +276,6 @@ sub _NotificationSendToClient {
     my %ClientNotification = $Self->ClientNotificationGet(
         ClientID => $Param{ClientID}
     );
-
-    # don't use Crypt::SSLeay but IO::Socket::SSL instead
-    $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
 
     if ( !$Self->{UserAgent} ) {
         my $ConfigObject       = $Kernel::OM->Get('Config');

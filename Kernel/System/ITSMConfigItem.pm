@@ -1361,7 +1361,7 @@ sub UniqueNameCheck {
         ObjectType => 'ConfigItem',
         Result     => 'ARRAY',
         UserID     => 1,
-        UsertType  => 'Agent'
+        UserType   => 'Agent'
     );
 
     # remove the provided ConfigItemID from the results, otherwise the duplicate check would fail
@@ -1381,6 +1381,7 @@ recalculates the current incident state of this config item and all linked confi
 
     my $NewConfigItemInciStateHashRef = $ConfigItemObject->RecalculateCurrentIncidentState(
         ConfigItemID => 123,
+        Event        => '...',              # optional, if triggered by a specific event
         Simulate     => {                   # optional, don't update the config items
             1 => 'Warning',
             2 => 'Incident',
@@ -1401,6 +1402,9 @@ sub RecalculateCurrentIncidentState {
         );
         return;
     }
+
+    my $PropagationEnabled = $Kernel::OM->Get('Config')->Get('ITSM::Core::IncidentStatePropagation::Enabled');
+    return if !$PropagationEnabled && !IsHashRefWithData($Param{Simulate});
 
     # get the incident state lists
     if ( !IsHashRefWithData($Self->{IncidentStateList}) ) {
@@ -1443,12 +1447,16 @@ sub RecalculateCurrentIncidentState {
 
     my $Simulate = $Param{Simulate} || {};
 
+    # in case of a link change, we only need to investigate our direct neighbors otherwise use config
+    my $MaxLevel = ($Param{Event} && $Param{Event} =~ /^Link(Add|Delete)$/) ? 1 : $Kernel::OM->Get('Config')->Get('ITSM::Core::IncidentStatePropagation::MaxDepth');
+
     # find all config items with an incident state
     $Self->_FindInciConfigItems(
         ConfigItemID              => $Param{ConfigItemID},
         IncidentLinkTypeDirection => $IncidentLinkTypeDirection,
         ScannedConfigItemIDs      => \%ScannedConfigItemIDs,
         Simulate                  => $Param{Simulate},
+        MaxLevel                  => $MaxLevel,
     );
 
     # calculate the new CI incident state for each configured linktype
@@ -1472,6 +1480,7 @@ sub RecalculateCurrentIncidentState {
                 Direction            => $LinkDirection,
                 ScannedConfigItemIDs => \%ScannedConfigItemIDs,
                 Simulate             => $Param{Simulate},
+                MaxLevel             => $MaxLevel,
             );
         }
 
@@ -1567,6 +1576,7 @@ sub RecalculateCurrentIncidentState {
                     Key  => $CacheKey . $XMLData,
                 );
             }
+
             $CacheObject->Delete(
                 Type => $Self->{CacheType},
                 Key  => 'VersionNameGet::ConfigItemID::' . $ConfigItemID,
@@ -1576,6 +1586,7 @@ sub RecalculateCurrentIncidentState {
             my $VersionList = $Self->VersionList(
                 ConfigItemID => $ConfigItemID,
             );
+    
             my $VersionID = $VersionList->[-1];
             $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
             for my $XMLData (qw(0 1)) {
@@ -2486,7 +2497,7 @@ sub UpdateCounters {
                     ]
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
             $Counters{'DeploymentState::Functionality::'.$Functionality} = $ConfigItemCount || 0;
         }
@@ -2512,7 +2523,7 @@ sub UpdateCounters {
                     ]
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
             $Counters{'DeploymentState::'.$DeplStateList->{$DeplStateID}->{Name}} = $ConfigItemCount || 0;
         }
@@ -2538,7 +2549,7 @@ sub UpdateCounters {
                     ]
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
             $Counters{'IncidentState::'.$InciStateList->{$InciStateID}->{Name}} = $ConfigItemCount || 0;
         }
@@ -2706,11 +2717,13 @@ find all config items with an incident state
         ConfigItemID              => $ConfigItemID,
         IncidentLinkTypeDirection => $IncidentLinkTypeDirection,
         ScannedConfigItemIDs      => \%ScannedConfigItemIDs,
+        MaxLevel                  => 123,                       # optional
         Simulate                  => {                          # optional
             1  => 'warning',
             3  => 'incident',
             99 => 'incident',
-        }
+        },
+        _Level                    => 123,                       # internal use in recursion
     );
 
 =cut
@@ -2720,6 +2733,11 @@ sub _FindInciConfigItems {
 
     # check needed stuff
     return if !$Param{ConfigItemID};
+
+    # if maxlevel is reached
+    $Param{_Level}   //= 0;
+    $Param{MaxLevel} //= 0;
+    return if $Param{MaxLevel} && $Param{_Level} == $Param{MaxLevel};
 
     # ignore already scanned ids (infinite loop protection)
     return if $Param{ScannedConfigItemIDs}->{ $Param{ConfigItemID} };
@@ -2786,6 +2804,8 @@ sub _FindInciConfigItems {
             IncidentLinkTypeDirection => $Param{IncidentLinkTypeDirection},
             ScannedConfigItemIDs      => $Param{ScannedConfigItemIDs},
             Simulate                  => $Param{Simulate},
+            MaxLevel                  => $Param{MaxLevel},
+            _Level                    => $Param{_Level} + 1,
         );
     }
 
@@ -2802,11 +2822,13 @@ find all config items with a warning
         Direction            => $LinkDirection,
         NumberOfLinkTypes    => 2,
         ScannedConfigItemIDs => $ScannedConfigItemIDs,
-        Simulate                  => {                          # optional
+        MaxLevel             => 123,                       # optional
+        Simulate             => {                          # optional
             1  => 'warning',
             3  => 'incident',
             99 => 'incident',
-        }
+        },
+        _Level               => 123,                       # internal use in recursion
     );
 
 =cut
@@ -2816,6 +2838,11 @@ sub _FindWarnConfigItems {
 
     # check needed stuff
     return if !$Param{ConfigItemID};
+
+    # if maxlevel is reached
+    $Param{_Level}   //= 0;
+    $Param{MaxLevel} //= 0;
+    return if $Param{MaxLevel} && $Param{_Level} == $Param{MaxLevel};
 
     my $IncidentCount = 0;
     for my $ConfigItemID ( sort keys %{ $Param{ScannedConfigItemIDs} } ) {
@@ -2861,6 +2888,8 @@ sub _FindWarnConfigItems {
             Direction            => $Param{Direction},
             ScannedConfigItemIDs => $Param{ScannedConfigItemIDs},
             Simulate             => $Param{Simulate},
+            MaxLevel             => $Param{MaxLevel},
+            _Level               => $Param{_Level} + 1,
         );
 
         next CONFIGITEMID

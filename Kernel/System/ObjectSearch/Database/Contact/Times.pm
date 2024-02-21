@@ -127,7 +127,8 @@ sub Search {
 
 
     return {
-        Where => [ $Condition ]
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 

@@ -129,8 +129,17 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
+        my $BigIntCast  = 'BIGINT';
+        my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
+        if (
+            ref( $CastMapping ) eq 'HASH'
+            && $CastMapping->{BIGINT}
+        ) {
+            $BigIntCast = $CastMapping->{BIGINT};
+        }
+
         # add join for xml storage
-        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS BIGINT) = $XMLStorageJoinColumn AND $JoinRestriction" );
+        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS $BigIntCast) = $XMLStorageJoinColumn AND $JoinRestriction" );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;
     }
@@ -147,8 +156,9 @@ sub Search {
 
     # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Join       => \@SQLJoin,
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 
@@ -168,12 +178,28 @@ sub _XMLAttributeGet {
             push( @{ $Param{AttributesRef}->{ $Key }->{ClassID} }, $Param{ClassID} );
         }
         else {
+            my $ValueType = undef;
+            my $Operators = [];
+            if (
+                $Attr->{Input}->{Type} eq 'Date'
+                || $Attr->{Input}->{Type} eq 'DateTime'
+            ) {
+                $ValueType = uc($Attr->{Input}->{Type});
+                if ( $Attr->{Searchable} ) {
+                    $Operators = ['EQ','NE','LT','LTE','GT','GTE']
+                }
+            }
+            elsif ( $Attr->{Searchable} ) {
+                $Operators = ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'];
+            }
+
             $Param{AttributesRef}->{$Key} = {
                 IsSearchable => $Attr->{Searchable} || 0,
                 IsSortable   => 0,
                 Class        => [ $Param{Class} ],
                 ClassID      => [ $Param{ClassID} ],
-                Operators    => $Attr->{Searchable} ? ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'] : []
+                Operators    => $Operators,
+                ValueType    => $ValueType
             };
         }
 

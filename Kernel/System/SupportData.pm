@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -189,9 +189,11 @@ sub _CollectDB {
         $Result{Size} = $Row[0]
     }
 
-    # get all counts
+    # get db schema
     my $DBSchema = $DBObject->GetSchemaInformation();
+    $Result{DBSchema} = $DBSchema;
 
+    # get all table counts
     TABLE:
     foreach my $Table ( sort keys %{$DBSchema} ) {
         $Result{Counts}->{$Table} = '???';
@@ -211,6 +213,7 @@ sub _CollectDB {
     foreach my $Table ( sort ('queue', 'organisation', 'contact', 'workflow_ruleset') ) {
         $Result{ValidCounts}->{$Table} = '???';
 
+        next TABLE if !$DBSchema->{$Table};
         next TABLE if !$DBObject->Prepare(
             SQL => "SELECT count(*) FROM $Table WHERE valid_id = 1",
             Limit => 1,

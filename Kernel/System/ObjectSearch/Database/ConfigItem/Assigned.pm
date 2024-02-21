@@ -246,7 +246,7 @@ sub _GetAssigendParams {
 
         # prepare xml search params (What)
         my %SearchParam = ();
-        $Self->_GetXMLSearchDataForAssignedCIs(
+        $Self->_GetSearchDataForAssignedCIs(
             XMLDefinition => $XMLDefinition->{DefinitionRef},
             SearchParams  => \%SearchParam,
             SearchData    => $SearchData
@@ -563,7 +563,7 @@ sub _GetAssignedMapping {
     return $Mapping;
 }
 
-sub _GetXMLSearchDataForAssignedCIs {
+sub _GetSearchDataForAssignedCIs {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -579,7 +579,7 @@ sub _GetXMLSearchDataForAssignedCIs {
         # process sub entry
         if ( $Item->{Sub} ) {
             # start recursion, if "Sub" was found
-            $Self->_GetXMLSearchDataForAssignedCIs(
+            $Self->_GetSearchDataForAssignedCIs(
                 XMLDefinition => $Item->{Sub},
                 SearchParams  => $Param{SearchParams},
                 SearchData    => $Param{SearchData},
@@ -594,8 +594,23 @@ sub _GetXMLSearchDataForAssignedCIs {
         # add search parameter for key
         my $SearchKey = $Key;
         $SearchKey =~ s{::}{.}xmsg;
-        $Param{SearchParams}->{ IsWhat }->{ $SearchKey }       = 1;
-        $Param{SearchParams}->{ SearchParams }->{ $SearchKey } = $Param{SearchData}->{ $Key };
+        $Param{SearchParams}->{IsWhat}->{ $SearchKey }       = 1;
+        $Param{SearchParams}->{SearchParams}->{ $SearchKey } = $Param{SearchData}->{ $Key };
+    }
+
+    for my $Attribute (qw(DeploymentState DeplState DeplStateID DeplStateIDs IncidentState InciState InciStateID InciStateIDs Name Number)) {
+        # skip attribute if not relevant for search data
+        next if ( !defined( $Param{SearchData}->{ $Attribute } ) );
+
+        if ( $Attribute eq 'DeploymentState' ) {
+            $Param{SearchParams}->{SearchParams}->{DeplState} = $Param{SearchData}->{ $Attribute };
+        }
+        elsif ( $Attribute eq 'IncidentState' ) {
+            $Param{SearchParams}->{SearchParams}->{InciState} = $Param{SearchData}->{ $Attribute };
+        }
+        else {
+            $Param{SearchParams}->{SearchParams}->{ $Attribute } = $Param{SearchData}->{ $Attribute };
+        }
     }
 
     return 1;

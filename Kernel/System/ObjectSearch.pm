@@ -295,7 +295,7 @@ sub Search {
     }
 
     # let backend process search
-    my $SearchResult = $Self->{Backend}->Search(
+    my ( $SearchResult, $IsRelative ) = $Self->{Backend}->Search(
         %Param,
         ObjectType => $ObjectType,
     );
@@ -322,7 +322,10 @@ sub Search {
     }
 
     # write cache
-    if ( $Param{CacheTTL} ) {
+    if (
+        !$IsRelative
+        && $Param{CacheTTL}
+    ) {
         $Kernel::OM->Get('Cache')->Set(
             Type  => 'ObjectSearch_' . $ObjectType,
             Key   => $CacheKey,

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-10 13:39+0000\n"
-"PO-Revision-Date: 2023-09-27 11:49+0000\n"
+"POT-Creation-Date: 2024-1-31 17:27+0000\n"
+"PO-Revision-Date: 2023-11-13 11:37+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -409,6 +409,10 @@ msgstr "andere"
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Outlet"
 msgstr "Outlet"
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Pattern"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Node"
@@ -1247,11 +1251,28 @@ msgid "Value"
 msgstr "Wert"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "(Optional) A message id the new article is a reply to."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "(Optional) Message ids of references of the new article."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "(Optional) Prevent sending of the new article by the system."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
 "(Optional) The channel of the new article. \"note\" will be used if omitted."
 msgstr ""
 "(Optional) Der Kanal des neuen Artikels. \"Notiz\" wird automatisch gesetzt, "
 "wenn hier kein Wert gewählt wird."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid ""
+"(Optional) The email address an answer should be send to of the new article."
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -1274,6 +1295,10 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) The email addresses of the receiver of the new article."
 msgstr "(Optional) Die E-Mail Adressen der Empfänger des neuen Artikels."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "(Optional) The message id of the new article."
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -1345,6 +1370,10 @@ msgid "Creates an article for a ticket."
 msgstr "Erstellt einen Artikel für ein Ticket."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "DoNotSendEmail"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "From"
 msgstr "Von"
 
@@ -1352,6 +1381,22 @@ msgstr "Von"
 msgid "If the new article is visible for customers"
 msgstr ""
 "Wenn der Hacken gesetzt ist, ist der Artikel im Self Service Portal sichtbar."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "InReplyTo"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "MessageID"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "References"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "ReplyTo"
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Sender Type"
@@ -1367,9 +1412,7 @@ msgstr "Betreff"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
-msgstr ""
-"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
-"Sie dieses weiterverwenden wollen."
+msgstr "Die ID des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The subject of the new article."
@@ -1389,7 +1432,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
 msgid "ArticleID"
-msgstr ""
+msgstr "ArtikelID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleDelete.pm
 msgid ""
@@ -1640,9 +1683,7 @@ msgstr "Team"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID of the new ticket."
-msgstr ""
-"Legen Sie einen Variablen-Namen für das Ergebnis der Macro-Action fest, wenn "
-"Sie dieses weiterverwenden wollen."
+msgstr "Die ID des neuen Tickets."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The ID or email of the contact of the new ticket."
@@ -2259,6 +2300,125 @@ msgstr "API-Modulregistrierung für die Validator-Schicht."
 msgid "Disable API validator for specific resources. Use RegEx."
 msgstr ""
 
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Assemble Object"
+msgstr "Objekt zusammenstellen"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Conditional"
+msgstr "Bedingung"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Create Report"
+msgstr "Bericht erstellen"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Enable Automation debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Event Based"
+msgstr "Eventgesteuert"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Execute Macro"
+msgstr "Makro ausführen"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Extract Text"
+msgstr "Text entnehmen"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Loop"
+msgstr "Schleife"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a execution plan type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a logging module for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a macro action type for automation."
+msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a macro type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a object (module) which uses exec plans."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a object (module) which uses macros."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a variable filter module."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Reporting"
+msgstr "Berichte"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid ""
+"Run file based generic agent jobs (Note: module name need needs to be "
+"specified in -configuration-module param e.g. \"Kernel::System::Automation"
+"\")."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Set Variable"
+msgstr "Variable setzen"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid ""
+"Set minimum loglevel for the automation layer. If you select 'error', just "
+"errors are logged. With 'debug' you get all logging messages."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Synchronisation"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "The daemon registration for the scheduler automation task manager."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Time Based"
+msgstr "Zeitgesteuert"
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "debug"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "error"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "info"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "notice"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Contact.xml
+msgid ""
+"Event module to assign organisations, if non is set on the contact, based of "
+"configured methods."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Cache Time To Leave for FAQ items."
 msgstr ""
@@ -2290,10 +2450,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Enable voting mechanism on FAQ module."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/FAQ.xml
-msgid "FAQ"
-msgstr "FAQ"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Field4"
@@ -2543,10 +2699,6 @@ msgid "Alternative to"
 msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Assemble Object"
-msgstr "Objekt zusammenstellen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
 msgstr ""
 
@@ -2605,10 +2757,9 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Checks if the sender of a follow-up message is contained in customer "
-"database an has an identical customer-ID as the ticket. If so, the email is "
-"considered as email-external, otherwise it is considered as email-internal. "
-"Default KIX behavior if disabled."
+"Checks if the sender of a follow-up message is contained in contact database "
+"an has an identical organisation as the ticket. If so, the email is visible "
+"in the self service portal."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2640,10 +2791,6 @@ msgid "Company name which will be included in outgoing emails as an X-Header."
 msgstr "Der Name Ihres Unternehmens für die Verwendung im KIX-Mail-Header."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Conditional"
-msgstr "Bedingung"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Configure any additional readonly mirror databases that you want to use."
 msgstr ""
@@ -2667,10 +2814,6 @@ msgid ""
 "Controls if the admin is allowed to make changes to the database via "
 "AdminSelectBox."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Create Report"
-msgstr "Bericht erstellen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Daily"
@@ -3090,6 +3233,14 @@ msgid "Defines the number of days to keep the daemon log files."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the number of days to keep the metric files."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the parameters for the SupportData collection and sending."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the parameters for the contact preferences table."
 msgstr ""
 
@@ -3337,10 +3488,6 @@ msgid "DynamicField object registration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enable Automation debugging."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Enable DB debugging for specific DB methods. Depends on DB::Debug as the "
 "\"main switch\"."
@@ -3372,6 +3519,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable keep-alive connection header for SOAP responses."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable or disable metrics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3417,10 +3568,6 @@ msgid "English"
 msgstr "Englisch"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Event Based"
-msgstr "Eventgesteuert"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Event handler which extracts asset info from articles or dynamic fields, "
 "attempts to find assets in order to automatically append them to a ticket "
@@ -3437,10 +3584,6 @@ msgid "Excel"
 msgstr "Excel"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Execute Macro"
-msgstr "Makro ausführen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Executes a custom command or module. Note: if module is used, function is "
 "required."
@@ -3450,10 +3593,6 @@ msgstr ""
 msgid "Extended organization description."
 msgstr ""
 "Weitere Informationen über Ihr Unternehmen (vgl. auch Platzhaltertext)."
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Extract Text"
-msgstr "Text entnehmen"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Fetch emails via fetchmail (using SSL)."
@@ -3537,18 +3676,6 @@ msgstr ""
 msgid ""
 "If \"SysLog\" was selected for LogModule, the charset that should be used "
 "for logging can be specified."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"If \"SysLog\" was selected for LogModule, you can specify a special log "
-"facility."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"If \"SysLog\" was selected for LogModule, you can specify the charset that "
-"should be used for logging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3775,18 +3902,8 @@ msgid "List of all contact events."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Log module for the SysConfig. \"File\" writes all messages in a given "
-"logfile, \"SysLog\" uses the syslog daemon of the system, e.g. syslogd."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Logs the configuration changes of SysConfig options."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Loop"
-msgstr "Schleife"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -3828,18 +3945,6 @@ msgstr "Mehrfachauswahl"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "My Removable Article Flags"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Name of Dynamic Field for Address."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Name of Dynamic Field for Host."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Name of Dynamic Field for Service."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3942,27 +4047,11 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a execution plan type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a function for reporting data source GenericSQL."
 msgstr "Funktionsregistrierung für Berichtsdatenquelle GnericSQL."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a object (module) which uses exec plans."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a object (module) which uses macros."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Registration of a report type for reporting."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Registration of a variable filter module."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3985,14 +4074,15 @@ msgstr "Relevant für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"Removes relevant caches if assigned objects/configitems mapping is changed."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "Renew existing SMIME certificates from customer backend. Note: SMIME and "
 "SMIME::FetchFromCustomer needs to be active in SysConfig and customer "
 "backend needs to be configured to fetch UserSMIMECertificate attribute."
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Reporting"
-msgstr "Berichte"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4006,13 +4096,6 @@ msgstr "Benötigt für"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "ResolveDynamicFieldValue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Run file based generic agent jobs (Note: module name need needs to be "
-"specified in -configuration-module param e.g. \"Kernel::System::Automation"
-"\")."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4048,26 +4131,20 @@ msgid "Send all ticket notifications asynchronously through the daemon."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Send the Support Data."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Sends all outgoing email via bcc to the specified address. Please use this "
 "only for backup reasons."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set Variable"
-msgstr "Variable setzen"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Set a true-value for key (ticket type) if a type update forces a state "
 "update to the default state. The update is done whenever the original ticket "
 "state does not appear in the new ticket types workflow definition."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Set minimum loglevel for the automation layer. If you select 'error', just "
-"errors are logged. With 'debug' you get all logging messages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4309,10 +4386,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Synchronisation"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Table"
 msgstr "Tabelle"
 
@@ -4323,10 +4396,6 @@ msgstr "Textbereich"
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
 msgstr "Textarea-Eingabe"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "The daemon registration for the scheduler automation task manager."
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler client notification worker."
@@ -4464,10 +4533,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Time Based"
-msgstr "Zeitgesteuert"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Translate"
 msgstr "Übersetzen"
 
@@ -4558,14 +4623,6 @@ msgid "attachment"
 msgstr "Anhang"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "debug"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "error"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "if_plugin_available"
 msgstr ""
 
@@ -4574,15 +4631,7 @@ msgid "if_plugin_available(:Plugin,:Text)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "info"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "inline"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "notice"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/HTMLToPDF.xml
@@ -4689,6 +4738,10 @@ msgid "Defines which type of ticket can affect the status of a linked CI."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Enable or diable the automatic incident state propagation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
 "Enables/disables the functionality to check ConfigItems for unique names. "
 "Before enabling this option you should check your system for already "
@@ -4746,6 +4799,12 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
 "Set the incident state of a CI automatically when a Ticket is Linked to a CI."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid ""
+"Set the maximum link depth to follow during the automatic incident state "
+"propagation. Default: 0 (no limit)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4853,6 +4912,17 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
 msgid ""
+"Defines a list of Ticket Dynamic Fields which are available for editing in "
+"the KIXMobileApp. The lists consists of dynamic field names (e.g. "
+"'WorkOrder') or regular expressions matching dynamic field names (e.g. 'Work."
+"*'). Be aware that field types which are not supported by the app, will not "
+"be available for input. Furthermore some specific DF such as any fields of "
+"type  Checklist, fields MobileProcessingState, PlanBegin, PlanEnd are fixed "
+"and cannot be removed or changed in their app behavior by this setting"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
 "Defines a list of Ticket Dynamic Fields which are evaluated by the "
 "KIXMobileApp. The lists consists of dynamic field names (e.g. "
 "'MobileProcessingState') or regular expressions matching dynamic field names "
@@ -4884,6 +4954,37 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Migration/KIX17.xml
 msgid "Object handler registration for data migration."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for confg items."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for contacts."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for faq articles."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for objects."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for organisations."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for tickets."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Register object type for backend \"ObjectSearch::Database\""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5056,10 +5157,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Default loop protection module."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Define a mapping between variables of the contact data (keys) and dynamic "
 "fields of a ticket (values). The purpose is to store contact data in ticket "
@@ -5096,16 +5193,20 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
+"Defines how many lines of the html content for the \"_BodyRichtext\" (and "
+"\"_BodyRichtextNoInline\") placeholder would be used in the replacement "
+"process if not given in placeholder itself (e.g. "
+"\"KIX_ARTICLE_BodyRichtext_30\")"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
 "Defines how the From field from the emails (sent from answers and email "
 "tickets) should look like."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the backend module for the watcher feature."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Defines the backend module that should be used to search for tickets."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5398,6 +5499,24 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
+"Is executed when an article is created in the \"Email\" channel. Checks "
+"whether at least one email reference (References and InReplyTo) is a message-"
+"id of a customer visible article at the same ticket. If Yes: The visibility "
+"of the article in the SSP is automatically activated (regardless of the "
+"agent's setting). If No: The visibility selected by the agent is not changed."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Is executed when an article is created in the \"Email\" channel. Checks "
+"whether at least one of the recipient addresses (To, Cc or Bcc) is assigned "
+"to the ticket contact. If Yes: The visibility of the article in the SSP is "
+"automatically activated (regardless of the agent's setting). If No: The "
+"visibility selected by the agent is not changed."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
 "Italian stop words for fulltext index. These words will be removed from the "
 "search index."
 msgstr ""
@@ -5452,10 +5571,6 @@ msgstr "Gesperrtes Ticket."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Log file for the ticket counter."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Loop-Protection! No auto-response sent to \"%s\"."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5590,18 +5705,6 @@ msgstr ""
 msgid ""
 "Recognize if a ticket is a follow-up to an existing ticket using an external "
 "ticket number."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a job type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a macro action type for automation."
-msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5909,6 +6012,10 @@ msgid "Updates the ticket index."
 msgstr "Aktualisiert den Ticketindex."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Updates the user ticket counters."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Updates ticket state after unlock ticket based on selected ticket type."
 msgstr "Aktualisiert Ticketstatus nach Entsperren basierend auf Tickettyp."
 
@@ -5973,6 +6080,10 @@ msgstr "Zugeordneter Kontakt"
 #. manual entry from templates.pot.manual
 msgid "Assigned Organisation"
 msgstr "Zugeordnete Organisation"
+
+#. manual entry from templates.pot.manual
+msgid "Assigned Owner"
+msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Attachment"
@@ -6131,7 +6242,7 @@ msgstr "Inbetriebnahme"
 
 #. manual entry from templates.pot.manual
 msgid "FirstResponse"
-msgstr "Erste Antwort"
+msgstr "Erstreaktion"
 
 #. manual entry from templates.pot.manual
 msgid "Floor"
@@ -6371,6 +6482,10 @@ msgid "Vendor"
 msgstr "Hersteller"
 
 #. manual entry from templates.pot.manual
+msgid "Vendor (Computer)"
+msgstr ""
+
+#. manual entry from templates.pot.manual
 msgid "Warranty Expiration Date"
 msgstr "Garantieende"
 
@@ -6453,6 +6568,9 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "FAQ"
+#~ msgstr "FAQ"
 
 #~ msgid "d"
 #~ msgstr "d"

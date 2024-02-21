@@ -141,7 +141,7 @@ sub Run {
             ObjectType => 'ConfigItem',
             Result     => 'ARRAY',
             UserID     => 1,
-            UsertType  => 'Agent'
+            UserType   => 'Agent'
         );
 
         # get number of config items
@@ -270,7 +270,7 @@ sub Run {
                     AND => \@SearchParam
                 },
                 UserID     => 1,
-                UsertType  => 'Agent'
+                UserType   => 'Agent'
             );
         }
         else {

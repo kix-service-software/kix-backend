@@ -22,7 +22,7 @@ use Kernel::System::Role::Permission;
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1819',
+        LogPrefix => 'framework_update-to-build-1849',
     },
 );
 
@@ -125,21 +125,53 @@ sub _AddNewPermissions {
 sub _SetFlagFirstValue {
     my ( $Self, %Param ) = @_;
 
-    return if $Kernel::OM->Get('DB')->Do(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => <<'END'
-UPDATE dynamic_field_value
-SET first_value = 1
-WHERE id IN (
-    SELECT dfv.id
-    FROM dynamic_field_value dfv
-    WHERE dfv.id = (
-        SELECT MIN(dfv1.id)
-        FROM dynamic_field_value dfv1
-        WHERE dfv1.object_id = dfv.object_id AND dfv1.field_id = dfv.field_id
-    )
-)
+SELECT MIN(id)
+FROM dynamic_field_value
+GROUP BY object_id, field_id
 END
     );
+
+    # fetch the result
+    my @IDs;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(
+            @IDs,
+            $Row[0]
+        );
+    }
+
+    if ( scalar(@IDs) ) {
+
+        my @Conditions;
+        # split IN statement with more than 900 elements in more statements combined with OR
+        # because Oracle doesn't support more than 1000 elements for one IN statement.
+        while ( @IDs ) {
+            # remove section in the array
+            my @IDPart = splice( @IDs, 0, 900 );
+
+            # add condition part
+            push(
+                @Conditions,
+                (
+                    'id IN (' .
+                    join( q{,}, @IDPart )
+                    . ')'
+                )
+            );
+        }
+
+        my $Condition = join( q{ OR }, @Conditions );
+
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL => <<"END"
+UPDATE dynamic_field_value
+SET first_value = 1
+WHERE $Condition
+END
+        );
+    }
 
     return 1;
 }
