@@ -97,8 +97,9 @@ sub Connect {
         sleep( 0.3 );
 
         # get a new access token
-        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestAccessToken(
+        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestToken(
             ProfileID => $Param{OAuth2_ProfileID},
+            TokenType => 'access_token',
             GrantType => 'refresh_token'
         );
         if ( !$AccessToken ) {
