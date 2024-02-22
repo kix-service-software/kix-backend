@@ -216,7 +216,28 @@ sub SendNotification {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    if ( $Param{Notification}->{ContentType} && $Param{Notification}->{ContentType} eq 'text/html' ) {
+    # send notification
+    # prepare subject
+    if (
+        defined( $Notification{Data}->{RecipientSubject} )
+        && defined( $Notification{Data}->{RecipientSubject}->[0] )
+        && !$Notification{Data}->{RecipientSubject}->[0]
+    ) {
+        my $TicketNumber = $TicketObject->TicketNumberLookup(
+            TicketID => $Param{TicketID},
+        );
+
+        $Notification{Subject} = $TicketObject->TicketSubjectClean(
+            TicketNumber => $TicketNumber,
+            Subject      => $Notification{Subject},
+            Size         => 0,
+        );
+    }
+
+    if (
+        $Param{Notification}->{ContentType}
+        && $Param{Notification}->{ContentType} eq 'text/html'
+    ) {
 
         # Get configured template with fallback to Default.
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
@@ -274,6 +295,7 @@ sub SendNotification {
                 push(@FieldAttachments, $Ticket{'DynamicField_' . $DynamicField->{Name}});
             }
         }
+
         ATTACHMENT:
         for my $Attachment ( @FieldAttachments ) {
             # read file from virtual fs
@@ -298,25 +320,6 @@ sub SendNotification {
             # add attachment
             push( @{ $Param{Attachments} }, \%Data );
         }
-
-    }
-
-    # send notification
-    # prepare subject
-    if (
-        defined( $Notification{Data}->{RecipientSubject} )
-        && defined( $Notification{Data}->{RecipientSubject}->[0] )
-        && !$Notification{Data}->{RecipientSubject}->[0]
-    ) {
-        my $TicketNumber = $TicketObject->TicketNumberLookup(
-            TicketID => $Param{TicketID},
-        );
-
-        $Notification{Subject} = $TicketObject->TicketSubjectClean(
-            TicketNumber => $TicketNumber,
-            Subject      => $Notification{Subject},
-            Size         => 0,
-        );
     }
 
     # send notification
@@ -354,7 +357,10 @@ sub SendNotification {
             return;
         }
 
-        if ( IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) && $Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if (
+            IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle})
+            && $Param{Notification}->{Data}->{CreateArticle}->[0]
+        ) {
             # create an article if requested
             my $ArticleID = $Self->CreateArticle(
                 %Param,
@@ -442,7 +448,10 @@ sub SendNotification {
         }
 
         my $ArticleID;
-        if ( IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) && $Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if (
+            IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle})
+            && $Param{Notification}->{Data}->{CreateArticle}->[0]
+        ) {
             # create an article if requested
             $ArticleID = $Self->CreateArticle(
                 %Param,
