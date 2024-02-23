@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -53,13 +53,11 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # set field behaviors
-    $Self->{Behaviors} = {
-        'IsNotificationEventCondition' => 1,
-        'IsSortable'                   => 0,
-        'IsFilterable'                 => 0,
-        'IsStatsCondition'             => 1,
-        'IsCustomerInterfaceCapable'   => 1,
+    # set field properties
+    $Self->{Properties} = {
+        'IsSearchable'    => 1,
+        'IsSortable'      => 1,
+        'SearchOperators' => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -88,12 +86,12 @@ sub new {
             }
         }
 
-        # check if extension contains more behaviors
-        if ( IsHashRefWithData( $Extension->{Behaviors} ) ) {
+        # check if extension contains more properties
+        if ( IsHashRefWithData( $Extension->{Properties} ) ) {
 
-            %{ $Self->{Behaviors} } = (
-                %{ $Self->{Behaviors} },
-                %{ $Extension->{Behaviors} }
+            %{ $Self->{Properties} } = (
+                %{ $Self->{Properties} },
+                %{ $Extension->{Properties} }
             );
         }
     }

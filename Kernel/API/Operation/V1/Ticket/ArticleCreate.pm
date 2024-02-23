@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -104,8 +104,12 @@ perform ArticleCreate Operation. This will return the created ArticleID.
                 To                              => 'some to string',           # optional
                 Cc                              => 'some Cc string',           # optional
                 Bcc                             => 'some Bcc string',          # optional
+                ReplyTo                         => 'some ReplyTo string',      # optional
                 InReplyTo                       => 'some InReplyTo string',    # optional
-                References                      => '<somemessageid-1@example.com> <somemessageid-2@example.com>',
+                References                      => '<somemessageid-1@example.com> <somemessageid-2@example.com>',  # optional
+                MessageID                       => '<messageid@example.com>',  # optional
+                DoNotSendEmail                  => 0|1,                        # optional
+                PlainEmail                      => 'plain email content',      # optional, only used for channel 'email', when article is NOT send by the system
                 HistoryType                     => 'some history type',        # optional
                 HistoryComment                  => 'Some  history comment',    # optional
                 TimeUnit                        => 123,                        # optional
@@ -277,7 +281,16 @@ sub _ArticleCreate {
     }
 
     # prepare subject if necessary
-    if ( $Article->{ChannelID} == 2 || (!$Article->{ChannelID} && $Article->{Channel} eq 'email') ) {
+    if (
+        !$Article->{DoNotSendEmail}
+        && (
+            $Article->{ChannelID} == 2
+            || (
+                !$Article->{ChannelID}
+                && $Article->{Channel} eq 'email'
+            )
+        )
+    ) {
         my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
         my $Fwd = $Kernel::OM->Get('Config')->Get('Ticket::SubjectFwd') || '(FW|FWD)';
         my $IsReply   = $Article->{Subject} =~ m/^$Re:/i;
@@ -312,6 +325,10 @@ sub _ArticleCreate {
         To               => $To,
         Cc               => $Article->{Cc}             || '',
         Bcc              => $Article->{Bcc}            || '',
+        ReplyTo          => $Article->{ReplyTo}        || '',
+        MessageID        => $Article->{MessageID}      || '',
+        DoNotSendEmail   => $Article->{DoNotSendEmail} || 0,
+        PlainEmail       => $Article->{PlainEmail}     || '',
         Subject          => $Article->{Subject},
         Body             => $Article->{Body},
         IncomingTime     => $Article->{IncomingTime}   || '',

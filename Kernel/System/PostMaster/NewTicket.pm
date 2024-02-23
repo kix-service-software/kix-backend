@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -172,18 +172,13 @@ sub Run {
     # get customer id if X-KIX-Organisation is given
     if ( $GetParam{'X-KIX-Organisation'} ) {
 
-        # get organisation object
-        my $OrgObject = $Kernel::OM->Get('Organisation');
-
-        # search organisation based on X-KIX-Organisation
-        my %OrgList = $OrgObject->OrganisationSearch(
-            Number => $GetParam{'X-KIX-Organisation'},
-            Limit  => 1,
-            Valid  => 0
+        # check if it is a valid Organisation
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            Number => $GetParam{'X-KIX-Organisation'}
         );
 
-        if (%OrgList) {
-            $GetParam{'X-KIX-Organisation'} = (keys %OrgList)[0];
+        if ($ID) {
+            $GetParam{'X-KIX-Organisation'}  = $ID;
         }
     }
 
@@ -368,16 +363,23 @@ sub Run {
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
 
         my $Key;
-        my $CheckKey = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey  = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
         my $CheckKey2 = 'X-KIX-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
 
-        if ( defined $GetParam{$CheckKey} && length $GetParam{$CheckKey} ) {
+        if (
+            defined( $GetParam{ $CheckKey } )
+            && length( $GetParam{ $CheckKey } )
+        ) {
             $Key = $CheckKey;
-        } elsif ( defined $GetParam{$CheckKey2} && length $GetParam{$CheckKey2} ) {
+        }
+        elsif (
+            defined( $GetParam{ $CheckKey2 } )
+            && length( $GetParam{ $CheckKey2 } )
+        ) {
             $Key = $CheckKey2;
         }
 
-        if ($Key) {
+        if ( $Key ) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
@@ -531,6 +533,7 @@ sub Run {
         HistoryComment   => "\%\%$Comment",
         OrigHeader       => \%GetParam,
         Queue            => $Queue,
+        DoNotSendEmail   => 1
     );
 
     # close ticket if article create failed!
@@ -591,9 +594,25 @@ sub Run {
     for my $DynamicFieldID ( sort keys %{$DynamicFieldList} ) {
         next DYNAMICFIELDID if !$DynamicFieldID;
         next DYNAMICFIELDID if !$DynamicFieldList->{$DynamicFieldID};
-        my $Key = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
 
-        if ( defined $GetParam{$Key} && length $GetParam{$Key} ) {
+        my $Key;
+        my $CheckKey  = 'X-KIX-DynamicField-' . $DynamicFieldList->{$DynamicFieldID};
+        my $CheckKey2 = 'X-KIX-DynamicField_' . $DynamicFieldList->{$DynamicFieldID};
+
+        if (
+            defined( $GetParam{ $CheckKey } )
+            && length( $GetParam{ $CheckKey } )
+        ) {
+            $Key = $CheckKey;
+        }
+        elsif (
+            defined( $GetParam{ $CheckKey2 } )
+            && length( $GetParam{ $CheckKey2 } )
+        ) {
+            $Key = $CheckKey2;
+        }
+
+        if ( $Key ) {
 
             # get dynamic field config
             my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(

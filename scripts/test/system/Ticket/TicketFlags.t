@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -213,7 +213,8 @@ my @SearchTests = (
 
 for my $SearchTest (@SearchTests) {
 
-    my @Tickets = $TicketObject->TicketSearch(
+    my @Tickets = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
         Result     => 'ARRAY',
         Limit      => 2,
         Search     => {
@@ -226,7 +227,7 @@ for my $SearchTest (@SearchTests) {
             ]
         },
         UserID     => 1,
-        Permission => 'rw',
+        UserType   => 'Agent',
     );
 
     $Self->Is(
@@ -380,10 +381,11 @@ for my $UserID (@UserIDs) {
 
 # tests for the NotTicketFlag TicketSearch feature
 #
-my $Count = $TicketObject->TicketSearch(
-    TicketID         => $TicketID,
-    UserID           => 1,
-    Search   => {
+my $Count = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'Ticket',
+    UserType   => 'Agent',
+    UserID     => 1,
+    Search     => {
         AND => [
             {
                 Field    => "TicketFlag",
@@ -567,10 +569,11 @@ $Kernel::OM->Get('Cache')->CleanUp(
 );
 
 for my $Test (@Tests) {
-    $Count = $TicketObject->TicketSearch(
-        TicketID => $TicketID,
-        UserID   => 1,
-        Result   => 'COUNT',
+    $Count = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        UserType   => 'Agent',
+        UserID     => 1,
+        Result     => 'COUNT',
         %{ $Test->{Search} },
     );
     $Self->Is( $Count, $Test->{Expected}, $Test->{Name} );

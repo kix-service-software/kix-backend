@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -19,13 +19,13 @@ use Kernel::Language qw(Translatable);
 
 use base qw(Kernel::System::DynamicField::Driver::BaseDateTime);
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'DynamicFieldValue',
-    'Main',
-    'Log',
-    'Time',
+our @ObjectDependencies = qw(
+    Config
+    DB
+    DynamicFieldValue
+    Main
+    Log
+    Time
 );
 
 =head1 NAME
@@ -57,13 +57,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # set field behaviors
-    $Self->{Behaviors} = {
-        'IsNotificationEventCondition' => 1,
-        'IsSortable'                   => 1,
-        'IsFilterable'                 => 0,
-        'IsStatsCondition'             => 1,
-        'IsCustomerInterfaceCapable'   => 1,
+    # set field properties
+    $Self->{Properties} = {
+        'IsSearchable'    => 1,
+        'IsSortable'      => 1,
+        'SearchOperators' => ['EQ','NE','GT','GTE','LT','LTE'],
+        'SearchValueType' => 'DATE'
     };
 
     # get the Dynamic Field Backend custom extensions
@@ -92,12 +91,12 @@ sub new {
             }
         }
 
-        # check if extension contains more behaviors
-        if ( IsHashRefWithData( $Extension->{Behaviors} ) ) {
+        # check if extension contains more properties
+        if ( IsHashRefWithData( $Extension->{Properties} ) ) {
 
-            %{ $Self->{Behaviors} } = (
-                %{ $Self->{Behaviors} },
-                %{ $Extension->{Behaviors} }
+            %{ $Self->{Properties} } = (
+                %{ $Self->{Properties} },
+                %{ $Extension->{Properties} }
             );
         }
     }
@@ -233,48 +232,6 @@ sub ValueSet {
     );
 }
 
-sub SearchSQLGet {
-    my ( $Self, %Param ) = @_;
-
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
-
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SearchTerm = $Param{SearchTerm};
-
-        # Append hh:mm:ss if only the ISO date was supplied to get a full date-time string.
-        if ( $SearchTerm =~ m{\A \d{4}-\d{2}-\d{2}\z}xms ) {
-            $SearchTerm .= " 00:00:00";
-        }
-
-        # calculate relative times
-        my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $SearchTerm
-        );
-        $SearchTerm = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $SystemTime
-        );
-        my $SQL = " $Param{TableAlias}.value_date $Operators{$Param{Operator}} '";
-        $SQL .= $Kernel::OM->Get('DB')->Quote( $SearchTerm ) . "' ";
-
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
-}
-
 sub RandomValueSet {
     my ( $Self, %Param ) = @_;
 
@@ -282,7 +239,7 @@ sub RandomValueSet {
     my $MonthValue = int( rand(9) ) + 1;
     my $DayValue   = int( rand(10) ) + 10;
 
-    my $Value = $YearValue . '-0' . $MonthValue . '-' . $DayValue . ' 00:00:00';
+    my $Value = $YearValue . '-0' . $MonthValue . q{-} . $DayValue . ' 00:00:00';
 
     my $Success = $Self->ValueSet(
         %Param,

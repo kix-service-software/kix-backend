@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -148,6 +148,10 @@ sub Run {
             $FAQArticle{VoteCount} = $VoteDataHashRef->{Votes};
         }
 
+        $Self->_FilterFAQArticleFields(
+            FAQArticle => \%FAQArticle
+        );
+
         # add
         push(@FAQArticleData, \%FAQArticle);
     }
@@ -210,6 +214,22 @@ sub _GetDynamicFields {
     }
 
     return \@DynamicFields;
+}
+
+sub _FilterFAQArticleFields {
+    my ( $Self, %Param ) = @_;
+
+    my $IsCustomer = $Self->{Authorization}->{UserType} eq 'Customer';
+
+    return if !$IsCustomer;
+
+    for my $Field (qw(Field1 Field2 Field3 Field4 Field5 Field6)) {
+        my $FieldConfig = $Kernel::OM->Get('Config')->Get('FAQ::Item::' . $Field) || {};
+
+        if ( $FieldConfig && $FieldConfig->{'Show'} eq 'internal') {
+            delete $Param{FAQArticle}->{$Field};
+        }
+    }
 }
 
 1;

@@ -1,2 +1,29 @@
 msgid "NextWeek"
 msgstr "Next Week"
+
+msgid "other Tickets"
+msgstr "other Tickets"
+
+msgid "All Assets"
+msgstr "All Assets"
+
+msgid "No assets found for this asset number."
+msgstr "No assets found for this asset number."
+
+msgid "very low"
+msgstr "very low"
+
+msgid "low"
+msgstr "low"
+
+msgid "high"
+msgstr "high"
+
+msgid "very high"
+msgstr "very high"
+
+msgid "Analytics"
+msgstr "Analytics"
+
+msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
+msgstr "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."

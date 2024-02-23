@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1174,6 +1174,29 @@ sub ResolveValueByKey {
     return if !$Param{Data};
 
     my $Data = $Param{Data};
+
+    # handle comma separated variables and merge to array
+    my @Keys = split( /,/, $Param{Key} );
+    if ( scalar( @Keys ) > 1 ) {
+        my @Result = ();
+
+        for my $Key ( @Keys ) {
+            my $KeyResult = $Self->ResolveValueByKey(
+                Key      => $Key,
+                Data     => $Data,
+                Resolver => $Param{Resolver}
+            );
+
+            if ( ref( $KeyResult ) eq 'ARRAY' ) {
+                push( @Result, @{ $KeyResult } );
+            }
+            else {
+                push( @Result, $KeyResult );
+            }
+        }
+
+        return \@Result;
+    }
 
     my @Parts = split( /\./, $Param{Key});
     my $Attribute = shift @Parts;

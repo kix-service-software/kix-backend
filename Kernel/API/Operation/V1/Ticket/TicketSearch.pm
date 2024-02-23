@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -28,6 +28,16 @@ Kernel::API::Operation::V1::Ticket::TicketSearch - API Ticket Search Operation b
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item Run()
 
@@ -94,13 +104,14 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my @TicketIndex = $TicketObject->TicketSearch(
-        Result   => 'ARRAY',
-        Search   => $Self->{Search}->{Ticket},
-        Limit    => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
-        Sort     => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
-        UserType => $Self->{Authorization}->{UserType},
-        UserID   => $Self->{Authorization}->{UserID}
+    my @TicketIndex = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{Ticket},
+        Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
    if ( @TicketIndex ) {

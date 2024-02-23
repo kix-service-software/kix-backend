@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -274,11 +274,27 @@ sub _AssignOrganisation {
     }
     if ( !$OrgID ) {
         # organisation with that number doesn't exist, lookup by name
-        my %OrgList = $OrganisationObject->OrganisationSearch(
-            Name   => $Param{Ticket}->{customer_id},
+        my @OrgList = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Organisation',
+            Result     => 'ARRAY',
+            Search => {
+                AND => [
+                    {
+                        Field => 'Name',
+                        Type  => 'EQ',
+                        Type  => 'STRING',
+                        Value => $Param{Ticket}->{customer_id}
+                    }
+                ]
+            },
+            UserType => 'Agent',
+            UserID   => 1
         );
-        if ( IsHashRefWithData(%OrgList) && scalar(keys %OrgList) == 1) {
-            $OrgID = (keys %OrgList)[0];
+        if (
+            @OrgList
+            && scalar(@OrgList) == 1
+        ) {
+            $OrgID = $OrgList[0];
         }
     }
 
@@ -299,11 +315,21 @@ sub _AssignContact {
         }
     }
 
-    my $ContactObject = $Kernel::OM->Get('Contact');
-
     # lookup contact
-    my @ContactIDs = $ContactObject->ContactSearch(
-        LoginEquals => $Param{Ticket}->{customer_user_id},
+    my @ContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        Search => {
+            AND => [
+                {
+                    Field    => 'Login',
+                    Operator => 'EQ',
+                    Value    => $Param{Ticket}->{customer_user_id}
+                }
+            ]
+        },
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        UserID     => 1,
+        UserType   => 'Agent'
     );
     my $ContactID = IsArrayRefWithData(\@ContactIDs) ? $ContactIDs[0] : undef;
 
@@ -325,17 +351,17 @@ sub _AssignContact {
             return;
         }
 
-        my @NameChunks = split(' ', $ContactEmailRealname);
-        $ContactID = $ContactObject->ContactLookup(
+        my @NameChunks = split(q{ }, $ContactEmailRealname);
+        $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $ContactEmail,
             Silent => 1,
         );
 
         if ( !$ContactID ) {
             # create a new contact
-            $ContactID = $ContactObject->ContactAdd(
+            $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
                 Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
+                Lastname              => (@NameChunks) ? join(q{ }, splice(@NameChunks, 1)) : $ContactEmail,
                 Email                 => $ContactEmail,
                 PrimaryOrganisationID => $Param{Ticket}->{organisation_id},
                 ValidID               => 1,
@@ -950,7 +976,7 @@ sub _MigrateChecklist {
             'object_id',
             'field_id'
         ],
-        NoCache => 1,  
+        NoCache => 1,
     );
 
     if ( !$ID ) {

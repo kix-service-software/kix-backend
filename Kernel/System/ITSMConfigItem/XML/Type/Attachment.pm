@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -145,47 +145,6 @@ sub InternalValuePrepare {
     );
 
     return $AttDirID;
-}
-
-=item StatsAttributeCreate()
-
-create a attribute array for the stats framework
-
-    my $Attribute = $BackendObject->StatsAttributeCreate(
-        Key => 'Key::Subkey',
-        Name => 'Name',
-        Item => $ItemRef,
-    );
-
-=cut
-
-sub StatsAttributeCreate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Argument (qw(Key Name Item)) {
-        if ( !$Param{$Argument} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Argument!"
-            );
-            return;
-        }
-    }
-
-    # create arrtibute
-    my $Attribute = [
-        {
-            Name             => $Param{Name},
-            UseAsXvalue      => 0,
-            UseAsValueSeries => 0,
-            UseAsRestriction => 0,
-            Element          => $Param{Key},
-            Block            => 'InputField',
-        },
-    ];
-
-    return $Attribute;
 }
 
 =item ExportSearchValuePrepare()

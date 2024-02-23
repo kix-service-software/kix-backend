@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -246,51 +246,23 @@ sub ValueIsDifferent {
     );
 }
 
-sub SearchSQLGet {
+sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
-    my %Operators = (
-        Equals            => '=',
-        GreaterThan       => '>',
-        GreaterThanEquals => '>=',
-        SmallerThan       => '<',
-        SmallerThanEquals => '<=',
-    );
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    if ( $Operators{ $Param{Operator} } ) {
-        my $SQL = " $Param{TableAlias}.value_text $Operators{$Param{Operator}} '";
-        $SQL .= $DBObject->Quote( $Param{SearchTerm} ) . "' ";
-        return $SQL;
-    }
-
-    if ( $Param{Operator} eq 'Like' ) {
-
-        my $SQL = $DBObject->QueryCondition(
-            Key   => "$Param{TableAlias}.value_text",
-            Value => $Param{SearchTerm},
-        );
-
-        return $SQL;
-    }
-
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            'Priority' => 'error',
-            'Message'  => "Unsupported Operator $Param{Operator}",
-        );
-    }
-
-    return;
+    return {
+        Column => "$Param{TableAlias}.value_text"
+    };
 }
 
-sub SearchSQLOrderFieldGet {
+sub SearchSQLSortFieldGet {
     my ( $Self, %Param ) = @_;
 
-    return "$Param{TableAlias}.value_text";
+    return {
+        Select  => ["$Param{TableAlias}.value_text"],
+        OrderBy => ["$Param{TableAlias}.value_text"]
+    };
 }
+
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 

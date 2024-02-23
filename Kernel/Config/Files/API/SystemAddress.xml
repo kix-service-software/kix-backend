@@ -2,7 +2,7 @@
 <kix_config version="1.0" init="Framework">
 
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressGet" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressGet</Item>
@@ -16,7 +16,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressSearch" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressSearch</Item>
@@ -29,7 +29,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressCreate" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressCreate</Item>
@@ -41,7 +41,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressUpdate" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressUpdate</Item>
@@ -53,7 +53,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::SystemAddress::SystemAddressDelete" Required="0" Valid="1">
-        <Description TranSystemAddresstable="1">API module registration for the operation layer.</Description>
+        <Description Translatable="1">API module registration for the operation layer.</Description>
         <Setting>
             <Hash>
                 <Item Key="Name">SystemAddressDelete</Item>

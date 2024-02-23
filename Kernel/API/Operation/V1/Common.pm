@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -174,6 +174,9 @@ sub RunOperation {
                 return $Result;
             }
         }
+
+        # keep it for varable replacement in permission conditions
+        $Self->{RelevantOrganisationID} = $Param{Data}->{RelevantOrganisationID};
 
         # check if we have permission for this object
         my $StartTime = Time::HiRes::time();
@@ -398,6 +401,9 @@ sub Init {
 
     # Search parameter is not handled in API by default
     $Self->{HandleSearchInAPI} = 0;
+
+    # Sort parameter is not handled in Core by default
+    $Self->{HandleSortInCORE} //= 0;
 
     # calculate LevelIndent for Logging
     $Self->{Level} = $Self->{Level} || 0;
@@ -973,6 +979,20 @@ sub HandleSearchInAPI {
     $Self->{HandleSearchInAPI} = 1;
 }
 
+=item HandleSortInCORE()
+
+Tell the API to handle the "sort" parameter in the CORE. This is needed for operations that don't handle the "sort" parameter and leave the work to the CORE.
+
+    $CommonObject->HandleSortInCORE();
+
+=cut
+
+sub HandleSortInCORE {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{HandleSortInCORE} = 1;
+}
+
 =item ApplyPaging()
 
 Apply the relevant limit and offset to the given data.
@@ -1099,7 +1119,9 @@ helper function to return a successful result.
 
 sub _Success {
     my ( $Self, %Param ) = @_;
-    my %Headers;
+    my %Headers = %{$Param{AdditionalHeaders}||{}};
+
+    delete $Param{AdditionalHeaders};
 
     # ignore cached values if we have a cached response (see end of Init method)
 
@@ -1222,7 +1244,10 @@ sub _Success {
         }
 
         # honor a sorter, if we have one
-        if ( IsHashRefWithData( $Self->{Sort} || $Self->{DefaultSort} ) ) {
+        if (
+            !$Self->{HandleSortInCORE}
+            && IsHashRefWithData( $Self->{Sort} )
+        ) {
             my $StartTime = Time::HiRes::time();
 
             $Self->_ApplySort(
@@ -1363,6 +1388,17 @@ helper function to execute another operation to work with its result.
 sub ExecOperation {
     my ( $Self, %Param ) = @_;
 
+    # add relevant orga id to data if given
+    if ( IsHashRefWithData($Self->{RequestData}) && $Self->{RequestData}->{RelevantOrganisationID} ) {
+        if (IsHashRefWithData($Param{Data})) {
+            $Param{Data}->{RelevantOrganisationID} = $Self->{RequestData}->{RelevantOrganisationID};
+        } else {
+            $Param{Data} = {
+                RelevantOrganisationID => $Self->{RequestData}->{RelevantOrganisationID}
+            };
+        }
+    }
+
     # check needed stuff
     for my $Needed (qw(OperationType)) {
         if ( !$Param{$Needed} ) {
@@ -1416,7 +1452,7 @@ sub ExecOperation {
 
         my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$Op} || {} };
         my $RouteRegEx = $RouteMapping{Route};
-        $RouteRegEx =~ s{:([^\/]+)}{(?<$1>[^\/]+)}xmsg;
+        $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
         if ( $ParentObjectRoute ) {
             # ignore anything that has nothing to do with the parent Ops route
@@ -1432,7 +1468,10 @@ sub ExecOperation {
             }
         }
 
-        if ( $RequestURI =~ m{^ $RouteRegEx $}xms ) {
+        if (
+            eval { qr/^ $RouteRegEx $/xms }
+            && $RequestURI =~ m{^ $RouteRegEx $}xms
+        ) {
             $AvailableMethods{ $RouteMapping{RequestMethod}->[0] } = {
                 Operation => $Op,
                 Route     => $RouteMapping{Route}
@@ -1480,6 +1519,8 @@ sub ExecOperation {
         Level                    => ($Self->{Level} || 0) + 1,
         SuppressPermissionErrors => $Param{SuppressPermissionErrors},
         IgnorePermissions        => $Param{IgnorePermissions},
+        SuppressPermissionErrors => $Param{SuppressPermissionErrors},
+        HandleSortInCORE         => $Self->{HandleSortInCORE},
         IgnoreValidators         => 1,                                  # always ignore validators in internal API calls
     );
 
@@ -1567,12 +1608,12 @@ sub _ValidateFilter {
         'LTE'        => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
         'GTE'        => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
         'IN'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
+        '!IN'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'CONTAINS'   => { 'STRING'  => 1 },
         'STARTSWITH' => { 'STRING'  => 1 },
         'ENDSWITH'   => { 'STRING'  => 1 },
         'LIKE'       => { 'STRING'  => 1 },
     );
-    my $ValidOperators = join( '|', keys %OperatorTypeMapping );
     my %ValidTypes;
     foreach my $Tmp ( values %OperatorTypeMapping ) {
         foreach my $Type ( keys %{$Tmp} ) {
@@ -1625,9 +1666,9 @@ sub _ValidateFilter {
 
             # iterate filters
             foreach my $Filter ( @{ $FilterDef->{$Object}->{$BoolOperator} } ) {
-                $Filter->{Operator} = uc( $Filter->{Operator} || '' );
+                $Filter->{Operator} = uc( $Filter->{Operator} || q{} );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
-                
+
                 # handle negated operators
                 if ( $Filter->{Operator} =~ /^!(.*?)$/ ) {
                     $Filter->{Operator} = $1;
@@ -1643,7 +1684,10 @@ sub _ValidateFilter {
                 }
 
                 # check if filter Operator is valid
-                if ( $Filter->{Operator} !~ /^($ValidOperators)$/g ) {
+                if (
+                    !$Filter->{Operator}
+                    || !$OperatorTypeMapping{$Filter->{Operator}}
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Unknown filter operator $Filter->{Operator} in $Object.$Filter->{Field}!",
@@ -1667,7 +1711,11 @@ sub _ValidateFilter {
                 }
 
                 # check DATE value
-                if ( $Filter->{Type} eq 'DATE' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
+                if (
+                    $Filter->{Type} eq 'DATE'
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -1675,7 +1723,10 @@ sub _ValidateFilter {
                 }
 
                 # check DATETIME value
-                if ( $Filter->{Type} eq 'DATETIME' && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/ ) {
+                if (
+                    $Filter->{Type} eq 'DATETIME'
+                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
@@ -2616,7 +2667,9 @@ sub _GetCacheKey {
         delete $RequestData{offset};
         delete $RequestData{limit};
     }
-    delete $RequestData{sort};
+    if ( !$Self->{HandleSortInCORE} ) {
+        delete $RequestData{sort};
+    }
     delete $RequestData{filter};
 
     my @CacheKeyParts;
@@ -3469,6 +3522,7 @@ sub _ReplaceVariablesInPermission {
         );
 
         if ( %User ) {
+
             # get contact for user
             my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Self->{Authorization}->{UserID},
@@ -3484,11 +3538,29 @@ sub _ReplaceVariablesInPermission {
                     }
                 }
 
+                $Self->{RelevantOrganisationID} ||= $Contact{PrimaryOrganisationID};
+                if (
+                    $Self->{RelevantOrganisationID} &&
+                    (grep {$Self->{RelevantOrganisationID} == $_} @{$Contact{OrganisationIDs} || []})
+                ) {
+                    $Contact{RelevantOrganisationID} = $Self->{RelevantOrganisationID};
+                    if ( $Contact{RelevantOrganisationID} ) {
+                        my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                            ID => $Contact{RelevantOrganisationID},
+                        );
+                        if ( %Organisation ) {
+                            $Contact{RelevantOrganisation} = \%Organisation;
+                        }
+                    }
+                } else {
+                    $Contact{RelevantOrganisationID} = 'NOT_ALLOWED';
+                }
+
                 $User{Contact} = \%Contact;
             }
 
             # add roles
-            my @RoleIDs = $Kernel::OM->Get('User')->RoleList(
+            my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
                 UserID => $Self->{Authorization}->{UserID},
                 Valid  => 1,
             );
@@ -3519,8 +3591,8 @@ sub _ResolveVariableValue {
         return;
     }
 
-    # return undef if we have no data to work through
-    return if exists $Param{Data} && !$Param{Data};
+    # return "no value" if we have no data to work through
+    return 'NO_VALUE' if exists $Param{Data} && (!$Param{Data});
 
     my $Data = $Param{Data};
 
@@ -3534,7 +3606,9 @@ sub _ResolveVariableValue {
     }
 
     # get the value of $Attribute
-    $Data = $Data->{$Attribute};
+    if (IsHashRefWithData($Param{Data})) {
+        $Data = $Data->{$Attribute};
+    }
 
     if ( defined $ArrayIndex && IsArrayRef($Data) ) {
         $Data = $Data->[$ArrayIndex];
@@ -3856,21 +3930,41 @@ sub _GetCustomerUserVisibleObjectIds {
             my @RelevantIDs = split(/\s*,\s*/, $Param{RelevantOrganisationID} // $ContactData{PrimaryOrganisationID});
             # make sure given id belongs to contact, else given id is not usable
             my @ValidRelevantIDs;
+            my %ContactOrgaIDs = map{ $_ => 1 } @{ $ContactData{OrganisationIDs} };
             for my $RelevantID (@RelevantIDs) {
-                if ( grep { $_ eq $RelevantID } @{ $ContactData{OrganisationIDs} } ) {
-                    push(@ValidRelevantIDs, $RelevantID);
-                }
+                next if ( !$ContactOrgaIDs{$RelevantID} );
+                push(@ValidRelevantIDs, $RelevantID);
             }
             $ContactData{RelevantOrganisationID} = \@ValidRelevantIDs if (scalar @ValidRelevantIDs);
 
+            # inform API caching about a new dependency
+            my $CacheObjectType = $Param{ObjectType} eq 'TicketArticle' ? 'Ticket' : $Param{ObjectType};
+            $Self->AddCacheDependency(Type => 'ObjectSearch_' . $CacheObjectType);
+
             if ($Param{ObjectType} eq 'ConfigItem') {
-                return $Kernel::OM->Get('ITSMConfigItem')->GetAssignedConfigItemsForObject(
-                    %Param,
-                    ObjectType => 'Contact',
-                    Object     => \%ContactData,
+                my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    Search => {
+                        AND => [
+                            {
+                                Field => 'AssignedContact',
+                                Operator => 'EQ',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{ID}
+                            },
+                            {
+                                Field => 'AssignedOrganisation',
+                                Operator => 'IN',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
+                            }
+                        ]
+                    },
+                    Result     => 'ARRAY',
+                    ObjectType => 'ConfigItem',
                     UserID     => $Self->{Authorization}->{UserID},
-                    UserType   => $Self->{Authorization}->{UserType},
+                    UserType   => $Self->{Authorization}->{UserType}
                 );
+                return scalar(@IDs) ? \@IDs : [];
             } elsif ($Param{ObjectType} eq 'Ticket') {
                 return $Kernel::OM->Get('Ticket')->GetAssignedTicketsForObject(
                     %Param,
@@ -3888,13 +3982,23 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserType   => $Self->{Authorization}->{UserType},
                 );
             } elsif ($Param{ObjectType} eq 'FAQArticle') {
-                return $Kernel::OM->Get('FAQ')->GetAssignedFAQArticlesForObject(
-                    %Param,
-                    ObjectType => 'Contact',
-                    Object     => \%ContactData,
+                my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                    Search => {
+                        AND => [
+                            {
+                                Field => 'AssignedContact',
+                                Operator => 'EQ',
+                                Type     => 'NUMERIC',
+                                Value    => $ContactData{ID}
+                            }
+                        ]
+                    },
+                    Result     => 'ARRAY',
+                    ObjectType => 'FAQArticle',
                     UserID     => $Self->{Authorization}->{UserID},
-                    UserType   => $Self->{Authorization}->{UserType},
+                    UserType   => $Self->{Authorization}->{UserType}
                 );
+                return scalar(@IDs) ? \@IDs : [];
             }
         }
     }

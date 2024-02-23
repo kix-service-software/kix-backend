@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -359,6 +359,7 @@ sub _HandleTicket {
                 }
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
+                    ArticleID             => $Param{Data}->{ArticleID},
                     Notification          => $Bundle->{Notification},
                     CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
                     Recipient             => $Bundle->{Recipient},
@@ -390,6 +391,7 @@ sub _HandleTicket {
 
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
+                    ArticleID             => $Param{Data}->{ArticleID},
                     Notification          => \%Notification,
                     CustomerMessageParams => $Param{Data}->{CustomerMessageParams} || {},
                     Recipient             => $Recipient,
@@ -423,7 +425,7 @@ sub _NotificationFilter {
 
     my $Filter = $Param{Notification}->{Filter};
 
-    # create or extend the filter with the ArticleID or TicketID
+    # create or extend the filter with the ArticleID
     if ( $Param{Data}->{ArticleID} ) {
         # add ArticleID to filter
         $Filter //= {};
@@ -434,7 +436,8 @@ sub _NotificationFilter {
             Value    => $Param{Data}->{ArticleID}
         };
     }
-    elsif ( $Param{Ticket}->{TicketID} ) {
+    # create or extend the filter with the TicketID
+    if ( $Param{Data}->{TicketID} ) {
         # add TicketID to filter
         $Filter //= {};
         $Filter->{AND} //= [];
@@ -446,10 +449,13 @@ sub _NotificationFilter {
     }
 
     # do the search
-    my @TicketIDs = $Kernel::OM->Get('Ticket')->TicketSearch(
-        Result => 'ARRAY',
-        Search => $Filter,
-        Limit  => 1
+    my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Filter,
+        Limit      => 1,
+        UserID     => 1,
+        UserType   => 'Agent'
     );
 
     return @TicketIDs && $TicketIDs[0] == $Param{Data}->{TicketID};
@@ -845,6 +851,7 @@ sub _SendRecipientNotification {
 
     my %ReplacedNotification = $Kernel::OM->Get('TemplateGenerator')->NotificationEvent(
         TicketID              => $Param{TicketID},
+        ArticleID             => $Param{ArticleID},
         Recipient             => $Param{Recipient},
         Notification          => $Param{Notification},
         CustomerMessageParams => $Param{CustomerMessageParams},

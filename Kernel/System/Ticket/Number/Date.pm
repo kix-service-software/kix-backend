@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -43,15 +43,18 @@ sub TicketCreateNumber {
 
     # read count
     my $Count = 0;
+    my $LastModify = '';
     if ( -f $CounterLog ) {
 
         my $ContentSCALARRef = $MainObject->FileRead(
             Location => $CounterLog,
         );
 
-        if ( $ContentSCALARRef && ${$ContentSCALARRef} ) {
-
-            ($Count) = split( /;/, ${$ContentSCALARRef} );
+        if (
+            $ContentSCALARRef
+            && ${$ContentSCALARRef}
+        ) {
+            ( $Count, $LastModify ) = split( /;/, ${$ContentSCALARRef} );
 
             # just debug
             if ( $Self->{Debug} > 0 ) {
@@ -63,14 +66,25 @@ sub TicketCreateNumber {
         }
     }
 
+    # check if we need to reset the counter
+    if (
+        !$LastModify
+        || $LastModify ne "$Year-$Month-$Day"
+    ) {
+        $Count = 0;
+    }
+
     # count auto increment ($Count++)
     $Count++;
     $Count = $Count + $JumpCounter;
 
-    # write new count
+    # prepare content for count log
+    my $Content = $Count . ";$Year-$Month-$Day;";
+
+    # write new count log
     my $Write = $MainObject->FileWrite(
         Location => $CounterLog,
-        Content  => \$Count,
+        Content  => \$Content,
     );
 
     if ($Write) {
@@ -84,8 +98,7 @@ sub TicketCreateNumber {
     }
 
     if ( $ConfigObject->Get('Ticket::NumberGenerator::Date::UseFormattedCounter') ) {
-        my $MinSize = $ConfigObject->Get('Ticket::NumberGenerator::MinCounterSize')
-            || 5;
+        my $MinSize = $ConfigObject->Get('Ticket::NumberGenerator::MinCounterSize') || 5;
         $Count = sprintf "%.*u", $MinSize, $Count;
     }
 

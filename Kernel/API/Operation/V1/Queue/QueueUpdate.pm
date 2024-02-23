@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -73,7 +73,6 @@ perform QueueUpdate Operation. This will return the updated TypeID.
                 ParentID            => 123,
                 Comment             => '...',     # (optional)
                 ValidID             => '...',     # (optional)
-                Calendar            => '...',     # (optional)
                 UnlockTimeout       => '...',,    # (optional)
                 FollowUpID          => '...',     # possible (1), reject (2) or new ticket (3) (optional, default 0)
                 FollowUpLock        => '...',     # yes (1) or no (0) (optional, default 0)
@@ -163,7 +162,6 @@ sub Run {
     my $Success = $Kernel::OM->Get('Queue')->QueueUpdate(
         QueueID             => $Param{Data}->{QueueID},
         Name                => $Queue->{Name} || $QueueData{Name},
-        Calendar            => $Queue->{Calendar} || $QueueData{Calendar},
         UnlockTimeout       => exists $Queue->{UnlockTimeout} ? $Queue->{UnlockTimeout} : $QueueData{UnlockTimeout},
         FollowUpID          => $Queue->{FollowUpID} || $QueueData{FollowUpID},
         FollowUpLock        =>

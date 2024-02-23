@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -61,21 +61,29 @@ sub Run {
 
     my ( $ListOfCertificates, $EmailsFromCertificates ) = $Self->_GetCurrentData();
 
-    my $ContactObject = $Kernel::OM->Get('Contact');
-
     EMAIL:
     for my $Email ( sort keys %{$EmailsFromCertificates} ) {
 
-        my %ContactList = $ContactObject->ContactSearch(
-            Email => $Email,
-            Limit => 1
+        my @UserIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            Search => {
+                AND => [
+                    {
+                        Field    => 'Emails',
+                        Operator => 'EQ',
+                        Value    => $Email
+                    }
+                ]
+            },
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            UserID     => 1,
+            UserType   => 'Agent',
+            Limit      => 1
         );
 
-        next EMAIL if !%ContactList;
+        next EMAIL if !@UserIDs;
 
-        my @UserIDs = sort keys %ContactList;
-
-        my %Contact = $ContactObject->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             ID => $UserIDs[0],
         );
 

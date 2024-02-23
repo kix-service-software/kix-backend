@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -145,13 +145,14 @@ sub new {
     # (overwrite auto-detection with config options)
     for my $Setting (
         qw(
-        Type Limit DirectBlob Attribute QuoteSingle QuoteBack
-        Connect Encode CaseSensitive LcaseLikeInLargeText
+            Type Limit DirectBlob Attribute QuoteSingle QuoteBack
+            Connect Encode CaseSensitive LcaseLikeInLargeText
         )
-        )
-    {
-        if ( defined $Param{$Setting} || defined $ConfigObject->Get("Database::$Setting") )
-        {
+    ) {
+        if (
+            defined $Param{$Setting}
+            || defined $ConfigObject->Get("Database::$Setting")
+        ) {
             $Self->{Backend}->{"DB::$Setting"} = $Param{$Setting}
                 // $ConfigObject->Get("Database::$Setting");
         }
@@ -233,7 +234,10 @@ sub Connect {
     }
 
     if ( $Self->{Debug} && $Self->{DebugMethods}->{Connect} ) {
-        $Self->_Debug(sprintf("Connect [DSN: $Self->{DSN}, User: $Self->{USER}, Pw: $Self->{PW}, DB Type: $Self->{'DB::Type'}] took %i ms", (Time::HiRes::time() - $StartTime) * 1000));
+        $Self->_Debug(
+            sprintf("Connect [DSN: $Self->{DSN}, User: $Self->{USER}, Pw: $Self->{PW}, DB Type: $Self->{'DB::Type'}] took %i ms",
+                (Time::HiRes::time() - $StartTime) * 1000)
+            );
     }
 
     return $Self->{dbh};
@@ -306,50 +310,84 @@ sub GetSchemaInformation {
 
     $Self->Connect() || die "Unable to connect to database!";
 
-    my $SchemaName = $Self->{'DB::Type'} eq 'postgresql' ? 'public' : '';
+    my $SchemaName = $Self->{'DB::Type'} eq 'postgresql' ? 'public' : undef;
+    my $Catalog    = $Self->{'DB::Type'} eq 'postgresql' ? q{} : undef;
 
     # get tables
     my @Tables = map {
         my $Table = (split(/\./, $_))[1]; $Table =~ s/\`//g; $Table
-    } $Self->{dbh}->tables('', $SchemaName, '', 'TABLE');
+    } $Self->{dbh}->tables(q{}, $SchemaName, q{}, 'TABLE');
 
     foreach my $Table ( sort @Tables ) {
         # get column infos
-        my $Handle = $Self->{dbh}->column_info( '', $SchemaName, $Table, undef );
-        my $ColumnInfos = $Handle->fetchall_arrayref({
-            COLUMN_NAME => 1,
-            TYPE_NAME => 1,
-        });
+        my $Handle = $Self->{dbh}->column_info( $Catalog, $SchemaName, $Table, undef );
+        if ( defined $Handle ) {
+            my $ColumnInfos = $Handle->fetchall_arrayref({
+                COLUMN_NAME => 1,
+                TYPE_NAME => 1,
+            });
 
-        $SchemaInfo->{$Table}->{Columns} = [];
+            $SchemaInfo->{$Table}->{Columns} = [];
 
-        foreach my $Column ( @{$ColumnInfos} ) {
-            push @{$SchemaInfo->{$Table}->{Columns}}, {
-                Name => $Column->{COLUMN_NAME},
-                Type => $Column->{TYPE_NAME},
+            foreach my $Column ( @{$ColumnInfos} ) {
+                push(
+                    @{$SchemaInfo->{$Table}->{Columns}},
+                    {
+                        Name => $Column->{COLUMN_NAME},
+                        Type => $Column->{TYPE_NAME},
+                    }
+                );
+            }
+        }
+        else {
+            $Self->Prepare(
+                SQL   => "SELECT * FROM $Table",
+                Limit => 1
+            );
+
+            my @ColumnNames = $Self->GetColumnNames();
+
+            $SchemaInfo->{$Table}->{Columns} = [];
+
+            for my $Column ( @ColumnNames ) {
+                push (
+                    @{$SchemaInfo->{$Table}->{Columns}},
+                    {
+                        Name => $Column,
+                    }
+                );
             }
         }
 
         # get primary key infos
-        $Handle = $Self->{dbh}->primary_key_info( '', $SchemaName, $Table );
+        $Handle = $Self->{dbh}->primary_key_info( $Catalog, $SchemaName, $Table );
         if ( $Handle ) {
             my $PrimaryKeyInfos = $Handle->fetchall_arrayref({COLUMN_NAME => 1});
             $SchemaInfo->{$Table}->{PrimaryKey} = [];
 
             foreach my $Column ( @{$PrimaryKeyInfos} ) {
-                push @{$SchemaInfo->{$Table}->{PrimaryKey}}, $Column->{COLUMN_NAME};
+                push(
+                    @{$SchemaInfo->{$Table}->{PrimaryKey}},
+                    $Column->{COLUMN_NAME}
+                );
             }
         }
 
         # get foreign key infos
-        $Handle = $Self->{dbh}->foreign_key_info( '', $SchemaName, $Table, '', $SchemaName, undef );
+        $Handle = $Self->{dbh}->foreign_key_info( q{}, $SchemaName, $Table, q{}, $SchemaName, undef );
         if ( $Handle ) {
             my $ForeignKeyInfos = $Handle->fetchall_arrayref({});
 
             foreach my $Column ( @{$ForeignKeyInfos} ) {
-                $SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}} //= [];
-                push @{$SchemaInfo->{$Table}->{ForeignKeys}->{$Column->{UK_COLUMN_NAME}}},
-                    "$Column->{FK_TABLE_NAME}.$Column->{FK_COLUMN_NAME}";
+                my $PKColumnName = $Column->{UK_COLUMN_NAME} || $Column->{PKCOLUMN_NAME};
+                my $FKColumnName = $Column->{FK_COLUMN_NAME} || $Column->{FKCOLUMN_NAME};
+                my $FKTableName  = $Column->{FK_TABLE_NAME}  || $Column->{FKTABLE_NAME};
+
+                $SchemaInfo->{$Table}->{ForeignKeys}->{$PKColumnName} //= [];
+                push(
+                    @{$SchemaInfo->{$Table}->{ForeignKeys}->{$PKColumnName}},
+                    "$FKTableName.$FKColumnName"
+                );
             }
         }
     }
@@ -500,8 +538,7 @@ sub Do {
                 $Kernel::OM->Get('Log')->Log(
                     Caller   => 1,
                     Priority => 'Error',
-                    Message  => 'No SCALAR param in Bind! Bind: ' .
-                        ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                    Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : q{} ),
                 );
                 return;
             }
@@ -567,7 +604,7 @@ sub _InitSlaveDB {
             DSN      => $ConfigObject->Get('Core::MirrorDB::DSN'),
             User     => $ConfigObject->Get('Core::MirrorDB::User'),
             Password => $ConfigObject->Get('Core::MirrorDB::Password'),
-            }
+        }
     );
 
     return $Self->{SlaveDBObject} if !%SlaveConfiguration;
@@ -584,8 +621,7 @@ sub _InitSlaveDB {
             $CurrentSlave{DSN}
             && $CurrentSlave{User}
             && $CurrentSlave{Password}
-            )
-        {
+        ) {
             my $SlaveDBObject = Kernel::System::DB->new(
                 DatabaseDSN  => $CurrentSlave{DSN},
                 DatabaseUser => $CurrentSlave{User},
@@ -645,8 +681,8 @@ sub Prepare {
     my ( $Self, %Param ) = @_;
 
     my $SQL   = $Param{SQL};
-    my $Limit = $Param{Limit} || '';
-    my $Start = $Param{Start} || '';
+    my $Limit = $Param{Limit} || q{};
+    my $Start = $Param{Start} || q{};
 
     # check needed stuff
     if ( !$Param{SQL} ) {
@@ -672,8 +708,7 @@ sub Prepare {
         && !$Self->{IsSlaveDB}
         && $Self->_InitSlaveDB( Silent => $Param{Silent} )    # this is very cheap after the first call (cached)
         && $SQL =~ m{\A\s*SELECT}xms
-        )
-    {
+    ) {
         $Self->{_PreparedOnSlaveDB} = 1;
         return $Self->{SlaveDBObject}->Prepare(%Param);
     }
@@ -684,6 +719,7 @@ sub Prepare {
     else {
         $Self->{Encode} = undef;
     }
+
     $Self->{Limit}        = 0;
     $Self->{LimitStart}   = 0;
     $Self->{LimitCounter} = 0;
@@ -694,6 +730,7 @@ sub Prepare {
             $Limit = $Limit + $Start;
             $Self->{LimitStart} = $Start;
         }
+
         if ( $Self->{Backend}->{'DB::Limit'} eq 'limit' ) {
             $SQL .= " LIMIT $Limit";
         }
@@ -721,8 +758,7 @@ sub Prepare {
                     $Kernel::OM->Get('Log')->Log(
                         Caller   => 1,
                         Priority => 'Error',
-                        Message  => 'No SCALAR param in Bind! Bind: ' .
-                            ($Self->{Debug}) ? Data::Dumper::Dumper(\$Param{Bind}) : '',
+                        Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : q{} ),
                     );
                 }
                 return;
@@ -915,7 +951,10 @@ sub FetchAllArrayRef {
     }
 
     if ( $Self->{Debug} && $Self->{DebugMethods}->{FetchAllArrayRef} ) {
-        $Self->_Debug(sprintf("FetchAllArrayRef [Columns: %s] took %i ms",  join(',', @{$Param{Columns}}), (Time::HiRes::time() - $StartTime) * 1000));
+        $Self->_Debug(
+            sprintf("FetchAllArrayRef [Columns: %s] took %i ms",
+            join(q{,}, @{$Param{Columns}}), (Time::HiRes::time() - $StartTime) * 1000)
+        );
     }
 
     return \@Result;
@@ -1068,8 +1107,7 @@ sub SQLProcessor {
                 $Tag->{Tag} eq 'Unique'
                 || $Tag->{Tag} eq 'UniqueCreate'
                 || $Tag->{Tag} eq 'UniqueDrop'
-                )
-            {
+            ) {
                 push @Table, $Tag;
             }
 
@@ -1082,8 +1120,7 @@ sub SQLProcessor {
                 $Tag->{Tag} eq 'Index'
                 || $Tag->{Tag} eq 'IndexCreate'
                 || $Tag->{Tag} eq 'IndexDrop'
-                )
-            {
+            ) {
                 push @Table, $Tag;
             }
 
@@ -1101,8 +1138,7 @@ sub SQLProcessor {
                 $Tag->{Tag} eq 'ForeignKey'
                 || $Tag->{Tag} eq 'ForeignKeyCreate'
                 || $Tag->{Tag} eq 'ForeignKeyDrop'
-                )
-            {
+            ) {
                 push @Table, $Tag;
             }
             elsif ( $Tag->{Tag} eq 'Reference' && $Tag->{TagType} eq 'Start' ) {
@@ -1202,9 +1238,9 @@ sub GetTableData {
 
     my $Table = $Param{Table};
     my $What  = $Param{What};
-    my $Where = $Param{Where} || '';
-    my $Valid = $Param{Valid} || '';
-    my $Clamp = $Param{Clamp} || '';
+    my $Where = $Param{Where} || q{};
+    my $Valid = $Param{Valid} || q{};
+    my $Clamp = $Param{Clamp} || q{};
     my %Data;
 
     my $SQL = "SELECT $What FROM $Table ";
@@ -1265,7 +1301,7 @@ generate SQL condition query based on a search expression
     my $SQL = $DBObject->QueryCondition(
         Key          => 'some_col',
         Value        => '(ABC+DEF)',
-        SearchPrefix => '',
+        SearchPrefix => q{},
         SearchSuffix => '*'
         Extended     => 1, # use also " " as "&&", e.g. "bob smith" -> "bob&&smith"
     );
@@ -1329,8 +1365,8 @@ sub QueryCondition {
     my $LikeEscapeString = $Self->GetDatabaseFunction('LikeEscapeString');
 
     # search prefix/suffix check
-    my $SearchPrefix  = $Param{SearchPrefix}  || '';
-    my $SearchSuffix  = $Param{SearchSuffix}  || '';
+    my $SearchPrefix  = $Param{SearchPrefix}  || q{};
+    my $SearchSuffix  = $Param{SearchSuffix}  || q{};
     my $CaseSensitive = $Param{CaseSensitive} || 0;
     my $BindMode      = $Param{BindMode}      || 0;
     my @BindValues;
@@ -1391,20 +1427,10 @@ sub QueryCondition {
 
     # clean up not needed spaces in condistions
     # removed spaces examples
-    # KIX4OTRS-capeIT
     # # [SPACE](, [SPACE]), [SPACE]|, [SPACE]&
     # [SPACE](, [SPACE]), [SPACE]||, [SPACE]&&
     # example not removed spaces
     # [SPACE]\\(, [SPACE]\\), [SPACE]\\&
-    # $Param{Value} =~ s{(
-    #     \s
-    #     (
-    #           (?<!\\) \(
-    #         | (?<!\\) \)
-    #         |         \|
-    #         | (?<!\\) &
-    #     )
-    # )}{$2}xg;
     $Param{Value} =~ s{(
         \s
         (
@@ -1420,15 +1446,6 @@ sub QueryCondition {
     # )[SPACE], )[SPACE], ||[SPACE], &&[SPACE]
     # example not removed spaces
     # \\([SPACE], \\)[SPACE], \\&[SPACE]
-    # $Param{Value} =~ s{(
-    #     (
-    #           (?<!\\) \(
-    #         | (?<!\\) \)
-    #         |         \|
-    #         | (?<!\\) &
-    #     )
-    #     \s
-    # )}{$2}xg;
     $Param{Value} =~ s{(
         (
               (?<!\\) \(
@@ -1438,7 +1455,6 @@ sub QueryCondition {
         )
         \s
     )}{$2}xg;
-    # EO KIX4OTRS-capeIT
 
     # use extended condition mode
     # 1. replace " " by "&&"
@@ -1460,9 +1476,9 @@ sub QueryCondition {
     my $Close = 0;
 
     # for processing
-    my @Array     = split( //, $Param{Value} );
-    my $SQL       = '';
-    my $Word      = '';
+    my @Array     = split( // , $Param{Value} );
+    my $SQL       = q{};
+    my $Word      = q{};
     my $Not       = 0;
     my $Backslash = 0;
 
@@ -1480,11 +1496,11 @@ sub QueryCondition {
 
         # remember if next token is a part of word
         elsif (
-            $Array[$Position] eq '\\'
+            $Array[$Position] eq q{\\}
             && $Position < $#Array
             && (
                 $SpecialCharacters->{ $Array[ $Position + 1 ] }
-                || $Array[ $Position + 1 ] eq '\\'
+                || $Array[ $Position + 1 ] eq q{\\}
             )
             )
         {
@@ -1493,24 +1509,24 @@ sub QueryCondition {
         }
 
         # remember if it's a NOT condition
-        elsif ( $Word eq '' && $Array[$Position] eq '!' ) {
+        elsif ( $Word eq q{} && $Array[$Position] eq q{!} ) {
             $Not = 1;
             next POSITION;
         }
-        elsif ( $Array[$Position] eq '&' ) {
-            if ( $Position >= 1 && $Array[ $Position - 1 ] eq '&' ) {
+        elsif ( $Array[$Position] eq q{&} ) {
+            if ( $Position >= 1 && $Array[ $Position - 1 ] eq q{&} ) {
                 next POSITION;
             }
-            if ( $Position == $#Array || $Array[ $Position + 1 ] ne '&' ) {
+            if ( $Position == $#Array || $Array[ $Position + 1 ] ne q{&} ) {
                 $Word .= $Array[$Position];
                 next POSITION;
             }
         }
-        elsif ( $Array[$Position] eq '|' ) {
-            if ( $Position >= 1 && $Array[ $Position - 1 ] eq '|' ) {
+        elsif ( $Array[$Position] eq q{|} ) {
+            if ( $Position >= 1 && $Array[ $Position - 1 ] eq q{|} ) {
                 next POSITION;
             }
-            if ( $Position == $#Array || $Array[ $Position + 1 ] ne '|' ) {
+            if ( $Position == $#Array || $Array[ $Position + 1 ] ne q{|} ) {
                 $Word .= $Array[$Position];
                 next POSITION;
             }
@@ -1521,7 +1537,7 @@ sub QueryCondition {
         }
 
         # if word exists, do something with it
-        if ( $Word ne '' ) {
+        if ( $Word ne q{} ) {
 
             # remove escape characters from $Word
             $Word =~ s{\\}{}smxg;
@@ -1560,49 +1576,42 @@ sub QueryCondition {
                     # check if like is used
                     my $Type = 'NOT LIKE';
                     if ( $Word !~ m/%/ ) {
-                        $Type = '!=';
+                        $Type = q{!=};
                     }
 
                     my $WordSQL = $Word;
                     if ($BindMode) {
-                        $WordSQL = "?";
+                        $WordSQL = q{?};
                     }
                     else {
-                        $WordSQL = "'" . $WordSQL . "'";
+                        $WordSQL = q{'} . $WordSQL . q{'};
                     }
 
-        # check if database supports LIKE in large text types
-        # the first condition is a little bit opaque
-        # CaseSensitive of the database defines, if the database handles case sensitivity or not
-        # and the parameter $CaseSensitive defines, if the customer database should do case sensitive statements or not.
-        # so if the database dont support case sensitivity or the configuration of the customer database want to do this
-        # then we prevent the LOWER() statements.
+                    # check if database supports LIKE in large text types
+                    # the first condition is a little bit opaque
+                    # CaseSensitive of the database defines, if the database handles case sensitivity or not
+                    # and the parameter $CaseSensitive defines, if the customer database should do case sensitive statements or not.
+                    # so if the database dont support case sensitivity or the configuration of the customer database want to do this
+                    # then we prevent the LOWER() statements.
                     if ( !$Self->GetDatabaseFunction('CaseSensitive') || $CaseSensitive ) {
                         $SQLA .= "$Key $Type $WordSQL";
                     }
                     elsif ( $Self->GetDatabaseFunction('LcaseLikeInLargeText') ) {
 
-                        # KIX4OTRS-capeIT
                         if ( $Param{StaticDB} ) {
                             $SQLA .= "$Key $Type LCASE($WordSQL)";
                         }
                         else {
                             $SQLA .= "LCASE($Key) $Type LCASE($WordSQL)";
                         }
-
-                        # EO KIX4OTRS-capeIT
                     }
                     else {
-
-                        # KIX4OTRS-capeIT
                         if ( $Param{StaticDB} ) {
                             $SQLA .= "$Key $Type LOWER($WordSQL)";
                         }
                         else {
                             $SQLA .= "LOWER($Key) $Type LOWER($WordSQL)";
                         }
-
-                        # EO KIX4OTRS-capeIT
                     }
 
                     if ( $Type eq 'NOT LIKE' ) {
@@ -1627,49 +1636,42 @@ sub QueryCondition {
                     # check if like is used
                     my $Type = 'LIKE';
                     if ( $Word !~ m/%/ ) {
-                        $Type = '=';
+                        $Type = q{=};
                     }
 
                     my $WordSQL = $Word;
                     if ($BindMode) {
-                        $WordSQL = "?";
+                        $WordSQL = q{?};
                     }
                     else {
-                        $WordSQL = "'" . $WordSQL . "'";
+                        $WordSQL = q{'} . $WordSQL . q{'};
                     }
 
-        # check if database supports LIKE in large text types
-        # the first condition is a little bit opaque
-        # CaseSensitive of the database defines, if the database handles case sensitivity or not
-        # and the parameter $CaseSensitive defines, if the customer database should do case sensitive statements or not.
-        # so if the database dont support case sensitivity or the configuration of the customer database want to do this
-        # then we prevent the LOWER() statements.
+                    # check if database supports LIKE in large text types
+                    # the first condition is a little bit opaque
+                    # CaseSensitive of the database defines, if the database handles case sensitivity or not
+                    # and the parameter $CaseSensitive defines, if the customer database should do case sensitive statements or not.
+                    # so if the database dont support case sensitivity or the configuration of the customer database want to do this
+                    # then we prevent the LOWER() statements.
                     if ( !$Self->GetDatabaseFunction('CaseSensitive') || $CaseSensitive ) {
                         $SQLA .= "$Key $Type $WordSQL";
                     }
                     elsif ( $Self->GetDatabaseFunction('LcaseLikeInLargeText') ) {
 
-                        # KIX4OTRS-capeIT
                         if ( $Param{StaticDB} ) {
                             $SQLA .= "$Key $Type LCASE($WordSQL)";
                         }
                         else {
                             $SQLA .= "LCASE($Key) $Type LCASE($WordSQL)";
                         }
-
-                        # EO KIX4OTRS-capeIT
                     }
                     else {
-
-                        # KIX4OTRS-capeIT
                         if ( $Param{StaticDB} ) {
                             $SQLA .= "$Key $Type LOWER($WordSQL)";
                         }
                         else {
                             $SQLA .= "LOWER($Key) $Type LOWER($WordSQL)";
                         }
-
-                        # EO KIX4OTRS-capeIT
                     }
 
                     if ( $Type eq 'LIKE' ) {
@@ -1684,14 +1686,14 @@ sub QueryCondition {
             }
 
             # reset word
-            $Word = '';
+            $Word = q{};
         }
 
         # check AND and OR conditions
         if ( $Array[ $Position + 1 ] ) {
 
             # if it's an AND condition
-            if ( $Array[$Position] eq '&' && $Array[ $Position + 1 ] eq '&' ) {
+            if ( $Array[$Position] eq q{&} && $Array[ $Position + 1 ] eq q{&} ) {
                 if ( $SQL =~ m/ OR $/ ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
@@ -1706,7 +1708,7 @@ sub QueryCondition {
             }
 
             # if it's an OR condition
-            elsif ( $Array[$Position] eq '|' && $Array[ $Position + 1 ] eq '|' ) {
+            elsif ( $Array[$Position] eq q{|} && $Array[ $Position + 1 ] eq q{|} ) {
                 if ( $SQL =~ m/ AND $/ ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
@@ -1723,7 +1725,7 @@ sub QueryCondition {
 
         # add ( or ) for query
         if ( $Array[$Position] eq '(' ) {
-            if ( $SQL ne '' && $SQL !~ /(?: (?:AND|OR) |\(\s*)$/ ) {
+            if ( $SQL ne q{} && $SQL !~ /(?: (?:AND|OR) |\(\s*)$/ ) {
                 $SQL .= ' AND ';
             }
             $SQL .= $Array[$Position];
@@ -1738,16 +1740,15 @@ sub QueryCondition {
                 && ( $Position > $#Array - 1 || $Array[ $Position + 1 ] ne ')' )
                 && (
                     $Position > $#Array - 2
-                    || $Array[ $Position + 1 ] ne '&'
-                    || $Array[ $Position + 2 ] ne '&'
+                    || $Array[ $Position + 1 ] ne q{&}
+                    || $Array[ $Position + 2 ] ne q{&}
                 )
                 && (
                     $Position > $#Array - 2
-                    || $Array[ $Position + 1 ] ne '|'
-                    || $Array[ $Position + 2 ] ne '|'
+                    || $Array[ $Position + 1 ] ne q{|}
+                    || $Array[ $Position + 2 ] ne q{|}
                 )
-                )
-            {
+            ) {
                 $SQL .= ' AND ';
             }
 
@@ -1812,7 +1813,7 @@ sub QueryStringEscape {
     }
 
     # Merge all special characters into one string, separated by \\
-    my $SpecialCharacters = '\\' . join '\\', keys %{ $Self->_SpecialCharactersGet() };
+    my $SpecialCharacters = q{\\} . join( q{\\} , keys %{ $Self->_SpecialCharactersGet() });
 
     # Use above string of special characters as character class
     # note: already escaped special characters won't be escaped again
@@ -1901,9 +1902,8 @@ sub _TypeCheck {
 
     if (
         $Tag->{Type}
-        && $Tag->{Type} !~ /^(DATE|SMALLINT|BIGINT|INTEGER|DECIMAL|VARCHAR|LONGBLOB)$/i
-        )
-    {
+        && $Tag->{Type} !~ /^(?:DATE|SMALLINT|BIGINT|INTEGER|DECIMAL|VARCHAR|LONGBLOB)$/i
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'Error',
             Message  => "Unknown data type '$Tag->{Type}'!",
@@ -1930,10 +1930,10 @@ sub _SpecialCharactersGet {
     my ( $Self, %Param ) = @_;
 
     my %SpecialCharacter = (
-        '(' => 1,
-        ')' => 1,
-        '&' => 1,
-        '|' => 1,
+        '('  => 1,
+        ')'  => 1,
+        q{&} => 1,
+        q{|} => 1,
     );
 
     return \%SpecialCharacter;
@@ -1956,7 +1956,7 @@ sub _Debug {
 
     return if !$Self->{Debug};
 
-    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[DB]", $Message;
+    printf( STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[DB]", $Message);
 }
 
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -283,18 +283,18 @@ my @Tests = (
 
 # execute tests
 for my $Test (@Tests) {
-    for my $Behavior (@Behaviors) {
-        my $HasBehaviorResult = $DFBackendObject->HasBehavior(
+    for my $Property (@Behaviors) {
+        my $GetPropertyResult = $DFBackendObject->GetProperty(
             DynamicFieldConfig => $Test->{Config}->{FieldConfig},
-            Behavior           => $Behavior,
+            Property           => $Property,
         );
 
         $Self->Is(
-            $HasBehaviorResult,
-            $Test->{ExpectedResutls}->{Behaviors}->{$Behavior},
-            "$Test->{Name} HasBehavior $Behavior",
+            $GetPropertyResult,
+            $Test->{ExpectedResutls}->{Behaviors}->{$Property},
+            "$Test->{Name} GetProperty $Property",
         );
-        for my $FunctionName ( @{ $Functions{$Behavior} } ) {
+        for my $FunctionName ( @{ $Functions{$Property} } ) {
             my $FunctionResult = $DFBackendObject->$FunctionName(
                 DynamicFieldConfig => $Test->{Config}->{FieldConfig},
             );

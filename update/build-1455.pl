@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -136,19 +136,6 @@ sub _GetDynamicFieldsDefinitions {
     my ( $Self, %Param ) = @_;
 
     my @DynamicFields = (
-        {
-            Name          => 'AcknowledgeName',
-            Label         => Kernel::Language::Translatable('System Acknowledge Name'),
-            FieldType     => 'Text',
-            ObjectType    => 'Ticket',
-            InternalField => 0,
-            Config        => {
-                CountDefault          => 1,
-                CountMax              => 1,
-                CountMin              => 1,
-                DefaultValue          => ""
-            }
-        },
         {
             Name          => 'SysMonXAlias',
             Label         => Kernel::Language::Translatable('System Alias'),

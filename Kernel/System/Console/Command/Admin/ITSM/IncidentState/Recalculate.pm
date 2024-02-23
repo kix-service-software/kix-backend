@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -15,15 +15,24 @@ use warnings;
 
 use base qw(Kernel::System::Console::BaseCommand);
 
-our @ObjectDependencies = (
-    'GeneralCatalog',
-    'ITSMConfigItem',
+our @ObjectDependencies = qw(
+    GeneralCatalog
+    ITSMConfigItem
+    ObjectSearch
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
     $Self->Description('Recalculates the incident state of config items.');
+    $Self->AddOption(
+        Name        => 'configitem-number',
+        Description => "Recalculate only this config item",
+        Required    => 0,
+        HasValue    => 1,
+        ValueRegex  => qr/\d+/smx,
+        Multiple    => 1,
+    );
 
     return;
 }
@@ -38,22 +47,57 @@ sub Run {
         Class => 'ITSM::ConfigItem::Class',
     );
 
-    # get the valid class ids
-    my @ValidClassIDs = sort keys %{$ClassList};
+    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number') // [] };
 
-    # get all config items ids form all valid classes
-    my $ConfigItemsIDsRef = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemSearch(
-        ClassIDs => \@ValidClassIDs,
-    );
+    my @ConfigItemIDs;
+
+    if ( !@ConfigItemNumbers ) {
+        # get the valid class ids
+        my @ValidClassIDs = sort keys %{$ClassList};
+
+        # get all config items ids form all valid classes
+        @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'ClassIDs',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => \@ValidClassIDs
+                    }
+                ]
+            },
+            UserID     => 1,
+            UserType   => 'Agent'
+        );
+    }
+    else {
+        for my $ConfigItemNumber (@ConfigItemNumbers) {
+
+            # checks the validity of the config item id
+            my $ID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+                ConfigItemNumber => $ConfigItemNumber,
+            );
+
+            if ($ID) {
+                push @ConfigItemIDs, $ID;
+            }
+            else {
+                $Self->Print("<yellow>Unable to find config item $ConfigItemNumber.</yellow>\n");
+            }
+        }
+    }
 
     # get number of config items
-    my $CICount = scalar @{$ConfigItemsIDsRef};
+    my $CICount = scalar @ConfigItemIDs;
 
     $Self->Print("<yellow>Recalculating incident state for $CICount config items.</yellow>\n");
 
     my $Count = 0;
     CONFIGITEM:
-    for my $ConfigItemID ( @{$ConfigItemsIDsRef} ) {
+    for my $ConfigItemID ( @ConfigItemIDs ) {
 
         my $Success = $Kernel::OM->Get('ITSMConfigItem')->RecalculateCurrentIncidentState(
             ConfigItemID => $ConfigItemID,

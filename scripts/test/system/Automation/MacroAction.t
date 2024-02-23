@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -506,6 +506,54 @@ END
         Expected => {
             Result => '1
 3',
+        }
+    },
+    {
+        Name => 'Combine variables as array',
+        MacroResults => {
+            Test1 => 'Test1',
+            Test2 => 'Test2',
+        },
+        Data => {
+            Dummy => '${Test1,Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1','Test2'],
+        }
+    },
+    {
+        Name => 'Combine variables containing arrays as array',
+        MacroResults => {
+            Test1 => [
+                'Test1.1',
+                'Test1.2'
+            ],
+            Test2 => [
+                'Test2.1',
+                'Test2.2'
+            ],
+        },
+        Data => {
+            Dummy => '${Test1,Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1.1','Test1.2','Test2.1','Test2.2'],
+        }
+    },
+    {
+        Name => 'Multiple line data without leading or trailing content on line with variable',
+        MacroResults => {
+            Test1 => 'Variable: 1',
+        },
+        Data => {
+            Dummy => 'Static: 1
+${Test1}
+Static: 2'
+        },
+        Expected => {
+            Dummy => 'Static: 1
+Variable: 1
+Static: 2',
         }
     },
 );

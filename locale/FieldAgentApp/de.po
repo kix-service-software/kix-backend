@@ -552,3 +552,30 @@ msgstr "siehe Checklisten"
 
 msgid "see work notes"
 msgstr "siehe Notizen"
+
+msgid "other Tickets"
+msgstr "andere Tickets"
+
+msgid "All Assets"
+msgstr "alle Assets"
+
+msgid "No assets found for this asset number."
+msgstr "keine Asstes gefunden für diese Asset Nummer"
+
+msgid "very low"
+msgstr "sehr niedrig"
+
+msgid "low"
+msgstr "niedrig"
+
+msgid "high"
+msgstr "hoch"
+
+msgid "very high"
+msgstr "sehr hoch"
+
+msgid "Analytics"
+msgstr "Analyse"
+
+msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
+msgstr "Diese App sammelt Standortdaten, um Ihrem Backoffice-Team Ihre aktuelle Position zu melden, damit das Backoffice Agenten in der Nähe eines Einsatzortes einsetzen kann. Dies gilt auch, wenn die App im Hintergrund läuft."

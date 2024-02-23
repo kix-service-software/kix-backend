@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Modified version of the work: Copyright (C) 2006-2022 c.a.p.e. IT GmbH, http://www.cape-it.de
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, http://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -82,6 +82,12 @@ sub LoadPreferences {
     if ( !$Kernel::OM->Get('Config')->Get('Database::ShellOutput') ) {
         $Self->{'DB::Connect'} = 'SET NAMES utf8';
     }
+
+    # add mapping for CAST
+    # BIGINT has to be handled as UNSIGNED
+    $Self->{'DB::CastMapping'} = {
+        'BIGINT' => 'UNSIGNED'
+    };
 
     return 1;
 }

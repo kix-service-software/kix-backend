@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -71,9 +71,7 @@ sub new {
 
     $Self->{RichText} = $Kernel::OM->Get('Config')->Get('Frontend::RichText');
 
-    # KIX4OTRS-capeIT
     $Self->{UserLanguage} = $Param{UserLanguage};
-    # EO KIX4OTRS-capeIT
 
     return $Self;
 }
@@ -380,7 +378,6 @@ sub NotificationEvent {
         }
     }
 
-    # KIX4OTRS-capeIT
     # get customer article data for replacing
     # (KIX_COMMENT and KIX_CUSTOMER_BODY and KIX_CUSTOMER_EMAIL could be the same)
     $Param{CustomerMessageParams}->{CustomerBody} = $Article{Body} || '';
@@ -391,8 +388,6 @@ sub NotificationEvent {
     {
         $Param{CustomerMessageParams}->{CustomerBody} =~ s/(^>.+|.{4,86})(?:\s|\z)/$1\n/gm;
     }
-
-    # EO KIX4OTRS-capeIT
 
     # fill up required attributes
     for my $Text (qw(Subject Body)) {
@@ -453,11 +448,7 @@ sub NotificationEvent {
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
-
-        # KIX4OTRS-capeIT
         ArticleID => $Param{ArticleID} || '',
-
-        # EO KIX4OTRS-capeIT
     );
     $Notification{Subject} = $Self->_Replace(
         RichText  => 0,
@@ -469,11 +460,7 @@ sub NotificationEvent {
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
         Language  => $Language,
-
-        # KIX4OTRS-capeIT
         ArticleID => $Param{ArticleID} || '',
-
-        # EO KIX4OTRS-capeIT
     );
 
     my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
@@ -497,8 +484,6 @@ sub NotificationEvent {
 
     return %Notification;
 }
-
-# KIX4OTRS-capeIT
 
 =item ReplacePlaceHolder()
     just a wrapper for external access to sub _Replace
@@ -528,6 +513,9 @@ sub ReplacePlaceHolder {
         }
     }
 
+    # return if text is not a string
+    return $Param{Text} if ( ref( $Param{Text} ) ne '' );
+
     $Param{Translate} //= 1;
 
     if ( $Param{Translate} && (!defined $Param{Language} || !$Param{Language}) ) {
@@ -541,8 +529,6 @@ sub ReplacePlaceHolder {
         %Param,
     );
 }
-
-# EO KIX4OTRS-capeIT
 
 =begin Internal:
 
@@ -601,17 +587,7 @@ sub _Replace {
     }egx;
 
     # return if no placeholders included
-    if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/) {
-        # convert any html to ascii
-        if ( !$Param{RichText} ) {
-            $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-                String            => $Param{Text},
-                NoURLGlossar      => 1,
-                NoForcedLinebreak => 1,
-            );
-        }
-        return $Param{Text};
-    }
+    return $Param{Text} if ($Param{Text} !~ m/(?:<|&lt;)KIX_.+/);
 
     # TODO: move ticket specific handling
     $Param{TicketID} ||= $Param{ObjectType} && $Param{ObjectType} eq 'Ticket' && $Param{ObjectID} ? $Param{ObjectID} : undef;
@@ -625,6 +601,19 @@ sub _Replace {
         $Param{ObjectType} = 'Ticket';
         $Param{ObjectID}   = $Param{TicketID};
     }
+    elsif (
+        defined $Param{Data}
+        && IsHashRefWithData($Param{Data}->{Ticket})
+    ) {
+        %Ticket = %{$Param{Data}->{Ticket}};
+        $Param{ObjectType} = 'Ticket';
+    }
+
+    # Translate the different values.
+    for my $Field ( keys %Ticket ) {
+        next if !defined $Ticket{$Field};
+        $Ticket{$Field.'!'} = $Ticket{$Field};      # store the original value with a trailing "!"
+    }
 
     # translate ticket values if needed
     if ( $Param{Language} ) {
@@ -635,15 +624,17 @@ sub _Replace {
 
         # Translate the different values.
         for my $Field (qw(Type State StateType Lock Priority)) {
+            next if !defined $Ticket{$Field};
             $Ticket{$Field} = $LanguageObject->Translate( $Ticket{$Field} );
         }
 
-        # Transform the date values from the ticket data (but not the dynamic field values).
+        # Transform the date values from the ticket data (but not the dynamic field values and the ! ones).
         ATTRIBUTE:
         for my $Attribute ( sort keys %Ticket ) {
             next ATTRIBUTE if $Attribute =~ m{ \A DynamicField_ }xms;
+            next ATTRIBUTE if $Attribute =~ /^.*?!$/g;
             next ATTRIBUTE if !$Ticket{$Attribute};
-
+            
             if ( $Ticket{$Attribute} =~ m{\A(\d\d\d\d)-(\d\d)-(\d\d)\s(\d\d):(\d\d):(\d\d)\z}xi ) {
                 $Ticket{$Attribute} = $LanguageObject->FormatTimeString(
                     $Ticket{$Attribute},
@@ -666,6 +657,10 @@ sub _Replace {
             );
         }
     }
+
+    # do not handle DF object value as text (prevent string handling)
+    # TODO: ... but do it elsewhere
+    my $KeepValueAsIs = $Param{Text} =~ m/^<KIX_(?:\w|^>)+_DynamicField_(?:\w+?)_ObjectValue>$/ ? 1 : 0;
 
     # get and execute placeholder modules
     my $PlaceholderModules = $Kernel::OM->Get('Config')->Get('Placeholder::Module');
@@ -695,15 +690,6 @@ sub _Replace {
                 Ticket => \%Ticket
             );
         }
-    }
-
-    # convert any html to ascii
-    if ( !$Param{RichText} ) {
-        $Param{Text} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-            String            => $Param{Text},
-            NoURLGlossar      => 1,
-            NoForcedLinebreak => 1,
-        );
     }
 
     return $Param{Text};

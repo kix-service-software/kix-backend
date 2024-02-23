@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -249,7 +249,7 @@ sub MacroAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Macro',
         ObjectID  => $ID,
@@ -356,7 +356,7 @@ sub MacroUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Macro',
         ObjectID  => $Param{ID},
@@ -525,7 +525,7 @@ sub MacroDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Macro',
         ObjectID  => $Param{ID},
@@ -583,6 +583,7 @@ executes a macro
     my $Success = $AutomationObject->MacroExecute(
         ID            => 123,        # the ID of the macro
         ObjectID      => 123,        # the ID of the object to execute the macro onto
+        Variables     => {...}       # optional, these will be available as macro variables
         UserID        => 1
     );
 
@@ -619,8 +620,16 @@ sub MacroExecute {
             AdditionalData => $Param{AdditionalData} || {}
         };
     }
-
+    
     $Self->{MacroID} = $Param{ID};
+
+    # add variables
+    if ( IsHashRefWithData($Param{Variables}) ) {
+        $Self->{MacroResults} = {
+            %{$Self->{MacroResults}||{}},
+            %{$Param{Variables}},
+        }
+    }
 
     # set possible new id e.g. if we are a sub macro
     $Self->{ObjectID} = $Param{ObjectID};

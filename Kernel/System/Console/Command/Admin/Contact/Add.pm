@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -77,7 +77,12 @@ sub Run {
 
     $Self->Print("<yellow>Adding a new contact...</yellow>\n");
 
-    my %OrganisationList = reverse $Kernel::OM->Get('Organisation')->OrganisationSearch(Valid => 0);
+    my %OrganisationList = reverse $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Organisation',
+        Result     => 'HASH',
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
 
     my $AssignedUserID;
     if ($Self->GetOption('user-login')) {
@@ -98,7 +103,10 @@ sub Run {
         };
     }
 
-    if ( $Self->GetOption('primary-organisation') && !$OrganisationList{$Self->GetOption('primary-organisation')} ) {
+    if (
+        $Self->GetOption('primary-organisation')
+        && !$OrganisationList{$Self->GetOption('primary-organisation')}
+    ) {
         $Self->PrintError("Can't find organisation \"".$Self->GetOption('primary-organisation'). "\".");
         return $Self->ExitCodeError();
     }

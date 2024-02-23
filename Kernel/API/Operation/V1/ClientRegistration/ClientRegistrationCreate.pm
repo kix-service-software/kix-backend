@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -291,14 +291,7 @@ sub Run {
     my %Requesting;
     if ( IsHashRefWithData($ClientRegistration->{Requesting}) ) {
         if ( $ClientRegistration->{Requesting}->{SystemInfo} ) {
-            foreach my $Key ( qw(Product Version BuildDate BuildHost BuildNumber PatchNumber) ) {
-                $Requesting{SystemInfo}->{$Key} = $Kernel::OM->Get('Config')->Get($Key);
-            }
-
-            use DateTime::TimeZone;
-            my $TimeZoneObject = DateTime::TimeZone->new( name => 'local' );
-            $Requesting{SystemInfo}->{TimeZone} = $TimeZoneObject->name();
-            $Requesting{SystemInfo}->{TimeZoneOffset} = $TimeZoneObject->offset_for_datetime(DateTime->now);
+            $Requesting{SystemInfo} = $Kernel::OM->Get('SupportData')->_CollectSystemInfo();
         }
         if ( $ClientRegistration->{Requesting}->{DBSchema} ) {
             $Requesting{DBSchema} = $Kernel::OM->Get('DB')->GetSchemaInformation();

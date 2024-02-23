@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2023 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -286,7 +286,7 @@ sub JobAdd {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job',
         ObjectID  => $ID,
@@ -415,7 +415,7 @@ sub JobUpdate {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -600,7 +600,7 @@ sub JobDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
@@ -775,7 +775,7 @@ sub JobMacroAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.Macro',
             ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -822,7 +822,7 @@ sub JobMacroDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.Macro',
         ObjectID  => $Param{JobID}.'::'.$Param{MacroID},
@@ -997,7 +997,7 @@ sub JobExecPlanAdd {
         );
 
         # push client callback event
-        $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
             Namespace => 'Job.ExecPlan',
             ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -1044,7 +1044,7 @@ sub JobExecPlanDelete {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Job.ExecPlan',
         ObjectID  => $Param{JobID}.'::'.$Param{ExecPlanID},
@@ -1314,7 +1314,7 @@ sub _JobExecute {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
         Namespace => 'Job.JobRun',
         ObjectID  => $Param{ID}.'::'.$RunID,
@@ -1745,7 +1745,7 @@ sub _JobLastExecutionTimeSet {
     );
 
     # push client callback event
-    $Kernel::OM->Get('ClientRegistration')->NotifyClients(
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Job',
         ObjectID  => $Param{ID},
