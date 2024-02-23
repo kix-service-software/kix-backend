@@ -263,29 +263,16 @@ sub Run {
         }
     }
 
-    # set ticket service
-    if ( $GetParam{'X-KIX-FollowUp-Service'} ) {
-        $TicketObject->TicketServiceSet(
-            Service  => $GetParam{'X-KIX-FollowUp-Service'},
-            TicketID => $Param{TicketID},
-            UserID   => $Param{InmailUserID},
-        );
-        if ( $Self->{Debug} > 0 ) {
-            print "Service: ".$GetParam{'X-KIX-FollowUp-Service'}."\n";
-        }
-    }
-
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
-    my $DynamicFieldList =
-        $DynamicFieldObject->DynamicFieldList(
+    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldList(
         Valid      => 1,
         ResultType => 'HASH',
         ObjectType => 'Ticket',
-        );
+    );
 
     # set dynamic fields for Ticket object type
     DYNAMICFIELDID:
@@ -643,7 +630,7 @@ sub Run {
         Valid      => 1,
         ResultType => 'HASH',
         ObjectType => 'Article'
-        );
+    );
 
     # set dynamic fields for Article object type
     DYNAMICFIELDID:
