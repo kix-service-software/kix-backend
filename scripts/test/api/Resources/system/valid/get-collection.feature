@@ -8,4 +8,4 @@
   Scenario: get the list of existing valid
     When I query the collection of valid
     Then the response code is 200
-#   And the response object is ValidCollectionResponse
+   And the response object is ValidCollectionResponse

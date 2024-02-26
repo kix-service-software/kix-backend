@@ -8,7 +8,7 @@ Feature: POST request to the /system/ticket/ticketstates resource
   Scenario: create a ticketstate
     When I create a ticketstate
     Then the response code is 201 
-#    Then the response object is TicketStatePostPatchResponse
+    Then the response object is TicketStatePostPatchResponse
     When I delete this ticketstate
     Then the response code is 204
 

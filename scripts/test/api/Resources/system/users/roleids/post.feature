@@ -8,7 +8,7 @@ Feature: POST request to the /system/users/:UserID/roleids resource
   Scenario: added a user roleid
      When added a user roleid with UserID 1
      Then the response code is 201
-#     Then the response object is UserRoleIDPostResponse
+     Then the response object is UserRoleIDPostResponse
      When I delete this user roleid with UserID 1
      Then the response code is 204
 

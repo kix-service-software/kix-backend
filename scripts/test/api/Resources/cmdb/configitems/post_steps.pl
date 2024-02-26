@@ -65,7 +65,7 @@ Given qr/a configitem$/, sub {
 					],
 		            SectionWarranty => [
 		               {
-		                  FirstUsageDate => "04-09-2018"
+		                  FirstUsageDate => "2018-09-04"
 		               }
 		            ]
 		         }
@@ -137,7 +137,7 @@ Given qr/(\d+) of configitems$/, sub {
 	for (my $i=0;$i<$1;$i++){
 		if ($i == 2) {
 			$Name = 'test ci xx1111_filter';
-			$DeplStateID = 12;
+			$DeplStateID = 17;
 		}
 		else {
 			$Name = 'test ci xx1111test' . rand();
@@ -150,7 +150,7 @@ Given qr/(\d+) of configitems$/, sub {
 				ConfigItem => {
 					ClassID    => 4,
 					Version    => {
-						Name        => "test ci xx1111",
+						Name        => $Name,    #"test ci xx1111",
 						DeplStateID => $DeplStateID,
 						InciStateID => 2,
 						Data        => {
@@ -176,6 +176,11 @@ Given qr/(\d+) of configitems$/, sub {
 									Filename    => "Test2.pdf"
 								}
 							],
+							SectionWarranty => [
+								{
+									FirstUsageDate => "2018-09-04"
+								}
+							]
 						}
 					},
 					Images     => [

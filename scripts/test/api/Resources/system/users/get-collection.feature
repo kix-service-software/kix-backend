@@ -8,7 +8,7 @@
   Scenario: get the list of existing users 
     When I query the collection of users
     Then the response code is 200
-#    And the response object is UserCollectionResponse
+    And the response object is UserCollectionResponse
 
   Scenario: get the list of existing users with filter
     Given 8 of users

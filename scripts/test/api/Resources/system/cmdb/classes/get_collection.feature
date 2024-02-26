@@ -8,7 +8,7 @@ Feature: GET request to the /system/cmdb/classes resource
   Scenario: get the list of existing classes
     When I query the cmdb collection of classes
     Then the response code is 200
-#    And the response object is ConfigItemClassCollectionResponse
+    And the response object is ConfigItemClassCollectionResponse
 
   Scenario: get the list of existing classes filtered
     When I query the cmdb collection of classes with filter of Building

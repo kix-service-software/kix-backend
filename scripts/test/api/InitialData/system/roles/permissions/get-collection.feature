@@ -36,11 +36,12 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 3
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 18 items of type "Permission"
+    And the response contains 19 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                              | Value | TypeID |
       | /auth                                                                               | 1     | 1      |
       | /i18n                                                                               | 2     | 1      |
+      | /objectsearch                                                                       | 2     | 1      |
       | /session                                                                            | 15    | 1      |
       | /system                                                                             | 2     | 1      |
       | /system/*                                                                           | 0     | 1      |
@@ -239,11 +240,13 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer
     When I query the collection of permissions with roleid 13
     Then the response code is 200
-    And the response contains 54 items of type "Permission"
+    And the response contains 57 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                                                                                                                       | Value | TypeID |
       | /auth                                                                                                                                                        | 1     | 1      |
       | /cmdb                                                                                                                                                        | 2     | 1      |
+      | /contacts                                                                                                                                                    | 2     | 1      |
+      | /contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}                                                                         | 0     | 2      |
       | /faq                                                                                                                                                         | 2     | 1      |
       | /faq/*                                                                                                                                                       | 0     | 1      |
       | /faq/articles                                                                                                                                                | 2     | 1      |
@@ -251,6 +254,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /faq/articles/*/votes                                                                                                                                        | 3     | 1      |
       | /i18n                                                                                                                                                        | 2     | 1      |
       | /links                                                                                                                                                       | 2     | 1      |
+      | /objectsearch                                                                                                                                                | 2     | 1      |
       | /organisations                                                                                                                                               | 2     | 1      |
       | /organisations/*{Organisation.ID !IN $CurrentUser.Contact.OrganisationIDs}                                                                                   | 0     | 2      |
       | /session                                                                                                                                                     | 15    | 1      |

@@ -7,8 +7,8 @@ Feature: POST request to the /system/ticket/priorities resource
     
   Scenario: create a ticket priority
     When I create a ticket priority with 
-#    Then the response object is PriorityPostPatchResponse 
-     Then the response code is 201
+    Then the response object is PriorityPostPatchResponse
+    Then the response code is 201
     When I delete this ticket priority
     Then the response code is 204
 

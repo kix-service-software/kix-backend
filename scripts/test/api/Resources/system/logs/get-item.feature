@@ -9,6 +9,7 @@
     When I query the collection of logs
     Then the response code is 200
     When I get the first log
+    Then the response content is
     Then the response code is 200
 ##    And the response object is LogFileResponse
     And the attribute "LogFile.Filename" is "TicketCounter.log"

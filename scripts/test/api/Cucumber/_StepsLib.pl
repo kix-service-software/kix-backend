@@ -90,6 +90,7 @@ Then qr/the response object is (.*?)$/, sub {
      Directory => S->{API_SCHEMA_LOCATION},
      Filename  => $SchemaName .'.json'
   );
+
   isnt($Schema, undef, 'read schema file');
   is(ref $Schema, 'SCALAR', 'get schema file content');
 
@@ -97,7 +98,7 @@ Then qr/the response object is (.*?)$/, sub {
   $Validator->schema($$Schema);
   my @Result = $Validator->validate(S->{ResponseContent});
   use Data::Dumper;
- is(@Result, 0, 'validate response object '.Dumper(\@Result));
+  is(@Result, 0, 'validate response object '.Dumper(\@Result));
 };
 
 Then qr/the response has no content/, sub {

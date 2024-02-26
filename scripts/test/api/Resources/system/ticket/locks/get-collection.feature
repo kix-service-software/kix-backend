@@ -8,10 +8,12 @@
   Scenario: get the list of existing ticket locks
     When I query the collection of ticket locks
     Then the response code is 200
+    And the response object is LockCollectionResponse
 
   Scenario: get the list of existing ticket locks filter
     When I query the collection of ticket locks with filter of lock
     Then the response code is 200
+    And the response object is LockCollectionResponse
     And the response contains the following items of type Lock
       | Name | ValidID |
       | lock | 1       | 

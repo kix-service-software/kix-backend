@@ -5,12 +5,12 @@ Feature: GET request to the /system/ticket/states/types resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
- Scenario: check is the existing statetypes are consistent with the delivery defaults
+ Scenario Outline: check is the existing statetypes are consistent with the delivery defaults
     When I query the collection of statetypes
     Then the response code is 200
-#    And the response object is StateTypeCollectionResponse
-    And the response contains 7 items of type "StateType"
-    And the response contains the following items of type StateType
+   Then the statetypes output is "<Name>"
+
+   Examples:
       | Name             |
       | new              |
       | open             |

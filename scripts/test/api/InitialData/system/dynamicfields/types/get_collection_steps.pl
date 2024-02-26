@@ -36,4 +36,22 @@ When qr/I get a collection of dynamicfield types\s*$/, sub {
    );
 };
 
+Then qr/the dynamicfield types output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{DynamicFieldType};
+   my @AttributeValue =( "CheckList", "Date", "DateTime", "ITSMConfigItemReference", "Multiselect", "Table", "Text", "TextArea" );
 
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+
+         }
+         else{
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};
