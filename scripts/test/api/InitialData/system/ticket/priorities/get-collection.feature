@@ -5,6 +5,19 @@ Feature: GET request to the /system/ticket/priorities resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
+  Scenario Outline: check is the existing priorities are consistent with the delivery defaults
+    When I query the collection of ticket priorities
+    Then the response code is 200
+    Then the priorities output is "<Name>"
+
+    Examples:
+      | Name        |
+      | 5 very low  |
+      | 4 low       |
+      | 3 normal    |
+      | 2 high      |
+      | 1 very high |
+
   Scenario: check is the existing priorities are consistent with the delivery defaults
     When I query the collection of ticket priorities
     Then the response code is 200
@@ -17,4 +30,3 @@ Feature: GET request to the /system/ticket/priorities resource
       | 3 normal    | 1       |
       | 2 high      | 1       |
       | 1 very high | 1       |
-

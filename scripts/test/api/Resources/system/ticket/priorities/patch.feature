@@ -9,7 +9,7 @@ Feature: PATCH request to the /system/ticket/priorities/:PriorityID resource
     Given a ticket priority with
     When I update this ticket priority with
     Then the response code is 200
-#    And the response object is PriorityPostPatchResponse
+    And the response object is PriorityPostPatchResponse
     When I delete this ticket priority
     Then the response code is 204
 

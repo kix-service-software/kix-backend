@@ -17,4 +17,4 @@ Feature: POST request to the /system/communication/mailaccounts resource
     Then the response code is 400
     And the response object is Error
     And the error code is "BadRequest"
-    And the error message is "Parameter MailAccount::Type is not one of 'IMAP,IMAPS,IMAPS_OAuth2,IMAPTLS,IMAPTLS_OAuth2,POP3,POP3S,POP3TLS,POP3TLS_OAuth2'!"
+    And the error message is "Parameter MailAccount::Type is not one of 'IMAP,IMAPS,IMAPS_OAuth2,IMAPTLS,IMAPTLS_OAuth2,POP3,POP3S,POP3S_OAuth2,POP3TLS,POP3TLS_OAuth2'!"

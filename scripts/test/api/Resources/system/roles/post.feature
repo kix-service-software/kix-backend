@@ -8,7 +8,7 @@ Feature: POST request to the /system/roles resource
   Scenario: create a role
     When I create a role
     Then the response code is 201   
-#    Then the response object is RolePostPatchResponse
+    Then the response object is RolePostPatchResponse
     When I delete this role
     Then the response code is 204
     Then the response has no content

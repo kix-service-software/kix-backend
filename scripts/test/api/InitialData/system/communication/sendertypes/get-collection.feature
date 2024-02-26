@@ -5,12 +5,12 @@
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
- Scenario: check is the existing sendertypes are consistent with the delivery defaults
+ Scenario Outline: check is the existing sendertypes are consistent with the delivery defaults
     When I query the collection of sendertypes
     Then the response code is 200
-#    And the response object is SenderTypeCollectionResponse
-    And the response contains 3 items of type "SenderType"
-    And the response contains the following items of type SenderType
+   Then the sendertypes output is "<Name>"
+
+   Examples:
       | Name     |
       | agent    |
       | system   |

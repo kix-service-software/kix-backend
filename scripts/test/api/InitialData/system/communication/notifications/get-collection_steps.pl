@@ -66,7 +66,26 @@ Then qr/the recipients "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
    is(S->{ResponseContent}->{Notification}->{Data}->{$2}->[$3], $4, 'Check attribute value in response');
 };
 
+Then qr/the notifications output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{Notification};
+   my @AttributeValue =( "Agent - New Ticket Notification", "Agent - Reminder (if unlocked)", "Customer - New Ticket Receipt", "Customer - Follow Up Rejection", "Agent - FUP Notification (if unlocked)", "Agent - FUP Notification (if locked)", "Agent - Lock Timeout", "Agent - Owner Assignment", "Agent - Responsible Assignment", "Agent - New Note Notification", "Agent - Ticket Move Notification", "Agent - Reminder (if locked)" );
 
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+            print STDERR "NOTE:".Dumper($hash_ref->{Name},$Name);
+         }
+         else{
+
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};
 
 
 

@@ -12,7 +12,7 @@ Feature: GET request to the /system/dynamicfields/objecttypes resource
     And the response contains the following items of type DynamicFieldObject
       | Name         | DisplayName  |
       | Contact      | Contact      |
-      | FAQArticle   | FAQ          |
+      | FAQArticle   | FAQArticle   |
       | Organisation | Organisation |
       | Ticket       | Ticket       |
 

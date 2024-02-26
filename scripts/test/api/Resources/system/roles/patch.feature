@@ -9,6 +9,6 @@ Feature: PATCH request to the /system/roles/:RoleID resource
     Given a role
     When I update this role with
     Then the response code is 200
-#    And the response object is RolePostPatchResponse
+    And the response object is RolePostPatchResponse
     When I delete this role
     Then the response code is 204

@@ -8,9 +8,10 @@ Feature: GET request to the /system/automation/jobs/types resource
   Scenario: get the list of automation job types
     When I query the collection of automation job types
     Then the response code is 200
-    And the response contains 3 items of type "JobType"
+    And the response contains 4 items of type "JobType"
     And the response contains the following items of type JobType
       | Name            | DisplayName     |
+      | Contact         | Contact         |
       | Reporting       | Reporting       |
       | Synchronisation | Synchronisation |
       | Ticket          | Ticket          |

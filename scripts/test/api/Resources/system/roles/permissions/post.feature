@@ -9,7 +9,7 @@ Feature: POST request to the /system/roles/:RoleID/permissions resource
     Given a role
     When I create a permission
     Then the response code is 201
-#    Then the response object is PermissionPostPatchResponse
+    Then the response object is PermissionPostPatchResponse
     When I delete this permission
     Then the response code is 204
     When I delete this role
