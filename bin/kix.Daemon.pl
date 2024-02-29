@@ -58,17 +58,13 @@ if ( !$Command || $Options{Help} ) {
     exit 0;
 }
 
-# get required objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $CacheObject  = $Kernel::OM->Get('Cache');
-
 # get pid directory
-my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
+my $PIDDir  = $Kernel::OM->Get('Config')->Get('Home') . '/var/run/';
 my $PIDFile = $PIDDir . "Daemon.pid";
 my $PIDFH;
 
 # get default log directory
-my $LogDir = $ConfigObject->Get('Daemon::Log::LogPath') || $ConfigObject->Get('Home') . '/var/log/Daemon';
+my $LogDir = $Kernel::OM->Get('Config')->Get('Daemon::Log::LogPath') || $Kernel::OM->Get('Config')->Get('Home') . '/var/log/Daemon';
 
 if ( !-d $LogDir ) {
     File::Path::mkpath( $LogDir, 0, 0770 );    ## no critic
@@ -194,7 +190,7 @@ sub Start {
     } while ( $ReloadRequired );
 
     # cleanup
-    $CacheObject->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type  => 'Daemon',
         Key   => $$
     );
@@ -225,7 +221,7 @@ sub Stop {
     while ( $RunningDaemonPID && kill 0, $RunningDaemonPID ) { sleep 1 }
 
     # cleanup
-    $CacheObject->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type  => 'Daemon',
         Key   => $$
     );
@@ -279,8 +275,13 @@ sub _Run {
     # no reload triggert atm
     $ReloadRequired = 0;
 
+    # discard cache object to get a new one
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Cache']
+    );
+
     # register the process - tell the system we are up and running
-    $CacheObject->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => 'Daemon',
         Key   => $$,
         Value => {
@@ -315,7 +316,7 @@ sub _Run {
     print "Daemon started\n";
 
     while ($DaemonChecker) {
-        my $Cache = $CacheObject->Get(
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type  => 'Daemon',
             Key   => $$
         );
@@ -375,7 +376,7 @@ sub _Run {
 
     # unregister the process - tell the system we are no longer active
     print "Removing daemon registration...";
-    $CacheObject->Delete(
+    $Kernel::OM->Get('Cache')->Delete(
         Type  => 'Daemon',
         Key   => $$
     );
@@ -399,7 +400,7 @@ sub _RunModule {
     );
 
     # disable in memory cache because many processes run at the same time
-    $CacheObject->Configure(
+    $Kernel::OM->Get('Cache')->Configure(
         CacheInMemory  => 0,
         CacheInBackend => 1,
     );
@@ -611,11 +612,8 @@ sub _LogFilesSet {
         move( "$FileStdErr.log", "$FileStdErr-$SystemTime.log" );
     }
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    my $RedirectSTDOUT = $ConfigObject->Get('Daemon::Log::STDOUT') || 0;
-    my $RedirectSTDERR = $ConfigObject->Get('Daemon::Log::STDERR') || 0;
+    my $RedirectSTDOUT = $Kernel::OM->Get('Config')->Get('Daemon::Log::STDOUT') || 0;
+    my $RedirectSTDERR = $Kernel::OM->Get('Config')->Get('Daemon::Log::STDERR') || 0;
 
     # redirect STDOUT and STDERR
     if ($RedirectSTDOUT) {
@@ -626,7 +624,7 @@ sub _LogFilesSet {
     }
 
     # remove not needed log files
-    my $DaysToKeep = $ConfigObject->Get('Daemon::Log::DaysToKeep') || 1;
+    my $DaysToKeep = $Kernel::OM->Get('Config')->Get('Daemon::Log::DaysToKeep') || 1;
     my $DaysToKeepTime = $SystemTime - $DaysToKeep * 24 * 60 * 60;
 
     my @LogFiles = glob "$LogDir/*.log";
