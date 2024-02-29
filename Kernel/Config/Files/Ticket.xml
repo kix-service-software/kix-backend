@@ -362,11 +362,15 @@
       background-color: #efefef;
     }
 
-    .bodyContent,
-    .bodyContent * {
+    .bodyContent {
       color: #323232;
       font-family: Arial;
       font-size: 13px;
+      line-height: 150%;
+      text-align: left;
+    }
+
+    .bodyContent * {
       line-height: 150%;
       text-align: left;
     }
