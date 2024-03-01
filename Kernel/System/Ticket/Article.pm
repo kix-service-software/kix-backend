@@ -2252,6 +2252,7 @@ set article flags
         Value     => 1,
         UserID    => 123,
         Silent    => 1       # optional - if set, no client notification will be triggered
+        NoEvents  => 1       # optional - trigger no events
     );
 
 Events:
@@ -2299,6 +2300,7 @@ sub ArticleFlagSet {
                 AND create_by = ?',
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
     );
+
     return if !$DBObject->Do(
         SQL => 'INSERT INTO article_flag
             (article_id, article_key, article_value, create_time, create_by)
@@ -2308,17 +2310,19 @@ sub ArticleFlagSet {
 
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
-    $Self->EventHandler(
-        Event => 'ArticleFlagSet',
-        Data  => {
-            TicketID  => $Article{TicketID},
-            ArticleID => $Param{ArticleID},
-            Key       => $Param{Key},
-            Value     => $Param{Value},
-            UserID    => $Param{UserID},
-        },
-        UserID => $Param{UserID},
-    );
+    if ( !$Param{NoEvents} ) {
+        $Self->EventHandler(
+            Event => 'ArticleFlagSet',
+            Data  => {
+                TicketID  => $Article{TicketID},
+                ArticleID => $Param{ArticleID},
+                Key       => $Param{Key},
+                Value     => $Param{Value},
+                UserID    => $Param{UserID},
+            },
+            UserID => $Param{UserID},
+        );
+    }
 
     # push client callback event
     if (!$Param{Silent}) {
