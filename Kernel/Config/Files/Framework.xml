@@ -7595,14 +7595,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="OutOfOfficeMessageTemplate" Required="0" Valid="1">
-        <Description Translatable="1">Defines out of office message template. Two string parameters (%s) available: end date and number of days left.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <String Translatable="1">*** out of office until %s (%s d left) ***</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::Timeout" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Sets the timeout (in seconds) for http/ftp downloads.</Description>
         <Group>Framework</Group>
@@ -8338,23 +8330,6 @@ You can log in via the following URL:
                 <Item Key="Key" Translatable="1">Language</Item>
                 <Item Key="PrefKey">UserLanguage</Item>
                 <Item Key="Prio">1000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###OutOfOffice" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::OutOfOffice</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Block">OutOfOffice</Item>
-                <Item Key="Label" Translatable="1">Out Of Office Time</Item>
-                <Item Key="Key" Translatable="1"></Item>
-                <Item Key="PrefKey">UserOutOfOffice</Item>
-                <Item Key="Prio">4000</Item>
                 <Item Key="Active">1</Item>
             </Hash>
         </Setting>

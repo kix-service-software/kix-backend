@@ -116,8 +116,7 @@ sub _ReplaceUserPlaceholder {
     my ( $Self, %Param ) = @_;
 
     my %User = $Kernel::OM->Get('User')->GetUserData(
-        UserID        => $Param{UseUserID},
-        NoOutOfOffice => 1,
+        UserID => $Param{UseUserID},
     );
 
     my $Languages = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');

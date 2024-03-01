@@ -88,16 +88,10 @@ $Self->Is(
     'lock',
     'Ticket still locked (UnlockOnAway)',
 );
-$Kernel::OM->Get('User')->SetPreferences(
-    UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOffice',
-    Value  => 1,
-);
 
 my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
     SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
 );
-
 # Special case for leap years. There is no Feb 29 in the next and previous years in this case.
 if ( $Month == 2 && $Day == 29 ) {
     $Day--;
@@ -105,33 +99,13 @@ if ( $Month == 2 && $Day == 29 ) {
 
 $Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeStartYear',
-    Value  => $Year - 1,
+    Key    => 'OutOfOfficeStart',
+    Value  => sprintf( '%04d-%02d-%02d', ( $Year - 1 ), $Month, $Day ),
 );
 $Kernel::OM->Get('User')->SetPreferences(
     UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeEndYear',
-    Value  => $Year + 1,
-);
-$Kernel::OM->Get('User')->SetPreferences(
-    UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeStartMonth',
-    Value  => $Month,
-);
-$Kernel::OM->Get('User')->SetPreferences(
-    UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeEndMonth',
-    Value  => $Month,
-);
-$Kernel::OM->Get('User')->SetPreferences(
-    UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeStartDay',
-    Value  => $Day,
-);
-$Kernel::OM->Get('User')->SetPreferences(
-    UserID => $Ticket{OwnerID},
-    Key    => 'OutOfOfficeEndDay',
-    Value  => $Day,
+    Key    => 'OutOfOfficeEnd',
+    Value  => sprintf( '%04d-%02d-%02d', ( $Year + 1 ), $Month, $Day ),
 );
 
 $Kernel::OM->Get('Ticket')->ArticleCreate(
