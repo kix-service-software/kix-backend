@@ -14,18 +14,19 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $TimeObject   = $Kernel::OM->Get('Time');
-my $UserObject   = $Kernel::OM->Get('User');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # begin transaction on database
 $Helper->BeginWork();
 
-$ConfigObject->Set(
+# init fixed time
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2024-02-09 00:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
+
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
@@ -37,7 +38,7 @@ for my $Try ( 1 .. 20 ) {
 
     $UserRand = 'unittest-' . $Helper->GetRandomID();
 
-    my $UserID = $UserObject->UserLookup(
+    my $UserID = $Kernel::OM->Get('User')->UserLookup(
         UserLogin => $UserRand,
         Silent    => 1,
     );
@@ -53,7 +54,7 @@ for my $Try ( 1 .. 20 ) {
 }
 
 # add user
-my $UserID = $UserObject->UserAdd(
+my $UserID = $Kernel::OM->Get('User')->UserAdd(
     UserLogin    => $UserRand,
     ValidID      => 1,
     ChangeUserID => 1,
@@ -65,7 +66,7 @@ $Self->True(
     'UserAdd()',
 );
 
-my %UserList = $UserObject->UserList(
+my %UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 0,
 );
@@ -76,7 +77,7 @@ $Self->Is(
     "UserList valid 0",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 1,
 );
@@ -87,7 +88,7 @@ $Self->Is(
     "UserList valid 1",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 0,
 );
@@ -98,7 +99,7 @@ $Self->Is(
     "UserList valid 0 cached",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 1,
 );
@@ -109,7 +110,7 @@ $Self->Is(
     "UserList valid 1 cached",
 );
 
-my $Update = $UserObject->UserUpdate(
+my $Update = $Kernel::OM->Get('User')->UserUpdate(
     UserID        => $UserID,
     UserLogin     => $UserRand . '房治郎',
     ValidID       => 2,
@@ -121,7 +122,7 @@ $Self->True(
     'UserUpdate()',
 );
 
-my %UserData = $UserObject->GetUserData( UserID => $UserID );
+my %UserData = $Kernel::OM->Get('User')->GetUserData( UserID => $UserID );
 
 $Self->Is(
     $UserData{UserLogin} || '',
@@ -129,7 +130,7 @@ $Self->Is(
     'GetUserData() - UserLogin',
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 0,
 );
@@ -140,7 +141,7 @@ $Self->Is(
     "UserList valid 0",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 1,
 );
@@ -151,7 +152,7 @@ $Self->Is(
     "UserList valid 1",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 0,
 );
@@ -162,7 +163,7 @@ $Self->Is(
     "UserList valid 0 cached",
 );
 
-%UserList = $UserObject->UserList(
+%UserList = $Kernel::OM->Get('User')->UserList(
     Type  => 'Short',
     Valid => 1,
 );
@@ -173,7 +174,7 @@ $Self->Is(
     "UserList valid 1 cached",
 );
 
-my %UserSearch = $UserObject->UserSearch(
+my %UserSearch = $Kernel::OM->Get('User')->UserSearch(
     UserLogin => '*房治郎*',
     Valid     => 0,
 );
@@ -185,13 +186,13 @@ $Self->Is(
 );
 
 # check token support
-my $Token = $UserObject->TokenGenerate( UserID => 1 );
+my $Token = $Kernel::OM->Get('User')->TokenGenerate( UserID => 1 );
 $Self->True(
     $Token || 0,
     "TokenGenerate() - $Token",
 );
 
-my $TokenValid = $UserObject->TokenCheck(
+my $TokenValid = $Kernel::OM->Get('User')->TokenCheck(
     Token  => $Token,
     UserID => 1,
 );
@@ -201,7 +202,7 @@ $Self->True(
     "TokenCheck() - $Token",
 );
 
-$TokenValid = $UserObject->TokenCheck(
+$TokenValid = $Kernel::OM->Get('User')->TokenCheck(
     Token  => $Token,
     UserID => 1,
 );
@@ -211,7 +212,7 @@ $Self->True(
     "TokenCheck() - $Token",
 );
 
-$TokenValid = $UserObject->TokenCheck(
+$TokenValid = $Kernel::OM->Get('User')->TokenCheck(
     Token  => $Token . '123',
     UserID => 1,
 );
@@ -222,7 +223,7 @@ $Self->True(
 );
 
 # testing preferences
-my $SetPreferences = $UserObject->SetPreferences(
+my $SetPreferences = $Kernel::OM->Get('User')->SetPreferences(
     Key    => 'UserLanguage',
     Value  => 'fr',
     UserID => $UserID,
@@ -233,7 +234,7 @@ $Self->True(
     "SetPreferences - $UserID",
 );
 
-my %UserPreferences = $UserObject->GetPreferences(
+my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
     UserID => $UserID,
 );
 
@@ -248,7 +249,7 @@ $Self->Is(
     "GetPreferences $UserID - fr",
 );
 
-%UserList = $UserObject->SearchPreferences(
+%UserList = $Kernel::OM->Get('User')->SearchPreferences(
     Key   => 'UserLanguage',
     Value => 'fr',
 );
@@ -264,7 +265,7 @@ $Self->Is(
     "SearchPreferences() - $UserID",
 );
 
-%UserList = $UserObject->SearchPreferences(
+%UserList = $Kernel::OM->Get('User')->SearchPreferences(
     Key   => 'UserLanguage',
     Value => 'de',
 );
@@ -275,7 +276,7 @@ $Self->False(
 );
 
 # look for any value
-%UserList = $UserObject->SearchPreferences(
+%UserList = $Kernel::OM->Get('User')->SearchPreferences(
     Key => 'UserLanguage',
 );
 
@@ -291,7 +292,7 @@ $Self->Is(
 );
 
 #update existing prefs
-my $UpdatePreferences = $UserObject->SetPreferences(
+my $UpdatePreferences = $Kernel::OM->Get('User')->SetPreferences(
     Key    => 'UserLanguage',
     Value  => 'da',
     UserID => $UserID,
@@ -302,7 +303,7 @@ $Self->True(
     "UpdatePreferences - $UserID",
 );
 
-%UserPreferences = $UserObject->GetPreferences(
+%UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
     UserID => $UserID,
 );
 
@@ -317,71 +318,102 @@ $Self->Is(
     "UpdatePreferences $UserID - da",
 );
 
-#check no out of office
-%UserData = $UserObject->GetUserData(
-    UserID        => $UserID,
+### UserSearch with IsOutOfOffice ###
+## Check without set preference ##
+my %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 1,
     Valid         => 0,
-    NoOutOfOffice => 0
 );
-
 $Self->False(
-    $UserData{Preferences}->{OutOfOfficeMessage},
-    'GetUserData() - OutOfOfficeMessage',
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 1, Preference not set',
+);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 0,
+    Valid         => 0,
+);
+$Self->True(
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 0, Preference not set',
 );
 
-%UserData = $UserObject->GetUserData(
-    UserID => $UserID,
-    Valid  => 0,
-
-    #       NoOutOfOffice => 0
-);
-
-$Self->False(
-    $UserData{Preferences}->{OutOfOfficeMessage},
-    'GetUserData() - OutOfOfficeMessage',
-);
-
-my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-    SystemTime => $TimeObject->SystemTime(),
-);
-
+## Check with set preference on same day ##
+my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1/;
 my %Values = (
-    'OutOfOffice'           => 'on',
-    'OutOfOfficeStartYear'  => $Year,
-    'OutOfOfficeStartMonth' => $Month,
-    'OutOfOfficeStartDay'   => $Day,
-    'OutOfOfficeEndYear'    => $Year,
-    'OutOfOfficeEndMonth'   => $Month,
-    'OutOfOfficeEndDay'     => $Day,
+    'OutOfOfficeStart' => $CurrDate,
+    'OutOfOfficeEnd'   => $CurrDate,
 );
-
-for my $Key ( sort keys %Values ) {
-    $UserObject->SetPreferences(
+for my $Key ( sort( keys( %Values ) ) ) {
+    $Kernel::OM->Get('User')->SetPreferences(
         UserID => $UserID,
         Key    => $Key,
-        Value  => $Values{$Key},
+        Value  => $Values{ $Key },
     );
 }
-%UserData = $UserObject->GetUserData(
-    UserID        => $UserID,
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 1,
     Valid         => 0,
-    NoOutOfOffice => 0
 );
-
 $Self->True(
-    $UserData{Preferences}->{OutOfOfficeMessage},
-    'GetUserData() - OutOfOfficeMessage',
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 1, Preference set, correct day',
+);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 0,
+    Valid         => 0,
+);
+$Self->False(
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 0, Preference set, correct day',
 );
 
-%UserData = $UserObject->GetUserData(
-    UserID => $UserID,
-    Valid  => 0,
+## Check with set preference on day before ##
+$SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2024-02-08 00:00:00',
 );
-
+$Helper->FixedTimeSet($SystemTime);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 1,
+    Valid         => 0,
+);
+$Self->False(
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 1, Preference set, day before',
+);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 0,
+    Valid         => 0,
+);
 $Self->True(
-    $UserData{Preferences}->{OutOfOfficeMessage},
-    'GetUserData() - OutOfOfficeMessage',
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 0, Preference set, day before',
 );
+
+## Check with set preference on day after ##
+$SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2024-02-10 00:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 1,
+    Valid         => 0,
+);
+$Self->False(
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 1, Preference set, day after',
+);
+%UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+    IsOutOfOffice => 0,
+    Valid         => 0,
+);
+$Self->True(
+    $UserSearchResult{ $UserID },
+    'UserSearch() - IsOutOfOffice = 0, Preference set, day after',
+);
+
+# reset fixed time
+$Helper->FixedTimeUnset();
 
 # rollback transaction on database
 $Helper->Rollback();

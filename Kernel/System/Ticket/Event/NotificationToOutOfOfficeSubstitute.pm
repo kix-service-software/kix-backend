@@ -15,10 +15,10 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Config',
+    'Contact',
+    'Email',
     'HTMLUtils',
     'Log',
-    'Email',
-    'Time',
     'User',
 );
 
@@ -35,15 +35,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # create needed objects
-    $Self->{ConfigObject}    = $Kernel::OM->Get('Config');
-    $Self->{HTMLUtilsObject} = $Kernel::OM->Get('HTMLUtils');
-    $Self->{LogObject}       = $Kernel::OM->Get('Log');
-    $Self->{SendmailObject}  = $Kernel::OM->Get('Email');
-    $Self->{TimeObject}      = $Kernel::OM->Get('Time');
-    $Self->{UserObject}      = $Kernel::OM->Get('User');
-    $Self->{ContactObject}   = $Kernel::OM->Get('Contact');
-
     return $Self;
 }
 
@@ -53,11 +44,10 @@ sub Run {
     # check needed stuff
     foreach (qw(TicketID Notification)) {
         if ( !$Param{Data}->{$_} ) {
-            $Self->{LogObject}
-                ->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "NotificationToOutOfOfficeSubstitute: Need $_!"
-                );
+            );
             return;
         }
     }
@@ -65,87 +55,110 @@ sub Run {
 
     # check if recipient data is availible
     if ( !$Param{Data}->{RecipientMail} && !$Param{Data}->{RecipientID} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "NotificationToOutOfOfficeSubstitute: Need RecipientMail or RecipientID!"
         );
         return;
     }
 
-    my %User;
+    # check if recipient is valid and out of office
+    my %UserSearchResult = ();
     if ( $Param{Data}->{RecipientID} ) {
-        %User = $Self->{UserObject}->GetUserData(
-            UserID => $Param{Data}->{RecipientID},
-            Valid  => 1,
+        %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+            SearchUserID  => $Param{Data}->{RecipientID},
+            IsOutOfOffice => 1,
+            Valid         => 1,
+            Limit         => 1,
         );
-    } else {
-        my $ContactID = $Self->{ContactObject}->ContactLookup(
+    }
+    else {
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
             Email  => $Param{Data}->{RecipientMail},
             Silent => 1
         );
         if ($ContactID) {
-            my %Contact = $Self->{ContactObject}->ContactGet(
+            my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $ContactID
             );
-            if (IsHashRefWithData(\%Contact) && $Contact{AssignedUserID}) {
-                %User = $Self->{UserObject}->GetUserData(
-                    UserID => $Contact{AssignedUserID},
-                    Valid  => 1,
+            if (
+                %Contact
+                && $Contact{AssignedUserID}
+            ) {
+                %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+                    SearchUserID  => $Contact{AssignedUserID},
+                    IsOutOfOffice => 1,
+                    Valid         => 1,
+                    Limit         => 1,
                 );
             }
         }
     }
 
-    # check if user's out of office-time is configured
-    return if !%User || !$User{Preferences}->{OutOfOffice} || !$User{Preferences}->{OutOfOfficeSubstitute};
+    # check if recipient is out of office
+    my $UserID;
+    my $UserLogin;
+    for my $ResultUserID ( keys( %UserSearchResult ) ) {
+        $UserID = $ResultUserID;
+        $UserID = $UserSearchResult{ $ResultUserID };
+    }
+    return if (
+        !$UserID
+        || !$UserLogin
+    );
 
-    # check if user is out of office right now
-    my $CurrTime = $Self->{TimeObject}->SystemTime();
-    my $StartTime
-        = "$User{Preferences}->{OutOfOfficeStartYear}-$User{Preferences}->{OutOfOfficeStartMonth}-$User{Preferences}->{OutOfOfficeStartDay} 00:00:00";
-    $StartTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $StartTime );
-    my $EndTime
-        = "$User{Preferences}->{OutOfOfficeEndYear}-$User{Preferences}->{OutOfOfficeEndMonth}-$User{Preferences}->{OutOfOfficeEndDay} 23:59:59";
-    $EndTime = $Self->{TimeObject}->TimeStamp2SystemTime( String => $EndTime );
-    return if ( $StartTime > $CurrTime || $EndTime < $CurrTime );
+    # get preference OutOfOfficeSubstitute of user
+    my %Preferences = $Kernel::OM->Get('User')->GetPreferences(
+        UserID => $UserID,
+    );
+    return if (
+        !%Preferences
+        || !$Preferences{OutOfOfficeSubstitute}
+    );
 
     # get substitute contact data
-    my %SubstituteUserContact = $Self->{ContactObject}->ContactGet(
-        UserID => $User{Preferences}->{OutOfOfficeSubstitute},
+    my %SubstituteUserContact = $Kernel::OM->Get('Contact')->ContactGet(
+        UserID => $Preferences{OutOfOfficeSubstitute},
     );
-    return if !%SubstituteUserContact || !$SubstituteUserContact{Email};
+    return if (
+        !%SubstituteUserContact
+        || !$SubstituteUserContact{Email}
+    );
 
     # prepare notification body
-    if ( $User{Preferences}->{OutOfOfficeSubstituteNote} ) {
-        if ( $Notification{ContentType} && $Notification{ContentType} eq 'text/html' ) {
-            $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentStrip(
+    if ( $Preferences{OutOfOfficeSubstituteNote} ) {
+        if (
+            $Notification{ContentType}
+            && $Notification{ContentType} eq 'text/html'
+        ) {
+            $Notification{Body} = $Kernel::OM->Get('HTMLUtils')->DocumentStrip(
                 String => $Notification{Body},
             );
-            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $Preferences{OutOfOfficeSubstituteNote}
                 . "<br/>**********************************************************************<br/><br/>"
                 . $Notification{Body};
-            $Notification{Body} = $Self->{HTMLUtilsObject}->DocumentComplete(
+            $Notification{Body} = $Kernel::OM->Get('HTMLUtils')->DocumentComplete(
                 String  => $Notification{Body},
                 Charset => 'utf-8',
             );
         }
         else {
-            $Notification{Body} = $User{Preferences}->{OutOfOfficeSubstituteNote}
+            $Notification{Body} = $Preferences{OutOfOfficeSubstituteNote}
                 . "\n**********************************************************************\n\n"
                 . $Notification{Body};
         }
     }
 
-    $Self->{LogObject}->Log(
+    $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message =>
-            "Sent substitute email to '$SubstituteUserContact{Email}' for agent '$User{UserLogin}'",
+            "Sent substitute email to '$SubstituteUserContact{Email}' for agent '$UserLogin'",
     );
 
     # send notification to substitute
-    $Self->{SendmailObject}->Send(
-        From => $Self->{ConfigObject}->Get('NotificationSenderName') . ' <'
-            . $Self->{ConfigObject}->Get('NotificationSenderEmail') . '>',
+    $Kernel::OM->Get('Email')->Send(
+        From => $Kernel::OM->Get('Config')->Get('NotificationSenderName') . ' <'
+            . $Kernel::OM->Get('Config')->Get('NotificationSenderEmail') . '>',
         To         => $SubstituteUserContact{Email},
         Subject    => $Notification{Subject},
         MimeType   => $Notification{ContentType} || 'text/plain',
@@ -159,9 +172,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 

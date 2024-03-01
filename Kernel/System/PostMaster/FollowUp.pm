@@ -68,27 +68,16 @@ sub Run {
     my $Comment = $Param{Comment} || q{};
     my $Lock    = $Param{Lock}    || q{};
 
-    # Check if owner of ticket is still valid
-    my %UserInfo = $Kernel::OM->Get('User')->GetUserData(
-        UserID        => $Ticket{OwnerID},
-        NoOutOfOffice => 0,
+    # check if owner of ticket is valid and not out of office
+    my %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
+        SearchUserID  => $Ticket{OwnerID},
+        IsOutOfOffice => 0,
+        Valid         => 1,
+        Limit         => 1,
     );
 
-    # 1) check user, out of office, unlock ticket
-    if ( $UserInfo{Preferences}->{OutOfOfficeMessage} ) {
-        $TicketObject->TicketLockSet(
-            TicketID => $Param{TicketID},
-            Lock     => 'unlock',
-            UserID   => $Param{InmailUserID},
-        );
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Ticket [$Param{Tn}] unlocked, current owner is out of office!",
-        );
-    }
-
-    # 2) check user, just lock it if user is valid and ticket was closed
-    elsif ( $UserInfo{ValidID} eq '1' ) {
+    # ticket owner is valid and not out of office
+    if ( $UserSearchResult{ $Ticket{OwnerID} } ) {
 
         # set lock (if ticket should be locked on follow up)
         if ( $Lock && $Ticket{StateType} =~ /^close/i ) {
@@ -106,8 +95,7 @@ sub Run {
             }
         }
     }
-
-    # 3) Unlock ticket, because current user is set to invalid
+    # unlock ticket, because current owner is set to invalid or out of office
     else {
         $TicketObject->TicketLockSet(
             TicketID => $Param{TicketID},
@@ -116,26 +104,23 @@ sub Run {
         );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "Ticket [$Param{Tn}] unlocked, current owner is invalid!",
+            Message  => "Ticket [$Param{Tn}] unlocked, current owner is out of office or invalid!",
         );
     }
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # neither state- nor pending-time update if KeepState set..
     if ( !$GetParam{'X-KIX-FollowUp-KeepState'} ) {
         # set state
-        my $State = $ConfigObject->Get('PostmasterFollowUpState') || 'open';
+        my $State = $Kernel::OM->Get('Config')->Get('PostmasterFollowUpState') || 'open';
 
         if (
             $Ticket{StateType} =~ /^close/
-            && $ConfigObject->Get('PostmasterFollowUpStateClosed')
+            && $Kernel::OM->Get('Config')->Get('PostmasterFollowUpStateClosed')
         ) {
-            $State = $ConfigObject->Get('PostmasterFollowUpStateClosed');
+            $State = $Kernel::OM->Get('Config')->Get('PostmasterFollowUpStateClosed');
         }
 
-        my $NextStateRef = $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpState');
+        my $NextStateRef = $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::PostmasterFollowUpState');
 
         if (
             $NextStateRef->{ $Ticket{Type} . ':::' . $Ticket{State} }
@@ -412,7 +397,7 @@ sub Run {
     }
 
     # check if email-from is a valid agent...
-    if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
+    if ( $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
         FROM:
         for my $FromAddress (@EmailIn) {
 
@@ -479,7 +464,7 @@ sub Run {
         !$GetParam{CustomerVisible}
         && @EmailIn
         && $Ticket{OrganisationID}
-        && $ConfigObject->Get('PostMaster::FollowUp::CheckFromOrganisation')
+        && $Kernel::OM->Get('Config')->Get('PostMaster::FollowUp::CheckFromOrganisation')
     ) {
         # search for relevant contacts by email
         my @ContactListEmail = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -711,7 +696,7 @@ sub Run {
     }
 
     # run extensions
-    my $Extensions = $ConfigObject->Get('Postmaster::FollowUpExtension');
+    my $Extensions = $Kernel::OM->Get('Config')->Get('Postmaster::FollowUpExtension');
     if (IsHashRefWithData($Extensions)) {
         for my $Extension ( sort keys %{$Extensions} ) {
             next if (!IsHashRefWithData($Extensions->{$Extension}) || !$Extensions->{$Extension}->{Module});
