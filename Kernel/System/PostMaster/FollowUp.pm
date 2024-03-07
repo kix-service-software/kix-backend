@@ -396,24 +396,41 @@ sub Run {
         push( @EmailIn, $Address );
     }
 
-    # check if email-from is a valid agent...
-    if ( $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
-        FROM:
-        for my $FromAddress (@EmailIn) {
+    # check if X-KIX-FollowUp-SenderType exists
+    if (
+        $GetParam{'X-KIX-FollowUp-SenderType'} &&
+        !$TicketObject->ArticleSenderTypeLookup( SenderType => $GetParam{'X-KIX-FollowUp-SenderType'} )
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Can't find sender type '" . $GetParam{'X-KIX-FollowUp-SenderType'} . "' in db, will take 'external'",
+        );
+        # remove it for next check below
+        delete $GetParam{'X-KIX-FollowUp-SenderType'};
+    }
 
-            my %UserData = $Kernel::OM->Get('User')->UserSearch(
-                Search  => $FromAddress,
-                ValidID => 1
-            );
+    # if not given, check if is agent email else use external
+    if (!$GetParam{'X-KIX-FollowUp-SenderType'}) {
 
-            for my $CurrUserID ( keys(%UserData) ) {
-                if ( $UserData{$CurrUserID} =~ /^$FromAddress$/i ) {
+        # check if email-from is a valid agent...
+        if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
+            for my $FromAddress (@EmailIn) {
+                my %AgentUsers = $Kernel::OM->Get('User')->UserSearch(
+                    Search  => $FromAddress,
+                    IsAgent => 1,
+                    Limit   => 1,
+                    ValidID => 1
+                );
+
+                if ( IsHashRefWithData(\%AgentUsers) ) {
                     $GetParam{'X-KIX-FollowUp-SenderType'} = 'agent';
                     last;
                 }
             }
+        }
 
-            last if ( $GetParam{'X-KIX-FollowUp-SenderType'} eq 'agent' );
+        if (!$GetParam{'X-KIX-FollowUp-SenderType'}) {
+            $GetParam{'X-KIX-FollowUp-SenderType'} = 'external';
         }
     }
 

@@ -359,7 +359,7 @@ sub Run {
                 ) || 1;
             }
 
-            # ensure that queue for new ticket is part of possible followup queues 
+            # ensure that queue for new ticket is part of possible followup queues
             if (
                 $QueueID
                 && !$Queues{ $QueueID }
@@ -679,10 +679,8 @@ sub GetEmailParams {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-#rbo - T2016121190001552 - renamed X-KIX headers
-    # set sender type if not given
-    for my $Key (qw(X-KIX-SenderType X-KIX-FollowUp-SenderType)) {
-
+    # check sender type - if not given use external (check for follow up is done in FollowUp module!)
+    for my $Key (qw(X-KIX-SenderType)) {
         if ( !$GetParam{$Key} ) {
             $GetParam{$Key} = 'external';
         }
@@ -697,7 +695,6 @@ sub GetEmailParams {
         }
     }
 
-#rbo - T2016121190001552 - renamed X-KIX headers
     # set article type if not given
     for my $Key (qw(X-KIX-Channel X-KIX-FollowUp-Channel)) {
         if ( !$GetParam{$Key} ) {
