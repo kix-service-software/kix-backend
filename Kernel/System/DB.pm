@@ -1295,6 +1295,14 @@ generate SQL condition query based on a search expression
         Value => '(ABC+DEF)',
     );
 
+    Ignores replacement of the wildcard “*”, except SearchPrefix and SearchSuffix
+
+    my $SQL = $DBObject->QueryCondition(
+        Key        => 'some_col',
+        Value      => '(ABC*+DEF)',
+        NoWildcard => 1
+    );
+
     add SearchPrefix and SearchSuffix to search, in this case
     for "(ABC*+DEF*)"
 
@@ -1329,11 +1337,6 @@ generate SQL condition query based on a search expression
     );
 
     return the SQL String with ?-values and a array with values references:
-
-    $BindModeResult = (
-        'SQL'    => 'WHERE testa LIKE ? AND testb NOT LIKE ? AND testc = ?'
-        'Values' => ['a', 'b', 'c'],
-    )
 
 Note that the comparisons are usually performed case insensitively.
 Only VARCHAR colums with a size less or equal 3998 are supported,
@@ -1371,12 +1374,26 @@ sub QueryCondition {
     my $BindMode      = $Param{BindMode}      || 0;
     my @BindValues;
 
+
+    # replace * with % (for SearchPrefix)
+    if ( $SearchPrefix ) {
+        $SearchPrefix =~ s/\*/%/g;
+    }
+
+    # replace * with % (for SearchSuffix)
+    if ( $SearchSuffix ) {
+        $SearchSuffix =~ s/\*/%/g;
+    }
+
     # remove leading/trailing spaces
     $Param{Value} =~ s/^\s+//g;
     $Param{Value} =~ s/\s+$//g;
 
     # add base brackets
-    if ( $Param{Value} !~ /^(?<!\\)\(/ || $Param{Value} !~ /(?<!\\)\)$/ ) {
+    if (
+        $Param{Value} !~ /^(?<!\\)\(/
+        || $Param{Value} !~ /(?<!\\)\)$/
+    ) {
         $Param{Value} = '(' . $Param{Value} . ')';
     }
 
@@ -1410,7 +1427,9 @@ sub QueryCondition {
     $Param{Value} =~ s/(\s|(?<!\\)\)|(?<!\\)\()OR(\s|(?<!\\)\(|(?<!\\)\))/$1||$2/g;
 
     # replace * with % (for SQL)
-    $Param{Value} =~ s/\*/%/g;
+    if ( !$Param{NoWildcard} ) {
+        $Param{Value} =~ s/\*/%/g;
+    }
 
     # remove double %% (also if there is only whitespace in between)
     $Param{Value} =~ s/%\s*%/%/g;
@@ -1462,6 +1481,14 @@ sub QueryCondition {
         $Param{Value} =~ s/\s/&&/g;
     }
 
+    if ( $Param{NoWildcard} ) {
+        $Param{Value} = $Self->Quote(
+            $Param{Value},
+            'Like',
+            $Param{Silent}
+        );
+    }
+
     # get col.
     my @Keys;
     if ( ref $Param{Key} eq 'ARRAY' ) {
@@ -1502,8 +1529,7 @@ sub QueryCondition {
                 $SpecialCharacters->{ $Array[ $Position + 1 ] }
                 || $Array[ $Position + 1 ] eq q{\\}
             )
-            )
-        {
+        ) {
             $Backslash = 1;
             next POSITION;
         }
@@ -1549,9 +1575,12 @@ sub QueryCondition {
 
             # database quote
             $Word = $SearchPrefix . $Word . $SearchSuffix;
-            $Word =~ s/\*/%/g;
-            $Word =~ s/%%/%/g;
-            $Word =~ s/%%/%/g;
+
+            if ( !$Param{NoWildcard} ) {
+                $Word =~ s/\*/%/g;
+                $Word =~ s/%%/%/g;
+                $Word =~ s/%%/%/g;
+            }
 
             # perform quoting depending on query type (only if not in bind mode)
             if ( !$BindMode ) {

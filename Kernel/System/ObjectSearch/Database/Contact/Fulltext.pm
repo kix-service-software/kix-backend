@@ -102,14 +102,17 @@ sub Search {
 
     my %SearchMapping = (
         CONTAINS => {
-            SearchPrefix => q{*},
-            SearchSuffix => q{*}
+            SearchPrefix      => q{*},
+            SearchSuffix      => q{*},
+            NoWildcardReplace => 1
         },
         ENDSWITH => {
-            SearchPrefix => q{*}
+            SearchPrefix      => q{*},
+            NoWildcardReplace => 1
         },
         STARTSWITH => {
-            SearchSuffix => q{*}
+            SearchSuffix      => q{*},
+            NoWildcardReplace => 1
         },
         LIKE => {}
     );
