@@ -53,12 +53,13 @@ sub Check {
     if (IsHashRefWithData($FQDN)) {
         $FQDN = $FQDN->{Backend}
     }
-    $Self->{FQDN}     = $FQDN;
-    $Self->{MailHost} = $ConfigObject->Get('SendmailModule::Host')
+    $Self->{FQDN}      = $FQDN;
+    $Self->{MailHost}  = $ConfigObject->Get('SendmailModule::Host')
         || die "No SendmailModule::Host found in Kernel/Config.pm";
-    $Self->{SMTPPort} = $ConfigObject->Get('SendmailModule::Port');
-    $Self->{User}     = $ConfigObject->Get('SendmailModule::AuthUser');
-    $Self->{Password} = $ConfigObject->Get('SendmailModule::AuthPassword');
+    $Self->{SMTPPort}  = $ConfigObject->Get('SendmailModule::Port');
+    $Self->{User}      = $ConfigObject->Get('SendmailModule::AuthUser');
+    $Self->{Password}  = $ConfigObject->Get('SendmailModule::AuthPassword');
+    $Self->{SSLVerify} = $ConfigObject->Get('SendmailModule::SSLVerify');
 
     # try it 3 times to connect with the SMTP server
     # (M$ Exchange Server 2007 have sometimes problems on port 25)
@@ -72,6 +73,7 @@ sub Check {
             FQDN      => $Self->{FQDN},
             SMTPPort  => $Self->{SMTPPort},
             SMTPDebug => $Self->{SMTPDebug},
+            SSLVerify => $Self->{SSLVerify},
         );
 
         last TRY if $SMTP;
