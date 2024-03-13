@@ -42,6 +42,7 @@ sub Check {
     $ConfigData{SMTPPort}       = $ConfigObject->Get('SendmailModule::Port');
     $ConfigData{AuthUser}       = $ConfigObject->Get('SendmailModule::AuthUser');
     $ConfigData{OAuth2_Profile} = $ConfigObject->Get('SendmailModule::OAuth2_Profile');
+    $ConfigData{SSLVerify}      = $ConfigObject->Get('SendmailModule::SSLVerify');
 
     # check needed stuff
     for (qw(Host AuthUser OAuth2_Profile)) {
@@ -88,6 +89,7 @@ sub Check {
             FQDN      => $ConfigData{FQDN},
             SMTPPort  => $ConfigData{SMTPPort},
             SMTPDebug => $Self->{SMTPDebug},
+            SSLVerify => $ConfigData{SSLVerify},
         );
 
         last TRY if ( $SMTP );

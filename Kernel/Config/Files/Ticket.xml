@@ -1944,6 +1944,17 @@
             <String Regex="^[0-9]{1,3}$">20</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMasterSSLVerify" Required="1" Valid="1">
+        <Description Translatable="1">Verify ssl connection to the server.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostmasterAutoHTML2Text" Required="1" Valid="1">
         <Description Translatable="1">Converts HTML mails into text messages.</Description>
         <Group>Ticket</Group>
