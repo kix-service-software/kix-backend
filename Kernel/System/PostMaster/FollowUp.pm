@@ -413,7 +413,7 @@ sub Run {
     if (!$GetParam{'X-KIX-FollowUp-SenderType'}) {
 
         # check if email-from is a valid agent...
-        if ( $ConfigObject->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
+        if ( $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::PostmasterFollowUpCheckAgentFrom') ) {
             for my $FromAddress (@EmailIn) {
                 my %AgentUsers = $Kernel::OM->Get('User')->UserSearch(
                     Search  => $FromAddress,
