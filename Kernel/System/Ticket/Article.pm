@@ -310,19 +310,28 @@ sub ArticleCreate {
 
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
+
+        # get From by agent preference
+        if (!$Param{From} && $Param{SenderType} eq 'agent') {
+            $Param{From} = $Self->_GetFromByUser(
+                %Param,
+                Ticket => \%OldTicketData
+            )
+        }
+
         # check needed stuff
-        for (qw(TicketID UserID From Body Charset MimeType)) {
-            if ( !$Param{$_} ) {
+        for my $Needed (qw(TicketID UserID From Body Charset MimeType)) {
+            if ( !$Param{$Needed} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Need $_!"
+                    Message  => "Need $Needed!"
                 );
                 return;
             }
         }
 
-        $Param{ToOrig} = $Param{To}          || '';
-        $Param{Loop}        = $Param{Loop}        || 0;
+        $Param{ToOrig} = $Param{To}   || '';
+        $Param{Loop}   = $Param{Loop} || 0;
 
         # map ReplyTo into Reply-To if present
         if ( $Param{ReplyTo} ) {
@@ -3156,11 +3165,11 @@ prepares and transform config from AssignedObjectsMapping to a simple hash
 sub _GetAssignedSearchParams {
     my ( $Self, %Param ) = @_;
 
-    for ( qw(AssignedObjectType ObjectType) ) {
-        if ( !$Param{$_} ) {
+    for my $Needed ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -3412,6 +3421,79 @@ sub _ReplaceValuePlaceholder {
         Data            => $Param{Data},
         ReplaceNotFound => $Param{ReplaceNotFound}
     );
+}
+
+sub _GetFromByUser {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(UserID Ticket) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $FromFormat = 'SystemAddress';
+
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
+        UserID => $Param{UserID}
+    );
+    if (
+        IsHashRefWithData(\%UserData) && IsHashRefWithData($UserData{Preferences}) &&
+        $UserData{Preferences}->{ArticleFromFormat}
+    ) {
+        $FromFormat = $UserData{Preferences}->{ArticleFromFormat};
+    }
+
+    my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
+        QueueID => $Param{Ticket}->{QueueID},
+        UserID  => $Param{UserID}
+    );
+    if (!IsHashRefWithData(\%Address)) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Cannot prepare "From" value, could not load system address!'
+        );
+    }
+
+    my $From = '"';
+
+    my %Contact;
+    if ($FromFormat =~ m/^Agent/) {
+        %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID => $Param{UserID}
+        );
+        if (!IsHashRefWithData(\%Contact)) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Cannot prepare "From" value, could not load contact data of user!'
+            );
+            return;
+        }
+    }
+
+    if ($FromFormat eq 'Agent') {
+        $From .= "$Contact{Firstname} $Contact{Lastname}";
+    } elsif ($FromFormat eq 'AgentViaSystemAddress') {
+        $From .= "$Contact{Firstname} $Contact{Lastname} via $Address{RealName}";
+    } else {
+        $From .= $Address{RealName};
+    }
+
+    if ($From =~ m/[äÄöÖüÜß]/) {
+        $From =~ s/ä/ae/g;
+        $From =~ s/Ä/Ae/g;
+        $From =~ s/ö/oe/g;
+        $From =~ s/Ö/Oe/g;
+        $From =~ s/ü/ue/g;
+        $From =~ s/Ü/Ue/g;
+        $From =~ s/ß/ss/g;
+    }
+
+    return $From . "\" <$Address{Email}>";
 }
 
 1;

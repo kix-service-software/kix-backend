@@ -249,33 +249,33 @@ sub TicketCheckNumber {
 creates a new ticket
 
     my $TicketID = $TicketObject->TicketCreate(
-        Title        => 'Some Ticket Title',
-        Queue        => 'Raw',            # or QueueID => 123,
-        Lock         => 'unlock',
-        Priority     => '3 normal',       # or PriorityID => 2,
-        State        => 'new',            # or StateID => 5,
-        OrganisationID => '123465',
-        ContactID    => 123 || 'customer@example.com',
-        OwnerID      => 123,
-        TimeUnit     => 123,              # optional
-        UserID       => 123
+        Title          => 'Some Ticket Title',
+        Queue          => 'Raw',                             # or QueueID => 123
+        Lock           => 'unlock',
+        Priority       => '3 normal',                        # or PriorityID => 2
+        State          => 'new',                             # or StateID => 5
+        OrganisationID => '123465',                          # optional
+        ContactID      => 123 || 'customer@example.com',     # optional
+        OwnerID        => 123,                               # optional
+        TimeUnit       => 123,                               # optional
+        UserID         => 123
     );
 
 or
 
     my $TicketID = $TicketObject->TicketCreate(
-        TN             => $TicketObject->TicketCreateNumber(), # optional
+        TN             => $TicketObject->TicketCreateNumber(),  # optional
         Title          => 'Some Ticket Title',
-        Queue          => 'Raw',              # or QueueID => 123,
+        Queue          => 'Raw',                                # or QueueID => 123
         Lock           => 'unlock',
-        Priority       => '3 normal',         # or PriorityID => 2,
-        State          => 'new',              # or StateID => 5,
-        Type           => 'Incident',         # or TypeID = 1 or Ticket type default (Ticket::Type::Default), not required
-        OrganisationID => '123465',
-        ContactID      => '123' || 'customer@example.com',
-        OwnerID        => 123,
-        ResponsibleID  => 123,                # not required
-        ArchiveFlag    => 'y',                # (y|n) not required
+        Priority       => '3 normal',                           # or PriorityID => 2
+        State          => 'new',                                # or StateID => 5
+        Type           => 'Incident',                           # or TypeID = 1 or Ticket type default (Ticket::Type::Default), optional
+        OrganisationID => '123465',                             # optional
+        ContactID      => '123' || 'customer@example.com',      # optional
+        OwnerID        => 123,                                  # optional
+        ResponsibleID  => 123,                                  # optional
+        ArchiveFlag    => 'y',                                  # (y|n) optional
         UserID         => 123
     );
 
