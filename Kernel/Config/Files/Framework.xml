@@ -922,6 +922,22 @@
             </Hash>
         </Setting>
     </ConfigItem>
+        <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###CheckOutOfOffice" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Checks whether the OutOfOffice set by the user has expired and resets it.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">CheckOutOfOffice</Item>
+                <Item Key="Schedule">0 2 * * *</Item> <!-- Default every day 2AM -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::User::CheckOutOfOffice</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerGenericInterfaceTaskManager::FutureTaskTimeDiff" Required="1" Valid="1" ConfigLevel="100">
         <Description Translatable="1">Defines the default the number of seconds (from current time) to re-schedule a generic interface failed task.</Description>
         <Group>Framework</Group>
