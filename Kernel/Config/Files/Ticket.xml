@@ -1806,17 +1806,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::UnlockOnAway" Required="1" Valid="1">
-        <Description Translatable="1">Unlock tickets whenever a note is added and the owner is out of office.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Events###Ticket" Required="1" Valid="1">
         <Description Translatable="1">List of all ticket events to be displayed in the GUI.</Description>
         <Group>Ticket</Group>

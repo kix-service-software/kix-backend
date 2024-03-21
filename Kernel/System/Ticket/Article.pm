@@ -519,38 +519,6 @@ sub ArticleCreate {
         Name         => $Param{HistoryComment},
     );
 
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $UserObject   = $Kernel::OM->Get('User');
-
-    # unlock ticket if the owner is away (and the feature is enabled)
-    if (
-        $Param{UnlockOnAway}
-        && $OldTicketData{Lock} eq 'lock'
-        && $ConfigObject->Get('Ticket::UnlockOnAway')
-    ) {
-        # check if owner of ticket is valid and not out of office
-        my %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
-            SearchUserID  => $OldTicketData{OwnerID},
-            IsOutOfOffice => 1,
-            Valid         => 1,
-            Limit         => 1,
-        );
-
-        if ( $UserSearchResult{ $OldTicketData{OwnerID} } ) {
-            $Self->TicketLockSet(
-                TicketID => $Param{TicketID},
-                Lock     => 'unlock',
-                UserID   => $Param{UserID},
-            );
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message =>
-                    "Ticket [$OldTicketData{TicketNumber}] unlocked, current owner is out of office, or invalid!",
-            );
-        }
-    }
-
     # event
     $Self->EventHandler(
         Event => 'ArticleCreate',

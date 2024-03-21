@@ -4963,6 +4963,125 @@ DefaultValue:
     </Insert>
 <!-- EO initial job "Periodic Reports" -->
 
+<!-- initial job "Owner Out Of Office - unlock ticket" -->
+    <Insert Table="exec_plan">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="type" Type="Quote">EventBased</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"Event":["ArticleCreate"]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="exec_plan">
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Time based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="type" Type="Quote">TimeBased</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"Weekday": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], "Time": ["00:00:00","06:00:00","12:00:00","18:00:00"]}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Time based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="type" Type="Quote">Ticket</Data>
+        <Data Key="exec_order" Type="Quote">5,6</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro_action">
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="macro_id">4</Data>
+        <Data Key="type" Type="Quote">LockSet</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"Lock":"unlock"}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="macro_action">
+        <Data Key="id" Type="AutoIncrement">6</Data>
+        <Data Key="macro_id">4</Data>
+        <Data Key="type" Type="Quote">OwnerSet</Data>
+        <Data Key="parameters" Type="Quote"><![CDATA[
+{"OwnerLoginOrID":"1"}
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Owner Out Of Office - unlock ticket"</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job">
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Owner Out Of Office - unlock ticket</Data>
+        <Data Key="type" Type="Quote">Ticket</Data>
+        <Data Key="filter" Type="Quote"><![CDATA[
+[{"AND":[
+{"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"StateTypeID","Value":[4],"Operator":"IN","Type":"NUMERIC"},
+{"Field":"PendingTime","Operator":"LT","Type":"DATETIME","Value":"-0m"}
+]},
+{"AND":[
+{"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"StateTypeID","Value":[1,2],"Operator":"IN","Type":"NUMERIC"}
+]}]
+    ]]></Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Unlock ticket when owner is out of office.</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_exec_plan">
+        <Data Key="job_id">4</Data>
+        <Data Key="exec_plan_id">4</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_exec_plan">
+        <Data Key="job_id">4</Data>
+        <Data Key="exec_plan_id">5</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+    <Insert Table="job_macro">
+        <Data Key="job_id">4</Data>
+        <Data Key="macro_id">4</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+<!-- EO initial job "Owner Out Of Office - unlock ticket" -->
+
     <Insert Table="report_definition">
         <Data Key="id" Type="AutoIncrement">1</Data>
         <Data Key="name" Type="Quote" Translatable="1">Tickets Created In Date Range</Data>

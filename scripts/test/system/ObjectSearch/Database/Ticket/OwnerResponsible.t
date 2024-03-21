@@ -52,6 +52,12 @@ $Self->IsDeeply(
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        OwnerOutOfOffice => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ'],
+            ValueType    => 'NUMERIC'
+        },
         ResponsibleID => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -62,10 +68,22 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ResponsibleOutOfOffice => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ'],
+            ValueType    => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# set fixed time to have predetermined verifiable results
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2014-01-01 12:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
 
 # check Search
 my @SearchTests = (
@@ -608,6 +626,108 @@ my @SearchTests = (
                 'tru.login LIKE \'Test\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field OwnerOutOfOffice / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'OwnerOutOfOffice',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '(toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OwnerOutOfOffice / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'OwnerOutOfOffice',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '(toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OwnerOutOfOffice / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'OwnerOutOfOffice',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '((toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL) OR (toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\'))'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'ResponsibleOutOfOffice',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '(trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'ResponsibleOutOfOffice',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'ResponsibleOutOfOffice',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where' => [
+                '((trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL) OR (trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\'))'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -701,6 +821,16 @@ my @SortTests = (
                 'tru.login'
             ]
         }
+    },
+    {
+        Name      => 'Sort: Attribute "OwnerOutOfOffice" is not sortable',
+        Attribute => 'OwnerOutOfOffice',
+        Expected  => undef
+    },
+    {
+        Name      => 'Sort: Attribute "ResponsibleOutOfOffice" is not sortable',
+        Attribute => 'ResponsibleOutOfOffice',
+        Expected  => undef
     }
 );
 for my $Test ( @SortTests ) {
@@ -773,6 +903,24 @@ $Self->True(
     $ContactID1,
     'Contact for first user created'
 );
+my $UserPOOOOS1 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeStart',
+    Value  => '2014-01-01',
+    UserID => $UserID1,
+);
+$Self->True(
+    $UserPOOOOS1,
+    'OutOfOfficeStart for first user created'
+);
+my $UserPOOOOE1 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeEnd',
+    Value  => '2014-01-01',
+    UserID => $UserID1,
+);
+$Self->True(
+    $UserPOOOOE1,
+    'OutOfOfficeEnd for first user created'
+);
 my $UserID2 = $Kernel::OM->Get('User')->UserAdd(
     UserLogin     => $UserLogin2,
     ValidID       => 1,
@@ -798,6 +946,24 @@ my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
 $Self->True(
     $ContactID2,
     'Contact for second user created'
+);
+my $UserPOOOOS2 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeStart',
+    Value  => '2014-01-02',
+    UserID => $UserID2,
+);
+$Self->True(
+    $UserPOOOOS2,
+    'OutOfOfficeStart for second user created'
+);
+my $UserPOOOOE2 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeEnd',
+    Value  => '2014-01-02',
+    UserID => $UserID2,
+);
+$Self->True(
+    $UserPOOOOE2,
+    'OutOfOfficeEnd for second user created'
 );
 my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
     UserLogin     => $UserLogin3,
@@ -1381,6 +1547,58 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field OwnerOutOfOffice / Operator EQ / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOffice',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field OwnerOutOfOffice / Operator EQ / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOffice',
+                    Operator => 'EQ',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field ResponsibleOutOfOffice / Operator EQ / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOffice',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field ResponsibleOutOfOffice / Operator EQ / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOffice',
+                    Operator => 'EQ',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID2,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
