@@ -127,6 +127,22 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field IsAgent / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'IsAgent',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where' => [
+                '(u0.is_agent = 0 OR u0.is_agent IS NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field IsAgent / Operator NE',
         Search       => {
             Field    => 'IsAgent',
@@ -138,7 +154,23 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'u0.is_agent <> 1'
+                '(u0.is_agent <> 1 OR u0.is_agent IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field IsAgent / Operator NE / Value 0',
+        Search       => {
+            Field    => 'IsAgent',
+            Operator => 'NE',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where' => [
+                'u0.is_agent <> 0'
             ]
         }
     },
@@ -159,6 +191,22 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field IsCustomer / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'IsCustomer',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where' => [
+                '(u0.is_customer = 0 OR u0.is_customer IS NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field IsCustomer / Operator NE',
         Search       => {
             Field    => 'IsCustomer',
@@ -170,7 +218,23 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'u0.is_customer <> 1'
+                '(u0.is_customer <> 1 OR u0.is_customer IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field IsCustomer / Operator NE / Value 0',
+        Search       => {
+            Field    => 'IsCustomer',
+            Operator => 'NE',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where' => [
+                'u0.is_customer <> 0'
             ]
         }
     }

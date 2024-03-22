@@ -92,7 +92,6 @@ my @SearchTests = (
             Field    => 'CreateByID',
             Operator => 'EQ',
             Value    => 'Test'
-
         },
         Expected     => undef
     },

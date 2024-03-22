@@ -116,82 +116,58 @@ sub Search {
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
-    my $OrgaContactAlias = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
-    if ( !$Param{Flags}->{JoinMap}->{OrganisationContactJoin} ) {
-        my $Count = $Param{Flags}->{OrganisationContactJoinCounter}++;
-        $OrgaContactAlias .= $Count;
-
-        push(
-            @SQLJoin,
-            "LEFT JOIN contact_organisation $OrgaContactAlias ON $OrgaContactAlias.contact_id = c.id"
-        );
-
-        if ( $Param{Search}->{Field} =~ m/^Primary/sm ) {
-            push(
-                @SQLJoin,
-                "AND $OrgaContactAlias.is_primary = 1"
-            );
-        }
-        $Param{Flags}->{JoinMap}->{OrganisationContactJoin} = $OrgaContactAlias;
-    }
-
-    my $OrgaAlias = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
-    if (
-        !$Param{Flags}->{JoinMap}->{OrganisationJoin}
-        && $Param{Search}->{Field} !~ m/ID(?:s|)$/sm
-    ) {
-        my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
-        $OrgaAlias .= $Count;
-        push(
-            @SQLJoin,
-            "INNER JOIN organisation $OrgaAlias ON $OrgaContactAlias.org_id = $OrgaAlias.id"
-        );
-        $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaAlias;
-    }
+    my %JoinData = $Self->_JoinGet(
+        %Param
+    );
 
     # map search attributes to table attributes
     my %AttributeMapping = (
         OrganisationID => {
-            Column    => "$OrgaContactAlias.org_id",
+            Column    => "$JoinData{OCAlias}.org_id",
             ValueType => 'NUMERIC'
         },
         OrganisationIDs => {
-            Column    => "$OrgaContactAlias.org_id",
+            Column    => "$JoinData{OCAlias}.org_id",
             ValueType => 'NUMERIC'
         },
         Organisation => {
-            Column    =>"$OrgaAlias.name",
-            ValueType => 'STRING'
+            Column          =>"$JoinData{OAlias}.name",
+            ValueType       => 'STRING',
+            CaseInsensitive => 1
         },
         OrganisationNumber => {
-            Column    => "$OrgaAlias.number",
-            ValueType => 'STRING'
+            Column          => "$JoinData{OAlias}.number",
+            ValueType       => 'STRING',
+            CaseInsensitive => 1
         },
         PrimaryOrganisationID => {
-            Column    => "$OrgaContactAlias.org_id",
+            Column    => "$JoinData{POCAlias}.org_id",
             ValueType => 'NUMERIC'
         },
         PrimaryOrganisation => {
-            Column    => "$OrgaAlias.name",
-            ValueType => 'STRING'
+            Column          => "$JoinData{POAlias}.name",
+            ValueType       => 'STRING',
+            CaseInsensitive => 1
         },
         PrimaryOrganisationNumber => {
-            Column    => "$OrgaAlias.number",
-            ValueType => 'STRING'
+            Column          => "$JoinData{POAlias}.number",
+            ValueType       => 'STRING',
+            CaseInsensitive => 1
         }
     );
 
     my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}}->{Column},
-        Value     => $Param{Search}->{Value},
-        ValueType => $AttributeMapping{$Param{Search}->{Field}}->{ValueType}
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{$Param{Search}->{Field}}->{Column},
+        Value           => $Param{Search}->{Value},
+        ValueType       => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
+        CaseInsensitive => $AttributeMapping{$Param{Search}->{Field}}->{CaseInsensitive}
     );
 
     return if !$Condition;
 
     return {
-        Join  => \@SQLJoin,
+        Join  => $JoinData{Join},
         Where => [ $Condition ]
     };
 }
@@ -217,33 +193,67 @@ sub Sort {
     # check params
     return if !$Self->_CheckSortParams( %Param );
 
-    my @SQLJoin          = ();
-    my $OrgaContactAlias = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
-    if ( !$Param{Flags}->{JoinMap}->{OrganisationContactJoin} ) {
-        my $Count = $Param{Flags}->{OrganisationContactJoinCounter}++;
-        $OrgaContactAlias .= $Count;
+    my %JoinData = $Self->_JoinGet(
+        %Param
+    );
 
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        OrganisationID            => "$JoinData{OCAlias}.org_id",
+        OrganisationIDs           => "$JoinData{OCAlias}.org_id",
+        Organisation              => "$JoinData{OAlias}.name",
+        OrganisationNumber        => "$JoinData{OAlias}.number",
+        PrimaryOrganisationID     => "$JoinData{POCAlias}.org_id",
+        PrimaryOrganisation       => "$JoinData{POAlias}.name",
+        PrimaryOrganisationNumber => "$JoinData{POAlias}.number",
+    );
+
+    return {
+        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ],
+        Join    => $JoinData{Join}
+    };
+}
+
+sub _JoinGet {
+    my ( $Self, %Param ) = @_;
+
+    my $Attribute = $Param{Search}->{Field} || $Param{Attribute};
+    my @SQLJoin;
+
+    my $OrgaContactAlias = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
+    if (
+        !$Param{Flags}->{JoinMap}->{OrganisationContactJoin}
+        && $Attribute !~ m/^Primary/sm
+    ) {
         push(
             @SQLJoin,
             "LEFT JOIN contact_organisation $OrgaContactAlias ON $OrgaContactAlias.contact_id = c.id"
         );
 
-        if ( $Param{Attribute} =~ m/^Primary/sm ) {
-            push(
-                @SQLJoin,
-                "AND $OrgaContactAlias.is_primary = 1"
-            );
-        }
         $Param{Flags}->{JoinMap}->{OrganisationContactJoin} = $OrgaContactAlias;
+    }
+
+    my $POrgaContactAlias = $Param{Flags}->{JoinMap}->{POrganisationContactJoin} // 'cpo';
+    if (
+        !$Param{Flags}->{JoinMap}->{POrganisationContactJoin}
+        && $Attribute =~ m/^Primary/sm
+    ) {
+        push(
+            @SQLJoin,
+            "LEFT JOIN contact_organisation $POrgaContactAlias ON $POrgaContactAlias.contact_id = c.id",
+            "AND $POrgaContactAlias.is_primary = 1"
+        );
+
+        $Param{Flags}->{JoinMap}->{POrganisationContactJoin} = $POrgaContactAlias;
     }
 
     my $OrgaAlias = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
     if (
         !$Param{Flags}->{JoinMap}->{OrganisationJoin}
-        && $Param{Attribute} !~ m/ID(?:s|)$/sm
+        && $Attribute !~ m/ID(?:s|)$/sm
+        && $Attribute !~ m/^Primary/sm
     ) {
-        my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
-        $OrgaAlias .= $Count;
         push(
             @SQLJoin,
             "INNER JOIN organisation $OrgaAlias ON $OrgaContactAlias.org_id = $OrgaAlias.id"
@@ -251,22 +261,26 @@ sub Sort {
         $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaAlias;
     }
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        OrganisationID            => "$OrgaContactAlias.org_id",
-        OrganisationIDs           => "$OrgaContactAlias.org_id",
-        Organisation              => "$OrgaAlias.name",
-        OrganisationNumber        => "$OrgaAlias.number",
-        PrimaryOrganisationID     => "$OrgaContactAlias.org_id",
-        PrimaryOrganisation       => "$OrgaAlias.name",
-        PrimaryOrganisationNumber => "$OrgaAlias.number",
-    );
+    my $POrgaAlias = $Param{Flags}->{JoinMap}->{POrganisationJoin} // 'po';
+    if (
+        !$Param{Flags}->{JoinMap}->{POrganisationJoin}
+        && $Attribute !~ m/ID(?:s|)$/sm
+        && $Attribute =~ m/^Primary/sm
+    ) {
+        push(
+            @SQLJoin,
+            "INNER JOIN organisation $POrgaAlias ON $POrgaContactAlias.org_id = $POrgaAlias.id"
+        );
+        $Param{Flags}->{JoinMap}->{POrganisationJoin} = $POrgaAlias;
+    }
 
-    return {
-        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ],
-        Join    => \@SQLJoin
-    };
+    return (
+        Join     => \@SQLJoin,
+        POAlias  => $POrgaAlias,
+        POCAlias => $POrgaContactAlias,
+        OCAlias  => $OrgaContactAlias,
+        OAlias   => $OrgaAlias
+    );
 }
 
 1;

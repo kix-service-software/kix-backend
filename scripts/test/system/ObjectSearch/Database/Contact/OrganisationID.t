@@ -145,10 +145,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id = 1'
+                'co.org_id = 1'
             ]
         }
     },
@@ -161,10 +161,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id <> 1'
+                'co.org_id <> 1'
             ]
         }
     },
@@ -177,10 +177,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id IN (1)'
+                'co.org_id IN (1)'
             ]
         }
     },
@@ -193,10 +193,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id NOT IN (1)'
+                'co.org_id NOT IN (1)'
             ]
         }
     },
@@ -209,10 +209,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id = 1'
+                'co.org_id = 1'
             ]
         }
     },
@@ -225,10 +225,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id <> 1'
+                'co.org_id <> 1'
             ]
         }
     },
@@ -241,10 +241,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id IN (1)'
+                'co.org_id IN (1)'
             ]
         }
     },
@@ -257,10 +257,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co0.org_id NOT IN (1)'
+                'co.org_id NOT IN (1)'
             ]
         }
     },
@@ -273,11 +273,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
             ],
             'Where' => [
-                'co0.org_id = 1'
+                'cpo.org_id = 1'
             ]
         }
     },
@@ -290,11 +290,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
             ],
             'Where' => [
-                'co0.org_id <> 1'
+                'cpo.org_id <> 1'
             ]
         }
     },
@@ -307,11 +307,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
             ],
             'Where' => [
-                'co0.org_id IN (1)'
+                'cpo.org_id IN (1)'
             ]
         }
     },
@@ -324,11 +324,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
             ],
             'Where' => [
-                'co0.org_id NOT IN (1)'
+                'cpo.org_id NOT IN (1)'
             ]
         }
     },
@@ -341,11 +341,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name = \'Test\''
+                'LOWER(o.name) = \'test\''
             ]
         }
     },
@@ -358,11 +358,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name != \'Test\''
+                'LOWER(o.name) != \'test\''
             ]
         }
     },
@@ -375,11 +375,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name IN (\'Test\')'
+                'LOWER(o.name) IN (\'test\')'
             ]
         }
     },
@@ -392,11 +392,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name NOT IN (\'Test\')'
+                'LOWER(o.name) NOT IN (\'test\')'
             ]
         }
     },
@@ -409,11 +409,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name LIKE \'Test%\''
+                'LOWER(o.name) LIKE \'test%\''
             ]
         }
     },
@@ -426,11 +426,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name LIKE \'%Test\''
+                'LOWER(o.name) LIKE \'%test\''
             ]
         }
     },
@@ -443,11 +443,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name LIKE \'%Test%\''
+                'LOWER(o.name) LIKE \'%test%\''
             ]
         }
     },
@@ -460,11 +460,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.name LIKE \'Test\''
+                'LOWER(o.name) LIKE \'test\''
             ]
         }
     },
@@ -477,11 +477,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number = \'Test\''
+                'LOWER(o.number) = \'test\''
             ]
         }
     },
@@ -494,11 +494,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number != \'Test\''
+                'LOWER(o.number) != \'test\''
             ]
         }
     },
@@ -511,11 +511,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number IN (\'Test\')'
+                'LOWER(o.number) IN (\'test\')'
             ]
         }
     },
@@ -528,11 +528,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number NOT IN (\'Test\')'
+                'LOWER(o.number) NOT IN (\'test\')'
             ]
         }
     },
@@ -545,11 +545,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number LIKE \'Test%\''
+                'LOWER(o.number) LIKE \'test%\''
             ]
         }
     },
@@ -562,11 +562,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number LIKE \'%Test\''
+                'LOWER(o.number) LIKE \'%test\''
             ]
         }
     },
@@ -579,11 +579,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number LIKE \'%Test%\''
+                'LOWER(o.number) LIKE \'%test%\''
             ]
         }
     },
@@ -596,11 +596,11 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'o0.number LIKE \'Test\''
+                'LOWER(o.number) LIKE \'test\''
             ]
         }
     },
@@ -613,12 +613,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name = \'Test\''
+                'LOWER(po.name) = \'test\''
             ]
         }
     },
@@ -631,12 +631,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name != \'Test\''
+                'LOWER(po.name) != \'test\''
             ]
         }
     },
@@ -649,12 +649,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name IN (\'Test\')'
+                'LOWER(po.name) IN (\'test\')'
             ]
         }
     },
@@ -667,12 +667,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name NOT IN (\'Test\')'
+                'LOWER(po.name) NOT IN (\'test\')'
             ]
         }
     },
@@ -685,12 +685,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name LIKE \'Test%\''
+                'LOWER(po.name) LIKE \'test%\''
             ]
         }
     },
@@ -703,12 +703,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name LIKE \'%Test\''
+                'LOWER(po.name) LIKE \'%test\''
             ]
 
         }
@@ -722,12 +722,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name LIKE \'%Test%\''
+                'LOWER(po.name) LIKE \'%test%\''
             ]
         }
     },
@@ -740,12 +740,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.name LIKE \'Test\''
+                'LOWER(po.name) LIKE \'test\''
             ]
         }
     },
@@ -758,12 +758,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number = \'Test\''
+                'LOWER(po.number) = \'test\''
             ]
         }
     },
@@ -776,12 +776,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number != \'Test\''
+                'LOWER(po.number) != \'test\''
             ]
         }
     },
@@ -794,12 +794,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number IN (\'Test\')'
+                'LOWER(po.number) IN (\'test\')'
             ]
         }
     },
@@ -812,12 +812,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number NOT IN (\'Test\')'
+                'LOWER(po.number) NOT IN (\'test\')'
             ]
         }
     },
@@ -830,12 +830,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number LIKE \'Test%\''
+                'LOWER(po.number) LIKE \'test%\''
             ]
         }
     },
@@ -848,12 +848,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number LIKE \'%Test\''
+                'LOWER(po.number) LIKE \'%test\''
             ]
         }
     },
@@ -866,12 +866,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number LIKE \'%Test%\''
+                'LOWER(po.number) LIKE \'%test%\''
             ]
         }
     },
@@ -884,12 +884,12 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'o0.number LIKE \'Test\''
+                'LOWER(po.number) LIKE \'test\''
             ]
         }
     }
@@ -925,13 +925,13 @@ my @SortTests = (
         Attribute => 'OrganisationID',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co0.org_id'
+                'co.org_id'
             ],
             'Select' => [
-                'co0.org_id'
+                'co.org_id'
             ]
         }
     },
@@ -940,13 +940,13 @@ my @SortTests = (
         Attribute => 'OrganisationIDs',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co0.org_id'
+                'co.org_id'
             ],
             'Select' => [
-                'co0.org_id'
+                'co.org_id'
             ]
         }
     },
@@ -955,14 +955,14 @@ my @SortTests = (
         Attribute => 'Organisation',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o0.name'
+                'o.name'
             ],
             'Select' => [
-                'o0.name'
+                'o.name'
             ]
         }
     },
@@ -971,14 +971,14 @@ my @SortTests = (
         Attribute => 'OrganisationNumber',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o0.number'
+                'o.number'
             ],
             'Select' => [
-                'o0.number'
+                'o.number'
             ]
         }
     },
@@ -987,14 +987,14 @@ my @SortTests = (
         Attribute => 'PrimaryOrganisationID',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
             ],
             'OrderBy' => [
-                'co0.org_id'
+                'cpo.org_id'
             ],
             'Select' => [
-                'co0.org_id'
+                'cpo.org_id'
             ]
         }
     },
@@ -1003,15 +1003,15 @@ my @SortTests = (
         Attribute => 'PrimaryOrganisation',
         Expected  => {
            'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'o0.name'
+                'po.name'
             ],
             'Select' => [
-                'o0.name'
+                'po.name'
             ]
         }
     },
@@ -1020,15 +1020,15 @@ my @SortTests = (
         Attribute => 'PrimaryOrganisationNumber',
         Expected  => {
             'Join' => [
-                'LEFT JOIN contact_organisation co0 ON co0.contact_id = c.id',
-                'AND co0.is_primary = 1',
-                'INNER JOIN organisation o0 ON co0.org_id = o0.id'
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'o0.number'
+                'po.number'
             ],
             'Select' => [
-                'o0.number'
+                'po.number'
             ]
         }
     }

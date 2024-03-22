@@ -32,7 +32,7 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . '"'
+        'Attribute object can "' . $Method . q{"}
     );
 }
 
@@ -48,9 +48,9 @@ $Self->IsDeeply(
             ValueType    => 'NUMERIC'
         },
         Contact => {
-            IsSearchable => 0,
+            IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -126,6 +126,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id = 1'
             ]
@@ -139,6 +140,7 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 '(st.contact_id = 0 OR st.contact_id IS NULL)'
             ]
@@ -152,6 +154,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 '(st.contact_id <> 1 OR st.contact_id IS NULL)'
             ]
@@ -165,6 +168,7 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id <> 0'
             ]
@@ -178,6 +182,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id IN (1)'
             ]
@@ -191,6 +196,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id NOT IN (1)'
             ]
@@ -204,6 +210,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id < 1'
             ]
@@ -217,6 +224,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id > 1'
             ]
@@ -230,6 +238,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id <= 1'
             ]
@@ -243,8 +252,169 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.contact_id >= 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator EQ',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) = \'test\' OR LOWER(tcon.firstname) = \'test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator EQ / Value empty',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'EQ',
+            Value    => q{}
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) = \'\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) = \'\' OR tcon.firstname IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator NE',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) != \'test\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) != \'test\' OR tcon.firstname IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator NE / Value empty',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'NE',
+            Value    => q{}
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) != \'\' OR LOWER(tcon.firstname) != \'\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator IN',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) IN (\'test\') OR LOWER(tcon.firstname) IN (\'test\'))'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator !IN',
+        Search       => {
+            Field    => 'Contact',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) NOT IN (\'test\') OR LOWER(tcon.firstname) NOT IN (\'test\'))'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator STARTSWITH',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) LIKE \'test%\' OR LOWER(tcon.firstname) LIKE \'test%\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator ENDSWITH',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) LIKE \'%test\' OR LOWER(tcon.firstname) LIKE \'%test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator CONTAINS',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) LIKE \'%test%\' OR LOWER(tcon.firstname) LIKE \'%test%\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Contact / Operator LIKE',
+        Search       => {
+            Field    => 'Contact',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
+            ],
+            'Where' => [
+                '(LOWER(tcon.lastname) LIKE \'test\' OR LOWER(tcon.firstname) LIKE \'test\')'
             ]
         }
     }
@@ -338,10 +508,14 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 $Helper->BeginWork();
 
 ## prepare contact mapping
+my $ContactName1      = 'Test003';
+my $ContactName2      = 'Unit1';
+my $ContactName3      = 'test2';
+
 my $ContactLastname1  = 'Test1';
 my $ContactLastname2  = 'test2';
-my $ContactLastname3  = 'Test2';
-my $ContactFirstname1 = 'Test001';
+my $ContactLastname3  = 'Unit1';
+my $ContactFirstname1 = 'Unit001';
 my $ContactFirstname2 = 'test002';
 my $ContactFirstname3 = 'Test003';
 my $ContactID1 =  $Kernel::OM->Get('Contact')->ContactAdd(
@@ -564,7 +738,150 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2, $TicketID3]
-    }
+    },
+    {
+        Name     => 'Search: Field Contact / Operator EQ / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'EQ',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator NE / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'NE',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3,$TicketID4]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator IN / Value [$ContactName1,$ContactName3]',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'IN',
+                    Value    => [$ContactName1,$ContactName3]
+                }
+            ]
+        },
+        Expected => [$TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator !IN / Value [$ContactName1,$ContactName3]',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => '!IN',
+                    Value    => [$ContactName1,$ContactName3]
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator STARTSWITH / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'STARTSWITH',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator STARTSWITH / Value substr($ContactName2,0,4)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($ContactName2,0,4)
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator ENDSWITH / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'ENDSWITH',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator ENDSWITH / Value substr($ContactName2,-5)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($ContactName2,-5)
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator CONTAINS / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'CONTAINS',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator CONTAINS / Value substr($ContactName3,2,-2)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'CONTAINS',
+                    Value    => substr($ContactName3,2,-2)
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field Contact / Operator LIKE / Value $ContactName2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Contact',
+                    Operator => 'LIKE',
+                    Value    => $ContactName2
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(

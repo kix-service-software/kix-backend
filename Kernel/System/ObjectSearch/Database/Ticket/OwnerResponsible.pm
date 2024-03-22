@@ -46,6 +46,11 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        OwnerName => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
         OwnerOutOfOffice => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -59,6 +64,11 @@ sub GetSupportedAttributes {
             ValueType    => 'NUMERIC'
         },
         Responsible => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ResponsibleName => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
@@ -87,22 +97,41 @@ sub Search {
         Owner         => {
             Column    => 'tou.login'
         },
+        OwnerName     => {
+            Column          => ['touc.lastname','touc.firstname'],
+            CaseInsensitive => 1
+        },
         ResponsibleID => {
             Column    => 'st.responsible_user_id',
             ValueType => 'NUMERIC'
         },
         Responsible   => {
             Column    => 'tru.login'
+        },
+        ResponsibleName => {
+            Column          => ['truc.lastname','truc.firstname'],
+            CaseInsensitive => 1
         }
     );
 
     # check for needed joins
     my @SQLJoin = ();
-    if ( $Param{Search}->{Field} eq 'Owner' ) {
+    if (
+        $Param{Search}->{Field} eq 'Owner'
+        || $Param{Search}->{Field} eq 'OwnerName'
+    ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
             push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
 
             $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
+        }
+        if (
+            !$Param{Flags}->{JoinMap}->{TicketOwnerContact}
+            && $Param{Search}->{Field} eq 'OwnerName'
+        ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketOwnerContact} = 1;
         }
     }
     if ( $Param{Search}->{Field} eq 'OwnerOutOfOffice' ) {
@@ -126,11 +155,22 @@ sub Search {
             $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} = 1;
         }
     }
-    elsif ( $Param{Search}->{Field} eq 'Responsible' ) {
+    if (
+        $Param{Search}->{Field} eq 'Responsible'
+        || $Param{Search}->{Field} eq 'ResponsibleName'
+    ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
             push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
 
             $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
+        }
+        if (
+            !$Param{Flags}->{JoinMap}->{TicketResponsibleContact}
+            && $Param{Search}->{Field} eq 'ResponsibleName'
+        ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id' );
+
+            $Param{Flags}->{JoinMap}->{TicketResponsibleContact} = 1;
         }
     }
     if ( $Param{Search}->{Field} eq 'ResponsibleOutOfOffice' ) {
@@ -238,11 +278,12 @@ sub Search {
     # default handling
     else {
         $Condition = $Self->_GetCondition(
-            Operator  => $Param{Search}->{Operator},
-            Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-            ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-            Value     => $Param{Search}->{Value},
-            Silent    => $Param{Silent}
+            Operator        => $Param{Search}->{Operator},
+            Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+            ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+            Value           => $Param{Search}->{Value},
+            CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+            Silent          => $Param{Silent}
         );
     }
     return if ( !$Condition );
@@ -262,7 +303,10 @@ sub Sort {
 
     # check for needed joins
     my @SQLJoin = ();
-    if ( $Param{Attribute} eq 'Owner' ) {
+    if (
+        $Param{Attribute} eq 'Owner'
+        || $Param{Attribute} eq 'OwnerName'
+    ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
             push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
 
@@ -274,7 +318,10 @@ sub Sort {
             $Param{Flags}->{JoinMap}->{TicketOwnerContact} = 1;
         }
     }
-    if ( $Param{Attribute} eq 'Responsible' ) {
+    if (
+        $Param{Attribute} eq 'Responsible'
+        || $Param{Attribute} eq 'ResponsibleName'
+    ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
             push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
 
@@ -289,21 +336,29 @@ sub Sort {
 
     # init mapping
     my %AttributeMapping = (
-        OwnerID       => {
+        OwnerID         => {
             Select  => ['st.user_id'],
             OrderBy => ['st.user_id']
         },
-        Owner         => {
+        Owner           => {
             Select  => ['touc.lastname','touc.firstname','tou.login'],
             OrderBy => ['LOWER(touc.lastname)','LOWER(touc.firstname)','LOWER(tou.login)']
         },
-        ResponsibleID => {
+        OwnerName       => {
+            Select  => ['touc.lastname','touc.firstname'],
+            OrderBy => ['LOWER(touc.lastname)','LOWER(touc.firstname)']
+        },
+        ResponsibleID   => {
             Select  => ['st.responsible_user_id'],
             OrderBy => ['st.responsible_user_id']
         },
-        Responsible   => {
+        Responsible     => {
             Select  => ['truc.lastname','truc.firstname','tru.login'],
             OrderBy => ['LOWER(truc.lastname)','LOWER(truc.firstname)','LOWER(tru.login)']
+        },
+        ResponsibleName => {
+            Select  => ['truc.lastname','truc.firstname'],
+            OrderBy => ['LOWER(truc.lastname)','LOWER(truc.firstname)']
         }
     );
 
