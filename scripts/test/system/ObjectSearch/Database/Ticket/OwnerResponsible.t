@@ -32,7 +32,7 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . '"'
+        'Attribute object can "' . $Method . q{"}
     );
 }
 
@@ -52,6 +52,10 @@ $Self->IsDeeply(
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        OwnerName => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         OwnerOutOfOffice => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -69,6 +73,10 @@ $Self->IsDeeply(
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        ResponsibleName => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         ResponsibleOutOfOffice => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -88,12 +96,12 @@ $Helper->FixedTimeSet($SystemTime);
 # check Search
 my @SearchTests = (
     {
-        Name         => 'Search: undef search',
+        Name         => "Search: undef search",
         Search       => undef,
         Expected     => undef
     },
     {
-        Name         => 'Search: Value undef',
+        Name         => "Search: Value undef",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'EQ',
@@ -103,7 +111,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Value invalid',
+        Name         => "Search: Value invalid",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'EQ',
@@ -112,7 +120,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field undef',
+        Name         => "Search: Field undef",
         Search       => {
             Field    => undef,
             Operator => 'EQ',
@@ -121,7 +129,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field invalid',
+        Name         => "Search: Field invalid",
         Search       => {
             Field    => 'Test',
             Operator => 'EQ',
@@ -130,7 +138,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator undef',
+        Name         => "Search: Operator undef",
         Search       => {
             Field    => 'OwnerID',
             Operator => undef,
@@ -139,7 +147,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator invalid',
+        Name         => "Search: Operator invalid",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'Test',
@@ -148,7 +156,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator EQ',
+        Name         => "Search: valid search / Field OwnerID / Operator EQ",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'EQ',
@@ -162,7 +170,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator NE',
+        Name         => "Search: valid search / Field OwnerID / Operator NE",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'NE',
@@ -176,7 +184,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator IN',
+        Name         => "Search: valid search / Field OwnerID / Operator IN",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'IN',
@@ -190,7 +198,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator !IN',
+        Name         => "Search: valid search / Field OwnerID / Operator !IN",
         Search       => {
             Field    => 'OwnerID',
             Operator => '!IN',
@@ -204,7 +212,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator LT',
+        Name         => "Search: valid search / Field OwnerID / Operator LT",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'LT',
@@ -218,7 +226,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator GT',
+        Name         => "Search: valid search / Field OwnerID / Operator GT",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'GT',
@@ -232,7 +240,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator LTE',
+        Name         => "Search: valid search / Field OwnerID / Operator LTE",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'LTE',
@@ -246,7 +254,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerID / Operator GTE',
+        Name         => "Search: valid search / Field OwnerID / Operator GTE",
         Search       => {
             Field    => 'OwnerID',
             Operator => 'GTE',
@@ -260,7 +268,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator EQ',
+        Name         => "Search: valid search / Field Owner / Operator EQ",
         Search       => {
             Field    => 'Owner',
             Operator => 'EQ',
@@ -276,7 +284,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator NE',
+        Name         => "Search: valid search / Field Owner / Operator NE",
         Search       => {
             Field    => 'Owner',
             Operator => 'NE',
@@ -292,7 +300,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator IN',
+        Name         => "Search: valid search / Field Owner / Operator IN",
         Search       => {
             Field    => 'Owner',
             Operator => 'IN',
@@ -308,7 +316,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator !IN',
+        Name         => "Search: valid search / Field Owner / Operator !IN",
         Search       => {
             Field    => 'Owner',
             Operator => '!IN',
@@ -324,7 +332,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator STARTSWITH',
+        Name         => "Search: valid search / Field Owner / Operator STARTSWITH",
         Search       => {
             Field    => 'Owner',
             Operator => 'STARTSWITH',
@@ -340,7 +348,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator ENDSWITH',
+        Name         => "Search: valid search / Field Owner / Operator ENDSWITH",
         Search       => {
             Field    => 'Owner',
             Operator => 'ENDSWITH',
@@ -356,7 +364,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator CONTAINS',
+        Name         => "Search: valid search / Field Owner / Operator CONTAINS",
         Search       => {
             Field    => 'Owner',
             Operator => 'CONTAINS',
@@ -372,7 +380,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Owner / Operator LIKE',
+        Name         => "Search: valid search / Field Owner / Operator LIKE",
         Search       => {
             Field    => 'Owner',
             Operator => 'LIKE',
@@ -388,7 +396,143 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator EQ',
+        Name         => "Search: valid search / Field OwnerName / Operator EQ",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) = \'test\' OR LOWER(touc.firstname) = \'test\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator NE",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) != \'test\' OR LOWER(touc.firstname) != \'test\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator IN",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) IN (\'test\') OR LOWER(touc.firstname) IN (\'test\'))'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator !IN",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) NOT IN (\'test\') OR LOWER(touc.firstname) NOT IN (\'test\'))'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator STARTSWITH",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) LIKE \'test%\' OR LOWER(touc.firstname) LIKE \'test%\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator ENDSWITH",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) LIKE \'%test\' OR LOWER(touc.firstname) LIKE \'%test\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator CONTAINS",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) LIKE \'%test%\' OR LOWER(touc.firstname) LIKE \'%test%\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerName / Operator LIKE",
+        Search       => {
+            Field    => 'OwnerName',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'Where' => [
+                '(LOWER(touc.lastname) LIKE \'test\' OR LOWER(touc.firstname) LIKE \'test\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator EQ",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'EQ',
@@ -402,7 +546,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator NE',
+        Name         => "Search: valid search / Field ResponsibleID / Operator NE",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'NE',
@@ -416,7 +560,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator IN',
+        Name         => "Search: valid search / Field ResponsibleID / Operator IN",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'IN',
@@ -430,7 +574,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator !IN',
+        Name         => "Search: valid search / Field ResponsibleID / Operator !IN",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => '!IN',
@@ -444,7 +588,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator LT',
+        Name         => "Search: valid search / Field ResponsibleID / Operator LT",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'LT',
@@ -458,7 +602,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator GT',
+        Name         => "Search: valid search / Field ResponsibleID / Operator GT",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'GT',
@@ -472,7 +616,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator LTE',
+        Name         => "Search: valid search / Field ResponsibleID / Operator LTE",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'LTE',
@@ -486,7 +630,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field ResponsibleID / Operator GTE',
+        Name         => "Search: valid search / Field ResponsibleID / Operator GTE",
         Search       => {
             Field    => 'ResponsibleID',
             Operator => 'GTE',
@@ -500,7 +644,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator EQ',
+        Name         => "Search: valid search / Field Responsible / Operator EQ",
         Search       => {
             Field    => 'Responsible',
             Operator => 'EQ',
@@ -516,7 +660,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator NE',
+        Name         => "Search: valid search / Field Responsible / Operator NE",
         Search       => {
             Field    => 'Responsible',
             Operator => 'NE',
@@ -532,7 +676,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator IN',
+        Name         => "Search: valid search / Field Responsible / Operator IN",
         Search       => {
             Field    => 'Responsible',
             Operator => 'IN',
@@ -548,7 +692,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator !IN',
+        Name         => "Search: valid search / Field Responsible / Operator !IN",
         Search       => {
             Field    => 'Responsible',
             Operator => '!IN',
@@ -564,7 +708,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator STARTSWITH',
+        Name         => "Search: valid search / Field Responsible / Operator STARTSWITH",
         Search       => {
             Field    => 'Responsible',
             Operator => 'STARTSWITH',
@@ -580,7 +724,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator ENDSWITH',
+        Name         => "Search: valid search / Field Responsible / Operator ENDSWITH",
         Search       => {
             Field    => 'Responsible',
             Operator => 'ENDSWITH',
@@ -596,7 +740,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator CONTAINS',
+        Name         => "Search: valid search / Field Responsible / Operator CONTAINS",
         Search       => {
             Field    => 'Responsible',
             Operator => 'CONTAINS',
@@ -612,7 +756,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Responsible / Operator LIKE',
+        Name         => "Search: valid search / Field Responsible / Operator LIKE",
         Search       => {
             Field    => 'Responsible',
             Operator => 'LIKE',
@@ -624,6 +768,23 @@ my @SearchTests = (
             ],
             'Where' => [
                 'tru.login LIKE \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator EQ",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) = \'test\' OR LOWER(truc.firstname) = \'test\')'
             ]
         }
     },
@@ -645,6 +806,57 @@ my @SearchTests = (
         }
     },
     {
+        Name         => "Search: valid search / Field ResponsibleName / Operator NE",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) != \'test\' OR LOWER(truc.firstname) != \'test\')'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator IN",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) IN (\'test\') OR LOWER(truc.firstname) IN (\'test\'))'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator !IN",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+             'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) NOT IN (\'test\') OR LOWER(truc.firstname) NOT IN (\'test\'))'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field OwnerOutOfOffice / Operator EQ / Value 0',
         Search       => {
             Field    => 'OwnerOutOfOffice',
@@ -658,6 +870,23 @@ my @SearchTests = (
             ],
             'Where' => [
                 '(toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator STARTSWITH",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) LIKE \'test%\' OR LOWER(truc.firstname) LIKE \'test%\')'
             ]
         }
     },
@@ -679,6 +908,23 @@ my @SearchTests = (
         }
     },
     {
+        Name         => "Search: valid search / Field ResponsibleName / Operator ENDSWITH",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) LIKE \'%test\' OR LOWER(truc.firstname) LIKE \'%test\')'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 1',
         Search       => {
             Field    => 'ResponsibleOutOfOffice',
@@ -696,6 +942,23 @@ my @SearchTests = (
         }
     },
     {
+        Name         => "Search: valid search / Field ResponsibleName / Operator CONTAINS",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) LIKE \'%test%\' OR LOWER(truc.firstname) LIKE \'%test%\')'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 0',
         Search       => {
             Field    => 'ResponsibleOutOfOffice',
@@ -709,6 +972,23 @@ my @SearchTests = (
             ],
             'Where' => [
                 '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator LIKE",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where' => [
+                '(LOWER(truc.lastname) LIKE \'test\' OR LOWER(truc.firstname) LIKE \'test\')'
             ]
         }
     },
@@ -790,6 +1070,24 @@ my @SortTests = (
         }
     },
     {
+        Name      => 'Sort: Attribute "OwnerName"',
+        Attribute => 'OwnerName',
+        Expected  => {
+            'Join' => [
+                'INNER JOIN users tou ON tou.id = st.user_id',
+                'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
+            ],
+            'OrderBy' => [
+                'LOWER(touc.lastname)',
+                'LOWER(touc.firstname)'
+            ],
+            'Select' => [
+                'touc.lastname',
+                'touc.firstname'
+            ]
+        }
+    },
+    {
         Name      => 'Sort: Attribute "ResponsibleID"',
         Attribute => 'ResponsibleID',
         Expected  => {
@@ -819,6 +1117,24 @@ my @SortTests = (
                 'truc.lastname',
                 'truc.firstname',
                 'tru.login'
+            ]
+        }
+    },
+    {
+        Name      => 'Sort: Attribute "ResponsibleName"',
+        Attribute => 'ResponsibleName',
+        Expected  => {
+            'Join' => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'OrderBy' => [
+                'LOWER(truc.lastname)',
+                'LOWER(truc.firstname)'
+            ],
+            'Select' => [
+                'truc.lastname',
+                'truc.firstname'
             ]
         }
     },
@@ -873,6 +1189,9 @@ my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
 my $UserLogin1 = 'Test001';
 my $UserLogin2 = 'test002';
 my $UserLogin3 = 'Test003';
+my $UserName1 = 'Alf';
+my $UserName2 = 'Bert';
+my $UserName3 = 'Test';
 my $ContactFirstName1 = 'Alf';
 my $ContactFirstName2 = 'Bert';
 my $ContactLastName1  = 'test';
@@ -1055,7 +1374,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field OwnerID / Operator EQ / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1068,7 +1387,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator NE / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1081,7 +1400,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field OwnerID / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1094,7 +1413,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator !IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field OwnerID / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1107,7 +1426,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator LT / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1120,7 +1439,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator GT / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1133,7 +1452,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator LTE / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1146,7 +1465,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: Field OwnerID / Operator GTE / Value $UserID2',
+        Name     => "Search: Field OwnerID / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1159,7 +1478,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2, $TicketID3]
     },
     {
-        Name     => 'Search: Field Owner / Operator EQ / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator EQ / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1172,7 +1491,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator NE / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator NE / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1185,7 +1504,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: Field Owner / Operator IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field Owner / Operator IN / Value [\$UserLogin1,\$UserLogin3]",
         Search   => {
             'AND' => [
                 {
@@ -1198,7 +1517,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field Owner / Operator !IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field Owner / Operator !IN / Value [\$UserLogin1,\$UserLogin3]",
         Search   => {
             'AND' => [
                 {
@@ -1211,7 +1530,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator STARTSWITH / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator STARTSWITH / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1224,7 +1543,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator STARTSWITH / Value substr($UserLogin2,0,4)',
+        Name     => "Search: Field Owner / Operator STARTSWITH / Value substr(\$UserLogin2,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -1237,7 +1556,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator ENDSWITH / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator ENDSWITH / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1250,7 +1569,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator ENDSWITH / Value substr($UserLogin2,-5)',
+        Name     => "Search: Field Owner / Operator ENDSWITH / Value substr(\$UserLogin2,-5)",
         Search   => {
             'AND' => [
                 {
@@ -1263,7 +1582,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator CONTAINS / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator CONTAINS / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1276,7 +1595,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Owner / Operator CONTAINS / Value substr($UserLogin2,2,-2)',
+        Name     => "Search: Field Owner / Operator CONTAINS / Value substr(\$UserLogin2,2,-2)",
         Search   => {
             'AND' => [
                 {
@@ -1289,7 +1608,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Owner / Operator LIKE / Value $UserLogin2',
+        Name     => "Search: Field Owner / Operator LIKE / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1302,7 +1621,150 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator EQ / Value $UserID2',
+        Name     => "Search: Field OwnerName / Operator EQ / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'EQ',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator NE / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'NE',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator IN / Value [\$UserName1,\$UserName3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'IN',
+                    Value    => [$UserName1,$UserName3]
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator !IN / Value [\$UserName1,\$UserName3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => '!IN',
+                    Value    => [$UserName1,$UserName3]
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator STARTSWITH / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'STARTSWITH',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator STARTSWITH / Value substr(\$UserName2,0,2)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($UserName2,0,2)
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator ENDSWITH / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'ENDSWITH',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator ENDSWITH / Value substr(\$UserName2,-2)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($UserName2,-2)
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator CONTAINS / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'CONTAINS',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator CONTAINS / Value substr(\$UserName3,1,-1)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'CONTAINS',
+                    Value    => substr($UserName3,1,-1)
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerName / Operator LIKE / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerName',
+                    Operator => 'LIKE',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleID / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1315,7 +1777,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator NE / Value $UserID2',
+        Name     => "Search: Field ResponsibleID / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1328,7 +1790,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field ResponsibleID / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1341,7 +1803,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator !IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field ResponsibleID / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1354,7 +1816,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator LT / Value $UserID2',
+        Name     => "Search: Field ResponsibleID / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1367,7 +1829,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator GT / Value $UserID2',
+        Name     => "Search: Field ResponsibleID / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1380,7 +1842,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator LTE / Value $UserID2',
+        Name     => "Search: Field ResponsibleID / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1393,7 +1855,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: Field ResponsibleID / Operator GTE / Value $UserID2',
+        Name     => "Search: Field ResponsibleID / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1406,7 +1868,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2, $TicketID3]
     },
     {
-        Name     => 'Search: Field Responsible / Operator EQ / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator EQ / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1419,7 +1881,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator NE / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator NE / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1432,7 +1894,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: Field Responsible / Operator IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field Responsible / Operator IN / Value [\$UserLogin1,\$UserLogin3]",
         Search   => {
             'AND' => [
                 {
@@ -1445,7 +1907,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field Responsible / Operator !IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field Responsible / Operator !IN / Value [\$UserLogin1,\$UserLogin3]",
         Search   => {
             'AND' => [
                 {
@@ -1458,7 +1920,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator STARTSWITH / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator STARTSWITH / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1471,7 +1933,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator STARTSWITH / Value substr($UserLogin2,0,4)',
+        Name     => "Search: Field Responsible / Operator STARTSWITH / Value substr(\$UserLogin2,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -1484,7 +1946,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator ENDSWITH / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator ENDSWITH / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1497,7 +1959,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator ENDSWITH / Value substr($UserLogin2,-5)',
+        Name     => "Search: Field Responsible / Operator ENDSWITH / Value substr(\$UserLogin2,-5)",
         Search   => {
             'AND' => [
                 {
@@ -1510,7 +1972,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator CONTAINS / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator CONTAINS / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
@@ -1523,7 +1985,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Responsible / Operator CONTAINS / Value substr($UserLogin2,2,-2)',
+        Name     => "Search: Field Responsible / Operator CONTAINS / Value substr(\$UserLogin2,2,-2)",
         Search   => {
             'AND' => [
                 {
@@ -1536,13 +1998,156 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Responsible / Operator LIKE / Value $UserLogin2',
+        Name     => "Search: Field Responsible / Operator LIKE / Value \$UserLogin2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Responsible',
                     Operator => 'LIKE',
                     Value    => $UserLogin2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator EQ / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'EQ',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator NE / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'NE',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator IN / Value [\$UserName1,\$UserName3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'IN',
+                    Value    => [$UserName1,$UserName3]
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator !IN / Value [\$UserName1,\$UserName3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => '!IN',
+                    Value    => [$UserName1,$UserName3]
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator STARTSWITH / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'STARTSWITH',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator STARTSWITH / Value substr(\$UserName2,0,2)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($UserName2,0,2)
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator ENDSWITH / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'ENDSWITH',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator ENDSWITH / Value substr(\$UserName2,-2)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($UserName2,-2)
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator CONTAINS / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'CONTAINS',
+                    Value    => $UserName2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator CONTAINS / Value substr(\$UserName3,1,-1)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'CONTAINS',
+                    Value    => substr($UserName3,1,-1)
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleName / Operator LIKE / Value \$UserName2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleName',
+                    Operator => 'LIKE',
+                    Value    => $UserName2
                 }
             ]
         },
@@ -1677,6 +2282,35 @@ my @IntegrationSortTests = (
         Expected => [$TicketID3, $TicketID2, $TicketID1]
     },
     {
+        Name     => 'Sort: Field OwnerName',
+        Sort     => [
+            {
+                Field => 'OwnerName'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field OwnerName / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'OwnerName',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field OwnerName / Direction descending',
+        Sort     => [
+            {
+                Field     => 'OwnerName',
+                Direction => 'descending'
+            }
+        ],
+        Expected => [$TicketID3, $TicketID2, $TicketID1]
+    },
+    {
         Name     => 'Sort: Field ResponsibleID',
         Sort     => [
             {
@@ -1729,6 +2363,35 @@ my @IntegrationSortTests = (
         Sort     => [
             {
                 Field     => 'Responsible',
+                Direction => 'descending'
+            }
+        ],
+        Expected => [$TicketID3, $TicketID2, $TicketID1]
+    },
+    {
+        Name     => 'Sort: Field ResponsibleName',
+        Sort     => [
+            {
+                Field => 'ResponsibleName'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field ResponsibleName / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'ResponsibleName',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Sort: Field ResponsibleName / Direction descending',
+        Sort     => [
+            {
+                Field     => 'ResponsibleName',
                 Direction => 'descending'
             }
         ],
