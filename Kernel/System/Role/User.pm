@@ -148,7 +148,7 @@ sub BasePermissionAgentList {
         SELECT DISTINCT(ru.user_id)
         FROM role_user as ru
         JOIN role_permission as rp
-            ON ru.role_id=rp.role_id
+            ON (ru.role_id=rp.role_id AND ru.usage_context IN (1,3))
         JOIN permission_type as pt
             ON pt.id=rp.type_id
         JOIN users as u
