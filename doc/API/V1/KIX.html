@@ -20511,53 +20511,54 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Ticket": {
-        "Articles": [
-            {
-                "Attachment": [
-                    {
-                        "Content": "base64encodedContentString",
-                        "ContentType": "image/png",
-                        "Filename": "printer-error.png"
-                    }
-                ],
-                "Body": "\nThe printer responsed with &lt;b&gt;Error 123&lt;/b&gt;.\n\n",
-                "ChannelID": 2,
-                "Charset": "utf8",
-                "ContentType": "text/html; charset=utf8",
-                "CustomerVisible": 1,
-                "ForceNotificationToUserID": [3],
-                "From": "someone@somecorp.com",
-                "MimeType": "text/html",
-                "SenderTypeID": 3,
-                "Subject": "The printer does not work!",
-                "TimeUnits": 12345,
-                "To": "someoneelse@somecorp.com,\"another one\" &lt;anotherone@anothercorp.com&gt;"
-            }
+  "Ticket": {
+    "Articles": [
+      {
+        "Attachments": [
+          {
+            "Content": "base64encodedContentString",
+            "ContentType": "image/png",
+            "Filename": "printer-error.png"
+          }
         ],
-        "ContactID" : 2,
-        "DynamicFields": [
-            {
-                "Name": "RelevantAssets",
-                "Value": [3,156]
-            },
-            {
-                "Name": "DueDate",
-                "Value": ["2020-05-02 12:00:00"]
-            }
-        ],
-        "LockID": 1,
-        "OrganisationID" : 2,
-        "OwnerID": 4,
-        "PriorityID" : 1,
-        "QueueID": 13,
-        "ResponsibleID": 4,
-        "ServiceID": 2,
-        "StateID": 3,
-        "Title": "The printer does not work!",
-        "TypeID": 6
-    }
-}</code></pre></div></div><div class="tab-pane" id="tickets_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Ticket has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+        "Body": "\nThe printer responsed with &lt;b&gt;Error 123&lt;/b&gt;.\n\n",
+        "ChannelID": 2,
+        "Charset": "utf8",
+        "ContentType": "text/html; charset=utf8",
+        "CustomerVisible": 1,
+        "ForceNotificationToUserID": [3],
+        "From": "someone@somecorp.com",
+        "MimeType": "text/html",
+        "SenderTypeID": 3,
+        "Subject": "The printer does not work!",
+        "TimeUnits": 12345,
+        "To": "someoneelse@somecorp.com,\"another one\" &lt;anotherone@anothercorp.com&gt;"
+      }
+    ],
+    "ContactID": 2,
+    "DynamicFields": [
+      {
+        "Name": "RelevantAssets",
+        "Value": [3, 156]
+      },
+      {
+        "Name": "DueDate",
+        "Value": ["2020-05-02 12:00:00"]
+      }
+    ],
+    "LockID": 1,
+    "OrganisationID": 2,
+    "OwnerID": 4,
+    "PriorityID": 1,
+    "QueueID": 13,
+    "ResponsibleID": 4,
+    "ServiceID": 2,
+    "StateID": 3,
+    "Title": "The printer does not work!",
+    "TypeID": 6
+  }
+}
+</code></pre></div></div><div class="tab-pane" id="tickets_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Ticket has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketPostPatchResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The ID of the created or updated ticket.",
