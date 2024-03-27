@@ -92,6 +92,7 @@ sub new {
                 Name   => $Config->{Name},
                 Config => $Config->{Config}
             );
+            next if ( !defined( $Config->{BackendObject} ) );
 
             # set global config in module
             $Config->{BackendObject}->{Config} = $Config;
