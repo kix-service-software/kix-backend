@@ -2012,16 +2012,9 @@ sub UpdateCounters {
                     Value    => $UserID,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1',
                 }
             ],
             OwnedAndLockedAndUnseen => [
@@ -2037,16 +2030,9 @@ sub UpdateCounters {
                     Value    => 2,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
                 }
             ],
             Watched => [
@@ -2065,16 +2051,9 @@ sub UpdateCounters {
                     Value    => $UserID,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
                 }
             ]
         );
