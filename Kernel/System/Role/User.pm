@@ -148,15 +148,18 @@ sub BasePermissionAgentList {
         SELECT DISTINCT(ru.user_id)
         FROM role_user as ru
         JOIN role_permission as rp
-            ON (ru.role_id=rp.role_id AND ru.usage_context IN (1,3))
+            ON ru.role_id=rp.role_id
         JOIN permission_type as pt
             ON pt.id=rp.type_id
         JOIN users as u
             ON ru.user_id=u.id
+        JOIN roles r
+            ON ru.role_id=r.id
         WHERE pt.name='Base::Ticket'
             AND rp.target IN ('*', ?)
             AND u.valid_id=1
             AND u.is_agent=1
+            AND r.usage_context IN (1,3)
 END
 
     my @Bind = ( \$Param{Target}, \$Param{Value} );
