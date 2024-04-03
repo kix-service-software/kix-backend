@@ -724,7 +724,7 @@ END
                       ON pt.id=rp.type_id';
 
         # part 1 - in case ticket base permissions exist for the relevant users
-        my @WherePart1 = ( 
+        my @WherePart1 = (
             "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
@@ -741,7 +741,7 @@ END
         push @UnionWhere, \@WherePart1;
 
         # part 2 - in case ticket base permissions do not exist for the relevant users
-        my @WherePart2 = ( 
+        my @WherePart2 = (
             "NOT EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
@@ -1396,25 +1396,25 @@ sub CheckResourcePermission {
         $Self->{Cache}->{PermissionCheckRoleList} = { $Kernel::OM->Get('Role')->RoleList( Valid => 1 ) };
     }
 
-    if ( !$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) {
-        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = [];
+    if ( !$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} ) {
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = [];
     }
 
-    if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
+    if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
         # get all roles the user is assigned to
         my @UserRoleList = $Kernel::OM->Get('Role')->UserRoleList(
             UserID       => $Param{UserID},
             UsageContext => $Param{UsageContext},
             Valid        => 1,
         );
-        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
             my $UserLogin = $Self->UserLookup(
                 UserID => $Param{UserID},
                 Silent => 1,
             );
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}): " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
         }
     }
 
@@ -1423,18 +1423,18 @@ sub CheckResourcePermission {
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for target $Param{Target}");
     }
 
-    if ( !$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) {
-        $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} = {};
+    if ( !$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) {
+        $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} = {};
     }
 
-    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
+    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
         my %PermissionList = $Self->PermissionList(
-            UserID   => $Param{UserID},
-            Types    => ['Resource'],
-            UserType => $Param{UserType}
+            UserID       => $Param{UserID},
+            Types        => ['Resource'],
+            UsageContext => $Param{UsageContext}
         );
         foreach my $Permission ( values %PermissionList ) {
-            $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+            $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
         }
     }
 
@@ -1452,12 +1452,11 @@ sub CheckResourcePermission {
 
         my $TargetPermission;
         ROLEID:
-        foreach my $RoleID ( sort @{ $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} } ) {
+        foreach my $RoleID ( sort @{ $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} } ) {
             my ( $RoleGranted, $RolePermission ) = $Self->_CheckResourcePermissionForRole(
                 %Param,
-                Target   => $Target,
-                RoleID   => $RoleID,
-                UserType => $Param{UserType}
+                Target => $Target,
+                RoleID => $RoleID
             );
 
             # use parent permission if no permissions have been found
@@ -1547,7 +1546,8 @@ returns true if the requested permission is granted for a given role
         UserID              => 123,
         RoleID              => 456,
         Target              => '/tickets',
-        RequestedPermission => 'READ'
+        RequestedPermission => 'READ',
+        UsageContext        => 'Agent'|'Customer'
     );
 
 =cut
@@ -1595,8 +1595,21 @@ sub _CheckResourcePermissionForRole {
     else {
         my $Result = 0;
         my %RelevantPermissions;
-        foreach my $ID ( sort keys %{$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}} ) {
-            my $Permission = $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}->{$ID};
+
+        # prepare cache if needed
+        if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
+            my %PermissionList = $Self->PermissionList(
+                UserID       => $Param{UserID},
+                Types        => ['Resource'],
+                UsageContext => $Param{UsageContext}
+            );
+            foreach my $Permission ( values %PermissionList ) {
+                $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+            }
+        }
+
+        foreach my $ID ( sort keys %{$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Param{RoleID}}} ) {
+            my $Permission = $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Param{RoleID}}->{$ID};
 
             # prepare target
             my $Target = $Permission->{Target};
