@@ -235,7 +235,12 @@ sub Connect {
 
     if ( $Self->{Debug} && $Self->{DebugMethods}->{Connect} ) {
         $Self->_Debug(
-            sprintf("Connect [DSN: $Self->{DSN}, User: $Self->{USER}, Pw: $Self->{PW}, DB Type: $Self->{'DB::Type'}] took %i ms",
+            sprintf(
+                "Connect [DSN: %s, User: %s, Pw: %s, DB Type: %s] took %i ms",
+                $Self->{DSN},
+                $Self->{USER},
+                $Self->{PW},
+                $Self->{'DB::Type'},
                 (Time::HiRes::time() - $StartTime) * 1000)
             );
     }
