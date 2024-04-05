@@ -81,6 +81,12 @@ sub GetPermissionDef {
             Where => [ 'st.queue_id IN (' . join( q{,}, @{ $QueueIDs } ) . q{)} ]
         };
     }
+    elsif(
+        !IsArrayRef( $QueueIDs )
+        && $QueueIDs
+    ) {
+        return {};
+    }
     else {
         return {
             Where => [ '0=1' ]

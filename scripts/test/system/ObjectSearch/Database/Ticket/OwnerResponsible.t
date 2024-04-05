@@ -56,6 +56,7 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
         OwnerOutOfOffice => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -77,6 +78,7 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
         ResponsibleOutOfOffice => {
             IsSearchable => 1,
             IsSortable   => 0,
