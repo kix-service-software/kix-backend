@@ -309,6 +309,7 @@
 /tickets/:TicketID/articles/:ArticleID/flags/:FlagName                                     | PATCH            | V1::Ticket::ArticleFlagUpdate                    |
 /tickets/:TicketID/history                                                                 | GET              | V1::Ticket::HistorySearch                        |
 /tickets/:TicketID/history/:HistoryID                                                      | GET              | V1::Ticket::HistoryGet                           |
+/virtualfs/:Token                                                                          | GET              | V1::VirtualFS::VirtualFSGet                      |
 /watchers                                                                                  | GET              | V1::Watcher::WatcherSearch                       |
 /watchers                                                                                  | POST             | V1::Watcher::WatcherCreate                       |
 /watchers/:WatcherID                                                                       | DELETE           | V1::Watcher::WatcherDelete                       |

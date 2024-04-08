@@ -78,6 +78,7 @@
 "Ticket Agent";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent";"Base::Ticket";"*";"x";"x";"x";"x";
+"Ticket Agent";"Resource";"/virtualfs";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/*";;;;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket";;"x";;;
 "Ticket Agent (w/o teams)";"Resource";"/system/ticket/locks";;"x";;;
@@ -163,6 +164,7 @@
 "FAQ Reader";"Resource";"/faq/articles";;"x";;;
 "FAQ Reader";"Resource";"/faq/articles/*/votes";"x";"x";"x";"x";
 "FAQ Reader";"Resource";"/links";;"x";;;
+"FAQ Reader";"Resource";"/virtualfs";;"x";;;
 "FAQ Editor";"Resource";"/system/faq";;"x";;;
 "FAQ Editor";"Resource";"/system/faq/*";;;;;
 "FAQ Editor";"Resource";"/system/faq/categories";;"x";;;
@@ -189,6 +191,7 @@
 "Customer Manager";"Resource";"/organisations";"x";"x";"x";"x";
 "Customer Manager";"Resource";"/contacts";"x";"x";"x";"x";
 "Customer Manager";"Resource";"/system/objecticons";"x";"x";"x";;
+"Customer Manager";"Resource";"/virtualfs";;"x";;;
 "System Admin";"Resource";"/system";"x";"x";"x";"x";
 "System Admin";"Resource";"/auth";"x";;;;
 "System Admin";"Resource";"/session";"x";"x";"x";"x";
@@ -257,6 +260,7 @@
 "Customer";"Resource";"/objectsearch";;"x";;;
 "Customer";"Resource";"/contacts";;"x";;;
 "Customer";"Object";"/contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}";;;;;
+"Customer";"Resource";"/virtualfs";;"x";;;
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;

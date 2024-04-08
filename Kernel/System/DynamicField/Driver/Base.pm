@@ -131,6 +131,23 @@ sub DisplayKeyRender {
     return $Self->DisplayValueRender(%Param);
 }
 
+sub DisplayObjectValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Param{Value};
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    return \@Values;
+}
+
 sub DFValueObjectReplace {
     my ( $Self, %Param ) = @_;
 
