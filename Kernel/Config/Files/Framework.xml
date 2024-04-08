@@ -9679,4 +9679,40 @@ You can log in via the following URL:
     </ConfigItem>
 
 
+
+    <ConfigItem AccessLevel="internal" Name="VirtualFSObjectsMapping" Required="1" Valid="1">
+        <Description Translatable="1"></Description>
+        <Group>VirtualFS</Group>
+        <SubGroup>Core::VirtualFS</SubGroup>
+        <Setting>
+            <String Regex="">
+{
+    "Ticket": {
+        "Operation": "V1::Ticket::TicketGet",
+        "Parameters": {
+            "TicketID": "ObjectID"
+        }
+    },
+    "Contact": {
+        "Operation": "V1::Contact::ContactGet",
+        "Parameters": {
+            "ContactID": "ObjectID"
+        }
+    },
+    "Organisation": {
+        "Operation": "V1::Organisation::OrganisationGet",
+        "Parameters": {
+            "OrganisationID": "ObjectID"
+        }
+    },
+    "FAQArticle": {
+        "Operation": "V1::FAQ::FAQArticleGet",
+        "Parameters": {
+            "FAQArticleID": "ObjectID"
+        }
+    }
+}
+            </String>
+        </Setting>
+    </ConfigItem>
 </kix_config>

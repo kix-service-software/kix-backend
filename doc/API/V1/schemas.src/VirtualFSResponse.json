@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "VirtualFSResponse.json",
+  "type": "object",
+  "description": "A response for a virtualfs GET request.",
+  "properties": {
+    "VirtualFS": {
+      "$ref": "VirtualFS.json"
+    }
+  },
+  "required": [
+    "VirtualFS"
+  ]
+}

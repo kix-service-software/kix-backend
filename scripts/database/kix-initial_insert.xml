@@ -6205,6 +6205,16 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/virtualfs]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
     <Data Key="role_id">16</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/ticket/*]]></Data>
@@ -7055,6 +7065,16 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
+    <Data Key="role_id">7</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/virtualfs]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
     <Data Key="role_id">8</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/faq]]></Data>
@@ -7309,6 +7329,16 @@ DefaultValue:
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/objecticons]]></Data>
     <Data Key="value">7</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">12</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/virtualfs]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -7989,6 +8019,16 @@ DefaultValue:
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}]]></Data>
     <Data Key="value">0</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">13</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/virtualfs]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
