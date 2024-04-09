@@ -464,7 +464,7 @@ sub ProcessRequest {
     # workaround for fieldservice-app
     elsif (
         $ENV{'CONTENT_TYPE'} eq 'text/plain; charset=utf-8'
-        && $ENV{HTTP_USER_AGENT} eq 'Dart/3.0 (dart:io)'
+        && $ENV{HTTP_USER_AGENT} =~ /.*Dart.*dart.*/
     ) {
         $ContentDecoded = $Kernel::OM->Get('JSON')->Decode(
             Data => $Content,
