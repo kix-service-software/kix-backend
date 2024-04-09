@@ -1,0 +1,44 @@
+{
+   "$id" : "VirtualFSResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a virtualfs GET request.",
+   "type" : "object",
+   "properties" : {
+      "VirtualFS" : {
+         "$ref" : "#/definitions/_VirtualFS_json"
+      }
+   },
+   "required" : [
+      "VirtualFS"
+   ],
+   "definitions" : {
+      "_VirtualFS_json" : {
+         "$id" : "VirtualFS.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The virtualfs object.",
+         "type" : "object",
+         "properties" : {
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FileID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
+            }
+         }
+      }
+   }
+}
