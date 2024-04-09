@@ -97,11 +97,11 @@ sub Run {
     );
 
     my @ValueList;
-    if ( IsArrayRefWithData($Values) ) {
+    if ( IsArrayRef( $Values ) ) {
         @ValueList = @{$Values};
     }
     else {
-        @ValueList = split('\s*,\s*', $Values);
+        @ValueList = split( '\s*,\s*', ( $Values // '' ) );
     }
 
     # FIXME: use given instance
