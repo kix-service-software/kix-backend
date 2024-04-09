@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -104,6 +104,10 @@ sub Run {
         );
         $Self->PreloadOIDMappings( ObjectType => [ keys %TypesToPreload ] );
     }
+
+    $Self->_PrepareFirstValue(
+        Items => $SourceData
+    );
 
     $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
 
@@ -243,6 +247,21 @@ sub _Run {
     }
 
     return $Result;
+}
+
+sub _PrepareFirstValue {
+    my ( $Self, %Param ) = @_;
+
+    my %FirstValues;
+    for my $Item ( @{$Param{Items}} ) {
+        my $Key = "$Item->{field_id}_$Item->{object_id}";
+        if ( !$FirstValues{$Key} ) {
+            $FirstValues{$Key}  = 1;
+            $Item->{first_value} = 1;
+        }
+    }
+
+    return 1;
 }
 
 1;
