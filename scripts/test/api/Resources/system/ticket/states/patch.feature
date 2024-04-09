@@ -9,7 +9,7 @@ Feature: PATCH request to the /system/ticket/ticketstates/:TicketStateID resourc
     Given a ticketstate
     When I update this ticketstate
     Then the response code is 200
-#    And the response object is TicketStatePostPatchResponse
+    And the response object is TicketStatePostPatchResponse
     When I delete this ticketstate
     Then the response code is 204
 

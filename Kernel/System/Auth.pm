@@ -82,11 +82,17 @@ sub new {
         foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
             next if !$Config->{Enabled} || !$Config->{Module};
 
-            if ( !$MainObject->Require($Config->{Module}) ) {
+            my $Module = $Kernel::OM->GetModuleFor($Config->{Module}) || $Config->{Module};
+
+            if ( !$MainObject->Require($Module) ) {
                 $MainObject->Die("Can't load auth backend module $Config->{Module}! $@");
             }
 
-            $Config->{BackendObject} = $Config->{Module}->new(Config => $Config->{Config});
+            $Config->{BackendObject} = $Module->new(
+                Name   => $Config->{Name},
+                Config => $Config->{Config}
+            );
+            next if ( !defined( $Config->{BackendObject} ) );
 
             # set global config in module
             $Config->{BackendObject}->{Config} = $Config;
@@ -95,11 +101,13 @@ sub new {
                 foreach my $SyncConfig ( @{$Config->{Sync}} ) {
                     next if !$SyncConfig->{Enabled} || !$SyncConfig->{Module};
 
-                    if ( !$MainObject->Require($SyncConfig->{Module}) ) {
+                    my $SyncModule = $Kernel::OM->GetModuleFor($SyncConfig->{Module}) || $SyncConfig->{Module};
+
+                    if ( !$MainObject->Require($SyncModule) ) {
                         $MainObject->Die("Can't load auth sync backend module $SyncConfig->{Module}! $@");
                     }
                     # load sync module
-                    $SyncConfig->{BackendObject} = $SyncConfig->{Module}->new(
+                    $SyncConfig->{BackendObject} = $SyncModule->new(
                         Config => {
                             %{$Config->{Config} || {}},
                             %{$SyncConfig->{Config} || {}}
@@ -131,20 +139,170 @@ sub new {
     return $Self;
 }
 
-=item GetOption()
+=item GetPreAuthTypes()
 
-Get module options. Currently there is just one option, "PreAuth".
+get possible preauth types
+    my $PreAuthTypes = $AuthObject->GetPreAuthTypes(
+        UsageContext => 'Agent',       # (Agent|Customer)
+    );
 
-    if ( $AuthObject->GetOption( What => 'PreAuth' ) ) {
-        print "No login screen is needed. Authentication is based on some other options. E. g. $ENV{REMOTE_USER}\n";
-    }
+Returns:
+
+    $PreAuthTypes = [
+        'PreAuthType'
+    ];
 
 =cut
 
-sub GetOption {
+sub GetPreAuthTypes {
     my ( $Self, %Param ) = @_;
 
-    return $Self->{AuthBackend}->GetOption(%Param);
+    my %PreAuthTypesHash = ();
+
+    AUTHREG:
+    for my $AuthReg ( sort( keys( %{ $Self->{AuthConfig} } ) ) ) {
+
+        CONFIG:
+        for my $Config ( @{ $Self->{AuthConfig}->{ $AuthReg } } ) {
+            next CONFIG if (
+                !$Config->{Enabled}
+                || !$Config->{BackendObject}
+            );
+            next CONFIG if (
+                defined $Config->{UsageContext}
+                && $Config->{UsageContext} ne $Param{UsageContext}
+            );
+            next CONFIG if (
+                !$Config->{BackendObject}->can('PreAuth')
+                || !$Config->{BackendObject}->can('PreAuthType')
+            );
+
+            # get PreAuthType of auth backend
+            my $PreAuthType = $Config->{BackendObject}->PreAuthType();
+
+            $PreAuthTypesHash{ $PreAuthType } = 1;
+        }
+    }
+
+    my @PreAuthTypes = sort( keys( %PreAuthTypesHash ) );
+    return \@PreAuthTypes;
+}
+
+=item GetAuthMethods()
+
+get possible auth methods
+    my $AuthMethods = $AuthObject->GetAuthMethods(
+        UsageContext => 'Agent',       # (Agent|Customer)
+    );
+
+Returns:
+
+    $AuthMethods = [
+        {
+            Type    => 'LOGIN',
+            PreAuth => 0
+        }
+    ];
+
+=cut
+
+sub GetAuthMethods {
+    my ( $Self, %Param ) = @_;
+
+    my @AuthMethods = ();
+
+    AUTHREG:
+    for my $AuthReg ( sort( keys( %{ $Self->{AuthConfig} } ) ) ) {
+
+        CONFIG:
+        for my $Config ( @{ $Self->{AuthConfig}->{ $AuthReg } } ) {
+            next CONFIG if (
+                !$Config->{Enabled}
+                || !$Config->{BackendObject}
+            );
+            next CONFIG if (
+                defined $Config->{UsageContext}
+                && $Config->{UsageContext} ne $Param{UsageContext}
+            );
+            next CONFIG if ( !$Config->{BackendObject}->can('GetAuthMethod') );
+
+            # get AuthMethod of auth backend
+            my $AuthMethod = $Config->{BackendObject}->GetAuthMethod();
+
+            next CONFIG if (
+                ref( $AuthMethod ) ne 'HASH'
+                || !$AuthMethod->{Type}
+                || !defined( $AuthMethod->{PreAuth} )
+            );
+
+            # check for identical known entry
+            my $NewEntry = 1;
+            ENTRY:
+            for my $KnownEntry ( @AuthMethods ) {
+                if (
+                    !DataIsDifferent(
+                        Data1 => $AuthMethod,
+                        Data2 => $KnownEntry
+                    )
+                ) {
+                    $NewEntry = 0;
+
+                    last ENTRY;
+                }
+            }
+            if ( $NewEntry ) {
+                push( @AuthMethods, $AuthMethod );
+            }
+        }
+    }
+
+    return \@AuthMethods;
+}
+
+=item PreAuth()
+
+The preauthentication function provides required data
+    my $PreAuthData = $AuthObject->PreAuth(
+        UsageContext => 'Agent',        # (Agent|Customer)
+        Type         => 'PreAuthType',  # Type as provided by GetAuthMethods
+        Data         => { ... }         # Data as provided by GetAuthMethods
+    );
+
+Returns:
+
+    $PreAuthData = {
+        RedirectURL => 'http://...'
+    };
+
+=cut
+
+sub PreAuth {
+    my ( $Self, %Param ) = @_;
+
+    AUTHREG:
+    for my $AuthReg ( sort( keys( %{ $Self->{AuthConfig} } ) ) ) {
+
+        CONFIG:
+        for my $Config ( @{ $Self->{AuthConfig}->{ $AuthReg } } ) {
+            next CONFIG if (
+                !$Config->{Enabled}
+                || !$Config->{BackendObject}
+            );
+            next CONFIG if (
+                defined $Config->{UsageContext}
+                && $Config->{UsageContext} ne $Param{UsageContext}
+            );
+            next CONFIG if ( !$Config->{BackendObject}->can('PreAuth') );
+
+            # get pre auth data from backend
+            my $PreAuthData = $Config->{BackendObject}->PreAuth(%Param);
+
+            # return data if we got a defined result
+            return $PreAuthData if ( defined( $PreAuthData ) );
+        }
+    }
+
+    return;
 }
 
 =item Auth()

@@ -130,14 +130,18 @@ sub Fetch {
     # MaxPopEmailSession
     my $MaxPopEmailSession = $ConfigObject->Get('PostMasterReconnectMessage') || 20;
 
+    # SSLVerify
+    my $SSLVerify = $ConfigObject->Get('PostMasterSSLVerify');
+
     my $FetchCounter = 0;
 
     $Self->{Reconnect} = 0;
 
     my %Connect = $Self->Connect(
         %Param,
-        Timeout => 15,
-        Debug   => $Debug
+        Timeout   => 15,
+        Debug     => $Debug,
+        SSLVerify => $SSLVerify,
     );
 
     if ( !$Connect{Successful} ) {

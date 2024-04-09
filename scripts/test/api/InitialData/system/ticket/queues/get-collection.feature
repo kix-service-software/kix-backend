@@ -5,6 +5,17 @@
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
+   Scenario Outline: check is the existing queues are consistent with the delivery defaults
+     When I query the collection of ticket queues
+     Then the response code is 200
+     Then the queues output is "<Name>"
+
+     Examples:
+       | Name         | ValidID |
+       | Service Desk | 1       |
+       | Monitoring   | 1       |
+       | Junk         | 1       |
+
   Scenario: check is the existing queues are consistent with the delivery defaults
     When I query the collection of ticket queues
     Then the response code is 200

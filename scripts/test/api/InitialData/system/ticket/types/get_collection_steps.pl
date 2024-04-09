@@ -35,3 +35,25 @@ When qr/I query the collection of tickettypes$/, sub {
       Limit => $1,
    );
 };
+
+Then qr/the tickettypes output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{TicketType};
+   my @AttributeValue =( "Unclassified", "Incident", "Service Request" );
+
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+
+         }
+         else{
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};
+
+

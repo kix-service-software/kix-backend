@@ -32,7 +32,7 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . '"'
+        'Attribute object can "' . $Method . q{"}
     );
 }
 
@@ -64,12 +64,12 @@ $Self->IsDeeply(
 # check Search
 my @SearchTests = (
     {
-        Name         => 'Search: undef search',
+        Name         => "Search: undef search",
         Search       => undef,
         Expected     => undef
     },
     {
-        Name         => 'Search: Value undef',
+        Name         => "Search: Value undef",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'EQ',
@@ -79,7 +79,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Value invalid',
+        Name         => "Search: Value invalid",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'EQ',
@@ -88,7 +88,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field undef',
+        Name         => "Search: Field undef",
         Search       => {
             Field    => undef,
             Operator => 'EQ',
@@ -97,7 +97,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field invalid',
+        Name         => "Search: Field invalid",
         Search       => {
             Field    => 'Test',
             Operator => 'EQ',
@@ -106,7 +106,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator undef',
+        Name         => "Search: Operator undef",
         Search       => {
             Field    => 'OrganisationID',
             Operator => undef,
@@ -115,7 +115,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator invalid',
+        Name         => "Search: Operator invalid",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'Test',
@@ -124,7 +124,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator EQ',
+        Name         => "Search: valid search / Field OrganisationID / Operator EQ",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'EQ',
@@ -138,7 +138,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator EQ / Value zero',
+        Name         => "Search: valid search / Field OrganisationID / Operator EQ / Value zero",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'EQ',
@@ -152,7 +152,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator NE',
+        Name         => "Search: valid search / Field OrganisationID / Operator NE",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'NE',
@@ -166,7 +166,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator NE / Value zero',
+        Name         => "Search: valid search / Field OrganisationID / Operator NE / Value zero",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'NE',
@@ -180,7 +180,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator IN',
+        Name         => "Search: valid search / Field OrganisationID / Operator IN",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'IN',
@@ -194,7 +194,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator !IN',
+        Name         => "Search: valid search / Field OrganisationID / Operator !IN",
         Search       => {
             Field    => 'OrganisationID',
             Operator => '!IN',
@@ -208,7 +208,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator LT',
+        Name         => "Search: valid search / Field OrganisationID / Operator LT",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'LT',
@@ -222,7 +222,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator GT',
+        Name         => "Search: valid search / Field OrganisationID / Operator GT",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'GT',
@@ -236,7 +236,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator LTE',
+        Name         => "Search: valid search / Field OrganisationID / Operator LTE",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'LTE',
@@ -250,7 +250,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationID / Operator GTE',
+        Name         => "Search: valid search / Field OrganisationID / Operator GTE",
         Search       => {
             Field    => 'OrganisationID',
             Operator => 'GTE',
@@ -264,7 +264,7 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator EQ',
+        Name         => "Search: valid search / Field Organisation / Operator EQ",
         Search       => {
             Field    => 'Organisation',
             Operator => 'EQ',
@@ -275,28 +275,28 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name = \'Test\''
+                'LOWER(torg.name) = \'test\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator EQ / Value empty string',
+        Name         => "Search: valid search / Field Organisation / Operator EQ / Value empty string",
         Search       => {
             Field    => 'Organisation',
             Operator => 'EQ',
-            Value    => ''
+            Value    => q{}
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(torg.name = \'\' OR torg.name IS NULL)'
+                '(LOWER(torg.name) = \'\' OR torg.name IS NULL)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator NE',
+        Name         => "Search: valid search / Field Organisation / Operator NE",
         Search       => {
             Field    => 'Organisation',
             Operator => 'NE',
@@ -307,28 +307,28 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(torg.name != \'Test\' OR torg.name IS NULL)'
+                '(LOWER(torg.name) != \'test\' OR torg.name IS NULL)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator NE / Value empty string',
+        Name         => "Search: valid search / Field Organisation / Operator NE / Value empty string",
         Search       => {
             Field    => 'Organisation',
             Operator => 'NE',
-            Value    => ''
+            Value    => q{}
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name != \'\''
+                'LOWER(torg.name) != \'\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator IN',
+        Name         => "Search: valid search / Field Organisation / Operator IN",
         Search       => {
             Field    => 'Organisation',
             Operator => 'IN',
@@ -339,12 +339,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name IN (\'Test\')'
+                'LOWER(torg.name) IN (\'test\')'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator !IN',
+        Name         => "Search: valid search / Field Organisation / Operator !IN",
         Search       => {
             Field    => 'Organisation',
             Operator => '!IN',
@@ -355,12 +355,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name NOT IN (\'Test\')'
+                'LOWER(torg.name) NOT IN (\'test\')'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator STARTSWITH',
+        Name         => "Search: valid search / Field Organisation / Operator STARTSWITH",
         Search       => {
             Field    => 'Organisation',
             Operator => 'STARTSWITH',
@@ -371,12 +371,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name LIKE \'Test%\''
+                'LOWER(torg.name) LIKE \'test%\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator ENDSWITH',
+        Name         => "Search: valid search / Field Organisation / Operator ENDSWITH",
         Search       => {
             Field    => 'Organisation',
             Operator => 'ENDSWITH',
@@ -387,12 +387,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name LIKE \'%Test\''
+                'LOWER(torg.name) LIKE \'%test\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator CONTAINS',
+        Name         => "Search: valid search / Field Organisation / Operator CONTAINS",
         Search       => {
             Field    => 'Organisation',
             Operator => 'CONTAINS',
@@ -403,12 +403,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name LIKE \'%Test%\''
+                'LOWER(torg.name) LIKE \'%test%\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field Organisation / Operator LIKE',
+        Name         => "Search: valid search / Field Organisation / Operator LIKE",
         Search       => {
             Field    => 'Organisation',
             Operator => 'LIKE',
@@ -419,12 +419,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.name LIKE \'Test\''
+                'LOWER(torg.name) LIKE \'test\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator EQ',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator EQ",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'EQ',
@@ -435,28 +435,28 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number = \'Test\''
+                'LOWER(torg.number) = \'test\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator EQ / Value empty string',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator EQ / Value empty string",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'EQ',
-            Value    => ''
+            Value    => q{}
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(torg.number = \'\' OR torg.number IS NULL)'
+                '(LOWER(torg.number) = \'\' OR torg.number IS NULL)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator NE',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator NE",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'NE',
@@ -467,28 +467,28 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(torg.number != \'Test\' OR torg.number IS NULL)'
+                '(LOWER(torg.number) != \'test\' OR torg.number IS NULL)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator NE / Value empty string',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator NE / Value empty string",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'NE',
-            Value    => ''
+            Value    => q{}
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number != \'\''
+                'LOWER(torg.number) != \'\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator IN',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator IN",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'IN',
@@ -499,12 +499,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number IN (\'Test\')'
+                'LOWER(torg.number) IN (\'test\')'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator !IN',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator !IN",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => '!IN',
@@ -515,12 +515,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number NOT IN (\'Test\')'
+                'LOWER(torg.number) NOT IN (\'test\')'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator STARTSWITH',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator STARTSWITH",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'STARTSWITH',
@@ -531,12 +531,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number LIKE \'Test%\''
+                'LOWER(torg.number) LIKE \'test%\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator ENDSWITH',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator ENDSWITH",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'ENDSWITH',
@@ -547,12 +547,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number LIKE \'%Test\''
+                'LOWER(torg.number) LIKE \'%test\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator CONTAINS',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator CONTAINS",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'CONTAINS',
@@ -563,12 +563,12 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number LIKE \'%Test%\''
+                'LOWER(torg.number) LIKE \'%test%\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OrganisationNumber / Operator LIKE',
+        Name         => "Search: valid search / Field OrganisationNumber / Operator LIKE",
         Search       => {
             Field    => 'OrganisationNumber',
             Operator => 'LIKE',
@@ -579,7 +579,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'torg.number LIKE \'Test\''
+                'LOWER(torg.number) LIKE \'test\''
             ]
         }
     }
@@ -812,7 +812,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field OrganisationID / Operator EQ / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator EQ / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -825,7 +825,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator NE / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator NE / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -838,7 +838,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3,$TicketID4]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator IN / Value [$OrganisationID1,$OrganisationID3]',
+        Name     => "Search: Field OrganisationID / Operator IN / Value [\$OrganisationID1,\$OrganisationID3]",
         Search   => {
             'AND' => [
                 {
@@ -851,7 +851,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator !IN / Value [$OrganisationID1,$OrganisationID3]',
+        Name     => "Search: Field OrganisationID / Operator !IN / Value [\$OrganisationID1,\$OrganisationID3]",
         Search   => {
             'AND' => [
                 {
@@ -864,7 +864,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator LT / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator LT / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -877,7 +877,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator GT / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator GT / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -890,7 +890,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator LTE / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator LTE / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -903,7 +903,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationID / Operator GTE / Value $OrganisationID2',
+        Name     => "Search: Field OrganisationID / Operator GTE / Value \$OrganisationID2",
         Search   => {
             'AND' => [
                 {
@@ -916,7 +916,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2, $TicketID3]
     },
     {
-        Name     => 'Search: Field Organisation / Operator EQ / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator EQ / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -929,7 +929,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator NE / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator NE / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -942,7 +942,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3,$TicketID4]
     },
     {
-        Name     => 'Search: Field Organisation / Operator IN / Value [$OrganisationName1,$OrganisationName3]',
+        Name     => "Search: Field Organisation / Operator IN / Value [\$OrganisationName1,\$OrganisationName3]",
         Search   => {
             'AND' => [
                 {
@@ -955,7 +955,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field Organisation / Operator !IN / Value [$OrganisationName1,$OrganisationName3]',
+        Name     => "Search: Field Organisation / Operator !IN / Value [\$OrganisationName1,\$OrganisationName3]",
         Search   => {
             'AND' => [
                 {
@@ -968,7 +968,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator STARTSWITH / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator STARTSWITH / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -981,7 +981,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator STARTSWITH / Value substr($OrganisationName2,0,4)',
+        Name     => "Search: Field Organisation / Operator STARTSWITH / Value substr(\$OrganisationName2,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -991,10 +991,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Organisation / Operator ENDSWITH / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator ENDSWITH / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -1007,7 +1007,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator ENDSWITH / Value substr($OrganisationName2,-5)',
+        Name     => "Search: Field Organisation / Operator ENDSWITH / Value substr(\$OrganisationName2,-5)",
         Search   => {
             'AND' => [
                 {
@@ -1020,7 +1020,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator CONTAINS / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator CONTAINS / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -1033,7 +1033,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field Organisation / Operator CONTAINS / Value substr($OrganisationName3,2,-2)',
+        Name     => "Search: Field Organisation / Operator CONTAINS / Value substr(\$OrganisationName3,2,-2)",
         Search   => {
             'AND' => [
                 {
@@ -1046,7 +1046,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Organisation / Operator LIKE / Value $OrganisationName2',
+        Name     => "Search: Field Organisation / Operator LIKE / Value \$OrganisationName2",
         Search   => {
             'AND' => [
                 {
@@ -1059,7 +1059,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator EQ / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator EQ / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {
@@ -1072,7 +1072,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator NE / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator NE / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {
@@ -1085,7 +1085,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID3,$TicketID4]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator IN / Value [$OrganisationNumber1,$OrganisationNumber3]',
+        Name     => "Search: Field OrganisationNumber / Operator IN / Value [\$OrganisationNumber1,\$OrganisationNumber3]",
         Search   => {
             'AND' => [
                 {
@@ -1098,7 +1098,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator !IN / Value [$OrganisationNumber1,$OrganisationNumber3]',
+        Name     => "Search: Field OrganisationNumber / Operator !IN / Value [\$OrganisationNumber1,\$OrganisationNumber3]",
         Search   => {
             'AND' => [
                 {
@@ -1111,7 +1111,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator STARTSWITH / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator STARTSWITH / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {
@@ -1124,7 +1124,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator STARTSWITH / Value substr($OrganisationNumber2,0,4)',
+        Name     => "Search: Field OrganisationNumber / Operator STARTSWITH / Value substr(\$OrganisationNumber2,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -1134,10 +1134,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator ENDSWITH / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator ENDSWITH / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {
@@ -1150,7 +1150,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator ENDSWITH / Value substr($OrganisationNumber2,-5)',
+        Name     => "Search: Field OrganisationNumber / Operator ENDSWITH / Value substr(\$OrganisationNumber2,-5)",
         Search   => {
             'AND' => [
                 {
@@ -1163,7 +1163,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator CONTAINS / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator CONTAINS / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {
@@ -1176,7 +1176,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator CONTAINS / Value substr($OrganisationNumber3,2,-2)',
+        Name     => "Search: Field OrganisationNumber / Operator CONTAINS / Value substr(\$OrganisationNumber3,2,-2)",
         Search   => {
             'AND' => [
                 {
@@ -1189,7 +1189,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field OrganisationNumber / Operator LIKE / Value $OrganisationNumber2',
+        Name     => "Search: Field OrganisationNumber / Operator LIKE / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
                 {

@@ -20,6 +20,7 @@ package Kernel::System::MailAccount::POP3S_OAuth2;
 use strict;
 use warnings;
 
+use IO::Socket::SSL qw( SSL_VERIFY_NONE SSL_VERIFY_PEER );
 use Net::POP3;
 use MIME::Base64;
 
@@ -69,7 +70,7 @@ sub Connect {
         Timeout         => $Param{Timeout},
         Debug           => $Param{Debug},
         SSL             => 1,
-        SSL_verify_mode => 0,
+        SSL_verify_mode => $Param{SSLVerify} ? SSL_VERIFY_PEER : SSL_VERIFY_NONE,
     );
 
     if ( !$PopObject ) {
@@ -94,8 +95,9 @@ sub Connect {
         sleep( 0.3 );
 
         # get a new access token
-        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestAccessToken(
+        $AccessToken = $Kernel::OM->Get('OAuth2')->RequestToken(
             ProfileID => $Param{OAuth2_ProfileID},
+            TokenType => 'access_token',
             GrantType => 'refresh_token'
         );
         if ( !$AccessToken ) {

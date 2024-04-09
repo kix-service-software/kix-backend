@@ -8,5 +8,5 @@ Feature: GET request to the /system/cmdb/classes/:ClassID/definitions resource
   Scenario: get the list of existing definitions
     When I query the cmdb collection of definitions of class 4
     Then the response code is 200
-#    And the response object is ConfigItemClassDefinitionCollectionResponse
+    And the response object is ConfigItemClassDefinitionCollectionResponse
 

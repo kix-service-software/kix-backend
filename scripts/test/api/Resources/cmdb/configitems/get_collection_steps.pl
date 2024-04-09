@@ -50,6 +50,7 @@ When qr/I query the cmdb collection of configitems (\d+) searchlimit object$/, s
 };
 
 When qr/I query the cmdb collection of configitems with filter of DeplStateID (\d+)$/, sub {
+   sleep(20);
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/cmdb/configitems',

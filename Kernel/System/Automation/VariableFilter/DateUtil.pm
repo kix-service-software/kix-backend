@@ -31,11 +31,23 @@ sub GetFilterHandler {
         'DateUtil.UnixTime' => \&_UnixTime,
         'DateUtil.TimeStamp' => \&_TimeStamp,
         'DateUtil.Calc' => \&_Calc,
-    )
+    );
+
+    return %Handler;
 }
 
 sub _BOB {
     my ( $Self, %Param ) = @_;
+
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"DateUitl.BOB\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
 
     # TODO: get relevant ticket/sla calender?
     my $Calendar;
@@ -59,6 +71,16 @@ sub _BOB {
 sub _EOB {
     my ( $Self, %Param ) = @_;
 
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"DateUitl.EOB\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
+
     # TODO: get relevant ticket/sla calender?
     my $Calendar;
 
@@ -80,6 +102,16 @@ sub _EOB {
 sub _UnixTime {
     my ( $Self, %Param ) = @_;
 
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"DateUitl.UnixTime\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
+
     my $UnixTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
         String => $Param{Value}
     );
@@ -88,6 +120,16 @@ sub _UnixTime {
 
 sub _TimeStamp {
     my ( $Self, %Param ) = @_;
+
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"DateUitl.TimeStamp\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
 
     my $TimeStamp = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Param{Value}
@@ -98,6 +140,16 @@ sub _TimeStamp {
 
 sub _Calc {
     my ( $Self, %Param ) = @_;
+
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"DateUitl.Calc\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
 
     # handle unix time
     if ($Param{Value} =~ m/^\d+$/) {

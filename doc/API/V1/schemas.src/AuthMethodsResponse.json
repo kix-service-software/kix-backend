@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "AuthMethodsResponse.json",
+    "type": "object",
+    "description": "The auth method response.",
+    "properties": {
+        "AuthMethods": {
+            "type": "array",
+            "items": {
+              "$ref": "AuthMethod.json"
+            }
+        }
+    }
+}

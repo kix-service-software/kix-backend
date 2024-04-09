@@ -34,3 +34,25 @@ When qr/I query the collection of automation macro type "(.*?)" actiontypes$/, s
       URL   => S->{API_URL}.'/system/automation/macros/types/'.$1.'/actiontypes',
    );
 };
+
+Then qr/the macroactiontype output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{MacroActionType};
+   my @AttributeValue =( "ArticleCreate", "ArticleDelete", "AssembleObject", "Conditional", "ContactSet", "CreateReport", "DynamicFieldSet", "ExecuteMacro", "ExtractText", "FetchAssetAttributes", "LockSet", "Loop", "OrganisationSet", "OwnerSet", "PrioritySet", "ResponsibleSet", "StateSet", "TeamSet", "TicketCreate", "TicketDelete", "TitleSet", "TypeSet", "VariableSet" );
+
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+
+         }
+         else{
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};
+
+

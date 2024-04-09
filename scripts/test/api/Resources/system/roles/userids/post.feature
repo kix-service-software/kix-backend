@@ -9,4 +9,4 @@ Feature: POST request to the /system/roles/:RoleID/userids resource
     Given a user
     When I assign the user to RoleID 1
     Then the response code is 201
-#    Then the response object is RoleUserIDPostResponse
+    Then the response object is RoleUserIDPostResponse

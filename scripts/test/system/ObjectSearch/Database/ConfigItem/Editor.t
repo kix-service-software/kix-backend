@@ -32,14 +32,15 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . '"'
+        'Attribute object can "' . $Method . q{"}
     );
 }
 
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         CreateByID => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -49,7 +50,8 @@ $Self->IsDeeply(
         CreateBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         },
         ChangeByID => {
             IsSearchable => 1,
@@ -60,7 +62,8 @@ $Self->IsDeeply(
         ChangeBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -136,7 +139,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by = 1'
             ]
@@ -150,7 +152,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by <> 1'
             ]
@@ -164,7 +165,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by IN (1)'
             ]
@@ -178,7 +178,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by NOT IN (1)'
             ]
@@ -192,7 +191,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by < 1'
             ]
@@ -206,7 +204,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by > 1'
             ]
@@ -220,7 +217,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by <= 1'
             ]
@@ -234,7 +230,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.create_by >= 1'
             ]
@@ -245,14 +240,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'CreateBy',
             Operator => 'EQ',
-            Value    => 'Test'
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) = \'test\''
+                'ci.create_by = 1'
             ]
         }
     },
@@ -261,14 +253,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'CreateBy',
             Operator => 'NE',
-            Value    => 'Test'
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) != \'test\''
+                'ci.create_by <> 1'
             ]
         }
     },
@@ -277,14 +266,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'CreateBy',
             Operator => 'IN',
-            Value    => ['Test']
+            Value    => ['1']
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) IN (\'test\')'
+                'ci.create_by IN (1)'
             ]
         }
     },
@@ -293,78 +279,63 @@ my @SearchTests = (
         Search       => {
             Field    => 'CreateBy',
             Operator => '!IN',
-            Value    => ['Test']
+            Value    => ['1']
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) NOT IN (\'test\')'
+                'ci.create_by NOT IN (1)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field CreateBy / Operator STARTSWITH',
+        Name         => 'Search: valid search / Field CreateBy / Operator LT',
         Search       => {
             Field    => 'CreateBy',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
+            Operator => 'LT',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) LIKE \'test%\''
+                'ci.create_by < 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field CreateBy / Operator ENDSWITH',
+        Name         => 'Search: valid search / Field CreateBy / Operator LTE',
         Search       => {
             Field    => 'CreateBy',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
+            Operator => 'LTE',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) LIKE \'%test\''
+                'ci.create_by <= 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field CreateBy / Operator CONTAINS',
+        Name         => 'Search: valid search / Field CreateBy / Operator GT',
         Search       => {
             Field    => 'CreateBy',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
+            Operator => 'GT',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) LIKE \'%test%\''
+                'ci.create_by > 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field CreateBy / Operator LIKE',
+        Name         => 'Search: valid search / Field CreateBy / Operator GTE',
         Search       => {
             Field    => 'CreateBy',
-            Operator => 'LIKE',
-            Value    => 'Test'
+            Operator => 'GTE',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cicru ON cicru.id = ci.create_by'
-            ],
             'Where' => [
-                'LOWER(cicru.login) LIKE \'test\''
+                'ci.create_by >= 1'
             ]
         }
     },
@@ -376,7 +347,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by = 1'
             ]
@@ -390,7 +360,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by <> 1'
             ]
@@ -404,7 +373,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by IN (1)'
             ]
@@ -418,7 +386,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by NOT IN (1)'
             ]
@@ -432,7 +399,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by < 1'
             ]
@@ -446,7 +412,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by > 1'
             ]
@@ -460,7 +425,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by <= 1'
             ]
@@ -474,7 +438,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'ci.change_by >= 1'
             ]
@@ -485,14 +448,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'ChangeBy',
             Operator => 'EQ',
-            Value    => 'Test'
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) = \'test\''
+                'ci.change_by = 1'
             ]
         }
     },
@@ -501,14 +461,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'ChangeBy',
             Operator => 'NE',
-            Value    => 'Test'
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) != \'test\''
+                'ci.change_by <> 1'
             ]
         }
     },
@@ -517,14 +474,11 @@ my @SearchTests = (
         Search       => {
             Field    => 'ChangeBy',
             Operator => 'IN',
-            Value    => ['Test']
+            Value    => ['1']
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) IN (\'test\')'
+                'ci.change_by IN (1)'
             ]
         }
     },
@@ -533,78 +487,63 @@ my @SearchTests = (
         Search       => {
             Field    => 'ChangeBy',
             Operator => '!IN',
-            Value    => ['Test']
+            Value    => ['1']
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) NOT IN (\'test\')'
+                'ci.change_by NOT IN (1)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field ChangeBy / Operator STARTSWITH',
+        Name         => 'Search: valid search / Field ChangeBy / Operator LT',
         Search       => {
             Field    => 'ChangeBy',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
+            Operator => 'LT',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) LIKE \'test%\''
+                'ci.change_by < 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field ChangeBy / Operator ENDSWITH',
+        Name         => 'Search: valid search / Field ChangeBy / Operator LTE',
         Search       => {
             Field    => 'ChangeBy',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
+            Operator => 'LTE',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) LIKE \'%test\''
+                'ci.change_by <= 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field ChangeBy / Operator CONTAINS',
+        Name         => 'Search: valid search / Field ChangeBy / Operator GT',
         Search       => {
             Field    => 'ChangeBy',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
+            Operator => 'GT',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) LIKE \'%test%\''
+                'ci.change_by > 1'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / Field ChangeBy / Operator LIKE',
+        Name         => 'Search: valid search / Field ChangeBy / Operator GTE',
         Search       => {
             Field    => 'ChangeBy',
-            Operator => 'LIKE',
-            Value    => 'Test'
+            Operator => 'GTE',
+            Value    => '1'
         },
         Expected     => {
-            'Join'  => [
-                'INNER JOIN users cichu ON cichu.id = ci.change_by'
-            ],
             'Where' => [
-                'LOWER(cichu.login) LIKE \'test\''
+                'ci.change_by >= 1'
             ]
         }
     }
@@ -640,12 +579,8 @@ my @SortTests = (
         Attribute => 'CreateByID',
         Expected  => {
             'Join'    => [],
-            'OrderBy' => [
-                'ci.create_by'
-            ],
-            'Select'  => [
-                'ci.create_by'
-            ]
+            'Select'  => ['ci.create_by'],
+            'OrderBy' => ['ci.create_by']
         }
     },
     {
@@ -673,12 +608,8 @@ my @SortTests = (
         Attribute => 'ChangeByID',
         Expected  => {
             'Join'    => [],
-            'OrderBy' => [
-                'ci.change_by'
-            ],
-            'Select'  => [
-                'ci.change_by'
-            ]
+            'Select'  => ['ci.change_by'],
+            'OrderBy' => ['ci.change_by']
         }
     },
     {
@@ -737,7 +668,7 @@ $Helper->BeginWork();
 
 ## prepare user mapping
 my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-    Role => 'Ticket Agent'
+    Role => 'Asset Maintainer'
 );
 my $UserLogin1 = 'Test001';
 my $UserLogin2 = 'test002';
@@ -766,7 +697,7 @@ my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
     Lastname              => $ContactLastName1,
     AssignedUserID        => $UserID1,
     ValidID               => 1,
-    UserID                => 1,
+    UserID                => $UserID1,
 );
 $Self->True(
     $ContactID1,
@@ -792,7 +723,7 @@ my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
     Lastname              => $ContactLastName2,
     AssignedUserID        => $UserID2,
     ValidID               => 1,
-    UserID                => 1,
+    UserID                => $UserID2
 );
 $Self->True(
     $ContactID2,
@@ -868,7 +799,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field CreateByID / Operator EQ / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -881,7 +812,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator NE / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -894,7 +825,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field CreateByID / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -907,7 +838,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1, $ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator !IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field CreateByID / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -920,7 +851,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator LT / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -933,7 +864,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator GT / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -946,7 +877,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator LTE / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -959,7 +890,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1, $ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateByID / Operator GTE / Value $UserID2',
+        Name     => "Search: Field CreateByID / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -972,111 +903,111 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2, $ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator EQ / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
                     Operator => 'EQ',
-                    Value    => $UserLogin2
+                    Value    => $UserID2
                 }
             ]
         },
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator NE / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
                     Operator => 'NE',
-                    Value    => $UserLogin2
+                    Value    => $UserID2
                 }
             ]
         },
         Expected => [$ConfigItemID1,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field CreateBy / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
                     Operator => 'IN',
-                    Value    => [$UserLogin1,$UserLogin3]
+                    Value    => [$UserID1,$UserID3]
                 }
             ]
         },
         Expected => [$ConfigItemID1, $ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator !IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field CreateBy / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
                     Operator => '!IN',
-                    Value    => [$UserLogin1,$UserLogin3]
+                    Value    => [$UserID1,$UserID3]
                 }
             ]
         },
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator STARTSWITH / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
-                    Operator => 'STARTSWITH',
-                    Value    => $UserLogin2
+                    Operator => 'LT',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID1]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator ENDSWITH / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
-                    Operator => 'ENDSWITH',
-                    Value    => $UserLogin2
+                    Operator => 'GT',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator CONTAINS / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
-                    Operator => 'CONTAINS',
-                    Value    => $UserLogin2
+                    Operator => 'LTE',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field CreateBy / Operator LIKE / Value $UserLogin2',
+        Name     => "Search: Field CreateBy / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'CreateBy',
-                    Operator => 'LIKE',
-                    Value    => $UserLogin2
+                    Operator => 'GTE',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID2,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator EQ / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1089,7 +1020,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator NE / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1102,7 +1033,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field ChangeByID / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1115,7 +1046,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1, $ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator !IN / Value [$UserID1,$UserID3]',
+        Name     => "Search: Field ChangeByID / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
@@ -1128,7 +1059,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator LT / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1141,7 +1072,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator GT / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1154,7 +1085,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator LTE / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1167,7 +1098,7 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1, $ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeByID / Operator GTE / Value $UserID2',
+        Name     => "Search: Field ChangeByID / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
@@ -1180,147 +1111,108 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2, $ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator EQ / Value $UserLogin2',
+        Name     => "Search: Field ChangeBy / Operator EQ / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
                     Operator => 'EQ',
-                    Value    => $UserLogin2
+                    Value    => $UserID2
                 }
             ]
         },
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator NE / Value $UserLogin2',
+        Name     => "Search: Field ChangeBy / Operator NE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
                     Operator => 'NE',
-                    Value    => $UserLogin2
+                    Value    => $UserID2
                 }
             ]
         },
         Expected => [$ConfigItemID1,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field ChangeBy / Operator IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
                     Operator => 'IN',
-                    Value    => [$UserLogin1,$UserLogin3]
+                    Value    => [$UserID1,$UserID3]
                 }
             ]
         },
         Expected => [$ConfigItemID1,$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator !IN / Value [$UserLogin1,$UserLogin3]',
+        Name     => "Search: Field ChangeBy / Operator !IN / Value [\$UserID1,\$UserID3]",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
                     Operator => '!IN',
-                    Value    => [$UserLogin1,$UserLogin3]
+                    Value    => [$UserID1,$UserID3]
                 }
             ]
         },
         Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator STARTSWITH / Value $UserLogin2',
+        Name     => "Search: Field ChangeBy / Operator LT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
-                    Operator => 'STARTSWITH',
-                    Value    => $UserLogin2
+                    Operator => 'LT',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID1]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator STARTSWITH / Value substr($UserLogin2,0,2)',
+        Name     => "Search: Field ChangeBy / Operator GT / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($UserLogin2,0,2)
+                    Operator => 'GT',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+        Expected => [$ConfigItemID3]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator ENDSWITH / Value $UserLogin2',
+        Name     => "Search: Field ChangeBy / Operator LTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
-                    Operator => 'ENDSWITH',
-                    Value    => $UserLogin2
+                    Operator => 'LTE',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field ChangeBy / Operator ENDSWITH / Value substr($UserLogin2,-3)',
+        Name     => "Search: Field ChangeBy / Operator GTE / Value \$UserID2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'ChangeBy',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($UserLogin2,-3)
+                    Operator => 'GTE',
+                    Value    => $UserID2
                 }
             ]
         },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field ChangeBy / Operator CONTAINS / Value $UserLogin2',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ChangeBy',
-                    Operator => 'CONTAINS',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field ChangeBy / Operator CONTAINS / Value substr($UserLogin2,1,-2)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ChangeBy',
-                    Operator => 'CONTAINS',
-                    Value    => substr($UserLogin2,1,-2)
-                }
-            ]
-        },
-        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
-    },
-    {
-        Name     => 'Search: Field ChangeBy / Operator LIKE / Value $UserLogin2',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ChangeBy',
-                    Operator => 'LIKE',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
+        Expected => [$ConfigItemID2,$ConfigItemID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

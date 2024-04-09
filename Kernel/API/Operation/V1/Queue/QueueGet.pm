@@ -160,7 +160,7 @@ sub Run {
             my @DirectSubQueues;
             CHILDQUEUE:
             foreach my $ChildName ( sort keys %QueueDataListByName ) {
-                next CHILDQUEUE if $ChildName !~ /^\Q$QueueData{Fullname}\E::\w+$/;
+                next CHILDQUEUE if $ChildName !~ /^\Q$QueueData{Fullname}\E::(?:(?!::).)+$/;
                 push @DirectSubQueues, $QueueDataListByName{$ChildName}->{QueueID};
             }
 
@@ -168,7 +168,7 @@ sub Run {
         }
 
         # add "pseudo" ParentID
-        my $ParentName = join('::', @QueueParts);
+        my $ParentName = join(q{::}, @QueueParts);
 
         if ( $ParentName ) {
             if ( !$QueueDataListByName{$ParentName} ) {

@@ -8,7 +8,7 @@
   Scenario: get the list of existing objecticons  
     When I query the collection of objecticons  
     Then the response code is 200
-#    And the response object is ObjectIconCollectionResponse
+    And the response object is ObjectIconCollectionResponse
 
   Scenario: get the list of existing objecticons with filter (+)
     When I query the collection of objecticons with filter

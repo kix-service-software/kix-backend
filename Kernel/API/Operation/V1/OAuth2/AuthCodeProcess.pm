@@ -91,7 +91,7 @@ perform OAuth2 AuthCodeProcess Operation. This will return the ProfileID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $ProfileID = $Kernel::OM->Get('OAuth2')->ProcessAuthCode(
+    my ( $ProfileID ) = $Kernel::OM->Get('OAuth2')->ProcessAuthCode(
         AuthCode => $Param{Data}->{ProfileAuth}->{Code},
         State    => $Param{Data}->{ProfileAuth}->{State}
     );

@@ -200,7 +200,6 @@ When qr/I create a ticket$/, sub {
    );
 };
 
-
 When qr/I create a complete ticket$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Post(
       URL     => S->{API_URL}.'/tickets',
@@ -315,4 +314,53 @@ Then qr/the placeholder "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
     else{
         is('', $4, 'Check attribute value in response');
     }
+};
+
+When qr/added a user with no organisation$/, sub {
+	( S->{Response}, S->{ResponseContent} ) = _Post(
+		URL     => S->{API_URL}.'/system/users',
+		Token   => S->{Token},
+		Content => {
+			User => {
+				UserEmail => "lili@lulu.de",
+				UserFirstname => "li",
+				UserLastname => "li",
+				UserLogin => "lili",
+				UserPw => "secret2".rand(),
+				UserTitle => "DR.",
+				IsAgent => 0,
+				IsCustomer => 1,
+				ValidID => 1
+			}
+		}
+	);
+};
+
+When qr/I create a complete ticket no organisation$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/tickets',
+        Token   => S->{Token},
+        Content => {
+            Ticket => {
+                Title => "test none orga",
+		        ContactID => "lili\@lulu.de",
+                OrganisationID => '',
+		        OwnerID => 1,
+		        QueueID => 1,
+		        Articles => [
+			        {
+				        Subject => "test one orga",
+				        to => "recipient1@example.com",
+				        Cc => "test\@byom.de",
+				        Body => "test one orgatest none orga",
+				        ContentType => "text/plain; charset=utf8",
+				        MimeType => "text/plain",
+				        Charset => "utf8",
+				        SenderType => "external",
+				        Channel => "note"
+			        }
+		        ]
+            }
+        }
+    );
 };

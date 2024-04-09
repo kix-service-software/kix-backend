@@ -247,30 +247,6 @@ Your KIX Notification Master
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8305" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'ConfigItem' objects using the 'Normal' link type.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">FAQArticle</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###8306" Required="0" Valid="1">
-        <Description Translatable="1">This setting defines that a 'FAQ' object can be linked with other 'ConfigItem' objects using the 'RelevantTo' link type.</Description>
-        <Group>FAQ</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">FAQArticle</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">RelevantTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FAQ::Item::HTML" Required="1" Valid="1">
         <Description Translatable="1">Show FAQ Article with HTML.</Description>
         <Group>FAQ</Group>

@@ -33,6 +33,16 @@ Kernel::API::Operation::V1::Session::UserTicketsGet - API User Tickets Get Opera
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item Run()
 
 perform UserCountersGet Operation.
@@ -65,7 +75,35 @@ sub Run {
         UserID   => $Self->{Authorization}->{UserID},
     );
 
+    # consider search and sort
+    if ( @TicketIDs && (IsHashRefWithData($Self->{Search}->{Ticket}) || $Self->{Sort}->{Ticket}) ) {
+        if ( !IsHashRefWithData($Self->{Search}->{Ticket}) ) {
+            $Self->{Search}->{Ticket} = {};
+        }
+        if ( !IsArrayRefWithData($Self->{Search}->{Ticket}->{AND}) ) {
+            $Self->{Search}->{Ticket}->{AND} = [
+                { Field => 'TicketID', Operator => 'IN', Value => \@TicketIDs }
+            ];
+        } else {
+            push(
+                @{$Self->{Search}->{Ticket}->{AND}},
+                { Field => 'TicketID', Operator => 'IN', Value => \@TicketIDs }
+            );
+        }
+
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            Search     => $Self->{Search}->{Ticket},
+            Limit      => $Self->{SearchLimit}->{Ticket} || $Self->{SearchLimit}->{'__COMMON'},
+            Sort       => $Self->{Sort}->{Ticket} || $Self->{DefaultSort}->{Ticket},
+            UserType   => $Self->{Authorization}->{UserType},
+            UserID     => $Self->{Authorization}->{UserID},
+        );
+    }
+
     if ( @TicketIDs ) {
+
         # get already prepared Ticket data from TicketGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::TicketGet',
@@ -92,7 +130,7 @@ sub Run {
             )
         }
     }
-    
+
     # return result
     return $Self->_Success(
         Ticket => [],

@@ -362,11 +362,15 @@
       background-color: #efefef;
     }
 
-    .bodyContent,
-    .bodyContent * {
+    .bodyContent {
       color: #323232;
       font-family: Arial;
       font-size: 13px;
+      line-height: 150%;
+      text-align: left;
+    }
+
+    .bodyContent * {
       line-height: 150%;
       text-align: left;
     }
@@ -1802,17 +1806,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::UnlockOnAway" Required="1" Valid="1">
-        <Description Translatable="1">Unlock tickets whenever a note is added and the owner is out of office.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Events###Ticket" Required="1" Valid="1">
         <Description Translatable="1">List of all ticket events to be displayed in the GUI.</Description>
         <Group>Ticket</Group>
@@ -1938,6 +1931,17 @@
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
             <String Regex="^[0-9]{1,3}$">20</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMasterSSLVerify" Required="1" Valid="1">
+        <Description Translatable="1">Verify ssl connection to the server.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostmasterAutoHTML2Text" Required="1" Valid="1">
@@ -2454,66 +2458,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0202" Required="0" Valid="1">
-        <Description Translatable="1">Links a ticket with an FAQArticle using a "Normal" type link.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0203" Required="0" Valid="0">
-        <Description Translatable="1">Links ticket with an FAQArticle using a "ParentChild" type link.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">FAQArticle</Item>
-                <Item Key="Type">ParentChild</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0204" Required="0" Valid="1">
-        <Description Translatable="1">Links a ticket with a ConfigItem using a "DependsOn" type link.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">DependsOn</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0205" Required="0" Valid="1">
-        <Description Translatable="1">Links ticket with a ConfigItem using a "RelevantTo" type link.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">RelevantTo</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="LinkObject::PossibleLink###0206" Required="0" Valid="1">
-        <Description Translatable="1">Links a ticket with a ConfigItem using a "Normal" type link.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::LinkObject</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Object1">Ticket</Item>
-                <Item Key="Object2">ConfigItem</Item>
-                <Item Key="Type">Normal</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LinkObject::IgnoreLinkedTicketStateTypes" Required="0" Valid="1">
         <Description Translatable="1">Defines, which tickets of which ticket state types should not be listed in linked ticket lists.</Description>
         <Group>Ticket</Group>
@@ -2877,7 +2821,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="0">
         <Description Translatable="1">Sends all agent's notifications to its configured out of office substitute while agent is out of office.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>

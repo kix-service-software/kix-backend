@@ -8,7 +8,7 @@ Feature: POST request /system/textmodules resource
   Scenario: added a textmodule
      When added a textmodule
      Then the response code is 201
-#     Then the response object is ContactPostPatchResponse
+     Then the response object is TextModulePostPatchResponse
      When I delete this textmodule
      Then the response code is 204
 

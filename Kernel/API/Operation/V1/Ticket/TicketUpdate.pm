@@ -174,7 +174,8 @@ sub Run {
                 Key       => 'Seen',
                 Value     => 1,
                 UserID    => $Self->{Authorization}->{UserID},
-                Silent    => 1
+                Silent    => 1,
+                NoEvents  => 1,
             );
         }
 

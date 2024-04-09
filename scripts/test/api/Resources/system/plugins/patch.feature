@@ -8,5 +8,5 @@ Feature: PATCH request to the /system/plugins/:product resource
   Scenario: update a plugin
     When I update the plugin "KIXPro"
     Then the response code is 400
-#    Then the response content is
+
 

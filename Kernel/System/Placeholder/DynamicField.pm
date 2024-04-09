@@ -271,33 +271,38 @@ sub _ReplaceDynamicFieldPlaceholder {
             # only prepare values of the requested ones
             next DYNAMICFIELD if !$DynamicFields{ $DynamicFieldConfig->{Name} };
 
-            # "prepare" object value
-            my @Values;
-            if ( ref $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } eq 'ARRAY' ) {
-                @Values = @{ $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } };
-            } elsif ( defined $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } ) {
-                @Values = ( $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } );
-            }
+            # get the display objectvalues for each dynamic field
+            my $DisplayObjectValueStrg = $Self->{DynamicFieldBackendObject}->DisplayObjectValueRender(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                Value              => $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                ObjectID           => $Param{ObjectID}
+            );
 
-            # return object value if text is just "_ObjectValue" placeholder (no surrounding text)
+            # return object value if text is just "ObjectValue" or "!" placeholder (no surrounding text)
             my $ReturnObjectValue;
             if ($Param{Text} =~ m/^$Param{Tag}(\S+?)(ObjectValue|!)$Self->{End}$/gixms) {
 
                 # but not (now) if _Object_ is included => handle sub object value
                 if ($Param{Text} !~ m/_Object_/) {
-                    return \@Values;
+                    return $DisplayObjectValueStrg;
                 }
 
                 $ReturnObjectValue = 1;
             }
 
-            my $Index = 0;
-            for my $ObjectValue (@Values) {
-                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue_' . $Index } = $ObjectValue;
-                $Index++;
+            if (
+                IsArrayRefWithData($DisplayObjectValueStrg)
+                && !$ReturnObjectValue
+            ) {
+                my $Index = 0;
+                for my $ObjectValue (@{$DisplayObjectValueStrg}) {
+                    $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue_' . $Index } = $ObjectValue;
+                    $Index++;
+                }
+                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = join(q{,},@{$DisplayObjectValueStrg});
+                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . q{!} } = join(q{,},@{$DisplayObjectValueStrg});
             }
-            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_ObjectValue' } = join(',',@Values);
-            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '!' } = join(',',@Values);
+
 
             # get the display values for each dynamic field
             my $DisplayValueStrg = $Self->{DynamicFieldBackendObject}->DisplayValueRender(

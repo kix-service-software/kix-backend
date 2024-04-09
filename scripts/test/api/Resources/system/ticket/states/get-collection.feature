@@ -8,12 +8,12 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
   Scenario: get the list of existing ticketstates
     When I query the collection of ticketstates
     Then the response code is 200
-#    And the response object is TicketStateCollectionResponse
+    And the response object is TicketStateCollectionResponse
 
   Scenario: get the list of existing ticketstates with filter
     When I query the collection of ticketstates with filter of closed
     Then the response code is 200
-#   And the response object is TicketStateCollectionResponse
+   And the response object is TicketStateCollectionResponse
     And the response contains the following items of type TicketState
       | Name   | ValidID |
       | closed | 1       |   
@@ -21,19 +21,19 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
   Scenario: get the list of existing ticketstates with limit
     When I query the collection of ticketstates with a limit of 2
     Then the response code is 200
-#    And the response object is TicketStateCollectionResponse 
+    And the response object is TicketStateCollectionResponse
     And the response contains 2 items of type "TicketState" 
     
   Scenario: get the list of existing ticketstates with offset
     When I query the collection of ticketstates with offset 2
     Then the response code is 200
-#    And the response object is TicketStateCollectionResponse 
+    And the response object is TicketStateCollectionResponse
     And the response contains 5 items of type "TicketState"
     
   Scenario: get the list of existing ticketstates with limit and offset
     When I query the collection of ticketstates with limit 2 and offset 1
     Then the response code is 200
-#    And the response object is TicketStateCollectionResponse 
+    And the response object is TicketStateCollectionResponse
     And the response contains 2 items of type "TicketState"
     
   Scenario: get the list of existing ticketstates with sorted
@@ -50,12 +50,10 @@ Feature: GET request to the /system/ticket/states/:TicketStateID resource
       | removed            |
       | merged             |
 
-       
-    
   Scenario: get the list of existing ticketstates with sorted, limit and offset
     When I query the collection of ticketstates with sorted by "TicketState.-Name:textual" limit 2 and offset 1
     Then the response code is 200
-#    And the response object is TicketStateCollectionResponse 
+    And the response object is TicketStateCollectionResponse
     And the response contains 2 items of type "TicketState"
     
     

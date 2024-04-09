@@ -5,6 +5,82 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
+  Scenario Outline: get the list of automation macro type actiontypes Ticket
+    When I query the collection of automation macro type "Ticket" actiontypes
+    Then the response code is 200
+    Then the macroactiontype output is "<Name>"
+
+     Examples:
+      | Name                 |
+      | ArticleCreate        |
+      | ArticleDelete        |
+      | AssembleObject       |
+      | Conditional          |
+      | ContactSet           |
+      | CreateReport         |
+      | DynamicFieldSet      |
+      | ExecuteMacro         |
+      | ExtractText          |
+      | FetchAssetAttributes |
+      | LockSet              |
+      | Loop                 |
+      | OrganisationSet      |
+      | OwnerSet             |
+      | PrioritySet          |
+      | ResponsibleSet       |
+      | StateSet             |
+      | TeamSet              |
+      | TicketCreate         |
+      | TicketDelete         |
+      | TitleSet             |
+      | TypeSet              |
+      | VariableSet          |
+
+  Scenario Outline: get the list of automation macro type actiontypes Synchronisation
+    When I query the collection of automation macro type "Synchronisation" actiontypes
+    Then the response code is 200
+    Then the macroactiontype output is "<Name>"
+
+    Examples:
+      | Name                 |
+      | AssembleObject       |
+      | Conditional          |
+      | CreateReport         |
+      | ExecuteMacro         |
+      | ExtractText          |
+      | Loop                 |
+      | VariableSet          |
+
+  Scenario Outline: get the list of automation macro type actiontypes Reporting
+    When I query the collection of automation macro type "Reporting" actiontypes
+    Then the response code is 200
+    Then the macroactiontype output is "<Name>"
+
+    Examples:
+      | Name                 |
+      | AssembleObject       |
+      | Conditional          |
+      | CreateReport         |
+      | ExecuteMacro         |
+      | ExtractText          |
+      | Loop                 |
+      | VariableSet          |
+
+  Scenario Outline: get the list of automation macro type actiontypes Contact
+    When I query the collection of automation macro type "Contact" actiontypes
+    Then the response code is 200
+    Then the macroactiontype output is "<Name>"
+
+    Examples:
+      | Name                 |
+      | AssembleObject       |
+      | Conditional          |
+      | CreateReport         |
+      | ExecuteMacro         |
+      | ExtractText          |
+      | Loop                 |
+      | VariableSet          |
+
   Scenario: get the list of automation macro type actiontypes
     When I query the collection of automation macro type "Ticket" actiontypes
     Then the response code is 200

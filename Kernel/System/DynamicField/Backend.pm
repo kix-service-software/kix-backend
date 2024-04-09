@@ -427,6 +427,57 @@ sub DisplayKeyRender {
     return $ValueStrg;
 }
 
+=item DisplayObjectValueRender()
+
+creates key string to be used to be used in display masks.
+
+    my $ValueStrg = $BackendObject->DisplayObjectValueRender(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        Value              => 'Any value',              # Optional
+    );
+
+    Returns
+
+    $ValueStrg = [
+        'some value'
+    ]
+
+=cut
+
+sub DisplayObjectValueRender {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Self->_CheckParams(%Param);
+
+    for my $Needed (qw(ObjectID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!"
+        );
+        return;
+    }
+
+    $Param{LayoutObject} //= $Kernel::OM->Get('Output::HTML::Layout');
+
+    # call DisplayObjectValueRender on the specific backend
+    my $ValueStrg = $Self->{$DynamicFieldBackend}->DisplayObjectValueRender(%Param);
+
+    return $ValueStrg;
+}
+
 =item DFValueObjectReplace()
 
 gets the object specific value.

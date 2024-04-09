@@ -59,14 +59,50 @@ sub Run {
         DynamicFields => 0,
     );
 
-    my $Comment          = $Param{Comment}          || '';
-    my $Lock             = $Param{Lock}             || '';
+    my $Comment = $Param{Comment} || q{};
+    my $Lock    = $Param{Lock}    || q{};
+
+    # check channel
+    if ( $GetParam{'X-KIX-Channel'} ) {
+
+        # check if it's an existing Channel
+        my $ChannelID = $Kernel::OM->Get('Channel')->ChannelLookup(
+            Name => $GetParam{'X-KIX-Channel'},
+        );
+        if ( !$ChannelID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Channel "
+                    . $GetParam{'X-KIX-Channel'}
+                    . " does not exist, falling back to 'email'."
+            );
+            $GetParam{'X-KIX-Channel'} = 'email';
+        }
+    }
+
+    # check sender type
+    if ( $GetParam{'X-KIX-SenderType'} ) {
+
+        # check if it's an existing SenderType
+        my $SenderTypeID = $TicketObject->ArticleSenderTypeLookup(
+            SenderType => $GetParam{'X-KIX-SenderType'},
+        );
+        if ( !$SenderTypeID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "SenderType "
+                    . $GetParam{'X-KIX-SenderType'}
+                    . " does not exist, falling back to 'external'."
+            );
+            $GetParam{'X-KIX-SenderType'} = 'external';
+        }
+    }
 
     # do db insert
     my $ArticleID = $TicketObject->ArticleCreate(
         TicketID         => $Param{TicketID},
-        Channel          => $GetParam{'X-KIX-Channel'},
-        SenderType       => $GetParam{'X-KIX-SenderType'},
+        Channel          => $GetParam{'X-KIX-Channel'}    || 'email',
+        SenderType       => $GetParam{'X-KIX-SenderType'} || 'external',
         From             => $GetParam{From},
         ReplyTo          => $GetParam{ReplyTo},
         To               => $GetParam{To},
@@ -83,6 +119,7 @@ sub Run {
         OrigHeader       => \%GetParam,
         DoNotSendEmail   => 1
     );
+
     if ( !$ArticleID ) {
         return;
     }
@@ -123,12 +160,11 @@ sub Run {
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
-    my $DynamicFieldList =
-        $DynamicFieldObject->DynamicFieldList(
+    my $DynamicFieldList = $DynamicFieldObject->DynamicFieldList(
         Valid      => 0,
         ResultType => 'HASH',
         ObjectType => 'Article',
-        );
+    );
 
     # set dynamic fields for Article object type
     DYNAMICFIELDID:
@@ -177,11 +213,11 @@ sub Run {
     my %DynamicFieldListReversed = reverse %{$DynamicFieldList};
 
     # set free article text
-    my %Values =
-        (
+    my %Values = (
         'X-KIX-FollowUp-ArticleKey'   => 'ArticleFreeKey',
         'X-KIX-FollowUp-ArticleValue' => 'ArticleFreeText',
-        );
+    );
+
     for my $Item ( sort keys %Values ) {
         for my $Count ( 1 .. 16 ) {
             my $Key = $Item . $Count;
@@ -189,8 +225,7 @@ sub Run {
                 defined $GetParam{$Key}
                 && length $GetParam{$Key}
                 && $DynamicFieldListReversed{ $Values{$Item} . $Count }
-                )
-            {
+            ) {
                 # get dynamic field config
                 my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
                     ID => $DynamicFieldListReversed{ $Values{$Item} . $Count },
@@ -232,9 +267,6 @@ sub Run {
 }
 
 1;
-
-
-
 
 =back
 

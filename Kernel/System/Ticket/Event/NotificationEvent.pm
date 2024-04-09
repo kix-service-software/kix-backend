@@ -23,17 +23,15 @@ use Kernel::System::VariableCheck qw(:all);
 our @ObjectDependencies = (
     'Config',
     'Contact',
-    'DB',
     'DynamicField',
     'DynamicField::Backend',
     'Email',
-    'HTMLUtils',
     'JSON',
     'Log',
+    'Main',
     'NotificationEvent',
     'Role',
     'Queue',
-    'SystemAddress',
     'TemplateGenerator',
     'Ticket',
     'Time',
@@ -71,7 +69,10 @@ sub Run {
     }
     return if !IsArrayRefWithData($Self->{NotificationEventMapping}->{$Param{Event}});
 
-    if ( !$Param{Data}->{TicketID} && !IsArrayRefWithData($Param{Data}->{TicketList}) ) {
+    if (
+        !$Param{Data}->{TicketID}
+        && !IsArrayRefWithData($Param{Data}->{TicketList})
+    ) {
         return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -80,15 +81,12 @@ sub Run {
         return;
     }
 
-    # get objects
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     # return if no notification is active
-    return 1 if $TicketObject->{SendNoNotification};
+    return 1 if $Kernel::OM->Get('Ticket')->{SendNoNotification};
 
     if ( $Param{Data}->{TicketID} ) {
         # return if no ticket exists (e. g. it got deleted)
-        my $TicketNumber = $TicketObject->TicketNumberLookup(
+        my $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
             TicketID => $Param{Data}->{TicketID},
             UserID   => $Param{UserID},
         );
@@ -98,9 +96,12 @@ sub Run {
 
     my $Result;
 
-    if ( !$ENV{IsDaemon} && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously') ) {
+    if (
+        !$ENV{IsDaemon}
+        && $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously')
+    ) {
         my $MaximumParallelInstances = $Kernel::OM->Get('Config')->Get('TicketNotification::SendAsynchronously::MaximumParallelInstances') || 0;
-        my $Result = $Self->AsyncCall(
+        $Result = $Self->AsyncCall(
             FunctionName             => '_Run',
             FunctionParams           => \%Param,
             MaximumParallelInstances => $MaximumParallelInstances
@@ -163,26 +164,19 @@ sub _Run {
 sub _HandleTicket {
     my ( $Self, %Param ) = @_;
 
-    # get notification event object
-    my $NotificationEventObject = $Kernel::OM->Get('NotificationEvent');
-
-    # get objects
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     # get ticket attribute matches
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Param{Data}->{TicketID},
         UserID        => $Param{UserID},
         DynamicFields => 0,
     );
-
 
     NOTIFICATION:
     for my $ID ( @{$Self->{NotificationEventMapping}->{$Param{Event}} || []} ) {
 
         my $InformedRecipientCount = 0;
 
-        my %Notification = $NotificationEventObject->NotificationGet(
+        my %Notification = $Kernel::OM->Get('NotificationEvent')->NotificationGet(
             ID => $ID,
         );
 
@@ -197,10 +191,12 @@ sub _HandleTicket {
         # add attachments only on ArticleCreate or ArticleSend event
         my @Attachments;
         if (
-            ( ( $Param{Event} eq 'ArticleCreate' ) || ( $Param{Event} eq 'ArticleSend' ) )
-            && $Param{Data}->{ArticleID}
+            (
+                $Param{Event} eq 'ArticleCreate'
+                || $Param{Event} eq 'ArticleSend'
             )
-        {
+            && $Param{Data}->{ArticleID}
+        ) {
 
             # add attachments to notification
             if ( $Notification{Data}->{ArticleAttachmentInclude}->[0] ) {
@@ -213,7 +209,7 @@ sub _HandleTicket {
                     DynamicFields => 0,
                 );
 
-                my %Index = $TicketObject->ArticleAttachmentIndex(
+                my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
                     ArticleID                  => $Param{Data}->{ArticleID},
                     Article                    => \%Article,
                     UserID                     => $Param{UserID},
@@ -222,7 +218,7 @@ sub _HandleTicket {
                 if (%Index) {
                     FILE_ID:
                     for my $FileID ( sort keys %Index ) {
-                        my %Attachment = $TicketObject->ArticleAttachment(
+                        my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
                             ArticleID => $Param{Data}->{ArticleID},
                             FileID    => $FileID,
                             UserID    => $Param{UserID},
@@ -230,11 +226,10 @@ sub _HandleTicket {
                         next FILE_ID if !%Attachment;
 
                         # remove HTML-Attachments (HTML-Emails)
-                        next
-                            if (
+                        next if (
                             $Index{$FileID}->{Filename} =~ /^file-[12]$/
                             && $Index{$FileID}->{ContentType} =~ /text\/html/i
-                            );
+                        );
 
                         push @Attachments, \%Attachment;
                     }
@@ -265,11 +260,8 @@ sub _HandleTicket {
             };
         }
 
-        # get config object
-        my $ConfigObject = $Kernel::OM->Get('Config');
-
         # get notification transport config
-        my %TransportConfig = %{ $ConfigObject->Get('Notification::Transport') || {} };
+        my %TransportConfig = %{ $Kernel::OM->Get('Config')->Get('Notification::Transport') || {} };
 
         # remember already sent agent notifications
         my %AlreadySent;
@@ -315,7 +307,6 @@ sub _HandleTicket {
 
             BUNDLE:
             for my $Bundle (@NotificationBundle) {
-
                 my $UserPreference = "Notification-$Notification{ID}-$Transport";
 
                 # check if agent should get the notification
@@ -332,8 +323,7 @@ sub _HandleTicket {
                         defined $Notification{Data}->{VisibleForAgent}->[0]
                         && !$Notification{Data}->{VisibleForAgent}->[0]
                     )
-                    )
-                {
+                ) {
                     $AgentSendNotification = 1;
                 }
 
@@ -343,20 +333,19 @@ sub _HandleTicket {
                     && $Notification{Data}->{VisibleForAgent}->[0]
                     && $Bundle->{Recipient}->{Type} eq 'Agent'
                     && !$AgentSendNotification
-                    )
-                {
+                ) {
                     next BUNDLE;
                 }
 
                 # Check if notification should not be send to the customer.
                 if (
                     $Bundle->{Recipient}->{Type} eq 'Customer'
-                    && $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
-                    )
-                {
+                    && $Kernel::OM->Get('Config')->Get('CustomerNotifyJustToRealCustomer')
+                ) {
                     # No UserID means it's not a mapped customer.
-                    next BUNDLE if !$Bundle->{Recipient}->{UserID};
+                    next BUNDLE if ( !$Bundle->{Recipient}->{UserID} );
                 }
+
                 my $Success = $Self->_SendRecipientNotification(
                     TicketID              => $Param{Data}->{TicketID},
                     ArticleID             => $Param{Data}->{ArticleID},
@@ -382,6 +371,7 @@ sub _HandleTicket {
             my @TransportRecipients = $TransportObject->GetTransportRecipients(
                 Notification => \%Notification,
                 TicketID     => $Param{Data}->{TicketID},
+                ArticleID    => $Param{Data}->{ArticleID}
             );
 
             next TRANSPORT if !@TransportRecipients;
@@ -473,10 +463,6 @@ sub _RecipientsGet {
     my %Notification = %{ $Param{Notification} };
     my %Ticket       = %{ $Param{Ticket} };
 
-    # get needed objects
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     my @RecipientUserIDs;
     my @RecipientUsers;
 
@@ -490,34 +476,21 @@ sub _RecipientsGet {
 
     # get recipients by Recipients
     if ( $Notification{Data}->{Recipients} ) {
-
-        # get needed objects
-        my $QueueObject        = $Kernel::OM->Get('Queue');
-        my $ContactObject = $Kernel::OM->Get('Contact');
-
         RECIPIENT:
         for my $Recipient ( @{ $Notification{Data}->{Recipients} } ) {
-
-            if (
-                $Recipient
-                =~ /^Agent(Owner|Responsible|Watcher|ReadPermissions|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|)$/
-                )
-            {
-
+            if ( $Recipient =~ /^Agent(Owner|Responsible|Watcher|ReadPermissions|WritePermissions|MyQueues|MyServices|MyQueuesMyServices|)$/ ) {
                 if ( $Recipient eq 'AgentOwner' ) {
                     push @{ $Notification{Data}->{RecipientAgents} }, $Ticket{OwnerID};
                 }
                 elsif ( $Recipient eq 'AgentResponsible' ) {
-
                     # add the responsible agent to the notification list
-                    if ( $ConfigObject->Get('Ticket::Responsible') && $Ticket{ResponsibleID} ) {
+                    if ( $Kernel::OM->Get('Config')->Get('Ticket::Responsible') && $Ticket{ResponsibleID} ) {
 
                         push @{ $Notification{Data}->{RecipientAgents} },
                             $Ticket{ResponsibleID};
                     }
                 }
                 elsif ( $Recipient eq 'AgentWatcher' ) {
-
                     # its checked on WatcherList function
                     push @{ $Notification{Data}->{RecipientAgents} }, map { $_->{UserID} } $Kernel::OM->Get('Watcher')->WatcherList(
                         Object   => 'Ticket',
@@ -525,7 +498,6 @@ sub _RecipientsGet {
                     );
                 }
                 elsif ( $Recipient eq 'AgentReadPermissions' ) {
-
                     my @UserIDs = $Self->_GetUserIDsWithRequiredPermission(
                         Ticket     => \%Ticket,
                         Permission => 'READ',
@@ -535,7 +507,6 @@ sub _RecipientsGet {
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentWritePermissions' ) {
-
                     my @UserIDs = $Self->_GetUserIDsWithRequiredPermission(
                         Ticket     => \%Ticket,
                         Permission => 'WRITE,READ'
@@ -544,21 +515,18 @@ sub _RecipientsGet {
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyQueues' ) {
-
                     my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
                     );
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyServices' ) {
-
                     my @UserIDs = $Self->_GetSubscribedUserIDsByServiceID(
                         ServiceID => $Ticket{ServiceID}
                     );
                     push @{ $Notification{Data}->{RecipientAgents} }, @UserIDs;
                 }
                 elsif ( $Recipient eq 'AgentMyQueuesMyServices' ) {
-
                     # get subscribed users
                     my @UserIDs = $Self->_GetSubscribedUserIDsByQueueID(
                         QueueID => $Ticket{QueueID}
@@ -586,15 +554,14 @@ sub _RecipientsGet {
             }
 
             elsif ( $Recipient eq 'Customer' ) {
-
                 # get old article for quoting
-                my %Article = $TicketObject->ArticleLastCustomerArticle(
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleLastCustomerArticle(
                     TicketID      => $Param{Data}->{TicketID},
                     DynamicFields => 0,
                 );
 
                 # get the raw ticket data
-                my %Ticket = $TicketObject->TicketGet(
+                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                     TicketID      => $Param{Data}->{TicketID},
                     DynamicFields => 0,
                 );
@@ -614,10 +581,9 @@ sub _RecipientsGet {
 
                 # check if customer notifications should be send
                 if (
-                    $ConfigObject->Get('CustomerNotifyJustToRealCustomer')
+                    $Kernel::OM->Get('Config')->Get('CustomerNotifyJustToRealCustomer')
                     && !$Ticket{ContactID}
-                    )
-                {
+                ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'info',
                         Message  => 'Send no customer notification because no customer is set!',
@@ -626,42 +592,46 @@ sub _RecipientsGet {
                 }
 
                 # get language and send recipient
-                $Recipient{UserLanguage} = $ConfigObject->Get('DefaultLanguage') || 'en';
+                $Recipient{UserLanguage} = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
 
                 if ( $Ticket{ContactID} ) {
 
-                    my %Contact = $ContactObject->ContactGet(
+                    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                         ID => $Ticket{ContactID},
                     );
 
                     # join Recipient data with Contact data
                     %Recipient = ( %Recipient, %Contact );
 
-                    # set recipient language
-                    my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
-                        UserID => $Contact{AssignedUserID}
-                    );
-                    if ( $Language ) {
-                        $Recipient{UserLanguage} = $Language;
+                    # set recipient language by assigned user
+                    if ( $Contact{AssignedUserID} ) {
+                        my $Language = $Kernel::OM->Get('User')->GetUserLanguage(
+                            UserID => $Contact{AssignedUserID}
+                        );
+                        if ( $Language ) {
+                            $Recipient{UserLanguage} = $Language;
+                        }
                     }
 
-                    $Recipient{Realname} = $Contact{Firstname}.' '.$Contact{Lastname};
+                    $Recipient{Realname} = $Contact{Firstname}
+                        . q{ }
+                        . $Contact{Lastname};
                 }
 
                 if ( !$Recipient{Realname} ) {
-                    $Recipient{Realname} = $Article{From} || '';
+                    $Recipient{Realname} = $Article{From} || q{};
                     $Recipient{Realname} =~ s/<.*>|\(.*\)|\"|;|,//g;
                     $Recipient{Realname} =~ s/( $)|(  $)//g;
                 }
 
-                push @RecipientUsers, \%Recipient;
+                push( @RecipientUsers, \%Recipient );
             }
         }
     }
 
     # add recipient agents
     if ( IsArrayRefWithData( $Notification{Data}->{RecipientAgents} ) ) {
-        push @RecipientUserIDs, @{ $Notification{Data}->{RecipientAgents} };
+        push( @RecipientUserIDs, @{ $Notification{Data}->{RecipientAgents} } );
     }
 
     # hash to keep track which agents are already receiving this notification
@@ -690,142 +660,116 @@ sub _RecipientsGet {
         }
     }
 
-    # get needed objects
-    my $UserObject = $Kernel::OM->Get('User');
+    # remove duplicates
+    @RecipientUserIDs = $Kernel::OM->Get('Main')->GetUnique( @RecipientUserIDs );
 
     my %SkipRecipients;
     if ( IsArrayRefWithData( $Param{Data}->{SkipRecipients} ) ) {
         %SkipRecipients = map { $_ => 1 } @{ $Param{Data}->{SkipRecipients} };
     }
 
-    # agent 1 should not receive notifications
+    # user 1 should not receive notifications
     $SkipRecipients{'1'} = 1;
+
+    # user of PostMasterUserID should not receive notifications
+    my $PostmasterUserID = $Kernel::OM->Get('Config')->Get('PostmasterUserID') || 1;
+    $SkipRecipients{ $PostmasterUserID } = 1;
 
     # remove recipients should not receive a notification
     @RecipientUserIDs = grep { !$SkipRecipients{$_} } @RecipientUserIDs;
 
     # get valid users list
-    my %ValidUsersList = $UserObject->UserList(
-        Type          => 'Short',
-        Valid         => 1,
-        NoOutOfOffice => 0,
+    my %ValidUsersList = $Kernel::OM->Get('User')->UserList(
+        Type  => 'Short',
+        Valid => 1,
     );
 
-    # remove invalid users
+    # keep only valid users
     @RecipientUserIDs = grep { $ValidUsersList{$_} } @RecipientUserIDs;
 
-    # remove duplicated
-    my %TempRecipientUserIDs = map { $_ => 1 } @RecipientUserIDs;
-    @RecipientUserIDs = sort keys %TempRecipientUserIDs;
+    # skip users that are out of office, if not enforced
+    if ( !$Notification{Data}->{SendOnOutOfOffice} ) {
+        my %OutOfOfficeUsersList = $Kernel::OM->Get('User')->UserSearch(
+            IsOutOfOffice => 1,
+            Valid         => 1,
+        );
 
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
+        # remove out of office users
+        @RecipientUserIDs = grep { !$OutOfOfficeUsersList{$_} } @RecipientUserIDs;
+    }
 
-    # get current time-stamp
-    my $Time = $TimeObject->SystemTime();
+    # get date string for current date at begin of day
+    my $CurrDayBegin = $Kernel::OM->Get('Time')->CurrentTimestamp();
+    $CurrDayBegin =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1 00:00:00/;
 
     # get all data for recipients as they should be needed by all notification transports
     RECIPIENT:
-    for my $UserID (@RecipientUserIDs) {
+    for my $UserID ( @RecipientUserIDs ) {
+        # skip user that triggers the event (it should not be notified) but only if it is not
+        #   a pre-calculated recipient
+        if (
+            !$Kernel::OM->Get('Config')->Get('AgentSelfNotifyOnAction')
+            && $UserID == $Param{UserID}
+            && !$PrecalculatedUserIDs{ $Param{UserID} }
+        ) {
+            next RECIPIENT;
+        }
 
-        my %User = $UserObject->GetUserData(
+        # check for required permission
+        my $Granted;
+        my $Resource = '/tickets/' . $Ticket{TicketID};
+        if ( exists( $Self->{Cache}->{UserPermission}->{ $UserID }->{ $Resource }->{READ} ) ) {
+            $Granted = $Self->{Cache}->{UserPermission}->{ $UserID }->{ $Resource }->{READ};
+        }
+        else {
+            # skip users with out READ permissions
+            $Granted = $Kernel::OM->Get('User')->CheckResourcePermission(
+                UserID              => $UserID,
+                Target              => $Resource,
+                UsageContext        => 'Agent',
+                RequestedPermission => 'READ'
+            );
+        }
+        next RECIPIENT if ( !$Granted );
+
+        # get data of recipient user
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $UserID,
             Valid  => 1,
-
         );
-        next RECIPIENT if !%User;
-
-        # set recipient language
-        my $Language = $UserObject->GetUserLanguage(UserID => $UserID);
-        if ( $Language ) {
-            $User{UserLanguage} = $Language;
-        }
+        next RECIPIENT if ( !%User );
 
         # check if the notification needs to be sent just one time per day
         if (
-            IsArrayRefWithData($Notification{Data}->{OncePerDay})
+            IsArrayRefWithData( $Notification{Data}->{OncePerDay} )
             && $Notification{Data}->{OncePerDay}->[0]
             && $User{UserLogin}
         ) {
-
-            # get time object
-            my $TimeObject = $Kernel::OM->Get('Time');
-
-            # get current date
-            my ( $CurrSec, $CurrMin, $CurrHour, $CurrDay, $CurrMonth, $CurrYear, $CurrWeekDay ) = $TimeObject->SystemTime2Date(
-                SystemTime => $TimeObject->SystemTime()
-            );
-
             # get ticket history
-            my @HistoryLines = $TicketObject->HistoryGet(
+            my @HistoryLines = $Kernel::OM->Get('Ticket')->HistoryGet(
                 TicketID      => $Param{Data}->{TicketID},
                 HistoryType   => 'SendAgentNotification',
                 Name          => "\%\%$Notification{Name}\%\%$User{UserLogin}\%\%Email",      # we use a fixed Email here
-                MinCreateTime => "$CurrYear-$CurrMonth-$CurrDay 00:00:00",
+                MinCreateTime => $CurrDayBegin,
                 SortReverse   => 1,
                 UserID        => $Param{UserID},
                 Limit         => 1,
             );
 
             # do not send the notification if it has been sent already today
-            return if @HistoryLines;
+            next RECIPIENT if ( @HistoryLines );
         }
 
-        # skip user that triggers the event (it should not be notified) but only if it is not
-        #   a pre-calculated recipient
-        if (
-            !$ConfigObject->Get('AgentSelfNotifyOnAction')
-            && $User{UserID} == $Param{UserID}
-            && !$PrecalculatedUserIDs{ $Param{UserID} }
-            )
-        {
-            next RECIPIENT;
+        # set recipient language
+        my $Language = $Kernel::OM->Get('User')->GetUserLanguage(UserID => $UserID);
+        if ( $Language ) {
+            $User{UserLanguage} = $Language;
         }
 
-        # skip users out of the office if configured
-        if ( !$Notification{Data}->{SendOnOutOfOffice} && $User{Preferences}->{OutOfOffice} ) {
-            my $Start = sprintf(
-                "%04d-%02d-%02d 00:00:00",
-                $User{Preferences}->{OutOfOfficeStartYear}, $User{Preferences}->{OutOfOfficeStartMonth},
-                $User{Preferences}->{OutOfOfficeStartDay}
-            );
-            my $TimeStart = $TimeObject->TimeStamp2SystemTime(
-                String => $Start,
-            );
-            my $End = sprintf(
-                "%04d-%02d-%02d 23:59:59",
-                $User{Preferences}->{OutOfOfficeEndYear}, $User{Preferences}->{OutOfOfficeEndMonth},
-                $User{Preferences}->{OutOfOfficeEndDay}
-            );
-            my $TimeEnd = $TimeObject->TimeStamp2SystemTime(
-                String => $End,
-            );
-
-            next RECIPIENT if $TimeStart < $Time && $TimeEnd > $Time;
-        }
-
-        my $Granted;
-        my $Resource = '/tickets/' . $Ticket{TicketID};
-        if ( exists $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ} ) {
-            $Granted = $Self->{Cache}->{UserPermission}->{$User{UserID}}->{$Resource}->{READ};
-        }
-        else {
-            # skip users with out READ permissions
-            $Granted = $UserObject->CheckResourcePermission(
-                UserID              => $User{UserID},
-                Target              => $Resource,
-                UsageContext        => 'Agent',
-                RequestedPermission => 'READ'
-            );
-        }
-        next RECIPIENT if !$Granted;
-        # skip PostMasterUserID
-        my $PostmasterUserID = $ConfigObject->Get('PostmasterUserID') || 1;
-        next RECIPIENT if $User{UserID} == $PostmasterUserID;
-
+        # set recipient type to Agent
         $User{Type} = 'Agent';
 
-        push @RecipientUsers, \%User;
+        push( @RecipientUsers, \%User );
     }
 
     return @RecipientUsers;
@@ -843,9 +787,6 @@ sub _SendRecipientNotification {
             );
         }
     }
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Ticket');
 
     my $TransportObject = $Param{TransportObject};
 
@@ -873,18 +814,24 @@ sub _SendRecipientNotification {
 
     # create separate history entries if no article has been created
     if ( !IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) || !$Param{Notification}->{Data}->{CreateArticle}->[0] ) {
-        if ( $Param{Recipient}->{Type} eq 'Agent'&& $Param{Recipient}->{UserLogin} ) {
+        if (
+            $Param{Recipient}->{Type} eq 'Agent'
+            && $Param{Recipient}->{UserLogin}
+        ) {
             # write history
-            $TicketObject->HistoryAdd(
+            $Kernel::OM->Get('Ticket')->HistoryAdd(
                 TicketID     => $Param{TicketID},
                 HistoryType  => 'SendAgentNotification',
                 Name         => "\%\%$Param{Notification}->{Name}\%\%$Param{Recipient}->{UserLogin}\%\%$Param{Transport}",
                 CreateUserID => $Param{UserID},
             );
         }
-        elsif ( $Param{Recipient}->{Type} eq 'Customer' && $Param{Recipient}->{Email} ) {
+        elsif (
+            $Param{Recipient}->{Type} eq 'Customer'
+            && $Param{Recipient}->{Email}
+        ) {
             # write history
-            $TicketObject->HistoryAdd(
+            $Kernel::OM->Get('Ticket')->HistoryAdd(
                 TicketID     => $Param{TicketID},
                 HistoryType  => 'SendCustomerNotification',
                 Name         => "\%\%$Param{Recipient}->{Email}",
@@ -908,7 +855,7 @@ sub _SendRecipientNotification {
     }
 
     # ticket event
-    $TicketObject->EventHandler(
+    $Kernel::OM->Get('Ticket')->EventHandler(
         %EventData,
     );
 

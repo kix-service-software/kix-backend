@@ -177,6 +177,11 @@ END
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',

@@ -922,6 +922,22 @@
             </Hash>
         </Setting>
     </ConfigItem>
+        <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###CheckOutOfOffice" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Checks whether the OutOfOffice set by the user has expired and resets it.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">CheckOutOfOffice</Item>
+                <Item Key="Schedule">0 2 * * *</Item> <!-- Default every day 2AM -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::User::CheckOutOfOffice</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerGenericInterfaceTaskManager::FutureTaskTimeDiff" Required="1" Valid="1" ConfigLevel="100">
         <Description Translatable="1">Defines the default the number of seconds (from current time) to re-schedule a generic interface failed task.</Description>
         <Group>Framework</Group>
@@ -2472,6 +2488,17 @@
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
             <String Regex="">Profile1</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="SendmailModule::SSLVerify" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">If any of the "SMTPS" or "SMTPTLS" mechanisms was selected as SendmailModule, this controls if the ssl connection will be verified.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Sendmail</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailBcc" Required="0" Valid="1" ConfigLevel="200">
@@ -7595,14 +7622,6 @@ Notes:
             </Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="OutOfOfficeMessageTemplate" Required="0" Valid="1">
-        <Description Translatable="1">Defines out of office message template. Two string parameters (%s) available: end date and number of days left.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <String Translatable="1">*** out of office until %s (%s d left) ***</String>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::Timeout" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Sets the timeout (in seconds) for http/ftp downloads.</Description>
         <Group>Framework</Group>
@@ -8338,23 +8357,6 @@ You can log in via the following URL:
                 <Item Key="Key" Translatable="1">Language</Item>
                 <Item Key="PrefKey">UserLanguage</Item>
                 <Item Key="Prio">1000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###OutOfOffice" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::OutOfOffice</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Block">OutOfOffice</Item>
-                <Item Key="Label" Translatable="1">Out Of Office Time</Item>
-                <Item Key="Key" Translatable="1"></Item>
-                <Item Key="PrefKey">UserOutOfOffice</Item>
-                <Item Key="Prio">4000</Item>
                 <Item Key="Active">1</Item>
             </Hash>
         </Setting>
@@ -9677,4 +9679,40 @@ You can log in via the following URL:
     </ConfigItem>
 
 
+
+    <ConfigItem AccessLevel="internal" Name="VirtualFSObjectsMapping" Required="1" Valid="1">
+        <Description Translatable="1"></Description>
+        <Group>VirtualFS</Group>
+        <SubGroup>Core::VirtualFS</SubGroup>
+        <Setting>
+            <String Regex="">
+{
+    "Ticket": {
+        "Operation": "V1::Ticket::TicketGet",
+        "Parameters": {
+            "TicketID": "ObjectID"
+        }
+    },
+    "Contact": {
+        "Operation": "V1::Contact::ContactGet",
+        "Parameters": {
+            "ContactID": "ObjectID"
+        }
+    },
+    "Organisation": {
+        "Operation": "V1::Organisation::OrganisationGet",
+        "Parameters": {
+            "OrganisationID": "ObjectID"
+        }
+    },
+    "FAQArticle": {
+        "Operation": "V1::FAQ::FAQArticleGet",
+        "Parameters": {
+            "FAQArticleID": "ObjectID"
+        }
+    }
+}
+            </String>
+        </Setting>
+    </ConfigItem>
 </kix_config>
