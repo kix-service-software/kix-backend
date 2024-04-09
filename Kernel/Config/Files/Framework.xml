@@ -226,16 +226,6 @@
             <String Regex="">Your Org. Director/s according to Registration</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-PGPInlineDecrypt" Required="0" Valid="1">
-        <Description Translatable="1">Module to decrypt PGP-encrypted mails before any other processing.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::PGPInlineDecryptFilter</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ImportExport::ObjectBackendRegistration###Contact" Required="0" Valid="1">
         <Description Translatable="1">Object backend module registration for the import/export module.</Description>
         <Group>Framework</Group>
@@ -628,24 +618,6 @@
                 <Item Key="TaskName">TicketUnlockTimeout</Item>
                 <Item Key="Schedule">*/5 * * * *</Item> <!-- default: every 5 minutes -->
                 <Item Key="Module">Kernel::System::Console::Command::Maint::Ticket::UnlockTimeout</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###RenewCustomerSMIMECertificates" Required="0" Valid="1">
-        <Description Translatable="1">Renew existing SMIME certificates from customer backend. Note: SMIME and SMIME::FetchFromCustomer needs to be active in SysConfig and customer backend needs to be configured to fetch UserSMIMECertificate attribute.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">RenewCustomerSMIMECertificates</Item>
-                <Item Key="Schedule">02 02 * * *</Item> <!-- default each day at 02:02 AM -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::SMIME::CustomerCertificate::Renew</Item>
                 <Item Key="Function">Execute</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
@@ -7800,141 +7772,6 @@ Notes:
             <String Regex="">DejaVuSansMono-BoldOblique.ttf</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PGP" Required="1" Valid="1">
-        <Description Translatable="1">Enables PGP support. When PGP support is enabled for signing and encrypting mail, it is HIGHLY recommended that the web server runs as the KIX user. Otherwise, there will be problems with the privileges when accessing .gnupg folder.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PGP::Bin" Required="1" Valid="1">
-        <Description Translatable="1">Defines the path to PGP binary.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <String Regex="" Check="File">/usr/bin/gpg</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PGP::Options" Required="1" Valid="1">
-        <Description Translatable="1">Sets the options for PGP binary.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <String Regex="">--homedir /opt/kix/.gnupg/ --batch --no-tty --yes</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="confidential" Name="PGP::Key::Password" Required="1" Valid="1">
-        <Description Translatable="1">Sets the password for private PGP key.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="D2DF79FA">SomePassword</Item>
-                <Item Key="488A0B8F">SomePassword</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PGP::TrustedNetwork" Required="0" Valid="1">
-        <Description Translatable="1">Set this to yes if you trust in all your public and private pgp keys, even if they are not certified with a trusted signature.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PGP::Log" Required="1" Valid="1">
-        <Description Translatable="1">Configure your own log text for PGP.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::PGP</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="SIG_ID">Signature data.</Item>
-                <Item Key="GOODSIG">Good PGP signature.</Item>
-                <Item Key="VALIDSIG">The PGP signature with the keyid is good.</Item>
-                <Item Key="TRUST_UNDEFINED">This key is not certified with a trusted signature!.</Item>
-                <Item Key="KEYREVOKED">The PGP signature was made by a revoked key, this could mean that the signature is forged.</Item>
-                <Item Key="REVKEYSIG">The PGP signature was made by a revoked key, this could mean that the signature is forged.</Item>
-                <Item Key="BADSIG">The PGP signature with the keyid has not been verified successfully.</Item>
-                <Item Key="ERRSIG">It was not possible to check the PGP signature, this may be caused by a missing public key or an unsupported algorithm.</Item>
-                <Item Key="SIGEXPIRED">The PGP signature is expired.</Item>
-                <Item Key="EXPKEYSIG">The PGP signature was made by an expired key.</Item>
-                <Item Key="NO_PUBKEY">No public key found.</Item>
-                <Item Key="NODATA">No valid OpenPGP data found.</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME" Required="1" Valid="1">
-        <Description Translatable="1">Enables S/MIME support.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::Bin" Required="1" Valid="1">
-        <Description Translatable="1">Defines the path to open ssl binary. It may need a HOME env ($ENV{HOME} = '/var/lib/wwwrun';).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <String Regex="" Check="File">/usr/bin/openssl</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::CertPath" Required="1" Valid="1">
-        <Description Translatable="1">Specifies the directory where SSL certificates are stored.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <String Regex="" Check="Directory">/etc/ssl/certs</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::PrivatePath" Required="1" Valid="1">
-        <Description Translatable="1">Specifies the directory where private SSL certificates are stored.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <String Regex="" Check="Directory">/etc/ssl/private</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::CacheTTL" Required="1" Valid="1">
-        <Description Translatable="1">Cache time in seconds for the SSL certificate attributes.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <String Regex="\d+">86400</String><!-- default 1 day -->
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::StoreDecryptedData" Required="1" Valid="1">
-        <Description Translatable="1">If this option is enabled, then the decrypted data will be stored in the database if they are displayed in AgentTicketZoom.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="SMIME::FetchFromCustomer" Required="1" Valid="1">
-        <Description Translatable="1">Enables fetch S/MIME from Contact backend support.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Crypt::SMIME</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="NotificationSenderName" Required="1" Valid="1">
         <Description Translatable="1">Specifies the name that should be used by the application when sending notifications. The sender name is used to build the complete display name for the notification master (i.e. "KIX Notifications" kix@your.example.com).</Description>
         <Group>Framework</Group>
@@ -8418,38 +8255,6 @@ You can log in via the following URL:
                 <Item Key="Key" Translatable="1">Time Zone</Item>
                 <Item Key="PrefKey">UserTimeZone</Item>
                 <Item Key="Prio">5000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###PGP" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::PGP</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">PGP Key</Item>
-                <Item Key="Key" Translatable="1">PGP Key Upload</Item>
-                <Item Key="PrefKey">UserPGPKey</Item>
-                <Item Key="Prio">10000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###SMIME" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::SMIME</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">S/MIME Certificate</Item>
-                <Item Key="Key" Translatable="1">S/MIME Certificate Upload</Item>
-                <Item Key="PrefKey">UserSMIMEKey</Item>
-                <Item Key="Prio">11000</Item>
                 <Item Key="Active">1</Item>
             </Hash>
         </Setting>
