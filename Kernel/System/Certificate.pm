@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::SMIME;
+package Kernel::System::Certificate;
 
 use strict;
 use warnings;
@@ -18,11 +18,11 @@ our @ObjectDependencies = qw(
 
 =head1 NAME
 
-Kernel::System::SMIME - smime backend lib
+Kernel::System::Certificate - Certificate backend lib
 
 =head1 SYNOPSIS
 
-This is a sub module of Kernel::System::SMIME contains all smime functions.
+This is a sub module of Kernel::System::Certificate contains all Certificate functions.
 
 =head1 PUBLIC INTERFACE
 

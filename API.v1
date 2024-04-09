@@ -34,6 +34,10 @@
 /system/automation/macros/types                                                            | GET              | V1::Automation::MacroTypeSearch                  |
 /system/automation/macros/types/:MacroType/actiontypes                                     | GET              | V1::Automation::MacroActionTypeSearch            |
 /system/automation/macros/types/:MacroType/actiontypes/:MacroActionType                    | GET              | V1::Automation::MacroActionTypeGet               |
+/system/certificate                                                                        | GET              | V1::Certificate::CertificateSearch
+/system/certificate                                                                        | POST             | V1::Certificate::CertificateCreate
+/system/certificate/:Fingerprint                                                           | GET              | V1::Certificate::CertificateGet
+/system/certificate/:Fingerprint                                                           | DELETE           | V1::Certificate::CertificateDelete
 /system/cmdb/classes                                                                       | GET              | V1::CMDB::ClassSearch                            |
 /system/cmdb/classes                                                                       | POST             | V1::CMDB::ClassCreate                            |
 /system/cmdb/classes/:ClassID                                                              | DELETE           | V1::CMDB::ClassDelete                            |
