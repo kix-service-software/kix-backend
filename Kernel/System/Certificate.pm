@@ -93,15 +93,15 @@ sub CertificateDelete {
     return 1;
 }
 
-=item CertificateList()
+=item CertificateSearch()
 
 get list of local certificates filenames
 
-    my @CertList = $CryptObject->CertificateList();
+    my @CertList = $CryptObject->CertificateSearch();
 
 =cut
 
-sub CertificateList {
+sub CertificateSearch {
     my ( $Self, %Param ) = @_;
 
     my @CertList;

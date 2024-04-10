@@ -51,19 +51,20 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'Filename' => {
+        'Certificate' => {
+            Type     => 'HASH',
             Required => 1
         },
-        'ContentType' => {
+        'Certificate::ContentType' => {
             Required => 1
         },
-        'Content' => {
+        'Certificate::Content' => {
             Required => 1
         },
-        'Type' => {
+        'Certificate::Type' => {
             Required => 1
         },
-        'Passphrase' => {}
+        'Certificate::Passphrase' => {}
     };
 }
 
@@ -94,10 +95,10 @@ perform CertificateCreate Operation. This will return the created CertificateID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-
+print STDERR Data::Dumper::Dumper(\%Param);
     # isolate and trim Certificate parameter
     my $Certificate = $Self->_Trim(
-        Data => $Param{Data}
+        Data => $Param{Data}->{Certificate}
     );
 
     # check attribute values
@@ -130,7 +131,7 @@ sub Run {
         UserID  => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$Success ) {
+    if ( !$Fingerprint ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create Certificate, please contact the system administrator',
@@ -139,7 +140,7 @@ sub Run {
 
     # return result
     return $Self->_Success(
-        Code       => 'Object.Created',
+        Code        => 'Object.Created',
         Fingerprint => $Fingerprint,
     );
 }
@@ -148,10 +149,7 @@ sub Run {
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
 
-
-
-
-    return 1;
+    return $Self->_Success();
 }
 
 1;

@@ -55,7 +55,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Certificate search
-    my %CertificateList = $Kernel::OM->Get('Certificate')->CertificateList();
+    my %CertificateList = $Kernel::OM->Get('Certificate')->CertificateSearch();
 
 	# get already prepared Certificate data from CertificateGet operation
     if ( IsHashRefWithData(\%CertificateList) ) {
