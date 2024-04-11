@@ -76,12 +76,19 @@ sub Run {
                 delete $TypeData{$Attr};
             }
 
-            my %Type = (
+            push(@Result, {
                 Source  => $TypeList{$LinkType}->{Object1},
                 Target  => $TypeList{$LinkType}->{Object2},
-                %TypeData,
-            );
-            push(@Result, \%Type);
+                %TypeData
+            });
+
+            if ( $TypeList{$LinkType}->{Object1} ne $TypeList{$LinkType}->{Object2} ) {
+                push(@Result, {
+                    Source  => $TypeList{$LinkType}->{Object2},
+                    Target  => $TypeList{$LinkType}->{Object1},
+                    %TypeData
+                });
+            }
         }
 
         return $Self->_Success(
