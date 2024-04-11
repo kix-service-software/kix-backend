@@ -426,7 +426,7 @@ sub SendNotification {
         return if !$SecurityOptions;
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
-            From       => "$Address{RealName} <$Address{Email}>",
+            From       => "\"$Address{RealName}\" <$Address{Email}>",
             To         => $Recipient{Email},
             Subject    => $Notification{Subject},
             MimeType   => $Notification{ContentType},
