@@ -51,8 +51,9 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'Fingerprint' => {
+        'CertificateID' => {
             Type     => 'ARRAY',
+            DataType => 'NUMBER',
             Required => 1
         },
     }
@@ -64,7 +65,7 @@ perform CertificateDelete Operation. This will return the deleted Filename.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Filename  => '...',
+            CertificateID  => '...',
         },
     );
 
@@ -78,11 +79,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # start loop
-    foreach my $Filename ( @{$Param{Data}->{Filename}} ) {
+    foreach my $CertificateID ( @{$Param{Data}->{CertificateID}} ) {
 
         # delete Certificate
         my $Success = $Kernel::OM->Get('Certificate')->CertificateDelete(
-            Filename  => $Filename,
+            ID  => $CertificateID,
         );
 
         if ( !$Success ) {

@@ -53,9 +53,9 @@ sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
     return {
-        'Fingerprint' => {
+        'CertificateID' => {
             Type     => 'ARRAY',
-            DataType => 'STRING',
+            DataType => 'NUMBER',
             Required => 1
         }
     }
@@ -68,7 +68,7 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Filename => 'some name'       # comma separated in case of multiple or arrayref (depending on transport)
+            CertificateID => 1       # comma separated in case of multiple or arrayref (depending on transport)
         },
     );
 
@@ -95,22 +95,27 @@ sub Run {
 
     my @CertificateList;
 
+    my $Include;
+    if ( $Param{Data}->{include}->{Content} ) {
+        $Include = 'Content';
+    }
     # start loop
-    foreach my $Filename ( @{$Param{Data}->{Filename}} ) {
+    foreach my $ID ( @{$Param{Data}->{CertificateID}} ) {
 
         # get the Certificate data
-        my %CertificateData = $Kernel::OM->Get('Certificate')->CertificateGet(
-            Filename => $Filename,
+        my $CertificateData = $Kernel::OM->Get('Certificate')->CertificateGet(
+            ID      => $ID,
+            Include => $Include
         );
 
-        if ( !%CertificateData ) {
+        if ( !IsHashRefWithData($CertificateData) ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
 
         # add
-        push(@CertificateList, \%CertificateData);
+        push(@CertificateList, $CertificateData);
     }
 
     if ( scalar(@CertificateList) == 1 ) {

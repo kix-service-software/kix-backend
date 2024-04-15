@@ -55,16 +55,25 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },
-        'Certificate::ContentType' => {
+        'Certificate::File' => {
+            Type     => 'HASH',
             Required => 1
         },
-        'Certificate::Content' => {
+        'Certificate::File::ContentType' => {
+            Required => 1
+        },
+        'Certificate::File::Content' => {
             Required => 1
         },
         'Certificate::Type' => {
-            Required => 1
+            Required => 1,
+            OneOf    => [
+                'Private',
+                'Cert'
+            ]
         },
-        'Certificate::Passphrase' => {}
+        'Certificate::Passphrase' => {},
+        'Certificate::ObjectType' => {}
     };
 }
 
@@ -87,7 +96,7 @@ perform CertificateCreate Operation. This will return the created CertificateID.
         Code            => '',                      #
         Message         => '',                      # in case of error
         Data            => {                        # result data payload after Operation
-            Fingerprint  => '',                      # boolean of the created Certificate
+            CertificateID  => '',                   # ID of the created Certificate
         },
     };
 
@@ -95,7 +104,7 @@ perform CertificateCreate Operation. This will return the created CertificateID.
 
 sub Run {
     my ( $Self, %Param ) = @_;
-print STDERR Data::Dumper::Dumper(\%Param);
+
     # isolate and trim Certificate parameter
     my $Certificate = $Self->_Trim(
         Data => $Param{Data}->{Certificate}
@@ -112,42 +121,42 @@ print STDERR Data::Dumper::Dumper(\%Param);
         );
     }
 
-    # check if Certificate exists
-    my $CertificateList = $Kernel::OM->Get('Certificate')->CertificateSearch(
-        %{$Certificate},
-        UserID => $Self->{Authorization}->{UserID},
-    );
-
-    if ( IsArrayRefWithData($CertificateList) ) {
-        return $Self->_Error(
-            Code    => 'Object.AlreadyExists',
-            Message => "Cannot create Certificate. A Certificate with these parameters already exists.",
-        );
-    }
-
     # create Certificate
-    my $Fingerprint = $Kernel::OM->Get('Certificate')->CertificateCreate(
+    my $CertificateID = $Kernel::OM->Get('Certificate')->CertificateCreate(
         %{$Certificate},
-        UserID  => $Self->{Authorization}->{UserID},
+        ObjectType => $Certificate->{ObjectType} || 'SMIME',
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
-    if ( !$Fingerprint ) {
+    if ( !$CertificateID ) {
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Certificate, please contact the system administrator',
+            Message => 'Could not create Certificate',
         );
     }
 
     # return result
     return $Self->_Success(
         Code        => 'Object.Created',
-        Fingerprint => $Fingerprint,
+        CertificateID => $CertificateID,
     );
 }
 
 
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
+
+    my $Certificate = $Param{Certificate};
+
+    if (
+        $Certificate->{Type} eq 'Private'
+        && !$Certificate->{Passphrase}
+    ) {
+        return $Self->_Error(
+            Code    => 'Object.BadRequest',
+            Message => "Required parameter 'Passphrase' is missing!",
+        );
+    }
 
     return $Self->_Success();
 }

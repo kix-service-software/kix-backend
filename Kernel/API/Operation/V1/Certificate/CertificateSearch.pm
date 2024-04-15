@@ -55,15 +55,15 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Certificate search
-    my %CertificateList = $Kernel::OM->Get('Certificate')->CertificateSearch();
+    my @CertificateList = $Kernel::OM->Get('Certificate')->CertificateSearch();
 
 	# get already prepared Certificate data from CertificateGet operation
-    if ( IsHashRefWithData(\%CertificateList) ) {
+    if ( scalar(@CertificateList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Certificate::CertificateGet',
             SuppressPermissionErrors => 1,
             Data                     => {
-                Fingerprint => join(q{,}, sort keys %CertificateList),
+                CertificateID => join(q{,}, @CertificateList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
