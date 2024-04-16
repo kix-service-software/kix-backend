@@ -29,6 +29,16 @@ Kernel::API::Operation::Certificate::CertificateSearch - API Certificate Search 
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item Run()
 
 perform ChannelSearch Operation. This will return a Certificate list.
@@ -55,7 +65,15 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # perform Certificate search
-    my @CertificateList = $Kernel::OM->Get('Certificate')->CertificateSearch();
+    my @CertificateList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        UserID     => $Self->{Authorization}->{UserID},
+        UserType   => $Self->{Authorization}->{UserType},
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{Certificate},
+        Limit      => $Self->{SearchLimit}->{Certificate} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Certificate},
+    );
 
 	# get already prepared Certificate data from CertificateGet operation
     if ( scalar(@CertificateList) ) {

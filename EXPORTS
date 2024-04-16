@@ -215,6 +215,7 @@ ObjectIcon                                                                    = 
 ObjectManager                                                                 = Kernel::System::ObjectManager
 ObjectSearch                                                                  = Kernel::System::ObjectSearch
 ObjectSearch::Database                                                        = Kernel::System::ObjectSearch::Database
+ObjectSearch::Database::Certificate                                           = Kernel::System::ObjectSearch::Database::Certificate
 ObjectSearch::Database::ConfigItem                                            = Kernel::System::ObjectSearch::Database::ConfigItem
 ObjectSearch::Database::Contact                                               = Kernel::System::ObjectSearch::Database::Contact
 ObjectSearch::Database::FAQArticle                                            = Kernel::System::ObjectSearch::Database::FAQArticle

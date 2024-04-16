@@ -91,11 +91,23 @@ sub CertificateCreate {
         . q{/}
         . $Attributes->{Fingerprint};
 
-    my @Exists = $Self->CertificateSearch(
-        Filename => $Filename
+    my $Exists = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        UserType   => 'Agent',
+        UserID     => $Param{UserID} || 1,
+        Result     => 'COUNT',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Filename',
+                    Valie    => $Filename,
+                    Operator => 'EQ'
+                }
+            ]
+        }
     );
 
-    if ( scalar(@Exists) ) {
+    if ( $Exists ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -109,6 +121,9 @@ sub CertificateCreate {
     for my $Key ( sort keys %{$Attributes} ) {
         $Preferences{$Key} = $Attributes->{$Key};
     }
+
+    # ToDo: If we allow other certification types, this should be generic
+    $Preferences{CType} = 'SMIME';
 
     my $Content = $Param{File}->{Content};
 
@@ -380,72 +395,6 @@ sub CertificateDelete {
     );
 
     return 1;
-}
-
-=item CertificateSearch()
-
-get list of local certificates file ids
-
-    my @CertList = $CertificateObject->CertificateSearch(
-        ObjectType  => 'SMIME'                          # optional
-        Type        => 'Cert'                           # optional
-        Filename    => 'Certificate/SMIME/KIX_Cert_1'   # optional
-    );
-
-    return list of virtual fs ids
-
-=cut
-
-sub CertificateSearch {
-    my ( $Self, %Param ) = @_;
-
-    my %SearchWhat;
-    for my $Key ( qw(ObjectType Type) ) {
-        next if !$Param{$Key};
-        $SearchWhat{Preferences}->{$Key} = $Param{$Key};
-    }
-
-    if ( $Param{Filename} ) {
-        $SearchWhat{Filename} = $Param{Filename};
-    }
-    else {
-        $SearchWhat{Filename} = 'Certificate/*';
-    }
-
-    my $CacheKey = 'CertificateSearch';
-    for my $Key ( qw(ObjectType Type Filename) ) {
-        next if !$Param{$Key};
-        $CacheKey .= q{::}
-            . $Key
-            . q{::}
-            . $Param{$Key};
-    }
-
-    # check cache
-    my $Cache = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-
-    # return if cache found,
-    return @{$Cache} if ref $Cache eq 'ARRAY';
-
-    my @CertIDs = $Kernel::OM->Get('VirtualFS')->Find(
-        %SearchWhat,
-        ReturnIDs => 1
-    );
-
-    # set cache
-    if ($CacheKey) {
-        $Kernel::OM->Get('Cache')->Set(
-            Type  => $Self->{CacheType},
-            Key   => $CacheKey,
-            Value => \@CertIDs,
-            TTL   => $Self->{CacheTTL},
-        );
-    }
-
-    return @CertIDs;
 }
 
 sub _CheckCertificate {
