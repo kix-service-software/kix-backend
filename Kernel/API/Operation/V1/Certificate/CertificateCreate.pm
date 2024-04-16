@@ -65,6 +65,12 @@ sub ParameterDefinition {
         'Certificate::File::Content' => {
             Required => 1
         },
+        'Certificate::File::Filename' => {
+            Required => 1
+        },
+        'Certificate::File::Filesize' => {
+            Required => 1
+        },
         'Certificate::Type' => {
             Required => 1,
             OneOf    => [
@@ -110,17 +116,6 @@ sub Run {
         Data => $Param{Data}->{Certificate}
     );
 
-    # check attribute values
-    my $CheckResult = $Self->_CheckCertificate(
-        Certificate => $Certificate
-    );
-
-    if ( !$CheckResult->{Success} ) {
-        return $Self->_Error(
-            %{$CheckResult},
-        );
-    }
-
     # create Certificate
     my $CertificateID = $Kernel::OM->Get('Certificate')->CertificateCreate(
         %{$Certificate},
@@ -140,25 +135,6 @@ sub Run {
         Code        => 'Object.Created',
         CertificateID => $CertificateID,
     );
-}
-
-
-sub _CheckCertificate {
-    my ( $Self, %Param ) = @_;
-
-    my $Certificate = $Param{Certificate};
-
-    if (
-        $Certificate->{Type} eq 'Private'
-        && !$Certificate->{Passphrase}
-    ) {
-        return $Self->_Error(
-            Code    => 'Object.BadRequest',
-            Message => "Required parameter 'Passphrase' is missing!",
-        );
-    }
-
-    return $Self->_Success();
 }
 
 1;
