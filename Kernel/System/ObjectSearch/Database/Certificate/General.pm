@@ -38,12 +38,12 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        Email => {
+        Issuer => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        Filename => {
+        Email => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
@@ -52,6 +52,11 @@ sub GetSupportedAttributes {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE']
+        },
+        CType => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Type => {
             IsSearchable => 1,
@@ -85,9 +90,6 @@ sub Search {
         },
         Email => {
             PrefKey => 'Email'
-        },
-        Filename => {
-            PrefKey => 'Filename'
         },
         Fingerprint => {
             PrefKey => 'Fingerprint'
@@ -156,11 +158,6 @@ sub Sort {
             JoinType => 'CertificateEmail',
             Select   => 'preferences_value AS cemail',
             OrderBy  => 'cemail'
-        },
-        Filename => {
-            JoinType => 'CertificateFilename',
-            Select   => 'preferences_value AS cfilename',
-            OrderBy  => 'cfilename'
         },
         Fingerprint => {
             JoinType => 'CertificateFingerprint',

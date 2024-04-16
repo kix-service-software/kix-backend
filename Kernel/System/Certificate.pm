@@ -100,7 +100,7 @@ sub CertificateCreate {
             AND => [
                 {
                     Field    => 'Filename',
-                    Valie    => $Filename,
+                    Value    => $Filename,
                     Operator => 'EQ'
                 }
             ]

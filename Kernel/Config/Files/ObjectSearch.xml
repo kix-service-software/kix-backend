@@ -768,5 +768,15 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Certificate::Module###Filename" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for certificates.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Certificate::Filename</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <!-- EO FAQ OBJECTSEARCH ATTRIBUTES -->
 </kix_config>
