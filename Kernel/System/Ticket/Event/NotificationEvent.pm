@@ -688,7 +688,10 @@ sub _RecipientsGet {
     @RecipientUserIDs = grep { $ValidUsersList{$_} } @RecipientUserIDs;
 
     # skip users that are out of office, if not enforced
-    if ( !$Notification{Data}->{SendOnOutOfOffice} ) {
+    if (
+        !IsArrayRefWithData($Notification{Data}->{SendOnOutOfOffice})
+        || !$Notification{Data}->{SendOnOutOfOffice}->[0]
+    ) {
         my %OutOfOfficeUsersList = $Kernel::OM->Get('User')->UserSearch(
             IsOutOfOffice => 1,
             Valid         => 1,
