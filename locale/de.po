@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-4-16 09:48+0000\n"
+"POT-Creation-Date: 2024-4-16 09:49+0000\n"
 "PO-Revision-Date: 2023-11-13 11:37+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -1200,6 +1200,10 @@ msgid "RegEx"
 msgstr "RegEx"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
+msgid "Text"
+msgstr "Text"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The RegEx containing the capture groups."
 msgstr "Kann Capture Group Namen enthalten."
 
@@ -1585,10 +1589,6 @@ msgstr "Die ID oder KNR des Kunden, der gesetzt werden soll."
 msgid "Sets the owner of a ticket."
 msgstr "Setzt den Bearbeiter eines Tickets."
 
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
-msgid "The ID or login of the agent to be set."
-msgstr "Die ID oder der Login des Agenten, der gesetzt werden soll."
-
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
 msgid "Sets the priority of a ticket."
 msgstr "Setzt die Priorität eines Tickets."
@@ -1602,6 +1602,10 @@ msgstr ""
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "Sets the responsible of a ticket."
 msgstr "Setzt den Verantwortlichen eines Tickets."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
+msgid "The ID or login of the agent to be set."
+msgstr "Die ID oder der Login des Agenten, der gesetzt werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
 msgid ""
@@ -1782,6 +1786,10 @@ msgstr ""
 msgid "The title of the new ticket and subject of the first article."
 msgstr "Der Titel des neuen Tickets und Betreff des ersten Artikels."
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
+msgid "Title"
+msgstr "Titel"
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Sets the title of a ticket."
 msgstr "Setzt den Titel eines Tickets."
@@ -1807,16 +1815,16 @@ msgid "CIHistory::"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration.pm
+msgid "aborted"
+msgstr "abgebrochen"
+
+#. Perl Module: Kernel/System/Installation/Migration.pm
 msgid "aborting"
 msgstr "abbrechen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17.pm
 msgid "in progress"
 msgstr "in Bearbeitung"
-
-#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
-msgid "aborted"
-msgstr "abgebrochen"
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
 msgid "finished"
@@ -1880,20 +1888,12 @@ msgstr ""
 "vorhanden ist."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
-msgid "Text"
-msgstr "Text"
-
-#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "The name of the plugin to check for."
 msgstr "Der Name des zu prüfenden Plugins."
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "The text to return if the requested plugin is available."
 msgstr "Der zurückzugebende Text, wenn das Plugin vorhanden ist."
-
-#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
-msgid "Columns"
-msgstr "Spalten"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/ResolveDynamicFieldValue.pm
 msgid "Field Names"
@@ -1942,6 +1942,10 @@ msgstr ""
 "Eine Liste (Array) der Spalten, die im Bericht enthalten sind, Reihenfolge "
 "wie hier angegeben. Wird hier nichts eingetragen, werden alle Spalten "
 "angezeigt."
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
+msgid "Columns"
+msgstr "Spalten"
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
 msgid "Converts the report data to CSV."
@@ -2002,10 +2006,6 @@ msgid ""
 msgstr ""
 "Sie können für jedes Ausgabeformat einen anderen Titel angeben. Der hier "
 "hinterlegte Titel überschreibt den oben eingegebenen Titel."
-
-#. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
-msgid "Title"
-msgstr "Titel"
 
 #. Perl Module: Kernel/System/Ticket.pm
 msgid "Reset of unlock time."
@@ -2208,6 +2208,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
 msgid ""
+"Defines a generic expand available for all GET (including SEARCH) operations."
+msgstr ""
+"Definiert ein generisches \"expand\" für alle GET-Operationen (inkl. Search)."
+
+#. SysConfig: Kernel/Config/Files/API/Contact.xml
+msgid ""
 "Defines which attributes of the contact data hash should NOT be exported. "
 "Key = Attribute, Value = 1 if attribute should not be exported. If nothing "
 "is defined, every attribute will be exported"
@@ -2223,12 +2229,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
 msgid "Enable wildcard praefix for contact fulltext search."
 msgstr "De-/Aktiviert Wildcard-Suchpräfix für Kontaktsuche via Volltext."
-
-#. SysConfig: Kernel/Config/Files/API/ObjectIcon.xml
-msgid ""
-"Defines a generic include available for all GET (including SEARCH) "
-"operations."
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
 msgid ""
@@ -2248,24 +2248,10 @@ msgstr ""
 msgid "Enable wildcard praefix for organisation search."
 msgstr "De-/Aktiviert Wildcard-Suchpräfix für Organisationssuche via Volltext."
 
-#. SysConfig: Kernel/Config/Files/API/Queue.xml
+#. SysConfig: Kernel/Config/Files/API/Role.xml
 msgid ""
-"Defines a generic expand available for all GET (including SEARCH) operations."
-msgstr ""
-"Definiert ein generisches \"expand\" für alle GET-Operationen (inkl. Search)."
-
-#. SysConfig: Kernel/Config/Files/API/Session.xml
-msgid ""
-"Defines which attributes of the user data hash should NOT be exported. Key = "
-"Attribute, Value = 1 if attribute should not be exported. If nothing is "
-"defined, every attribute will be exported"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Session.xml
-msgid ""
-"Defines which attributes of the user data hash should be exported. Key = "
-"Attribute, Value = 1 if attribute should be exported. If nothing is defined, "
-"every attribute will be exported"
+"Defines a generic include available for all GET (including SEARCH) "
+"operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2318,6 +2304,20 @@ msgstr "Team"
 msgid "Up"
 msgstr "Aufsteigend"
 
+#. SysConfig: Kernel/Config/Files/API/User.xml
+msgid ""
+"Defines which attributes of the user data hash should NOT be exported. Key = "
+"Attribute, Value = 1 if attribute should not be exported. If nothing is "
+"defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/User.xml
+msgid ""
+"Defines which attributes of the user data hash should be exported. Key = "
+"Attribute, Value = 1 if attribute should be exported. If nothing is defined, "
+"every attribute will be exported"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
 msgstr "API-Modulregistrierung für die Validator-Schicht."
@@ -2363,19 +2363,7 @@ msgid "Registration of a execution plan type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
-msgid "Registration of a job type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Automation.xml
 msgid "Registration of a logging module for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Automation.xml
-msgid "Registration of a macro action type for automation."
-msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
-
-#. SysConfig: Kernel/Config/Files/Automation.xml
-msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
@@ -2450,6 +2438,10 @@ msgid "Cache Time To Leave for FAQ items."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
+msgid "Comment"
+msgstr "Kommentar"
+
+#. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Decimal places of the voting result."
 msgstr "Dezimalstellen des Bewertungsergebnisses."
 
@@ -2471,6 +2463,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Definition of FAQ item free text field."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/FAQ.xml
+msgid "DynamicField object registration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
@@ -2800,10 +2796,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Christmas Eve"
 msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Comment"
-msgstr "Kommentar"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
@@ -3495,10 +3487,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField backend registration."
 msgstr "DynamicField Backend Registrierung."
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "DynamicField object registration."
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -5700,6 +5688,18 @@ msgstr ""
 msgid ""
 "Recognize if a ticket is a follow-up to an existing ticket using an external "
 "ticket number."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a macro action type for automation."
+msgstr "Registrierung eines Makroaktionstyps für die Automatisierung."
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
