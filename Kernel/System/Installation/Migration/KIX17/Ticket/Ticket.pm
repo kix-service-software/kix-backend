@@ -153,7 +153,8 @@ sub _Run {
             RelevantAttr => [
                 'tn',
             ],
-            NoCache => 1,        # don't cache this mass data
+            NoOIDMapping => 1,
+            NoCache      => 1,        # don't cache this mass data
         );
         if ( $Exists ) {
             $Item->{tn} = 'Migration-'.$Item->{tn};
