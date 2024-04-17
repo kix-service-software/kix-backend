@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-4-17 09:13+0000\n"
+"POT-Creation-Date: 2024-4-17 09:15+0000\n"
 "PO-Revision-Date: 2023-11-13 11:37+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -3520,6 +3520,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable keep-alive connection header for SOAP responses."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable migration debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
