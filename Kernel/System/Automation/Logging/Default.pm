@@ -65,13 +65,20 @@ sub Log {
 
     my %LogData = %{$Param{LogData}||{}};
 
+    my $ObjectIDString = $LogData{ObjectID};
+    if ( IsHashRef($LogData{ObjectID}) || IsArrayRef($LogData{ObjectID}) ) {
+        $ObjectIDString = $Kernel::OM->Get('JSON')->Encode(
+            Data => $LogData{ObjectID},
+        );
+    }
+
     # log in DB automation log
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
             \$LogData{JobID}, \$LogData{RunID}, \$LogData{MacroID}, \$LogData{MacroActionID}, 
-            \$LogData{ObjectID}, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
+            \$ObjectIDString, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
         ],
     );
 
