@@ -106,9 +106,12 @@ sub Run {
         }
 
         # check if this item already exists (i.e. some initial data)
-        my @RelevantAttr = ( 'firstname', 'lastname' );
+        my @RelevantAttr;
         if ( $EmailUniqueCheck ) {
-            push @RelevantAttr, 'email';
+            @RelevantAttr = ( 'email' );
+        }
+        else {
+            @RelevantAttr = ( 'firstname', 'lastname', 'email' );
         }
         
         my $ID = $Self->Lookup(

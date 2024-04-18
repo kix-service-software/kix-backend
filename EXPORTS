@@ -138,7 +138,6 @@ Console::Command::Maint::Database::MySQL::InnoDBMigration                     = 
 Console::Command::Maint::Database::PasswordCrypt                              = Kernel::System::Console::Command::Maint::Database::PasswordCrypt
 Console::Command::Maint::FAQ::ContentTypeSet                                  = Kernel::System::Console::Command::Maint::FAQ::ContentTypeSet
 Console::Command::Maint::Log::Clear                                           = Kernel::System::Console::Command::Maint::Log::Clear
-Console::Command::Maint::Log::Print                                           = Kernel::System::Console::Command::Maint::Log::Print
 Console::Command::Maint::PostMaster::FetchMail                                = Kernel::System::Console::Command::Maint::PostMaster::FetchMail
 Console::Command::Maint::PostMaster::MailAccountFetch                         = Kernel::System::Console::Command::Maint::PostMaster::MailAccountFetch
 Console::Command::Maint::PostMaster::Read                                     = Kernel::System::Console::Command::Maint::PostMaster::Read
