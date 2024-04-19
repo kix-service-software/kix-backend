@@ -80,20 +80,27 @@ sub Search {
 
     # check for needed joins
     my @SQLJoin = ();
-    if ( !$Param{Flags}->{JoinMap}->{CertificatePreference} ) {
-        push( @SQLJoin, 'INNER JOIN virtual_fs_preferences vfsp ON vfsp.virtual_fs_id = vfs.id' );
+    my $JoinFlag = 'JoinCertificate' . $Param{Search}->{Field};
+    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinFlag } // 'vfsp';
+    if ( !$Param{Flags}->{JoinMap}->{ $JoinFlag } ) {
+        my $Count = $Param{Flags}->{CertificateJoinCounter}++;
+        $TableAlias .= $Count;
+        push(
+            @SQLJoin,
+            "INNER JOIN virtual_fs_preferences $TableAlias ON $TableAlias.virtual_fs_id = vfs.id",
+            "AND $TableAlias.preferences_key = '$AttributeMapping{ $Param{Search}->{Field} }->{PrefKey}'"
+        );
 
-        $Param{Flags}->{JoinMap}->{CertificatePreference} = 1;
+        $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;
     }
 
     # prepare condition
     my $Condition = $Self->_GetCondition(
         Operator    => $Param{Search}->{Operator},
-        Column      => 'vfsp.preferences_value',
+        Column      => "$TableAlias.preferences_value",
         Value       => $Param{Search}->{Value},
         Silent      => $Param{Silent},
-        NULLValue   => 1,
-        Supplement  => 'vfsp.preferences_key = ' . $AttributeMapping{ $Param{Search}->{Field} }->{PrefKey}
+        NULLValue   => 1
     );
     return if ( !$Condition );
 
@@ -114,32 +121,28 @@ sub Sort {
     # init mapping
     my %AttributeMapping = (
         StartDate => {
-            JoinType => 'CertificateStartDate',
             Select   => 'preferences_value AS cstartdate',
             OrderBy  => 'cstartdate'
         },
         EndDate => {
-            JoinType => 'CertificateEndDate',
             Select   => 'preferences_value AS cenddate',
             OrderBy  => 'cenddate'
         },
         ShortEndDate => {
-            JoinType => 'CertificateShortStart',
             Select   => 'preferences_value AS cshortstart',
             OrderBy  => 'cshortstart'
         },
         ShortStartDate => {
-            JoinType => 'CertificateShortEnd',
             Select   => 'preferences_value AS cshortend',
             OrderBy  => 'cshortend'
         }
     );
 
     # check for needed joins
-    my $JoinType = $AttributeMapping{ $Attr }->{JoinType};
-    my @SQLJoin = ();
-    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinType } // 'vfsp';
-    if ( !$Param{Flags}->{JoinMap}->{ $JoinType } ) {
+    my @SQLJoin    = ();
+    my $JoinFlag   = 'JoinCertificate' . $Attr;
+    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinFlag } // 'vfsp';
+    if ( !$Param{Flags}->{JoinMap}->{ $JoinFlag } ) {
         my $Count = $Param{Flags}->{CertificateJoinCounter}++;
         $TableAlias .= $Count;
 
@@ -149,7 +152,7 @@ sub Sort {
             "AND $TableAlias.preferences_key = '$Attr'"
         );
 
-        $Param{Flags}->{JoinMap}->{ $JoinType } = $TableAlias;
+        $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;
     }
 
     # return sort def

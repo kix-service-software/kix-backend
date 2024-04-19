@@ -79,7 +79,7 @@ sub ParameterDefinition {
             ]
         },
         'Certificate::Passphrase' => {},
-        'Certificate::ObjectType' => {}
+        'Certificate::CType'      => {}
     };
 }
 
@@ -119,8 +119,8 @@ sub Run {
     # create Certificate
     my $CertificateID = $Kernel::OM->Get('Certificate')->CertificateCreate(
         %{$Certificate},
-        ObjectType => $Certificate->{ObjectType} || 'SMIME',
-        UserID     => $Self->{Authorization}->{UserID},
+        CType  => $Certificate->{CType} || 'SMIME',
+        UserID => $Self->{Authorization}->{UserID},
     );
 
     if ( !$CertificateID ) {

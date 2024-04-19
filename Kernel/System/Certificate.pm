@@ -67,7 +67,7 @@ create a local certificate
         },
         Type       => 'Cert'            # required
         Passphrase => 'some secret'     # required, if type Private
-        ObjectType => 'SMIME'           # required
+        CType      => 'SMIME'           # required
     );
 
     return certificate id
@@ -79,43 +79,48 @@ sub CertificateCreate {
 
     return if !$Self->_CheckCertificate(%Param);
 
-    my $Attributes = $Self->_GetCertificateAttributes(
-        File => $Param{File}
-    );
+    my $Attributes = $Self->_GetCertificateAttributes( %Param );
 
     return if !$Attributes;
 
+    if ( $Param{Type} eq 'Private' ) {
+        # checks whether there is a public certificate for the private one
+        my $CertID = $Self->CertificateExists(
+            %Param,
+            Attributes     => $Attributes,
+            HasCertificate => 1
+        );
+
+        return if !$CertID;
+
+        my $Certificate = $Self->CertificateGet(
+            ID => $CertID
+        );
+
+        for my $Key (
+            qw(
+                Hash CType Serial ShortStartDate Subject Issuer
+                StartDate EndDate Fingerprint ShortEndDate
+            )
+        ) {
+            next if !$Certificate->{$Key};
+            $Attributes->{$Key} = $Certificate->{$Key};
+        }
+    }
+
     my $Filename = 'Certificate'
         . q{/}
-        . $Param{ObjectType}
+        . $Param{CType}
+        . q{/}
+        . $Param{Type}
         . q{/}
         . $Attributes->{Fingerprint};
 
-    my $Exists = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'Certificate',
-        UserType   => 'Agent',
-        UserID     => $Param{UserID} || 1,
-        Result     => 'COUNT',
-        Search     => {
-            AND => [
-                {
-                    Field    => 'Filename',
-                    Value    => $Filename,
-                    Operator => 'EQ'
-                }
-            ]
-        }
+    # Checks whether a public/private certificate already exists according to the type
+    return if $Self->CertificateExists(
+        %Param,
+        Filename => $Filename
     );
-
-    if ( $Exists ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Certificate already exists!'
-            );
-        }
-        return;
-    }
 
     my %Preferences;
     for my $Key ( sort keys %{$Attributes} ) {
@@ -123,7 +128,7 @@ sub CertificateCreate {
     }
 
     # ToDo: If we allow other certification types, this should be generic
-    $Preferences{CType} = 'SMIME';
+    $Preferences{CType} = $Param{CType} || 'SMIME';
 
     my $Content = $Param{File}->{Content};
 
@@ -145,36 +150,11 @@ sub CertificateCreate {
         return;
     }
 
-    my $Path = $Self->{CertPath};
-    if ( $Preferences{Type} eq 'Private') {
-        $Path = $Self->{PrivatePath};
-    }
-
-    $Path .= '/KIX_'
-        . $Preferences{Type}
-        . q{_}
-        . $FileID;
-
-    my $Success = $Kernel::OM->Get('Main')->FileWrite(
-        Location => $Path,
-        Content  => \$Content,
-        Mode     => 'binmode'
+    return if !$Self->_WriteCertificate(
+        Type    => $Preferences{Type},
+        Content => $Content,
+        ID      => $FileID
     );
-
-    if ( !$Success ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Certificate could not be create!'
-            );
-        }
-        $Self->CertificateDelete(
-            ID     => $FileID,
-            Silent => $Param{Silent}
-        );
-
-        return;
-    }
 
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
@@ -278,7 +258,7 @@ sub CertificateGet {
     $Certificate->{Filename} = $Filename;
 
     # remove unnessary datas
-    for my $Key ( qw(Filesize FilesizeRaw) ) {
+    for my $Key ( qw(Filesize FilesizeRaw Secret) ) {
         delete $Certificate->{$Key};
     }
 
@@ -397,6 +377,178 @@ sub CertificateDelete {
     return 1;
 }
 
+sub CertificateExists {
+    my ( $Self,%Param ) = @_;
+
+    if ( $Param{HasCertificate} ) {
+        return 1 if $Param{Type} ne 'Private';
+
+        my @CertID = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Certificate',
+            UserType   => 'Agent',
+            UserID     => $Param{UserID} || 1,
+            Result     => 'ARRAY',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'Type',
+                        Value    => 'Cert',
+                        Operator => 'EQ'
+                    },
+                    {
+                        Field    => 'Modulus',
+                        Value    => $Param{Attributes}->{Modulus},
+                        Operator => 'EQ'
+                    }
+                ]
+            }
+        );
+
+        if ( !@CertID ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need Certificate of Private Key first -$Param{Attributes}->{Modulus})!",
+                );
+            }
+            return;
+        }
+        return $CertID[0];
+    }
+    else {
+        my $Exists = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Certificate',
+            UserType   => 'Agent',
+            UserID     => $Param{UserID} || 1,
+            Result     => 'COUNT',
+            Search     => {
+                AND => [
+                    {
+                        Field    => 'Filename',
+                        Value    => $Param{Filename},
+                        Operator => 'EQ'
+                    }
+                ]
+            }
+        );
+
+        if ( $Exists ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Certificate already exists!'
+                );
+            }
+            return 1;
+        }
+    }
+
+    return;
+}
+
+sub CertificateToFS {
+    my ( $Self,%Param ) = @_;
+
+    my $Debug = $Param{Debug} || 0;
+
+    my @Certificates = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'CType',
+                    Operator => 'EQ',
+                    Value    => 'SMIME'
+                }
+            ]
+        },
+        Result   => 'ARRAY',
+        UserType => 'Agent',
+        UserID   => 1
+    );
+
+    my $Count = scalar(@Certificates);
+    if ( $Debug ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "CertificateToFS: Found $Count certificate(s)!"
+        );
+    }
+
+    return 0 if !$Count;
+
+    for my $ID ( @Certificates ) {
+        my $Certificate = $Self->CertificateGet(
+            ID      => $ID,
+            Include => 'Content',
+            Silent  => $Debug
+        );
+
+        next if ( !IsHashRefWithData($Certificate) );
+
+        next if !$Self->_WriteCertificate(
+            Type     => $Certificate->{Type},
+            Content  => $Certificate->{Content},
+            ID       => $ID,
+            NoDelete => 1,
+            Silent   => $Debug
+        );
+
+    }
+
+    return 1;
+}
+
+sub _WriteCertificate {
+    my ( $Self,%Param ) = @_;
+
+    for my $Needed ( qw(ID Type Content) ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    my $Path = $Self->{CertPath};
+    if ( $Param{Type} eq 'Private') {
+        $Path = $Self->{PrivatePath};
+    }
+
+    $Path .= '/KIX_'
+        . $Param{Type}
+        . q{_}
+        . $Param{ID};
+
+    my $Content = $Param{Content};
+    my $Success = $Kernel::OM->Get('Main')->FileWrite(
+        Location => $Path,
+        Content  => \$Content,
+        Mode     => 'binmode'
+    );
+
+    if ( !$Success ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Certificate could not be create!'
+            );
+        }
+        if ( !$Param{NoDelete} ) {
+            $Self->CertificateDelete(
+                ID     => $Param{ID},
+                Silent => $Param{Silent}
+            );
+        }
+    }
+
+    return $Success;
+}
+
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
 
@@ -466,7 +618,9 @@ sub _GetCertificateAttributes {
     my $Content = MIME::Base64::decode_base64( $File->{Content} );
 
     my $CacheKey = 'Certificate::'
-        . ( $Param{ObjectType} ? $Param{ObjectType} . q{::} : q{} )
+        . ( $Param{CType} ? $Param{CType} . q{::} : q{} )
+        . $Param{Type}
+        . q{::}
         . 'Attributes::Filename::'
         . $File->{Filename};
 
@@ -491,24 +645,55 @@ sub _GetCertificateAttributes {
         );
         return;
     }
-    my $Attributes = $Self->_FetchAttributes( Filename => $Filename );
+    my $Attributes = $Self->_FetchAttributes(
+        Filename   => $Filename,
+        Type       => $Param{Type},
+        Passphrase => $Param{Passphrase} || q{}
+    );
 
-    if ( $Attributes->{Hash} ) {
-        # my ($Private) = $Self->PrivateGet($Attributes);
-        # if ($Private) {
-        #     $Attributes->{Private} = 'Yes';
-        # }
-        # else {
-        #     $Attributes->{Private} = 'No';
-        # }
-        $Attributes->{Type} = 'Cert';
+    if ( $Param{Type} eq 'Cert' ) {
+        if ( $Attributes->{Hash} ) {
+            my $Private = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Certificate',
+                Result     => 'COUNT',
+                UserID     => $Param{UserID} || 1,
+                UserType   => 'Agent',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Type',
+                            Value    => 'Private',
+                            Operator => 'EQ'
+                        },
+                        {
+                            Field    => 'Hash',
+                            Value    => $Attributes->{Hash},
+                            Operator => 'EQ'
+                        },
+                        {
+                            Field    => 'Modulus',
+                            Value    => $Attributes->{Modulus},
+                            Operator => 'EQ'
+                        }
+                    ]
+                }
+            );
+            $Attributes->{Private} = 'No';
+            if ($Private) {
+                $Attributes->{Private} = 'Yes';
+            }
+            $Attributes->{Type} = 'Cert';
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Can\'t add invalid certificate!'
+            );
+            return;
+        }
     }
     else {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Can\'t add invalid certificate!'
-        );
-        return;
+        $Attributes->{Type} = 'Private';
     }
 
     # set cache
@@ -543,6 +728,10 @@ sub _FetchAttributes {
 
     # call all attributes at same time
     my $Options = "x509 -in $Filename -noout $OptionString";
+    if ( $Param{Type} eq 'Private' ) {
+        $OptionString = '-modulus ';
+        $Options      = "rsa -in $Filename -noout $OptionString -passin pass:$Param{Passphrase}";
+    }
 
     # get the output string
     my $Output = qx{$Self->{Cmd} $Options 2>&1};
@@ -638,6 +827,13 @@ sub _FetchAttributes {
         $AttributesRef->{"Short$DateType"} = "$Y-$M-$D";
     }
 
+    if (
+        $Param{Type} eq 'Private'
+        && $Param{Secret}
+    ) {
+        $AttributesRef->{Secret} = $Param{Secret};
+    }
+
     return $AttributesRef;
 }
 
@@ -651,18 +847,19 @@ sub _Init {
 
     # valid content types
     $Self->{ContentTypes} = {
-        'application/pkcs8'                 => 1,
-        'application/pkcs10'                => 1,
-        'application/pkix-cert'             => 1,
-        'application/pkix-crl'              => 1,
-        'application/pkcs7-mime'            => 1,
-        'application/x-x509-ca-cert'        => 1,
-        'application/x-x509-user-cert'      => 1,
-        'application/x-pkcs7-crl'           => 1,
-        'application/x-pem-file'            => 1,
-        'application/x-pkcs12'              => 1,
-        'application/x-pkcs7-certificates'  => 1,
-        'application/x-pkcs7-certreqresp'   => 1
+        'application/pkcs8'                  => 1,
+        'application/pkcs10'                 => 1,
+        'application/pkix-cert'              => 1,
+        'application/pkix-crl'               => 1,
+        'application/pkcs7-mime'             => 1,
+        'application/x-x509-ca-cert'         => 1,
+        'application/x-x509-user-cert'       => 1,
+        'application/x-pkcs7-crl'            => 1,
+        'application/x-pem-file'             => 1,
+        'application/x-pkcs12'               => 1,
+        'application/x-pkcs7-certificates'   => 1,
+        'application/x-pkcs7-certreqresp'    => 1,
+        'application/x-iwork-keynote-sffkey' => 1
     };
 
     # make sure that we are getting POSIX (i.e. english) messages from openssl
@@ -676,18 +873,18 @@ sub _Init {
         . $Kernel::OM->Get('Config')->Get('Home')
         . " RANDFILE=$ENV{RANDFILE} $Self->{Cmd}";
 
-    return $Self->_Check();
+    return $Self->_InitCheck();
 }
 
-=item Check()
+=item _InitCheck()
 
 check if environment is working
 
-    my $Message = $CryptObject->Check();
+    my $Message = $CryptObject->_InitCheck();
 
 =cut
 
-sub _Check {
+sub _InitCheck {
     my ( $Self, %Param ) = @_;
 
     my $Success = 1;
