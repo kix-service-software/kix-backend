@@ -20,7 +20,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Build .');
+    $Self->Description('Adds the certificates and private keys stored in KIX into the file system.');
 
     return;
 }
