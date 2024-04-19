@@ -21,6 +21,7 @@ our @ObjectDependencies = qw(
 );
 
 use MIME::Base64 qw();
+use Kernel::System::VariableCheck qw(:all);
 
 =head1 NAME
 
@@ -523,6 +524,10 @@ sub _WriteCertificate {
         . $Param{Type}
         . q{_}
         . $Param{ID};
+
+    if ( -e $Path ) {
+        return 1;
+    }
 
     my $Content = $Param{Content};
     my $Success = $Kernel::OM->Get('Main')->FileWrite(

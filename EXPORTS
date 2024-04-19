@@ -127,6 +127,7 @@ Console::Command::Maint::Automation::DeleteNotReferencedMacros                = 
 Console::Command::Maint::Cache::Delete                                        = Kernel::System::Console::Command::Maint::Cache::Delete
 Console::Command::Maint::Cache::DeleteStats                                   = Kernel::System::Console::Command::Maint::Cache::DeleteStats
 Console::Command::Maint::Cache::ShowStats                                     = Kernel::System::Console::Command::Maint::Cache::ShowStats
+Console::Command::Maint::Certificate::Build                                   = Kernel::System::Console::Command::Maint::Certificate::Build
 Console::Command::Maint::ClientRegistration::List                             = Kernel::System::Console::Command::Maint::ClientRegistration::List
 Console::Command::Maint::ClientRegistration::Remove                           = Kernel::System::Console::Command::Maint::ClientRegistration::Remove
 Console::Command::Maint::ClientRegistration::SendNotifications                = Kernel::System::Console::Command::Maint::ClientRegistration::SendNotifications

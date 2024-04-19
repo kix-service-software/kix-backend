@@ -61,21 +61,37 @@ sub Search {
         }
     );
 
-    # OR-combine relevant fields with requested operator and value
-    for my $Field ( @{$AttributeMapping{$Param{Search}->{Field}}->{Fields}} ) {
-        push (
-            @{ $Search{OR} },
-            {
-                Field    => $Field,
-                Operator => $Param{Search}->{Operator},
-                Value    => $Param{Search}->{Value}
-            }
+    # check for needed joins
+    my @SQLJoin = ();
+    my $JoinFlag = 'JoinCertificate' . $Param{Search}->{Field};
+    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinFlag } // 'vfsp';
+    if ( !$Param{Flags}->{JoinMap}->{ $JoinFlag } ) {
+        my $Count = $Param{Flags}->{CertificateJoinCounter}++;
+        $TableAlias .= $Count;
+        push(
+            @SQLJoin,
+            "INNER JOIN virtual_fs_preferences $TableAlias ON $TableAlias.virtual_fs_id = vfs.id",
+            "AND $TableAlias.preferences_key IN ('Subject','Email')"
         );
+
+        $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;
     }
+
+    # prepare condition
+    my $Condition = $Self->_GetCondition(
+        Operator        => $Param{Search}->{Operator},
+        Column          => "$TableAlias.preferences_value",
+        Value           => $Param{Search}->{Value},
+        Silent          => $Param{Silent},
+        CaseInsensitive => 1,
+        NULLValue       => 1
+    );
+    return if ( !$Condition );
 
     # return search def
     return {
-        Search => \%Search,
+        Join  => \@SQLJoin,
+        Where => [ $Condition ]
     };
 }
 

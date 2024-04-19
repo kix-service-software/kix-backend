@@ -1,0 +1,59 @@
+# --
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+package Kernel::System::Console::Command::Maint::Certificate::Build;
+
+use strict;
+use warnings;
+
+use base qw(Kernel::System::Console::BaseCommand);
+
+our @ObjectDependencies = (
+    'Certificate',
+);
+
+sub Configure {
+    my ( $Self, %Param ) = @_;
+
+    $Self->Description('Build .');
+
+    return;
+}
+
+sub Run {
+    my ( $Self, %Param ) = @_;
+
+    $Self->Print("<yellow>building certificates...</yellow>\n");
+
+    my $Success = $Kernel::OM->Get('Certificate')->CertificateToFS();
+
+    if ( $Success ) {
+        $Self->Print("<green>Done.</green>\n");
+
+        return $Self->ExitCodeOk();
+    }
+
+     $Self->Print("<red>Error.</red>\n");
+    return $Self->ExitCodeError();
+}
+
+1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the KIX project
+(L<https://www.kixdesk.com/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
+LICENSE-GPL3 for license information (GPL3). If you did not receive this file, see
+
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+=cut
