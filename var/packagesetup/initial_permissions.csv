@@ -197,6 +197,7 @@
 "System Admin";"Resource";"/session";"x";"x";"x";"x";
 "System Admin";"Resource";"/contacts";"x";"x";"x";"x";
 "System Admin";"Resource";"/organisations";;"x";"x";;
+"System Admin";"Resource";"/certificate";x;"x";"x";x;
 "System Admin";"Object";"/*{}";"x";"x";"x";"x";
 "System Admin";"Property";"/*{}";"x";"x";"x";"x";
 "Superuser";"Resource";"/*";"x";"x";"x";"x";
