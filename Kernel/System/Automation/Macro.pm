@@ -669,8 +669,15 @@ sub MacroExecute {
         return 1;
     }
 
+    my $ObjectIDString = $Param{ObjectID};
+    if ( IsHashRef($Param{ObjectID}) || IsArrayRef($Param{ObjectID}) ) {
+        $ObjectIDString = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{ObjectID},
+        );
+    }
+
     $Self->LogInfo(
-        Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}}))." macro actions on ObjectID $Param{ObjectID}.",
+        Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}})).' macro actions on ObjectID "'.$ObjectIDString.'".',
         UserID   => $Param{UserID},
     );
 

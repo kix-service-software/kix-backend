@@ -178,6 +178,72 @@ foreach my $MinimumLogLevel ( qw( error notice info debug) ) {
     }
 }
 
+my @ObjectIDTests = (
+    {
+        Test     => 'ObjectIDIsScalar',
+        ObjectID => 'ObjectIDIsScalar',
+    },
+    {
+        Test     => 'ObjectIDIsHashRef',
+        ObjectID => {
+            WhatIsIt => 'ObjectIDIsHashRef'
+        },
+    },
+    {
+        Test     => 'ObjectIDIsArrayRef',
+        ObjectID => [
+            'ObjectIDIsArrayRef'
+        ]
+    }
+);
+foreach my $Test ( @ObjectIDTests ) {
+    my $Result = $Kernel::OM->Get('Automation')->_Log(
+        Message  => "executing logging test \"$Test->{Test}\"",
+        Priority => 'error',
+        UserID   => 1,
+        Referrer => {
+            ObjectID => $Test->{ObjectID}
+        }
+    );
+    $Self->True(
+        $Result,
+        "logging test \"$Test->{Test}\" returns 1",
+    );
+
+    # check log entry
+    $Result = $Kernel::OM->Get('DB')->Prepare(
+        SQL   => 'SELECT object_id FROM automation_log ORDER BY id DESC',
+        Limit => 1,
+    );
+    $Self->True(
+        $Result,
+        "Prepare to get log entry from DB",
+    );
+
+    my $ObjectIDString = $Test->{ObjectID};
+    if ( IsHashRef($Test->{ObjectID}) || IsArrayRef($Test->{ObjectID}) ) {
+        $ObjectIDString = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Test->{ObjectID},
+        );
+    }
+
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
+        Columns => [ 'ObjectID' ],
+    );
+    $Self->Is(
+        $Data->[0]->{ObjectID},
+        $ObjectIDString,
+        "logged ObjectID",
+    );
+
+    # data found...
+    my @Result;
+    if ( IsArrayRefWithData($Data) ) {
+        @Result = @{$Data};
+    }
+
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 
