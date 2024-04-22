@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "CertificateResponse.json",
+  "type": "object",
+  "description": "A response for a certificate GET request.",
+  "properties": {
+    "Channel": {
+      "$ref": "Certificate.json"
+    }
+  },
+  "required": [
+    "Certificate"
+  ]
+}

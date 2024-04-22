@@ -46,8 +46,9 @@ sub new {
 
     $Self->{Debug} = $Param{Debug} || 0;
 
-    $Self->{CacheType} = 'Certificate';
-    $Self->{CacheTTL}  = 60 * 60 * 24;
+    $Self->{CacheType}   = 'Certificate';
+    $Self->{OSCacheType} = 'ObjectSearch_ertificate';
+    $Self->{CacheTTL}    = 60 * 60 * 24;
 
     return 0 if !$Self->_Init();
 
@@ -160,6 +161,9 @@ sub CertificateCreate {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -184,7 +188,6 @@ get a local certificate
 
     $Certificate = {
         Email           => "selfsigned@example.de",
-        EndDate         => "Jun  1 14:41:34 2030 GMT",
         FileID          => "4",
         Filename        => "KIX_Cert_4",
         Fingerprint     => "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
@@ -192,9 +195,8 @@ get a local certificate
         Issuer          => "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
         Modulus         => "9B383D6A49187936214BD3AAF55F9334AA94B42E66BA63021594F056B19E46D21DBFE9868C25AD14C67836E82497DCE5B1F7CB8CF3F253883428EE105E447CA3765BD4D172FB5AF2C3A3A5A6B4FDCA12B5ECC96D7263FB303C48DD8E3D45355D336885D81F0F618CF0D6B3748C7E76B59CD49A6ACDFE9B4DADC65BB1045D8027D416D03520D7F8CB14D05D76D2DECA334811A5747CB5C9632AFDAFFB867D3A9B61775DC8BCE3632AC8E6E247C7F8BACACAE7E6F1B745C8FD0132DF823607D5468A15844BCB643389C50B215D62B8C1B0DBB8F4FB265ED178F0015212494A243124A69F500F72F6DEEF0ACC7FB3196E2DED7BD76A6B743F8B74031A7C3EFA3991421411FA42AFBE8ABE062180BAAC0E9F7CF0E65A8D480DA17BD800935F38A510DF7C87838B014A134DF4371D8C3CA4B2AA93673F3E46698DDB1D2BAF691FB0C68992D96F4F1F83A14D7B9006B609E15FC5D7B68BB7FB1895473E33AF3A113EC85D439026665A277E4AA97C08400CAAD36533C63565670777D2FD77D824089DE74685217236A0DAC0B9066FC274B90A9F8D9F357D8FA08E10A3CB38139881D883DFFADEB6BCA678757155333FB9C9A7523986DEA2539CDE8209E8820480D1E56385333720914BED77BDC1707D3453E9ED24D5BAA81F06EFA0F551C7D58D2DC6BF59D78D222C23D5BC583284515286B48DD5120EF76DE2B6C7F08DA1A94A6A795B",
         Serial          => "0B9444A6464EE36AC4B6BACD1F7FBC786295FB05",
-        ShortEndDate    => "2030-06-01",
-        ShortStartDate  => "2020-06-03",
-        StartDate       => "Jun  3 14:41:34 2020 GMT",
+        StartDate       => "2020-06-03 14:41:34",
+        EndDate         => "2030-06-01 14:41:34",
         Subject         => "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
         Type            => "Cert"
         Content         => 'some base64 content'
@@ -366,6 +368,9 @@ sub CertificateDelete {
 
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType}
     );
 
     # push client callback event
@@ -814,13 +819,15 @@ sub _FetchAttributes {
 
     for my $DateType ( 'StartDate', 'EndDate' ) {
         next if !$AttributesRef->{$DateType};
+
         my @Date = $AttributesRef->{$DateType} =~ /(.+?)\s(.+?)\s(\d\d:\d\d:\d\d)\s(\d\d\d\d)/sm;
 
         next if !@Date || scalar(@Date) < 4;
 
-        my $D = sprintf('%02d', $Date[1]);
-        my $M = q{};
-        my $Y = $Date[3];
+        my $D    = sprintf('%02d', $Date[1]);
+        my $M    = q{};
+        my $Y    = $Date[3];
+        my $Time = $Date[2];
 
         MONTH_KEY:
         for my $MonthKey ( sort keys %Month ) {
@@ -829,7 +836,7 @@ sub _FetchAttributes {
                 last MONTH_KEY;
             }
         }
-        $AttributesRef->{"Short$DateType"} = "$Y-$M-$D";
+        $AttributesRef->{$DateType} = "$Y-$M-$D $Time";
     }
 
     if (
