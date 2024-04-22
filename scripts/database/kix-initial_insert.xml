@@ -7398,7 +7398,7 @@ DefaultValue:
     <Data Key="role_id">2</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/certificate]]></Data>
-    <Data Key="value">15</Data>
+    <Data Key="value">11</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
