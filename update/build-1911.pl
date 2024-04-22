@@ -47,7 +47,9 @@ sub _AddNewPermissions {
             Role   => 'System Admin',
             Type   => 'Resource',
             Target => '/certificate',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{CRUD},
+            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
+                + Kernel::System::Role::Permission::PERMISSION->{CREATE}
+                + Kernel::System::Role::Permission::PERMISSION->{DELETE},
         }
     );
 
