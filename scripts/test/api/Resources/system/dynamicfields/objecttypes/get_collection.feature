@@ -16,7 +16,7 @@ Feature: GET request to the /system/dynamicfields/objecttypes resource
     And the response contains the following items of type DynamicFieldObject
       | Name         | DisplayName  |
       | Contact      | Contact      |
-      | FAQArticle   | FAQ          |
+      | FAQArticle   | FAQArticle   |
       | Organisation | Organisation |
       | Ticket       | Ticket       |
 
@@ -24,7 +24,7 @@ Feature: GET request to the /system/dynamicfields/objecttypes resource
     When I get a collection of dynamicfield objecttypes with filter "FAQArticle"
     Then the response code is 200
     And the response contains the following items of type DynamicFieldObject
-      | Name         | DisplayName  |
-      | FAQArticle   | FAQ          |
+      | Name         | DisplayName |
+      | FAQArticle   | FAQArticle  |
 
     

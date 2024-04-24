@@ -35,3 +35,22 @@ When qr/I query the collection of valid\s*$/, sub {
    );
 };
 
+Then qr/the valid output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{Valid};
+   my @AttributeValue =( "valid", "invalid", "invalid-temporarily" );
+
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+
+         }
+         else{
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};

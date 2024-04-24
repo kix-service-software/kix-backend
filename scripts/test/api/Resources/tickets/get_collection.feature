@@ -63,7 +63,6 @@ Feature: GET request to the /tickets resource
     Given 20 of tickets
     When I query the collection of tickets with multiplesort by "Ticket.PriorityID:numeric,Ticket.QueueID:numeric"
     Then the response code is 200
-    Then the response content is
 #    And the response contains 35 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204

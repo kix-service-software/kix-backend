@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use Net::SMTP;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE SSL_VERIFY_PEER );
 
 use base qw(Kernel::System::Email::SMTP);
 
@@ -56,7 +57,7 @@ sub _Connect {
         Timeout         => 30,
         Debug           => $Param{SMTPDebug},
         SSL             => 1,
-        SSL_verify_mode => 0,
+        SSL_verify_mode => $Param{SSLVerify} ? SSL_VERIFY_PEER : SSL_VERIFY_NONE,
     );
 
     return $SMTP;

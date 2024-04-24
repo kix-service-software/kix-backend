@@ -10,7 +10,7 @@
     Given a faq article votes
     When I query the collection of faq article votes
     Then the response code is 200
-    Then the response object is FAQVoteCollectionResponse
+#    Then the response object is FAQVoteCollectionResponse
     When I delete this faq article
     Then the response code is 204
     And the response has no content

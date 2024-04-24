@@ -33,20 +33,22 @@ my %Data = (
     OrganisationNumber => 'TicketCreateOrganisation',
     UserLogin          => 'TicketCreate',
     Priority           => '5 very low',
-    State              => 'closed',
+    State              => 'pending reminder',
+    PendingTimeDiff    => '600',
     Team               => 'Junk',
     Type               => 'Unclassified',
     Title              => 'TicketCreate_SourceTicket',
 
     DFSelectionName => 'TicketCreateSelection',
-    DFSelection_PossibleValues => {
+    DFSelectionPossibleValues => {
         Key1 => "Value1",
         Key2 => "Value2",
         Key3 => "Value3"
     },
-    DFSelection_Value => ['Key1', 'Key2'],
+    DFSelectionValue => ['Key1', 'Key2'],
 
-    DFTextName => 'TicketCreateText'
+    DFTextName => 'TicketCreateText',
+    DFTextValue => '300'
 );
 
 my ($ContactID, $OrgID, $UserID);
@@ -99,7 +101,9 @@ if ($Success) {
         );
 
         if ($MacroID) {
-            my @DFValue = map{ [$Data{DFSelectionName}, $_] } @{$Data{DFSelection_Value}};
+            my @DFValue = map{ [$Data{DFSelectionName}, $_] } @{$Data{DFSelectionValue}};
+            push(@DFValue, [$Data{DFTextName},$Data{DFTextValue}]);
+
             my $MacroActionID = $AutomationObject->MacroActionAdd(
                 MacroID    => $MacroID,
                 Type       => 'TicketCreate',
@@ -109,6 +113,7 @@ if ($Success) {
                     OwnerLoginOrID         => $Data{UserLogin},
                     Priority               => $Data{Priority},
                     State                  => $Data{State},
+                    PendingTimeDiff        => $Data{PendingTimeDiff},
                     Title                  => $Data{Title},
                     Team                   => $Data{Team},
                     Type                   => $Data{Type},
@@ -140,6 +145,9 @@ if ($Success) {
                         'MacroUpdate - ExecOrder',
                     );
 
+                    # get system time arround potential target pending time
+                    my @PendingTimeUnix = ( $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} );
+
                     $Success = $AutomationObject->MacroExecute(
                         ID       => $MacroID,
                         # ObjectID => $TicketID, # no object id
@@ -150,13 +158,16 @@ if ($Success) {
                         'MacroExecute (source ticket)',
                     );
 
+                    push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} );
+
+                    my $SourceTicketID = $AutomationObject->{MacroResults}->{NewTicketID};
                     $Self->True(
-                        $AutomationObject->{MacroResults}->{NewTicketID},
+                        $SourceTicketID,
                         'Ticket created and ID in results (source ticket)',
                     );
-                    if ($AutomationObject->{MacroResults}->{NewTicketID}) {
+                    if ($SourceTicketID) {
                         my %SourceTicket = $TicketObject->TicketGet(
-                            TicketID      => $AutomationObject->{MacroResults}->{NewTicketID},
+                            TicketID      => $SourceTicketID,
                             DynamicFields => 1,
                             UserID        => 1,
                             Silent        => 1
@@ -176,6 +187,11 @@ if ($Success) {
                                 $SourceTicket{StateID},
                                 $StateID,
                                 'Check state (source ticket)'
+                            );
+                            $Self->ContainedIn(
+                                $SourceTicket{PendingTimeUnix},
+                                \@PendingTimeUnix,
+                                'Check pending time (source ticket)'
                             );
                             $Self->Is(
                                 $SourceTicket{QueueID},
@@ -216,8 +232,26 @@ if ($Success) {
                                 );
                                 $Self->IsDeeply(
                                     $SelectionValue,
-                                    $Data{DFSelection_Value},
-                                    'Check selection DF (source ticket)'
+                                    $Data{DFSelectionValue},
+                                    'Check selection DF value (source ticket)'
+                                );
+                            }
+
+                            my $TestValue = $SourceTicket{'DynamicField_'.$Data{DFTextName}};
+                            $Self->True(
+                                IsArrayRefWithData($TestValue) ? 1 : 0,
+                                'Check text DF (source ticket)'
+                            );
+                            if (IsArrayRefWithData($TestValue)) {
+                                $Self->Is(
+                                    scalar(@{$TestValue}),
+                                    1,
+                                    'Check text DF (source ticket)'
+                                );
+                                $Self->Is(
+                                    $TestValue->[0],
+                                    $Data{DFTextValue},
+                                    'Check text DF value (source ticket)'
                                 );
                             }
                         }
@@ -232,6 +266,7 @@ if ($Success) {
                             OwnerLoginOrID         => '<KIX_TICKET_OwnerID>',
                             Priority               => '<KIX_TICKET_Priority>',
                             State                  => '<KIX_TICKET_State>',
+                            PendingTimeDiff        => "<KIX_TICKET_DynamicField_$Data{DFTextName}_ObjectValue_0>",
                             Title                  => '<KIX_TICKET_Title> clone',
                             Team                   => '<KIX_TICKET_Queue>',
                             Type                   => '<KIX_TICKET_Type>',
@@ -242,7 +277,10 @@ if ($Success) {
                             Body => 'some body for TicketCreate test'
                         }
                     );
-                    my $SourceTicketID = $AutomationObject->{MacroResults}->{NewTicketID};
+
+                    # get system time arround potential target pending time
+                    @PendingTimeUnix = ( $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} );
+
                     $Success = $AutomationObject->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $SourceTicketID, # use previous created ticket
@@ -252,18 +290,22 @@ if ($Success) {
                         $Success,
                         'MacroExecute (clone ticket)'
                     );
+
+                    push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} );
+
+                    my $CloneTicketID = $AutomationObject->{MacroResults}->{NewTicketID};
                     $Self->True(
-                        $AutomationObject->{MacroResults}->{NewTicketID},
+                        $CloneTicketID,
                         'Ticket created and ID in results (clone ticket)'
                     );
                     $Self->IsNot(
                         $SourceTicketID,
-                        $AutomationObject->{MacroResults}->{NewTicketID},
+                        $CloneTicketID,
                         'clone ticket create'
                     );
-                    if ($AutomationObject->{MacroResults}->{NewTicketID}) {
+                    if ($CloneTicketID) {
                         my %CloneTicket = $TicketObject->TicketGet(
-                            TicketID      => $AutomationObject->{MacroResults}->{NewTicketID},
+                            TicketID      => $CloneTicketID,
                             DynamicFields => 1,
                             UserID        => 1,
                             Silent        => 1
@@ -283,6 +325,11 @@ if ($Success) {
                                 $CloneTicket{StateID},
                                 $StateID,
                                 'Check state (clone ticket)'
+                            );
+                            $Self->ContainedIn(
+                                $CloneTicket{PendingTimeUnix},
+                                \@PendingTimeUnix,
+                                'Check pending time (clone ticket)'
                             );
                             $Self->Is(
                                 $CloneTicket{QueueID},
@@ -323,7 +370,7 @@ if ($Success) {
                                 );
                                 $Self->IsDeeply(
                                     $SelectionValue,
-                                    $Data{DFSelection_Value},
+                                    $Data{DFSelectionValue},
                                     'Check selection DF (clone ticket)'
                                 );
                             }
@@ -341,7 +388,7 @@ if ($Success) {
                                 );
                                 $Self->Is(
                                     $TextValue->[0],
-                                    'KEYS: '. join('#', @{ $Data{DFSelection_Value} }),
+                                    'KEYS: '. join('#', @{ $Data{DFSelectionValue} }),
                                     'Check text DF (clone ticket)'
                                 );
                             }
@@ -402,14 +449,14 @@ sub _AddObjects {
                 CountDefault => 0,
                 ItemSeparator => q{#},
                 DefaultValue => undef,
-                PossibleValues => $Data{DFSelection_PossibleValues}
+                PossibleValues => $Data{DFSelectionPossibleValues}
         },
         ValidID => 1,
         UserID  => 1
     );
     $Self->True(
         $SelectionDFID,
-        '_AddObjectss - create selection dynamic field'
+        '_AddObjects - create selection dynamic field'
     );
     return if (!$SelectionDFID);
 
@@ -430,7 +477,7 @@ sub _AddObjects {
     );
     $Self->True(
         $TextDFID,
-        '_AddObjectss - create text dynamic field'
+        '_AddObjects - create text dynamic field'
     );
     return if (!$TextDFID);
 

@@ -1,0 +1,9 @@
+{
+    "VirtualFS": {
+        "FileID": 2,
+        "Filename": "Example.pdf",
+        "Filesize": "5 Mb",
+        "FilesizeRaw": 5242880,
+        "Content": "base64-Content"
+    }
+}

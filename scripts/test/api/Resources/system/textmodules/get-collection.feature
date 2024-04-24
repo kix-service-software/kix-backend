@@ -8,6 +8,7 @@
   Scenario: get the list of textmodules
     When I query the collection of textmodules with filter of Anrede
     Then the response code is 200
+#    And the response object is TextModuleCollectionResponse
 
   Scenario: get the list of textmodules with filter
     When I query the collection of textmodules with filter of Anrede

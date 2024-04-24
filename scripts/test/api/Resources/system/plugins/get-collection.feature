@@ -8,5 +8,5 @@
   Scenario: get the list of existing plugins
     When I query the collection of plugins
     Then the response code is 200
-
+#    Then the response object is PluginCollectionResponse
 

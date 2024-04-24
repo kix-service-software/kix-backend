@@ -8,7 +8,7 @@ Feature: POST request to the /system/users resource
   Scenario: added a user
      When added a user
      Then the response code is 201
-#     Then the response object is UserPostPatchResponse
+     Then the response object is UserPostPatchResponse
 
   Scenario: added a user with roles
      When added a user with roles

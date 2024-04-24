@@ -94,34 +94,6 @@ sub new {
         %Param,
     );
 
-    return $Self if !eval "require IPC::SysV";    ## no critic
-
-    # create the IPC options
-    $Self->{IPCKey} = '444423' . $SystemID;       # This name is used to identify the shared memory segment.
-    $Self->{IPCSize} = $ConfigObject->Get('LogSystemCacheSize') || 32 * 1024;
-
-    # init session data mem
-    if ( !eval { $Self->{IPCSHMKey} = shmget( $Self->{IPCKey}, $Self->{IPCSize}, oct(1777) ) } ) {
-
-        # If direct creation fails, try more gently, allocate a small segment first and the reset/resize it.
-        $Self->{IPCSHMKey} = shmget( $Self->{IPCKey}, 1, oct(1777) );
-        if ( !shmctl( $Self->{IPCSHMKey}, 0, 0 ) ) {
-            $Self->Log(
-                Priority => 'error',
-                Message  => "Can't remove shm for log: $!",
-            );
-            return;
-        }
-
-        # Re-initialize SHM segment.
-        $Self->{IPCSHMKey} = shmget( $Self->{IPCKey}, $Self->{IPCSize}, oct(1777) );
-    }
-
-    return if !$Self->{IPCSHMKey};
-
-    # Only flag IPC as active if everything worked well.
-    $Self->{IPC} = 1;
-
     return $Self;
 }
 
@@ -265,17 +237,6 @@ sub Log {
         }
     }
 
-    # write shm cache log
-    if ( lc $Priority ne 'debug' && $Self->{IPC} ) {
-
-        $Priority = lc $Priority;
-
-        my $Data   = localtime() . ";;$Priority;;$Self->{LogPrefix};;$Message\n";    ## no critic
-        my $String = $Self->GetLog();
-
-        shmwrite( $Self->{IPCSHMKey}, $Data . $String, 0, $Self->{IPCSize} ) || die $!;
-    }
-
     return 1;
 }
 
@@ -297,31 +258,6 @@ sub GetLogEntry {
     my $Index = $Param{Index} || -1;
 
     return $Self->{ lc $Param{Type} }->{ $Param{What} }[$Index] || '';
-}
-
-=item GetLog()
-
-to get the tmp log data (from shared memory - ipc) in csv form
-
-    my $CSVLog = $LogObject->GetLog();
-
-=cut
-
-sub GetLog {
-    my ( $Self, %Param ) = @_;
-
-    my $String = '';
-    if ( $Self->{IPC} ) {
-        shmread( $Self->{IPCSHMKey}, $String, 0, $Self->{IPCSize} ) || die "$!";
-    }
-
-    # Remove \0 bytes that shmwrite adds for padding.
-    $String =~ s{\0}{}smxg;
-
-    # encode the string
-    $Kernel::OM->Get('Encode')->EncodeInput( \$String );
-
-    return $String;
 }
 
 =item GetNumericLogLevel()
@@ -356,10 +292,6 @@ sub CleanUp {
     if ( $Self->{Backend}->can('CleanUp') ) {
         $Self->{Backend}->CleanUp();
     }
-
-    return 1 if !$Self->{IPC};
-
-    shmwrite( $Self->{IPCSHMKey}, '', 0, $Self->{IPCSize} ) || die $!;
 
     return 1;
 }

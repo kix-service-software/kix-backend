@@ -8,6 +8,7 @@
   Scenario: get the list of existing organisations
     When I query the collection of organisations
     Then the response code is 200
+#    Then the response object is OrganisationCollectionResponse
     And the response contains the following items of type Organisation
       | Number  | Name            |
       | MY_ORGA | My Organisation |
@@ -17,3 +18,4 @@
     Then the DynamicField attributes are
       | DisplayValue     | DisplayValueShort |
       | Service Provider | Service Provider  |
+      

@@ -34,3 +34,13 @@ When qr/I get this organisation$/, sub {
       URL   => S->{API_URL}.'/organisations/'.S->{OrganisationID},
    );
 };
+
+When qr/I get this organisation (\d+) history$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/organisations/'.S->{OrganisationID}/history,
+   );
+};
+
+
+

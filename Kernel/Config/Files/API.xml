@@ -122,6 +122,7 @@
                 <Item Key="PrepareData.InvalidExpand">400</Item>
                 <Item Key="Provider.InternalError">500</Item>
                 <Item Key="SessionCreate.AuthFail">401:Authorization not possible, please contact the system administrator.</Item>
+                <Item Key="SessionCreate.PreAuthFail">400</Item>
                 <Item Key="Transport.InternalError">500</Item>
                 <Item Key="Transport.OperationNotFound">501</Item>
                 <Item Key="Transport.REST.DataMissing">400</Item>

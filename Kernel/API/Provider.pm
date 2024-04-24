@@ -162,7 +162,7 @@ sub Run {
     # use max length from config
     my $LengthFromConfig = $Kernel::OM->Get('Config')->Get('API::Provider::Transport::MaxLength');
     if (IsInteger($LengthFromConfig) && $LengthFromConfig) {
-        $Self->{TransportConfig}->{Config}->{MaxLength} = $LengthFromConfig;
+        $Self->{TransportConfig}->{MaxLength} = $LengthFromConfig;
     }
 
     # read request content

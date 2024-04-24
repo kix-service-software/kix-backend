@@ -65,8 +65,7 @@ sub _Replace {
     if ( !%Recipient && $Param{RecipientID} ) {
 
         %Recipient = $UserObject->GetUserData(
-            UserID        => $Param{RecipientID},
-            NoOutOfOffice => 1,
+            UserID => $Param{RecipientID},
         );
     }
 

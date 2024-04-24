@@ -113,7 +113,7 @@ sub Run {
         delete $ProfileData{ClientSecret};
 
         # check access token
-        my $Result= $Kernel::OM->Get('OAuth2')->HasToken(
+        my $Result= $Kernel::OM->Get('OAuth2')->HasAccessToken(
             ProfileID => $ProfileID
         );
         $ProfileData{HasAccessToken} = $Result ? 1 : 0;

@@ -8,7 +8,7 @@ Feature: GET request to the /system/roles/permissiontypes resource
   Scenario: get the list of permissiontypes 
     When I query the collection of roles permissiontypes
     Then the response code is 200
-#    And the response object is PermissionTypeCollectionResponse   
+    And the response object is PermissionTypeCollectionResponse
 
   Scenario: get the list of permissiontypes with filter 
     When I query the collection of roles permissiontypes with filter of Object

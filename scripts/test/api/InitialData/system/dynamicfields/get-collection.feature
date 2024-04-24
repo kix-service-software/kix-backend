@@ -9,12 +9,41 @@ Feature: GET request to the /system/dynamicfields resource
     When I query the collection of dynamicfields
     Then the response code is 200
 
+  Scenario Outline:get the list of existing dynamicfields name
+    When I query the collection of dynamicfields
+    Then the response code is 200
+    Then the dynamicfield output is "<Name>"
+
+    Examples:
+      | Name                         |
+      | AddressDomainPattern         |
+      | AffectedAsset                |
+      | MobileProcessingChecklist010 |
+      | MobileProcessingChecklist020 |
+      | MobileProcessingState        |
+      | PlanBegin                    |
+      | PlanEnd                      |
+      | RelatedAssets                |
+      | RiskAssumptionRemark         |
+      | Source                       |
+      | SysMonXAddress               |
+      | SysMonXAlias                 |
+      | SysMonXHost                  |
+      | SysMonXService               |
+      | SysMonXState                 |
+      | Type                         |
+      | WorkOrder                    |
+
+
+
+
   Scenario: get the list of existing dynamicfields
     When I query the collection of dynamicfields
     Then the response code is 200
-    Then the response contains 16 items of type "DynamicField"
+    Then the response contains 17 items of type "DynamicField"
     And the response contains the following items of type DynamicField
       | Name                         | Label                   | FieldTypeDisplayName    | FieldType               | ObjectType   | InternalField | CustomerVisible |
+      | AddressDomainPattern         | Pattern                 | Text                    | Text                    | Organisation | 1             | 0               |
       | AffectedAsset                | Affected Asset          | AssetReference          | ITSMConfigItemReference | Ticket       | 0             | 1               |
       | MobileProcessingChecklist010 | Checklist 01            | Checklist               | CheckList               | Ticket       | 0             | 0               |
       | MobileProcessingChecklist020 | Checklist 02            | Checklist               | CheckList               | Ticket       | 0             | 0               |
@@ -31,7 +60,6 @@ Feature: GET request to the /system/dynamicfields resource
       | SysMonXState                 | System State            | Text                    | Text                    | Ticket       | 0             | 0               |
       | Type                         | Type                    | Selection               | Multiselect             | Organisation | 0             | 0               |
       | WorkOrder                    | Work Order              | Textarea                | TextArea                | Ticket       | 0             | 0               |
-
 
 
 

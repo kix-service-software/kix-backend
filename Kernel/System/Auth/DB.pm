@@ -35,9 +35,6 @@ sub new {
     # Debug 0=off 1=on
     $Self->{Debug} = $Param{Config}->{Debug} || 0;
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     # get user table
     $Self->{UserTable} = $Param{Config}->{Table} || 'users';
     $Self->{UserTableUserID} = $Param{Config}->{Columns}->{ID} || 'id';
@@ -47,25 +44,13 @@ sub new {
     return $Self;
 }
 
-sub GetOption {
+sub GetAuthMethod {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{What} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need What!"
-        );
-        return;
-    }
-
-    # module options
-    my %Option = (
-        PreAuth => 0,
-    );
-
-    # return option
-    return $Option{ $Param{What} };
+    return {
+        Type    => 'LOGIN',
+        PreAuth => 0
+    };
 }
 
 sub Auth {

@@ -65,10 +65,12 @@ sub Search {
             ValueType => 'NUMERIC'
         },
         Organisation       => {
-            Column    => 'torg.name'
+            Column          => 'torg.name',
+            CaseInsensitive => 1
         },
         OrganisationNumber => {
-            Column    => 'torg.number'
+            Column          => 'torg.number',
+            CaseInsensitive => 1
         }
     );
 
@@ -87,12 +89,13 @@ sub Search {
 
     # prepare condition
     my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        NULLValue => 1,
-        Silent    => $Param{Silent}
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value           => $Param{Search}->{Value},
+        NULLValue       => 1,
+        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+        Silent          => $Param{Silent}
     );
     return if ( !$Condition );
 

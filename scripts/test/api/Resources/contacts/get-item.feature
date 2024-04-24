@@ -1,4 +1,4 @@
- Feature: GET request to the /contacts /:ContactID resource
+ Feature: GET request to the /contacts/:ContactID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__
@@ -18,3 +18,4 @@
     When I delete this organisation
     Then the response code is 204
     And the response has no content
+

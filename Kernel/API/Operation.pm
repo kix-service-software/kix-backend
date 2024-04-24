@@ -380,7 +380,7 @@ sub _CheckPermission {
                 Format => 'Short'
             );
 
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: $RequestedPermission, granted: %i, allowed permission: %s", $ResourceBase.$Resource, ($Granted || 0), $AllowedPermissionShort));
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("RequestURI: %s, requested permission: %s, granted: %i, allowed permission: %s (0x%04x)", $ResourceBase.$Resource, $RequestedPermission, ($Granted || 0), $AllowedPermissionShort, ($AllowedPermission||0)));
         }
 
         if ( $Granted ) {
@@ -398,7 +398,7 @@ sub _CheckPermission {
                 Value  => $AllowedPermission || 0,
                 Format => 'Short'
             );
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("altered RequestURI: %s, requested permission: $RequestedPermission, granted: " . ($Granted || 0) . ", allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $AllowedPermissionShort, ($AllowedPermission||0)));
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("altered RequestURI: %s, requested permission: %s, granted: %i, allowed permission: %s (0x%04x)", $Self->{AlteredRequestURI}, $RequestedPermission, ($Granted || 0), $AllowedPermissionShort, ($AllowedPermission||0)));
         }
     }
 
@@ -412,7 +412,7 @@ sub _CheckPermission {
     }
 
     $Self->{LevelIndent} = $OldLevelIndent;
-    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
 
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );

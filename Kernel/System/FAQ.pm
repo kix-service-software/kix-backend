@@ -1473,6 +1473,11 @@ sub FAQDelete {
         Type => $Self->{CacheType}
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     # delete all FAQ links of this FAQ article
     $Kernel::OM->Get('LinkObject')->LinkDeleteAll(
         Object => 'FAQ',
@@ -1501,6 +1506,11 @@ sub FAQDelete {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # push client callback event

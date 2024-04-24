@@ -14,7 +14,7 @@ Feature: POST request /organisations resource
 
   Scenario: added a organisation
     When added a organisation without number
-    Then the response code is 409
+    Then the response code is 400
     And the response object is Error
-    And the error code is "Object.AlreadyExists"
-    And the error message is "Cannot create organisation. Another organisation with same number already exists."
+    And the error code is "Object.UnableToCreate"
+    And the error message is "Could not create organisation, please contact the system administrator"

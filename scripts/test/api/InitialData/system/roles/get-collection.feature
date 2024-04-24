@@ -6,6 +6,35 @@ Feature: GET request to the /system/roles resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
+#  Scenario Outline: get the list of existing roles
+#    When I query the collection of roles
+#    Then the response code is 200
+#    Then the roles output is "<Name>"
+#
+#    Examples:
+#      | Name                         |
+#      | Agent User                   |
+#      | Asset Maintainer             |
+#      | Asset Reader                 |
+#      | Customer                     |
+#      | Customer Manager             |
+#      | Customer Reader              |
+#      | FAQ Admin                    |
+#      | FAQ Editor                   |
+#      | FAQ Reader                   |
+#      | Report Manager               |
+#      | Report User                  |
+#      | Superuser                    |
+#      | System Admin                 |
+#      | Textmodule Admin             |
+#      | Ticket Agent                 |
+#      | Ticket Agent Base Permission |
+#      | Ticket Agent (Servicedesk)   |
+#      | Ticket Agent (w/o teams)     |
+#      | Ticket Reader                |
+#      | Webform Ticket Creator       |
+
+
   Scenario: get the list of existing roles
     When I query the collection of roles
     Then the response code is 200

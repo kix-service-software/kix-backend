@@ -315,7 +315,6 @@ for my $Test (@Tests) {
 
         # (else) if not given a known orga and not new orga, ticket should has no orga at all
         else {
-print STDERR Data::Dumper::Dumper($Ticket{OrganisationID});
             $Self->False(
                 $Ticket{OrganisationID},
                 "$TestPrefix Check set organisation id (undef) $TestPostfix"

@@ -8,5 +8,5 @@
   Scenario: get an existing plugin
     When I get the plugin "KIXPro"
     Then the response code is 200
-#    Then the response content is
+
 

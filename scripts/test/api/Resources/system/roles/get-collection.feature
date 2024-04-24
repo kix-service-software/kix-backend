@@ -9,7 +9,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles
     When I query the collection of roles
     Then the response code is 200
-#    And the response object is RoleCollectionResponse
+    And the response object is RoleCollectionResponse
 
   Scenario: get the list of existing roles with filter
     When I query the collection of roles with filter of "Customer Manager"

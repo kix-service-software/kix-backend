@@ -30,27 +30,6 @@ sub new {
     return $Self;
 }
 
-sub GetOption {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{What} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need What!"
-        );
-        return;
-    }
-
-    # module options
-    my %Option = (
-        PreAuth => 0,
-    );
-
-    # return option
-    return $Option{ $Param{What} };
-}
-
 sub Auth {
     my ( $Self, %Param ) = @_;
 

@@ -34,3 +34,13 @@ When qr/I get this contact$/, sub {
       URL   => S->{API_URL}.'/contacts/'.S->{ResponseContent}->{ContactID},
    );
 };
+
+When qr/I get this contact (\d+) history$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/contacts/'.S->{ResponseContent}->{ContactID},
+   );
+};
+
+
+

@@ -40,9 +40,9 @@ sub GetSupportedAttributes {
             ValueType    => 'NUMERIC'
         },
         Contact => {
-            IsSearchable => 0,
+            IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => []
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
@@ -57,23 +57,39 @@ sub Search {
     my %AttributeMapping = (
         ContactID => {
             Column    => 'st.contact_id',
-            ValueType => 'NUMERIC'
+            ValueType => 'NUMERIC',
+        },
+        Contact => {
+            Column          => ['tcon.lastname','tcon.firstname'],
+            CaseInsensitive => 1
         },
     );
 
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Search}->{Field} eq 'Contact' ) {
+        if ( !$Param{Flags}->{JoinMap}->{TicketContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id' );
+
+            $Param{Flags}->{JoinMap}->{TicketContact} = 1;
+        }
+    }
+
     # prepare condition
     my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        NULLValue => 1,
-        Silent    => $Param{Silent}
+        Operator        => $Param{Search}->{Operator},
+        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        Value           => $Param{Search}->{Value},
+        NULLValue       => 1,
+        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+        Silent          => $Param{Silent}
     );
     return if ( !$Condition );
 
     # return search def
     return {
+        Join  => \@SQLJoin,
         Where => [ $Condition ]
     };
 }

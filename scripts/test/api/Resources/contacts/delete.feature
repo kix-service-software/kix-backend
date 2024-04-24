@@ -14,3 +14,5 @@ Feature: DELETE request /contacts/:ContactID resource
     When I delete this organisation
     Then the response code is 204
     And the response has no content
+    
+    

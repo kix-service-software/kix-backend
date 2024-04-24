@@ -6,10 +6,13 @@
     "properties": {
         "Token": {
             "type": "string",
+            "description": "response if UserLogin, NegitiationToken, or state is given",
+            "readOnly": true
+        },
+        "Data": {
+            "type": "object",
+            "description": "response if PreAuthRequest is given. Content depends on PreAuthRequest",
             "readOnly": true
         }
-    },
-    "required": [
-        "Token"
-    ]
+    }
 }

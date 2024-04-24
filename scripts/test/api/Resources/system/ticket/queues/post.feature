@@ -8,7 +8,7 @@ Feature: POST request to the /system/ticket/queues resource
   Scenario: added a ticket queue
     When added a ticket queue
     Then the response code is 201
-#    Then the response object is QueuePostPatchResponse
+    Then the response object is QueuePostPatchResponse
     When I delete this ticket queue
     Then the response code is 204
 

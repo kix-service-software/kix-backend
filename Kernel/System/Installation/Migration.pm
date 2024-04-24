@@ -33,6 +33,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    $Self->{Debug} = $Param{Debug} || $Kernel::OM->Get('Config')->Get('Migration::Debug');
+
     return $Self;
 }
 
@@ -68,9 +70,10 @@ sub MigrationSupportedTypeList {
         );
         return;
     }
-
+    
     $Kernel::OM->ObjectParamAdd(
         $SourceList->{$Param{Source}}->{Module} => {
+            Debug => $Self->{Debug},
             %Param,
         },
     );
@@ -128,6 +131,7 @@ sub CountMigratableObjects {
 
     $Kernel::OM->ObjectParamAdd(
         $SourceList->{$Param{Source}}->{Module} => {
+            Debug => $Self->{Debug},
             %Param,
         },
     );
@@ -161,12 +165,15 @@ migrate the data from another source
         MappingFile => 'mappings.json'  # optional
         Workers     => 4,               # optional, number of workers to used if something can be parallelly executed
         Async       => 1,               # optional, start migration as a background process
+        Debug       => 1,               # optional, enable debug output
     );
 
 =cut
 
 sub MigrationStart {
     my ( $Self, %Param ) = @_;
+
+    $Self->{Debug} ||=  $Param{Debug};
 
     my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
 
@@ -261,6 +268,7 @@ sub _MigrationStart {
 
     $Kernel::OM->ObjectParamAdd(
         $Param{BackendModule} => {
+            Debug => $Self->{Debug},
             %Param,
         },
         ClientRegistration => {
@@ -431,6 +439,10 @@ sub GetOIDMapping {
         return;
     }
 
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](GetOIDMapping) getting OID mapping (ObjectID=".($Param{ObjectID}||'').', SourceObjectID='.($Param{SourceObjectID}||'').')');
+    }
+
     # check whether we have a preloaded mapping
     my $PreloadedOIDMappings = $Kernel::OM->Get('Cache')->Get(
         Type           => 'MigrationOIDMapping',
@@ -440,9 +452,15 @@ sub GetOIDMapping {
     ); 
     if ( IsHashRefWithData($PreloadedOIDMappings) ) {
         if ( $Param{SourceObjectID} && $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}} ) {
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("[$Param{ObjectType}](GetOIDMapping) OID mapping: ".$PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}});
+            }
             return $PreloadedOIDMappings->{$Param{ObjectType}}->{SourceObjectID}->{$Param{SourceObjectID}};
         }
         elsif ( $Param{ObjectID} && $PreloadedOIDMappings->{$Param{ObjectType}}->{ObjectID}->{$Param{ObjectID}} ) {
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("[$Param{ObjectType}](GetOIDMapping) OID mapping: ".$PreloadedOIDMappings->{$Param{ObjectType}}->{ObjectID}->{$Param{ObjectID}});
+            }
             return $PreloadedOIDMappings->{$Param{ObjectType}}->{ObjectID}->{$Param{ObjectID}};
         }
     }
@@ -456,7 +474,12 @@ sub GetOIDMapping {
             Key  => $CacheKey,
             %{$Self->{CacheOptions}->{$Param{Source}}->{$Param{SourceID}}->{$Param{ObjectType}} || {}},
         );
-        return $Cache if $Cache;
+        if ( $Cache ) {
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("[$Param{ObjectType}](GetOIDMapping) OID mapping: $Cache");
+            }
+            return $Cache;
+        }
     }
 
     # get the mapped ID
@@ -494,7 +517,11 @@ sub GetOIDMapping {
             %{$Self->{CacheOptions}->{$Param{Source}}->{$Param{SourceID}}->{$Param{ObjectType}} || {}},
         ); 
     }
-    
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](GetOIDMapping) OID mapping: $ID");
+    }
+
     return $ID;
 }
 
@@ -510,6 +537,10 @@ sub CreateOIDMapping {
             );
             return;
         }
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](CreateOIDMapping) creating OID mapping (SourceObjectID=$Param{SourceObjectID}, ObjectID=$Param{ObjectID})");
     }
 
     my $AdditionalData;
@@ -531,6 +562,9 @@ sub CreateOIDMapping {
             Priority => 'error',
             Message  => "Unable to create object id mapping!"
         );
+        if ( $Self->{Debug} ) {
+            $Self->_Debug("[$Param{ObjectType}](CreateOIDMapping) unable to create OID mapping (SourceObjectID=$Param{SourceObjectID}, ObjectID=$Param{ObjectID})");
+        }
         return;
     }
 
@@ -549,6 +583,10 @@ sub ReplaceOIDMapping {
             );
             return;
         }
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](ReplaceOIDMapping) replacing OID mapping (SourceObjectID=$Param{SourceObjectID} => ObjectID=$Param{ObjectID})");
     }
 
     my $AdditionalData;
@@ -654,6 +692,23 @@ sub Lookup {
         return;
     }
 
+    my $Mapping = IsHashRefWithData($Param{Mapping}) ? $Param{Mapping}->{$Param{Table}} || {} : {};
+
+    if ( $Self->{Debug} ) {
+        my @AttrList;
+        foreach my $Attr ( @{$Param{RelevantAttr}} ) {
+            my $Value = $Param{Item}->{$Attr};
+            next if !defined $Value;
+
+            # map value if defined
+            $Value = $Mapping->{$Value} if $Mapping->{$Value};
+
+            push @AttrList, "$Attr=$Value";
+        }
+
+        $Self->_Debug("[$Param{Table}](Lookup) lookup in table (IgnoreCase=".($Param{IgnoreCase}||'').", PrimaryKey=$Param{PrimaryKey}, ".join(', ', @AttrList). ")");
+    }
+
     # check cache
     my $CacheType = 'MigrationLookup_'.$Param{Table};
     my $CacheKey  = join('::', values %Param);
@@ -663,12 +718,15 @@ sub Lookup {
             Key  => $CacheKey,
             %{$Self->{CacheOptions}->{$Param{Source}}->{$Param{SourceID}}->{$Param{Table}} || {}},
         );
-        return $Cache if $Cache;
+        if ( $Cache ) {
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("[$Param{Table}](Lookup) lookup found row ID: $Cache");
+            }
+            return $Cache;
+        }
     }
 
     my $DBObject = $Kernel::OM->Get('DB');
-
-    my $Mapping = IsHashRefWithData($Param{Mapping}) ? $Param{Mapping}->{$Param{Table}} || {} : {};
 
     # prepare select statement
     my @Bind;
@@ -699,7 +757,12 @@ sub Lookup {
         push @Result, $Row[0];
     }
 
-    return if @Result > 1;
+    if ( @Result > 1 ) {
+        if ( $Self->{Debug} ) {
+            $Self->_Debug("[$Param{Table}](Lookup) lookup found multiple rows - returning without success");
+        }
+        return;
+    }
 
     if ( $Result[0] && !$Param{NoOIDMapping} && ( $Param{Item}->{$Param{PrimaryKey}} || $Param{SourceObjectID} ) ) {
         # check if OID mapping exists and create one if not or replace it
@@ -739,7 +802,27 @@ sub Lookup {
         ); 
     }
 
+    if ( $Self->{Debug} ) {
+        if ( $Result[0] ) {
+            $Self->_Debug("[$Param{Table}](Lookup) lookup found row ID: $Result[0]");
+        }
+        else  { 
+            $Self->_Debug("[$Param{Table}](Lookup) lookup found nothing");
+        }
+    }
+
     return $Result[0];
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'debug',
+        Message  => "[Migration][$$] $Message"
+    );
 }
 
 1;

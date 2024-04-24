@@ -18,20 +18,23 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $TestUser    = $Helper->TestUserCreate(
+my $TestUser = $Helper->TestUserCreate(
     Roles => [
         'Ticket Agent'
     ]
 );
 
 my %User = $Kernel::OM->Get('User')->GetUserData(
-    User  => $TestUser
+    User => $TestUser
 );
 
 my $TestContactID = $Helper->TestContactCreate();
 
 my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $TestContactID
+);
+my %ContactUser = $Kernel::OM->Get('User')->GetUserData(
+    UserID => $Contact{AssignedUserID}
 );
 
 my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
@@ -90,6 +93,26 @@ for my $Attribute ( sort keys %Contact ) {
         );
     }
 }
+
+# check login
+push(
+    @UnitTests,
+    {
+        TestName  => "Placeholder: <KIX_CONTACT_UserLogin>",
+        TicketID  => $TicketID,
+        Test      => "<KIX_CONTACT_UserLogin>",
+        Expection => $ContactUser{UserLogin} || q{-},
+    }
+);
+push(
+    @UnitTests,
+    {
+        TestName  => "Placeholder: <KIX_CONTACT_Login>",
+        TicketID  => $TicketID,
+        Test      => "<KIX_CONTACT_Login>",
+        Expection => $ContactUser{UserLogin} || q{-},
+    }
+);
 
 # placeholder of KIX_ORG_
 for my $Attribute ( sort keys %Organisation ) {

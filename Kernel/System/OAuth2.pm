@@ -522,13 +522,159 @@ sub ProfileDelete {
     return 1;
 }
 
+=item StateAdd()
+
+add new oauth2 state
+
+    my $State = $OAuth2Object->StateAdd(
+        ProfileID   => '123',
+        TokenType   => 'access_token',
+        URLRedirect => 'URL Redirect',      # optional, fallback to URLRedirect of profile
+        StateData   => {},                  # optional, hash with additional data
+    );
+
+=cut
+
+sub StateAdd {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ProfileID TokenType)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my %Profile = $Self->ProfileGet(
+        ID => $Param{ProfileID},
+    );
+    return if ( !%Profile );
+
+    # create a random string to prevent cross-site requests.
+    my $State = $Kernel::OM->Get('Main')->GenerateRandomString(
+        Length => 32,
+    );
+
+    # prepare state data
+    if ( ref( $Param{StateData} ) ne 'HASH' ) {
+        $Param{StateData} = {};
+    }
+    my %StateData = (
+        %{ $Param{StateData} },
+        ProfileID   => $Param{ProfileID},
+        TokenType   => $Param{TokenType},
+        URLRedirect => $Param{URLRedirect} || $Profile{URLRedirect}
+    );
+    if ( $Param{Nonce} ) {
+        $StateData{Nonce} = $Param{Nonce};
+    }
+
+    # remember state in cache for 15minutes
+    $Kernel::OM->Get('Cache')->Set(
+        Type           => $Self->{CacheType},
+        TTL            => ( 15 * 60 ),
+        Key            => "State::$State",
+        Value          => \%StateData,
+        CacheInMemory  => 0,                                            # Cache in Backend only to enforce TTL
+        CacheInBackend => 1,
+        NoStatsUpdate  => 1
+    );
+
+    return $State;
+}
+
+=item StateGet()
+
+get state data
+
+    my $StateData = $OAuth2Object->StateGet(
+        State  => 'State',
+    );
+
+returns
+
+    my $StateData = {
+        ProfileID   => 123,
+        TokenType   => "access_token",
+        URLRedirect => 'URL Redirect',
+        ...
+    };
+
+=cut
+
+sub StateGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(State)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # get state data from cache
+    my $StateDataRef = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => "State::$Param{State}",
+    );
+
+    return $StateDataRef;
+}
+
+=head2 StateDelete()
+
+Delete state.
+
+    my $Success = $OAuth2Object->StateDelete(
+        State => 'State',
+    );
+
+=cut
+
+sub StateDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(State)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # forget state
+    $Kernel::OM->Get('Cache')->Delete(
+        Type => $Self->{CacheType},
+        Key  => "State::$Param{State}",
+    );
+
+    return 1;
+}
+
+
+
 =head2 PrepareAuthURL()
 
 Build the URL to request an authorization code.
 
 Example:
     my $AuthURL = $OAuth2Object->PrepareAuthURL(
-        ProfileID => 123,
+        ProfileID   => 123,
+        TokenType   => 'access_token',          # optional, default 'access_token'
+        URLRedirect => 'redirect url',          # optional, override URLRedirect from profile
+        Nonce       => 1,                       # optional, generate nonce for request
+        StateData   => {...},                   # optional, addition state data
     );
 
 returns
@@ -542,42 +688,58 @@ sub PrepareAuthURL {
 
 ### Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
     # check needed stuff
-    if ( !$Param{ProfileID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need ProfileID!"
-        );
-        return;
+    for (qw(ProfileID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
     }
 
     my %Profile = $Self->ProfileGet(
         ID => $Param{ProfileID},
     );
-    return if !%Profile;
+    return if ( !%Profile );
 
-    # Create a random string to prevent cross-site requests.
-    my $RandomString = $Kernel::OM->Get('Main')->GenerateRandomString(
-        Length => 32,
-    );
+    # use provided redirect url or fallback to profile
+    my $URLRedirect = $Param{URLRedirect} || $Profile{URLRedirect};
 
-    # set state token for profile
-    my $Success = $Self->_TokenAdd(
-        ProfileID => $Param{ProfileID},
-        TokenType => 'state',
-        Token     => $RandomString,
-    );
-    if ( !$Success ) {
-        return;
+    # fallback to access_token if not defined
+    if ( !defined( $Param{TokenType} ) ) {
+        $Param{TokenType} = 'access_token';
     }
+
+    # generate nonce, when requested
+    my $Nonce;
+    if ( $Param{Nonce} ) {
+        $Nonce = $Kernel::OM->Get('Main')->GenerateRandomString(
+            Length => 32,
+        );
+    }
+
+    # create state
+    my $State = $Self->StateAdd(
+        ProfileID   => $Param{ProfileID},
+        TokenType   => $Param{TokenType},
+        URLRedirect => $URLRedirect,
+        StateData   => $Param{StateData},
+        Nonce       => $Nonce,
+    );
+    return if ( !$State );
 
     # build authorization url
     my $URL = URI->new( $Profile{URLAuth} );
     $URL->query_param_append( 'client_id',     $Profile{ClientID} );
     $URL->query_param_append( 'scope',         $Profile{Scope} );
-    $URL->query_param_append( 'redirect_uri',  $Profile{URLRedirect} );
+    $URL->query_param_append( 'redirect_uri',  $URLRedirect );
     $URL->query_param_append( 'response_type', 'code' );
     $URL->query_param_append( 'response_mode', 'query' );
-    $URL->query_param_append( 'state',         $RandomString );
+    $URL->query_param_append( 'state',         $State );
+    if ( $Nonce ) {
+        $URL->query_param_append( 'nonce', $Nonce );
+    }
 ### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2021 Rother OSS GmbH, https://otobo.de/ ###
 
     return $URL->as_string();
@@ -585,17 +747,17 @@ sub PrepareAuthURL {
 
 =head2 ProcessAuthCode()
 
-Build the URL to request an authorization code.
+Process the provided code and state.
 
 Example:
-    my $ProfileID = $OAuth2Object->ProcessAuthCode(
+    my ( $ProfileID, $Token ) = $OAuth2Object->ProcessAuthCode(
         AuthCode => 'iLjCNtwdbGTF3WyBuJPeT3uJA8njrQEi',
         State    => 'mrgMqBWueEKYufTcLgQXeCYLzxHw6695'
     );
 
 returns
 
-    my $ProfileID = 123;
+    my ( $ProfileID, $Token ) = ( 123, 'iLjCNtwueEKYufTcLgQXeCYJA8njrQEi' );
 
 =cut
 
@@ -613,12 +775,16 @@ sub ProcessAuthCode {
         }
     }
 
-    # get matching profile
-    my $ProfileID = $Self->_TokenLookup(
-        TokenType => 'state',
-        Token     => $Param{State},
+    # get state data
+    my $StateData = $Self->StateGet(
+        State => $Param{State}
     );
-    if ( !$ProfileID ) {
+    if (
+        ref( $StateData ) ne 'HASH'
+        || !$StateData->{ProfileID}
+        || !$StateData->{TokenType}
+        || !$StateData->{URLRedirect}
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Could not find profile for provided state!"
@@ -626,22 +792,24 @@ sub ProcessAuthCode {
         return;
     }
 
-    # delete token of profile
-    $Self->_TokenDelete(
-        ProfileID => $ProfileID,
+    # forget state
+    $Self->StateDelete(
+        State => $Param{State}
     );
 
     # request token with authorization code
-    my $AccessToken = $Self->RequestAccessToken(
-        ProfileID => $ProfileID,
-        GrantType => 'authorization_code',
-        Code      => $Param{AuthCode},
+    my $Token = $Self->RequestToken(
+        ProfileID   => $StateData->{ProfileID},
+        TokenType   => $StateData->{TokenType},
+        URLRedirect => $StateData->{URLRedirect},
+        GrantType   => 'authorization_code',
+        Code        => $Param{AuthCode},
     );
-    if ( !$AccessToken ) {
+    if ( !$Token ) {
         return;
     }
 
-    return $ProfileID;
+    return ( $StateData->{ProfileID}, $Token );
 }
 
 =head2 GetAccessToken()
@@ -675,8 +843,9 @@ sub GetAccessToken {
     return $Token if $Token;
 
     # Get an access and refresh token.
-    my $AccessToken = $Self->RequestAccessToken(
+    my $AccessToken = $Self->RequestToken(
         ProfileID => $Param{ProfileID},
+        TokenType => 'access_token',
         GrantType => 'refresh_token'
     );
     return if !$AccessToken;
@@ -684,12 +853,12 @@ sub GetAccessToken {
     return $AccessToken;
 }
 
-=head2 HasToken()
+=head2 HasAccessToken()
 
-Request a valid access token for the profile
+Check if profile has a valid access_token, or at least a refresh_token
 
 Example:
-    my $Result = $OAuth2Object->HasToken(
+    my $Result = $OAuth2Object->HasAccessToken(
         ProfileID => 123,
         Silent    => 0       # Optional: No error if tokens not found
     )
@@ -698,7 +867,7 @@ Example:
 
 =cut
 
-sub HasToken {
+sub HasAccessToken {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -716,12 +885,6 @@ sub HasToken {
         Key  => "AccessToken::$Param{ProfileID}",
     );
     return 1 if $Token;
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "No access token found for profile ($Param{ProfileID})!"
-        );
-    }
 
     my %TokenList = $Self->_TokenList(
         ProfileID => $Param{ProfileID},
@@ -731,13 +894,14 @@ sub HasToken {
     return;
 }
 
-=head2 RequestAccessToken()
+=head2 RequestToken()
 
-This can either be used to request an initial access and refresh token or to request a refreshed access token.
+This can either be used to request an initial token or to request a refreshed token.
 
 Example:
-    my $AccessToken = $Self->RequestAccessToken(
+    my $Token = $Self->RequestToken(
         ProfileID => 123,
+        TokenType => 'access_token',
         GrantType => 'refresh_token',
         Code      => $Code,    # Optional: Only needed in combination with GrantType "authorization_code".
     )
@@ -747,12 +911,12 @@ Returns:
 
 =cut
 
-sub RequestAccessToken {
+sub RequestToken {
     my ( $Self, %Param ) = @_;
 
 ### Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
     # check needed stuff
-    for (qw(ProfileID GrantType)) {
+    for (qw(ProfileID GrantType TokenType)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -767,17 +931,20 @@ sub RequestAccessToken {
     );
     return if !%Profile;
 
-    # delete access token
+    # delete current token
     $Self->_TokenDelete(
         ProfileID => $Param{ProfileID},
-        TokenType => 'access',
+        TokenType => $Param{TokenType},
     );
+
+    # use provided redirect url or fallback to profile
+    my $URLRedirect = $Param{URLRedirect} || $Profile{URLRedirect};
 
     # init data
     my %Data = (
         client_id     => $Profile{ClientID},
         client_secret => $Profile{ClientSecret},
-        redirect_uri  => $Profile{URLRedirect},
+        redirect_uri  => $URLRedirect,
         scope         => $Profile{Scope},
         grant_type    => $Param{GrantType},
     );
@@ -840,60 +1007,78 @@ sub RequestAccessToken {
         return;
     }
 
-    # Should not happen if no error message given.
-    if ( !$ResponseData->{access_token} || !$ResponseData->{refresh_token} || !$ResponseData->{expires_in} ) {
+    # check for requested token
+    if ( !$ResponseData->{ $Param{TokenType} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Host did not provide "access_token", "refresh_token" or "expires_in"!',
+            Message  => 'Host did not provide requested token!',
         );
         return;
     }
 
-    # renew refresh token if necessary
-    if ( !$Data{refresh_token} || $Data{refresh_token} ne $ResponseData->{refresh_token} ) {
-        return if !$Self->_TokenAdd(
-            ProfileID => $Param{ProfileID},
-            TokenType => 'refresh',
-            Token     => $ResponseData->{refresh_token},
-        );
-    }
+    # special handling for access_token
+    if ( $Param{TokenType} eq 'access_token' ) {
+        # check for refresh_token and expires_in
+        if (
+            !$ResponseData->{refresh_token}
+            || !$ResponseData->{expires_in}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Host did not provide "refresh_token" or "expires_in" for access_token!',
+            );
+            return;
+        }
+
+        # renew refresh token if necessary
+        if (
+            !$Data{refresh_token}
+            || $Data{refresh_token} ne $ResponseData->{refresh_token}
+        ) {
+            return if !$Self->_TokenAdd(
+                ProfileID => $Param{ProfileID},
+                TokenType => 'refresh',
+                Token     => $ResponseData->{refresh_token},
+            );
+        }
 ### EO Code licensed under the GPL-3.0, Copyright (C) 2019-2024 Rother OSS GmbH, https://otobo.de/ ###
 
-    # Cache the access token until it expires - add a buffer (90 seconds) for latency reasons
-    my $TTL = $ResponseData->{expires_in} ? ($ResponseData->{expires_in} - 90) : 0;
-    if ($TTL > 0) {
-        $Kernel::OM->Get('Cache')->Set(
-            Type           => $Self->{CacheType},
-            TTL            => $TTL,
-            Key            => "AccessToken::$Param{ProfileID}",
-            Value          => $ResponseData->{access_token},
-            CacheInMemory  => 0,                                            # Cache in Backend only to enforce TTL
-            CacheInBackend => 1,
-            NoStatsUpdate  => 1
-        );
+        # Cache the access token until it expires - add a buffer (90 seconds) for latency reasons
+        my $TTL = $ResponseData->{expires_in} ? ($ResponseData->{expires_in} - 90) : 0;
+        if ($TTL > 0) {
+            $Kernel::OM->Get('Cache')->Set(
+                Type           => $Self->{CacheType},
+                TTL            => $TTL,
+                Key            => "AccessToken::$Param{ProfileID}",
+                Value          => $ResponseData->{access_token},
+                CacheInMemory  => 0,                                            # Cache in Backend only to enforce TTL
+                CacheInBackend => 1,
+                NoStatsUpdate  => 1
+            );
+        }
+
+        if (
+            $Param{GrantType} eq 'authorization_code'
+            && $Param{Code}
+        ) {
+            # push client callback event
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
+                Event     => 'CREATE',
+                Namespace => 'OAuth2ProfileAuth',
+                ObjectID  => $Param{ProfileID},
+            );
+        }
+        else {
+            # push client callback event
+            $Kernel::OM->Get('ClientNotification')->NotifyClients(
+                Event     => 'UPDATE',
+                Namespace => 'OAuth2ProfileAuth',
+                ObjectID  => $Param{ProfileID},
+            );
+        }
     }
 
-    if (
-        $Param{GrantType} eq 'authorization_code'
-        && $Param{Code}
-    ) {
-        # push client callback event
-        $Kernel::OM->Get('ClientNotification')->NotifyClients(
-            Event     => 'CREATE',
-            Namespace => 'OAuth2ProfileAuth',
-            ObjectID  => $Param{ProfileID},
-        );
-    }
-    else {
-        # push client callback event
-        $Kernel::OM->Get('ClientNotification')->NotifyClients(
-            Event     => 'UPDATE',
-            Namespace => 'OAuth2ProfileAuth',
-            ObjectID  => $Param{ProfileID},
-        );
-    }
-
-    return $ResponseData->{access_token};
+    return $ResponseData->{ $Param{TokenType} };
 }
 
 =begin Internal:
@@ -964,47 +1149,6 @@ sub _TokenList {
     return %TokenList;
 }
 
-sub _TokenLookup {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(TokenType Token)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
-    }
-
-    # get needed objects
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # lookup
-    $DBObject->Prepare(
-        SQL   => 'SELECT profile_id FROM oauth2_token WHERE token_type = ? AND token = ?',
-        Bind  => [ \$Param{TokenType}, \$Param{Token} ],
-        Limit => 1,
-    );
-
-    my $ProfileID;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $ProfileID = $Row[0];
-    }
-
-    # check if data exists
-    if ( !defined $ProfileID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No profile for given token found!",
-        );
-        return;
-    }
-
-    return $ProfileID;
-}
-
 sub _TokenDelete {
     my ( $Self, %Param ) = @_;
 
@@ -1040,7 +1184,7 @@ sub _TokenDelete {
 
     if (
         !$Param{TokenType}
-        || $Param{TokenType} eq 'access'
+        || $Param{TokenType} eq 'access_token'
     ) {
         # delete access token from cache
         $Kernel::OM->Get('Cache')->Delete(

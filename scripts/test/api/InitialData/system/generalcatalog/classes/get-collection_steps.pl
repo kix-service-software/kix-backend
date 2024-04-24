@@ -8,7 +8,7 @@ use lib cwd() . '/scripts/test/api/Cucumber';
 
 use LWP::UserAgent;
 use HTTP::Request;
-use JSON::XS qw(encode_json decode_json);
+use JSON::MaybeXS qw(encode_json decode_json);
 use JSON::Validator;
 
 use Test::More;
@@ -26,7 +26,7 @@ require '_Helper.pl';
 # require our common library
 require '_StepsLib.pl';
 
-# feature specific steps 
+# feature specific steps
 
 When qr/I query the collection of generalcatalog class$/, sub {
    my $Object = "GeneralCatalogClass";

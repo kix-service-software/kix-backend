@@ -153,10 +153,13 @@ sub BasePermissionAgentList {
             ON pt.id=rp.type_id
         JOIN users as u
             ON ru.user_id=u.id
+        JOIN roles r
+            ON ru.role_id=r.id
         WHERE pt.name='Base::Ticket'
             AND rp.target IN ('*', ?)
             AND u.valid_id=1
             AND u.is_agent=1
+            AND r.usage_context IN (1,3)
 END
 
     my @Bind = ( \$Param{Target}, \$Param{Value} );
@@ -354,20 +357,28 @@ sub RoleUserDelete {
         return;
     }
 
-    my $SQL = 'DELETE FROM role_user WHERE 1=1 ';
+    my $SQL = 'DELETE FROM role_user';
 
-    if ( $Param{IgnoreContextRoles} ) {
-        $SQL .= 'AND role_id NOT IN (SELECT id FROM roles WHERE name IN (\'Customer\', \'Agent User\')) ';
-    }
-
+    my @Where;
     my @Bind;
+    if ( $Param{IgnoreContextRoles} ) {
+        my $RoleNameAgent    = 'Agent User';
+        my $RoleNameCustomer = 'Customer';
+
+        push( @Where, 'role_id NOT IN (SELECT id FROM roles WHERE name IN (?, ?))' );
+        push( @Bind, \$RoleNameAgent, \$RoleNameCustomer );
+    }
     if ( $Param{UserID} ) {
-        $SQL .= 'AND user_id = ?';
-        push @Bind, \$Param{UserID};
+        push( @Where, 'user_id = ?' );
+        push( @Bind, \$Param{UserID} );
     }
     if ( $Param{RoleID} ) {
-        $SQL .= 'AND role_id = ?';
-        push @Bind, \$Param{RoleID};
+        push( @Where, 'role_id = ?' );
+        push( @Bind, \$Param{RoleID} );
+    }
+
+    if ( @Where ) {
+        $SQL .= ' WHERE ' . join( ' AND ', @Where );
     }
 
     # delete existing RoleUser relation

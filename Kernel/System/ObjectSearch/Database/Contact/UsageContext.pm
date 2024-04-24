@@ -111,7 +111,8 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{$Param{Search}->{Field}},
         Value     => $Param{Search}->{Value},
-        ValueType => 'NUMERIC'
+        ValueType => 'NUMERIC',
+        NULLValue => 1
     );
     return if ( !$Condition );
 
@@ -130,7 +131,7 @@ run this module and return the SQL extensions
     );
 
     $Result = {
-        Select   => [ ],          # optional
+        Select  => [ ],          # optional
         OrderBy => [ ]           # optional
     };
 

@@ -35,3 +35,23 @@ When qr/I query the collection of ticket queues$/, sub {
       Limit => $1,
    );
 };
+
+Then qr/the queues output is "(.*?)"/, sub {
+   my $Name=$1;
+   my $array=S->{ResponseContent}->{Queue};
+   my @AttributeValue =( "Service Desk", "Monitoring", "Junk" );
+
+   foreach $hash_ref (@$array) {
+      if ($hash_ref->{Name} eq $Name ){
+         is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+      }
+      else{
+         if ( "@AttributeValue" =~ /$hash_ref->{Name}/ && "@AttributeValue" =~ /$Name/ ) {
+
+         }
+         else{
+            is( $hash_ref->{Name}, $Name, 'Check attribute value in response' );
+         }
+      }
+   }
+};

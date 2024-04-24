@@ -29,16 +29,14 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
-
     # preferences table data
-    $Self->{PreferencesTable} = $Self->{ConfigObject}->Get('PreferencesTable')
+    $Self->{PreferencesTable} = $Kernel::OM->Get('Config')->Get('PreferencesTable')
         || 'user_preferences';
-    $Self->{PreferencesTableKey} = $Self->{ConfigObject}->Get('PreferencesTableKey')
+    $Self->{PreferencesTableKey} = $Kernel::OM->Get('Config')->Get('PreferencesTableKey')
         || 'preferences_key';
-    $Self->{PreferencesTableValue} = $Self->{ConfigObject}->Get('PreferencesTableValue')
+    $Self->{PreferencesTableValue} = $Kernel::OM->Get('Config')->Get('PreferencesTableValue')
         || 'preferences_value';
-    $Self->{PreferencesTableUserID} = $Self->{ConfigObject}->Get('PreferencesTableUserID')
+    $Self->{PreferencesTableUserID} = $Kernel::OM->Get('Config')->Get('PreferencesTableUserID')
         || 'user_id';
 
     $Self->{CacheType} = 'User';

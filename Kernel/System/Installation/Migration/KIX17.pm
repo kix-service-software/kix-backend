@@ -34,7 +34,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    foreach ( qw(Async MigrationID Source SourceID) ) {
+    foreach ( qw(Async MigrationID Source SourceID Debug) ) {
         $Self->{$_} = $Param{$_};
     }
 
@@ -225,9 +225,17 @@ sub Run {
         if ( $MigrationState->{State}->{Progress}->{$Type}->{ItemCount} > 0 ) {
             $Self->{Handler}->{$Type}->SetWorkers(Workers => $Param{Workers} || 1);
 
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("starting migration of type \"$Type\"");
+            }
+
             my $Result = $Self->{Handler}->{$Type}->Run(
                 Type => $Type,
             );
+
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("finished migration of type \"$Type\"");
+            }
         }
         $Self->{Handler}->{$Type}->StopProgress($Type);
     }
@@ -237,6 +245,10 @@ sub Run {
     $MigrationState->{Status} = $MigrationState->{Status} ne 'aborting' ? 'finished' : 'aborted';
     $MigrationState->{EndTime} = Time::HiRes::time();
     $Self->_UpdateMigrationState($MigrationState);
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("finished migration: ".$Kernel::OM->Get('Main')->Dump($MigrationState));
+    }
 
     return 1;
 }

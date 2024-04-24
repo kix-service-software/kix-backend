@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -239,13 +239,6 @@ sub _ArticleCreate {
     my $Ticket  = $Param{Ticket};
     my $Article = $Param{Article};
 
-    # get customer information
-    # with information will be used to create the ticket if customer is not defined in the
-    # database, customer ticket information need to be empty strings
-    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $Ticket->{ContactID},
-    );
-
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
@@ -253,15 +246,32 @@ sub _ArticleCreate {
     my $From;
     if ( $Article->{From} ) {
         $From = $Article->{From};
-    }
-    # use data from contact (if contact is in database)
-    elsif ( IsHashRefWithData( \%ContactData ) ) {
-        $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
-            . ' <' . $ContactData{Email} . '>';
-    }
-    # otherwise use customer user as sent from the request (it should be an email)
-    else {
-        $From = $Ticket->{ContactID};
+    } else {
+        if (!$Article->{SenderType}) {
+            $Article->{SenderType} = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
+                SenderTypeID => $Article->{SenderTypeID},
+            );
+        }
+
+        # set From by contact if "send" from contact else ArticleCreate in core will handle From
+        if ($Article->{SenderType} ne 'agent') {
+            # get customer information
+            # with information will be used to create the ticket if customer is not defined in the
+            # database, customer ticket information need to be empty strings
+            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                ID => $Ticket->{ContactID},
+            );
+
+            # use data from contact (if contact is in database)
+            if ( IsHashRefWithData( \%ContactData ) ) {
+                $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
+                    . ' <' . $ContactData{Email} . '>';
+            }
+            # otherwise use customer user as sent from the request (it should be an email)
+            else {
+                $From = $Ticket->{ContactID};
+            }
+        }
     }
 
     # set Article To

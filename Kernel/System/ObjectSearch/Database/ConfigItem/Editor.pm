@@ -42,7 +42,10 @@ sub GetSupportedAttributes {
         CreateBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
+## TODO: login based search instead of id
+#            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ChangeByID => {
             IsSearchable => 1,
@@ -53,7 +56,10 @@ sub GetSupportedAttributes {
         ChangeBy => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC'
+## TODO: login based search instead of id
+#            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
@@ -71,42 +77,50 @@ sub Search {
             ValueType       => 'NUMERIC'
         },
         CreateBy   => {
-            Column          => 'cicru.login',
-            CaseInsensitive => 1
+            Column          => 'ci.create_by',
+            ValueType       => 'NUMERIC'
+## TODO: login based search instead of id
+#            Column          => 'cicru.login',
+#            CaseInsensitive => 1
         },
         ChangeByID => {
             Column          => 'ci.change_by',
             ValueType       => 'NUMERIC'
         },
         ChangeBy   => {
-            Column          => 'cichu.login',
-            CaseInsensitive => 1
+            Column          => 'ci.change_by',
+            ValueType       => 'NUMERIC'
+## TODO: login based search instead of id
+#            Column          => 'cichu.login',
+#            CaseInsensitive => 1
         }
     );
 
-    # check for needed joins
-    my @SQLJoin = ();
-    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
-        if ( !$Param{Flags}->{JoinMap}->{ConfigItemCreateBy} ) {
-            push( @SQLJoin, 'INNER JOIN users cicru ON cicru.id = ci.create_by' );
-
-            $Param{Flags}->{JoinMap}->{ConfigItemCreateBy} = 1;
-        }
-    }
-    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
-        if ( !$Param{Flags}->{JoinMap}->{ConfigItemChangeBy} ) {
-            push( @SQLJoin, 'INNER JOIN users cichu ON cichu.id = ci.change_by' );
-
-            $Param{Flags}->{JoinMap}->{ConfigItemChangeBy} = 1;
-        }
-    }
+## TODO: login based search instead of id
+#    # check for needed joins
+#    my @SQLJoin = ();
+#    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ConfigItemCreateBy} ) {
+#            push( @SQLJoin, 'INNER JOIN users cicru ON cicru.id = ci.create_by' );
+#
+#            $Param{Flags}->{JoinMap}->{ConfigItemCreateBy} = 1;
+#        }
+#    }
+#    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ConfigItemChangeBy} ) {
+#            push( @SQLJoin, 'INNER JOIN users cichu ON cichu.id = ci.change_by' );
+#
+#            $Param{Flags}->{JoinMap}->{ConfigItemChangeBy} = 1;
+#        }
+#    }
 
     # prepare condition
     my $Condition = $Self->_GetCondition(
         Operator        => $Param{Search}->{Operator},
         Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
         ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
+## TODO: login based search instead of id
+#        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
         Value           => $Param{Search}->{Value},
         Silent          => $Param{Silent}
     );
@@ -114,7 +128,8 @@ sub Search {
 
     # return search def
     return {
-        Join  => \@SQLJoin,
+## TODO: login based search instead of id
+#        Join  => \@SQLJoin,
         Where => [ $Condition ]
     };
 }
