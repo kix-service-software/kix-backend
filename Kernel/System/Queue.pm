@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -173,12 +173,6 @@ sub GetSystemAddress {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Address{Email}    = $Row[0];
         $Address{RealName} = $Row[1];
-    }
-
-    # prepare realname quote
-    if ( $Address{RealName} =~ /(,|@|\(|\)|:)/ && $Address{RealName} !~ /^("|')/ ) {
-        $Address{RealName} =~ s/"/\"/g;
-        $Address{RealName} = '"' . $Address{RealName} . '"';
     }
 
     return %Address;

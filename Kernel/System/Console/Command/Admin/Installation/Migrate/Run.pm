@@ -78,6 +78,13 @@ sub Configure {
         ValueRegex  => qr/^\d+$/smx,
     );
 
+    $Self->AddOption(
+        Name        => 'debug',
+        Description => "Enable debug output in kix log (MinimumLogLevel has to be \"debug\")",
+        Required    => 0,
+        HasValue    => 0,
+    );
+
     return;
 }
 
@@ -94,6 +101,7 @@ sub Run {
         Filter       => $Self->GetOption('filter'),
         MappingFile  => $Self->GetOption('mapping-file'),
         Workers      => $Self->GetOption('workers'),
+        Debug        => $Self->GetOption('debug'),
     );
 
     if ( !$Result ) {

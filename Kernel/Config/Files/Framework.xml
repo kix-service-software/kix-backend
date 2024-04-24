@@ -9545,6 +9545,16 @@ You can log in via the following URL:
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="Migration::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable migration debugging.</Description>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="AssignedObjectsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines which dependend object (e.g. "Ticket") is assigned by which attributes to a relevant object (e.g. "Contact") - e.g. "Tickets of Contact". Structure is "{ "RelevantObject": { "DependendObject": { "DependendObjectAttribut": { "SearchAttribut OR SearchStatic": [ "RelevantObjectAttribut OR StaticValue" ] } } } }. All attributes will be OR combined."</Description>
         <Group>ITSM</Group>

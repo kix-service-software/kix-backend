@@ -48,6 +48,8 @@ create a new item in the DB
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $EmailUniqueCheck = $Kernel::OM->Get('Config')->Get('ContactEmailUniqueCheck');
+
     # get source data
     my $SourceData = $Self->GetSourceData(Type => 'users', OrderBy => 'id');
 
@@ -147,6 +149,15 @@ sub Run {
                 );
             }
 
+            # check if this item already exists (i.e. some initial data)
+            my @RelevantAttr;
+            if ( $EmailUniqueCheck ) {
+                @RelevantAttr = ( 'email' );
+            }
+            else {
+                @RelevantAttr = ( 'firstname', 'lastname', 'email' );
+            }
+
             # check if there already is a contact
             my $ContactID = $Self->Lookup(
                 Table        => 'contact',
@@ -157,11 +168,7 @@ sub Run {
                     'lastname'  => $Contact{last_name},
                     'email'     => $Contact{UserEmail},
                 },
-                RelevantAttr => [
-                    'firstname',
-                    'lastname',
-                    'email'
-                ]
+                RelevantAttr => \@RelevantAttr,
             );
 
             if ( !$ContactID ) {
