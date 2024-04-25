@@ -688,15 +688,8 @@ sub _GetCertificateAttributes {
             if ($Private) {
                 $Attributes->{Private} = 'Yes';
             }
-            $Attributes->{Type} = 'Cert';
         }
-        else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Can\'t add invalid certificate!'
-            );
-            return;
-        }
+        $Attributes->{Type} = 'Cert';
     }
     else {
         $Attributes->{Type} = 'Private';
@@ -724,39 +717,51 @@ sub _FetchAttributes {
     my $Command = $Self->{$Param{Type}}->{ContentTypes}->{$Param{ContentType}};
     my $Options = $Self->{$Param{Type}}->{Options}->{$Command};
 
-    # Replacing of needed parameters
-    $Options =~ s/###FILENAME###/$Filename/sm;
-    $Options =~ s/###SECRET###/$Param{Passphrase}/sm;
-    $Options =~ s/###BIN###/$Self->{Bin}/sm;
-
-    # get the output string
-    my $Output = qx{$Self->{Cmd} $Options 2>&1};
-
-    if ( $Output =~ /error:/sm ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => $Output
-            );
-        }
-        return;
+    if ( !IsArrayRef($Options) ) {
+        $Options = [$Options];
     }
+
+    my $Result;
+    for my $OptionStrg ( @{$Options}) {
+        # Replacing of needed parameters
+        $OptionStrg =~ s/###FILENAME###/$Filename/sm;
+        $OptionStrg =~ s/###SECRET###/$Param{Passphrase}/sm;
+        $OptionStrg =~ s/###BIN###/$Self->{Bin}/sm;
+
+        # get the output string
+        my $Output = qx{$Self->{Cmd} $OptionStrg 2>&1};
+
+        if ( $Output =~ /error:/sm ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => $Output
+                );
+            }
+            return;
+        }
+
+        $Result .= "\n" if $Result;
+        $Result .= $Output;
+    }
+
 
     # filters
     my %Filters = (
         Hash        => '(\w{8})',
         Issuer      => 'issuer=\s*(.*)',
-        Fingerprint => 'SHA1\sFingerprint=(.*)',
+        Fingerprint => '(?:SHA1\sFingerprint|\(stdin\))=(?:\s+|)(.*)',
         Serial      => 'serial=(.*)',
         Subject     => 'subject=\s*(.*)',
         StartDate   => 'notBefore=(.*)',
         EndDate     => 'notAfter=(.*)',
         Email       => '([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})',
         Modulus     => 'Modulus=(.*)',
+        Verify      => 'verify\s+(.*)'
     );
 
     # parse output string
-    my @Attributes = split( /\n/sm, $Output );
+    my @Attributes = split( /\n/sm, $Result );
     for my $Line (@Attributes) {
 
         # clean end spaces
@@ -858,8 +863,8 @@ sub _Init {
             'application/pkcs10'                 => 'req',
             'application/x-x509-ca-cert'         => 'x509',
             'application/x-x509-user-cert'       => 'x509',
-            'application/x-pkcs7-certificates'   => 'pkcs7',
-            'application/x-pkcs7-certreqresp'    => 'pkcs7',
+            # 'application/x-pkcs7-certificates'   => 'pkcs7',
+            # 'application/x-pkcs7-certreqresp'    => 'pkcs7',
             'application/pkix-cert'              => 'x509',
             'application/pkix-crl'               => 'x509',
             'application/x-pem-file'             => 'x509',
@@ -867,9 +872,12 @@ sub _Init {
             # 'application/pkcs8'                  => 'pkcs8',
         },
         Options => {
-            'req'    => 'req -in ###FILENAME### -noout -modulus | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            'req'    => [
+                'req -in ###FILENAME### -noout -verify -modulus -subject',
+                'req -in ###FILENAME### -outform DER -noout | openssl dgst -sha1 -c'
+            ],
             'x509'   => 'x509 -in ###FILENAME### -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
-            'pkcs7'  => 'pkcs7 -in ###FILENAME### -inform PEM -print_certs | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            # 'pkcs7'  => 'pkcs7 -in ###FILENAME### -inform PEM -print_certs | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
             # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
             # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
         }
