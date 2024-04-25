@@ -326,11 +326,7 @@ sub CertificateDelete {
         . q{_}
         . $Param{ID};
 
-    my $Path = $Self->{CertPath};
-    if ( $File{Preferences}->{Type} eq 'Private' ) {
-        $Path = $Self->{PrivatePath};
-    }
-
+    my $Path = $Self->{$File{Preferences}->{Type}}->{Path};
     $Path .= "/$Filename";
 
     my $Success;
@@ -520,11 +516,7 @@ sub _WriteCertificate {
         }
     }
 
-    my $Path = $Self->{CertPath};
-    if ( $Param{Type} eq 'Private') {
-        $Path = $Self->{PrivatePath};
-    }
-
+    my $Path = $Self->{$Param{Type}}->{Path};
     $Path .= '/KIX_'
         . $Param{Type}
         . q{_}
@@ -534,7 +526,7 @@ sub _WriteCertificate {
         return 1;
     }
 
-    my $Content = $Param{Content};
+    my $Content = MIME::Base64::decode_base64( $Param{Content} );
     my $Success = $Kernel::OM->Get('Main')->FileWrite(
         Location => $Path,
         Content  => \$Content,
@@ -586,11 +578,12 @@ sub _CheckCertificate {
         }
     }
 
-    if ( !$Self->{ContentTypes}->{$Param{File}->{ContentType}} ) {
+    my $ContentTypes = $Self->{$Param{Type}}->{ContentTypes};
+    if ( !$ContentTypes->{$Param{File}->{ContentType}} ) {
         if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
                     Priority => 'error',
-                    Message  => "Invalid file!"
+                    Message  => "Invalid content type $Param{File}->{ContentType}"
                 );
             }
             return;
@@ -655,10 +648,13 @@ sub _GetCertificateAttributes {
         );
         return;
     }
+
     my $Attributes = $Self->_FetchAttributes(
-        Filename   => $Filename,
-        Type       => $Param{Type},
-        Passphrase => $Param{Passphrase} || q{}
+        Filename    => $Filename,
+        Type        => $Param{Type},
+        ContentType => $File->{ContentType},
+        Passphrase  => $Param{Passphrase} || q{},
+        Silent      => $Param{Silent}
     );
 
     if ( $Param{Type} eq 'Cert' ) {
@@ -725,26 +721,26 @@ sub _FetchAttributes {
     my $AttributesRef;
     my $Filename = $Param{Filename};
 
-    # testing new solution
-    my $OptionString = '-subject_hash '
-        . '-issuer '
-        . '-fingerprint -sha1 '
-        . '-serial '
-        . '-subject '
-        . '-startdate '
-        . '-enddate '
-        . '-email '
-        . '-modulus ';
+    my $Command = $Self->{$Param{Type}}->{ContentTypes}->{$Param{ContentType}};
+    my $Options = $Self->{$Param{Type}}->{Options}->{$Command};
 
-    # call all attributes at same time
-    my $Options = "x509 -in $Filename -noout $OptionString";
-    if ( $Param{Type} eq 'Private' ) {
-        $OptionString = '-modulus ';
-        $Options      = "rsa -in $Filename -noout $OptionString -passin pass:$Param{Passphrase}";
-    }
+    # Replacing of needed parameters
+    $Options =~ s/###FILENAME###/$Filename/sm;
+    $Options =~ s/###SECRET###/$Param{Passphrase}/sm;
+    $Options =~ s/###BIN###/$Self->{Bin}/sm;
 
     # get the output string
     my $Output = qx{$Self->{Cmd} $Options 2>&1};
+
+    if ( $Output =~ /error:/sm ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => $Output
+            );
+        }
+        return;
+    }
 
     # filters
     my %Filters = (
@@ -853,26 +849,46 @@ sub _FetchAttributes {
 sub _Init {
     my ( $Self, %Param ) = @_;
 
-    $Self->{CertPath}    = '/etc/ssl/certs';
-    $Self->{PrivatePath} = '/etc/ssl/private';
-    $Self->{Bin}         = '/usr/bin/openssl';
-
-    # valid content types
-    $Self->{ContentTypes} = {
-        'application/pkcs8'                  => 1,
-        'application/pkcs10'                 => 1,
-        'application/pkix-cert'              => 1,
-        'application/pkix-crl'               => 1,
-        'application/pkcs7-mime'             => 1,
-        'application/x-x509-ca-cert'         => 1,
-        'application/x-x509-user-cert'       => 1,
-        'application/x-pkcs7-crl'            => 1,
-        'application/x-pem-file'             => 1,
-        'application/x-pkcs12'               => 1,
-        'application/x-pkcs7-certificates'   => 1,
-        'application/x-pkcs7-certreqresp'    => 1,
-        'application/x-iwork-keynote-sffkey' => 1
+    # ToDo: The following MimeTypes are deactivated for the time being,
+    #       as the password is also required for the public to access the information.
+    my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
+    $Self->{Cert} = {
+        Path         => $HomeDir. '/var/ssl/certs',
+        ContentTypes => {
+            'application/pkcs10'                 => 'req',
+            'application/x-x509-ca-cert'         => 'x509',
+            'application/x-x509-user-cert'       => 'x509',
+            'application/x-pkcs7-certificates'   => 'pkcs7',
+            'application/x-pkcs7-certreqresp'    => 'pkcs7',
+            'application/pkix-cert'              => 'x509',
+            'application/pkix-crl'               => 'x509',
+            'application/x-pem-file'             => 'x509',
+            # 'application/x-pkcs12'               => 'pkcs12',
+            # 'application/pkcs8'                  => 'pkcs8',
+        },
+        Options => {
+            'req'    => 'req -in ###FILENAME### -noout -modulus | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            'x509'   => 'x509 -in ###FILENAME### -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            'pkcs7'  => 'pkcs7 -in ###FILENAME### -inform PEM -print_certs | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+        }
     };
+    $Self->{Private} = {
+        Path         => $HomeDir. '/var/ssl/private',
+        ContentTypes => {
+            # 'application/pkcs8'                  => 'pkcs8',
+            # 'application/x-pkcs12'               => 'pkcs12',
+            'application/x-pem-file'             => 'rsa',
+            'application/x-iwork-keynote-sffkey' => 'rsa'
+        },
+        Options => {
+            'rsa'    => 'rsa -in ###FILENAME### -noout -modulus -passin pass:###SECRET###',
+            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passin pass:###SECRET### | ###BIN### x509 -noout -modulus',
+            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -noout -nodes -passin pass:###SECRET### | ###BIN### x509 -noout -modulus',
+        }
+    };
+    $Self->{Bin} = '/usr/bin/openssl';
 
     # make sure that we are getting POSIX (i.e. english) messages from openssl
     $Self->{Cmd} = "LC_MESSAGES=POSIX $Self->{Bin}";
@@ -915,48 +931,31 @@ sub _InitCheck {
         $Success = 0;
     }
 
-    if ( !-e $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No such $Self->{CertPath}!",
-        );
-        $Success = 0;
-    }
-    elsif ( !-d $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No such $Self->{CertPath} directory!",
-        );
-        $Success = 0;
-    }
-    elsif ( !-w $Self->{CertPath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "$Self->{CertPath} not writable!",
-        );
-        $Success = 0;
-    }
-
-    if ( !-e $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No such $Self->{PrivatePath}!",
-        );
-        $Success = 0;
-    }
-    elsif ( !-d $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "No such $Self->{PrivatePath} directory!",
-        );
-        $Success = 0;
-    }
-    elsif ( !-w $Self->{PrivatePath} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Priority => 'error',
-            Message  => "$Self->{PrivatePath} not writable!",
-        );
-        $Success = 0;
+    for my $Key ( qw( Cert Private) ) {
+        if ( !-e $Self->{$Key}->{Path} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "No such $Self->{$Key}->{Path}!",
+            );
+            $Success = 0;
+            last;
+        }
+        elsif ( !-d $Self->{$Key}->{Path} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "No such $Self->{$Key}->{Path} directory!",
+            );
+            $Success = 0;
+            last;
+        }
+        elsif ( !-w $Self->{$Key}->{Path} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "$Self->{$Key}->{Path} not writable!",
+            );
+            $Success = 0;
+            last;
+        }
     }
 
     return $Success;

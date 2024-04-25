@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -19,6 +19,7 @@ use base qw(
 
 # prevent 'Used once' warning for Kernel::OM
 use Kernel::System::ObjectManager;
+use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
 
@@ -65,8 +66,22 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} eq 'MimeType' ) {
-        $Self->{MIMETypesObject} = MIME::Types->new() if !$Self->{MIMETypesObject};
-        $Valid = { map { $_ => 1 } $Self->{MIMETypesObject}->listTypes() }->{$Param{Data}->{$Param{Attribute}}};
+        my $MimeObject = MIME::Types->new();
+
+        if ( !$Self->{MimeTypeList} ) {
+            %{$Self->{MimeTypeList}} = map { $_ => 1 } $MimeObject->listTypes();
+        }
+
+        if (
+            defined $Param{Parameters}
+            && IsHashRefWithData($Param{Parameters}->{MimeTypes})
+        ) {
+            for my $Type ( keys %{$Param{Parameters}->{MimeTypes}} ) {
+                next if $Self->{MimeTypeList}->{$Type};
+                $Self->{MimeTypeList}->{$Type} = 1;
+            }
+        }
+        $Valid = $Self->{MimeTypeList}->{$Param{Data}->{$Param{Attribute}}} || 0;
     }
     else {
         return $Self->_Error(
