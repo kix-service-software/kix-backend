@@ -1,3 +1,4 @@
 var/run/service.pid
 /.project
 /.idea
+/config/config

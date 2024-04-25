@@ -3413,8 +3413,6 @@ sub _GetFromByUser {
         );
     }
 
-    my $From = '"';
-
     my %Contact;
     if ($FromFormat =~ m/^Agent/) {
         %Contact = $Kernel::OM->Get('Contact')->ContactGet(
@@ -3429,25 +3427,27 @@ sub _GetFromByUser {
         }
     }
 
+    my $Realname = '';
     if ($FromFormat eq 'Agent') {
-        $From .= "$Contact{Firstname} $Contact{Lastname}";
+        $Realname .= "$Contact{Firstname} $Contact{Lastname}";
     } elsif ($FromFormat eq 'AgentViaSystemAddress') {
-        $From .= "$Contact{Firstname} $Contact{Lastname} via $Address{RealName}";
+        my $Separator = $Kernel::OM->Get('Config')->Get('Ticket::DefineEmailFromSeparator') || '';
+        $Realname .= "$Contact{Firstname} $Contact{Lastname} $Separator $Address{RealName}";
     } else {
-        $From .= $Address{RealName};
+        $Realname .= $Address{RealName};
     }
 
-    if ($From =~ m/[äÄöÖüÜß]/) {
-        $From =~ s/ä/ae/g;
-        $From =~ s/Ä/Ae/g;
-        $From =~ s/ö/oe/g;
-        $From =~ s/Ö/Oe/g;
-        $From =~ s/ü/ue/g;
-        $From =~ s/Ü/Ue/g;
-        $From =~ s/ß/ss/g;
+    if ($Realname =~ m/[äÄöÖüÜß]/) {
+        $Realname =~ s/ä/ae/g;
+        $Realname =~ s/Ä/Ae/g;
+        $Realname =~ s/ö/oe/g;
+        $Realname =~ s/Ö/Oe/g;
+        $Realname =~ s/ü/ue/g;
+        $Realname =~ s/Ü/Ue/g;
+        $Realname =~ s/ß/ss/g;
     }
 
-    return $From . "\" <$Address{Email}>";
+    return "\"$Realname\" <$Address{Email}>";
 }
 
 1;
