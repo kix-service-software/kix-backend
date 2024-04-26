@@ -47,7 +47,7 @@ sub new {
     $Self->{Debug} = $Param{Debug} || 0;
 
     $Self->{CacheType}   = 'Certificate';
-    $Self->{OSCacheType} = 'ObjectSearch_ertificate';
+    $Self->{OSCacheType} = 'ObjectSearch_Certificate';
     $Self->{CacheTTL}    = 60 * 60 * 24;
 
     return 0 if !$Self->_Init();
@@ -218,7 +218,10 @@ sub CertificateGet {
     }
 
     my $Mode = 'Preferences';
-    if ( $Param{Include} eq 'Content' ) {
+    if (
+        defined $Param{Include}
+        && $Param{Include} eq 'Content'
+    ) {
         $Mode = 'binary';
     }
 
@@ -265,7 +268,19 @@ sub CertificateGet {
         delete $Certificate->{$Key};
     }
 
-    if ( $Param{Include} eq 'Content' ) {
+    if (
+        defined $Param{Include}
+        && $Param{Include} eq 'Content'
+    ) {
+        if ( !$File{Content} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Certificate could load content!'
+                );
+            }
+            return;
+        }
         $Certificate->{Content} = ${$File{Content}};
     }
 
@@ -383,7 +398,27 @@ sub CertificateExists {
     my ( $Self,%Param ) = @_;
 
     if ( $Param{HasCertificate} ) {
+        if ( !$Param{Type} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed Type!",
+                );
+            }
+            return;
+        }
+
         return 1 if $Param{Type} ne 'Private';
+
+        if ( !$Param{Attributes}->{Modulus} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed Modulus!",
+                );
+            }
+            return;
+        }
 
         my @CertID = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'Certificate',
@@ -418,6 +453,16 @@ sub CertificateExists {
         return $CertID[0];
     }
     else {
+        if ( !$Param{Filename} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed Filename!",
+                );
+            }
+            return;
+        }
+
         my $Exists = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'Certificate',
             UserType   => 'Agent',
@@ -486,9 +531,11 @@ sub CertificateToFS {
             Silent  => $Debug
         );
 
-        next if ( !IsHashRefWithData($Certificate) );
+        return if ( !IsHashRefWithData($Certificate) );
 
-        next if !$Self->_WriteCertificate(
+        return if !$Certificate->{Content};
+
+        return if !$Self->_WriteCertificate(
             Type     => $Certificate->{Type},
             Content  => $Certificate->{Content},
             ID       => $ID,
@@ -888,7 +935,8 @@ sub _Init {
             # 'application/pkcs8'                  => 'pkcs8',
             # 'application/x-pkcs12'               => 'pkcs12',
             'application/x-pem-file'             => 'rsa',
-            'application/x-iwork-keynote-sffkey' => 'rsa'
+            'application/x-iwork-keynote-sffkey' => 'rsa',
+            'application/x-x509-ca-cert'         => 'rsa'
         },
         Options => {
             'rsa'    => 'rsa -in ###FILENAME### -noout -modulus -passin pass:###SECRET###',
