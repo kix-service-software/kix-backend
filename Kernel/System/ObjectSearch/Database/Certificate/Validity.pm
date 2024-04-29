@@ -36,22 +36,14 @@ sub GetSupportedAttributes {
         StartDate => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         },
         EndDate => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE']
-        },
-        ShortStartDate => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE']
-        },
-        ShortEndDate => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE']
+            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType    => 'DATETIME'
         }
     };
 }
@@ -69,12 +61,6 @@ sub Search {
         },
         EndDate => {
             PrefKey => 'EndDate'
-        },
-        ShortStartDate => {
-            PrefKey => 'ShortStartDate'
-        },
-        ShortEndDate => {
-            PrefKey => 'ShortEndDate'
         }
     );
 
@@ -106,8 +92,9 @@ sub Search {
 
     # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Join       => \@SQLJoin,
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative}
     };
 }
 
@@ -127,14 +114,6 @@ sub Sort {
         EndDate => {
             Select   => 'preferences_value AS cenddate',
             OrderBy  => 'cenddate'
-        },
-        ShortEndDate => {
-            Select   => 'preferences_value AS cshortstart',
-            OrderBy  => 'cshortstart'
-        },
-        ShortStartDate => {
-            Select   => 'preferences_value AS cshortend',
-            OrderBy  => 'cshortend'
         }
     );
 

@@ -66,9 +66,9 @@ sub Validate {
 
     my $Valid;
     if ( $Param{Attribute} eq 'MimeType' ) {
-        my $MimeObject = MIME::Types->new();
 
         if ( !$Self->{MimeTypeList} ) {
+            my $MimeObject = MIME::Types->new();
             %{$Self->{MimeTypeList}} = map { $_ => 1 } $MimeObject->listTypes();
         }
 

@@ -29,6 +29,10 @@ for my $Method (
         'Certificate can "' . $Method . q{"}
     );
 }
+
+# begin transaction on database
+$Helper->BeginWork();
+
 my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
 my @Certificates = _ReadCertificates();
 
@@ -155,9 +159,6 @@ for my $Test ( @NegativTests ) {
         $Test->{Name}
     );
 }
-
-# begin transaction on database
-$Helper->BeginWork();
 
 # Certificate: Create / Get / Exists
 my @CertificateIDs;

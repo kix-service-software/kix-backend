@@ -68,7 +68,6 @@
     "Subject",
     "Type",
     "CType",
-    "Modulus",
-    "Hash"
+    "Modulus"
   ]
 }

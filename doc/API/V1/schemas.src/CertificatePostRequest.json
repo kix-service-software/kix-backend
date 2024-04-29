@@ -27,8 +27,7 @@
           "required": [
             "Content",
             "ContentType",
-            "Filename",
-            "Filesize"
+            "Filename"
           ]
         },
         "Type": {

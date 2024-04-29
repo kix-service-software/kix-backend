@@ -63,7 +63,7 @@ create a local certificate
     my $CertificateID = $CertificateObject->CertificateCreate(
         File => {                                   # required
             Content     => 'some base64 content'
-            Filesize    => '6059'
+            Filesize    => '6059'                   # optional
             ContentType => 'application/pcks7-mime'
             Filename    => 'some name'
         },
@@ -101,8 +101,9 @@ sub CertificateCreate {
 
         for my $Key (
             qw(
-                Hash CType Serial ShortStartDate Subject Issuer
-                StartDate EndDate Fingerprint ShortEndDate
+                Hash CType Serial Subject Issuer
+                StartDate EndDate Fingerprint Email
+                Varify
             )
         ) {
             next if !$Certificate->{$Key};
@@ -128,9 +129,6 @@ sub CertificateCreate {
     for my $Key ( sort keys %{$Attributes} ) {
         $Preferences{$Key} = $Attributes->{$Key};
     }
-
-    # ToDo: If we allow other certification types, this should be generic
-    $Preferences{CType} = $Param{CType} || 'SMIME';
 
     my $Content = $Param{File}->{Content};
 
@@ -254,6 +252,22 @@ sub CertificateGet {
         }
         return;
     }
+
+
+    if (
+        !$File{Preferences}->{Type}
+        || !$Self->{$File{Preferences}->{Type}}
+        || !$Self->{$File{Preferences}->{Type}}->{Path}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "The file found is not a supported certificate!"
+            );
+        }
+        return;
+    }
+
     my $Filename = 'KIX_'
         . $File{Preferences}->{Type}
         . q{_}
@@ -331,6 +345,20 @@ sub CertificateDelete {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
                 Message  => "No certificate found!"
+            );
+        }
+        return;
+    }
+
+    if (
+        !$File{Preferences}->{Type}
+        || !$Self->{$File{Preferences}->{Type}}
+        || !$Self->{$File{Preferences}->{Type}}->{Path}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Kernel::System::Log')->Log(
+                Priority => 'error',
+                Message  => "The file found is not a supported certificate!"
             );
         }
         return;
@@ -601,7 +629,7 @@ sub _WriteCertificate {
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed ( qw(File Type) ) {
+    for my $Needed ( qw(File Type CType) ) {
         if ( !$Param{$Needed} ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -613,7 +641,7 @@ sub _CheckCertificate {
         }
     }
 
-    for my $Needed ( qw(Content Filesize ContentType Filename) ) {
+    for my $Needed ( qw(Content ContentType Filename) ) {
         if ( !$Param{File}->{$Needed} ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Kernel::System::Log')->Log(
@@ -741,6 +769,9 @@ sub _GetCertificateAttributes {
     else {
         $Attributes->{Type} = 'Private';
     }
+
+    # set CType
+    $Attributes->{CType} = $Param{CType};
 
     # set cache
     if ($CacheKey) {

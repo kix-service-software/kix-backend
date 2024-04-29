@@ -49,6 +49,7 @@ sub GetBaseDef {
     return {
         Select  => ['vfs.id', 'vfs.filename'],
         From    => ['virtual_fs vfs'],
+        Where   => ['vfs.filename LIKE \'Certificate/%\''],
         OrderBy => ['vfs.id ASC']
     };
 }

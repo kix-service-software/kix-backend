@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Subject => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Issuer => {
             IsSearchable => 1,
@@ -51,27 +51,27 @@ sub GetSupportedAttributes {
         Fingerprint => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE']
+            Operators    => ['EQ','NE','IN','!IN']
         },
         CType => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN']
         },
         Type => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EQ','NE','IN','!IN']
         },
         Modulus => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE']
+            Operators    => ['EQ','NE','IN','!IN']
         },
         Hash => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE']
+            Operators    => ['EQ','NE','IN','!IN']
         }
     };
 }
@@ -81,34 +81,6 @@ sub Search {
 
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
-        Subject => {
-            PrefKey => 'Subject'
-        },
-        Issuer => {
-            PrefKey => 'Issuer'
-        },
-        CType => {
-            PrefKey => 'CType'
-        },
-        Email => {
-            PrefKey => 'Email'
-        },
-        Fingerprint => {
-            PrefKey => 'Fingerprint'
-        },
-        Type => {
-            PrefKey => 'Type'
-        },
-        Modulus => {
-            PrefKey => 'Modulus'
-        },
-        Hash => {
-            PrefKey => 'Hash'
-        }
-    );
 
     # check for needed joins
     my @SQLJoin = ();
@@ -120,7 +92,7 @@ sub Search {
         push(
             @SQLJoin,
             "INNER JOIN virtual_fs_preferences $TableAlias ON $TableAlias.virtual_fs_id = vfs.id",
-            "AND $TableAlias.preferences_key = '$AttributeMapping{ $Param{Search}->{Field} }->{PrefKey}'"
+            "AND $TableAlias.preferences_key = '$Param{Search}->{Field}'"
         );
 
         $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;

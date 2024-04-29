@@ -68,9 +68,7 @@ sub ParameterDefinition {
         'Certificate::File::Filename' => {
             Required => 1
         },
-        'Certificate::File::Filesize' => {
-            Required => 1
-        },
+        'Certificate::File::Filesize' => {},
         'Certificate::Type' => {
             Required => 1,
             OneOf    => [
@@ -89,11 +87,15 @@ perform CertificateCreate Operation. This will return the created CertificateID.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Filename    => '...',
-            ContentType => '...',
-            Content     => '...',
+            File => {
+                Filename    => '...',
+                ContentType => '...',
+                Content     => '...',
+                Filesize    => '...'
+            },
             Passphrase  => '...',
             Type        => '...'
+            CType       => '...'
         },
     );
 
