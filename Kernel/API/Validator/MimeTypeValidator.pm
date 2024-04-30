@@ -72,16 +72,17 @@ sub Validate {
             %{$Self->{MimeTypeList}} = map { $_ => 1 } $MimeObject->listTypes();
         }
 
+        my %MimeTypes = %{$Self->{MimeTypeList}};
         if (
-            defined $Param{Parameters}
+            IsHashRefWithData($Param{Parameters})
             && IsHashRefWithData($Param{Parameters}->{MimeTypes})
         ) {
             for my $Type ( keys %{$Param{Parameters}->{MimeTypes}} ) {
-                next if $Self->{MimeTypeList}->{$Type};
-                $Self->{MimeTypeList}->{$Type} = 1;
+                next if $MimeTypes{$Type};
+                $MimeTypes{$Type} = 1;
             }
         }
-        $Valid = $Self->{MimeTypeList}->{$Param{Data}->{$Param{Attribute}}} || 0;
+        $Valid = $MimeTypes{$Param{Data}->{$Param{Attribute}}} || 0;
     }
     else {
         return $Self->_Error(
