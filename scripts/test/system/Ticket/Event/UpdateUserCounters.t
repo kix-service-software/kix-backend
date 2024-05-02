@@ -465,6 +465,69 @@ my @Tests = (
             }
         }
     },
+    {
+        Name   => 'WatcherAdd and FlagDelete for TicketID '.$TicketIDs{'User Counter Test 2'},
+        Action => sub {
+            $Kernel::OM->Get('Ticket')->TicketFlagDelete(
+                TicketID => $TicketIDs{'User Counter Test 2'},
+                Key      => 'Seen',
+                UserID   => $UserID2,
+            );
+            return $Kernel::OM->Get('Watcher')->WatcherAdd(
+                Object      => 'Ticket',
+                ObjectID    => $TicketIDs{'User Counter Test 2'},
+                WatchUserID => $UserID2,
+                UserID      => 1,
+            );
+        },
+        Expect => {
+            $UserID1 => {
+                Owned => undef,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => undef,
+                OwnedAndLockedAndUnseen => undef,
+                Watched => undef,
+                WatchedAndUnseen => undef,
+            },
+            $UserID2 => {
+                Owned => 1,
+                OwnedAndUnseen => 1,
+                OwnedAndLocked => 1,
+                OwnedAndLockedAndUnseen => 1,
+                Watched => 1,
+                WatchedAndUnseen => 1,
+            }
+        }
+    },
+    {
+        Name   => 'FlagSet for TicketID '.$TicketIDs{'User Counter Test 2'},
+        Action => sub {
+            return $Kernel::OM->Get('Ticket')->TicketFlagSet(
+                TicketID => $TicketIDs{'User Counter Test 2'},
+                Key      => 'Seen',
+                Value    => 1,
+                UserID   => $UserID2,
+            );
+        },
+        Expect => {
+            $UserID1 => {
+                Owned => undef,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => undef,
+                OwnedAndLockedAndUnseen => undef,
+                Watched => undef,
+                WatchedAndUnseen => undef,
+            },
+            $UserID2 => {
+                Owned => 1,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => 1,
+                OwnedAndLockedAndUnseen => undef,
+                Watched => 1,
+                WatchedAndUnseen => undef,
+            }
+        }
+    },
 );
 
 
