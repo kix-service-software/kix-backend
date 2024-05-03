@@ -16,6 +16,7 @@ use warnings;
 use HTTP::Headers;
 use List::Util qw(first);
 use LWP::UserAgent;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -156,6 +157,7 @@ sub Request {
     {
         $UserAgent->ssl_opts(
             verify_hostname => 0,
+            SSL_verify_mode => SSL_VERIFY_NONE,
         );
     }
 
