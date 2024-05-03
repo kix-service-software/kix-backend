@@ -126,9 +126,13 @@ sub Run {
     );
 
     if ( !$CertificateID ) {
+        my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+            Type => 'error',
+            What => 'Message'
+        );
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create Certificate',
+            Message => "Could not create Certificate! ( Error: $LogMessage )"
         );
     }
 

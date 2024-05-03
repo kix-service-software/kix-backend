@@ -848,7 +848,7 @@ sub _FetchAttributes {
         # look for every attribute by filter
         FILTER:
         for my $Filter ( sort keys %Filters ) {
-            my @Matches = $Line =~ m{ \A $Filters{$Filter} \z }xms;
+            my @Matches = $Line =~ m{ \A $Filters{$Filter} \z }xmsi;
 
             next FILTER if !scalar(@Matches);
 
