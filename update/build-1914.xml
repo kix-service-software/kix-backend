@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableCreate Name="text_module_queue">
+        <Column Name="text_module_id" Required="true" Type="INTEGER" />
+        <Column Name="queue_id" Required="true" Type="INTEGER" />
+        <ForeignKey ForeignTable="queue">
+            <Reference Local="queue_id" Foreign="id" />
+        </ForeignKey>
+        <ForeignKey ForeignTable="text_module">
+            <Reference Local="text_module_id" Foreign="id" />
+        </ForeignKey>
+    </TableCreate>
+
+    <TableCreate Name="text_module_type">
+        <Column Name="text_module_id" Required="true" Type="INTEGER" />
+        <Column Name="ticket_type_id" Required="true" Type="SMALLINT" />
+        <ForeignKey ForeignTable="ticket_type">
+            <Reference Local="ticket_type_id" Foreign="id" />
+        </ForeignKey>
+        <ForeignKey ForeignTable="text_module">
+            <Reference Local="text_module_id" Foreign="id" />
+        </ForeignKey>
+    </TableCreate>
+
+</database>
