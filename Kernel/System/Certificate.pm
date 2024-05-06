@@ -260,7 +260,7 @@ sub CertificateGet {
         || !$Self->{$File{Preferences}->{Type}}->{Path}
     ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The file found is not a supported certificate!"
             );
@@ -326,7 +326,7 @@ sub CertificateDelete {
 
     if ( !$Param{ID} ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need ID!"
             );
@@ -342,7 +342,7 @@ sub CertificateDelete {
 
     if ( !%File ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No certificate found!"
             );
@@ -356,7 +356,7 @@ sub CertificateDelete {
         || !$Self->{$File{Preferences}->{Type}}->{Path}
     ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "The file found is not a supported certificate!"
             );
@@ -381,7 +381,7 @@ sub CertificateDelete {
 
         if ( !$Success ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Couldn't delete certificate!"
                 );
@@ -397,7 +397,7 @@ sub CertificateDelete {
 
     if ( !$Success ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Couldn't delete certificate!"
             );
@@ -428,7 +428,7 @@ sub CertificateExists {
     if ( $Param{HasCertificate} ) {
         if ( !$Param{Type} ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Needed Type!",
                 );
@@ -440,7 +440,7 @@ sub CertificateExists {
 
         if ( !$Param{Attributes}->{Modulus} ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Needed Modulus!",
                 );
@@ -471,7 +471,7 @@ sub CertificateExists {
 
         if ( !@CertID ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need Certificate of Private Key first -$Param{Attributes}->{Modulus})!",
                 );
@@ -483,7 +483,7 @@ sub CertificateExists {
     else {
         if ( !$Param{Filename} ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Needed Filename!",
                 );
@@ -632,7 +632,7 @@ sub _CheckCertificate {
     for my $Needed ( qw(File Type CType) ) {
         if ( !$Param{$Needed} ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Needed!"
                 );
@@ -644,7 +644,7 @@ sub _CheckCertificate {
     for my $Needed ( qw(Content ContentType Filename) ) {
         if ( !$Param{File}->{$Needed} ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Needed in File!"
                 );
@@ -656,7 +656,7 @@ sub _CheckCertificate {
     my $ContentTypes = $Self->{$Param{Type}}->{ContentTypes};
     if ( !$ContentTypes->{$Param{File}->{ContentType}} ) {
         if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Invalid content type $Param{File}->{ContentType}"
                 );
@@ -669,7 +669,7 @@ sub _CheckCertificate {
         && !$Param{Passphrase}
     ) {
         if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need Passphrase!"
             );
@@ -684,7 +684,7 @@ sub _GetCertificateAttributes {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{File} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need File!'
         );
@@ -717,7 +717,7 @@ sub _GetCertificateAttributes {
     close $FH or return;
 
     if ( !-e $Filename ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Filename!",
         );
@@ -731,6 +731,8 @@ sub _GetCertificateAttributes {
         Passphrase  => $Param{Passphrase} || q{},
         Silent      => $Param{Silent}
     );
+
+    return if !$Attributes;
 
     if ( $Param{Type} eq 'Cert' ) {
         if ( $Attributes->{Hash} ) {
@@ -811,7 +813,7 @@ sub _FetchAttributes {
 
         if ( $Output =~ /error:/sm ) {
             if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Kernel::System::Log')->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => $Output
                 );
@@ -1005,14 +1007,14 @@ sub _InitCheck {
 
     my $Success = 1;
     if ( !-e $Self->{Bin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No such $Self->{Bin}!",
         );
         $Success = 0;
     }
     elsif ( !-x $Self->{Bin} ) {
-        $Kernel::OM->Get('Kernel::System::Log')->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "$Self->{Bin} not executable!",
         );
@@ -1021,7 +1023,7 @@ sub _InitCheck {
 
     for my $Key ( qw( Cert Private) ) {
         if ( !-e $Self->{$Key}->{Path} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such $Self->{$Key}->{Path}!",
             );
@@ -1029,7 +1031,7 @@ sub _InitCheck {
             last;
         }
         elsif ( !-d $Self->{$Key}->{Path} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such $Self->{$Key}->{Path} directory!",
             );
@@ -1037,7 +1039,7 @@ sub _InitCheck {
             last;
         }
         elsif ( !-w $Self->{$Key}->{Path} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "$Self->{$Key}->{Path} not writable!",
             );
