@@ -206,7 +206,7 @@ sub HandleTicketFlagSet {
         TicketID => $Param{Ticket}->{TicketID} 
     );
 
-    if ( lc $Param{Data}->{Key} eq 'seen' && $OwnerID == $Param{Data}->{UserID} ) {
+    if ( $Param{Data}->{Key} eq 'Seen' && $OwnerID == $Param{UserID} ) {
         $Kernel::OM->Get('User')->DeleteUserCounterObject(
             Category => 'Ticket',
             Counter  => '*AndUnseen',
@@ -218,14 +218,14 @@ sub HandleTicketFlagSet {
     my $IsWatched = $Kernel::OM->Get('Watcher')->WatcherLookup(
         Object      => 'Ticket',
         ObjectID    => $Param{Ticket}->{TicketID},
-        WatchUserID => $Param{Ticket}->{UserID},
+        WatchUserID => $Param{UserID},
     );
     if ( $IsWatched ) {
         $Kernel::OM->Get('User')->DeleteUserCounterObject(
             Category => 'Ticket',
             Counter  => 'WatchedAndUnseen',
             ObjectID => $Param{Ticket}->{TicketID},
-            UserID   => $Param{Ticket}->{UserID}
+            UserID   => $Param{UserID}
         );
     }
 
