@@ -86,7 +86,9 @@ perform TextModuleUpdate Operation. This will return the updated TypeID.
                     'some', 'keywords'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                ValidID             => 1            # optional
+                ValidID             => 1,           # optional
+                QueueIDs            => [...],       # optional
+                TicketTypeIDs       => [...]        # optional
             },
         },
     );
@@ -146,6 +148,8 @@ sub Run {
         Subject            => exists $TextModule->{Subject} ? $TextModule->{Subject} : $TextModuleData{Subject},
         Keywords           => IsArrayRef($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : $TextModuleData{Keywords},
         Comment            => exists $TextModule->{Comment} ? $TextModule->{Comment} : $TextModuleData{Comment},
+        QueueIDs           => $TextModule->{QueueIDs},
+        TicketTypeIDs      => $TextModule->{TicketTypeIDs},
         ValidID            => $TextModule->{ValidID} || $TextModuleData{ValidID},
         UserID             => $Self->{Authorization}->{UserID},
     );
