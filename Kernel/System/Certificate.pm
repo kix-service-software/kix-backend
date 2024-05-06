@@ -967,6 +967,7 @@ sub _Init {
             # 'application/x-pkcs12'               => 'pkcs12',
             'application/x-pem-file'             => 'rsa',
             'application/x-iwork-keynote-sffkey' => 'rsa',
+            'application/vnd.apple.keynote'      => 'rsa',
             'application/x-x509-ca-cert'         => 'rsa'
         },
         Options => {
