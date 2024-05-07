@@ -538,11 +538,14 @@ to search users
         IsCustomer      => 1,                         # optional
         IsOutOfOffice   => 1,                         # optional
         Limit           => 50,                        # optional
-        ValidID         => 2                          # optional - if given "Valid" is ignored
-        Valid           => 1                          # optional - if omitted, 1 is used
-        UserIDs         => [1,2,3]                    # optional
-        SearchUserID    => 1                          # optional
-        HasPermission   => {...}                      # optional
+        ValidID         => 2,                         # optional - if given "Valid" is ignored
+        Valid           => 1,                         # optional - if omitted, 1 is used
+        UserIDs         => [1,2,3],                   # optional
+        SearchUserID    => 1,                         # optional
+        HasPermission   => {...},                     # optional
+        RoleIDs         => {...},                     # optional - which roles the user schould have (one is enough)
+        NotRoleIDs      => {...},                     # optional - which roles the user schould NOT have (one is enough)
+        ExcludeUsersByRoleIDsIgnoreUserIDs => [1]     # optional - used for filter of sysconfig ExcludeUsersByRoleIDs (do not consider check for given users; relevant if HasPermission is given)
     );
 
 Returns hash of UserID, Login pairs:
@@ -573,11 +576,13 @@ sub UserSearch {
         && !$Param{SearchUserID}
         && !IsArrayRefWithData{$Param{UserIDs}}
         && !IsHashRefWithData($Param{HasPermission})
+        && !IsArrayRefWithData($Param{RoleIDs})
+        && !IsArrayRefWithData($Param{NotRoleIDs})
     ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or HasPermission - else use UserList!',
+                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
             );
         }
         return;
@@ -594,7 +599,10 @@ sub UserSearch {
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
         . ( $Param{Limit} || '' ) . '::'
         . ( $Param{SearchUserID} || '') . '::'
-        . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' );
+        . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' ) . '::'
+        . ( IsArrayRefWithData($Param{RoleIDs}) ? join(',', @{ $Param{RoleIDs} }) : '' ) . '::'
+        . ( IsArrayRefWithData($Param{NotRoleIDs}) ? join(',', @{ $Param{NotRoleIDs} }) : '' ) . '::'
+        . ( IsArrayRefWithData($Param{ExcludeUsersByRoleIDsIgnoreUserIDs}) ? join(',', @{ $Param{ExcludeUsersByRoleIDsIgnoreUserIDs} }) : '' );
 
     # skip cache check if IsOutOfOffice is defined (time relative search)
     if ( !defined( $Param{IsOutOfOffice} ) ) {
@@ -633,10 +641,10 @@ sub UserSearch {
     }
 
     if ( $Param{UserLogin} ) {
-        push(@Where, "$Self->{Lower}(u.$Self->{UserTableUser}) LIKE ? $LikeEscapeString");
+        push( @Where, "$Self->{Lower}(u.$Self->{UserTableUser}) LIKE ? $LikeEscapeString" );
         $Param{UserLogin} =~ s/\*/%/g;
-        $Param{UserLogin} = $Kernel::OM->Get('DB')->Quote( $Param{UserLogin}, 'Like' );
-        push @Bind, \$Param{UserLogin};
+        $Param{UserLogin} = lc( $Kernel::OM->Get('DB')->Quote( $Param{UserLogin}, 'Like' ) );
+        push( @Bind, \$Param{UserLogin} );
     }
 
     if ( $Param{UserLoginEquals} ) {
@@ -706,9 +714,32 @@ END
         push(@Bind, \$Param{SearchUserID});
     }
 
+    if ( IsArrayRefWithData($Param{RoleIDs}) ) {
+        push(@Where, "u.id IN (SELECT DISTINCT(r_u.user_id) FROM role_user r_u WHERE r_u.role_id IN (" . join( ', ', @{ $Param{RoleIDs} } ) . "))");
+    }
+
+    if ( IsArrayRefWithData($Param{NotRoleIDs}) ) {
+        push(@Where, "u.id NOT IN (SELECT DISTINCT(r_u.user_id) FROM role_user r_u WHERE r_u.role_id IN (" . join( ', ', @{ $Param{NotRoleIDs} } ) . "))");
+    }
+
     my @UnionWhere;
 
     if ( IsHashRefWithData($Param{HasPermission}) ) {
+
+        # prepare special condition for excluded roles in permission check
+        my $ExcludeRoleIDs = $Kernel::OM->Get('Config')->Get('ExcludeUsersByRoleIDs');
+        if ( IsArrayRefWithData($ExcludeRoleIDs) ) {
+            # ignore some roles in the permission check
+            my $ExcludedRoleCondition = '(ru.role_id NOT IN (' . join( ', ', @{ $ExcludeRoleIDs } ) . ')';
+
+            # ignore some users in this conditon
+            if ( IsArrayRefWithData( $Param{ExcludeUsersByRoleIDsIgnoreUserIDs} ) ) {
+                $ExcludedRoleCondition .= ' OR u.id IN ('. join( ', ', @{ $Param{ExcludeUsersByRoleIDsIgnoreUserIDs} } ) .')';
+            }
+
+            $ExcludedRoleCondition .= ')';
+            push(@Where, $ExcludedRoleCondition);
+        }
 
         my @PermissionValues;
         foreach my $Permission ( split(/,/, $Param{HasPermission}->{Permission}) ) {
