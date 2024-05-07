@@ -3128,4 +3128,13 @@ Thanks for your help!
             <String Regex="">99</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ExcludeUsersByRoleIDs" Required="0" Valid="0">
+        <Description Translatable="1">Exclude users based on their role id if requested with required permissions (e.g. for owner/responsible assignment)</Description>
+        <Setting>
+            <Array>
+                <Item>1</Item>
+                <Item>2</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
 </kix_config>
