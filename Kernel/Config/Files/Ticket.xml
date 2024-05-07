@@ -2352,28 +2352,6 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-DecryptBody" Required="0" Valid="0">
-        <Description Translatable="1">Module to filter encrypted bodies of incoming messages.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::Decrypt</Item>
-                <Item Key="StoreDecryptedBody">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-SMIMEFetchFromCustomer" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Module to fetch contacts SMIME certificates of incoming messages.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::SMIMEFetchFromCustomer</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0100-Subject" Required="0" Valid="1">
         <Description Translatable="1">Checks if an E-Mail is a followup to an existing ticket by searching the subject for a valid ticket number.</Description>
         <Group>Ticket</Group>

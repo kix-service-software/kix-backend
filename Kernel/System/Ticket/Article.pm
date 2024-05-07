@@ -75,20 +75,6 @@ create an article
                 Filename    => 'lala1.txt',
             },
         ],
-        Sign => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
-        Crypt => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
         NoAgentNotify    => 0,                                      # if you don't want to send agent notifications
 
         ForceNotificationToUserID   => [ 1, 43, 56 ],               # if you want to force somebody

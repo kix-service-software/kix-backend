@@ -1568,7 +1568,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="virtual_fs_id" Required="true" Type="BIGINT"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="350" Type="VARCHAR"/>
+    <Column Name="preferences_value" Required="false" Size="1800000" Type="VARCHAR"/>
     <Index Name="virtual_fs_preferences_virtual_fs_id">
         <IndexColumn Name="virtual_fs_id"/>
     </Index>

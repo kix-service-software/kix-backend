@@ -31,7 +31,7 @@ use vars qw(%INC);
 # add the new job
 _AddUnlockJob();
 
-# add virutal fs ressource permission
+# add virtual fs ressource permission
 _AddNewPermissions();
 
 sub _AddUnlockJob {
