@@ -6208,44 +6208,54 @@ Returns the previous ticket state to the current one.
 
 sub GetPreviousTicketState {
     my ( $Self, %Param ) = @_;
-    my $Result = 0;
 
     # check needed stuff
-    for (qw(TicketID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "Need $_!" );
+    for my $Needed ( qw(TicketID) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $Needed!"
+            );
             return 0;
         }
     }
 
     my $SelectValue = 'ts1.name';
-    if ( $Param{ResultType} && $Param{ResultType} eq 'ID' ) {
-        $SelectValue = 'ts1.id';
-    }
-
-    # following deprecated but kept for backward-compatibility...
-    elsif ( $Param{ResultType} && $Param{ResultType} eq 'StateID' ) {
+    if (
+        $Param{ResultType}
+        && (
+            $Param{ResultType} eq 'ID'
+            || $Param{ResultType} eq 'StateID'
+        )
+    ) {
         $SelectValue = 'ts1.id';
     }
 
     my %Ticket = $Self->TicketGet(
         TicketID => $Param{TicketID},
     );
-    return 0 if !%Ticket || !$Ticket{State};
-
-    return 0 if !$Kernel::OM->Get('DB')->Prepare(
-        SQL => "SELECT " . $SelectValue . " FROM ticket_history th1, ticket_state ts1 " .
-            " WHERE " .
-            "   th1.id = ( " .
-            "     SELECT max(th2.id) FROM ticket_history th2, ticket_state ts2 WHERE " .
-            "     th2.ticket_id = ? AND th2.create_time = th2.change_time " .
-            "     AND th2.state_id = ts2.id AND ts2.name != ? " .
-            "   ) " .
-            "   AND ts1.id = th1.state_id ",
-        Bind => [ \$Ticket{TicketID}, \$Ticket{State} ],
+    return 0 if (
+        !%Ticket
+        || !$Ticket{State}
     );
 
+    return 0 if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => <<"END",
+SELECT $SelectValue
+FROM ticket_history th1, ticket_state ts1
+WHERE th1.id = (
+    SELECT max(th2.id)
+    FROM ticket_history th2
+    WHERE th2.ticket_id = ?
+        AND th2.create_time = th2.change_time
+        AND th2.state_id != ?
+    )
+    AND ts1.id = th1.state_id
+END
+        Bind => [ \$Ticket{TicketID}, \$Ticket{StateID} ],
+    );
+
+    my $Result = 0;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result = $Row[0];
     }

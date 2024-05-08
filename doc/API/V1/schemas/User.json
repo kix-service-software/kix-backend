@@ -887,6 +887,16 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true

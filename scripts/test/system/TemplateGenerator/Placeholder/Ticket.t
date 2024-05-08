@@ -108,6 +108,18 @@ push(
         TicketID  => $Ticket{TicketID},
         Test      => "<KIX_TICKET_NUMBER>",
         Expection => $Ticket{TicketNumber},
+    },
+    {
+        TestName  => 'Placeholder: <KIX_TICKET_StatePrevious>',
+        TicketID  => $Ticket{TicketID},
+        Test      => '<KIX_TICKET_StatePrevious>',
+        Expection => 'new',
+    },
+    {
+        TestName  => 'Placeholder: <KIX_TICKET_StateIDPrevious>',
+        TicketID  => $Ticket{TicketID},
+        Test      => '<KIX_TICKET_StateIDPrevious>',
+        Expection => 1,
     }
 );
 
@@ -135,6 +147,34 @@ push(
     }
 );
 
+# run tests
+_TestRun(
+    Tests => \@UnitTests
+);
+
+# update ticket
+%Ticket = _UpdateTicket(
+    TicketID => $Ticket{TicketID},
+    TestName => '_UpdateTicket(): ticket update'
+);
+
+# prepare test cases after update
+@UnitTests = (
+    {
+        TestName  => 'Placeholder: <KIX_TICKET_StatePrevious>',
+        TicketID  => $Ticket{TicketID},
+        Test      => '<KIX_TICKET_StatePrevious>',
+        Expection => 'new',
+    },
+    {
+        TestName  => 'Placeholder: <KIX_TICKET_StateIDPrevious>',
+        TicketID  => $Ticket{TicketID},
+        Test      => '<KIX_TICKET_StateIDPrevious>',
+        Expection => 1,
+    }
+);
+
+# run tests
 _TestRun(
     Tests => \@UnitTests
 );
@@ -183,8 +223,42 @@ sub _CreateTicket {
         $Param{TestName}
     );
 
+    $Kernel::OM->Get('Ticket')->TicketStateSet(
+        TicketID => $ID,
+        State    => 'open',
+        UserID   => 1
+    );
+
     my %Data = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $ID,
+        UserID   => 1
+    );
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'Ticket'
+        ]
+    );
+
+    return %Data;
+}
+
+sub _UpdateTicket {
+    my (%Param) = @_;
+
+    my $NewStateID = $Kernel::OM->Get('Ticket')->TicketStateSet(
+        TicketID => $Param{TicketID},
+        State    => 'open',
+        UserID   => 1
+    );
+
+    $Self->True(
+        $NewStateID,
+        $Param{TestName}
+    );
+
+    my %Data = $Kernel::OM->Get('Ticket')->TicketGet(
+        TicketID => $Param{TicketID},
         UserID   => 1
     );
 
