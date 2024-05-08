@@ -1,0 +1,14 @@
+{
+   "$id" : "CertificatePostResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The ID of the created certificate.",
+   "type" : "object",
+   "properties" : {
+      "CertificateID" : {
+         "type" : "integer"
+      }
+   },
+   "required" : [
+      "CertificateID"
+   ]
+}
