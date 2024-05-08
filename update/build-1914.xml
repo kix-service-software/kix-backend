@@ -12,7 +12,7 @@
         </ForeignKey>
     </TableCreate>
 
-    <TableCreate Name="text_module_type">
+    <TableCreate Name="text_module_ticket_type">
         <Column Name="text_module_id" Required="true" Type="INTEGER" />
         <Column Name="ticket_type_id" Required="true" Type="SMALLINT" />
         <ForeignKey ForeignTable="ticket_type">
