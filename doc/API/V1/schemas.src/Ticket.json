@@ -130,6 +130,16 @@
             "type": "integer",
             "readOnly": true
         },
+        "StatePrevious": {
+            "type": "string",
+            "description": "added via include \"StatePrevious\"",
+            "readOnly": true
+        },
+        "StateIDPrevious": {
+            "type": "integer",
+            "description": "added via include \"StatePrevious\"",
+            "readOnly": true
+        },
         "StateType": {
             "type": "string",
             "readOnly": true

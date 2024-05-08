@@ -4686,6 +4686,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -5875,6 +5885,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -6899,6 +6919,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -11138,6 +11168,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -12403,6 +12443,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -13612,6 +13662,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -14364,6 +14424,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -17651,6 +17721,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -18696,6 +18776,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -19455,7 +19545,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="objectsearch__objecttype__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>AccountedTime</code></td><td>Adds the sum of all time units for the ticket (its articles)</td></tr><tr><td><code>DynamicFields</code></td><td>Includes the assigned Dynamic Fields and their prepared values. You can disable the preparation of specific DF types with the URI parameter <code>NoDynamicFieldDisplayValues</code>, which is a comma separated list of DF types.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="objectsearch__objecttype__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>AccountedTime</code></td><td>Adds the sum of all time units for the ticket (its articles)</td></tr><tr><td><code>DynamicFields</code></td><td>Includes the assigned Dynamic Fields and their prepared values. You can disable the preparation of specific DF types with the URI parameter <code>NoDynamicFieldDisplayValues</code>, which is a comma separated list of DF types.</td></tr><tr><td><code>LinkCount</code></td><td>Includes the number of linked objects of this ticket</td></tr><tr><td><code>StatePrevious</code></td><td>Includes the previous state and its ID</td></tr><tr><td><code>Unseen</code></td><td>Includes the property <code>Unseen</code></td></tr><tr><td><code>WatcherID</code></td><td>Includes the ID of the watcher if the current user is watching the ticket</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of tickets.",
@@ -20023,6 +20113,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -21185,6 +21285,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -46897,6 +47007,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -48149,6 +48269,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
