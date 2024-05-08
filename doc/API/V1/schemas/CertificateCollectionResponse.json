@@ -1,0 +1,92 @@
+{
+   "$id" : "CertificateCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of certificates.",
+   "type" : "object",
+   "properties" : {
+      "Certificate" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_Certificate_json"
+         }
+      }
+   },
+   "required" : [
+      "Certificate"
+   ],
+   "definitions" : {
+      "_Certificate_json" : {
+         "$id" : "Certificate.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The certificate object.",
+         "type" : "object",
+         "properties" : {
+            "CType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "EndDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FileID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fingerprint" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Hash" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Issuer" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Modulus" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Serial" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StartDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "FileID",
+            "Filename",
+            "Fingerprint",
+            "Subject",
+            "Type",
+            "CType",
+            "Modulus"
+         ]
+      }
+   }
+}
