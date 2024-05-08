@@ -736,9 +736,11 @@ sub ContactLookup {
         );
         return $Cache if $Cache;
 
+        my $UserLogin = lc $Param{UserLogin};
+
         return if !$DBObject->Prepare(
-            SQL => "SELECT c.id FROM contact c, users u WHERE u.id = c.user_id AND u.login = ?",
-            Bind  => [ \$Param{UserLogin} ],
+            SQL => "SELECT c.id FROM contact c, users u WHERE u.id = c.user_id AND $Self->{Lower}(u.login) = ?",
+            Bind  => [ \$UserLogin ],
             Limit => 1,
         );
 
