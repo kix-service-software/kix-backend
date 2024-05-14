@@ -486,10 +486,11 @@ sub Run {
         if ( !$ChannelID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "Channel ".$GetParam{'X-KIX-Channel'}." does not exist, falling back to 'email'."
+                Message  => "Channel "
+                    . $GetParam{'X-KIX-Channel'}
+                    . " does not exist, falling back to 'email'."
             );
-            $GetParam{'X-KIX-Channel'} = undef;
+            $GetParam{'X-KIX-Channel'} = 'email';
         }
     }
 
@@ -503,8 +504,9 @@ sub Run {
         if ( !$SenderTypeID ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "SenderType ".$GetParam{'X-KIX-SenderType'}." does not exist, falling back to 'external'."
+                Message  => "SenderType "
+                    . $GetParam{'X-KIX-SenderType'}
+                    . " does not exist, falling back to 'external'."
             );
             $GetParam{'X-KIX-SenderType'} = 'external';
         }

@@ -252,7 +252,8 @@ sub ArticleCreate {
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
             $Param{Body} = $HTMLUtilsObject->ToAscii(
-                String => $Param{Body},
+                String            => $Param{Body},
+                NoForcedLinebreak => 1
             );
         }
         elsif ( $Param{MimeType} && $Param{MimeType} eq "application/json" ) {
@@ -309,19 +310,28 @@ sub ArticleCreate {
 
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
+
+        # get From by agent preference
+        if (!$Param{From} && $Param{SenderType} eq 'agent') {
+            $Param{From} = $Self->_GetFromByUser(
+                %Param,
+                Ticket => \%OldTicketData
+            )
+        }
+
         # check needed stuff
-        for (qw(TicketID UserID From Body Charset MimeType)) {
-            if ( !$Param{$_} ) {
+        for my $Needed (qw(TicketID UserID From Body Charset MimeType)) {
+            if ( !$Param{$Needed} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Need $_!"
+                    Message  => "Need $Needed!"
                 );
                 return;
             }
         }
 
-        $Param{ToOrig} = $Param{To}          || '';
-        $Param{Loop}        = $Param{Loop}        || 0;
+        $Param{ToOrig} = $Param{To}   || '';
+        $Param{Loop}   = $Param{Loop} || 0;
 
         # map ReplyTo into Reply-To if present
         if ( $Param{ReplyTo} ) {
@@ -508,35 +518,6 @@ sub ArticleCreate {
         HistoryType  => $Param{HistoryType},
         Name         => $Param{HistoryComment},
     );
-
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $UserObject   = $Kernel::OM->Get('User');
-
-    # unlock ticket if the owner is away (and the feature is enabled)
-    if (
-        $Param{UnlockOnAway}
-        && $OldTicketData{Lock} eq 'lock'
-        && $ConfigObject->Get('Ticket::UnlockOnAway')
-        )
-    {
-        my %OwnerInfo = $UserObject->GetUserData(
-            UserID => $OldTicketData{OwnerID},
-        );
-
-        if ( $OwnerInfo{Preferences}->{OutOfOfficeMessage} ) {
-            $Self->TicketLockSet(
-                TicketID => $Param{TicketID},
-                Lock     => 'unlock',
-                UserID   => $Param{UserID},
-            );
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message =>
-                    "Ticket [$OldTicketData{TicketNumber}] unlocked, current owner is out of office!",
-            );
-        }
-    }
 
     # event
     $Self->EventHandler(
@@ -2251,6 +2232,7 @@ set article flags
         Value     => 1,
         UserID    => 123,
         Silent    => 1       # optional - if set, no client notification will be triggered
+        NoEvents  => 1       # optional - trigger no events
     );
 
 Events:
@@ -2298,6 +2280,7 @@ sub ArticleFlagSet {
                 AND create_by = ?',
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
     );
+
     return if !$DBObject->Do(
         SQL => 'INSERT INTO article_flag
             (article_id, article_key, article_value, create_time, create_by)
@@ -2307,17 +2290,19 @@ sub ArticleFlagSet {
 
     $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
-    $Self->EventHandler(
-        Event => 'ArticleFlagSet',
-        Data  => {
-            TicketID  => $Article{TicketID},
-            ArticleID => $Param{ArticleID},
-            Key       => $Param{Key},
-            Value     => $Param{Value},
-            UserID    => $Param{UserID},
-        },
-        UserID => $Param{UserID},
-    );
+    if ( !$Param{NoEvents} ) {
+        $Self->EventHandler(
+            Event => 'ArticleFlagSet',
+            Data  => {
+                TicketID  => $Article{TicketID},
+                ArticleID => $Param{ArticleID},
+                Key       => $Param{Key},
+                Value     => $Param{Value},
+                UserID    => $Param{UserID},
+            },
+            UserID => $Param{UserID},
+        );
+    }
 
     # push client callback event
     if (!$Param{Silent}) {
@@ -3148,11 +3133,11 @@ prepares and transform config from AssignedObjectsMapping to a simple hash
 sub _GetAssignedSearchParams {
     my ( $Self, %Param ) = @_;
 
-    for ( qw(AssignedObjectType ObjectType) ) {
-        if ( !$Param{$_} ) {
+    for my $Needed ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
             return;
         }
@@ -3404,6 +3389,79 @@ sub _ReplaceValuePlaceholder {
         Data            => $Param{Data},
         ReplaceNotFound => $Param{ReplaceNotFound}
     );
+}
+
+sub _GetFromByUser {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(UserID Ticket) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $FromFormat = 'SystemAddress';
+
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
+        UserID => $Param{UserID}
+    );
+    if (
+        IsHashRefWithData(\%UserData) && IsHashRefWithData($UserData{Preferences}) &&
+        $UserData{Preferences}->{ArticleFromFormat}
+    ) {
+        $FromFormat = $UserData{Preferences}->{ArticleFromFormat};
+    }
+
+    my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
+        QueueID => $Param{Ticket}->{QueueID},
+        UserID  => $Param{UserID}
+    );
+    if (!IsHashRefWithData(\%Address)) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Cannot prepare "From" value, could not load system address!'
+        );
+    }
+
+    my %Contact;
+    if ($FromFormat =~ m/^Agent/) {
+        %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID => $Param{UserID}
+        );
+        if (!IsHashRefWithData(\%Contact)) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Cannot prepare "From" value, could not load contact data of user!'
+            );
+            return;
+        }
+    }
+
+    my $Realname = '';
+    if ($FromFormat eq 'Agent') {
+        $Realname .= "$Contact{Firstname} $Contact{Lastname}";
+    } elsif ($FromFormat eq 'AgentViaSystemAddress') {
+        my $Separator = $Kernel::OM->Get('Config')->Get('Ticket::DefineEmailFromSeparator') || '';
+        $Realname .= "$Contact{Firstname} $Contact{Lastname} $Separator $Address{RealName}";
+    } else {
+        $Realname .= $Address{RealName};
+    }
+
+    if ($Realname =~ m/[äÄöÖüÜß]/) {
+        $Realname =~ s/ä/ae/g;
+        $Realname =~ s/Ä/Ae/g;
+        $Realname =~ s/ö/oe/g;
+        $Realname =~ s/Ö/Oe/g;
+        $Realname =~ s/ü/ue/g;
+        $Realname =~ s/Ü/Ue/g;
+        $Realname =~ s/ß/ss/g;
+    }
+
+    return "\"$Realname\" <$Address{Email}>";
 }
 
 1;

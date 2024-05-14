@@ -528,7 +528,6 @@ my @Tests = (
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
-        SetOutOfOffice          => 1,
         SetOutOfOfficeDiffStart => -3 * 60 * 60 * 24,
         SetOutOfOfficeDiffEnd   => -1 * 60 * 60 * 24,
         Success                 => 1,
@@ -549,7 +548,6 @@ my @Tests = (
             UserID => 1,
         },
         ExpectedResults         => [],
-        SetOutOfOffice          => 1,
         SetOutOfOfficeDiffStart => -1 * 60 * 60 * 24,
         SetOutOfOfficeDiffEnd   => 1 * 60 * 60 * 24,
         Success                 => 1,
@@ -575,7 +573,6 @@ my @Tests = (
                 Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
             },
         ],
-        SetOutOfOffice          => 1,
         SetOutOfOfficeDiffStart => 1 * 60 * 60 * 24,
         SetOutOfOfficeDiffEnd   => 3 * 60 * 60 * 24,
         Success                 => 1,
@@ -1294,74 +1291,50 @@ my $SetOutOfOffice = sub {
 
     if ( $Param{OutOfOffice} ) {
 
-        my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+        my ( $StartSec, $StartMin, $StartHour, $StartDay, $StartMonth, $StartYear, $StartWeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
             SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $Param{SetOutOfOfficeDiffStart},
         );
-
-        my ( $ESec, $EMin, $EHour, $EDay, $EMonth, $EYear, $EWeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+        my ( $EndSec, $EndMin, $EndHour, $EndDay, $EndMonth, $EndYear, $EndWeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
             SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $Param{SetOutOfOfficeDiffEnd},
         );
 
         my %Preferences = (
-            OutOfOfficeStartYear  => $Year,
-            OutOfOfficeStartMonth => $Month,
-            OutOfOfficeStartDay   => $Day,
-            OutOfOfficeEndYear    => $EYear,
-            OutOfOfficeEndMonth   => $EMonth,
-            OutOfOfficeEndDay     => $EDay,
+            OutOfOfficeStart => sprintf( '%04d-%02d-%02d', $StartYear, $StartMonth, $StartDay ),
+            OutOfOfficeEnd   => sprintf( '%04d-%02d-%02d', $EndYear, $EndMonth, $EndDay ),
         );
 
-        # pref update db
-        my $IsSuccess = $Kernel::OM->Get('User')->SetPreferences(
-            UserID => $Param{UserID},
-            Key    => 'OutOfOffice',
-            Value  => 1,
-        );
-
-        for my $Key (
-            qw(
-                OutOfOfficeStartYear OutOfOfficeStartMonth OutOfOfficeStartDay
-                OutOfOfficeEndYear OutOfOfficeEndMonth OutOfOfficeEndDay
-            )
-        ) {
-
+        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
             # pref update db
             my $PreferenceSet = $Kernel::OM->Get('User')->SetPreferences(
                 UserID => $Param{UserID},
                 Key    => $Key,
-                Value  => $Preferences{$Key},
+                Value  => $Preferences{ $Key },
+            );
+            $Self->True(
+                $PreferenceSet,
+                "User preference $Key set to $Preferences{ $Key }",
             );
 
             if ( !$PreferenceSet ) {
-                $IsSuccess = 0;
+                return;
             }
         }
-
-        $Self->True(
-            $IsSuccess,
-            "User set OutOfOffice",
-        );
     }
     else {
-
-        # pref update db
-        my $IsSuccess = $Kernel::OM->Get('User')->SetPreferences(
-            UserID => $Param{UserID},
-            Key    => 'OutOfOffice',
-            Value  => 0,
-        );
-
-        $Self->True(
-            $IsSuccess,
-            "User set Not OutOfOffice",
-        );
+        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
+            # pref update db
+            my $IsSuccess = $Kernel::OM->Get('User')->DeletePreferences(
+                UserID => $Param{UserID},
+                Key    => $Key,
+            );
+            $Self->True(
+                $IsSuccess,
+                "User preference $Key deleted",
+            );
+        }
     }
 
-    my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
-        UserID => $Param{UserID},
-    );
-
-    return $UserPreferences{OutOfOffice};
+    return 1;
 
 };
 
@@ -1503,7 +1476,10 @@ for my $Test (@Tests) {
         );
     }
 
-    if ( $Test->{SetOutOfOffice} ) {
+    if (
+        defined( $Test->{SetOutOfOfficeDiffStart} )
+        && defined( $Test->{SetOutOfOfficeDiffEnd} )
+    ) {
         my $SuccessOOO = $SetOutOfOffice->(
             SetOutOfOfficeDiffStart => $Test->{SetOutOfOfficeDiffStart},
             SetOutOfOfficeDiffEnd   => $Test->{SetOutOfOfficeDiffEnd},
@@ -1617,7 +1593,10 @@ continue {
     }
 
     # reset OutOfOffice status
-    if ( $Test->{SetOutOfOffice} ) {
+    if (
+        defined( $Test->{SetOutOfOfficeDiffStart} )
+        && defined( $Test->{SetOutOfOfficeDiffEnd} )
+    ) {
         $SetOutOfOffice->(
             UserID      => $UserID,
             OutOfOffice => 0,

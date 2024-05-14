@@ -328,7 +328,7 @@ sub Run {
         }
 
         # search if there's sth to search for...
-        next SEARCHSTRING if !scalar( @SearchParams );
+        next CLASS if !scalar( @SearchParams );
 
         my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'ConfigItem',
@@ -429,7 +429,7 @@ sub _ExportXMLSearchDataPrepare {
         if ($Values) {
 
             # create search key
-            my $SearchKey = (!$Param{Prefix} ? 'CurrentVersion.Data.' : q{} ) . $Key;
+            my $SearchKey = 'CurrentVersion.Data.' . $Key;
             $SearchKey =~ s/::/./gsm;
 
             push(

@@ -10,7 +10,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">ObjectType</Item>
                 <Item Key="CacheType">API_objectsearch</Item>
-                <Item Key="CacheTypeDependency">ObjectSearch</Item>
+                <Item Key="CacheTypeDependency">ObjectSearch,DynamicField</Item>
             </Hash>
         </Setting>
     </ConfigItem>

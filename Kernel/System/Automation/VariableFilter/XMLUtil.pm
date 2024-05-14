@@ -25,11 +25,23 @@ sub GetFilterHandler {
 
     my %Handler = (
         'XMLUtil.FromXML' => \&_FromXML,
-    )
+    );
+
+    return %Handler;
 }
 
 sub _FromXML {
     my ( $Self, %Param ) = @_;
+
+    if ( !IsStringWithData( $Param{Value} ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"XMLUtil.FromXML\" need string with data!"
+            );
+        }
+        return $Param{Value};
+    }
 
     # init return data
     my $ReturnData;

@@ -49,9 +49,11 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
+    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes();
+
     return {
         'UserLogin' => {
-            RequiredIfNot => ['NegotiateToken']
+            RequiredIfNot => ['PreAuthRequest','NegotiateToken','state']
         },
         'UserType' => {
             Required => 1,
@@ -61,7 +63,24 @@ sub ParameterDefinition {
             ]
         },
         'Password' => {
-            RequiredIfNot => ['NegotiateToken']
+            RequiredIf => ['UserLogin']
+        },
+        'code' => {
+            RequiredIf => ['state']
+        },
+        'csrfCookie' => {
+            RequiredIf => ['state']
+        },
+        'PreAuthRequest' => {
+            Type => 'HASH'
+        },
+        'PreAuthRequest::Type' => {
+            RequiredIf => ['PreAuthRequest'],
+            OneOf      => $PreAuthTypes
+        },
+        'PreAuthRequest::Data' => {
+            RequiredIf => ['PreAuthRequest'],
+            Type => 'HASH'
         }
     }
 }
@@ -91,74 +110,80 @@ Authenticate user.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $UserID;
-    my $User;
+    # get remote addresses
+    my $CGIObject       = CGI->new;
+    my @RemoteAddresses = ();
+    if ( $CGIObject->http('HTTP_X_FORWARDED_FOR') ) {
+        @RemoteAddresses = split(/",\s{0,1}"/, $CGIObject->http('HTTP_X_FORWARDED_FOR'));
+    }
 
-    # get params
-    my $PostPw = $Param{Data}->{Password} || '';
-
-    if ( defined $Param{Data}->{UserType} ) {
-
-        my $CGIObject       = CGI->new;
-        my @RemoteAddresses = ();
-        if ( $CGIObject->http('HTTP_X_FORWARDED_FOR') ) {
-            @RemoteAddresses = split(/",\s{0,1}"/, $CGIObject->http('HTTP_X_FORWARDED_FOR'));
-        }
-
-        # check submitted data
-        $User = $Kernel::OM->Get('Auth')->Auth(
-            User            => $Param{Data}->{UserLogin} || '',
+    # special handling for PreAuthRequest
+    if ( ref( $Param{Data}->{PreAuthRequest} ) eq 'HASH' ) {
+        my $PreAuthData = $Kernel::OM->Get('Auth')->PreAuth(
+            %{ $Param{Data}->{PreAuthRequest} },
             UsageContext    => $Param{Data}->{UserType},
-            Pw              => $PostPw,
-            NegotiateToken  => $Param{Data}->{NegotiateToken},
             RemoteAddresses => \@RemoteAddresses
         );
-        if ( $User ) {
-            $UserID = $Kernel::OM->Get('User')->UserLookup(
-                UserLogin => $User,
-            );
 
-            # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
-            my $HasPermission = $Kernel::OM->Get('User')->CheckResourcePermission(
-                UserID              => $UserID,
-                UsageContext        => $Param{Data}->{UserType},
-                Target              => '/auth',
-                RequestedPermission => 'CREATE'
+        if ( !defined( $PreAuthData ) ) {
+            return $Self->_Error(
+                Code => 'SessionCreate.PreAuthFail'
             );
-            if ( !$HasPermission ) {
-                return $Self->_Error(
-                    Code => 'Forbidden'
-                );
+        }
+
+        return $Self->_Success(
+            Code => 'Object.Created',
+            Data => $PreAuthData,
+        );
+    }
+
+    # auth with submitted data
+    my $User = $Kernel::OM->Get('Auth')->Auth(
+        User            => $Param{Data}->{UserLogin} || '',
+        UsageContext    => $Param{Data}->{UserType},
+        Pw              => $Param{Data}->{Password} || '',
+        NegotiateToken  => $Param{Data}->{NegotiateToken},
+        Code            => $Param{Data}->{code},
+        State           => $Param{Data}->{state},
+        CSRFToken       => $Param{Data}->{csrfCookie},
+        RemoteAddresses => \@RemoteAddresses
+    );
+    if ( $User ) {
+        my $UserID = $Kernel::OM->Get('User')->UserLookup(
+            UserLogin => $User,
+        );
+
+        # check permission - this is something special since this operation is not protected by the framework because the UserID will just be determined here
+        my $HasPermission = $Kernel::OM->Get('User')->CheckResourcePermission(
+            UserID              => $UserID,
+            UsageContext        => $Param{Data}->{UserType},
+            Target              => '/auth',
+            RequestedPermission => 'CREATE'
+        );
+        if ( !$HasPermission ) {
+            return $Self->_Error(
+                Code => 'Forbidden'
+            );
+        }
+
+        # create new token
+        my $Token = $Kernel::OM->Get('Token')->CreateToken(
+            Payload => {
+                UserID      => $UserID,
+                UserType    => $Param{Data}->{UserType},
             }
+        );
+        if ( $Token ) {
+            return $Self->_Success(
+                Code  => 'Object.Created',
+                Token => $Token,
+            );
         }
     }
 
     # not authenticated
-    if ( !$User ) {
-
-        return $Self->_Error(
-            Code => 'SessionCreate.AuthFail'
-        );
-    }
-
-    # create new token
-    my $Token = $Kernel::OM->Get('Token')->CreateToken(
-        Payload => {
-            UserID      => $UserID,
-            UserType    => $Param{Data}->{UserType},
-        }
-    );
-
-    if ( !$Token ) {
-
-        return $Self->_Error(
-            Code => 'SessionCreate.AuthFail'
-        );
-    }
-
-    return $Self->_Success(
-        Code  => 'Object.Created',
-        Token => $Token,
+    return $Self->_Error(
+        Code => 'SessionCreate.AuthFail'
     );
 }
 

@@ -46,13 +46,12 @@ $Self->False(
 );
 
 # check that no token is available (access / refresh) after creation
-my $HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+my $HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token
@@ -64,27 +63,25 @@ $Self->True(
     'PrepareAuthURL()',
 );
 
-# check for state token in list
+# check for no token in list
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
 
 # check that no token is available (access / refresh)
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # setting fake access token to cache
@@ -102,27 +99,25 @@ $Self->True(
     'Create fake access token',
 );
 
-# check for state token in list (still one token in list, since access token is only in cache)
+# check for no token in list (access token is only in cache)
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
 
 # check that token is available (access / refresh)
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->True(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # update profile with changed name
@@ -143,25 +138,23 @@ $Self->True(
     'ProfileUpdate() changed Name',
 );
 
-# check for state token in list and avaiable token
+# check for no token in list and avaiable token
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->True(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # update profile with changed URLAuth
@@ -190,13 +183,12 @@ $Self->False(
     IsHashRefWithData( \%TokenList ) // 0,
     'Empty token list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token and setting fake access token to cache
@@ -247,13 +239,12 @@ $Self->False(
     IsHashRefWithData( \%TokenList ) // 0,
     'Empty token list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token and setting fake access token to cache
@@ -296,25 +287,23 @@ $Self->True(
     'ProfileUpdate() changed URLRedirect',
 );
 
-# check for state token in list and avaiable token
+# check for no token in list and avaiable token
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->True(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # update profile with changed ClientID
@@ -343,13 +332,12 @@ $Self->False(
     IsHashRefWithData( \%TokenList ) // 0,
     'Empty token list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token and setting fake access token to cache
@@ -392,25 +380,23 @@ $Self->True(
     'ProfileUpdate() changed ClientSecret',
 );
 
-# check for state token in list and avaiable token
+# check for no token in list and avaiable token
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->True(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # update profile with changed scope
@@ -435,19 +421,23 @@ $Self->False(
     IsHashRefWithData( \%TokenList ) // 0,
     'Empty token list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token and setting fake access token to cache
 $AuthURL = $Kernel::OM->Get('OAuth2')->PrepareAuthURL(
     ProfileID => $OAuth2ProfileID,
 );
+# extract state from provided url
+my $State;
+if ( $AuthURL =~ m/state=([^&;]+)/ ) {
+    $State = $1;
+}
 $Self->True(
     $AuthURL,
     'PrepareAuthURL()',
@@ -484,31 +474,29 @@ $Self->True(
     'ProfileUpdate() changed ValidID',
 );
 
-# check for state token in list and avaiable token
+# check for no token in list and avaiable token
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->True(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # process auth code with failure
 my $ProcessAuthCodeProfileID = $Kernel::OM->Get('OAuth2')->ProcessAuthCode(
     AuthCode => 'UnitTest',
-    State    => $TokenList{state}
+    State    => $State
 );
 $Self->False(
     $ProcessAuthCodeProfileID,
@@ -523,13 +511,12 @@ $Self->False(
     IsHashRefWithData( \%TokenList ) // 0,
     'Empty token list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # get AuthURL to generate state token and setting fake access token to cache
@@ -555,8 +542,9 @@ $Self->True(
 );
 
 # request access token with invalid grant type
-my $RequestAccessToken = $Kernel::OM->Get('OAuth2')->RequestAccessToken(
+my $RequestAccessToken = $Kernel::OM->Get('OAuth2')->RequestToken(
     ProfileID => $OAuth2ProfileID,
+    TokenType => 'access_token',
     GrantType => 'UnitTest',
 );
 $Self->False(
@@ -564,25 +552,23 @@ $Self->False(
     'RequestAccessToken()',
 );
 
-# check for state token in list but no avaiable token
+# check for no avaiable token
 %TokenList = $Kernel::OM->Get('OAuth2')->_TokenList(
     ProfileID => $OAuth2ProfileID,
 );
 $Self->True(
     (
-        IsHashRefWithData( \%TokenList )
-        && scalar( keys( %TokenList ) ) == 1
-        && $TokenList{state}
+        IsHashRef( \%TokenList )
+        && scalar( keys( %TokenList ) ) == 0
     ),
-    'Only state token in list',
+    'No token in list',
 );
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # setting fake access token to cache
@@ -618,13 +604,12 @@ $Self->False(
 );
 
 # check that no token is available (access / refresh)
-$HasToken = $Kernel::OM->Get('OAuth2')->HasToken(
-    ProfileID => $OAuth2ProfileID,
-    Silent    => 1,
+$HasAccessToken = $Kernel::OM->Get('OAuth2')->HasAccessToken(
+    ProfileID => $OAuth2ProfileID
 );
 $Self->False(
-    $HasToken,
-    'HasToken()',
+    $HasAccessToken,
+    'HasAccessToken()',
 );
 
 # rollback transaction on database

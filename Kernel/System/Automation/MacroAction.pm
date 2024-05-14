@@ -1179,31 +1179,79 @@ sub _ExecuteVariableFilters {
     foreach my $Filter ( @Filters ) {
         next if !$Filter;
 
-        if ( $Filter =~ /^(JSON|ToJSON)$/i ) {
-            $Value = $Kernel::OM->Get('JSON')->Encode(
-                Data => $Value
-            );
-            $Value =~ s/^"//;
-            $Value =~ s/"$//;
+        if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
+            if ( defined( $Value ) ) {
+                $Value = $Kernel::OM->Get('JSON')->Encode(
+                    Data => $Value
+                );
+                $Value =~ s/^"//;
+                $Value =~ s/"$//;
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need defined data!"
+                );
+            }
         }
-        elsif ( $Filter =~ /^FromJSON$/i && IsStringWithData($Value) ) {
-            $Value = $Kernel::OM->Get('JSON')->Decode(
-                Data => $Value
-            );
+        elsif ( $Filter =~ /^FromJSON$/i ) {
+            if ( IsStringWithData( $Value ) ) {
+                $Value = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Value
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need string with data!"
+                );
+            }
         }
-        elsif ( $Filter =~ /^jq((.*?))$/ && IsStringWithData($Value) ) {
-            my $JqExpression = $2;
-            $JqExpression =~ s/\s+::\s+/|/g;
-            $JqExpression =~ s/&quot;/"/g;
-            $Value = `echo '$Value' | jq -r '$JqExpression'`;
-            chomp $Value;
+        elsif ( $Filter =~ /^jq\((.*)\)$/i ) {
+            my $JqExpression = $1;
+            if ( $JqExpression ) {
+                if ( IsStringWithData( $Value ) ) {
+                    $JqExpression =~ s/\s+::\s+/|/g;
+                    $JqExpression =~ s/&quot;/"/g;
+                    $Value = `echo '$Value' | jq -r '$JqExpression'`;
+                    chomp $Value;
+                }
+                else {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "\"$Filter\" need string with data!"
+                    );
+                }
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" has no jq expression!"
+                );
+            }
         }
-        elsif ( $Filter =~ /^(base64|ToBase64)$/i ) {
-            $Value = MIME::Base64::encode_base64($Value);
-            $Value =~ s/\n//g;
+        elsif ( $Filter =~ /^(?:base64|ToBase64)$/i ) {
+            if ( defined( $Value ) ) {
+                $Value = MIME::Base64::encode_base64($Value);
+                $Value =~ s/\n//g;
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need defined data!"
+                );
+            }
         }
         elsif ( $Filter =~ /^FromBase64$/i ) {
-            $Value = MIME::Base64::decode_base64($Value);
+            if ( IsStringWithData( $Value ) ) {
+                $Value = MIME::Base64::decode_base64($Value);
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need string with data!"
+                );
+            }
         }
         elsif (IsHashRefWithData($Self->{VariableFilter})) {
             $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;

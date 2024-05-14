@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -79,7 +79,7 @@ sub SendNotification {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Need $Needed!',
+                Message  => "Need $Needed!",
             );
             return;
         }
@@ -104,8 +104,8 @@ sub SendNotification {
     ) {
         # get objects
         my $ContactObject = $Kernel::OM->Get('Contact');
-        my $TicketObject       = $Kernel::OM->Get('Ticket');
-        my $UserObject         = $Kernel::OM->Get('User');
+        my $TicketObject  = $Kernel::OM->Get('Ticket');
+        my $UserObject    = $Kernel::OM->Get('User');
 
         # get ticket
         my %Ticket = $TicketObject->TicketGet(
@@ -129,7 +129,7 @@ sub SendNotification {
         for my $FieldRecipient (@FieldRecipients) {
             next FIELDRECIPIENT if !$FieldRecipient;
 
-            my $AddressLine = '';
+            my $AddressLine = q{};
             # handle dynamic field by type
             if ($Recipient{DynamicFieldType} eq 'User') {
                 my $ExistingUserID = $Kernel::OM->('User')->UserLookup(
@@ -153,8 +153,8 @@ sub SendNotification {
 
             # generate recipient
             my %DFRecipient = (
-                Realname  => '',
-                Email => $AddressLine,
+                Realname  => q{},
+                Email     => $AddressLine,
                 Type      => $Recipient{Type},
             );
 
@@ -216,7 +216,28 @@ sub SendNotification {
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    if ( $Param{Notification}->{ContentType} && $Param{Notification}->{ContentType} eq 'text/html' ) {
+    # send notification
+    # prepare subject
+    if (
+        defined( $Notification{Data}->{RecipientSubject} )
+        && defined( $Notification{Data}->{RecipientSubject}->[0] )
+        && !$Notification{Data}->{RecipientSubject}->[0]
+    ) {
+        my $TicketNumber = $TicketObject->TicketNumberLookup(
+            TicketID => $Param{TicketID},
+        );
+
+        $Notification{Subject} = $TicketObject->TicketSubjectClean(
+            TicketNumber => $TicketNumber,
+            Subject      => $Notification{Subject},
+            Size         => 0,
+        );
+    }
+
+    if (
+        $Param{Notification}->{ContentType}
+        && $Param{Notification}->{ContentType} eq 'text/html'
+    ) {
 
         # Get configured template with fallback to Default.
         my $EmailTemplate = $Param{Notification}->{Data}->{TransportEmailTemplate}->[0] || 'Default';
@@ -274,6 +295,7 @@ sub SendNotification {
                 push(@FieldAttachments, $Ticket{'DynamicField_' . $DynamicField->{Name}});
             }
         }
+
         ATTACHMENT:
         for my $Attachment ( @FieldAttachments ) {
             # read file from virtual fs
@@ -289,8 +311,8 @@ sub SendNotification {
                 'Filename'           => $File{Preferences}->{Filename},
                 'Content'            => ${$File{Content}},
                 'ContentType'        => $File{Preferences}->{ContentType},
-                'ContentID'          => '',
-                'ContentAlternative' => '',
+                'ContentID'          => q{},
+                'ContentAlternative' => q{},
                 'Filesize'           => $File{Preferences}->{Filesize},
                 'FilesizeRaw'        => $File{Preferences}->{FilesizeRaw},
                 'Disposition'        => 'attachment',
@@ -298,25 +320,6 @@ sub SendNotification {
             # add attachment
             push( @{ $Param{Attachments} }, \%Data );
         }
-
-    }
-
-    # send notification
-    # prepare subject
-    if (
-        defined( $Notification{Data}->{RecipientSubject} )
-        && defined( $Notification{Data}->{RecipientSubject}->[0] )
-        && !$Notification{Data}->{RecipientSubject}->[0]
-    ) {
-        my $TicketNumber = $TicketObject->TicketNumberLookup(
-            TicketID => $Param{TicketID},
-        );
-
-        $Notification{Subject} = $TicketObject->TicketSubjectClean(
-            TicketNumber => $TicketNumber,
-            Subject      => $Notification{Subject},
-            Size         => 0,
-        );
     }
 
     # send notification
@@ -354,7 +357,10 @@ sub SendNotification {
             return;
         }
 
-        if ( IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) && $Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if (
+            IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle})
+            && $Param{Notification}->{Data}->{CreateArticle}->[0]
+        ) {
             # create an article if requested
             my $ArticleID = $Self->CreateArticle(
                 %Param,
@@ -420,7 +426,7 @@ sub SendNotification {
         return if !$SecurityOptions;
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
-            From       => "$Address{RealName} <$Address{Email}>",
+            From       => "\"$Address{RealName}\" <$Address{Email}>",
             To         => $Recipient{Email},
             Subject    => $Notification{Subject},
             MimeType   => $Notification{ContentType},
@@ -442,7 +448,10 @@ sub SendNotification {
         }
 
         my $ArticleID;
-        if ( IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle}) && $Param{Notification}->{Data}->{CreateArticle}->[0] ) {
+        if (
+            IsArrayRefWithData($Param{Notification}->{Data}->{CreateArticle})
+            && $Param{Notification}->{Data}->{CreateArticle}->[0]
+        ) {
             # create an article if requested
             $ArticleID = $Self->CreateArticle(
                 %Param,
@@ -492,11 +501,16 @@ sub GetTransportRecipients {
 
         # check and replace placeholders
         if ($RecipientString =~ m/(<|&lt;)KIX_.+/) {
+            my $Data = {};
+            if ( $Param{ArticleID} ) {
+                $Data->{ArticleID} = $Param{ArticleID};
+            }
+
             $RecipientString = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
                 RichText => 0,
                 Text     => $RecipientString,
                 TicketID => $Param{TicketID},
-                Data     => {},
+                Data     => $Data,
                 UserID   => $Param{UserID} || 1,
             );
         }
@@ -506,7 +520,7 @@ sub GetTransportRecipients {
 
         foreach my $MailAddress (@ParsedMailAddresses) {
             my %Recipient;
-            $Recipient{Realname} = '';
+            $Recipient{Realname} = q{};
             $Recipient{Type}     = 'Customer';
             $Recipient{Email}    = $MailAddress->address;
 
@@ -592,13 +606,13 @@ sub SecurityOptionsGet {
     my ( $Self, %Param ) = @_;
 
     # Verify security options are enabled.
-    my $EnableSecuritySettings = $Param{Notification}->{Data}->{EmailSecuritySettings}->[0] || '';
+    my $EnableSecuritySettings = $Param{Notification}->{Data}->{EmailSecuritySettings}->[0] || q{};
 
     # Return empty hash ref to continue with email sending (without security options).
     return {} if !$EnableSecuritySettings;
 
     # Verify if the notification has to be signed or encrypted
-    my $SignEncryptNotification = $Param{Notification}->{Data}->{EmailSigningCrypting}->[0] || '';
+    my $SignEncryptNotification = $Param{Notification}->{Data}->{EmailSigningCrypting}->[0] || q{};
 
     # Return empty hash ref to continue with email sending (without security options).
     return {} if !$SignEncryptNotification;
@@ -663,11 +677,11 @@ sub SecurityOptionsGet {
 
         # Convert legacy stored default sign keys.
         if ( $Queue{DefaultSignKey} =~ m{ (?: Inline|Detached ) }msx ) {
-            my ( $Type, $SubType, $Key ) = split /::/, $Queue{DefaultSignKey};
+            my ( $Type, $SubType, $Key ) = split( /::/, $Queue{DefaultSignKey});
             $DefaultSignKey = $Key;
         }
         else {
-            my ( $Type, $Key ) = split /::/, $Queue{DefaultSignKey};
+            my ( $Type, $Key ) = split( /::/, $Queue{DefaultSignKey});
             $DefaultSignKey = $Key;
         }
 
@@ -692,7 +706,7 @@ sub SecurityOptionsGet {
         last CRYPTKEY;
     }
 
-    my $OnMissingSigningKeys = $Param{Notification}->{Data}->{EmailMissingSigningKeys}->[0] || '';
+    my $OnMissingSigningKeys = $Param{Notification}->{Data}->{EmailMissingSigningKeys}->[0] || q{};
 
     # Add options to sign the notification
     if ( $SignEncryptNotification =~ /Sign/i ) {
@@ -731,7 +745,7 @@ sub SecurityOptionsGet {
         }
     }
 
-    my $OnMissingEncryptionKeys = $Param{Notification}->{Data}->{EmailMissingCryptingKeys}->[0] || '';
+    my $OnMissingEncryptionKeys = $Param{Notification}->{Data}->{EmailMissingCryptingKeys}->[0] || q{};
 
     # Add options to encrypt the notification
     if ( $SignEncryptNotification =~ /Crypt/i ) {
@@ -844,10 +858,6 @@ sub CreateArticle {
 }
 
 1;
-
-
-
-
 
 =back
 

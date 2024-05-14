@@ -1,13 +1,36 @@
   displayName: Authentication
   description: !include ../descriptions/resources/auth.md
   post:
-    description: Manage existing sessions.
+    description: Create sessions or preauth data.
     securedBy: [ null ]
     body:
       application/json:
         type: AuthRequest
     responses:
       201:
+        body:
+          application/json:
+            type: AuthResponse
+  get:
+    description: Get possible auth methods or session for OIDC.
+    securedBy: [ null ]
+    queryParameters:
+      UserType:
+        displayName: UserType
+      code:
+        displayName: OIDC-Code
+      state:
+        displayName: OIDC-State
+      csrfCookie:
+        displayName: OIDC-CSRFToken
+    responses:
+      200:
+        description: Response when UserType is given
+        body:
+          application/json:
+            type: AuthMethodsResponse
+      201:
+        description: Response when code, csrfCookie and state is given
         body:
           application/json:
             type: AuthResponse

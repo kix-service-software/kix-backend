@@ -8,11 +8,26 @@
          "type" : "string"
       },
       "Password" : {
-         "description" : "required if no NegitiationToken is given",
+         "description" : "required if UserLogin is given",
          "type" : "string"
       },
+      "PreAuthRequest" : {
+         "type" : "object",
+         "properties" : {
+            "Data" : {
+               "type" : "object"
+            },
+            "Type" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "Type",
+            "Data"
+         ]
+      },
       "UserLogin" : {
-         "description" : "required if no NegitiationToken is given",
+         "description" : "required if no PreAuthRequest, NegitiationToken, or state is given",
          "type" : "string"
       },
       "UserType" : {
@@ -21,6 +36,10 @@
             "Agent",
             "Customer"
          ]
+      },
+      "code" : {
+         "description" : "required if state is given",
+         "type" : "string"
       }
    },
    "required" : [

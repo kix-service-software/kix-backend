@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,11 +13,11 @@ package Kernel::System::VirtualFS;
 use strict;
 use warnings;
 
-our @ObjectDependencies = (
-    'Config',
-    'DB',
-    'Log',
-    'Main',
+our @ObjectDependencies = qw(
+    Config
+    DB
+    Log
+    Main
 );
 
 =head1 NAME
@@ -71,10 +71,8 @@ read a file from virtual file system
     my %File = $VirtualFSObject->Read(
         Filename => '/Object/some/name.txt',    # or ID
         ID       => 123,                        # or Filename
-        Mode     => 'utf8',
-
-        # optional
-        DisableWarnings => 1,
+        Mode     => 'utf8',                 # Mode set to 'preferences' only returns Preferences without Content
+        Silent   => 1                       # optional
     );
 
 returns
@@ -103,16 +101,22 @@ sub Read {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Mode)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(Mode)) {
+        next if $Param{$Needed};
+
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
-            return;
         }
+        return;
     }
-    if ( !$Param{Filename} && !$Param{ID} ) {
+
+    if (
+        !$Param{Filename}
+        && !$Param{ID}
+    ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need Filename or ID!"
@@ -123,7 +127,7 @@ sub Read {
     # lookup
     my ( $FileID, $BackendKey, $Backend, $Filename ) = $Self->_FileLookup(%Param);
     if ( !$BackendKey ) {
-        if ( !$Param{DisableWarnings} ) {
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such file '" . ($Param{Filename} && !$Param{ID} ? $Param{Filename} : $Param{ID}) . "'!",
@@ -132,18 +136,18 @@ sub Read {
         return;
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
     # get preferences
     my %Preferences;
-    return if !$DBObject->Prepare(
-        SQL => 'SELECT preferences_key, preferences_value FROM '
-            . 'virtual_fs_preferences WHERE virtual_fs_id = ?',
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => <<'END',
+SELECT preferences_key, preferences_value
+FROM virtual_fs_preferences
+WHERE virtual_fs_id = ?
+END
         Bind => [ \$FileID ],
     );
 
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Preferences{ $Row[0] } = $Row[1];
     }
 
@@ -158,12 +162,14 @@ sub Read {
     }
 
     # get file
-    my $Content = $Self->{Backend}->{$Backend}->Read(
-        %Param,
-        Filename   => $Filename,
-        BackendKey => $BackendKey,
-    );
-    return if !$Content;
+    my $Content;
+    if ( $Param{Mode} !~ m/preferences/i ) {
+        $Content = $Self->{Backend}->{$Backend}->Read(
+            %Param,
+            BackendKey => $BackendKey,
+        );
+        return if !$Content;
+    }
 
     return (
         Preferences => \%Preferences,
@@ -188,6 +194,8 @@ write a file to virtual file system and returns its id
             ContentAlternative => 1,
             SomeCustomParams   => 'with our own value',
         },
+
+        Silent                 => 1, # Dont log if file exists
     );
 
 =cut
@@ -196,43 +204,47 @@ sub Write {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Filename Content Mode)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(Filename Content Mode)) {
+        next if ( $Param{$Needed} );
+        if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $Needed!"
             );
-            return;
         }
-    }
-
-    # lookup
-    my ($FileID) = $Self->_FileLookup( Name => $Param{Filename} );
-    if ($FileID) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "File already exists '$Param{Filename}'!",
-        );
         return;
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    # lookup
+    my ($FileID) = $Self->_FileLookup( Filename => $Param{Filename} );
+    if ($FileID) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "File already exists '$Param{Filename}'!",
+            );
+        }
+        return;
+    }
 
     # insert
-    return if !$DBObject->Do(
-        SQL => 'INSERT INTO virtual_fs (filename, backend_key, backend, create_time)'
-            . ' VALUES ( ?, \'TMP\', ?, current_timestamp)',
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => <<'END',
+INSERT INTO virtual_fs (filename, backend_key, backend, create_time)
+VALUES ( ?, 'TMP', ?, current_timestamp)
+END
         Bind => [ \$Param{Filename}, \$Self->{BackendDefault} ],
     );
 
     ($FileID) = $Self->_FileLookup( Filename => $Param{Filename} );
 
     if ( !$FileID ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to store '$Param{Filename}'!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to store '$Param{Filename}'!",
+            );
+        }
         return;
     }
 
@@ -252,9 +264,12 @@ sub Write {
 
     # insert preferences
     for my $Key ( sort keys %{ $Param{Preferences} } ) {
-        return if !$DBObject->Do(
-            SQL => 'INSERT INTO virtual_fs_preferences '
-                . '(virtual_fs_id, preferences_key, preferences_value) VALUES ( ?, ?, ?)',
+        return if !$Kernel::OM->Get('DB')->Do(
+            SQL => <<'END',
+INSERT INTO virtual_fs_preferences
+    (virtual_fs_id, preferences_key, preferences_value)
+VALUES ( ?, ?, ?)
+END
             Bind => [ \$FileID, \$Key, \$Param{Preferences}->{$Key} ],
         );
     }
@@ -264,22 +279,26 @@ sub Write {
     if ( !$BackendKey ) {
         # cleanup data if file could not be stored in backend
 
-        $DBObject->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'DELETE FROM virtual_fs_preferences WHERE virtual_fs_id=?',
             Bind => [ \$FileID ],
         );
 
-        $DBObject->Do(
+        return if !$Kernel::OM->Get('DB')->Do(
             SQL => 'DELETE FROM virtual_fs WHERE id=?',
             Bind => [ \$FileID ],
         );
-        
+
         return;
     }
 
     # update backend key
-    return if !$DBObject->Do(
-        SQL  => 'UPDATE virtual_fs SET backend_key = ? WHERE id = ?',
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => <<'END',
+UPDATE virtual_fs
+SET backend_key = ?
+WHERE id = ?
+END
         Bind => [ \$BackendKey, \$FileID ],
     );
 
@@ -425,7 +444,7 @@ sub Find {
     # prepare file name search
     my $SQLResult = $Param{ReturnIDs} ? 'vfs.id' : 'vfs.filename';
     my $SQLTable  = 'virtual_fs vfs ';
-    my $SQLWhere  = '';
+    my $SQLWhere  = q{};
     my @SQLBind;
     if ( $Param{Filename} ) {
         my $Like = $Param{Filename};
@@ -442,7 +461,7 @@ sub Find {
             $SQLWhere .= ' AND ';
         }
         $SQLWhere .= 'vfs.id = vfsp.virtual_fs_id ';
-        my $SQL = '';
+        my $SQL = q{};
         for my $Key ( sort keys %{ $Param{Preferences} } ) {
             if ($SQL) {
                 $SQL .= ' OR ';
@@ -524,6 +543,16 @@ file is stored (Filename or ID must be given)
 
 sub _FileLookup {
     my ( $Self, %Param ) = @_;
+
+    if ( !$Param{ID} && !$Param{Filename} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Filename or ID!',
+            );
+        }
+        return;
+    }
 
     my $Where = $Param{ID} ? 'id' : 'filename';
     my $Value = $Param{ID} ? $Param{ID} : $Param{Filename};

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -179,11 +179,13 @@ sub _ValidateAttribute {
             # next validator if this one ignores our current operation
             next;
         }
-        
+
         foreach my $Value ( @Values ) {
             my $ValidatorResult = $Validator->{BackendObject}->Validate(
-                Attribute => $Param{Attribute},
-                Data      => {
+                Attribute        => $Param{Attribute},
+                ParentAttribute  => $Param{ParentAttribute},
+                Operation        => $Param{Operation},
+                Data             => {
                     $Param{Attribute} => $Value
                 }
             );

@@ -26,16 +26,15 @@ our @ObjectDependencies = qw(
     Config
     Cache
     Contact
-    CheckItem
-    ClientRegistration
+    ClientNotification
     DB
     Encode
     Log
     Main
+    ObjectSearch
     Role
     Time
     Valid
-    ObjectSearch
 );
 
 =head1 NAME
@@ -69,18 +68,15 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     # get user table
-    $Self->{UserTable}       = $ConfigObject->Get('DatabaseUserTable')       || 'users';
-    $Self->{UserTableUserID} = $ConfigObject->Get('DatabaseUserTableUserID') || 'id';
-    $Self->{UserTableUserPW} = $ConfigObject->Get('DatabaseUserTableUserPW') || 'pw';
-    $Self->{UserTableUser}   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
+    $Self->{UserTable}       = $Kernel::OM->Get('Config')->Get('DatabaseUserTable')       || 'users';
+    $Self->{UserTableUserID} = $Kernel::OM->Get('Config')->Get('DatabaseUserTableUserID') || 'id';
+    $Self->{UserTableUserPW} = $Kernel::OM->Get('Config')->Get('DatabaseUserTableUserPW') || 'pw';
+    $Self->{UserTableUser}   = $Kernel::OM->Get('Config')->Get('DatabaseUserTableUser')   || 'login';
 
-    $Self->{CacheType} = 'User';
+    $Self->{CacheType}         = 'User';
     $Self->{CacheTypeCounters} = 'UserCounters';
-    $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+    $Self->{CacheTTL}          = 60 * 60 * 24 * 20;
 
     # set lower if database is case sensitive
     $Self->{Lower} = '';
@@ -107,8 +103,6 @@ get user data
         User          => 'franz',
         Valid         => 1,       # not required -> 0|1 (default 0)
                                   # returns only data if user is valid
-        NoOutOfOffice => 1,       # not required -> 0|1 (default 0)
-                                  # returns data without out of office infos
         NoPreferences => 1,       # not required -> 0|1 (default 0)
                                   # returns data without preferences
     );
@@ -120,15 +114,14 @@ sub GetUserData {
 
     # check needed stuff
     if ( !$Param{User} && !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need User or UserID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need User or UserID!',
+            );
+        }
         return;
     }
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
 
     # check if result is cached
     if ( $Param{Valid} ) {
@@ -136,12 +129,6 @@ sub GetUserData {
     }
     else {
         $Param{Valid} = 0;
-    }
-    if ( $Param{NoOutOfOffice} ) {
-        $Param{NoOutOfOffice} = 1;
-    }
-    else {
-        $Param{NoOutOfOffice} = 0;
     }
     if ( $Param{NoPreferences} ) {
         $Param{NoPreferences} = 1;
@@ -155,14 +142,12 @@ sub GetUserData {
         $CacheKey = join '::', 'GetUserData', 'User',
             $Param{User},
             $Param{Valid},
-            $Param{NoOutOfOffice},
             $Param{NoPreferences};
     }
     else {
         $CacheKey = join '::', 'GetUserData', 'UserID',
             $Param{UserID},
             $Param{Valid},
-            $Param{NoOutOfOffice},
             $Param{NoPreferences};
     }
 
@@ -188,17 +173,14 @@ sub GetUserData {
         push @Bind, \$Param{UserID};
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Bind  => \@Bind,
         Limit => 1,
     );
 
     my %Data;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Data{UserID}      = $Row[0];
         $Data{UserLogin}   = $Row[1];
         $Data{UserPw}      = $Row[2];
@@ -269,69 +251,31 @@ sub GetUserData {
         }
     }
 
-    # get preferences
-    my %Preferences = $Self->GetPreferences( UserID => $Data{UserID} );
-
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    # out of office check
-    if ( !$Param{NoOutOfOffice} ) {
-        if ( $Preferences{OutOfOffice} ) {
-            my $Time = $TimeObject->SystemTime();
-            my $Start
-                = "$Preferences{OutOfOfficeStartYear}-$Preferences{OutOfOfficeStartMonth}-$Preferences{OutOfOfficeStartDay} 00:00:00";
-            my $TimeStart = $TimeObject->TimeStamp2SystemTime(
-                String => $Start,
-            );
-            my $End
-                = "$Preferences{OutOfOfficeEndYear}-$Preferences{OutOfOfficeEndMonth}-$Preferences{OutOfOfficeEndDay} 23:59:59";
-            my $TimeEnd = $TimeObject->TimeStamp2SystemTime(
-                String => $End,
-            );
-            if ( $TimeStart < $Time && $TimeEnd > $Time ) {
-                my $OutOfOfficeMessageTemplate =
-                    $ConfigObject->Get('OutOfOfficeMessageTemplate')
-                    || '*** out of office until %s (%s d left) ***';
-                my $TillDate = sprintf(
-                    '%04d-%02d-%02d',
-                    $Preferences{OutOfOfficeEndYear},
-                    $Preferences{OutOfOfficeEndMonth},
-                    $Preferences{OutOfOfficeEndDay}
-                );
-                my $Till = int( ( $TimeEnd - $Time ) / 60 / 60 / 24 );
-                $Preferences{OutOfOfficeMessage}
-                    = sprintf( $OutOfOfficeMessageTemplate, $TillDate, $Till );
-            }
-
-            # Reduce CacheTTL to one hour for users that are out of office to make sure the cache expires timely
-            #   even if there is no update action.
-            $CacheTTL = 60 * 60 * 1;
-        }
-    }
-
     if ( !$Param{NoPreferences} ) {
+        # get preferences
+        my %Preferences = $Self->GetPreferences( UserID => $Data{UserID} );
 
         # add last login timestamp
         if ( $Preferences{UserLastLogin} ) {
-            $Preferences{UserLastLoginTimestamp} = $TimeObject->SystemTime2TimeStamp(
+            $Preferences{UserLastLoginTimestamp} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                 SystemTime => $Preferences{UserLastLogin},
             );
         }
 
         # add preferences defaults
-        my $Config = $ConfigObject->Get('PreferencesGroups');
-        if ( $Config && ref $Config eq 'HASH' ) {
+        my $Config = $Kernel::OM->Get('Config')->Get('PreferencesGroups');
+        if ( ref( $Config ) eq 'HASH' ) {
 
             KEY:
-            for my $Key ( sort keys %{$Config} ) {
+            for my $Key ( keys( %{ $Config } ) ) {
 
-                next KEY if !defined $Config->{$Key}->{DataSelected};
+                next KEY if ( !defined(  $Config->{ $Key }->{DataSelected} ) );
 
                 # check if data is defined
-                next KEY if defined $Preferences{ $Config->{$Key}->{PrefKey} };
+                next KEY if ( defined( $Preferences{ $Config->{ $Key }->{PrefKey} } ) );
 
                 # set default data
-                $Preferences{ $Config->{$Key}->{PrefKey} } = $Config->{$Key}->{DataSelected};
+                $Preferences{ $Config->{ $Key }->{PrefKey} } = $Config->{ $Key }->{DataSelected};
             }
         }
 
@@ -370,12 +314,14 @@ sub UserAdd {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(UserLogin ValidID ChangeUserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-            );
+    for my $Needed ( qw(UserLogin ValidID ChangeUserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!",
+                );
+            }
             return;
         }
     }
@@ -394,23 +340,16 @@ sub UserAdd {
         $Param{UserPw} = $Self->GenerateRandomPassword();
     }
 
-    $Param{IsAgent}
-        = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
-    $Param{IsCustomer}
-        = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) )
-        ? $Param{IsCustomer}
-        : 0;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    $Param{IsAgent}    = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
+    $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) ) ? $Param{IsCustomer} : 0;
 
     # Don't store the user's password in plaintext initially. It will be stored in a
     #   hashed version later with SetPassword().
     my $RandomPassword = $Self->GenerateRandomPassword();
 
     # sql
-    return if !$DBObject->Do(
-        SQL => "INSERT INTO $Self->{UserTable} "
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => "INSERT INTO $Self->{UserTable} "
             . " ( $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
             . " comments, valid_id, create_time, create_by, change_time, change_by, is_agent, is_customer )"
             . " VALUES "
@@ -423,8 +362,8 @@ sub UserAdd {
 
     # get new user id
     my $UserLogin = lc $Param{UserLogin};
-    return if !$DBObject->Prepare(
-        SQL => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} "
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} "
             . " WHERE $Self->{Lower}($Self->{UserTableUser}) = ?",
         Bind  => [ \$UserLogin ],
         Limit => 1,
@@ -432,7 +371,7 @@ sub UserAdd {
 
     # fetch the result
     my $UserID;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $UserID = $Row[0];
     }
 
@@ -448,8 +387,7 @@ sub UserAdd {
     # log notice
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message =>
-            "User: '$Param{UserLogin}' ID: '$UserID' created successfully ($Param{ChangeUserID})!",
+        Message  => "User: '$Param{UserLogin}' ID: '$UserID' created successfully ($Param{ChangeUserID})!",
     );
 
     # set password
@@ -504,11 +442,14 @@ sub UserUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(UserID UserLogin ValidID ChangeUserID)) {
-
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "Need $_!" );
+    for my $Needed ( qw(UserID UserLogin ValidID ChangeUserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -532,9 +473,7 @@ sub UserUpdate {
         return;
     }
     $Param{IsAgent}    = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
-    $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) )
-        ? $Param{IsCustomer}
-        : 0;
+    $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) ) ? $Param{IsCustomer} : 0;
 
     # update db
     return if !$Kernel::OM->Get('DB')->Do(
@@ -597,6 +536,7 @@ to search users
         UserLoginEquals => 'some',                    # optional - exact match
         IsAgent         => 1,                         # optional
         IsCustomer      => 1,                         # optional
+        IsOutOfOffice   => 1,                         # optional
         Limit           => 50,                        # optional
         ValidID         => 2                          # optional - if given "Valid" is ignored
         Valid           => 1                          # optional - if omitted, 1 is used
@@ -626,17 +566,20 @@ sub UserSearch {
         !$Param{Search}
         && !$Param{UserLogin}
         && !$Param{UserLoginEquals}
-        && !$Param{IsAgent}
-        && !$Param{IsCustomer}
+        && !defined( $Param{IsAgent} )
+        && !defined( $Param{IsCustomer} )
+        && !defined( $Param{IsOutOfOffice} )
         && !$Param{ValidID}
         && !$Param{SearchUserID}
-        && !IsArrayRef{$Param{UserIDs}}
+        && !IsArrayRefWithData{$Param{UserIDs}}
         && !IsHashRefWithData($Param{HasPermission})
     ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or ValidID or SearchUserID or HasPermission - else use UserList!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or HasPermission - else use UserList!',
+            );
+        }
         return;
     }
 
@@ -653,18 +596,18 @@ sub UserSearch {
         . ( $Param{SearchUserID} || '') . '::'
         . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' );
 
-    # check cache
-    my $Cache = $Kernel::OM->Get('Cache')->Get(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
-    );
-    return %{$Cache} if $Cache;
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    # skip cache check if IsOutOfOffice is defined (time relative search)
+    if ( !defined( $Param{IsOutOfOffice} ) ) {
+        # check cache
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
+            Type => $Self->{CacheType},
+            Key  => $CacheKey,
+        );
+        return %{$Cache} if $Cache;
+    }
 
     # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
+    my $LikeEscapeString = $Kernel::OM->Get('DB')->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string
     my $SQL = "SELECT DISTINCT(u.$Self->{UserTableUserID}), u.login FROM $Self->{UserTable} u";
@@ -680,7 +623,7 @@ sub UserSearch {
         $Param{Search} =~ s/\*/%/g;
         $Param{Search} =~ s/%%/%/g;
 
-        my %QueryCondition = $DBObject->QueryCondition(
+        my %QueryCondition = $Kernel::OM->Get('DB')->QueryCondition(
             Key      => [qw(u.login c.firstname c.lastname c.email c.email1 c.email2 c.email3 c.email4 c.email5)], # ignore rest for now: c.title c.phone c.fax c.mobile c.street c.zip c.city c.country)],
             Value    => $Param{Search},
             BindMode => 1,
@@ -692,7 +635,7 @@ sub UserSearch {
     if ( $Param{UserLogin} ) {
         push(@Where, "$Self->{Lower}(u.$Self->{UserTableUser}) LIKE ? $LikeEscapeString");
         $Param{UserLogin} =~ s/\*/%/g;
-        $Param{UserLogin} = $DBObject->Quote( $Param{UserLogin}, 'Like' );
+        $Param{UserLogin} = $Kernel::OM->Get('DB')->Quote( $Param{UserLogin}, 'Like' );
         push @Bind, \$Param{UserLogin};
     }
 
@@ -701,14 +644,47 @@ sub UserSearch {
         push @Bind, \$Param{UserLoginEquals};
     }
 
-    if ( $Param{IsAgent} ) {
+    if ( defined( $Param{IsAgent} ) ) {
         push(@Where,"u.is_agent = ?");
         push(@Bind, \$Param{IsAgent});
     }
 
-    if ( $Param{IsCustomer} ) {
+    if ( defined( $Param{IsCustomer} ) ) {
         push(@Where,"u.is_customer = ?");
         push(@Bind, \$Param{IsCustomer});
+    }
+
+    if ( defined( $Param{IsOutOfOffice} ) ) {
+        # get user preferences config
+        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
+            || 'Kernel::System::User::Preferences::DB';
+
+        # get generator preferences module
+        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+        my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
+        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1/;
+
+        # handle true value
+        if ( $Param{IsOutOfOffice} ) {
+            # join the relevant preference table
+            $SQL .= <<"END";
+ JOIN $PreferencesObject->{PreferencesTable} upooos ON upooos.$PreferencesObject->{PreferencesTableUserID} = u.id AND upooos.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'
+ JOIN $PreferencesObject->{PreferencesTable} upoooe ON upoooe.$PreferencesObject->{PreferencesTableUserID} = u.id AND upoooe.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'
+END
+            push(@Where,"( upooos.$PreferencesObject->{PreferencesTableValue} <= ? AND upoooe.$PreferencesObject->{PreferencesTableValue} >= ? )");
+            push(@Bind, \$CurrDate, \$CurrDate);
+        }
+        # handle false value
+        else {
+            # join the relevant preference table
+            $SQL .= <<"END";
+ LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} upooos ON upooos.$PreferencesObject->{PreferencesTableUserID} = u.id AND upooos.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'
+ LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} upoooe ON upoooe.$PreferencesObject->{PreferencesTableUserID} = u.id AND upoooe.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'
+END
+            push(@Where,"( upooos.$PreferencesObject->{PreferencesTableValue} IS NULL OR upooos.$PreferencesObject->{PreferencesTableValue} > ? OR upoooe.$PreferencesObject->{PreferencesTableValue} IS NULL OR upoooe.$PreferencesObject->{PreferencesTableValue} < ? )");
+            push(@Bind, \$CurrDate, \$CurrDate);
+        }
     }
 
     if ( $Param{ValidID} ) {
@@ -748,7 +724,7 @@ sub UserSearch {
                       ON pt.id=rp.type_id';
 
         # part 1 - in case ticket base permissions exist for the relevant users
-        my @WherePart1 = ( 
+        my @WherePart1 = (
             "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
@@ -765,7 +741,7 @@ sub UserSearch {
         push @UnionWhere, \@WherePart1;
 
         # part 2 - in case ticket base permissions do not exist for the relevant users
-        my @WherePart2 = ( 
+        my @WherePart2 = (
             "NOT EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
@@ -798,24 +774,27 @@ sub UserSearch {
     }
 
     # get data
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Bind  => \@Bind,
-        Limit => $Param{Limit} || $Self->{UserSearchListLimit},
+        Limit => $Param{Limit} // $Self->{UserSearchListLimit},
     );
 
     # fetch the result
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Users{ $Row[0] } = $Row[1];
     }
 
-    # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => \%Users,
-    );
+    # skip cache set if IsOutOfOffice is defined (time relative search)
+    if ( !defined( $Param{IsOutOfOffice} ) ) {
+        # set cache
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => \%Users,
+        );
+    }
 
     return %Users;
 }
@@ -836,20 +815,26 @@ sub SetPassword {
 
     # check needed stuff
     if ( !$Param{UserLogin} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserLogin!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need UserLogin!'
+            );
+        }
         return;
     }
 
     # get old user data
-    my %User = $Self->GetUserData( User => $Param{UserLogin} );
+    my %User = $Self->GetUserData(
+        User => $Param{UserLogin}
+    );
     if ( !$User{UserLogin} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'No such User!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'No such User!',
+            );
+        }
         return;
     }
 
@@ -912,8 +897,7 @@ sub SetPassword {
         if ( !$Kernel::OM->Get('Main')->Require('Crypt::Eksblowfish::Bcrypt') ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message =>
-                    "User: '$User{UserLogin}' tried to store password with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
+                Message  => "User: '$User{UserLogin}' tried to store password with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
             );
             return;
         }
@@ -996,15 +980,14 @@ sub UserLookup {
 
     # check needed stuff
     if ( !$Param{UserLogin} && !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserLogin or UserID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need UserLogin or UserID!'
+            );
+        }
         return;
     }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
 
     if ( $Param{UserLogin} ) {
 
@@ -1019,8 +1002,8 @@ sub UserLookup {
         # build sql query
         my $UserLogin = lc $Param{UserLogin};
 
-        return if !$DBObject->Prepare(
-            SQL => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} "
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL   => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} "
                 . " WHERE $Self->{Lower}($Self->{UserTableUser}) = ?",
             Bind  => [ \$UserLogin ],
             Limit => 1,
@@ -1028,7 +1011,7 @@ sub UserLookup {
 
         # fetch the result
         my $ID;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ID = $Row[0];
         }
 
@@ -1054,7 +1037,6 @@ sub UserLookup {
     }
 
     else {
-
         # check cache
         my $CacheKey = 'UserLookup::Login::' . $Param{UserID};
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
@@ -1064,7 +1046,7 @@ sub UserLookup {
         return $Cache if $Cache;
 
         # build sql query
-        return if !$DBObject->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL => "SELECT $Self->{UserTableUser} FROM $Self->{UserTable} "
                 . " WHERE $Self->{UserTableUserID} = ?",
             Bind  => [ \$Param{UserID} ],
@@ -1073,7 +1055,7 @@ sub UserLookup {
 
         # fetch the result
         my $Login;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $Login = $Row[0];
         }
 
@@ -1135,9 +1117,8 @@ sub UserName {
 return a hash with all users
 
     my %List = $UserObject->UserList(
-        Type          => 'Short', # Short|Long, default Short
-        Valid         => 1,       # default 1
-        NoOutOfOffice => 1,       # (optional) default 0
+        Type  => 'Short', # Short|Long, default Short
+        Valid => 1,       # default 1
     );
 
 =cut
@@ -1150,14 +1131,8 @@ sub UserList {
     # set valid option
     my $Valid = $Param{Valid} // 1;
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get configuration for the full name order
-    my $NoOutOfOffice = $Param{NoOutOfOffice} || 0;
-
     # check cache
-    my $CacheKey = join '::', 'UserList', $Type, $Valid, $NoOutOfOffice, ($Param{Limit} ? $Param{Limit} : '');
+    my $CacheKey = join( '::', 'UserList', $Type, $Valid, ($Param{Limit} ? $Param{Limit} : '') );
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -1182,10 +1157,7 @@ sub UserList {
             .= " WHERE u.valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL   => $SQL,
         Limit => $Param{Limit},
     );
@@ -1193,7 +1165,7 @@ sub UserList {
     # fetch the result
     my %UsersRaw;
     my %Users;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $UsersRaw{ $Row[0] } = \@Row;
     }
 
@@ -1211,22 +1183,6 @@ sub UserList {
                 Lastname  => $Data[3],
             );
             $Users{$CurrentUserID} = $UserFullname;
-        }
-    }
-
-    # check vacation option
-    if ( !$NoOutOfOffice ) {
-
-        USERID:
-        for my $UserID ( sort keys %Users ) {
-            next USERID if !$UserID;
-
-            my %User = $Self->GetUserData(
-                UserID => $UserID,
-            );
-            if ( $User{Preferences}->{OutOfOfficeMessage} ) {
-                $Users{$UserID} .= ' ' . $User{Preferences}->{OutOfOfficeMessage};
-            }
         }
     }
 
@@ -1255,18 +1211,14 @@ return 1 if another user with this login (username) already exists
 sub UserLoginExistsCheck {
     my ( $Self, %Param ) = @_;
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    return if !$DBObject->Prepare(
-        SQL =>
-            "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
         Bind => [ \$Param{UserLogin} ],
     );
 
     # fetch the result
     my $Flag;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         if ( !$Param{UserID} || $Param{UserID} ne $Row[0] ) {
             $Flag = 1;
         }
@@ -1298,10 +1250,12 @@ sub PermissionList {
 
     # check needed stuff
     if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need UserID!'
+            );
+        }
         return;
     }
 
@@ -1372,17 +1326,14 @@ sub PermissionList {
         push @Bind, map { \$_ } @{ $Param{Values} };
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => \@Bind
     );
 
     # fetch the result
     my %Result;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Result{ $Row[0] } = $Row[1];
     }
 
@@ -1422,12 +1373,14 @@ sub CheckResourcePermission {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    foreach my $Key ( qw(UserID UsageContext Target RequestedPermission) ) {
-        if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+    for my $Needed ( qw(UserID UsageContext Target RequestedPermission) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -1443,25 +1396,25 @@ sub CheckResourcePermission {
         $Self->{Cache}->{PermissionCheckRoleList} = { $Kernel::OM->Get('Role')->RoleList( Valid => 1 ) };
     }
 
-    if ( !$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) {
-        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = [];
+    if ( !$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} ) {
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = [];
     }
 
-    if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} ) ) {
+    if ( !IsArrayRefWithData($Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
         # get all roles the user is assigned to
         my @UserRoleList = $Kernel::OM->Get('Role')->UserRoleList(
             UserID       => $Param{UserID},
             UsageContext => $Param{UsageContext},
             Valid        => 1,
         );
-        $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} = \@UserRoleList;
+        $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
             my $UserLogin = $Self->UserLookup(
                 UserID => $Param{UserID},
                 Silent => 1,
             );
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}): " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
         }
     }
 
@@ -1470,18 +1423,18 @@ sub CheckResourcePermission {
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for target $Param{Target}");
     }
 
-    if ( !$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) {
-        $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} = {};
+    if ( !$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) {
+        $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} = {};
     }
 
-    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}} ) ) {
+    if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
         my %PermissionList = $Self->PermissionList(
-            UserID   => $Param{UserID},
-            Types    => ['Resource'],
-            UserType => $Param{UserType}
+            UserID       => $Param{UserID},
+            Types        => ['Resource'],
+            UsageContext => $Param{UsageContext}
         );
         foreach my $Permission ( values %PermissionList ) {
-            $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+            $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
         }
     }
 
@@ -1499,12 +1452,11 @@ sub CheckResourcePermission {
 
         my $TargetPermission;
         ROLEID:
-        foreach my $RoleID ( sort @{ $Self->{Cache}->{PermissionCheckUserRoleList}->{$Param{UserID}} } ) {
+        foreach my $RoleID ( sort @{ $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} } ) {
             my ( $RoleGranted, $RolePermission ) = $Self->_CheckResourcePermissionForRole(
                 %Param,
-                Target   => $Target,
-                RoleID   => $RoleID,
-                UserType => $Param{UserType}
+                Target => $Target,
+                RoleID => $RoleID
             );
 
             # use parent permission if no permissions have been found
@@ -1573,15 +1525,15 @@ sub CheckResourcePermission {
     }
 
     # check if we have a DENY
-    return 0
-        if !defined $ResultingPermission
-        || ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} )
-        == Kernel::System::Role::Permission::PERMISSION->{DENY};
+    return 0 if (
+        !defined( $ResultingPermission )
+        || ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY}
+    );
 
-    my $Granted
-        = ( $ResultingPermission
-            & Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} } )
-        == Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} };
+    my $Granted = (
+        ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} } )
+        == Kernel::System::Role::Permission::PERMISSION->{ $Param{RequestedPermission} }
+    );
 
     return ( $Granted, $ResultingPermission );
 }
@@ -1594,7 +1546,8 @@ returns true if the requested permission is granted for a given role
         UserID              => 123,
         RoleID              => 456,
         Target              => '/tickets',
-        RequestedPermission => 'READ'
+        RequestedPermission => 'READ',
+        UsageContext        => 'Agent'|'Customer'
     );
 
 =cut
@@ -1603,12 +1556,14 @@ sub _CheckResourcePermissionForRole {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    foreach my $Key (qw(UserID RoleID Target RequestedPermission)) {
-        if ( !$Param{$Key} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Key!"
-            );
+    for my $Needed ( qw(UserID RoleID Target RequestedPermission) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -1640,8 +1595,21 @@ sub _CheckResourcePermissionForRole {
     else {
         my $Result = 0;
         my %RelevantPermissions;
-        foreach my $ID ( sort keys %{$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}} ) {
-            my $Permission = $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{$Param{UserID}}->{$Param{RoleID}}->{$ID};
+
+        # prepare cache if needed
+        if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"} ) ) {
+            my %PermissionList = $Self->PermissionList(
+                UserID       => $Param{UserID},
+                Types        => ['Resource'],
+                UsageContext => $Param{UsageContext}
+            );
+            foreach my $Permission ( values %PermissionList ) {
+                $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Permission->{RoleID}}->{$Permission->{ID}} = $Permission;
+            }
+        }
+
+        foreach my $ID ( sort keys %{$Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Param{RoleID}}} ) {
+            my $Permission = $Self->{Cache}->{PermissionCheckUserRolePermissionList}->{"$Param{UsageContext}::$Param{UserID}"}->{$Param{RoleID}}->{$ID};
 
             # prepare target
             my $Target = $Permission->{Target};
@@ -1753,33 +1721,32 @@ sub SetPreferences {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Key UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+    for my $Needed ( qw(Key UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
 
     # get current setting
     my %User = $Self->GetUserData(
-        UserID        => $Param{UserID},
-        NoOutOfOffice => 1,
+        UserID => $Param{UserID},
     );
 
     # no updated needed
-    return 1
-        if defined $User{ $Param{Key} }
-        && defined $Param{Value}
-        && $User{ $Param{Key} } eq $Param{Value};
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
+    return 1 if (
+        defined( $User{ $Param{Key} } )
+        && defined( $Param{Value} )
+        && $User{ $Param{Key} } eq $Param{Value}
+    );
 
     # get user preferences config
-    my $GeneratorModule = $ConfigObject->Get('User::PreferencesModule')
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
         || 'Kernel::System::User::Preferences::DB';
 
     # get generator preferences module
@@ -1811,7 +1778,18 @@ get user preferences
 sub GetUserLanguage {
     my ( $Self, %Param ) = @_;
 
-    return if (!$Param{UserID});
+    # check needed stuff
+    for my $Needed ( qw(UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
+    }
 
     my %Preferences = $Self->GetPreferences(
         UserID => $Param{UserID},
@@ -1915,13 +1893,18 @@ sub TokenGenerate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need UserID!"
-        );
-        return;
+    for my $Needed ( qw(UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
     }
+
     my $Token = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length => 15,
     );
@@ -1951,12 +1934,16 @@ sub TokenCheck {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{Token} || !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need Token and UserID!'
-        );
-        return;
+    for my $Needed ( qw(Token UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
     }
 
     # get preferences token
@@ -2038,16 +2025,9 @@ sub UpdateCounters {
                     Value    => $UserID,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1',
                 }
             ],
             OwnedAndLockedAndUnseen => [
@@ -2063,16 +2043,9 @@ sub UpdateCounters {
                     Value    => 2,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
                 }
             ],
             Watched => [
@@ -2091,16 +2064,9 @@ sub UpdateCounters {
                     Value    => $UserID,
                 },
                 {
-                    Field    => 'TicketFlag',
-                    Operator => 'EQ',
-                    Not      => 1,
-                    Value    => [
-                        {
-                            Flag   => 'Seen',
-                            Value  => '1',
-                            UserID => $UserID,
-                        }
-                    ]
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
                 }
             ]
         );
@@ -2176,7 +2142,18 @@ get the users counters
 sub GetUserCounters {
     my ( $Self, %Param ) = @_;
 
-    return if (!$Param{UserID});
+    # check needed stuff
+    for my $Needed ( qw(UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
+    }
 
     # ask database
     my $Success = $Kernel::OM->Get('DB')->Prepare(
@@ -2213,12 +2190,14 @@ sub AddUserCounterObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Category Counter ObjectID UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+    for my $Needed ( qw(Category Counter ObjectID UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -2267,12 +2246,14 @@ sub DeleteUserCounterObject {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Category ObjectID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+    for my $Needed ( qw(Category ObjectID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -2328,12 +2309,14 @@ sub GetObjectIDsForCounter {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Category Counter UserID)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
+    for my $Needed ( qw(Category Counter UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
@@ -2359,12 +2342,17 @@ sub GetObjectIDsForCounter {
 sub _AssignRolesByContext {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
+    # check needed stuff
+    for my $Needed ( qw(UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
     }
 
     my %User = $Self->GetUserData(
@@ -2442,6 +2430,8 @@ sub _PermissionDebug {
     $Indent ||= '';
 
     printf STDERR "(%5i) %-15s %s%s\n", $$, "[Permission]", $Indent, $Message;
+
+    return 1;
 }
 
 =end Internal:

@@ -7,6 +7,7 @@
 
   Scenario: get the list of existing console command
     When I query the collection of console
+#    Then the response content
     Then the response code is 200
 #    And the response object is ConsoleCommandCollectionResponse
 
@@ -65,6 +66,7 @@
      And the response contains the following items type of ConsoleCommand
        | Command                                                   | Description                                    |
        | Console::Command::Admin::ITSM::Configitem::ListDuplicates | List ConfigItems which have a non-unique name. |
+
 
    Scenario: get the list of existing console command filter
      When I query the collection of console with filter command "Console::Command::Admin::ITSM::ImportExport::AutoCreateMapping"

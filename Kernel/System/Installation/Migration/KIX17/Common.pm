@@ -34,7 +34,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    foreach ( qw(Config Async MigrationID Options Source SourceID) ) {
+    foreach ( qw(Config Async MigrationID Options Source SourceID Debug) ) {
         $Self->{$_} = $Param{$_};
     }
 
@@ -77,8 +77,14 @@ sub Count {
         push @URLExt, 'Where='.URI::Escape::uri_escape_utf8($Param{Where});
     }
 
+    my $URL = $Self->{Options}->{URL} . '?Result=COUNT;' . join(';', @URLExt);
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{Type}](Count) executing HTTP request \"GET $URL\"");
+    }
+
     my %Response = $WebUserAgentObject->Request(
-        URL                 => $Self->{Options}->{URL} . '?Result=COUNT;' . join(';', @URLExt),
+        URL                 => $URL,
         SkipSSLVerification => 1,
     );
 
@@ -136,8 +142,14 @@ sub GetSourceData {
         push @URLExt, 'Limit='.URI::Escape::uri_escape_utf8($Param{Limit} || $Self->{Options}->{Limit});
     }
 
+    my $URL = $Self->{Options}->{URL} . '?' . join(';', @URLExt);
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{Type}](GetSourceData) executing HTTP request \"GET $URL\"");
+    }
+
     my %Response = $WebUserAgentObject->Request(
-        URL                 => $Self->{Options}->{URL} . '?' . join(';', @URLExt),
+        URL                 => $URL,
         SkipSSLVerification => 1,
     );
 
@@ -162,6 +174,10 @@ sub GetSourceData {
             foreach my $Dep ( sort keys %Deps ) {
                 next if !$Item->{$Dep};
 
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug("[$Param{Type}](GetSourceData) resolving dependency for property \"$Dep\" ($Deps{$Dep}.id=$Item->{$Dep})");
+                }
+
                 my $MappedID = $Self->GetOIDMapping(
                     ObjectType     => $Deps{$Dep},
                     SourceObjectID => $Item->{$Dep},
@@ -170,14 +186,21 @@ sub GetSourceData {
                 if ( !$MappedID ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => "Dependency for \"$Dep\" cannot be resolved ($Deps{$Dep}: $Item->{$Dep})!"
+                        Message  => "Dependency for property \"$Dep\" cannot be resolved ($Deps{$Dep}: $Item->{$Dep})!"
                     );
+                    if ( $Self->{Debug} ) {
+                        $Self->_Debug("[$Param{Type}](GetSourceData) dependency for property \"$Dep\" ($Deps{$Dep}.id=$Item->{$Dep}) could not be resolved");
+                    }
                     return;
                 }
 
                 # replace the original reference and safe the original
                 $Item->{$Dep.'::raw'} = $Item->{$Dep};
                 $Item->{$Dep}         = $MappedID;
+
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug("[$Param{Type}](GetSourceData) resolved dependency for property \"$Dep\" ($Deps{$Dep}.id=$Item->{$Dep}) => $MappedID");
+                }
             }
         }
     }
@@ -219,6 +242,10 @@ sub Insert {
     # remove all attributes that are no part of the table
     foreach my $Attr ( sort keys %Item ) {
         delete $Item{$Attr} if !$Columns{$Attr};
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{Table}](Insert) storing migrated data");
     }
 
     # prepare statements
@@ -287,6 +314,11 @@ sub Insert {
                 );
             }
         }
+
+        if ( $Self->{Debug} ) {
+            $Self->_Debug("[$Param{Table}](Insert) row ID: $ID");
+        }
+
         return $ID;
     }
 
@@ -412,6 +444,10 @@ sub ParseOptions {
 
 sub InitProgress {
     my ( $Self, %Param ) = @_;
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{Type}](InitProgress) initializing progress data (count: $Param{ItemCount})");
+    }
 
     my $MigrationState = $Self->_GetMigrationState();
 
@@ -633,9 +669,14 @@ sub _RunParallel {
                     ClientRegistration => {
                         DisableClientNotifications => 1,
                     },
+                    Migration => {
+                        Debug => $Param{Debug},
+                    }
                 );
                 $Kernel::OM->Get('DB')->Disconnect();
                 $DBD::Pg::VERSION = $DBDPg_VERSION;
+
+                $Self->{Debug} = $Param{Debug};
 
                 while ( (my $Item = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE") {
                     my $Result = $Sub->($Self, Item => $Item, %Param);
@@ -651,6 +692,7 @@ sub _RunParallel {
             },
             $Self,
             %Param,
+            Debug       => $Self->{Debug},
             WorkQueue   => $WorkQueue,
             ResultQueue => $ResultQueue,
             WorkerID    => $WorkerID,
@@ -766,6 +808,14 @@ sub PreloadOIDMappings {
         SourceID => $Self->{SourceID},
         %Param,
     );
+}
+
+sub _Debug {
+    my ( $Self, $Message ) = @_;
+
+    return if !$Self->{Debug};
+
+    $Kernel::OM->Get('Migration')->_Debug($Message);
 }
 
 1;

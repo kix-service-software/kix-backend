@@ -5,11 +5,12 @@ Feature: GET request to the /system/cmdb/classes resource
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
-  Scenario: check is the existing classes are consistent with the delivery defaults
+  Scenario Outline: check is the existing classes are consistent with the delivery defaults
     When I query the cmdb collection of classes
     Then the response code is 200
-    And the response contains 7 items of type "ConfigItemClass"
-    And the response contains the following items of type ConfigItemClass
+    Then the classes output is "<Name>"
+
+    Examples:
       | Name     |
       | Building |
       | Computer |

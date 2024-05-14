@@ -21,7 +21,7 @@ Feature: POST request to the /tickets/:TicketID/articles resource
     When I create a article with fail mimetype
     Then the response code is 400
     And the error code is "Validator.Failed"
-    And the error message is "Validation of attribute ContentType (html/text; charset=utf8) failed!"
+    And the error message is "Validation of attribute ContentType (html/text; charset=utf8) failed! Invalid MimeType!"
     When I delete this ticket
     Then the response code is 204
     And the response has no content
@@ -31,7 +31,7 @@ Feature: POST request to the /tickets/:TicketID/articles resource
     When I create a article with fail mimetype 2
     Then the response code is 400
     And the error code is "Validator.Failed"
-    And the error message is "Validation of attribute ContentType (text/pain; charset=utf8) failed!"
+    And the error message is "Validation of attribute ContentType (text/pain; charset=utf8) failed! Invalid MimeType!"
     When I delete this ticket
     Then the response code is 204
     And the response has no content

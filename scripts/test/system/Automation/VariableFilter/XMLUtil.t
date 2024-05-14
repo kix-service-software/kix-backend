@@ -76,7 +76,7 @@ if (!$Handler{'XMLUtil.FromXML'}) {
         {
             Name     => 'Undefined value',
             Value    => undef,
-            Expected => '',
+            Expected => undef,
             Silent   => 1
         },
         {

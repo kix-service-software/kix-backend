@@ -5,6 +5,28 @@
     Given the API schema files are located at __API_SCHEMA_LOCATION__
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
+#   Scenario Outline: get the list of existing notifications
+#     When I query the collection of notifications
+#     Then the response code is 200
+#     Then the response content is
+#     Then the notifications output is "<Name>"
+
+#     Examples:
+#       | Name                                     |
+#       | Agent - New Ticket Notification          |
+#       | Agent - Reminder (if unlocked)           |
+#       | Customer - New Ticket Receipt            |
+#       | Customer - Follow Up Rejection           |
+#       | Agent - FUP Notification (if unlocked)   |
+#       | Agent - FUP Notification (if locked)     |
+#       | Agent - Lock Timeout                     |
+#       | Agent - Owner Assignment                 |
+#       | Agent - Responsible Assignment           |
+#       | Agent - New Note Notification            |
+#       | Agent - Ticket Move Notification         |
+#       | Agent - Reminder (if locked)             |
+
+
   Scenario: get the list of existing notifications
     When I query the collection of notifications
     Then the response code is 200

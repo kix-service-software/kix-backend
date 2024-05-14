@@ -168,7 +168,7 @@ sub RunOperation {
                 %Param,
                 Data => $Param{Data},
             );
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
 
             if ( !$Result->{Success} ) {
                 return $Result;
@@ -184,7 +184,7 @@ sub RunOperation {
             %Param,
             Data => $Param{Data},
         );
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
 
         if ( !$Result->{Success} ) {
             return $Result;
@@ -196,7 +196,7 @@ sub RunOperation {
             %Param,
             Data => $Param{Data},
         );
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for $Self->{RequestURI} took %i ms", TimeDiff($StartTime)));
+        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
 
         if ( !$Result->{Success} ) {
             return $Result;

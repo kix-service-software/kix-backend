@@ -102,22 +102,25 @@ sub Search {
 
     my %SearchMapping = (
         CONTAINS => {
-            SearchPrefix => q{*},
-            SearchSuffix => q{*}
+            SearchPrefix      => q{*},
+            SearchSuffix      => q{*},
+            NoWildcardReplace => 1
         },
         ENDSWITH => {
-            SearchPrefix => q{*}
+            SearchPrefix      => q{*},
+            NoWildcardReplace => 1
         },
         STARTSWITH => {
-            SearchSuffix => q{*}
+            SearchSuffix      => q{*},
+            NoWildcardReplace => 1
         },
         LIKE => {}
     );
 
     my @SQLJoin;
     my $UserTable        = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
-    my $OrgaTable        = $Param{Flags}->{JoinMap}->{OrgansiationJoin} // 'o';
-    my $OrgaContactTable = $Param{Flags}->{JoinMap}->{OrgansiationContactJoin} // 'co';
+    my $OrgaTable        = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
+    my $OrgaContactTable = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
     if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
         my $Count = $Param{Flags}->{UserJoinCounter}++;
         $UserTable .= $Count;
@@ -129,8 +132,8 @@ sub Search {
         $Param{Flags}->{JoinMap}->{UserJoin} = $UserTable;
     }
 
-    if ( !$Param{Flags}->{JoinMap}->{OrgansiationContactJoin} ) {
-        my $Count = $Param{Flags}->{OrgansiationContactJoinCounter}++;
+    if ( !$Param{Flags}->{JoinMap}->{OrganisationContactJoin} ) {
+        my $Count = $Param{Flags}->{OrganisationContactJoinCounter}++;
         $OrgaContactTable .= $Count;
 
         push(
@@ -138,18 +141,18 @@ sub Search {
             "LEFT JOIN contact_organisation $OrgaContactTable ON c.id = $OrgaContactTable.contact_id"
         );
 
-        $Param{Flags}->{JoinMap}->{OrgansiationContactJoin} = $OrgaContactTable;
+        $Param{Flags}->{JoinMap}->{OrganisationContactJoin} = $OrgaContactTable;
     }
 
-    if ( !$Param{Flags}->{JoinMap}->{OrgansiationJoin} ) {
-        my $Count = $Param{Flags}->{OrgansiationJoinCounter}++;
+    if ( !$Param{Flags}->{JoinMap}->{OrganisationJoin} ) {
+        my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
         $OrgaTable .= $Count;
 
         push(
             @SQLJoin,
             "LEFT JOIN organisation $OrgaTable ON $OrgaTable.id = $OrgaContactTable.org_id"
         );
-        $Param{Flags}->{JoinMap}->{OrgansiationJoin} = $OrgaTable;
+        $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaTable;
     }
 
     my $Condition = $Kernel::OM->Get('DB')->QueryCondition(
