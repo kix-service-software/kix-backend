@@ -171,6 +171,15 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => undef,
+            Value2             => [''],
+        },
         Success => 1,
     },
     {
@@ -178,6 +187,15 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
             Value1             => q{},
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => [''],
             Value2             => undef,
         },
         Success => 1,
@@ -254,6 +272,15 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => undef,
+            Value2             => [''],
+        },
         Success => 1,
     },
     {
@@ -261,6 +288,15 @@ my @Tests = (
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
             Value1             => q{},
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             =>  [''],
             Value2             => undef,
         },
         Success => 1,
@@ -611,7 +647,7 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'DateTime: Value1 empty, Value2 undef',
@@ -620,7 +656,7 @@ my @Tests = (
             Value1             => q{},
             Value2             => undef,
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'DateTime: Both undefs',
@@ -668,7 +704,7 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Date: Value1 empty, Value2 undef',
@@ -677,7 +713,7 @@ my @Tests = (
             Value1             => q{},
             Value2             => undef,
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Date: Both undefs',
