@@ -7,15 +7,20 @@
     type: [ item-nodelete: { typeName: User } ]
     /counters:
       description: !include ../descriptions/resources/session/user/counters.md
-      type: { item-readonly: { typeName: Counter } }  
+      type: { item-readonly: { typeName: Counter } }
     /tickets:
       description: !include ../descriptions/resources/session/user/tickets.md
-      type: { collection-readonly: { typeName: Ticket } }  
+      type: { collection-readonly: { typeName: Ticket } }
     /preferences:
-      type: { collection: { typeName: UserPreference } }  
+      type: { collection: { typeName: UserPreference } }
       /{preferenceId}:
         type: { item: { typeName: UserPreference } }
         uriParameters:
           preferenceId:
             displayName: PeferenceID
             type: string
+  /markobjectasseen:
+    displayName: Mark Object As Seen
+    description: !include ../descriptions/resources/session/markobjectasseen.md
+    type: [ collection-postonly: { typeName: MarkObjectAsSeen } ]
+

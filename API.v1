@@ -283,6 +283,7 @@
 /reporting/reports/:ReportID/results/:ReportResultID                                       | DELETE           | V1::Reporting::ReportResultDelete                |
 /session                                                                                   | DELETE           | V1::Session::SessionDelete                       |
 /session                                                                                   | GET              | V1::Session::SessionGet                          |
+/session/markobjectasseen                                                                  | POST             | V1::Session::MarkObjectAsSeen                    |
 /session/user                                                                              | GET              | V1::Session::UserGet                             |
 /session/user                                                                              | PATCH            | V1::Session::UserUpdate                          |
 /session/user/counters                                                                     | GET              | V1::Session::UserCountersGet                     |
