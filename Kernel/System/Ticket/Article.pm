@@ -2217,8 +2217,9 @@ set article flags
         Key       => 'Seen',
         Value     => 1,
         UserID    => 123,
-        Silent    => 1       # optional - if set, no client notification will be triggered
-        NoEvents  => 1       # optional - trigger no events
+        Silent    => 1,       # optional - if set, no client notification will be triggered
+        NoEvents  => 1,       # optional - trigger no events
+        TicketID  => 123      # optional
     );
 
 Events:
@@ -2240,14 +2241,25 @@ sub ArticleFlagSet {
         }
     }
 
-    my %Article = $Self->ArticleGet(
-        ArticleID     => $Param{ArticleID},
-        UserID        => $Param{UserID},
-        DynamicFields => 0,
-    );
+    if (!$Param{TicketID}) {
+        my %Article = $Self->ArticleGet(
+            ArticleID     => $Param{ArticleID},
+            UserID        => $Param{UserID},
+            DynamicFields => 0,
+        );
+
+        if (!IsHashRefWithData(\%Article)) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No article found with id $Param{ArticleID}!"
+            );
+            return;
+        }
+        $Param{TicketID} = $Article{TicketID};
+    }
 
     my %Flag = $Self->ArticleFlagGet(
-        TicketID => $Article{TicketID},
+        TicketID => $Param{TicketID},
         %Param,
     );
 
@@ -2274,13 +2286,13 @@ sub ArticleFlagSet {
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     if ( !$Param{NoEvents} ) {
         $Self->EventHandler(
             Event => 'ArticleFlagSet',
             Data  => {
-                TicketID  => $Article{TicketID},
+                TicketID  => $Param{TicketID},
                 ArticleID => $Param{ArticleID},
                 Key       => $Param{Key},
                 Value     => $Param{Value},
@@ -2296,7 +2308,7 @@ sub ArticleFlagSet {
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
             UserID    => $Param{UserID},
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+            ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
