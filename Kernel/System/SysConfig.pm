@@ -431,6 +431,9 @@ sub OptionAdd {
         Type => $Self->{CacheType}
     );
 
+    # delete OS cache
+    $Self->_ObjectSearchCacheCleanUp();
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -580,6 +583,9 @@ sub OptionUpdate {
         Type => $Self->{CacheType}
     );
 
+    # delete OS cache
+    $Self->_ObjectSearchCacheCleanUp();
+
     my %OptionData = $Self->OptionGet(
         Name => $Param{Name},
     );
@@ -677,6 +683,9 @@ sub OptionDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
+
+    # delete OS cache
+    $Self->_ObjectSearchCacheCleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -854,6 +863,9 @@ sub CleanUp {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
+
+    # delete OS cache
+    $Self->_ObjectSearchCacheCleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -1132,6 +1144,22 @@ sub _RebuildFromFile {
     }
 
     return %ExistingKeys;
+}
+
+sub _ObjectSearchCacheCleanUp {
+    my ( $Self, %Param ) = @_;
+
+    # delete cache for OS ConfigItem
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_ConfigItem'
+    );
+
+    # delete cache for OS GeneralCatalog
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_GeneralCatalog'
+    );
+
+    return 1;
 }
 
 1;

@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Debug" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable ObjectSearch debugging.</Description>
+        <Group>ObjectSearch</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="ObjectSearch::Backend" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the backend module that should be used to search for objects.</Description>
         <Group>ObjectSearch</Group>
@@ -68,6 +79,16 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Certificate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###GeneralCatalog" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::GeneralCatalog</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -779,4 +800,77 @@
         </Setting>
     </ConfigItem>
     <!-- EO FAQ OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- GENERAL CATALOG OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###Times" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::Times</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###ItemID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::ItemID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###Preferences" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::Preferences</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###Editor" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::Editor</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###Fulltext" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for general catalog items.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::GeneralCatalog::Fulltext</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO GENERAL CATALOG OBJECTSEARCH ATTRIBUTES -->
 </kix_config>
