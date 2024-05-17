@@ -37,7 +37,7 @@ sub GetSupportedAttributes {
     # check cache
     my $CacheKey  = "GetSupportedAttributes::XMLData";
     my $CacheData = $Kernel::OM->Get('Cache')->Get(
-        Type => 'ITSMConfigurationManagement',
+        Type => 'ObjectSearch_ConfigItem',
         Key  => $CacheKey,
     );
     return $CacheData if ( IsHashRefWithData( $CacheData ) );

@@ -59,6 +59,9 @@ sub new {
     # init hash for used object backend
     $Self->{ObjectTypeBackends} = {};
 
+    # set object search debug
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('ObjectSearch::Debug') || 0;
+
     return $Self;
 }
 
@@ -179,11 +182,10 @@ sub Search {
     );
     return if ( !$SQL );
 
-    if ( $Param{Debug} ) {
+    if ( $Self->{Debug} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => <<"END"
-ObjectSearch SQL-Limit: $Param{Limit}
 ObjectSearch SQL-Statement: $SQL
 END
         );
