@@ -236,9 +236,9 @@ sub ShortDisplayValueRender {
             my $Done = 0;
             my $All = 0;
             for my $Item ( @{ $Items } ) {
-                if ($Item && $Item->{IsCheckList}) {
+                if ($Item) {
                     $All++;
-                    if ($Item->{Value} eq 'OK' || $Item->{Value} eq 'NOK' || $Item->{Value} eq 'n.a.') {
+                    if ($Item->{IsCountable}) {
                         $Done++;
                     }
                 }
@@ -264,12 +264,27 @@ sub _GetChecklistRows {
     if ( IsArrayRefWithData($Param{Items}) ) {
         for my $Item ( @{ $Param{Items} } ) {
             if (IsHashRefWithData($Item)) {
+
+                # check if the item is countable
+                my $IsCountable = 0;
+                if( $Item->{input} eq 'ChecklistState' ) {
+                    for my $ChecklistState ( @{ $Item->{inputStates} }) {
+                        if ( $ChecklistState->{value} eq $Item->{value} && $ChecklistState->{done} ) {
+                            $IsCountable = 1;
+                            last;
+                        }
+                    }
+                } else {
+                    # if text has a value than it should be counted
+                    $IsCountable = length( $Item->{value} ) > 0;
+                }
+
                 push(
                     @Rows,
                     {
                         Title       => $Item->{title} || q{},
                         Value       => $Item->{value} || q{},
-                        IsCheckList => $Item->{input} eq 'ChecklistState' ? 1 : 0
+                        IsCountable => $IsCountable
                     }
                 );
 
