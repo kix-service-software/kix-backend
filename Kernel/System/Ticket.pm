@@ -111,7 +111,7 @@ sub new {
 
     # load article storage module
     my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule')
-        || 'Kernel::System::Ticket::ArticleStorageDB';
+        || 'Kernel::System::Ticket::ArticleStorageFS';
     if ( !$Kernel::OM->Get('Main')->RequireBaseClass($StorageModule) ) {
         die "Can't load ticket storage backend module $StorageModule! $@";
     }
