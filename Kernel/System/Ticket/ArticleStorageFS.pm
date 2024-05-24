@@ -720,9 +720,6 @@ sub ArticleAttachmentIndexRaw {
 
     FILENAME:
     for my $Filename ( sort @List ) {
-        my $FileSize    = -s $Filename || 0;
-        my $FileSizeRaw = $FileSize;
-
         # do not use control file
         next FILENAME if $Filename =~ /\.content_alternative$/;
         next FILENAME if $Filename =~ /\.content_id$/;
@@ -731,6 +728,9 @@ sub ArticleAttachmentIndexRaw {
         next FILENAME if $Filename =~ /\/plain.txt$/;
 
         # human readable file size
+        my $FileSize    = -s $Filename || 0;
+        my $FileSizeRaw = $FileSize;
+
         if ( $FileSize > ( 1024 * 1024 ) ) {
             $FileSize = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
         }
@@ -1006,13 +1006,15 @@ sub ArticleAttachment {
                     return if !$Content;
                     $Data{ContentType} = ${$Content};
 
-                    # read content
-                    $Content = $MainObject->FileRead(
-                        Location => $Filename,
-                        Mode     => 'binmode',
-                    );
-                    return if !$Content;
-                    $Data{Content} = ${$Content};
+                    if ( !$Param{NoContent} ) {
+                        # read content
+                        $Content = $MainObject->FileRead(
+                            Location => $Filename,
+                            Mode     => 'binmode',
+                        );
+                        return if !$Content;
+                        $Data{Content} = ${$Content};
+                    }
 
                     # content id (optional)
                     if ( -e "$Filename.content_id" ) {
@@ -1060,7 +1062,7 @@ sub ArticleAttachment {
                         $Data{Disposition} = 'attachment';
                     }
                 }
-                else {
+                elsif ( !$Param{NoContent} ) {
 
                     # read content
                     my $Content = $MainObject->FileRead(
