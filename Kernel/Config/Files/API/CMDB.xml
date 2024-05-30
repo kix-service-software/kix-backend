@@ -139,6 +139,7 @@
                 <Item Key="ResponseSchema">ConfigItemCollectionResponse</Item>
                 <Item Key="CacheType">API_cmdb_configitems</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
+                <Item Key="ImplicitPagingFor">ConfigItem</Item>
             </Hash>
         </Setting>
     </ConfigItem>
