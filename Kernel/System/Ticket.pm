@@ -567,11 +567,23 @@ sub TicketCreate {
                 $Param{ContactID} = undef;
             } else {
                 my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
+
+                # find valid contact
                 my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                     Email  => $ContactEmail,
                     Silent => 1,
+                    Valid  => 1
                 );
 
+                # find invalid contact as fallback
+                if (!$ExistingContactID) {
+                    $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                        Email  => $ContactEmail,
+                        Silent => 1
+                    );
+                }
+
+                # create if none was found
                 if (!$ExistingContactID) {
                     $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
                         Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,

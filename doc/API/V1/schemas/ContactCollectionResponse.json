@@ -208,14 +208,7 @@
                "readOnly" : true
             },
             "Title" : {
-               "anyOf" : [
-                  {
-                     "type" : "string"
-                  },
-                  {
-                     "type" : "null"
-                  }
-               ],
+               "type" : "string",
                "readOnly" : true
             },
             "User" : {
