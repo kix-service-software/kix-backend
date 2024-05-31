@@ -14,6 +14,7 @@ use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
 # get ticket object
+my $ConfigObject  = $Kernel::OM->Get('Config');
 my $ContactObject = $Kernel::OM->Get('Contact');
 my $OrgaObject    = $Kernel::OM->Get('Organisation');
 my $TicketObject  = $Kernel::OM->Get('Ticket');
@@ -35,7 +36,7 @@ my %Contact = $ContactObject->ContactGet(
     ID => $ContactID
 );
 # without primary
-my $ContactIDWithoutPrimary = $Kernel::OM->Get('Contact')->ContactAdd(
+my $ContactIDWithoutPrimary = $ContactObject->ContactAdd(
     Firstname             => 'ContactWithoutPrimary',
     Lastname              => 'ContactWithoutPrimary',
     Email                 => 'ContactWithoutPrimary@localunittest.com',
@@ -337,6 +338,88 @@ for my $Test (@Tests) {
     }
 
     $Counter++;
+}
+
+# check valid/invalid contact with same email
+# disable unique check
+$ConfigObject->Set(
+    Key   => 'ContactEmailUniqueCheck',
+    Value => 0,
+);
+my $FirstContactID = $ContactObject->ContactAdd(
+    Firstname             => 'First',
+    Lastname              => 'Contact',
+    Email                 => 'same@testemail.com',
+    ValidID               => 1,
+    UserID                => 1
+);
+my $SecondContactID = $ContactObject->ContactAdd(
+    Firstname             => 'Second',
+    Lastname              => 'Contact',
+    Email                 => 'same@testemail.com',
+    ValidID               => 1,
+    UserID                => 1
+);
+$Self->True(
+    $FirstContactID && $SecondContactID ? 1 : 0,
+    "Same Email: ContactAdd()"
+);
+
+if ($FirstContactID && $SecondContactID) {
+    _SameEmailContactCheck('first contact', $FirstContactID);
+
+    # set first contact invalid
+    my %Contact = $ContactObject->ContactGet(ID => $FirstContactID);
+    if (IsHashRefWithData(\%Contact)) {
+        $ContactObject->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
+
+        # create new ticket, now second contact should be used, because first one is invalid
+        _SameEmailContactCheck('second contact', $SecondContactID);
+
+        # set also second contact invalid
+        %Contact = $ContactObject->ContactGet(ID => $SecondContactID);
+        if (IsHashRefWithData(\%Contact)) {
+            $ContactObject->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
+
+            # create new ticket, now first contact should be used again, because second one is also invalid
+            _SameEmailContactCheck('first contact again', $FirstContactID);
+        }
+    }
+}
+
+sub _SameEmailContactCheck {
+    my ($Suffix, $CheckContactID) = @_;
+
+    my $TicketID = $TicketObject->TicketCreate(
+        Title          => 'Same Email Valid/Invalid Test',
+        Queue          => 'Junk',
+        Lock           => 'unlock',
+        Priority       => '3 normal',
+        State          => 'closed',
+        ContactID      => 'same@testemail.com',
+        OwnerID        => 1,
+        UserID         => 1
+    );
+    $Self->True(
+        $TicketID,
+        "Same Email: TicketCreate() - $Suffix"
+    );
+    if ($TicketID) {
+        my %Ticket = $TicketObject->TicketGet(
+            TicketID => $TicketID
+        );
+        $Self->True(
+            IsHashRefWithData(\%Ticket) || 0,
+            "Same Email: TicketGet() - $Suffix"
+        );
+        if (IsHashRefWithData(\%Ticket)) {
+            $Self->Is(
+                $Ticket{ContactID},
+                $CheckContactID,
+                "Same Email: ticket contact check - $Suffix"
+            );
+        }
+    }
 }
 
 # rollback transaction on database

@@ -1,5 +1,5 @@
 {
-   "$id" : "ConsoleCommand.json",
+   "$id" : "ConsoleCommandPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The console command request object for creation/execution.",
    "type" : "object",
