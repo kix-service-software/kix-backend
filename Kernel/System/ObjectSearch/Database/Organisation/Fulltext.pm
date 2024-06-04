@@ -47,31 +47,21 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # init search parameter for fulltext search
-    my %Search = (
-        OR => []
+    my $Condition = $Self->_FulltextCondition(
+        Operaror      => $Param{Search}->{Operator},
+        Value         => $Param{Search}->{Value},
+        Columns       => [
+            'o.name', 'o.number', 'o.street', 'o.city',
+            'o.zip', 'o.url', 'o.country'
+        ],
+        Silent        => $Param{Silent},
+        CaseSensitive => 1
     );
 
-    # OR-combine relevant fields with requested operator and value
-    for my $Field (
-        qw(
-            Name Number Street
-            Zip City Country Url
-        )
-    ) {
-        push (
-            @{ $Search{OR} },
-            {
-                Field    => $Field,
-                Operator => $Param{Search}->{Operator},
-                Value    => $Param{Search}->{Value}
-            }
-        );
-    }
+    return if ( !$Condition );
 
-    # return search def
     return {
-        Search => \%Search,
+        Where => [$Condition]
     };
 }
 

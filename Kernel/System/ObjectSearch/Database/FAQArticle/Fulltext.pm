@@ -47,48 +47,15 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # prepare value for query condition
-    my $Value;
-    my @ORGroups = split(/[|]/smx,$Param{Search}->{Value});
-    for my $Group ( @ORGroups ) {
-        next if !defined $Group;
-        next if $Group eq q{};
-
-        if ( $Value ) {
-            $Value .= q{||};
-        }
-        $Value .= q{(}
-            . $Group
-            . q{)};
-    }
-
-    if ( $Value ) {
-        $Value = q{(}
-            . $Value
-            . q{)};
-    }
-
-    my %Additional = (
-        'CONTAINS' =>  {
-            SearchPrefix => q{*},
-            SearchSuffix => q{*}
-        },
-        'STARTSWITH' =>  {
-            SearchSuffix => q{*}
-        },
-        'ENDSWITH' =>  {
-            SearchPrefix => q{*}
-        },
-        'LIKE' => {}
-    );
-
-    my $Condition = $Kernel::OM->Get('DB')->QueryCondition(
-        %{$Additional{$Param{Search}->{Operator}}},
-        Value => $Value,
-        Key   => [
+    my $Condition = $Self->_FulltextCondition(
+        Operaror     => $Param{Search}->{Operator},
+        Value        => $Param{Search}->{Value},
+        Columns      => [
             'f.f_number', 'f.f_subject', 'f.f_keywords',
             'f.f_field1','f.f_field2','f.f_field3','f.f_field4','f.f_field5','f.f_field6',
-        ]
+        ],
+        Silent        => $Param{Silent},
+        CaseSensitive => 1
     );
 
     return if ( !$Condition );

@@ -1056,6 +1056,383 @@ sub _CheckSortParams {
     return 1;
 }
 
+=item _FulltextCondition()
+
+generate SQL condition query based on a search expression
+
+    my $SQL = $Self->_FulltextCondition(
+        Columns  => ['some_col'],
+        Value    => 'ABC+DEF',
+        Operator => 'LIKE'      # supported are LIKE, CONTAINS, STARTSWITH, ENDSWITH
+    );
+
+    example of a more complex search condition
+
+    my $SQL = $Self->_FulltextCondition(
+        Key   => [ 'some_col_a', 'some_col_b' ],
+        Value => 'ABC&DEF&!GHI',
+    );
+=cut
+
+sub _FulltextCondition {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (
+        qw(
+            Operator Columns Value
+        )
+    ) {
+        # check needed stuff
+        if ( !defined $Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    if ( !IsArrayRefWithData($Param{Columns}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Columns is not a array ref!"
+        );
+        return;
+    }
+
+    my %OperationMap = (
+        CONTAINS => {
+            Prefix     => q{%},
+            Suffix     => q{%},
+            NoWildcard => 1
+        },
+        ENDSWITH => {
+            Prefix     => q{%},
+            NoWildcard => 1
+        },
+        STARTSWITH => {
+            Suffix     => q{%},
+            NoWildcard => 1
+        },
+        LIKE => {}
+    );
+
+    if ( !$OperationMap{$Param{Operator}} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Operation $Param{Operator} not supported!"
+        );
+        return;
+    }
+
+    # search prefix/suffix check
+    my $Prefix        = $OperationMap{$Param{Operator}}->{Prefix}     || q{};
+    my $Suffix        = $OperationMap{$Param{Operator}}->{Suffix}     || q{};
+    my $NoWildcard    = $OperationMap{$Param{Operator}}->{NoWildcard} || 0;
+    my $CaseSensitive = $Param{CaseSensitive} || 0;
+
+    # remove leading/trailing spaces
+    $Param{Value} =~ s/^\s+//g;
+    $Param{Value} =~ s/\s+$//g;
+
+    # escape backslash characters from $Word
+    $Param{Value} =~ s{\\}{\\\\}smxg;
+
+    # escape slq wildcard
+    $Param{Value} =~ s{%}{\\%}smxg;
+
+    # quote ".+?" expressions
+    # for example ("some and me" AND !some), so "some and me" is used for search 1:1
+    my $Count = 0;
+    my %Expression;
+    $Param{Value} =~ s{
+        "([^"]+?)(?:"|$)
+    }
+    {
+        $Count++;
+        my $Item = $1;
+        $Expression{"###$Count###"} = $Item;
+        "###$Count###";
+    }egx;
+
+    my $Value = $Self->_FulltextValueCleanUp(
+        Value      => $Param{Value},
+        NoWildcard => $NoWildcard,
+        Silent     => $Param{Silent}
+    );
+
+    # for processing
+    my @Array     = split( // , $Value );
+    my $SQL       = q{};
+    my $Word      = q{};
+    my $Not       = 0;
+    my $Backslash = 0;
+
+    POSITION:
+    for my $Position ( 0 .. $#Array ) {
+        if (
+            $Word eq q{}
+            && $Array[$Position] eq q{!}
+        ) {
+            $Not = 1;
+            next POSITION;
+        }
+        elsif ( $Array[$Position] eq q{&} ) {
+            if (
+                $Position == 0
+                || $Position == $#Array
+            ) {
+                next POSITION;
+            }
+        }
+        elsif ( $Array[$Position] eq q{|} ) {
+            if (
+                $Position == 0
+                || $Position == $#Array
+            ) {
+                next POSITION;
+            }
+        }
+        else {
+            $Word .= $Array[$Position];
+            next POSITION if $Position != $#Array;
+        }
+
+        # if word exists, do something with it
+        if ( $Word ne q{} ) {
+
+            # replace word if it's an "some expression" expression
+            if ( $Expression{$Word} ) {
+                $Word = $Expression{$Word};
+            }
+
+            $Word = $Kernel::OM->Get('DB')->Quote( $Word, 'Like' );
+
+            # database quote
+            $Word = $Prefix . $Word . $Suffix;
+
+            # if it's a NOT LIKE condition
+            if ($Not) {
+                $Not = 0;
+
+                my $SQLA;
+                for my $Column (@{$Param{Columns}}) {
+                    if ($SQLA) {
+                        $SQLA .= ' AND ';
+                    }
+
+                    # check if like is used
+                    my $Type = 'NOT LIKE';
+                    if ( $Word !~ m/%/ ) {
+                        $Type = q{!=};
+                    }
+
+                    $SQLA .= $Self->_FulltextColumnSQL(
+                        Type           => $Type,
+                        Word           => $Word,
+                        Column         => $Column,
+                        Silent         => $Param{Silent},
+                        CaseSensitive  => $CaseSensitive,
+                        IsStaticSearch => $Param{IsStaticSearch}
+                    );
+
+                    if ( $Type eq 'NOT LIKE' ) {
+                        $SQLA .= " ESCAPE '\\'";
+                    }
+                }
+                $SQL .= '(' . $SQLA . ') ';
+            }
+
+            # if it's a LIKE condition
+            else {
+                my $SQLA;
+                for my $Column (@{$Param{Columns}}) {
+                    if ($SQLA) {
+                        $SQLA .= ' OR ';
+                    }
+
+                    # check if like is used
+                    my $Type = 'LIKE';
+                    if ( $Word !~ m/%/ ) {
+                        $Type = q{=};
+                    }
+
+                    $SQLA .= $Self->_FulltextColumnSQL(
+                        Type           => $Type,
+                        Word           => $Word,
+                        Column         => $Column,
+                        Silent         => $Param{Silent},
+                        CaseSensitive  => $CaseSensitive,
+                        IsStaticSearch => $Param{IsStaticSearch}
+                    );
+
+                    if ( $Type eq 'LIKE' ) {
+                        $SQLA .= " ESCAPE '\\'";
+                    }
+                }
+                $SQL .= '(' . $SQLA . ') ';
+            }
+
+            # reset word
+            $Word = q{};
+        }
+
+        # if it's an AND condition
+        if ( $Array[$Position] eq q{&} ) {
+            if ( $SQL =~ m/ OR $/ ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message =>
+                        "Invalid condition '$Value', simultaneous usage both AND and OR conditions!",
+                );
+                return "1=0";
+            }
+            elsif ( $SQL !~ m/ AND $/ ) {
+                $SQL .= ' AND ';
+            }
+        }
+
+        # if it's an OR condition
+        elsif (
+            $Array[$Position] eq q{|}
+        ) {
+            if ( $SQL =~ m/ AND $/ ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message =>
+                        "Invalid condition '$Param{Value}', simultaneous usage both AND and OR conditions!",
+                );
+                return "1=0";
+            }
+            elsif ( $SQL !~ m/ OR $/ ) {
+                $SQL .= ' OR ';
+            }
+        }
+    }
+
+    return $SQL;
+}
+
+sub _FulltextValueCleanUp {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = $Param{Value};
+
+    # replace multiple spaces by &&
+    $Value =~ s/\s+/&/g;
+
+    # replace + by &
+    $Value =~ s/\+/&/g;
+
+    # replace * with % (for SQL)
+    if ( !$Param{NoWildcard} ) {
+        $Value =~ s/\*/%/g;
+    }
+
+    # remove double %% (also if there is only whitespace in between)
+    $Value =~ s/%\s*%/%/g;
+
+    # replace '%!%' by '!%' (done if * is added by search frontend)
+    $Value =~ s/\%!\%/!%/g;
+
+    # replace '%!' by '!%' (done if * is added by search frontend)
+    $Value =~ s/\%!/!%/g;
+
+    # remove leading/trailing conditions
+    $Value =~ s/(&|\|)(?<!\\)\)$/)/g;
+    $Value =~ s/^(?<!\\)\((&|\|)/(/g;
+
+    # clean up not needed spaces in condistions
+    # removed spaces examples
+    # [SPACE](, [SPACE]), [SPACE]|, [SPACE]&
+    # example not removed spaces
+    # [SPACE]\\(, [SPACE]\\), [SPACE]\\&
+    $Value =~ s{(
+        \s
+        (
+              (?<!\\) \(
+            | (?<!\\) \)
+            |         \|
+            | (?<!\\) &
+        )
+    )}{$2}xg;
+
+    # removed spaces examples
+    # )[SPACE], )[SPACE], |[SPACE], &[SPACE]
+    # example not removed spaces
+    # \\([SPACE], \\)[SPACE], \\&[SPACE]
+    $Value =~ s{(
+        (
+              (?<!\\) \(
+            | (?<!\\) \)
+            |         \|
+            | (?<!\\) &
+        )
+        \s
+    )}{$2}xg;
+
+    return $Value;
+}
+
+sub _FulltextColumnSQL {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (
+        qw(
+            Column Type
+        )
+    ) {
+        # check needed stuff
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $Column        = $Param{Column};
+    my $Type          = $Param{Type};
+    my $Word          = $Param{Word} || q{};
+    my $SQL           = q{};
+    my $CaseSensitive = $Param{CaseSensitive} || 0;
+
+    $Word = q{'} . $Word . q{'};
+
+    # check if database supports LIKE in large text types
+    # the first condition is a little bit opaque
+    # CaseSensitive of the database defines, if the database handles case sensitivity or not
+    # and the parameter $CaseSensitive defines, if the customer database should do case sensitive statements or not.
+    # so if the database dont support case sensitivity or the configuration of the customer database want to do this
+    # then we prevent the LOWER() statements.
+    if (
+        !$Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive')
+        || $CaseSensitive
+    ) {
+        $SQL .= "$Column $Type $Word";
+    }
+    elsif ( $Kernel::OM->Get('DB')->GetDatabaseFunction('LcaseLikeInLargeText') ) {
+
+        if ( $Param{IsStaticSearch} ) {
+            $SQL .= "$Column $Type LCASE($Word)";
+        }
+        else {
+            $SQL .= "LCASE($Column) $Type LCASE($Word)";
+        }
+    }
+    else {
+        if ( $Param{IsStaticSearch} ) {
+            $SQL .= "$Column $Type LOWER($Word)";
+        }
+        else {
+            $SQL .= "LOWER($Column) $Type LOWER($Word)";
+        }
+    }
+
+    return $SQL;
+}
+
 =end Internal:
 
 =cut

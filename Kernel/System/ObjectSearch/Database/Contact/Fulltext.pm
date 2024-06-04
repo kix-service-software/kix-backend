@@ -79,44 +79,6 @@ sub Search {
     # check params
     return if !$Self->_CheckSearchParams(%Param);
 
-    # prepare value for query condition
-    my $Value;
-    my @ORGroups = split(/[|]/smx,$Param{Search}->{Value});
-    for my $Group ( @ORGroups ) {
-        next if !defined $Group;
-        next if $Group eq q{};
-
-        if ( $Value ) {
-            $Value .= q{||};
-        }
-        $Value .= q{(}
-            . $Group
-            . q{)};
-    }
-
-    if ( $Value ) {
-        $Value = q{(}
-            . $Value
-            . q{)};
-    }
-
-    my %SearchMapping = (
-        CONTAINS => {
-            SearchPrefix      => q{*},
-            SearchSuffix      => q{*},
-            NoWildcardReplace => 1
-        },
-        ENDSWITH => {
-            SearchPrefix      => q{*},
-            NoWildcardReplace => 1
-        },
-        STARTSWITH => {
-            SearchSuffix      => q{*},
-            NoWildcardReplace => 1
-        },
-        LIKE => {}
-    );
-
     my @SQLJoin;
     my $UserTable        = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
     my $OrgaTable        = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
@@ -155,16 +117,17 @@ sub Search {
         $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaTable;
     }
 
-    my $Condition = $Kernel::OM->Get('DB')->QueryCondition(
-        Key => [
+    my $Condition = $Self->_FulltextCondition(
+        Columns       => [
             'c.firstname', 'c.lastname',
             'c.email','c.email1','c.email2','c.email3','c.email4','c.email5',
             'c.title','c.phone','c.fax','c.mobile',
             'c.street','c.city','c.zip','c.country',
             "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
         ],
-        %{$SearchMapping{$Param{Search}->{Operator}}},
-        Value => $Value
+        Operator      => $Param{Search}->{Operator},
+        Value         => $Param{Search}->{Value},
+        CaseSensitive => 1
     );
 
     return {

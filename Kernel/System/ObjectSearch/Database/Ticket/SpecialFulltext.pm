@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Certificate::Fulltext;
+package Kernel::System::ObjectSearch::Database::Ticket::SpecialFulltext;
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Certificate::Fulltext - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Ticket::SpecialFulltext - contains special attribute fulltext module for database object search
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,17 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Fulltext => {
+        OwnerFulltext => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ResponsibleFulltext => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        OrganisationFulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
@@ -53,45 +63,41 @@ sub Search {
     );
 
     my %AttributeMapping = (
-        Fulltext => {
+        OwnerFulltext => {
             Fields => [
-                'Subject',
-                'Email'
+                'Owner',
+                'OwnerName'
+            ]
+        },
+        ResponsibleFulltext => {
+            Fields => [
+                'Responsible',
+                'ResponsibleName'
+            ]
+        },
+        OrganisationFulltext => {
+            Fields => [
+                'Organisation',
+                'OrganisationNumber'
             ]
         }
     );
 
-    # check for needed joins
-    my @SQLJoin = ();
-    my $JoinFlag = 'JoinCertificate' . $Param{Search}->{Field};
-    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinFlag } // 'vfsp';
-    if ( !$Param{Flags}->{JoinMap}->{ $JoinFlag } ) {
-        my $Count = $Param{Flags}->{CertificateJoinCounter}++;
-        $TableAlias .= $Count;
-        push(
-            @SQLJoin,
-            "INNER JOIN virtual_fs_preferences $TableAlias ON $TableAlias.virtual_fs_id = vfs.id",
-            "AND $TableAlias.preferences_key IN ('Subject','Email')"
+    # OR-combine relevant fields with requested operator and value
+    for my $Field ( @{$AttributeMapping{$Param{Search}->{Field}}->{Fields}} ) {
+        push (
+            @{ $Search{OR} },
+            {
+                Field    => $Field,
+                Operator => $Param{Search}->{Operator},
+                Value    => $Param{Search}->{Value}
+            }
         );
-
-        $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;
     }
-
-    # prepare condition
-    my $Condition = $Self->_FulltextCondition(
-        Operator      => $Param{Search}->{Operator},
-        Columns       => [ "$TableAlias.preferences_value" ],
-        Value         => $Param{Search}->{Value},
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
-    );
-
-    return if ( !$Condition );
 
     # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Search => \%Search,
     };
 }
 
