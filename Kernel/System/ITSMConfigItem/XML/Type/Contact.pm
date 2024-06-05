@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -107,6 +107,13 @@ sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        ID => $Param{Value}
+    );
+
+    if ( IsHashRefWithData( \%Contact ) && $Contact{Email} ) {
+        return $Contact{Email};
+    }
     return $Param{Value};
 }
 
@@ -141,7 +148,57 @@ sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
-    return $Param{Value};
+    my $ID = '';
+
+    # check if it is an email address and lookup contact...
+    if ( $Param{Value} =~/.+@.+/) {
+        # try valid contact
+        $ID = $Kernel::OM->Get('Contact')->ContactLookup(
+            Email  => $Param{Value},
+            Silent => 1,
+            Valid  => 1
+        ) || '';
+
+        # try invalid contact
+        if ( !$ID ) {
+            $ID = $Kernel::OM->Get('Contact')->ContactLookup(
+                Email  => $Param{Value},
+                Silent => 1
+            ) || '';
+        }
+    }
+
+    # if no contact found, check if it's possibly a login name...
+    if ( !$ID ) {
+        $ID = $Kernel::OM->Get('Contact')->ContactLookup(
+            UserLogin  => $Param{Value},
+            Silent     => 1
+        ) || '';
+    }
+
+    # if no contact found, check if it's the contact ID...
+    if ( !$ID ) {
+        my $LookupEmail = $Kernel::OM->Get('Contact')->ContactLookup(
+            ID     => $Param{Value},
+            Silent => 1
+        ) || '';
+
+        if( $LookupEmail ) {
+            $ID = $Param{Value};
+        }
+    }
+
+    if ( !$ID ) {
+        return if $Param{Silent};
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Contact lookup of '$Param{Value}' failed!",
+        );
+        return;
+    }
+
+    return $ID;
+
 }
 
 =item ValidateValue()
