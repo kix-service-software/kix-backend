@@ -20,12 +20,13 @@ use MIME::Words;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Encode',
-    'HTMLUtils',
-    'Log',
-    'Time',
+our @ObjectDependencies = qw(
+    Certificate
+    Config
+    Encode
+    HTMLUtils
+    Log
+    Time
 );
 
 =head1 NAME
@@ -170,8 +171,6 @@ sub Send {
 
     # correct charset if necessary (KIX2018-8418)
     $Param{Charset} =~ s/utf8/utf-8/i;
-
-    # TODO: SIGN/CRYPT
 
     # build header
     my %Header;
@@ -451,7 +450,84 @@ sub Send {
         }
     }
 
-    # TODO: SIGN/Crypt
+    my @Flags;
+    my %Sign = $Kernel::OM->Get('Certificate')->Sign(
+        %Param,
+        Entity => $Entity
+    );
+
+    if ( %Sign ) {
+        push( @Flags, @{$Sign{Flags}} );
+
+        if ( $Sign{Entity} ) {
+            $Entity = $Sign{Entity};
+        }
+    }
+    else {
+        return {
+            HeadRef => undef,
+            BodyRef => undef,
+            Flags   => [
+                {
+                    Key   => 'SMIMESigned',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMESignedError',
+                    Value => "Internal Error!"
+                }
+            ]
+        };
+    }
+
+    my %Encrypt = $Kernel::OM->Get('Certificate')->Encrypt(
+        %Param,
+        Entity             => $Entity,
+        IgnoreEmailPattern => $IgnoreEmailPattern
+    );
+
+    if ( %Encrypt ) {
+        push( @Flags, @{$Encrypt{Flags}} );
+        if (
+            !$Encrypt{Successful}
+            && $Param{Encrypt} == 1
+        ) {
+            return {
+                HeadRef => undef,
+                BodyRef => undef,
+                Flags   => [
+                    \@Flags,
+                    {
+                        Key   => 'RetryEncrypt',
+                        Value => 1
+                    }
+                ]
+            };
+        }
+        if ( $Encrypt{Entity} ) {
+            $Entity = $Encrypt{Entity};
+        }
+    }
+    else {
+        return {
+            HeadRef => undef,
+            BodyRef => undef,
+            Flags   => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "Internal Error!"
+                },
+                {
+                    Key   => 'RetryEncrypt',
+                    Value => $Param{Encrypt} ? 1 : 0
+                }
+            ]
+        };
+    }
 
     # get header from Entity
     my $Head = $Entity->head();
@@ -461,7 +537,7 @@ sub Send {
     my @Headers = split( /\n/, $Param{Header} );
 
     # reset orig header
-    $Param{Header} = '';
+    $Param{Header} = q{};
     for my $Line (@Headers) {
         $Line =~ s/^    (.*)$/ $1/;
 
@@ -512,16 +588,19 @@ sub Send {
 
     # set envelope sender for notifications
     if ( $Param{Loop} ) {
-        my $NotificationEnvelopeFrom = $ConfigObject->Get('SendmailNotificationEnvelopeFrom') || '';
-        my $NotificationFallback = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
-        if ( $NotificationEnvelopeFrom || !$NotificationFallback ) {
+        my $NotificationEnvelopeFrom = $ConfigObject->Get('SendmailNotificationEnvelopeFrom') || q{};
+        my $NotificationFallback     = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
+        if (
+            $NotificationEnvelopeFrom
+            || !$NotificationFallback
+        ) {
             $RealFrom = $NotificationEnvelopeFrom;
         }
     }
 
     # debug
     if ( $Self->{Debug} > 1 ) {
-        my $To = join(',', @ToArray);
+        my $To = join( q{,}, @ToArray );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$To' from '$RealFrom'. Subject => '$Param{Subject}';",
@@ -544,15 +623,11 @@ sub Send {
         return;
     }
 
-    # don't push notification for email at the moment
-    # # push client callback event
-    # $Kernel::OM->Get('ClientNotification')->NotifyClients(
-    #     Event     => 'CREATE',
-    #     Namespace => 'Email',
-    #     ObjectID  => $MessageID,
-    # );
-
-    return ( \$Param{Header}, \$Param{Body} );
+    return {
+        HeadRef => \$Param{Header},
+        BodyRef => \$Param{Body},
+        Flags   => \@Flags
+    };
 }
 
 =item Check()

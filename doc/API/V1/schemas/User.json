@@ -592,6 +592,11 @@
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -607,6 +612,26 @@
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is a encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is an signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -668,10 +693,15 @@
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
