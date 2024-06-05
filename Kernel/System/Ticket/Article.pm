@@ -674,16 +674,21 @@ sub ArticleCreate {
         my $Charset = $Param{Charset};
 
         # send mail
-        my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Email')->Send(
+        # If EncryptIfPossible is active, it should be 2 because 1 means it needs to be encrypted
+        my $Send = $Kernel::OM->Get('Email')->Send(
             'Message-ID' => $Param{MessageID},
             %Param,
             MimeType => 'text/html',
             Charset  => $Charset,
-            Body     => $Body
+            Body     => $Body,
+            Encrypt  => $Param{EncryptIfPossible} ? 2 : 0
         );
 
         # return if no mail was able to send
-        if ( !$HeadRef || !$BodyRef ) {
+        if (
+            !$Send->{HeadRef}
+            || !$Send->{BodyRef}
+        ) {
             my $Error = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
                 What => 'Message',
@@ -692,7 +697,7 @@ sub ArticleCreate {
                 Message  => "Impossible to send message to: $Param{'To'} (Error: $Error).",
                 Priority => 'error',
             );
-            # flag article
+            # sets flag NotSentError, because article could not be sent
             $Self->ArticleFlagSet(
                 ArticleID => $ArticleID,
                 Key       => 'NotSentError',
@@ -700,14 +705,36 @@ sub ArticleCreate {
                 UserID    => $Param{UserID},
             );
 
+            # Sets specific article flags
+            for my $Flag ( @{$Send->{Flags}} ) {
+                $Self->ArticleFlagSet(
+                    ArticleID => $ArticleID,
+                    Key       => $Flag->{Key},
+                    Value     => $Flag->{Value},
+                    UserID    => $Param{UserID} || 1,
+                    Silent    => $Param{Silent}
+                );
+            }
+
             # return the ArticleID since we have created the article already but just not sent
             return $ArticleID;
+        }
+
+        # Sets specific article flags
+        for my $Flag ( @{$Send->{Flags}} ) {
+            $Self->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key       => $Flag->{Key},
+                Value     => $Flag->{Value},
+                UserID    => $Param{UserID} || 1,
+                Silent    => $Param{Silent}
+            );
         }
 
         # write plain article to fs
         my $Plain = $Self->ArticleWritePlain(
             ArticleID => $ArticleID,
-            Email     => ${$HeadRef} . "\n" . ${$BodyRef},
+            Email     => ${$Send->{HeadRef}} . "\n" . ${$Send->{BodyRef}},
             UserID    => $Param{UserID}
         );
         if ( !$Plain ) {
@@ -2266,24 +2293,26 @@ sub ArticleFlagSet {
     # check if set is needed
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    my $UserID = $Param{UserID};
+    if ( $Param{Key} =~ /^(?:SMIME|NotSend|RetryEncrypt)/smx ) {
+        $UserID = 1;
+    }
 
     # set flag
-    return if !$DBObject->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             DELETE FROM article_flag
             WHERE article_id = ?
                 AND article_key = ?
                 AND create_by = ?',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$UserID ],
     );
 
-    return if !$DBObject->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO article_flag
             (article_id, article_key, article_value, create_time, create_by)
             VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
     );
 
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
@@ -2296,7 +2325,7 @@ sub ArticleFlagSet {
                 ArticleID => $Param{ArticleID},
                 Key       => $Param{Key},
                 Value     => $Param{Value},
-                UserID    => $Param{UserID},
+                UserID    => $UserID,
             },
             UserID => $Param{UserID},
         );
@@ -2458,7 +2487,7 @@ sub ArticleFlagGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => '
             SELECT article_key, article_value
             FROM article_flag
@@ -2471,6 +2500,25 @@ sub ArticleFlagGet {
     my %Flag;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] } = $Row[1];
+    }
+
+    if ( $Param{UserID} ne '1' ) {
+        my $UserID = 1;
+        # sql query
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => '
+                SELECT article_key, article_value
+                FROM article_flag
+                WHERE article_id = ?
+                    AND create_by = ?',
+            Bind  => [ \$Param{ArticleID}, \$UserID ],
+            Limit => 1500,
+        );
+
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            next if ( $Row[0] !~ /^(?:SMIME|NotSend|RetryEncrypt)/smx );
+            $Flag{ $Row[0] } = $Row[1];
+        }
     }
 
     $Self->_TicketCacheSet(

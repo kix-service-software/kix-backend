@@ -605,6 +605,25 @@ sub Run {
         }
     }
 
+    # set specific article flag
+    for my $What ( qw( Decrypt Verify ) ) {
+        my $Flags = $Self->{ParserObject}->GetParam(
+            WHAT => $What
+        );
+
+        next if !IsArrayRefWithData($Flags);
+
+        for my $Flag ( @{$Flags} ) {
+            $TicketObject->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key    => $Flag->{Key},
+                Value  => $Flag->{Value},
+                UserID => $Param{InmailUserID},
+                Silent => $Param{Silent}
+            );
+        }
+    }
+
     # write plain email to the storage
     $TicketObject->ArticleWritePlain(
         ArticleID => $ArticleID,
