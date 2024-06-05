@@ -1084,19 +1084,23 @@ sub _FulltextCondition {
     ) {
         # check needed stuff
         if ( !defined $Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }
 
     if ( !IsArrayRefWithData($Param{Columns}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Columns is not a array ref!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Columns is not a array ref!"
+            );
+        }
         return;
     }
 
@@ -1118,10 +1122,12 @@ sub _FulltextCondition {
     );
 
     if ( !$OperationMap{$Param{Operator}} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Operation $Param{Operator} not supported!"
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Operation $Param{Operator} not supported!"
+            );
+        }
         return;
     }
 
@@ -1391,10 +1397,12 @@ sub _FulltextColumnSQL {
     ) {
         # check needed stuff
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }

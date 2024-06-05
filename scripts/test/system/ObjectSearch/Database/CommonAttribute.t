@@ -29,11 +29,12 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( 
+for my $Method (
     qw(
         GetSupportedAttributes Search Sort
         _GetCondition
         _CheckSearchParams _ValidateValueType _CheckSortParams
+        _FulltextCondition _FulltextValueCleanUp _FulltextColumnSQL
     )
 ) {
     $Self->True(
@@ -44,6 +45,14 @@ for my $Method (
 
 ## check internal functions ##
 my @LargeArray = (0) x 1000;
+
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
 # check _GetCondition
 my @GetOperationTests = (
     {
@@ -1088,10 +1097,1431 @@ my @GetOperationTests = (
             Supplement => ['try = 1']
         },
         Expected  => '((test1 NOT IN (\'Test1\',\'Test2\') OR test2 NOT IN (\'Test1\',\'Test2\')) AND try = 1)'
+    },
+    {
+        Name      => '_FulltextCondition: Column undef',
+        Parameter => {
+            Column   => undef,
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: Column empty',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Column   => '',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: Operator undef',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => undef,
+            Value    => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: Operator empty',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => '',
+            Value    => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: Operator invalid',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'Invalid',
+            Value    => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: Value undef',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit+Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit|Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator CONTAINS / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit+Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit+Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit|Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit|Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator CONTAINS / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'CONTAINS',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit+Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit|Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator STARTSWITH / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit+Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit+Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit|Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit|Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Foo Unit|Test+Baa%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'UnitTest%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator STARTSWITH / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'STARTSWITH',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit*Test%\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit+Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit|Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo Unit|Test+Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator ENDSWITH / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit+Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit+Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit|Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit|Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Foo Unit|Test+Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Foo Unit|Test+Baa\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%UnitTest\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  OR (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit\') ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator ENDSWITH / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'ENDSWITH',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%Unit*Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit+Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit|Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\'))  AND (LOWER(test) = LOWER(\'Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Foo\'))  AND (LOWER(test) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\'))  AND (LOWER(test) = LOWER(\'Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Foo Unit|Test+Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: single column / Operator LIKE / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test'],
+            Operator => 'LIKE',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit*Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'UnitTest'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\') OR LOWER(Foo) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / quoted simple text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"UnitTest"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\') OR LOWER(Foo) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / double quoted and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit"+Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / double quoted and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit" Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit+Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit+Test\') OR LOWER(Foo) = LOWER(\'Unit+Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / space in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit Test\') OR LOWER(Foo) = LOWER(\'Unit Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / double quoted and "|" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit"|Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / "|" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit|Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit|Test\') OR LOWER(Foo) = LOWER(\'Unit|Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / double quoted and "|" and "+" text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\'))  AND (LOWER(test) = LOWER(\'Baa\') OR LOWER(Foo) = LOWER(\'Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / double quoted and "|" and "+" and space text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'Foo "Unit"|Test+Baa'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Foo\') OR LOWER(Foo) = LOWER(\'Foo\'))  AND (LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\'))  AND (LOWER(test) = LOWER(\'Baa\') OR LOWER(Foo) = LOWER(\'Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / space, "|", "+" in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Foo Unit|Test+Baa"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Foo Unit|Test+Baa\') OR LOWER(Foo) = LOWER(\'Foo Unit|Test+Baa\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"UnitTest'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'UnitTest\') OR LOWER(Foo) = LOWER(\'UnitTest\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / "|" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'Unit|"Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  OR (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / "+" and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'Unit+"Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / space and not closed double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'Unit "Test'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit\') OR LOWER(Foo) = LOWER(\'Unit\'))  AND (LOWER(test) = LOWER(\'Test\') OR LOWER(Foo) = LOWER(\'Test\')) '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / wildcard text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => 'Unit*Test'
+        },
+        Expected  => '(LOWER(test) LIKE LOWER(\'Unit%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'Unit%Test\') ESCAPE \'' . $Escape . '\') '
+    },
+    {
+        Name      => '_FulltextCondition: multiple columns / Operator LIKE / wildcard in double quoted text value',
+        Method    => '_FulltextCondition',
+        Parameter => {
+            Columns  => ['test', 'Foo'],
+            Operator => 'LIKE',
+            Value    => '"Unit*Test"'
+        },
+        Expected  => '(LOWER(test) = LOWER(\'Unit*Test\') OR LOWER(Foo) = LOWER(\'Unit*Test\')) '
     }
 );
 for my $Test ( @GetOperationTests ) {
-    my $Result = $CommonAttributeObject->_GetCondition(
+    my $Method = $Test->{Method} || '_GetCondition';
+
+    my $Result = $CommonAttributeObject->$Method(
         %{ $Test->{Parameter} },
         Silent => defined( $Test->{Expected} ) ? 0 : 1
     );
