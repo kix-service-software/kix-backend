@@ -354,10 +354,11 @@ sub _ArticleCreate {
             Subject => $Article->{Subject},
             Body    => $Article->{Body},
         },
-        Attachment     => $Article->{Attachments},
-        TimeUnit       => $Article->{TimeUnit},
-        InReplyTo      => $Article->{InReplyTo} || '',
-        References     => $Article->{References} || ''
+        Attachment        => $Article->{Attachments},
+        TimeUnit          => $Article->{TimeUnit},
+        InReplyTo         => $Article->{InReplyTo} || '',
+        References        => $Article->{References} || '',
+        EncryptIfPossible => $Article->{EncryptIfPossible} || 0
     );
 
     if ( !$ArticleID ) {

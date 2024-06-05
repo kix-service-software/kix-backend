@@ -269,7 +269,13 @@ sub Run {
         # add unseen information
         $ArticleData{Unseen} = $Flags{Seen} ? 0 : 1;
         # add unsent information
+        $ArticleData{NotSent}      = $Flags{NotSentError} ? 1 : 0;
         $ArticleData{NotSentError} = $Flags{NotSentError} ? $Flags{NotSentError} : '';
+        # add SMIME info
+        $ArticleData{SMIMESigned}         = $Flags{SMIMESigned} ? 1 : 0;
+        $ArticleData{SMIMESignedError}    = $Flags{SMIMESignedError} ? $Flags{SMIMESignedError} : '';
+        $ArticleData{SMIMEEncrypted}      = $Flags{SMIMEEncrypted} ? 1 : 0;
+        $ArticleData{SMIMEEncryptedError} = $Flags{SMIMEEncryptedError} ? $Flags{SMIMEEncryptedError} : '';
 
         # add
         push(@ArticleList, \%ArticleData);

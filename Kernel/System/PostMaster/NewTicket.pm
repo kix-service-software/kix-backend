@@ -300,10 +300,10 @@ sub Run {
     # set pending time
     if ( $GetParam{'X-KIX-State-PendingTime'} ) {
 
-  # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
-  # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
-  # Combinations of units can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
-  # "+12d" (12 days). "+1d +12h" (1 day and 12 hours, note that the plus has to be specified before every unit).
+        # You can specify absolute dates like "2010-11-20 00:00:00" or relative dates, based on the arrival time of the email.
+        # Use the form "+ $Number $Unit", where $Unit can be 's' (seconds), 'm' (minutes), 'h' (hours) or 'd' (days).
+        # Combinations of units can be specified. Examples of valid settings: "+50s" (pending in 50 seconds), "+30m" (30 minutes),
+        # "+12d" (12 days). "+1d +12h" (1 day and 12 hours, note that the plus has to be specified before every unit).
 
         my $TargetTimeStamp = $GetParam{'X-KIX-State-PendingTime'};
 
@@ -349,12 +349,11 @@ sub Run {
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
     # dynamic fields
-    my $DynamicFieldList =
-        $DynamicFieldObject->DynamicFieldList(
+    my $DynamicFieldList =  $DynamicFieldObject->DynamicFieldList(
         Valid      => 1,
         ResultType => 'HASH',
         ObjectType => 'Ticket',
-        );
+    );
 
     # set dynamic fields for Ticket object type
     DYNAMICFIELDID:
@@ -404,11 +403,10 @@ sub Run {
 
     # set ticket free text
     # for backward compatibility (should be removed in a future version)
-    my %Values =
-        (
+    my %Values = (
         'X-KIX-TicketKey'   => 'TicketFreeKey',
         'X-KIX-TicketValue' => 'TicketFreeText',
-        );
+    );
     for my $Item ( sort keys %Values ) {
         for my $Count ( 1 .. 16 ) {
             my $Key = $Item . $Count;
@@ -416,8 +414,7 @@ sub Run {
                 defined $GetParam{$Key}
                 && length $GetParam{$Key}
                 && $DynamicFieldListReversed{ $Values{$Item} . $Count }
-                )
-            {
+            ) {
                 # get dynamic field config
                 my $DynamicFieldGet = $DynamicFieldObject->DynamicFieldGet(
                     ID => $DynamicFieldListReversed{ $Values{$Item} . $Count },
@@ -557,6 +554,25 @@ sub Run {
             Message  => $msg,
         );
         return;
+    }
+
+    # set specific article flag
+    for my $What ( qw( Decrypt Verify ) ) {
+        my $Flags = $Self->{ParserObject}->GetParam(
+            WHAT => $What
+        );
+
+        next if !IsArrayRefWithData($Flags);
+
+        for my $Flag ( @{$Flags} ) {
+            $TicketObject->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key    => $Flag->{Key},
+                Value  => $Flag->{Value},
+                UserID => $Param{InmailUserID},
+                Silent => $Param{Silent}
+            );
+        }
     }
 
     if ( $Param{LinkToTicketID} ) {

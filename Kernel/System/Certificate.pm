@@ -12,15 +12,19 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = qw(
-    Config
     Cache
-    FileTemp
     ClientNotification
+    Config
+    FileTemp
     Log
+    Main
+    ObjectSearch
     VirtualFS
 );
 
+use Email::Address::XS;
 use MIME::Base64 qw();
+use MIME::Parser;
 use Kernel::System::VariableCheck qw(:all);
 
 =head1 NAME
@@ -44,7 +48,7 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{Debug} = $Param{Debug} || 0;
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Certificate::Debug') || 0;
 
     $Self->{CacheType}   = 'Certificate';
     $Self->{OSCacheType} = 'ObjectSearch_Certificate';
@@ -89,7 +93,7 @@ sub CertificateCreate {
         # checks whether there is a public certificate for the private one
         my $CertID = $Self->CertificateExists(
             %Param,
-            Attributes     => $Attributes,
+            Modulus        => $Attributes->{Modulus} || q{},
             HasCertificate => 1
         );
 
@@ -156,12 +160,8 @@ sub CertificateCreate {
         ID      => $FileID
     );
 
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{OSCacheType}
-    );
+    # delete cache
+    $Self->_CacheCleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -178,8 +178,9 @@ sub CertificateCreate {
 get a local certificate
 
     my $Certificate = $CryptObject->CertificateGet(
-        ID      => 1          # required
-        Include => 'Content'  # optional, to include the content if needed
+        ID         => 1          # required
+        Include    => 'Content'  # optional, to include the content if needed
+        Passphrase => 1          # optional, inlcudes the passphrase
     );
 
     returns a hashref
@@ -226,7 +227,8 @@ sub CertificateGet {
     my $CacheKey = 'Certificate::'
         . $Param{ID}
         . q{::}
-        . $Mode;
+        . $Mode
+        . ($Param{Passphrase} ? q{::Passphrase} : q{});
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -278,7 +280,8 @@ sub CertificateGet {
     $Certificate->{Filename} = $Filename;
 
     # remove unnessary datas
-    for my $Key ( qw(Filesize FilesizeRaw Secret) ) {
+    for my $Key ( qw(Filesize FilesizeRaw Passphrase) ) {
+        next if ( $Key eq 'Passphrase' && $Param{Passphrase} );
         delete $Certificate->{$Key};
     }
 
@@ -313,7 +316,7 @@ sub CertificateGet {
 
 =item CertificateDelete()
 
-remove a local certificate
+removes the certificate/private key in the file system and db-storage
 
     my $Success = $CertificateObject->CertificateDelete(
         ID => 1
@@ -405,12 +408,8 @@ sub CertificateDelete {
         return;
     }
 
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{OSCacheType}
-    );
+    # delete cache
+    $Self->_CacheCleanUp();
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -421,6 +420,32 @@ sub CertificateDelete {
 
     return 1;
 }
+
+=item CertificateExists()
+
+Checks whether a certificate/private key already exists, or whether a matching certificate exists for the specified private key.
+
+Checks whether a certificate/private key exists:
+    my $Exists = $CertificateObject->CertificateExists(
+        Filename => 'Certificate/SMIME/Cert/some fingerprint'  # required, only if want to check the certificate/private key exists
+        UserID   => 1,
+        Silent   => 1
+    );
+
+    Returns 1 if exists
+
+Checks whether a certificate exists for the private key:
+    my $CertID = $CertificateObject->CertificateExists(
+        HasCertificate => 1,             # required, needed to switch the check method
+        Type           => 'Private',     # required
+        Modulus        => 'some string', # required, Modulus of the private key to get the certificate with the same modulus
+        UserID         => 1,
+        Silent         => 1
+    );
+
+    Returns the certificate ID, if a certificate was found
+
+=cut
 
 sub CertificateExists {
     my ( $Self,%Param ) = @_;
@@ -438,7 +463,7 @@ sub CertificateExists {
 
         return 1 if $Param{Type} ne 'Private';
 
-        if ( !$Param{Attributes}->{Modulus} ) {
+        if ( !$Param{Modulus} ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
@@ -462,7 +487,7 @@ sub CertificateExists {
                     },
                     {
                         Field    => 'Modulus',
-                        Value    => $Param{Attributes}->{Modulus},
+                        Value    => $Param{Modulus},
                         Operator => 'EQ'
                     }
                 ]
@@ -473,7 +498,7 @@ sub CertificateExists {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Need Certificate of Private Key first -$Param{Attributes}->{Modulus})!",
+                    Message  => "Need Certificate of Private Key first -$Param{Modulus})!",
                 );
             }
             return;
@@ -521,10 +546,16 @@ sub CertificateExists {
     return;
 }
 
+=item CertificateToFS()
+
+Writes all certificates/private keys stored in the database to the file system
+
+=cut
+
 sub CertificateToFS {
     my ( $Self,%Param ) = @_;
 
-    my $Debug = $Param{Debug} || 0;
+    my $Debug = $Param{Debug} || $Self->{Debug};
 
     my @Certificates = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'Certificate',
@@ -550,7 +581,7 @@ sub CertificateToFS {
         );
     }
 
-    return 0 if !$Count;
+    return 1 if !$Count;
 
     for my $ID ( @Certificates ) {
         my $Certificate = $Self->CertificateGet(
@@ -575,6 +606,882 @@ sub CertificateToFS {
 
     return 1;
 }
+
+sub Decrypt {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(Content Type) ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    if ( $Param{Type} eq 'Email' ) {
+
+        my $ContentType = $Self->_CheckContentType(
+            %Param
+        );
+        return if !$ContentType;
+
+        if (
+            $ContentType =~ /application\/(x-pkcs7|pkcs7)-mime/i
+            && $ContentType !~ /signed/i
+        ) {
+            # require EmailParser
+            if ( !$Kernel::OM->Get('Main')->Require( 'Kernel::System::EmailParser' ) ) {
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMEEncrypted',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMEEncryptedError',
+                            Value => 'Internal error!'
+                        }
+                    ],
+                    Content    => $Param{Content},
+                    Successful => 0
+                };
+            }
+
+            my @Content = @{$Param{Content}};
+            my $EmailParser = Kernel::System::EmailParser->new(
+                Email     => \@Content,
+                NoDecrypt => 1,
+                NoVerify  => 1
+            );
+
+            # get all email addresses on article
+            my %EmailsToSearch;
+            for my $Email (qw(Resent-To Envelope-To To Cc Delivered-To X-Original-To)) {
+
+                my @EmailAddressOnField = $EmailParser->SplitAddressLine(
+                    Line => $EmailParser->GetParam( WHAT => $Email ),
+                );
+
+                # filter email addresses avoiding repeated and save on hash to search
+                for my $EmailAddress (@EmailAddressOnField) {
+                    my $CleanEmailAddress = $EmailParser->GetEmailAddress(
+                        Email => $EmailAddress,
+                    );
+                    $EmailsToSearch{$CleanEmailAddress} = '1';
+                }
+            }
+
+            # look for private keys for every email address
+            my @PrivateKeyIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Certificate',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'Type',
+                            Operator => 'EQ',
+                            Value    => 'Private',
+                        },
+                        {
+                            Field    => 'Email',
+                            Operator => 'IN',
+                            Value    => [ keys %EmailsToSearch ],
+                        },
+                    ]
+                },
+                UserID   => 1,
+                UserType => 'Agent'
+            );
+
+            if ( !scalar( @PrivateKeyIDs ) ) {
+                if ( $Self->{Debug} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'debug',
+                        Message  => "Impossible to decrypt: private key for email was not found!"
+                    );
+                }
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMEEncrypted',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMEEncryptedError',
+                            Value => 'Private key for email was not found!'
+                        }
+                    ],
+                    Content    => $Param{Content},
+                    Successful => 0
+                };
+            }
+            elsif ( $Self->{Debug} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'debug',
+                    Message  => 'Private Keys (' . scalar( @PrivateKeyIDs ) . ') found!'
+                );
+            }
+
+            # search private cert to decrypt email
+            my %Decrypt;
+            for my $ID ( @PrivateKeyIDs ) {
+
+                # decrypt
+                %Decrypt = $Self->_Decrypt(
+                    Content => $Param{Content},
+                    ID      => $ID
+                );
+
+                if ( !%Decrypt ) {
+                    return {
+                        Flags   => [
+                            {
+                                Key   => 'SMIMEEncrypted',
+                                Value => 1
+                            },
+                            {
+                                Key   => 'SMIMEEncryptedError',
+                                Value => 'Internal error!'
+                            }
+                        ],
+                        Content    => $Param{Content},
+                        Successful => 0
+                    }
+                }
+                elsif ( $Decrypt{Successful} ) {
+                    if ( $Self->{Debug} ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'debug',
+                            Message  => "OpenSSL: OK"
+                        );
+                    }
+                    return {
+                        Flags   => [
+                            {
+                                Key   => 'SMIMEEncrypted',
+                                Value => 1
+                            }
+                        ],
+                        Content    => $Decrypt{Content},
+                        Successful => 1
+                    }
+                }
+            }
+
+            if ( !$Decrypt{Successful} ) {
+                if ( $Self->{Debug} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'debug',
+                        Message  => "Impossible to decrypt: private keys found do not match encryption!"
+                    );
+                }
+
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMEEncrypted',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMEEncryptedError',
+                            Value => 'Private keys found do not match encryption!'
+                        }
+                    ],
+                    Content    => $Param{Content},
+                    Successful => 0
+                }
+            }
+        }
+    }
+    else {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Not supported Type $Param{Type}!"
+            );
+        }
+        return;
+    }
+
+    return 1;
+}
+
+sub Encrypt {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(Entity To) ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    if ( !$Param{Encrypt} ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "The email will not be encrypted!"
+            );
+        }
+        # return empty flag to continue the normal process
+        return (
+            Flags      => [],
+            Successful => 1
+        );
+    }
+
+    # get recipients
+    my @ToArray;
+
+    RECIPIENT:
+    for my $Recipient ( qw(To Cc Bcc) ) {
+        next RECIPIENT if !$Param{$Recipient};
+        for my $Email ( Email::Address::XS->parse($Param{$Recipient}) ) {
+            my $EmailAddress = $Email->address();
+            if ( $EmailAddress !~ /$Param{IgnoreEmailPattern}/gix ) {
+                push(@ToArray, $EmailAddress);
+            }
+        }
+    }
+
+    my $Count = scalar( @ToArray );
+    if ( $Count > 1 ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Impossible to encrypt: Only one recipient supported for encryption. Got $Count recipients!"
+            );
+        }
+        return (
+            Successful => 0,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "Only one recipient supported for encryption. Got $Count recipients!"
+                }
+            ]
+        );
+    }
+
+    my $Certificates = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'COUNT',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Cert'
+                },
+                {
+                    Field    => 'Email',
+                    Operator => 'EQ',
+                    Value    => $ToArray[0]
+                }
+            ]
+        },
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    if (
+        $Param{Encrypt} eq '1'
+        && !$Certificates
+    ) {
+        return (
+            Successful => 0,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "Could not be sent, because no certificate found!"
+                }
+            ]
+        );
+    } elsif ( !$Certificates ) {
+        return (
+            Successful => 0,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "No certificate found!"
+                }
+            ]
+        );
+    }
+
+    my $CurrTime       = $Kernel::OM->Get('Time')->CurrentTimestamp();
+    my @CertificateIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Cert'
+                },
+                {
+                    Field    => 'Email',
+                    Operator => 'EQ',
+                    Value    => $ToArray[0]
+                },
+                {
+                    Field    => 'StartDate',
+                    Operator => 'LTE',
+                    Value    => $CurrTime
+                },
+                {
+                    Field    => 'EndDate',
+                    Operator => 'GTE',
+                    Value    => $CurrTime
+                }
+            ]
+        },
+        Sort     => [
+            {
+                Field     => 'ID',
+                Direction => 'descending'
+            }
+        ],
+        Limit    => 1,
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    if ( !scalar(@CertificateIDs) ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Impossible to encrypt: No valid certificate found for $ToArray[0]!"
+            );
+        }
+        return (
+            Successful => 0,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "No valid certificate found!"
+                }
+            ]
+        );
+    }
+
+    # make multi part
+    my $EntityCopy = $Param{Entity}->dup();
+    $EntityCopy->make_multipart(
+        'mixed;',
+        Force => 1,
+    );
+
+    # get header to remember
+    my $Head = $EntityCopy->head();
+    $Head->delete('MIME-Version');
+    $Head->delete('Content-Type');
+    $Head->delete('Content-Disposition');
+    $Head->delete('Content-Transfer-Encoding');
+    my $SMIMEHeader = $Head->as_string();
+
+    # get string to sign
+    my $Content = $EntityCopy->parts(0)->as_string();
+
+    # according to RFC3156 all line endings MUST be CR/LF
+    $Content =~ s/\x0A/\x0D\x0A/g;
+    $Content =~ s/\x0D+/\x0D/g;
+
+    my %Encrypt = $Self->_Encrypt(
+        Content => $Content,
+        ID      => $CertificateIDs[0]
+    );
+
+    if (!%Encrypt) {
+        return (
+            Successful => 0,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => 'Internal error!'
+                }
+            ]
+        );
+    }
+    elsif ( $Encrypt{Successful} ) {
+        my $Parser = MIME::Parser->new();
+        $Parser->output_to_core('ALL');
+
+        $Parser->output_dir( $Kernel::OM->Get('Config')->Get('TempDir') );
+        $Param{Entity} = $Parser->parse_data( $SMIMEHeader . $Encrypt{Content} );
+
+        # set 'mail_hdr_modify' for header to enable line folding
+        $Param{Entity}->head()->modify(1);
+
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Succesful to encrypted"
+            );
+        }
+
+        return (
+            Successful => 1,
+            Flags      => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                }
+            ],
+            Entity => $Param{Entity}
+        );
+    }
+
+    if ( $Self->{Debug} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "Impossible to encrypt: $Encrypt{Error}!"
+        );
+    }
+
+    return (
+        Successful => 0,
+        Flags      => [
+            {
+                Key   => 'SMIMEEncrypted',
+                Value => 1
+            },
+            {
+                Key   => 'SMIMEEncryptedError',
+                Value => "$Encrypt{Error}!"
+            }
+        ]
+    );
+}
+
+sub Verify {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(Content Type) ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    if ( $Param{Type} eq 'Email' ) {
+
+        my $ContentType = $Self->_CheckContentType(
+            %Param
+        );
+        return if !$ContentType;
+
+        if (
+            $ContentType =~ /application\/(x-pkcs7|pkcs7)/i
+            && $ContentType =~ /signed/i
+        ) {
+            # require EmailParser
+            if ( !$Kernel::OM->Get('Main')->Require( 'Kernel::System::EmailParser' ) ) {
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMESignedError',
+                            Value => 'Internal error!'
+                        }
+                    ],
+                    Content => $Param{Content}
+                };
+            }
+
+            my $Content = $Param{Content};
+
+            # check sign and get clear content
+            my %Verified = $Self->_Verify(
+                Content => $Content
+            );
+
+            if ( !%Verified ) {
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMESignedError',
+                            Value => 'Could not verified!'
+                        }
+                    ],
+                    Content => $Content
+                }
+            }
+
+            if (
+                $Verified{Type} eq 'Unverified'
+                && !defined $Verified{Content}
+            ) {
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMESignedError',
+                            Value => $Verified{Error}
+                        }
+                    ],
+                    Content => $Content
+                }
+            }
+            elsif ( $Verified{Type} eq 'SelfSign' ) {
+                my %NoVerified = $Self->_Verify(
+                    Content  => $Content,
+                    NoVerify => 1
+                );
+
+                # If the signature was verified well, use the stripped content to store the email
+                if (
+                    $NoVerified{Type}
+                    && $NoVerified{Content}
+                ) {
+                    $Verified{Content} = $NoVerified{Content};
+                }
+            }
+
+            # from RFC 3850
+            # 3.  Using Distinguished Names for Internet Mail
+            #
+            #   End-entity certificates MAY contain ...
+            #
+            #    ...
+            #
+            #   Sending agents SHOULD make the address in the From or Sender header
+            #   in a mail message match an Internet mail address in the signer's
+            #   certificate.  Receiving agents MUST check that the address in the
+            #   From or Sender header of a mail message matches an Internet mail
+            #   address, if present, in the signer's certificate, if mail addresses
+            #   are present in the certificate.  A receiving agent SHOULD provide
+            #   some explicit alternate processing of the message if this comparison
+            #   fails, which may be to display a message that shows the recipient the
+            #   addresses in the certificate or other certificate details.
+
+            # as described in bug#5098 and RFC 3850 an alternate mail handling should be
+            # made if sender and signer addresses does not match
+
+            # get original sender from email
+            my @OrigEmail = @{$Content};
+            my $ParserObjectOrig = Kernel::System::EmailParser->new(
+                Email     => \@OrigEmail,
+                NoDecrypt => 1,
+                NoVerify  => 1
+            );
+
+            my $OrigFrom   = $ParserObjectOrig->GetParam( WHAT => 'From' ) || q{};
+            my $OrigSender = $ParserObjectOrig->GetEmailAddress( Email => $OrigFrom ) || q{};
+
+            # compare sender email to signer email
+            my $SignerSenderMatch = 0;
+            SIGNER:
+            for my $Signer ( @{ $Verified{Signers} } ) {
+                if ( $OrigSender =~ m{\A \Q$Signer\E \z}xmsi ) {
+                    $SignerSenderMatch = 1;
+                    last SIGNER;
+                }
+            }
+
+            if ( IsArrayRefWithData($Verified{Content}) ) {
+                $Content = $Verified{Content};
+            }
+
+            # sender email does not match signing certificate!
+            if ( !$SignerSenderMatch ) {
+                my $Message = $Verified{Error};
+                $Message =~ s/successful/failed!/;
+                $Message .= " (signed by \""
+                    . join( ' | ', @{ $Verified{Signers} } )
+                    . "\")"
+                    . ", but sender address \"$OrigSender\": does not match certificate address!";
+
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => $Message
+                    );
+                }
+
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMESignedError',
+                            Value => $Message
+                        }
+                    ],
+                    Content => $Content
+                }
+            }
+            else{
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        }
+                    ],
+                    Content => $Content
+                }
+            }
+        }
+    }
+    else {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Not supported Type $Param{Type}!"
+            );
+        }
+        return;
+    }
+
+    return 1;
+}
+
+sub Sign {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(Entity From) ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    # parse mail addresses
+    my @ParsedMailAddresses = Email::Address::XS->parse($Param{From});
+    my $From;
+    foreach my $MailAddress (@ParsedMailAddresses) {
+        $From = $MailAddress->address;
+    }
+
+    my $CurrTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
+
+    my $PrivateKeys = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'COUNT',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Private'
+                },
+                {
+                    Field    => 'Email',
+                    Operator => 'EQ',
+                    Value    => $From
+                }
+            ]
+        },
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    # return empty flag to continue the normal process
+    return ( Flags => [] ) if !$PrivateKeys;
+
+    my @PrivateKeyIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Private'
+                },
+                {
+                    Field    => 'Email',
+                    Operator => 'EQ',
+                    Value    => $From
+                },
+                {
+                    Field    => 'StartDate',
+                    Operator => 'LTE',
+                    Value    => $CurrTime
+                },
+                {
+                    Field    => 'EndDate',
+                    Operator => 'GTE',
+                    Value    => $CurrTime
+                }
+            ]
+        },
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    if ( !scalar(@PrivateKeyIDs) ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Impossible to sign: no valid certificate found for $From!"
+            );
+        }
+        return (
+            Flags => [
+                {
+                    Key   => 'SMIMESigned',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMESignedError',
+                    Value => "No valid certificate found!"
+                }
+            ]
+        );
+    }
+
+    # make multi part
+    my $EntityCopy = $Param{Entity}->dup();
+    $EntityCopy->make_multipart(
+        'mixed;',
+        Force => 1,
+    );
+
+    # get header to remember
+    my $Head = $EntityCopy->head();
+    $Head->delete('MIME-Version');
+    $Head->delete('Content-Type');
+    $Head->delete('Content-Disposition');
+    $Head->delete('Content-Transfer-Encoding');
+    my $SMIMEHeader = $Head->as_string();
+
+    # get string to sign
+    my $Content = $EntityCopy->parts(0)->as_string();
+
+    # according to RFC3156 all line endings MUST be CR/LF
+    $Content =~ s/\x0A/\x0D\x0A/g;
+    $Content =~ s/\x0D+/\x0D/g;
+
+    # remove empty line after multi-part preable as it will be removed later by MIME::Parser
+    #    otherwise signed content will be different than the actual mail and verify will
+    #    fail
+    $Content =~ s{(This is a multi-part message in MIME format...\r\n)\r\n}{$1}g;
+
+    for my $ID ( @PrivateKeyIDs ) {
+
+        my %Sign = $Self->_Sign(
+            Content => $Content,
+            ID      => $ID
+        );
+
+        if (!%Sign) {
+            return (
+                Flags   => [
+                    {
+                        Key   => 'SMIMESigned',
+                        Value => 1
+                    },
+                    {
+                        Key   => 'SMIMESignedError',
+                        Value => 'Internal error!'
+                    }
+                ]
+            );
+        }
+        elsif ( $Sign{Successful} ) {
+            my $Parser = MIME::Parser->new();
+            $Parser->output_to_core('ALL');
+
+            $Parser->output_dir( $Kernel::OM->Get('Config')->Get('TempDir') );
+            $Param{Entity} = $Parser->parse_data( $SMIMEHeader . $Sign{Content} );
+
+            # set 'mail_hdr_modify' for header to enable line folding
+            $Param{Entity}->head()->modify(1);
+
+            return (
+                Flags   => [
+                    {
+                        Key   => 'SMIMESigned',
+                        Value => 1
+                    }
+                ],
+                Entity => $Param{Entity}
+            );
+        }
+    }
+
+    if ( $Self->{Debug} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "Impossible to sign: found certificates could not be applied!"
+        );
+    }
+
+    return (
+        Flags   => [
+            {
+                Key   => 'SMIMESigned',
+                Value => 1
+            },
+            {
+                Key   => 'SMIMESignedError',
+                Value => 'Found certificates could not be applied!'
+            }
+        ]
+    );
+}
+
+=begin Internal
+
+=item _WriteCertificate()
+
+writes certificates / private keys to the file system
+
+=cut
 
 sub _WriteCertificate {
     my ( $Self,%Param ) = @_;
@@ -625,6 +1532,12 @@ sub _WriteCertificate {
 
     return $Success;
 }
+
+=item _CheckCertificate()
+
+checks the given certificate/private key, if all needed parameters are exists
+
+=cut
 
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
@@ -680,6 +1593,12 @@ sub _CheckCertificate {
     return 1;
 }
 
+=item _GetCertificateAttributes()
+
+Captures all necessary certificate/private key information and returns this as a hashref
+
+=cut
+
 sub _GetCertificateAttributes {
     my ( $Self, %Param ) = @_;
 
@@ -732,44 +1651,17 @@ sub _GetCertificateAttributes {
         Silent      => $Param{Silent}
     );
 
-    return if !$Attributes;
+    return if !IsHashRefWithData($Attributes);
 
+    # set type
     if ( $Param{Type} eq 'Cert' ) {
-        if ( $Attributes->{Hash} ) {
-            my $Private = $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'Certificate',
-                Result     => 'COUNT',
-                UserID     => $Param{UserID} || 1,
-                UserType   => 'Agent',
-                Search     => {
-                    AND => [
-                        {
-                            Field    => 'Type',
-                            Value    => 'Private',
-                            Operator => 'EQ'
-                        },
-                        {
-                            Field    => 'Hash',
-                            Value    => $Attributes->{Hash},
-                            Operator => 'EQ'
-                        },
-                        {
-                            Field    => 'Modulus',
-                            Value    => $Attributes->{Modulus},
-                            Operator => 'EQ'
-                        }
-                    ]
-                }
-            );
-            $Attributes->{Private} = 'No';
-            if ($Private) {
-                $Attributes->{Private} = 'Yes';
-            }
-        }
         $Attributes->{Type} = 'Cert';
     }
     else {
         $Attributes->{Type} = 'Private';
+        if ( $Param{Passphrase} ) {
+            $Attributes->{Passphrase} = $Param{Passphrase};
+        }
     }
 
     # set CType
@@ -788,6 +1680,12 @@ sub _GetCertificateAttributes {
     return $Attributes;
 }
 
+=item _FetchAttributes()
+
+Gets the certificate/private key information via openssl
+
+=cut
+
 sub _FetchAttributes {
     my ( $Self, %Param ) = @_;
 
@@ -805,7 +1703,7 @@ sub _FetchAttributes {
     for my $OptionStrg ( @{$Options}) {
         # Replacing of needed parameters
         $OptionStrg =~ s/###FILENAME###/$Filename/sm;
-        $OptionStrg =~ s/###SECRET###/$Param{Passphrase}/sm;
+        $OptionStrg =~ s/###PASSPHRASE###/$Param{Passphrase}/sm;
         $OptionStrg =~ s/###BIN###/$Self->{Bin}/sm;
 
         # get the output string
@@ -835,7 +1733,7 @@ sub _FetchAttributes {
         Subject     => 'subject=\s*(.*)',
         StartDate   => 'notBefore=(.*)',
         EndDate     => 'notAfter=(.*)',
-        Email       => '([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})',
+        Email       => '([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+)',
         Modulus     => 'Modulus=(.*)',
         Verify      => 'verify\s+(.*)'
     );
@@ -920,16 +1818,14 @@ sub _FetchAttributes {
         $AttributesRef->{$DateType} = "$Y-$M-$D $Time";
     }
 
-    if (
-        $Param{Type} eq 'Private'
-        && $Param{Secret}
-    ) {
-        $AttributesRef->{Secret} = $Param{Secret};
-    }
-
     return $AttributesRef;
 }
 
+=item _Init()
+
+Initializes all necessary internal data
+
+=cut
 
 sub _Init {
     my ( $Self, %Param ) = @_;
@@ -958,8 +1854,8 @@ sub _Init {
             ],
             'x509'   => 'x509 -in ###FILENAME### -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
             # 'pkcs7'  => 'pkcs7 -in ###FILENAME### -inform PEM -print_certs | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
-            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
-            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -nodes -passout pass:###SECRET### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passout pass:###PASSPHRASE### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
+            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -nodes -passout pass:###PASSPHRASE### | ###BIN### x509 -noout -subject_hash -issuer -fingerprint -sha1 -serial -subject -startdate -enddate -email -modulus',
         }
     };
     $Self->{Private} = {
@@ -973,9 +1869,9 @@ sub _Init {
             'application/x-x509-ca-cert'         => 'rsa'
         },
         Options => {
-            'rsa'    => 'rsa -in ###FILENAME### -noout -modulus -passin pass:###SECRET###',
-            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passin pass:###SECRET### | ###BIN### x509 -noout -modulus',
-            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -noout -nodes -passin pass:###SECRET### | ###BIN### x509 -noout -modulus',
+            'rsa'    => 'rsa -in ###FILENAME### -noout -modulus -passin pass:###PASSPHRASE###',
+            # 'pkcs12' => 'pkcs12 -in ###FILENAME### -nodes -passin pass:###PASSPHRASE### | ###BIN### x509 -noout -modulus',
+            # 'pkcs8'  => 'pkcs8 -in ###FILENAME### -noout -nodes -passin pass:###PASSPHRASE### | ###BIN### x509 -noout -modulus',
         }
     };
     $Self->{Bin} = '/usr/bin/openssl';
@@ -997,8 +1893,6 @@ sub _Init {
 =item _InitCheck()
 
 check if environment is working
-
-    my $Message = $CryptObject->_InitCheck();
 
 =cut
 
@@ -1050,6 +1944,512 @@ sub _InitCheck {
 
     return $Success;
 }
+
+=item _CacheCleanUp()
+
+Deletes all caches for the Module
+
+=cut
+
+sub _CacheCleanUp {
+    my ( $Self, %Param ) = @_;
+
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType}
+    );
+
+    return 1;
+}
+
+sub _Decrypt {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Content ID)) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    my $PrivateKey    = $Self->CertificateGet(
+        %Param,
+        Passphrase => 1
+    );
+    my @CertificateID = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Modulus',
+                    Operator => 'EQ',
+                    Value    => $PrivateKey->{Modulus}
+                },
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Cert'
+                }
+            ]
+        },
+        Sort => [
+            {
+                Field     => 'ID',
+                Direction => 'descending'
+            }
+        ],
+        Limit    => 1,
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    if ( !scalar(@CertificateID) ) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Decrypt (Private Key: $PrivateKey->{FileID}): No suitable certificate found!"
+            );
+        }
+        return (
+            Successful => 0
+        );
+    }
+
+    my $Certificate = $Self->CertificateGet(
+        ID => $CertificateID[0]
+    );
+
+    my $PrivateFile = $Self->{Private}->{Path} . q{/} . $PrivateKey->{Filename};
+    my $CertFile    = $Self->{Cert}->{Path} . q{/} .  $Certificate->{Filename};
+    my $Content     = join(q{} , @{$Param{Content}} );
+
+    my ( $FH, $CryptedFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    print $FH $Content;
+    close $FH;
+    my ( $FHDecrypted, $PlainFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    close $FHDecrypted;
+
+    my $Options = "smime -decrypt"
+        . " -in $CryptedFile"
+        . " -out $PlainFile"
+        . " -recip $CertFile"
+        . " -inkey $PrivateFile"
+        . " -passin pass:$PrivateKey->{Passphrase}";
+
+    my $LogMessage = qx{$Self->{Cmd} $Options 2>&1};
+
+    if ($LogMessage) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Decrypt (Private Key: $PrivateKey->{FileID}): $LogMessage!"
+            );
+        }
+        return (
+            Successful => 0
+        );
+    }
+
+    my $DecryptedRef = $Kernel::OM->Get('Main')->FileRead(
+        Location => $PlainFile,
+        Silent   => 1
+    );
+
+    if ( !$DecryptedRef ) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "OpenSSL: Can't read $PlainFile!"
+            );
+        }
+        return (
+            Successful => 0
+        );
+    }
+
+    my @NewContent = map { "$_\n" } split( /\n/, ${$DecryptedRef});
+
+    return (
+        Successful => 1,
+        Content    => \@NewContent,
+    );
+}
+
+sub _Verify {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Content} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Content!"
+            );
+        }
+        return;
+    }
+
+    my $Content = join( q{}, @{$Param{Content}} );
+    my ( $FH, $SignedFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    print $FH $Content;
+    close $FH;
+    my ( $FHOutput, $VerifiedFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    close $FHOutput;
+    my ( $FHSigner, $SignerFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    close $FHSigner;
+
+    my @CertificateOption = ();
+    if ( $Param{NoVerify} ) {
+        push( @CertificateOption, '-noverify' );
+    }
+
+    my $Options = 'smime -verify'
+        . " -in $SignedFile"
+        . " -out $VerifiedFile"
+        . " -signer $SignerFile"
+        . " -CApath /etc/ssl/certs"
+        . q{ } .  join( q{ } , @CertificateOption )
+        . " $SignedFile";
+
+    my @LogLines = qx{$Self->{Cmd} $Options 2>&1};
+
+    my $Message     = q{};
+    my $MessageLong = q{};
+    for my $LogLine (@LogLines) {
+        $MessageLong .= $LogLine;
+        if ( $LogLine =~ /^\d.*:(.+?):.+?:.+?:$/ || $LogLine =~ /^\d.*:(.+?)$/ ) {
+            $Message .= ";$1";
+        }
+        else {
+            $Message .= $LogLine;
+        }
+    }
+
+    my $SignerCertRef    = $Kernel::OM->Get('Main')->FileRead(
+        Location => $SignerFile,
+        Silent   => 1
+    );
+    my $SignedContentRef = $Kernel::OM->Get('Main')->FileRead(
+        Location => $VerifiedFile,
+        Silent   => 1
+    );
+
+    my @NewContent = map { "$_\n" } split( /\n/, ${$SignedContentRef} );
+
+    # return message
+    if ( $Message =~ /Verification successful/i ) {
+
+        # Determine email address(es) from attributes of signer certificate.
+        my $Attributes = $Self->_FetchAttributes(
+            Filename    => $SignerFile,
+            Type        => 'Cert',
+            ContentType => 'application/x-x509-ca-cert',
+            Silent      => $Param{Silent}
+        );
+
+        my @SignersArray = split( /, /sm, $Attributes->{Email} );
+
+        if ( $Self->{Debug} ) {
+            # Include additional certificate attributes in the message:
+            #   - signer(s) email address(es)
+            #   - certificate hash
+            #   - certificate fingerprint
+            #   Please see bug#12284 for more information.
+            my $MessageSigner = join( ', ', @SignersArray ) . ' : '
+                . $Attributes->{Hash} . ' : '
+                . $Attributes->{Fingerprint};
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'OpenSSL: ' . $MessageLong . ' (' . $MessageSigner . ')',
+            );
+        }
+
+        return (
+            Type      => 'Verified',
+            Signers   => [@SignersArray],
+            Content   => \@NewContent,
+        );
+    }
+    elsif ( $Message =~ /self signed certificate/i ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'OpenSSL: self signed certificate, to use it send the \'Certificate\' parameter : '
+                    . $MessageLong,
+            );
+        }
+
+        return (
+            Type      => 'SelfSign',
+            Error     => 'OpenSSL: self signed certificate, to use it send the \'Certificate\' parameter : '
+                . $Message,
+            Content   => \@NewContent
+        );
+    }
+
+    # digest failure means that the content of the email does not match witht he signature
+    elsif ( $Message =~ m{digest failure}i ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'OpenSSL: The signature does not match the message content : ' . $MessageLong,
+            );
+        }
+
+        return (
+            Type      => 'Unverified',
+            Error     => 'OpenSSL: The signature does not match the message content : ' . $Message,
+            Content   => \@NewContent
+        );
+    }
+
+    if ( $Self->{Debug} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => 'OpenSSL: ' . $MessageLong,
+        );
+    }
+
+    return (
+        Type  => 'Unverified',
+        Error => 'OpenSSL: ' . $Message,
+    );
+}
+
+sub _Sign {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Content ID)) {
+        if ( !$Param{$_} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
+            return;
+        }
+    }
+
+    my $PrivateKey    = $Self->CertificateGet(
+        %Param,
+        Passphrase => 1
+    );
+    my @CertificateID = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Certificate',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'Modulus',
+                    Operator => 'EQ',
+                    Value    => $PrivateKey->{Modulus}
+                },
+                {
+                    Field    => 'Type',
+                    Operator => 'EQ',
+                    Value    => 'Cert'
+                }
+            ]
+        },
+        Sort => [
+            {
+                Field     => 'ID',
+                Direction => 'descending'
+            }
+        ],
+        Limit    => 1,
+        UserID   => 1,
+        UserType => 'Agent'
+    );
+
+    if ( !scalar(@CertificateID) ) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Sign (Private Key: $PrivateKey->{FileID}): No suitable certificate found!"
+            );
+        }
+        return (
+            Successful => 0
+        );
+    }
+
+    my $Certificate = $Self->CertificateGet(
+        ID => $CertificateID[0]
+    );
+
+    my $PrivateFile = $Self->{Private}->{Path} . q{/} . $PrivateKey->{Filename};
+    my $CertFile    = $Self->{Cert}->{Path} . q{/} .  $Certificate->{Filename};
+    my $Content     = $Param{Content};
+
+    if ( IsArrayRef($Param{Content}) ) {
+        $Content = join(q{} , @{$Param{Content}} );
+    }
+
+    my ( $FH, $PlainFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    print $FH $Content;
+    close $FH;
+    my ( $FHSign, $SignFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    close $FHSign;
+
+    my $Options = "smime -sign "
+        . " -in $PlainFile"
+        . " -out $SignFile"
+        . " -signer $CertFile"
+        . " -inkey $PrivateFile"
+        . " -text -binary -passin pass:$PrivateKey->{Passphrase}";
+
+    my $LogMessage = $Self->_CleanOutput(qx{$Self->{Cmd} $Options 2>&1});
+
+    if ($LogMessage) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Impossible to sign: $LogMessage! (Command: $Options)"
+            );
+        }
+        return(
+            Successful => 0,
+            Error      => "$LogMessage!"
+        );
+    }
+
+    my $SignedRef = $Kernel::OM->Get('Main')->FileRead(
+        Location => $SignFile
+    );
+    unlink($SignFile);
+
+    return(
+        Successful => 1,
+        Content    => ${$SignedRef}
+    );
+}
+
+sub _Encrypt {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Content ID)) {
+        if ( !$Param{$_} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $_!"
+                );
+            }
+            return;
+        }
+    }
+
+    my $Certificate    = $Self->CertificateGet(
+        %Param
+    );
+
+    my $CertFile = $Self->{Cert}->{Path} . q{/} .  $Certificate->{Filename};
+    my $Content  = $Param{Content};
+
+    if ( IsArrayRef($Param{Content}) ) {
+        $Content = join(q{} , @{$Param{Content}} );
+    }
+
+    my ( $FH, $PlainFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    print $FH $Content;
+    close $FH;
+    my ( $FHCrypted, $CryptedFile ) = $Kernel::OM->Get('FileTemp')->TempFile();
+    close $FHCrypted;
+
+    my $Options = "smime -encrypt -binary -des3"
+        . " -in $PlainFile"
+        . " -out $CryptedFile "
+        . $CertFile;
+
+    my $LogMessage = $Self->_CleanOutput(qx{$Self->{Cmd} $Options 2>&1});
+
+    if ($LogMessage) {
+        if( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "Impossible to encrypt: $LogMessage! (Command: $Options)"
+            );
+        }
+        return(
+            Successful => 0
+        );
+    }
+
+    my $CryptedRef = $Kernel::OM->Get('Main')->FileRead(
+        Location => $CryptedFile
+    );
+
+    return(
+        Successful => 1,
+        Content    => ${$CryptedRef}
+    );
+}
+
+sub _CheckContentType {
+    my ( $Self, %Param ) = @_;
+
+    if ( !$Param{Content} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Content!"
+            );
+        }
+        return;
+    }
+
+    my $Parser = MIME::Parser->new();
+    $Parser->decode_headers(0);
+    $Parser->extract_nested_messages(0);
+    $Parser->output_to_core("ALL");
+    my $Entity = $Parser->parse_data($Param{Content});
+    my $Head   = $Entity->head();
+    $Head->unfold();
+    $Head->combine('Content-Type');
+    my $ContentType = $Head->get('Content-Type');
+
+    if ( !$ContentType ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Email has no ContentType!"
+            );
+        }
+        return;
+    }
+
+    return $ContentType
+}
+
+# remove spurious warnings that appear on Windows
+sub _CleanOutput {
+    my ( $Self, $Output ) = @_;
+
+    if ( $^O =~ m{mswin}i ) {
+        $Output =~ s{Loading 'screen' into random state - done\r?\n}{}igms;
+    }
+
+    return $Output;
+}
+
+=end Internal
+
+=cut
 
 1;
 

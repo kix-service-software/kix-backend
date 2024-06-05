@@ -330,7 +330,10 @@ sub SendNotification {
             . $FromEmail . '>';
 
         # security part
-        my $SecurityOptions = $Self->SecurityOptionsGet( %Param, FromEmail => $FromEmail );
+        my $SecurityOptions = $Self->SecurityOptionsGet(
+            %Param,
+            FromEmail => $FromEmail
+        );
         return if !$SecurityOptions;
 
         my $Sent = $Kernel::OM->Get('Email')->Send(
@@ -367,7 +370,8 @@ sub SendNotification {
                 Address   => {
                     RealName => $ConfigObject->Get('NotificationSenderName'),
                     Email    => $FromEmail,
-                }
+                },
+                Flags => $Sent->{Flags}
             );
         }
 
@@ -456,6 +460,7 @@ sub SendNotification {
                 %{$SecurityOptions},
                 Recipient => \%Recipient,
                 Address   => \%Address,
+                Flags     => $Sent->{Flags}
             );
         }
 
@@ -603,6 +608,15 @@ sub IsUsable {
 sub SecurityOptionsGet {
     my ( $Self, %Param ) = @_;
 
+    if (
+        IsArrayRefWithData($Param{Notification}->{Data}->{EmailSecurity})
+        && $Param{Notification}->{Data}->{EmailSecurity}->[0]
+    ) {
+        return {
+            Encrypt => $Param{Notification}->{Data}->{EmailSecurity}->[0]
+        };
+    }
+
     return {};
 }
 
@@ -657,6 +671,17 @@ sub CreateArticle {
         );
 
         return;
+    }
+
+    # Sets specific article flags
+    for my $Flag ( @{$Param{Flags}} ) {
+        $Kernel::OM->Get('Ticket')->ArticleFlagSet(
+            ArticleID => $ArticleID,
+            Key       => $Flag->{Key},
+            Value     => $Flag->{Value},
+            UserID    => $Param{UserID} || 1,
+            Silent    => $Param{Silent}
+        );
     }
 
     # if required mark new article as seen for all users
