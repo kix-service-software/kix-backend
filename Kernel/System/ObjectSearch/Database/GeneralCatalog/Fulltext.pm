@@ -55,8 +55,7 @@ sub Search {
         ],
         Operator      => $Param{Search}->{Operator},
         Value         => $Param{Search}->{Value},
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
+        Silent        => $Param{Silent}
     );
 
     return {

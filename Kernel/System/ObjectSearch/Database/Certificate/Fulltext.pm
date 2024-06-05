@@ -84,8 +84,7 @@ sub Search {
         Operator      => $Param{Search}->{Operator},
         Columns       => [ "$TableAlias.preferences_value" ],
         Value         => $Param{Search}->{Value},
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
+        Silent        => $Param{Silent}
     );
 
     return if ( !$Condition );

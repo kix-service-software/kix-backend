@@ -132,8 +132,7 @@ sub Search {
             "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
         ],
         Operator      => $Param{Search}->{Operator},
-        Value         => $Param{Search}->{Value},
-        CaseSensitive => 1
+        Value         => $Param{Search}->{Value}
     );
 
     return {

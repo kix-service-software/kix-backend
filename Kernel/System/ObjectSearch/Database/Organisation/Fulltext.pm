@@ -56,8 +56,7 @@ sub Search {
             'o.name', 'o.number', 'o.street', 'o.city',
             'o.zip', 'o.url', 'o.country'
         ],
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
+        Silent        => $Param{Silent}
     );
 
     return if ( !$Condition );

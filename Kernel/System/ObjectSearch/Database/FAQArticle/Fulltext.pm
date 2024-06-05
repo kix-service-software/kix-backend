@@ -56,8 +56,7 @@ sub Search {
             'f.f_number', 'f.f_subject', 'f.f_keywords',
             'f.f_field1','f.f_field2','f.f_field3','f.f_field4','f.f_field5','f.f_field6',
         ],
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
+        Silent        => $Param{Silent}
     );
 
     return if ( !$Condition );

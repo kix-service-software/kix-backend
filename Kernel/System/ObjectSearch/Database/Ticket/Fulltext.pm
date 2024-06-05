@@ -93,7 +93,6 @@ sub Search {
     my $Condition = $Self->_FulltextCondition(
         Operator       => $Param{Search}->{Operator},
         Value          => $Param{Search}->{Value},
-        CaseSensitive  => 1,
         Columns        => [
             'st.tn', 'st.title', $TableAliasPrefix . 'ta.a_to', $TableAliasPrefix . 'ta.a_cc',
             $TableAliasPrefix . 'ta.a_from', $TableAliasPrefix . 'ta.a_body',

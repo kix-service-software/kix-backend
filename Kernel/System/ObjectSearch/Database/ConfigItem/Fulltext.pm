@@ -54,10 +54,9 @@ sub Search {
         Operator      => $Param{Search}->{Operator},
         Value         => $Param{Search}->{Value},
         Columns       => [
-            'ci.name', 'ci.number'
+            'ci.name', 'ci.configitem_number'
         ],
-        Silent        => $Param{Silent},
-        CaseSensitive => 1
+        Silent        => $Param{Silent}
     );
 
     return if ( !$Condition );
