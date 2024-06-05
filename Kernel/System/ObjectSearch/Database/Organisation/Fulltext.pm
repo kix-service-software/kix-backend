@@ -47,8 +47,10 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # fixed search in the  following columns:
+    # Name, Number, Street, City, Zip, URL and Country
     my $Condition = $Self->_FulltextCondition(
-        Operaror      => $Param{Search}->{Operator},
+        Operator      => $Param{Search}->{Operator},
         Value         => $Param{Search}->{Value},
         Columns       => [
             'o.name', 'o.number', 'o.street', 'o.city',

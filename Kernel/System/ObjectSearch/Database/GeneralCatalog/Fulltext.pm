@@ -47,6 +47,8 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # fixed search in the  following columns:
+    # Name and Class
     my $Condition = $Self->_FulltextCondition(
         Columns       => [
             'gc.name', 'gc.general_catalog_class'

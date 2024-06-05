@@ -86,8 +86,12 @@ sub Search {
         }
     }
 
+    # fixed search in the  following columns:
+    # Ticketnumber and Title
+    # inlcudes related columns of other tables:
+    # table article: To, Cc, From, Body and Subject
     my $Condition = $Self->_FulltextCondition(
-        Operaror       => $Param{Search}->{Operator},
+        Operator       => $Param{Search}->{Operator},
         Value          => $Param{Search}->{Value},
         CaseSensitive  => 1,
         Columns        => [

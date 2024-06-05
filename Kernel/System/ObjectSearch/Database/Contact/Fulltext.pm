@@ -117,6 +117,12 @@ sub Search {
         $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaTable;
     }
 
+    # fixed search in the  following columns:
+    # Firstname, Lastname, E-Mail, E-Mail1-5 Title, Phone, Fax, Mobile,
+    # Street, City, Zip and Country
+    # inlcudes related columns of other tables:
+    # table users: Login
+    # table organisation: Number and Name
     my $Condition = $Self->_FulltextCondition(
         Columns       => [
             'c.firstname', 'c.lastname',

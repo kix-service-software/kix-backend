@@ -47,8 +47,11 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # fixed search in the  following columns:
+    # Name and Number
+    # searching in older versions is currently not intended
     my $Condition = $Self->_FulltextCondition(
-        Operaror      => $Param{Search}->{Operator},
+        Operator      => $Param{Search}->{Operator},
         Value         => $Param{Search}->{Value},
         Columns       => [
             'ci.name', 'ci.number'

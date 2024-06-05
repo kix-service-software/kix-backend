@@ -78,6 +78,8 @@ sub Search {
     }
 
     # prepare condition
+    # fixed search in the  following columns:
+    # preferences_value (depending on the table prefix and requested preferences_key)
     my $Condition = $Self->_FulltextCondition(
         Operator      => $Param{Search}->{Operator},
         Columns       => [ "$TableAlias.preferences_value" ],

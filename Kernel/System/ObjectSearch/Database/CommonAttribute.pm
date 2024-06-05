@@ -1165,8 +1165,14 @@ sub _FulltextCondition {
     my @Array     = split( // , $Value );
     my $SQL       = q{};
     my $Word      = q{};
-    my $Not       = 0;
-    my $Backslash = 0;
+    my $Not       = 0;;
+
+    # Quoting ESCAPE character backslash
+    my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+    my $Escape = " ESCAPE '\\'";
+    if ( $QuoteBack ) {
+        $Escape =~ s/\\/$QuoteBack\\/g;
+    }
 
     POSITION:
     for my $Position ( 0 .. $#Array ) {
@@ -1237,7 +1243,8 @@ sub _FulltextCondition {
                     );
 
                     if ( $Type eq 'NOT LIKE' ) {
-                        $SQLA .= " ESCAPE '\\'";
+
+                        $SQLA .= $Escape;
                     }
                 }
                 $SQL .= '(' . $SQLA . ') ';
@@ -1267,7 +1274,7 @@ sub _FulltextCondition {
                     );
 
                     if ( $Type eq 'LIKE' ) {
-                        $SQLA .= " ESCAPE '\\'";
+                        $SQLA .= $Escape;
                     }
                 }
                 $SQL .= '(' . $SQLA . ') ';
