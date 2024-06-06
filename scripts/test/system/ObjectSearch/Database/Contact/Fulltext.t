@@ -49,6 +49,13 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
 # check Search
 my @SearchTests = (
     {
@@ -116,7 +123,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(((LOWER(c.firstname) LIKE LOWER(\'Test%\')  OR LOWER(c.lastname) LIKE LOWER(\'Test%\')  OR LOWER(c.email) LIKE LOWER(\'Test%\')  OR LOWER(c.email1) LIKE LOWER(\'Test%\')  OR LOWER(c.email2) LIKE LOWER(\'Test%\')  OR LOWER(c.email3) LIKE LOWER(\'Test%\')  OR LOWER(c.email4) LIKE LOWER(\'Test%\')  OR LOWER(c.email5) LIKE LOWER(\'Test%\')  OR LOWER(c.title) LIKE LOWER(\'Test%\')  OR LOWER(c.phone) LIKE LOWER(\'Test%\')  OR LOWER(c.fax) LIKE LOWER(\'Test%\')  OR LOWER(c.mobile) LIKE LOWER(\'Test%\')  OR LOWER(c.street) LIKE LOWER(\'Test%\')  OR LOWER(c.city) LIKE LOWER(\'Test%\')  OR LOWER(c.zip) LIKE LOWER(\'Test%\')  OR LOWER(c.country) LIKE LOWER(\'Test%\')  OR LOWER(u0.login) LIKE LOWER(\'Test%\')  OR LOWER(o0.number) LIKE LOWER(\'Test%\')  OR LOWER(o0.name) LIKE LOWER(\'Test%\') ) ))'
+                '(LOWER(c.firstname) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -134,7 +141,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(((LOWER(c.firstname) LIKE LOWER(\'%Test\')  OR LOWER(c.lastname) LIKE LOWER(\'%Test\')  OR LOWER(c.email) LIKE LOWER(\'%Test\')  OR LOWER(c.email1) LIKE LOWER(\'%Test\')  OR LOWER(c.email2) LIKE LOWER(\'%Test\')  OR LOWER(c.email3) LIKE LOWER(\'%Test\')  OR LOWER(c.email4) LIKE LOWER(\'%Test\')  OR LOWER(c.email5) LIKE LOWER(\'%Test\')  OR LOWER(c.title) LIKE LOWER(\'%Test\')  OR LOWER(c.phone) LIKE LOWER(\'%Test\')  OR LOWER(c.fax) LIKE LOWER(\'%Test\')  OR LOWER(c.mobile) LIKE LOWER(\'%Test\')  OR LOWER(c.street) LIKE LOWER(\'%Test\')  OR LOWER(c.city) LIKE LOWER(\'%Test\')  OR LOWER(c.zip) LIKE LOWER(\'%Test\')  OR LOWER(c.country) LIKE LOWER(\'%Test\')  OR LOWER(u0.login) LIKE LOWER(\'%Test\')  OR LOWER(o0.number) LIKE LOWER(\'%Test\')  OR LOWER(o0.name) LIKE LOWER(\'%Test\') ) ))'
+                '(LOWER(c.firstname) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -152,7 +159,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(((LOWER(c.firstname) LIKE LOWER(\'%Test%\')  OR LOWER(c.lastname) LIKE LOWER(\'%Test%\')  OR LOWER(c.email) LIKE LOWER(\'%Test%\')  OR LOWER(c.email1) LIKE LOWER(\'%Test%\')  OR LOWER(c.email2) LIKE LOWER(\'%Test%\')  OR LOWER(c.email3) LIKE LOWER(\'%Test%\')  OR LOWER(c.email4) LIKE LOWER(\'%Test%\')  OR LOWER(c.email5) LIKE LOWER(\'%Test%\')  OR LOWER(c.title) LIKE LOWER(\'%Test%\')  OR LOWER(c.phone) LIKE LOWER(\'%Test%\')  OR LOWER(c.fax) LIKE LOWER(\'%Test%\')  OR LOWER(c.mobile) LIKE LOWER(\'%Test%\')  OR LOWER(c.street) LIKE LOWER(\'%Test%\')  OR LOWER(c.city) LIKE LOWER(\'%Test%\')  OR LOWER(c.zip) LIKE LOWER(\'%Test%\')  OR LOWER(c.country) LIKE LOWER(\'%Test%\')  OR LOWER(u0.login) LIKE LOWER(\'%Test%\')  OR LOWER(o0.number) LIKE LOWER(\'%Test%\')  OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ) ))'
+                '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -170,7 +177,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(((LOWER(c.firstname) = LOWER(\'Test\') OR LOWER(c.lastname) = LOWER(\'Test\') OR LOWER(c.email) = LOWER(\'Test\') OR LOWER(c.email1) = LOWER(\'Test\') OR LOWER(c.email2) = LOWER(\'Test\') OR LOWER(c.email3) = LOWER(\'Test\') OR LOWER(c.email4) = LOWER(\'Test\') OR LOWER(c.email5) = LOWER(\'Test\') OR LOWER(c.title) = LOWER(\'Test\') OR LOWER(c.phone) = LOWER(\'Test\') OR LOWER(c.fax) = LOWER(\'Test\') OR LOWER(c.mobile) = LOWER(\'Test\') OR LOWER(c.street) = LOWER(\'Test\') OR LOWER(c.city) = LOWER(\'Test\') OR LOWER(c.zip) = LOWER(\'Test\') OR LOWER(c.country) = LOWER(\'Test\') OR LOWER(u0.login) = LOWER(\'Test\') OR LOWER(o0.number) = LOWER(\'Test\') OR LOWER(o0.name) = LOWER(\'Test\')) ))'
+                '(LOWER(c.firstname) = LOWER(\'Test\') OR LOWER(c.lastname) = LOWER(\'Test\') OR LOWER(c.email) = LOWER(\'Test\') OR LOWER(c.email1) = LOWER(\'Test\') OR LOWER(c.email2) = LOWER(\'Test\') OR LOWER(c.email3) = LOWER(\'Test\') OR LOWER(c.email4) = LOWER(\'Test\') OR LOWER(c.email5) = LOWER(\'Test\') OR LOWER(c.title) = LOWER(\'Test\') OR LOWER(c.phone) = LOWER(\'Test\') OR LOWER(c.fax) = LOWER(\'Test\') OR LOWER(c.mobile) = LOWER(\'Test\') OR LOWER(c.street) = LOWER(\'Test\') OR LOWER(c.city) = LOWER(\'Test\') OR LOWER(c.zip) = LOWER(\'Test\') OR LOWER(c.country) = LOWER(\'Test\') OR LOWER(u0.login) = LOWER(\'Test\') OR LOWER(o0.number) = LOWER(\'Test\') OR LOWER(o0.name) = LOWER(\'Test\')) '
             ]
         }
     }

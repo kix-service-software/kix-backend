@@ -49,6 +49,13 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
 # check Search
 my @SearchTests = (
     {
@@ -115,7 +122,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test%\''
+                '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'Test%\') ESCAPE \''. $Escape .'\') '
             ]
         }
     },
@@ -132,7 +139,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test\''
+                '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'%Test\') ESCAPE \''. $Escape .'\') '
             ]
         }
     },
@@ -149,7 +156,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test%\''
+                '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'%Test%\') ESCAPE \''. $Escape .'\') '
             ]
         }
     },
@@ -166,7 +173,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test\''
+                '(LOWER(vfsp0.preferences_value) = LOWER(\'Test\')) '
             ]
         }
     }
@@ -340,6 +347,7 @@ my $CertID5 = $List[4]->{FileID};
 my $SearchValue1 = $List[0]->{Subject};
 my $SearchValue2 = $List[2]->{Email};
 my $SearchValue3 = $List[3]->{Subject};
+print STDERR Data::Dumper::Dumper(\@List);
 
 # discard contact object to process events
 $Kernel::OM->ObjectsDiscard(
@@ -355,7 +363,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $SearchValue1
+                    Value    => q{"} . $SearchValue1 . q{"}
                 }
             ]
         },
@@ -368,7 +376,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue1,0,20)
+                    Value    => q{"} . substr($SearchValue1,0,20) . q{"}
                 }
             ]
         },
@@ -381,7 +389,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => $SearchValue1
+                    Value    => q{"} . $SearchValue1 . q{"}
                 }
             ]
         },
@@ -394,7 +402,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue1,-10)
+                    Value    => q{"} . substr($SearchValue1,-10) . q{"}
                 }
             ]
         },
@@ -407,7 +415,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => $SearchValue1
+                    Value    => q{"} . $SearchValue1 . q{"}
                 }
             ]
         },
@@ -420,7 +428,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => substr($SearchValue1,10,-10)
+                    Value    => q{"} . substr($SearchValue1,10,-10) . q{"}
                 }
             ]
         },
@@ -433,7 +441,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue1
+                    Value    => q{"} . $SearchValue1 . q{"}
                 }
             ]
         },
@@ -446,7 +454,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $SearchValue2
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
@@ -459,7 +467,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue2,0,4)
+                    Value    => q{"} . substr($SearchValue2,0,4) . q{"}
                 }
             ]
         },
@@ -472,7 +480,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => $SearchValue2
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
@@ -485,7 +493,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue2,-5)
+                    Value    => q{"} . substr($SearchValue2,-5) . q{"}
                 }
             ]
         },
@@ -498,7 +506,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => $SearchValue2
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
@@ -511,7 +519,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => substr($SearchValue2,2,-2)
+                    Value    => q{"} . substr($SearchValue2,2,-2) . q{"}
                 }
             ]
         },
@@ -524,7 +532,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue2
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
@@ -537,7 +545,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $SearchValue2
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
@@ -550,7 +558,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue3,0,15)
+                    Value    => q{"} . substr($SearchValue3,0,15) . q{"}
                 }
             ]
         },
@@ -563,7 +571,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => $SearchValue3
+                    Value    => q{"} . $SearchValue3 . q{"}
                 }
             ]
         },
@@ -576,7 +584,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue3,-15)
+                    Value    => q{"} . substr($SearchValue3,-15) . q{"}
                 }
             ]
         },
@@ -589,7 +597,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => $SearchValue3
+                    Value    => q{"} . $SearchValue3 . q{"}
                 }
             ]
         },
@@ -602,7 +610,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => substr($SearchValue3,8,-8)
+                    Value    => q{"} . substr($SearchValue3,8,-8) . q{"}
                 }
             ]
         },
@@ -615,7 +623,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue3
+                    Value    => q{"} . $SearchValue3 . q{"}
                 }
             ]
         },

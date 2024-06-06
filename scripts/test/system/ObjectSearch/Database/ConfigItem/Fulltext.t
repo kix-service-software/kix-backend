@@ -15,7 +15,7 @@ use vars (qw($Self));
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Organisation::Fulltext';
+my $AttributeModule = 'Kernel::System::ObjectSearch::Database::ConfigItem::Fulltext';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -39,7 +39,8 @@ for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -66,8 +67,8 @@ my @SearchTests = (
     {
         Name         => 'Search: Value undef',
         Search       => {
-            Field    => 'Name',
-            Operator => 'EQ',
+            Field    => 'Fulltext',
+            Operator => 'CONTAINS',
             Value    => undef
 
         },
@@ -77,7 +78,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'CONTAINS',
             Value    => 'Test'
         },
         Expected     => undef
@@ -86,7 +87,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'CONTAINS',
             Value    => 'Test'
         },
         Expected     => undef
@@ -94,7 +95,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator undef',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => undef,
             Value    => 'Test'
         },
@@ -103,7 +104,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator invalid',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => 'Test',
             Value    => 'Test'
         },
@@ -118,7 +119,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.street) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.city) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.zip) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.url) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.country) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+                '(LOWER(ci.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -131,7 +132,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.street) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.city) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.zip) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.url) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o.country) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+                '(LOWER(ci.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -144,7 +145,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.url) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+                '(LOWER(ci.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -157,7 +158,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.name) = LOWER(\'Test\') OR LOWER(o.number) = LOWER(\'Test\') OR LOWER(o.street) = LOWER(\'Test\') OR LOWER(o.city) = LOWER(\'Test\') OR LOWER(o.zip) = LOWER(\'Test\') OR LOWER(o.url) = LOWER(\'Test\') OR LOWER(o.country) = LOWER(\'Test\')) '
+                '(LOWER(ci.name) = LOWER(\'Test\') OR LOWER(ci.configitem_number) = LOWER(\'Test\')) '
             ]
         }
     }
@@ -165,6 +166,7 @@ my @SearchTests = (
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
+        Flags        => $Test->{Flags},
         BoolOperator => 'AND',
         UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
@@ -227,163 +229,197 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test organisation ##
-my $TestData1 = 'Test001';
-my $TestData2 = 'test002';
-my $TestData3 = 'Test003';
-my $TestData4 = 'Test004';
-
-# first organisation
-my $OrganisationID1 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $TestData1,
-    Name    => $Helper->GetRandomID(),
-    Street  => $Helper->GetRandomID(),
-    Zip     => $Helper->GetRandomID(),
-    City    => $Helper->GetRandomID(),
-    Country => $Helper->GetRandomID(),
-    Url     => $Helper->GetRandomID(),
-    Comment => $Helper->GetRandomID(),
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID1,
-    'Created first organisation'
-);
-# second organisation
-my $OrganisationID2 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $Helper->GetRandomID(),
-    Name    => $Helper->GetRandomID(),
-    Street  => $TestData2,
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID2,
-    'Created second organisation'
-);
-# third organisation
-my $OrganisationID3 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $Helper->GetRandomID(),
-    Name    => $TestData3,
-    Comment => $Helper->GetRandomID(),
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID3,
-    'Created third organisation'
-);
-# fourth organisation
-my $OrganisationID4 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $TestData4,
-    Name    => $TestData4,
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID4,
-    'Created fourth organisation without optional parameter'
+# prepare class mapping
+my $ClassRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class         => 'ITSM::ConfigItem::Class',
+    Name          => 'Building',
+    NoPreferences => 1
 );
 
-# discard ticket object to process events
+# prepare depl state mapping
+my $DeplStateRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::ConfigItem::DeploymentState',
+    Name  => 'Production',
+);
+
+# prepare inci state mapping
+my $InciStateRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::Core::IncidentState',
+    Name  => 'Operational',
+);
+
+# prepare name mapping
+my $ConfigItemName1 = 'Test001';
+my $ConfigItemName2 = 'Test002';
+my $ConfigItemName3 = 'Test003';
+
+## prepare test assets ##
+# first asset
+my $ConfigItemID1 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemID1,
+    'Created first asset'
+);
+my $VersionID1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID1,
+    Name         => $ConfigItemName1,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
+);
+$Self->True(
+    $VersionID1,
+    'Created version for first asset'
+);
+# second asset
+my $ConfigItemID2 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemID2,
+    'Created second asset'
+);
+my $VersionID2_1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID2,
+    Name         => $ConfigItemName2,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
+);
+$Self->True(
+    $VersionID2_1,
+    'Created version for second asset'
+);
+my $VersionID2_2 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID2,
+    Name         => $ConfigItemName3,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
+);
+$Self->True(
+    $VersionID2_2,
+    'Created second version for second asset'
+);
+# third asset
+my $ConfigItemID3 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemID3,
+    'Created third asset'
+);
+
+# discard config item object to process events
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['Organisation'],
+    Objects => ['ITSMConfigItem'],
 );
 
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value $ConfigItemName3',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $TestData2
+                    Value    => $ConfigItemName3
                 }
             ]
         },
-        Expected => [$OrganisationID2]
+        Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value substr($TestData2,0,4)',
+        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value substr($ConfigItemName3,0,4)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => substr($TestData2,0,4)
+                    Value    => substr($ConfigItemName3,0,4)
                 }
             ]
         },
-        Expected => [$OrganisationID1,$OrganisationID2,$OrganisationID3,$OrganisationID4]
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value $ConfigItemName3',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => $TestData2
+                    Value    => $ConfigItemName3
                 }
             ]
         },
-        Expected => [$OrganisationID2]
+        Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value substr($TestData2,-5)',
+        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value substr($ConfigItemName3,-5)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'ENDSWITH',
-                    Value    => substr($TestData2,-5)
+                    Value    => substr($ConfigItemName3,-5)
                 }
             ]
         },
-        Expected => [$OrganisationID2]
+        Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value $ConfigItemName3',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => $TestData2
+                    Value    => $ConfigItemName3
                 }
             ]
         },
-        Expected => [$OrganisationID2]
+        Expected => [$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value substr($TestData2,2,-2)',
+        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value substr($ConfigItemName3,2,-2)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'CONTAINS',
-                    Value    => substr($TestData2,2,-2)
+                    Value    => substr($ConfigItemName3,2,-2)
                 }
             ]
         },
-        Expected => [$OrganisationID1,$OrganisationID2,$OrganisationID3,$OrganisationID4]
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator LIKE / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value $ConfigItemName3',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $TestData2
+                    Value    => $ConfigItemName3
                 }
             ]
         },
-        Expected => [$OrganisationID2]
+        Expected => [$ConfigItemID2]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(
-        ObjectType => 'Organisation',
+        ObjectType => 'ConfigItem',
         Result     => 'ARRAY',
         Search     => $Test->{Search},
         UserType   => 'Agent',
@@ -406,7 +442,7 @@ $Helper->Rollback();
 
 =back
 
-=head1 TERMS AND CONDITIONS
+=headTest TERMS AND CONDITIONS
 
 This software is part of the KIX project
 (L<https://www.kixdesk.com/>).

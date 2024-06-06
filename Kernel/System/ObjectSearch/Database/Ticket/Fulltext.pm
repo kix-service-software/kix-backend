@@ -94,12 +94,15 @@ sub Search {
         Operator       => $Param{Search}->{Operator},
         Value          => $Param{Search}->{Value},
         Columns        => [
-            'st.tn', 'st.title', $TableAliasPrefix . 'ta.a_to', $TableAliasPrefix . 'ta.a_cc',
+            'st.tn', 'st.title'
+        ],
+        StaticColumns  => [
+            $TableAliasPrefix . 'ta.a_to', $TableAliasPrefix . 'ta.a_cc',
             $TableAliasPrefix . 'ta.a_from', $TableAliasPrefix . 'ta.a_body',
             $TableAliasPrefix . 'ta.a_subject'
         ],
-        Silent         => $Param{Silent},
-        IsStaticSearch => $IsStaticSearch
+        Silent          => $Param{Silent},
+        IsStaticSearch  => $IsStaticSearch
     );
 
     return if ( !$Condition );

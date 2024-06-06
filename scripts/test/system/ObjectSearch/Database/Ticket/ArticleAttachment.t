@@ -485,6 +485,15 @@ my @SearchTests = (
     }
 );
 for my $Test ( @SearchTests ) {
+    # ToDo: The config is currently always reset, why this has to be set again here.
+    # Unfortunately, it has not yet been possible to determine why the config was reset after the first complete run.
+
+    # make sure config 'Ticket::StorageModule' is 'Kernel::System::Ticket::ArticleStorageDB'
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'Ticket::StorageModule',
+        Value => 'Kernel::System::Ticket::ArticleStorageDB'
+    );
+
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         UserType     => $Test->{UserType},

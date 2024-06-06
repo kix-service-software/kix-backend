@@ -40,17 +40,7 @@ for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
-        OwnerFulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-        },
-        ResponsibleFulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-        },
-        OrganisationFulltext => {
+        Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
@@ -58,6 +48,13 @@ $Self->IsDeeply(
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
 
 # check Search
 my @SearchTests = (
@@ -69,8 +66,8 @@ my @SearchTests = (
     {
         Name         => 'Search: Value undef',
         Search       => {
-            Field    => 'Name',
-            Operator => 'EQ',
+            Field    => 'Fulltext',
+            Operator => 'CONTAINS',
             Value    => undef
 
         },
@@ -80,7 +77,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'CONTAINS',
             Value    => 'Test'
         },
         Expected     => undef
@@ -89,7 +86,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'CONTAINS',
             Value    => 'Test'
         },
         Expected     => undef
@@ -97,7 +94,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator undef',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => undef,
             Value    => 'Test'
         },
@@ -106,298 +103,74 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator invalid',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => 'Test',
             Value    => 'Test'
         },
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field OwnerFulltext / Operator STARTSWITH',
+        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
         Search       => {
-            Field    => 'OwnerFulltext',
+            Field    => 'Fulltext',
             Operator => 'STARTSWITH',
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Owner',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OwnerName',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Join' => [
+                'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(LOWER(st.tn) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerFulltext / Operator ENDSWITH',
+        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
         Search       => {
-            Field    => 'OwnerFulltext',
+            Field    => 'Fulltext',
             Operator => 'ENDSWITH',
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Owner',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OwnerName',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Join' => [
+                'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(LOWER(st.tn) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerFulltext / Operator CONTAINS',
+        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
         Search       => {
-            Field    => 'OwnerFulltext',
+            Field    => 'Fulltext',
             Operator => 'CONTAINS',
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Owner',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OwnerName',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Join' => [
+                'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(LOWER(st.tn) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
-        Name         => 'Search: valid search / Field OwnerFulltext / Operator LIKE',
+        Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
-            Field    => 'OwnerFulltext',
+            Field    => 'Fulltext',
             Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Owner',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OwnerName',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleFulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'ResponsibleFulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Responsible',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'ResponsibleName',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleFulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'ResponsibleFulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Responsible',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'ResponsibleName',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleFulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'ResponsibleFulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Responsible',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'ResponsibleName',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleFulltext / Operator LIKE',
-        Search       => {
-            Field    => 'ResponsibleFulltext',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Responsible',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'ResponsibleName',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field OrganisationFulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'OrganisationFulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Organisation',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OrganisationNumber',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field OrganisationFulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'OrganisationFulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Organisation',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OrganisationNumber',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field OrganisationFulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'OrganisationFulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Organisation',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OrganisationNumber',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field OrganisationFulltext / Operator LIKE',
-        Search       => {
-            Field    => 'OrganisationFulltext',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Organisation',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'OrganisationNumber',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Join' => [
+                'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(LOWER(st.tn) = LOWER(\'Test\') OR LOWER(st.title) = LOWER(\'Test\') OR s_ta.a_to = LOWER(\'Test\') OR s_ta.a_cc = LOWER(\'Test\') OR s_ta.a_from = LOWER(\'Test\') OR s_ta.a_body = LOWER(\'Test\') OR s_ta.a_subject = LOWER(\'Test\')) '
+            ]
         }
     }
 );
@@ -406,6 +179,7 @@ for my $Test ( @SearchTests ) {
         Search       => $Test->{Search},
         BoolOperator => 'AND',
         UserID       => 1,
+        UserType     => 'Agent',
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -428,18 +202,8 @@ my @SortTests = (
         Expected  => undef
     },
     {
-        Name      => 'Sort: Attribute "OwnerFulltext"',
-        Attribute => 'OwnerFulltext',
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute "ResponsibleFulltext"',
-        Attribute => 'ResponsibleFulltext',
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute "OrganisationFulltext"',
-        Attribute => 'OrganisationFulltext',
+        Name      => 'Sort: Attribute "Fulltext"',
+        Attribute => 'Fulltext',
         Expected  => undef
     }
 );
@@ -476,210 +240,163 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test organisation ##
-my $OrgaName1 = 'Test001';
-my $OrgaName2 = 'test002';
-my $OrgaName3 = 'Test003';
-my $OrgaNumber1 = 'Unit001';
-my $OrgaNumber2 = 'unit002';
-my $OrgaNumber3 = 'Unit003';
-
-# first organisation
-my $OrganisationID1 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $OrgaNumber1,
-    Name    => $OrgaName1,
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID1,
-    'Created first organisation'
-);
-# second organisation
-my $OrganisationID2 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $OrgaNumber2,
-    Name    => $OrgaName2,
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID2,
-    'Created second organisation'
-);
-# third organisation
-my $OrganisationID3 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $OrgaNumber3,
-    Name    => $OrgaName3,
-    UserID  => 1
-);
-$Self->True(
-    $OrganisationID3,
-    'Created third organisation'
+# set config 'Ticket::SearchIndexModule' to 'StaticDB' to get data prepared
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'Ticket::SearchIndexModule',
+    Value => 'Kernel::System::Ticket::ArticleSearchIndex::StaticDB'
 );
 
-# discard contact object to process events
-$Kernel::OM->ObjectsDiscard(
-    Objects => ['Organisation'],
-);
+my $SearchIndexAttributes = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndex::Attribute');
 
-## prepare test Owner/Responsible User+Contact ##
-my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-    Role => 'Ticket Agent'
-);
-my $UserLogin1 = 'Test001';
-my $UserLogin2 = 'test002';
-my $UserLogin3 = 'Test003';
-my $ContactFirstName1 = 'Theodor';
-my $ContactFirstName2 = 'Bertram';
-my $ContactFirstName3 = 'Gabriella';
-my $ContactLastName1  = 'Test001';
-my $ContactLastName2  = 'test002';
-my $ContactLastName3  = 'Test003';
-
-my $UserID1 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => $UserLogin1,
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
-);
-$Kernel::OM->Get('Role')->RoleUserAdd(
-    AssignUserID => $UserID1,
-    RoleID       => $RoleID,
-    UserID       => 1,
-);
-$Self->True(
-    $UserID1,
-    'First user created'
-);
-my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => $ContactFirstName1,
-    Lastname              => $ContactLastName1,
-    AssignedUserID        => $UserID1,
-    PrimaryOrganisationID => $OrganisationID1,
-    ValidID               => 1,
-    UserID                => 1,
-);
-$Self->True(
-    $ContactID1,
-    'Contact for first user created'
-);
-my $UserID2 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => $UserLogin2,
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
-);
-$Kernel::OM->Get('Role')->RoleUserAdd(
-    AssignUserID => $UserID2,
-    RoleID       => $RoleID,
-    UserID       => 1,
-);
-$Self->True(
-    $UserID2,
-    'Second user created'
-);
-my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => $ContactFirstName2,
-    Lastname              => $ContactLastName2,
-    AssignedUserID        => $UserID2,,
-    PrimaryOrganisationID => $OrganisationID2,
-    ValidID               => 1,
-    UserID                => 1,
-);
-$Self->True(
-    $ContactID2,
-    'Contact for second user created'
-);
-my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => $UserLogin3,
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
-);
-$Kernel::OM->Get('Role')->RoleUserAdd(
-    AssignUserID => $UserID3,
-    RoleID       => $RoleID,
-    UserID       => 1,
-);
-$Self->True(
-    $UserID3,
-    'Third user created'
-);
-my $ContactID3 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => $ContactFirstName3,
-    Lastname              => $ContactLastName3,
-    AssignedUserID        => $UserID3,,
-    PrimaryOrganisationID => $OrganisationID3,
-    ValidID               => 1,
-    UserID                => 1,
-);
-$Self->True(
-    $ContactID3,
-    'Contact for third user created'
-);
-
-# discard contact object to process events
-$Kernel::OM->ObjectsDiscard(
-    Objects => ['Contact'],
-);
-
-# discard user object to process events
-$Kernel::OM->ObjectsDiscard(
-    Objects => ['User'],
-);
+## prepare mappings ##
+my $Title1          = 'Unit Test + 001';
+my $Title2          = 'Unit Test + 002';
+my $Title3          = 'Unit Test + 003';
+my $ChannelName1    = 'note';
+my $ChannelName2    = 'email';
+my $ChannelID1      = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $ChannelName1 );
+my $ChannelID2      = $Kernel::OM->Get('Channel')->ChannelLookup( Name => $ChannelName2 );
+my $SenderTypeName1 = 'agent';
+my $SenderTypeName2 = 'external';
+my $SenderTypeID1   = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $SenderTypeName1 );
+my $SenderTypeID2   = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $SenderTypeName2 );
+my $From1           = '"Agent" <agent@kixdesk.com>';
+my $From2           = '"Customer" <customer@external.com>';
+my $To1             = '"Customer" <customer@external.com>';
+my $To2             = '"Agent" <agent@kixdesk.com>';
+my $Cc1             = '"External" <external@external.com>';
+my $Cc2             = '"External" <external@external.com>';
+my $Subject1        = 'Test1';
+my $Subject2        = 'Test2';
+my $Body1           = 'You have to test again.';
+my $Body2           = 'You have to test again and again.';
 
 ## prepare test tickets ##
 # first ticket
 my $TicketID1 = $Kernel::OM->Get('Ticket')->TicketCreate(
-    Title          => $Helper->GetRandomID(),
+    Title          => $Title1,
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
     StateID        => 1,
     TypeID         => 1,
-    OrganisationID => $OrganisationID1,
+    OrganisationID => 1,
     ContactID      => 1,
-    OwnerID        => $UserID1,
-    ResponsibleID  => $UserID1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
     UserID         => 1
 );
 $Self->True(
     $TicketID1,
     'Created first ticket'
 );
+my $ArticleID1 = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    TicketID        => $TicketID1,
+    ChannelID       => $ChannelID1,
+    SenderTypeID    => $SenderTypeID1,
+    From            => $From1,
+    To              => $To1,
+    Cc              => $Cc1,
+    Subject         => $Subject1,
+    Body            => $Body1,
+    ContentType     => 'text/plain; charset=utf-8',
+    HistoryType     => 'AddNote',
+    HistoryComment  => 'UnitTest',
+    CustomerVisible => 0,
+    UserID          => 1
+);
+$Self->True(
+    $ArticleID1,
+    'Created article for first ticket'
+);
 # second ticket
+$Helper->FixedTimeAddSeconds(60);
 my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
-    Title          => $Helper->GetRandomID(),
+    Title          => $Title2,
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
     StateID        => 1,
     TypeID         => 1,
-    OrganisationID => $OrganisationID2,
+    OrganisationID => 1,
     ContactID      => 1,
-    OwnerID        => $UserID2,
-    ResponsibleID  => $UserID2,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
     UserID         => 1
 );
 $Self->True(
     $TicketID2,
     'Created second ticket'
 );
+my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    TicketID        => $TicketID2,
+    ChannelID       => $ChannelID2,
+    SenderTypeID    => $SenderTypeID2,
+    From            => $From2,
+    To              => $To2,
+    Cc              => $Cc2,
+    Subject         => $Subject2,
+    Body            => $Body2,
+    ContentType     => 'text/plain; charset=utf-8',
+    HistoryType     => 'AddNote',
+    HistoryComment  => 'UnitTest',
+    CustomerVisible => 1,
+    UserID          => 1
+);
+$Self->True(
+    $ArticleID2,
+    'Created article for second ticket'
+);
 # third ticket
+$Helper->FixedTimeAddSeconds(60);
 my $TicketID3 = $Kernel::OM->Get('Ticket')->TicketCreate(
-    Title          => $Helper->GetRandomID(),
+    Title          => $Title3,
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
     StateID        => 1,
     TypeID         => 1,
-    OrganisationID => $OrganisationID3,
+    OrganisationID => 1,
     ContactID      => 1,
-    OwnerID        => $UserID3,
-    ResponsibleID  => $UserID3,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
     UserID         => 1
 );
 $Self->True(
     $TicketID3,
-    'Created third ticket'
+    'Created third ticket without article'
+);
+
+# prepare search variable
+$Subject1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Subject1
+);
+$Subject2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Subject2
+);
+$Body1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Body1
+);
+$Body2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Body2
+);
+$From1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $From1
+);
+$From2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $From2
+);
+$To1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $To1
+);
+$To2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $To2
+);
+$Cc1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Cc1
+);
+$Cc2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $Cc2
 );
 
 # discard ticket object to process events
@@ -690,732 +407,186 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value \$UserLogin2",
+        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$To1",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
+                    Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $UserLogin2
+                    Value    => $To1
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr(\$To1,0,4)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($To1,0,4)
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$Body1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'ENDSWITH',
+                    Value    => q{"} . $Body1 . q{"}
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$Body1,-5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'ENDSWITH',
+                    Value    => q{"} . substr($Body1,-5) . q{"}
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$Title2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'CONTAINS',
+                    Value    => q{"} . $Title2 . q{"}
                 }
             ]
         },
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value substr(\$UserLogin3,0,4)",
+        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$Title2,2,-2)",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($UserLogin3,0,4)
+                    Field    => 'Fulltext',
+                    Operator => 'CONTAINS',
+                    Value    => q{"} . substr($Title2,2,-2) . q{"}
                 }
             ]
         },
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value \$UserLogin2",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Subject2",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value substr(\$UserLogin1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($UserLogin1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value substr(\$UserLogin3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($UserLogin3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator LIKE / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
+                    Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $UserLogin2
+                    Value    => q{"} . $Subject2 . q{"}
                 }
             ]
         },
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value \$ContactFirstName2",
+        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \"\$To2\"",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
+                    Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => $ContactFirstName2
+                    Value    => q{"} . $To2 . q{"}
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value substr(\$ContactFirstName3,0,4)",
+        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \"substr(\$To2,0,4)\"",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
+                    Field    => 'Fulltext',
                     Operator => 'STARTSWITH',
-                    Value    => substr($ContactFirstName3,0,4)
+                    Value    => q{"} . substr($To2,0,4) . q{"}
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$Body2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'ENDSWITH',
+                    Value    => q{"} . $Body2 . q{"}
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$Body2,-5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'ENDSWITH',
+                    Value    => q{"} . substr($Body2,-5) . q{"}
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$Title3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'CONTAINS',
+                    Value    => q{"} . $Title3 . q{"}
                 }
             ]
         },
         Expected => [$TicketID3]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value \$ContactFirstName2",
+        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$Title3,2,-2)",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $ContactFirstName2
+                    Field    => 'Fulltext',
+                    Operator => 'CONTAINS',
+                    Value    => q{"} . substr($Title3,2,-2) . q{"}
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value substr(\$ContactFirstName1,-5)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Subject1",
         Search   => {
             'AND' => [
                 {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($ContactFirstName1,-5)
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => q{"} . $Subject1 . q{"}
                 }
             ]
         },
         Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value substr(\$ContactFirstName3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($ContactFirstName3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID3]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator LIKE / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'LIKE',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator STARTSWITH / Value substr(\$ContactLastName3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($ContactLastName3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator ENDSWITH / Value substr(\$ContactLastName1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($ContactLastName1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator CONTAINS / Value substr(\$ContactLastName3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($ContactLastName3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OwnerFulltext / Operator LIKE / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OwnerFulltext',
-                    Operator => 'LIKE',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value substr(\$UserLogin3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($UserLogin3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value substr(\$UserLogin1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($UserLogin1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value substr(\$UserLogin3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($UserLogin3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator LIKE / Value \$UserLogin2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'LIKE',
-                    Value    => $UserLogin2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value substr(\$ContactFirstName3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($ContactFirstName3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value substr(\$ContactFirstName1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($ContactFirstName1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value substr(\$ContactFirstName3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($ContactFirstName3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator LIKE / Value \$ContactFirstName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'LIKE',
-                    Value    => $ContactFirstName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator STARTSWITH / Value substr(\$ContactLastName3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($ContactLastName3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator ENDSWITH / Value substr(\$ContactLastName1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($ContactLastName1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator CONTAINS / Value substr(\$ContactLastName3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($ContactLastName3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field ResponsibleFulltext / Operator LIKE / Value \$ContactLastName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'ResponsibleFulltext',
-                    Operator => 'LIKE',
-                    Value    => $ContactLastName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator STARTSWITH / Value \$OrgaName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $OrgaName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator STARTSWITH / Value substr(\$OrgaName3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($OrgaName3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator ENDSWITH / Value \$OrgaName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $OrgaName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator ENDSWITH / Value substr(\$OrgaName1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($OrgaName1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator CONTAINS / Value \$OrgaName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $OrgaName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator CONTAINS / Value substr(\$OrgaName3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($OrgaName3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator LIKE / Value \$OrgaName2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'LIKE',
-                    Value    => $OrgaName2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator STARTSWITH / Value \$OrgaNumber2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $OrgaNumber2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator STARTSWITH / Value substr(\$OrgaNumber3,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($OrgaNumber3,0,4)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator ENDSWITH / Value \$OrgaNumber2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $OrgaNumber2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator ENDSWITH / Value substr(\$OrgaNumber1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($OrgaNumber1,-5)
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator CONTAINS / Value \$OrgaNumber2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $OrgaNumber2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator CONTAINS / Value substr(\$OrgaNumber3,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($OrgaNumber3,2,-2)
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
-    },
-    {
-        Name     => "Search: Field OrganisationFulltext / Operator LIKE / Value \$OrgaNumber2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'OrganisationFulltext',
-                    Operator => 'LIKE',
-                    Value    => $OrgaNumber2
-                }
-            ]
-        },
-        Expected => [$TicketID2]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

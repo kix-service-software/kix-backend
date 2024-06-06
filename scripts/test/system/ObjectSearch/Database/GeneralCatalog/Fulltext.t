@@ -49,6 +49,13 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
 # check Search
 my @SearchTests = (
     {
@@ -110,20 +117,9 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Name',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'Class',
-                        'Operator' => 'STARTSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Where' => [
+                '(LOWER(gc.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
@@ -134,20 +130,9 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Name',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'Class',
-                        'Operator' => 'ENDSWITH',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Where' => [
+                '(LOWER(gc.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
@@ -158,20 +143,9 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Name',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'Class',
-                        'Operator' => 'CONTAINS',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Where' => [
+                '(LOWER(gc.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+            ]
         }
     },
     {
@@ -182,20 +156,9 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field'    => 'Name',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    },
-                    {
-                        'Field'    => 'Class',
-                        'Operator' => 'LIKE',
-                        'Value'    => 'Test'
-                    }
-                ]
-            }
+            'Where' => [
+                '(LOWER(gc.name) = LOWER(\'Test\') OR LOWER(gc.general_catalog_class) = LOWER(\'Test\')) '
+            ]
         }
     }
 );

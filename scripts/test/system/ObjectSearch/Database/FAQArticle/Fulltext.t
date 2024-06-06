@@ -50,6 +50,13 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
 # check Search
 my @SearchTests = (
     {
@@ -112,7 +119,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'Test%\')  OR LOWER(f.f_subject) LIKE LOWER(\'Test%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field1) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field2) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field3) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field4) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field5) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -125,7 +132,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'Test%\')  OR LOWER(f.f_subject) LIKE LOWER(\'Test%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field1) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field2) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field3) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field4) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field5) LIKE LOWER(\'Test%\')  OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') )  AND (LOWER(f.f_number) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_subject) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field1) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field2) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field3) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field4) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field5) LIKE LOWER(\'Foo%\')  OR LOWER(f.f_field6) LIKE LOWER(\'Foo%\') ) ) OR ((LOWER(f.f_number) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_subject) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field1) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field2) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field3) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field4) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field5) LIKE LOWER(\'Baa%\')  OR LOWER(f.f_field6) LIKE LOWER(\'Baa%\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -138,7 +145,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_subject) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field1) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field2) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field3) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field4) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field5) LIKE LOWER(\'%TEST\')  OR LOWER(f.f_field6) LIKE LOWER(\'%TEST\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -151,7 +158,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'%Test\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Test\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Test\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Test\') )  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Foo\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Foo\') ) ) OR ((LOWER(f.f_number) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Baa\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Baa\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -164,7 +171,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Test%\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -177,7 +184,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Test%\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Test%\') )  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Foo%\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Foo%\') ) ) OR ((LOWER(f.f_number) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_subject) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field1) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field2) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field3) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field4) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field5) LIKE LOWER(\'%Baa%\')  OR LOWER(f.f_field6) LIKE LOWER(\'%Baa%\') ) ))'
+                '(LOWER(f.f_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     },
@@ -190,7 +197,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\')) ))'
+                '(LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\')) '
             ]
         }
     },
@@ -203,7 +210,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(((LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\'))  AND (LOWER(f.f_number) = LOWER(\'Foo\') OR LOWER(f.f_subject) = LOWER(\'Foo\') OR LOWER(f.f_keywords) = LOWER(\'Foo\') OR LOWER(f.f_field1) = LOWER(\'Foo\') OR LOWER(f.f_field2) = LOWER(\'Foo\') OR LOWER(f.f_field3) = LOWER(\'Foo\') OR LOWER(f.f_field4) = LOWER(\'Foo\') OR LOWER(f.f_field5) = LOWER(\'Foo\') OR LOWER(f.f_field6) = LOWER(\'Foo\')) ) OR ((LOWER(f.f_number) = LOWER(\'Baa\') OR LOWER(f.f_subject) = LOWER(\'Baa\') OR LOWER(f.f_keywords) = LOWER(\'Baa\') OR LOWER(f.f_field1) = LOWER(\'Baa\') OR LOWER(f.f_field2) = LOWER(\'Baa\') OR LOWER(f.f_field3) = LOWER(\'Baa\') OR LOWER(f.f_field4) = LOWER(\'Baa\') OR LOWER(f.f_field5) = LOWER(\'Baa\') OR LOWER(f.f_field6) = LOWER(\'Baa\')) ))'
+                '(LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\'))  AND (LOWER(f.f_number) = LOWER(\'Foo\') OR LOWER(f.f_subject) = LOWER(\'Foo\') OR LOWER(f.f_keywords) = LOWER(\'Foo\') OR LOWER(f.f_field1) = LOWER(\'Foo\') OR LOWER(f.f_field2) = LOWER(\'Foo\') OR LOWER(f.f_field3) = LOWER(\'Foo\') OR LOWER(f.f_field4) = LOWER(\'Foo\') OR LOWER(f.f_field5) = LOWER(\'Foo\') OR LOWER(f.f_field6) = LOWER(\'Foo\'))  OR (LOWER(f.f_number) = LOWER(\'Baa\') OR LOWER(f.f_subject) = LOWER(\'Baa\') OR LOWER(f.f_keywords) = LOWER(\'Baa\') OR LOWER(f.f_field1) = LOWER(\'Baa\') OR LOWER(f.f_field2) = LOWER(\'Baa\') OR LOWER(f.f_field3) = LOWER(\'Baa\') OR LOWER(f.f_field4) = LOWER(\'Baa\') OR LOWER(f.f_field5) = LOWER(\'Baa\') OR LOWER(f.f_field6) = LOWER(\'Baa\')) '
             ]
         }
     },

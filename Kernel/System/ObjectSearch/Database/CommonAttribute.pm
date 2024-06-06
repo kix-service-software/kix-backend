@@ -1079,7 +1079,7 @@ sub _FulltextCondition {
 
     for my $Needed (
         qw(
-            Operator Columns Value
+            Operator Value
         )
     ) {
         # check needed stuff
@@ -1094,11 +1094,57 @@ sub _FulltextCondition {
         }
     }
 
-    if ( !IsArrayRefWithData($Param{Columns}) ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
+    my @Columns;
+    my %StaticColumns;
+    if ( defined $Param{Columns} ) {
+        if ( !$Param{Columns} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need Columns!"
+                );
+            }
+            return;
+        }
+        elsif ( !IsArrayRefWithData($Param{Columns}) ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Columns is not a array ref!"
+                );
+            }
+            return;
+        }
+        push (@Columns, @{$Param{Columns}});
+    }
+
+    if ( $Param{IsStaticSearch} ) {
+        if ( !$Param{StaticColumns} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need StaticColumns!"
+                );
+            }
+            return;
+        }
+        elsif ( !IsArrayRefWithData($Param{StaticColumns}) ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "StaticColumns is not a array ref!"
+                );
+            }
+            return;
+        }
+        push (@Columns, @{$Param{StaticColumns}});
+        %StaticColumns = map { $_ => 1 } @{$Param{StaticColumns}};
+    }
+
+    if ( !scalar( @Columns ) ) {if ( !$Param{Silent} ) {
+        $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Columns is not a array ref!"
+                Message  => "Need Columns!"
             );
         }
         return;
@@ -1137,29 +1183,43 @@ sub _FulltextCondition {
     my $NoWildcard    = $OperationMap{$Param{Operator}}->{NoWildcard} || 0;
     my $CaseSensitive = $Param{CaseSensitive} || 0;
 
-    # remove leading/trailing spaces
-    $Param{Value} =~ s/^\s+//g;
-    $Param{Value} =~ s/\s+$//g;
-
     # escape backslash characters from $Word
     $Param{Value} =~ s{\\}{\\\\}smxg;
 
     # escape slq wildcard
     $Param{Value} =~ s{%}{\\%}smxg;
 
-    # quote ".+?" expressions
+    # quote '([^"]?)"([^"]*?)(?:"|$)([^"]?)' expressions
     # for example ("some and me" AND !some), so "some and me" is used for search 1:1
     my $Count = 0;
     my %Expression;
     $Param{Value} =~ s{
-        "([^"]+?)(?:"|$)
+        ([^"]?)"([^"]*?)(?:"|$)([^"]?)
     }
     {
         $Count++;
-        my $Item = $1;
-        $Expression{"###$Count###"} = $Item;
-        "###$Count###";
-    }egx;
+        my $Prefix = $1;
+        my $Item   = $2;
+        my $Suffix = $3;
+        if ( defined $Expression{$Item} ) {
+            $Count++;
+        }
+        my $Result = "###$Count###";
+        $Expression{$Result} = $Item;
+        if (
+            $Prefix !~ /[&|+\s]/
+            && $Prefix ne q{}
+        ){
+            $Prefix = "$Prefix&";
+        }
+        if (
+            $Suffix !~ /[&|+\s]/
+            && $Suffix ne q{}
+        ){
+            $Suffix = "&$Suffix";
+        }
+        "$Prefix$Result$Suffix";
+    }egx;+
 
     my $Value = $Self->_FulltextValueCleanUp(
         Value      => $Param{Value},
@@ -1214,7 +1274,7 @@ sub _FulltextCondition {
         if ( $Word ne q{} ) {
 
             # replace word if it's an "some expression" expression
-            if ( $Expression{$Word} ) {
+            if ( defined $Expression{$Word} ) {
                 $Word = $Expression{$Word};
             }
 
@@ -1228,7 +1288,7 @@ sub _FulltextCondition {
                 $Not = 0;
 
                 my $SQLA;
-                for my $Column (@{$Param{Columns}}) {
+                for my $Column (@Columns) {
                     if ($SQLA) {
                         $SQLA .= ' AND ';
                     }
@@ -1245,7 +1305,7 @@ sub _FulltextCondition {
                         Column         => $Column,
                         Silent         => $Param{Silent},
                         CaseSensitive  => $CaseSensitive,
-                        IsStaticSearch => $Param{IsStaticSearch}
+                        IsStaticSearch => $StaticColumns{$Column} || 0
                     );
 
                     if ( $Type eq 'NOT LIKE' ) {
@@ -1259,7 +1319,7 @@ sub _FulltextCondition {
             # if it's a LIKE condition
             else {
                 my $SQLA;
-                for my $Column (@{$Param{Columns}}) {
+                for my $Column (@Columns) {
                     if ($SQLA) {
                         $SQLA .= ' OR ';
                     }
@@ -1276,7 +1336,7 @@ sub _FulltextCondition {
                         Column         => $Column,
                         Silent         => $Param{Silent},
                         CaseSensitive  => $CaseSensitive,
-                        IsStaticSearch => $Param{IsStaticSearch}
+                        IsStaticSearch => $StaticColumns{$Column} || 0
                     );
 
                     if ( $Type eq 'LIKE' ) {
@@ -1330,6 +1390,9 @@ sub _FulltextValueCleanUp {
     my ( $Self, %Param ) = @_;
 
     my $Value = $Param{Value};
+    # remove leading/trailing spaces
+    $Value =~ s/^\s+//g;
+    $Value =~ s/\s+$//g;
 
     # replace multiple spaces by &&
     $Value =~ s/\s+/&/g;
@@ -1407,11 +1470,11 @@ sub _FulltextColumnSQL {
         }
     }
 
-    my $Column        = $Param{Column};
-    my $Type          = $Param{Type};
-    my $Word          = $Param{Word} || q{};
-    my $SQL           = q{};
-    my $CaseSensitive = $Param{CaseSensitive} || 0;
+    my $Column          = $Param{Column};
+    my $Type            = $Param{Type};
+    my $Word            = $Param{Word} || q{};
+    my $SQL             = q{};
+    my $CaseSensitive   = $Param{CaseSensitive} || 0;
 
     $Word = q{'} . $Word . q{'};
 
