@@ -153,12 +153,12 @@
         },
         "SMIMEEncryptedError": {
             "type": "string",
-            "description": "error string if article is a encrypted email article but could not be decrypted",
+            "description": "error string if article is an encrypted email article but could not be decrypted",
             "readOnly": true
         },
         "SMIMESigned": {
             "type": "integer",
-            "description": "1 if article is an signed email article",
+            "description": "1 if article is a signed email article",
             "readOnly": true
         },
         "SMIMESignedError": {
