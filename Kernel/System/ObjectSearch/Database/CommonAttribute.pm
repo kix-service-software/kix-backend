@@ -1095,7 +1095,7 @@ sub _FulltextCondition {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Columns is not a array ref or empty!"
+                    Message  => "Columns is not an array ref or empty!"
                 );
             }
             return;
@@ -1108,7 +1108,7 @@ sub _FulltextCondition {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "StaticColumns is not a array ref or empty!"
+                    Message  => "StaticColumns is not an array ref or empty!"
                 );
             }
             return;
