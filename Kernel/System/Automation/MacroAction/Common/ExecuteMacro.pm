@@ -89,15 +89,6 @@ sub Run {
             %Param,
             Value => $Param{Config}->{ObjectID} || ''
         );
-
-        if ( $Param{Config}->{ObjectID} !~ /^\d+$/ ) {
-            $Kernel::OM->Get('Automation')->LogError(
-                Referrer => $Self,
-                Message  => "ExecuteMacro: ObjectID \"$Param{Config}->{ObjectID}\" isn't numeric! It can't be used as ObjectID for the macro to be executed.",
-                UserID   => $Param{UserID}
-            );
-            return;
-        }
     }
 
     # FIXME: use given instance
