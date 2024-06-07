@@ -181,7 +181,7 @@ sub Search {
         Silent => $Param{Silent}
     );
     return if ( !$SQL );
-print STDERR Data::Dumper::Dumper( "ObjectSearch SQL-Statement: $SQL" );
+
     if ( $Self->{Debug} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',

@@ -144,7 +144,6 @@ for my $Test ( @SearchTests ) {
         UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
-    print STDERR Data::Dumper::Dumper($Result);
     $Self->IsDeeply(
         $Result,
         $Test->{Expected},
