@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }

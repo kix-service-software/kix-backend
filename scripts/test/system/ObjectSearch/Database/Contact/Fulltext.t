@@ -43,7 +43,7 @@ $Self->IsDeeply(
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -110,60 +110,6 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT JOIN users u0 ON c.user_id = u0.id',
-                'LEFT JOIN contact_organisation co0 ON c.id = co0.contact_id',
-                'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
-            ],
-            'Where' => [
-                '(LOWER(c.firstname) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT JOIN users u0 ON c.user_id = u0.id',
-                'LEFT JOIN contact_organisation co0 ON c.id = co0.contact_id',
-                'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
-            ],
-            'Where' => [
-                '(LOWER(c.firstname) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT JOIN users u0 ON c.user_id = u0.id',
-                'LEFT JOIN contact_organisation co0 ON c.id = co0.contact_id',
-                'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
-            ],
-            'Where' => [
-                '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
         Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
@@ -177,7 +123,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(LOWER(c.firstname) = LOWER(\'Test\') OR LOWER(c.lastname) = LOWER(\'Test\') OR LOWER(c.email) = LOWER(\'Test\') OR LOWER(c.email1) = LOWER(\'Test\') OR LOWER(c.email2) = LOWER(\'Test\') OR LOWER(c.email3) = LOWER(\'Test\') OR LOWER(c.email4) = LOWER(\'Test\') OR LOWER(c.email5) = LOWER(\'Test\') OR LOWER(c.title) = LOWER(\'Test\') OR LOWER(c.phone) = LOWER(\'Test\') OR LOWER(c.fax) = LOWER(\'Test\') OR LOWER(c.mobile) = LOWER(\'Test\') OR LOWER(c.street) = LOWER(\'Test\') OR LOWER(c.city) = LOWER(\'Test\') OR LOWER(c.zip) = LOWER(\'Test\') OR LOWER(c.country) = LOWER(\'Test\') OR LOWER(u0.login) = LOWER(\'Test\') OR LOWER(o0.number) = LOWER(\'Test\') OR LOWER(o0.name) = LOWER(\'Test\')) '
+                '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
@@ -320,77 +266,12 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$TestData1",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$TestData1,2,-2)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $TestData1
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr(\$TestData1,0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($TestData1,0,4)
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$TestData1",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $TestData1
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$TestData1,-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($TestData1,-5)
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$TestData1",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $TestData1
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$TestData1,2,-2)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
+                    Operator => 'LIKE',
                     Value    => substr($TestData1,2,-2)
                 }
             ]
@@ -411,45 +292,6 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$TestData2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$TestData2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$TestData2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
-    },
-    {
         Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData2",
         Search   => {
             'AND' => [
@@ -460,46 +302,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$TestData3",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $TestData3
-                }
-            ]
-        },
-        Expected => [$ContactID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$TestData3",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $TestData3
-                }
-            ]
-        },
-        Expected => [$ContactID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$TestData3",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $TestData3
-                }
-            ]
-        },
-        Expected => [$ContactID2]
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData3",

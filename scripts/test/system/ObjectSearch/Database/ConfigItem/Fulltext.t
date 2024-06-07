@@ -44,7 +44,7 @@ $Self->IsDeeply(
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -68,7 +68,7 @@ my @SearchTests = (
         Name         => 'Search: Value undef',
         Search       => {
             Field    => 'Fulltext',
-            Operator => 'CONTAINS',
+            Operator => 'LIKE',
             Value    => undef
 
         },
@@ -78,7 +78,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'CONTAINS',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -87,7 +87,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'CONTAINS',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -111,45 +111,6 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(ci.name) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(ci.name) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(ci.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
         Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
@@ -158,7 +119,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(ci.name) = LOWER(\'Test\') OR LOWER(ci.configitem_number) = LOWER(\'Test\')) '
+                '(LOWER(ci.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
@@ -326,77 +287,12 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value $ConfigItemName3',
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value substr($ConfigItemName3,2,-2)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $ConfigItemName3
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value substr($ConfigItemName3,0,4)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($ConfigItemName3,0,4)
-                }
-            ]
-        },
-        Expected => [$ConfigItemID1,$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value $ConfigItemName3',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $ConfigItemName3
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value substr($ConfigItemName3,-5)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($ConfigItemName3,-5)
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value $ConfigItemName3',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $ConfigItemName3
-                }
-            ]
-        },
-        Expected => [$ConfigItemID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value substr($ConfigItemName3,2,-2)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
+                    Operator => 'LIKE',
                     Value    => substr($ConfigItemName3,2,-2)
                 }
             ]

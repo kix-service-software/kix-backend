@@ -44,7 +44,7 @@ $Self->IsDeeply(
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -68,7 +68,7 @@ my @SearchTests = (
         Name         => 'Search: Value undef',
         Search       => {
             Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
+            Operator => 'LIKE',
             Value    => undef
 
         },
@@ -78,7 +78,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'STARTSWITH',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -87,7 +87,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'STARTSWITH',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -111,62 +111,10 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
+        Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH / with special inline operators',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test+Foo|Baa'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Foo%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'Baa%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'TEST'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%TEST\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH / with special inline operators',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test+Foo|Baa'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Test\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Foo\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Baa\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'CONTAINS',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => {
@@ -176,41 +124,15 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS / with special inline operators',
+        Name         => 'Search: valid search / Field Fulltext / Operator LIKE / with special inline operators',
         Search       => {
             Field    => 'Fulltext',
-            Operator => 'CONTAINS',
+            Operator => 'LIKE',
             Value    => 'Test+Foo|Baa'
         },
         Expected     => {
             'Where' => [
                 '(LOWER(f.f_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\')  AND (LOWER(f.f_number) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Foo%\') ESCAPE \'' . $Escape . '\')  OR (LOWER(f.f_number) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_subject) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_keywords) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field1) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field2) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field3) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field4) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field5) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\' OR LOWER(f.f_field6) LIKE LOWER(\'%Baa%\') ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\')) '
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH / with special inline operators',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'LIKE',
-            Value    => 'Test+Foo|Baa'
-        },
-        Expected     => {
-            'Where' => [
-                '(LOWER(f.f_number) = LOWER(\'Test\') OR LOWER(f.f_subject) = LOWER(\'Test\') OR LOWER(f.f_keywords) = LOWER(\'Test\') OR LOWER(f.f_field1) = LOWER(\'Test\') OR LOWER(f.f_field2) = LOWER(\'Test\') OR LOWER(f.f_field3) = LOWER(\'Test\') OR LOWER(f.f_field4) = LOWER(\'Test\') OR LOWER(f.f_field5) = LOWER(\'Test\') OR LOWER(f.f_field6) = LOWER(\'Test\'))  AND (LOWER(f.f_number) = LOWER(\'Foo\') OR LOWER(f.f_subject) = LOWER(\'Foo\') OR LOWER(f.f_keywords) = LOWER(\'Foo\') OR LOWER(f.f_field1) = LOWER(\'Foo\') OR LOWER(f.f_field2) = LOWER(\'Foo\') OR LOWER(f.f_field3) = LOWER(\'Foo\') OR LOWER(f.f_field4) = LOWER(\'Foo\') OR LOWER(f.f_field5) = LOWER(\'Foo\') OR LOWER(f.f_field6) = LOWER(\'Foo\'))  OR (LOWER(f.f_number) = LOWER(\'Baa\') OR LOWER(f.f_subject) = LOWER(\'Baa\') OR LOWER(f.f_keywords) = LOWER(\'Baa\') OR LOWER(f.f_field1) = LOWER(\'Baa\') OR LOWER(f.f_field2) = LOWER(\'Baa\') OR LOWER(f.f_field3) = LOWER(\'Baa\') OR LOWER(f.f_field4) = LOWER(\'Baa\') OR LOWER(f.f_field5) = LOWER(\'Baa\') OR LOWER(f.f_field6) = LOWER(\'Baa\')) '
             ]
         }
     },
@@ -222,6 +144,7 @@ for my $Test ( @SearchTests ) {
         UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
+    print STDERR Data::Dumper::Dumper($Result);
     $Self->IsDeeply(
         $Result,
         $Test->{Expected},
@@ -336,25 +259,12 @@ $Self->True(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value 'Test'",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr('Unit Test',0,4)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => 'Test'
-                }
-            ]
-        },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr('Unit Test',0,4)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
+                    Operator => 'LIKE',
                     Value    => substr('Unit Test',0,4)
                 }
             ]
@@ -362,51 +272,25 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID2,$FAQArticleID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value 'Baa'",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr('Unit Test',-5)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => 'Baa'
-                }
-            ]
-        },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr('Unit Test',-5)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
+                    Operator => 'LIKE',
                     Value    => substr('Unit Test',-5)
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value 'Test'",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => 'Test'
-                }
-            ]
-        },
         Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr('Unit Test,2,-2)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr('Unit Test,2,-2)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
+                    Operator => 'LIKE',
                     Value    => substr('Unit Test',2,-2)
                 }
             ]
@@ -424,7 +308,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => "Search: Field Fulltext / Operator LIKE / Value 'Foo|Unit*'",
