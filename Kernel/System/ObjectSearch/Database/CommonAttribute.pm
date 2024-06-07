@@ -1077,40 +1077,25 @@ generate SQL condition query based on a search expression
 sub _FulltextCondition {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (
-        qw(
-            Operator Value
-        )
-    ) {
-        # check needed stuff
-        if ( !defined $Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed!"
-                );
-            }
-            return;
+    # check needed stuff
+    if ( !defined $Param{Value} ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Value!"
+            );
         }
+        return;
     }
 
     my @Columns;
     my %StaticColumns;
     if ( defined $Param{Columns} ) {
-        if ( !$Param{Columns} ) {
+        if ( !IsArrayRefWithData($Param{Columns}) ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Need Columns!"
-                );
-            }
-            return;
-        }
-        elsif ( !IsArrayRefWithData($Param{Columns}) ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Columns is not a array ref!"
+                    Message  => "Columns is not a array ref or empty!"
                 );
             }
             return;
@@ -1119,20 +1104,11 @@ sub _FulltextCondition {
     }
 
     if ( $Param{IsStaticSearch} ) {
-        if ( !$Param{StaticColumns} ) {
+        if ( !IsArrayRefWithData($Param{StaticColumns}) ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "Need StaticColumns!"
-                );
-            }
-            return;
-        }
-        elsif ( !IsArrayRefWithData($Param{StaticColumns}) ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "StaticColumns is not a array ref!"
+                    Message  => "StaticColumns is not a array ref or empty!"
                 );
             }
             return;
@@ -1141,8 +1117,9 @@ sub _FulltextCondition {
         %StaticColumns = map { $_ => 1 } @{$Param{StaticColumns}};
     }
 
-    if ( !scalar( @Columns ) ) {if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
+    if ( !scalar( @Columns ) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need Columns!"
             );
@@ -1150,37 +1127,7 @@ sub _FulltextCondition {
         return;
     }
 
-    my %OperationMap = (
-        CONTAINS => {
-            Prefix     => q{%},
-            Suffix     => q{%},
-            NoWildcard => 1
-        },
-        ENDSWITH => {
-            Prefix     => q{%},
-            NoWildcard => 1
-        },
-        STARTSWITH => {
-            Suffix     => q{%},
-            NoWildcard => 1
-        },
-        LIKE => {}
-    );
-
-    if ( !$OperationMap{$Param{Operator}} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Operation $Param{Operator} not supported!"
-            );
-        }
-        return;
-    }
-
-    # search prefix/suffix check
-    my $Prefix        = $OperationMap{$Param{Operator}}->{Prefix}     || q{};
-    my $Suffix        = $OperationMap{$Param{Operator}}->{Suffix}     || q{};
-    my $NoWildcard    = $OperationMap{$Param{Operator}}->{NoWildcard} || 0;
+    # set case sensitive
     my $CaseSensitive = $Param{CaseSensitive} || 0;
 
     # escape backslash characters from $Word
@@ -1201,10 +1148,12 @@ sub _FulltextCondition {
         my $Prefix = $1;
         my $Item   = $2;
         my $Suffix = $3;
-        if ( defined $Expression{$Item} ) {
+        my $Result;
+        do {
             $Count++;
-        }
-        my $Result = "###$Count###";
+            $Result = "###$Count###";
+        } while ( $Param{Value} =~ m/$Result/ );
+
         $Expression{$Result} = $Item;
         if (
             $Prefix !~ /[&|+\s]/
@@ -1222,9 +1171,8 @@ sub _FulltextCondition {
     }egx;+
 
     my $Value = $Self->_FulltextValueCleanUp(
-        Value      => $Param{Value},
-        NoWildcard => $NoWildcard,
-        Silent     => $Param{Silent}
+        Value  => $Param{Value},
+        Silent => $Param{Silent}
     );
 
     # for processing
@@ -1281,7 +1229,7 @@ sub _FulltextCondition {
             $Word = $Kernel::OM->Get('DB')->Quote( $Word, 'Like' );
 
             # database quote
-            $Word = $Prefix . $Word . $Suffix;
+            $Word = q{%} . $Word . q{%};
 
             # if it's a NOT LIKE condition
             if ($Not) {
@@ -1401,9 +1349,7 @@ sub _FulltextValueCleanUp {
     $Value =~ s/\+/&/g;
 
     # replace * with % (for SQL)
-    if ( !$Param{NoWildcard} ) {
-        $Value =~ s/\*/%/g;
-    }
+    $Value =~ s/\*/%/g;
 
     # remove double %% (also if there is only whitespace in between)
     $Value =~ s/%\s*%/%/g;
@@ -1470,11 +1416,11 @@ sub _FulltextColumnSQL {
         }
     }
 
-    my $Column          = $Param{Column};
-    my $Type            = $Param{Type};
-    my $Word            = $Param{Word} || q{};
-    my $SQL             = q{};
-    my $CaseSensitive   = $Param{CaseSensitive} || 0;
+    my $Column        = $Param{Column};
+    my $Type          = $Param{Type};
+    my $Word          = $Param{Word} || q{};
+    my $SQL           = q{};
+    my $CaseSensitive = $Param{CaseSensitive} || 0;
 
     $Word = q{'} . $Word . q{'};
 

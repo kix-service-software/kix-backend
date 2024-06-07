@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }
@@ -91,7 +91,6 @@ sub Search {
     # inlcudes related columns of other tables:
     # table article: To, Cc, From, Body and Subject
     my $Condition = $Self->_FulltextCondition(
-        Operator       => $Param{Search}->{Operator},
         Value          => $Param{Search}->{Value},
         Columns        => [
             'st.tn', 'st.title'
@@ -101,8 +100,8 @@ sub Search {
             $TableAliasPrefix . 'ta.a_from', $TableAliasPrefix . 'ta.a_body',
             $TableAliasPrefix . 'ta.a_subject'
         ],
-        Silent          => $Param{Silent},
-        IsStaticSearch  => $IsStaticSearch
+        Silent         => $Param{Silent},
+        IsStaticSearch => $IsStaticSearch
     );
 
     return if ( !$Condition );

@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }
@@ -51,12 +51,11 @@ sub Search {
     # Name and Number
     # searching in older versions is currently not intended
     my $Condition = $Self->_FulltextCondition(
-        Operator      => $Param{Search}->{Operator},
-        Value         => $Param{Search}->{Value},
-        Columns       => [
+        Value   => $Param{Search}->{Value},
+        Columns => [
             'ci.name', 'ci.configitem_number'
         ],
-        Silent        => $Param{Silent}
+        Silent  => $Param{Silent}
     );
 
     return if ( !$Condition );

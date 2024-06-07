@@ -347,7 +347,6 @@ my $CertID5 = $List[4]->{FileID};
 my $SearchValue1 = $List[0]->{Subject};
 my $SearchValue2 = $List[2]->{Email};
 my $SearchValue3 = $List[3]->{Subject};
-print STDERR Data::Dumper::Dumper(\@List);
 
 # discard contact object to process events
 $Kernel::OM->ObjectsDiscard(

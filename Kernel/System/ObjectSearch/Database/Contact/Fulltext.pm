@@ -54,7 +54,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         },
     };
 }
@@ -124,15 +124,15 @@ sub Search {
     # table users: Login
     # table organisation: Number and Name
     my $Condition = $Self->_FulltextCondition(
-        Columns       => [
+        Columns => [
             'c.firstname', 'c.lastname',
             'c.email','c.email1','c.email2','c.email3','c.email4','c.email5',
             'c.title','c.phone','c.fax','c.mobile',
             'c.street','c.city','c.zip','c.country',
             "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
         ],
-        Operator      => $Param{Search}->{Operator},
-        Value         => $Param{Search}->{Value}
+        Value   => $Param{Search}->{Value},
+        Silent  => $Param{Silent}
     );
 
     return {

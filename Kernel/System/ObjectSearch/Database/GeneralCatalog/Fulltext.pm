@@ -50,12 +50,11 @@ sub Search {
     # fixed search in the  following columns:
     # Name and Class
     my $Condition = $Self->_FulltextCondition(
-        Columns       => [
+        Columns => [
             'gc.name', 'gc.general_catalog_class'
         ],
-        Operator      => $Param{Search}->{Operator},
-        Value         => $Param{Search}->{Value},
-        Silent        => $Param{Silent}
+        Value   => $Param{Search}->{Value},
+        Silent  => $Param{Silent}
     );
 
     return {

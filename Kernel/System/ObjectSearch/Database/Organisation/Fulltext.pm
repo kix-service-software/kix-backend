@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }
@@ -50,13 +50,12 @@ sub Search {
     # fixed search in the  following columns:
     # Name, Number, Street, City, Zip, URL and Country
     my $Condition = $Self->_FulltextCondition(
-        Operator      => $Param{Search}->{Operator},
-        Value         => $Param{Search}->{Value},
-        Columns       => [
+        Value   => $Param{Search}->{Value},
+        Columns => [
             'o.name', 'o.number', 'o.street', 'o.city',
             'o.zip', 'o.url', 'o.country'
         ],
-        Silent        => $Param{Silent}
+        Silent  => $Param{Silent}
     );
 
     return if ( !$Condition );

@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }
@@ -81,10 +81,9 @@ sub Search {
     # fixed search in the  following columns:
     # preferences_value (depending on the table prefix and requested preferences_key)
     my $Condition = $Self->_FulltextCondition(
-        Operator      => $Param{Search}->{Operator},
-        Columns       => [ "$TableAlias.preferences_value" ],
-        Value         => $Param{Search}->{Value},
-        Silent        => $Param{Silent}
+        Columns => [ "$TableAlias.preferences_value" ],
+        Value   => $Param{Search}->{Value},
+        Silent  => $Param{Silent}
     );
 
     return if ( !$Condition );
