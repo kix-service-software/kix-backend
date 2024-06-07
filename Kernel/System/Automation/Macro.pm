@@ -636,7 +636,7 @@ sub MacroExecute {
     my $OrgObjectID;
     if (
         $Self->{MacroResults}->{ObjectID} &&
-        $Self->{MacroResults}->{ObjectID} != $Param{ObjectID}
+        "$Self->{MacroResults}->{ObjectID}" ne "$Param{ObjectID}"
     ) {
         $OrgObjectID = $Self->{MacroResults}->{ObjectID};
         $Self->{MacroResults}->{ObjectID} = $Param{ObjectID};

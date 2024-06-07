@@ -116,6 +116,14 @@ my @Tests = (
         Result => 'True',
     },
     {
+        Name   => 'Valid MacroID, string as ObjectID',
+        Input  => {
+            MacroID  => $MacroIDCheck,
+            ObjectID => 'Test',
+        },
+        Result => 'True',
+    },
+    {
         Name   => 'Invalid MacroID',
         Input  => {
             MacroID  => -1,
