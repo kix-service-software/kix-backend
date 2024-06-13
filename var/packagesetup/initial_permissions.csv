@@ -142,6 +142,7 @@
 "Ticket Agent Base Permission";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent Base Permission";"Base::Ticket";"*";;;;;
+"Ticket Agent Base Permission";"Resource";"/virtualfs";;"x";;;
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/1";;"x";;;
 "Ticket Agent (Servicedesk)";"Resource";"/system/ticket/queues/2";;"x";;;
 "Ticket Agent (Servicedesk)";"Object";"/tickets/*{Ticket.QueueID IN [1,2]}";"x";"x";"x";"x";
