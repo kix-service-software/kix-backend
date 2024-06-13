@@ -19,6 +19,7 @@ use Encode ();
 use Time::HiRes;
 
 use Kernel::Language qw(Translatable);
+use Kernel::System::PreEventHandler;
 use Kernel::System::EventHandler;
 use Kernel::System::Ticket::Article;
 use Kernel::System::Ticket::TicketIndex;
@@ -93,8 +94,18 @@ sub new {
         Kernel::System::Ticket::Article
         Kernel::System::Ticket::TicketIndex
         Kernel::System::Ticket::BasePermission
+        Kernel::System::PreEventHandler
         Kernel::System::EventHandler
         Kernel::System::PerfLog
+    );
+
+    # init of pre-event handler
+    $Self->PreEventHandlerInit(
+        Config     => 'Ticket::EventModulePre',
+        BaseObject => 'Ticket',
+        Objects    => {
+            %{$Self},
+        },
     );
 
     # init of event handler
@@ -850,6 +861,23 @@ sub TicketDelete {
     my $Success = $Self->TicketAccountedTimeDelete(
         TicketID => $Param{TicketID}
     );
+
+    # trigger event
+    my $PreEventResult = $Self->PreEventHandler(
+        Event => 'TicketDelete',
+        Data  => {
+            TicketID => $Param{TicketID},
+            OwnerID  => $Ticket{OwnerID},
+        },
+        UserID => $Param{UserID},
+    );
+    if ( ( ref($PreEventResult) eq 'HASH' ) && ( $PreEventResult->{Error} ) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Pre-TicketDelete refused deletion of ticket.",
+        );
+        return;
+    }
 
     # delete ticket
     return if !$DBObject->Do(
