@@ -15,7 +15,7 @@ use vars (qw($Self));
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Contact::Fulltext';
+my $AttributeModule = 'Kernel::System::ObjectSearch::Database::ConfigItem::Fulltext';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -32,14 +32,15 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . q{"}
+        'Attribute object can "' . $Method . '"'
     );
 }
 
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
@@ -66,8 +67,8 @@ my @SearchTests = (
     {
         Name         => 'Search: Value undef',
         Search       => {
-            Field    => 'Name',
-            Operator => 'EQ',
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
             Value    => undef
 
         },
@@ -77,7 +78,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -86,7 +87,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -94,7 +95,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator undef',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => undef,
             Value    => 'Test'
         },
@@ -103,7 +104,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator invalid',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => 'Test',
             Value    => 'Test'
         },
@@ -117,13 +118,8 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
-                'LEFT JOIN users u0 ON c.user_id = u0.id',
-                'LEFT JOIN contact_organisation co0 ON c.id = co0.contact_id',
-                'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
-            ],
             'Where' => [
-                '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+                '(LOWER(ci.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(ci.configitem_number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
@@ -131,6 +127,7 @@ my @SearchTests = (
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
+        Flags        => $Test->{Flags},
         BoolOperator => 'AND',
         UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
@@ -193,134 +190,132 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test contact ##
-my $TestData1 = 'Somewhere';
-my $TestData2 = 'unittest|Somecountry';
-my $TestData3 = '02687+23456|musterstadt';
+# prepare class mapping
+my $ClassRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class         => 'ITSM::ConfigItem::Class',
+    Name          => 'Building',
+    NoPreferences => 1
+);
 
-# first contact
-my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => 'Huber',
-    Lastname              => 'Manfred',
-    Email                 => 'hubert.manfred@unittest.com',
-    Phone                 => '123456789',
-    Fax                   => '123456789',
-    Mobile                => '123456789',
-    Street                => 'Somestreet 123',
-    Zip                   => '12345',
-    City                  => 'Somewhere',
-    Country               => 'Somecountry',
-    Comment               => 'some comment',
-    ValidID               => 1,
-    UserID                => 1
+# prepare depl state mapping
+my $DeplStateRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::ConfigItem::DeploymentState',
+    Name  => 'Production',
+);
+
+# prepare inci state mapping
+my $InciStateRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::Core::IncidentState',
+    Name  => 'Operational',
+);
+
+# prepare name mapping
+my $ConfigItemName1 = 'Test001';
+my $ConfigItemName2 = 'Test002';
+my $ConfigItemName3 = 'Test003';
+
+## prepare test assets ##
+# first asset
+my $ConfigItemID1 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
 );
 $Self->True(
-    $ContactID1,
-    'Created first contact'
+    $ConfigItemID1,
+    'Created first asset'
 );
-
-# second contact
-my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => 'Max',
-    Lastname              => 'Mustermann',
-    Email                 => 'max.mustermann@unittest.com',
-    Phone                 => '21569818864',
-    Street                => 'Some alle 123',
-    Zip                   => '23456',
-    City                  => 'musterstadt',
-    Country               => 'musterland',
-    Comment               => 'Some comment',
-    ValidID               => 1,
-    UserID                => 1
+my $VersionID1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID1,
+    Name         => $ConfigItemName1,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
 );
 $Self->True(
-    $ContactID1,
-    'Created second contact'
+    $VersionID1,
+    'Created version for first asset'
 );
-
-# third contact
-my $ContactID3 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => 'Ablert',
-    Lastname              => 'Round',
-    Email                 => 'albert.round@subtests.com',
-    Phone                 => '846 84 218 3',
-    Fax                   => '108 60615 18',
-    Mobile                => '578 7849',
-    Zip                   => '02687',
-    City                  => 'Somewhere',
-    Country               => 'Somecountry',
-    Comment               => 'some comment',
-    ValidID               => 1,
-    UserID                => 1
+# second asset
+my $ConfigItemID2 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
 );
 $Self->True(
-    $ContactID1,
-    'Created third contact'
+    $ConfigItemID2,
+    'Created second asset'
+);
+my $VersionID2_1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID2,
+    Name         => $ConfigItemName2,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
+);
+$Self->True(
+    $VersionID2_1,
+    'Created version for second asset'
+);
+my $VersionID2_2 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+    ConfigItemID => $ConfigItemID2,
+    Name         => $ConfigItemName3,
+    DefinitionID => 1,
+    DeplStateID  => $DeplStateRef->{ItemID},
+    InciStateID  => $InciStateRef->{ItemID},
+    UserID       => 1,
+);
+$Self->True(
+    $VersionID2_2,
+    'Created second version for second asset'
+);
+# third asset
+my $ConfigItemID3 = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    ClassID => $ClassRef->{ItemID},
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemID3,
+    'Created third asset'
 );
 
-# discard ticket object to process events
+# discard config item object to process events
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['Contact'],
+    Objects => ['ITSMConfigItem'],
 );
 
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$TestData1,2,-2)",
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value substr($ConfigItemName3,2,-2)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => substr($TestData1,2,-2)
+                    Value    => substr($ConfigItemName3,2,-2)
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID3]
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData1",
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value $ConfigItemName3',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $TestData1
+                    Value    => $ConfigItemName3
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'LIKE',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData3",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'LIKE',
-                    Value    => $TestData3
-                }
-            ]
-        },
-        Expected => [$ContactID2]
+        Expected => [$ConfigItemID2]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(
-        ObjectType => 'Contact',
+        ObjectType => 'ConfigItem',
         Result     => 'ARRAY',
         Search     => $Test->{Search},
         UserType   => 'Agent',
@@ -343,7 +338,7 @@ $Helper->Rollback();
 
 =back
 
-=head1 TERMS AND CONDITIONS
+=headTest TERMS AND CONDITIONS
 
 This software is part of the KIX project
 (L<https://www.kixdesk.com/>).

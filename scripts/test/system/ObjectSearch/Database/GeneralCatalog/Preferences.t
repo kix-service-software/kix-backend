@@ -65,6 +65,9 @@ $Self->True(
 $Kernel::OM->Get('Cache')->CleanUp(
     Type => 'GeneralCatalog'
 );
+$Kernel::OM->Get('Cache')->CleanUp(
+    Type => 'ObjectSearch_GeneralCatalog'
+);
 
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();

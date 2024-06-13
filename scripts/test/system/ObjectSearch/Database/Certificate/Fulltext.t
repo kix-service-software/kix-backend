@@ -43,11 +43,18 @@ $Self->IsDeeply(
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
 
 # check Search
 my @SearchTests = (
@@ -60,7 +67,7 @@ my @SearchTests = (
         Name         => 'Search: Value undef',
         Search       => {
             Field    => 'Name',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => undef
 
         },
@@ -70,7 +77,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -79,7 +86,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -103,57 +110,6 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN virtual_fs_preferences vfsp0 ON vfsp0.virtual_fs_id = vfs.id',
-                'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
-            ],
-            'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN virtual_fs_preferences vfsp0 ON vfsp0.virtual_fs_id = vfs.id',
-                'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
-            ],
-            'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN virtual_fs_preferences vfsp0 ON vfsp0.virtual_fs_id = vfs.id',
-                'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
-            ],
-            'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test%\''
-            ]
-        }
-    },
-    {
         Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
@@ -166,7 +122,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test\''
+                '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
@@ -349,169 +305,91 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$SearchValue1",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $SearchValue1
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr(\$SearchValue1,0,20)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue1,0,20)
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$SearchValue1",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $SearchValue1
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$SearchValue1,-10)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue1,-10)
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$SearchValue1",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $SearchValue1
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$SearchValue1,10,-10)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($SearchValue1,10,-10)
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2]
-    },
-    {
         Name     => "Search: Field Fulltext / Operator LIKE / Value \$SearchValue1",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue1
+                    Value    => q{"} . $SearchValue1 . q{"}
                 }
             ]
         },
         Expected => [$CertID1,$CertID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$SearchValue2",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue1,0,20)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $SearchValue2
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue1,0,20) . q{"}
                 }
             ]
         },
-        Expected => [$CertID1,$CertID2,$CertID3,$CertID5]
+        Expected => [$CertID1,$CertID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr(\$SearchValue2,0,4)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue1,-10)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue2,0,4)
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2,$CertID3,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$SearchValue2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $SearchValue2
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue1,-10) . q{"}
                 }
             ]
         },
         Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
     },
     {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$SearchValue2,-5)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue1,10,-10)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue2,-5)
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue1,10,-10) . q{"}
+                }
+            ]
+        },
+        Expected => [$CertID1,$CertID2]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue2,0,4)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue2,0,4) . q{"}
                 }
             ]
         },
         Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
     },
     {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$SearchValue2",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue2,-5)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $SearchValue2
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue2,-5) . q{"}
                 }
             ]
         },
         Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
     },
     {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$SearchValue2,2,-2)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue2,2,-2)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($SearchValue2,2,-2)
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue2,2,-2) . q{"}
                 }
             ]
         },
@@ -524,85 +402,46 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue2
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2,$CertID3,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value \$SearchValue2",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $SearchValue2
-                }
-            ]
-        },
-        Expected => [$CertID1,$CertID2,$CertID3,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator STARTSWITH / Value substr(\$SearchValue3,0,15)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => substr($SearchValue3,0,15)
-                }
-            ]
-        },
-        Expected => [$CertID3,$CertID4,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value \$SearchValue3",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $SearchValue3
-                }
-            ]
-        },
-        Expected => [$CertID3,$CertID4,$CertID5]
-    },
-    {
-        Name     => "Search: Field Fulltext / Operator ENDSWITH / Value substr(\$SearchValue3,-15)",
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => substr($SearchValue3,-15)
+                    Value    => q{"} . $SearchValue2 . q{"}
                 }
             ]
         },
         Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
     },
     {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value \$SearchValue3",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue3,0,15)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $SearchValue3
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue3,0,15) . q{"}
                 }
             ]
         },
         Expected => [$CertID3,$CertID4,$CertID5]
     },
     {
-        Name     => "Search: Field Fulltext / Operator CONTAINS / Value substr(\$SearchValue3,8,-8)",
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue3,-15)",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => substr($SearchValue3,8,-8)
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue3,-15) . q{"}
+                }
+            ]
+        },
+        Expected => [$CertID1,$CertID2,$CertID3,$CertID4,$CertID5]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$SearchValue3,8,-8)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => q{"} . substr($SearchValue3,8,-8) . q{"}
                 }
             ]
         },
@@ -615,7 +454,7 @@ my @IntegrationSearchTests = (
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => $SearchValue3
+                    Value    => q{"} . $SearchValue3 . q{"}
                 }
             ]
         },

@@ -36,7 +36,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     };
 }
@@ -47,30 +47,18 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # init search parameter for fulltext search
-    my %Search = (
-        OR => []
+    # fixed search in the  following columns:
+    # Name and Class
+    my $Condition = $Self->_FulltextCondition(
+        Columns => [
+            'gc.name', 'gc.general_catalog_class'
+        ],
+        Value   => $Param{Search}->{Value},
+        Silent  => $Param{Silent}
     );
 
-    # OR-combine relevant fields with requested operator and value
-    for my $Field (
-        qw(
-            Name Class
-        )
-    ) {
-        push (
-            @{ $Search{OR} },
-            {
-                Field    => $Field,
-                Operator => $Param{Search}->{Operator},
-                Value    => $Param{Search}->{Value}
-            }
-        );
-    }
-
-    # return search def
     return {
-        Search => \%Search,
+        Where => [$Condition]
     };
 }
 

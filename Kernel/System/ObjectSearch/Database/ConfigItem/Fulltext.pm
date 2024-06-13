@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Certificate::Fulltext;
+package Kernel::System::ObjectSearch::Database::ConfigItem::Fulltext;
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Certificate::Fulltext - attribute module for database object search
+Kernel::System::ObjectSearch::Database::ConfigItem::Fulltext - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -47,51 +47,21 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    # init search parameter for fulltext search
-    my %Search = (
-        OR => []
-    );
-
-    my %AttributeMapping = (
-        Fulltext => {
-            Fields => [
-                'Subject',
-                'Email'
-            ]
-        }
-    );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    my $JoinFlag = 'JoinCertificate' . $Param{Search}->{Field};
-    my $TableAlias = $Param{Flags}->{JoinMap}->{ $JoinFlag } // 'vfsp';
-    if ( !$Param{Flags}->{JoinMap}->{ $JoinFlag } ) {
-        my $Count = $Param{Flags}->{CertificateJoinCounter}++;
-        $TableAlias .= $Count;
-        push(
-            @SQLJoin,
-            "INNER JOIN virtual_fs_preferences $TableAlias ON $TableAlias.virtual_fs_id = vfs.id",
-            "AND $TableAlias.preferences_key IN ('Subject','Email')"
-        );
-
-        $Param{Flags}->{JoinMap}->{ $JoinFlag } = $TableAlias;
-    }
-
-    # prepare condition
     # fixed search in the  following columns:
-    # preferences_value (depending on the table prefix and requested preferences_key)
+    # Name and Number
+    # searching in older versions is currently not intended
     my $Condition = $Self->_FulltextCondition(
-        Columns => [ "$TableAlias.preferences_value" ],
         Value   => $Param{Search}->{Value},
+        Columns => [
+            'ci.name', 'ci.configitem_number'
+        ],
         Silent  => $Param{Silent}
     );
 
     return if ( !$Condition );
 
-    # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Where => [$Condition]
     };
 }
 
