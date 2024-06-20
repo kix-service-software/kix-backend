@@ -469,7 +469,7 @@ sub PrepareData {
     # prepare search
     if ( exists( $Param{Data}->{search} ) ) {
 
-        # we use the same syntax like the filter, so we can you the same validation method
+        # we use the same syntax like the filter, so we can use the same validation method
         my $Result = $Self->_ValidateFilter(
             Filter => $Param{Data}->{search},
             Type   => 'search',
@@ -1669,8 +1669,14 @@ sub _ValidateFilter {
                 $Filter->{Operator} = uc( $Filter->{Operator} || q{} );
                 $Filter->{Type}     = uc( $Filter->{Type}     || 'STRING' );
 
-                # handle negated operators
-                if ( $Filter->{Operator} =~ /^!(.*?)$/ ) {
+                # handle negated operators but not for search
+                if (
+                    $Filter->{Operator} =~ /^!(.*?)$/
+                    && (
+                        !$Param{Type}
+                        || $Param{Type} ne 'search'
+                    )
+                ) {
                     $Filter->{Operator} = $1;
                     $Filter->{Not} = !$Filter->{Not};
                 }
