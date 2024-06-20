@@ -302,12 +302,12 @@
                "readOnly" : true
             },
             "SMIMEEncryptedError" : {
-               "description" : "error string if article is a encrypted email article but could not be decrypted",
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
                "type" : "string",
                "readOnly" : true
             },
             "SMIMESigned" : {
-               "description" : " if article is an signed email article",
+               "description" : " if article is a signed email article",
                "type" : "integer",
                "readOnly" : true
             },
