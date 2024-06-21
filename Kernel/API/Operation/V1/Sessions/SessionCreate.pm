@@ -49,7 +49,12 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes();
+    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes(
+        UsageContext => $Param{Data}->{UserType}
+    );
+    my $MFAuthTypes  = $Kernel::OM->Get('Auth')->GetMFAuthTypes(
+        UsageContext => $Param{Data}->{UserType}
+    );
 
     return {
         'UserLogin' => {
@@ -57,13 +62,23 @@ sub ParameterDefinition {
         },
         'UserType' => {
             Required => 1,
-            OneOf => [
+            OneOf    => [
                 'Agent',
                 'Customer'
             ]
         },
         'Password' => {
             RequiredIf => ['UserLogin']
+        },
+        'MFAToken' => {
+            Type => 'HASH'
+        },
+        'MFAToken::Type' => {
+            RequiredIf => ['MFAToken'],
+            OneOf      => $MFAuthTypes
+        },
+        'MFAToken::Value' => {
+            RequiredIf => ['MFAToken'],
         },
         'code' => {
             RequiredIf => ['state']
@@ -80,7 +95,7 @@ sub ParameterDefinition {
         },
         'PreAuthRequest::Data' => {
             RequiredIf => ['PreAuthRequest'],
-            Type => 'HASH'
+            Type       => 'HASH'
         }
     }
 }
@@ -142,6 +157,7 @@ sub Run {
         User            => $Param{Data}->{UserLogin} || '',
         UsageContext    => $Param{Data}->{UserType},
         Pw              => $Param{Data}->{Password} || '',
+        MFAToken        => $Param{Data}->{MFAToken} || {},
         NegotiateToken  => $Param{Data}->{NegotiateToken},
         Code            => $Param{Data}->{code},
         State           => $Param{Data}->{state},

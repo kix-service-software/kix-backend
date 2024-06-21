@@ -1771,9 +1771,15 @@ sub SetPreferences {
 
     # no updated needed
     return 1 if (
-        defined( $User{ $Param{Key} } )
-        && defined( $Param{Value} )
-        && $User{ $Param{Key} } eq $Param{Value}
+        (
+            !defined($User{Preferences}->{ $Param{Key} } )
+            && !defined( $Param{Value} )
+        )
+        || (
+            defined( $User{Preferences}->{ $Param{Key} } )
+            && defined( $Param{Value} )
+            && $User{ $Param{Preferences}->{Key} } eq $Param{Value}
+        )
     );
 
     # get user preferences config

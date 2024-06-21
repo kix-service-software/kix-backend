@@ -49,8 +49,6 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes();
-
     return {
         'code' => {
             RequiredIf => ['state']
