@@ -8031,42 +8031,29 @@ You can log in via the following URL:
             </Object>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule" Required="0" Valid="0" ConfigLevel="200">
-        <Description Translatable="1">Defines the two-factor module to authenticate agents.</Description>
+    <ConfigItem AccessLevel="confidential" Name="MultiFactorAuthentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the multi factor auth modules and their order of execution.</Description>
         <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Auth::TwoFactor</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Auth/TwoFactor/*.pm" SelectedID="Kernel::System::Auth::TwoFactor::GoogleAuthenticator"></Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="confidential" Name="AuthTwoFactorModule::SecretPreferencesKey" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the agent preferences key where the shared secret key is stored.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <String Regex="">UserGoogleAuthenticatorSecretKey</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule::AllowEmptySecret" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines if agents should be allowed to login if they have no shared secret stored in their preferences and therefore are not using two-factor authentication.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="AuthTwoFactorModule::AllowPreviousToken" Required="0" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines if the previously valid token should be accepted for authentication. This is slightly less secure but gives users 30 seconds more time to enter their one-time password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Auth::TwoFactor</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="1" Translatable="1">Yes</Item>
-                <Item Key="0" Translatable="1">No</Item>
-            </Option>
+            <Object><![CDATA[[
+                {
+                    "Enabled": 0,
+                    "Name": "TOTP-Example",
+                    "Module": "Kernel::System::Auth::MFA::TOTP",
+                    "UsageContext": "Agent",
+                    "AuthType": "LOGIN",
+                    "Config": {
+                        "TimeStep": 30,
+                        "Digits": 6,
+                        "Algorithm": "SHA1",
+                        "AllowEmptySecret": 1,
+                        "MaxPreviousToken": 0,
+                        "SecretLength": 8
+                    }
+                }
+            ]
+            ]]>
+            </Object>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PreferencesTable" Required="1" Valid="1">

@@ -19,14 +19,13 @@ use Kernel::Language qw(Translatable);
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Log',
-    'Main',
-    'SystemMaintenance',
-    'Time',
-    'User',
-    'Valid',
+our @ObjectDependencies = qw(
+    Config
+    Log
+    Main
+    Time
+    User
+    Valid
 );
 
 =head1 NAME
@@ -60,57 +59,61 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get needed objects
-    my $MainObject   = $Kernel::OM->Get('Main');
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    my $AuthConfigRef = $ConfigObject->Get("Authentication");
-
-    if ( !IsHashRefWithData($AuthConfigRef) ) {
-        $MainObject->Die("Invalid Authentication config!");
+    # handle auth config
+    my $AuthConfigRef = $Kernel::OM->Get('Config')->Get('Authentication');
+    if ( !IsHashRefWithData( $AuthConfigRef ) ) {
+        $Kernel::OM->Get('Main')->Die("Invalid Authentication config!");
     }
 
     # create clone to keep the original
-    $Self->{AuthConfig} =  Storable::dclone($AuthConfigRef);
+    $Self->{AuthConfig} =  Storable::dclone( $AuthConfigRef );
 
     # load auth module for each enabled config
-    foreach my $AuthReg ( sort keys %{$Self->{AuthConfig}} ) {
-        if ( !IsArrayRefWithData($Self->{AuthConfig}->{$AuthReg}) ) {
-            $MainObject->Die("Invalid Authentication config ($AuthReg)!");
+    for my $AuthReg ( sort( keys( %{ $Self->{AuthConfig} } ) ) ) {
+        if ( !IsArrayRefWithData( $Self->{AuthConfig}->{ $AuthReg } ) ) {
+            $Kernel::OM->Get('Main')->Die("Invalid Authentication config ($AuthReg)!");
         }
 
-        foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
-            next if !$Config->{Enabled} || !$Config->{Module};
+        CONFIG:
+        for my $Config ( @{ $Self->{AuthConfig}->{ $AuthReg } } ) {
+            next CONFIG if (
+                !$Config->{Enabled}
+                || !$Config->{Module}
+            );
 
-            my $Module = $Kernel::OM->GetModuleFor($Config->{Module}) || $Config->{Module};
+            my $Module = $Kernel::OM->GetModuleFor( $Config->{Module} ) || $Config->{Module};
 
-            if ( !$MainObject->Require($Module) ) {
-                $MainObject->Die("Can't load auth backend module $Config->{Module}! $@");
+            if ( !$Kernel::OM->Get('Main')->Require( $Module ) ) {
+                $Kernel::OM->Get('Main')->Die("Can't load auth backend module $Config->{Module}! $@");
             }
 
             $Config->{BackendObject} = $Module->new(
                 Name   => $Config->{Name},
                 Config => $Config->{Config}
             );
-            next if ( !defined( $Config->{BackendObject} ) );
+            next CONFIG if ( !defined( $Config->{BackendObject} ) );
 
             # set global config in module
             $Config->{BackendObject}->{Config} = $Config;
 
-            if ( IsArrayRefWithData($Config->{Sync}) ) {
-                foreach my $SyncConfig ( @{$Config->{Sync}} ) {
-                    next if !$SyncConfig->{Enabled} || !$SyncConfig->{Module};
+            if ( IsArrayRefWithData( $Config->{Sync} ) ) {
+                SYNCCONFIG:
+                for my $SyncConfig ( @{ $Config->{Sync} } ) {
+                    next SYNCCONFIG if (
+                        !$SyncConfig->{Enabled}
+                        || !$SyncConfig->{Module}
+                    );
 
-                    my $SyncModule = $Kernel::OM->GetModuleFor($SyncConfig->{Module}) || $SyncConfig->{Module};
+                    my $SyncModule = $Kernel::OM->GetModuleFor( $SyncConfig->{Module} ) || $SyncConfig->{Module};
 
-                    if ( !$MainObject->Require($SyncModule) ) {
-                        $MainObject->Die("Can't load auth sync backend module $SyncConfig->{Module}! $@");
+                    if ( !$Kernel::OM->Get('Main')->Require( $SyncModule ) ) {
+                        $Kernel::OM->Get('Main')->Die("Can't load auth sync backend module $SyncConfig->{Module}! $@");
                     }
                     # load sync module
                     $SyncConfig->{BackendObject} = $SyncModule->new(
                         Config => {
-                            %{$Config->{Config} || {}},
-                            %{$SyncConfig->{Config} || {}}
+                            %{ $Config->{Config} || {} },
+                            %{ $SyncConfig->{Config} || {} }
                         }
                     );
                 }
@@ -118,19 +121,41 @@ sub new {
         }
     }
 
-    # load 2factor auth modules
-    COUNT:
-    for my $Count ( '', 1 .. 10 ) {
+    # handle multi factor auth config
+    my $MultiFactorAuthConfigRef = $Kernel::OM->Get('Config')->Get('MultiFactorAuthentication');
+    if ( IsHashRefWithData( $MultiFactorAuthConfigRef ) ) {
+        # create clone to keep the original
+        $Self->{MultiFactorAuthConfig} =  Storable::dclone( $MultiFactorAuthConfigRef );
 
-        my $GenericModule = $ConfigObject->Get("AuthTwoFactorModule$Count");
+        # load multi factor auth module for each enabled config
+        for my $MFAuthReg ( sort( keys( %{ $Self->{MultiFactorAuthConfig} } ) ) ) {
+            if ( !IsArrayRefWithData($Self->{MultiFactorAuthConfig}->{ $MFAuthReg }) ) {
+                $Kernel::OM->Get('Main')->Die("Invalid MultiFactorAuthentication config ($MFAuthReg)!");
+            }
 
-        next COUNT if !$GenericModule;
+            MFACONFIG:
+            for my $MFAConfig ( @{ $Self->{MultiFactorAuthConfig}->{ $MFAuthReg } } ) {
+                next MFACONFIG if (
+                    !$MFAConfig->{Enabled}
+                    || !$MFAConfig->{Module}
+                );
 
-        if ( !$MainObject->Require($GenericModule) ) {
-            $MainObject->Die("Can't load backend module $GenericModule! $@");
+                my $Module = $Kernel::OM->GetModuleFor( $MFAConfig->{Module} ) || $MFAConfig->{Module};
+
+                if ( !$Kernel::OM->Get('Main')->Require( $Module ) ) {
+                    $Kernel::OM->Get('Main')->Die("Can't load auth backend module $MFAConfig->{Module}! $@");
+                }
+
+                $MFAConfig->{BackendObject} = $Module->new(
+                    Name   => $MFAConfig->{Name},
+                    Config => $MFAConfig->{Config}
+                );
+                next MFACONFIG if ( !defined( $MFAConfig->{BackendObject} ) );
+
+                # set global config in module
+                $MFAConfig->{BackendObject}->{Config} = $MFAConfig;
+            }
         }
-
-        $Self->{"AuthTwoFactorBackend$Count"} = $GenericModule->new( %{$Self}, Count => $Count );
     }
 
     # Initialize last error message
@@ -156,6 +181,17 @@ Returns:
 
 sub GetPreAuthTypes {
     my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(UsageContext) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
 
     my %PreAuthTypesHash = ();
 
@@ -188,6 +224,67 @@ sub GetPreAuthTypes {
     return \@PreAuthTypes;
 }
 
+=item GetMFATypes()
+
+get possible mfa types
+    my $MFAuthTypes = $AuthObject->GetMFAuthTypes(
+        UsageContext => 'Agent',       # (Agent|Customer)
+    );
+
+Returns:
+
+    $MFAuthTypes = [
+        'MFAuthType'
+    ];
+
+=cut
+
+sub GetMFAuthTypes {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(UsageContext) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my %MFAuthTypesHash = ();
+
+    # handle multi factor auth
+    if ( IsHashRefWithData( $Self->{MultiFactorAuthConfig} ) ) {
+
+        MFAREG:
+        for my $MFAuthReg ( sort( keys( %{ $Self->{MultiFactorAuthConfig} } ) ) ) {
+
+            MFACONFIG:
+            for my $MFAConfig ( @{ $Self->{MultiFactorAuthConfig}->{ $MFAuthReg } } ) {
+                next MFACONFIG if (
+                    !$MFAConfig->{Enabled}
+                    || !$MFAConfig->{BackendObject}
+                );
+                next MFACONFIG if (
+                    defined $MFAConfig->{UsageContext}
+                    && $MFAConfig->{UsageContext} ne $Param{UsageContext}
+                );
+                next MFACONFIG if ( !$MFAConfig->{BackendObject}->can('GetMFAuthType') );
+
+                # get MFAuthType of multi factor auth backend
+                my $MFAuthType = $MFAConfig->{BackendObject}->GetMFAuthType();
+
+                $MFAuthTypesHash{ $MFAuthType } = 1;
+            }
+        }
+    }
+
+    my @MFAuthTypes = sort( keys( %MFAuthTypesHash ) );
+    return \@MFAuthTypes;
+}
+
 =item GetAuthMethods()
 
 get possible auth methods
@@ -200,7 +297,8 @@ Returns:
     $AuthMethods = [
         {
             Type    => 'LOGIN',
-            PreAuth => 0
+            PreAuth => 0,
+            MFA     => []
         }
     ];
 
@@ -208,6 +306,17 @@ Returns:
 
 sub GetAuthMethods {
     my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(UsageContext) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
 
     my @AuthMethods = ();
 
@@ -234,6 +343,62 @@ sub GetAuthMethods {
                 || !$AuthMethod->{Type}
                 || !defined( $AuthMethod->{PreAuth} )
             );
+
+            # handle multi factor auth config
+            if ( IsHashRefWithData( $Self->{MultiFactorAuthConfig} ) ) {
+                my @MFAuthMethods = ();
+
+                MFAREG:
+                for my $MFAuthReg ( sort( keys( %{ $Self->{MultiFactorAuthConfig} } ) ) ) {
+
+                    MFACONFIG:
+                    for my $MFAConfig ( @{ $Self->{MultiFactorAuthConfig}->{ $MFAuthReg } } ) {
+                        next MFACONFIG if (
+                            !$MFAConfig->{Enabled}
+                            || !$MFAConfig->{BackendObject}
+                        );
+                        next MFACONFIG if (
+                            defined $MFAConfig->{UsageContext}
+                            && $MFAConfig->{UsageContext} ne $Param{UsageContext}
+                        );
+                        next MFACONFIG if (
+                            defined $MFAConfig->{AuthType}
+                            && $MFAConfig->{AuthType} ne $AuthMethod->{Type}
+                        );
+                        next MFACONFIG if ( !$MFAConfig->{BackendObject}->can('GetMFAuthMethod') );
+
+                        # get MFAuthMethod of multi factor auth backend
+                        my $MFAuthMethod = $MFAConfig->{BackendObject}->GetMFAuthMethod();
+
+                        next MFACONFIG if (
+                            ref( $MFAuthMethod ) ne 'HASH'
+                            || !$MFAuthMethod->{Type}
+                            || ref( $MFAuthMethod->{Data} ) ne 'HASH'
+                        );
+
+                        # check for identical known entry
+                        my $NewEntry = 1;
+                        MFAENTRY:
+                        for my $KnownEntry ( @MFAuthMethods ) {
+                            if (
+                                !DataIsDifferent(
+                                    Data1 => $MFAuthMethod,
+                                    Data2 => $KnownEntry
+                                )
+                            ) {
+                                $NewEntry = 0;
+
+                                last MFAENTRY;
+                            }
+                        }
+                        if ( $NewEntry ) {
+                            push( @MFAuthMethods, $MFAuthMethod );
+                        }
+                    }
+                }
+
+                $AuthMethod->{MFA} = \@MFAuthMethods;
+            }
 
             # check for identical known entry
             my $NewEntry = 1;
@@ -279,6 +444,17 @@ Returns:
 sub PreAuth {
     my ( $Self, %Param ) = @_;
 
+    # check needed stuff
+    for my $Needed ( qw(UsageContext) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
     AUTHREG:
     for my $AuthReg ( sort( keys( %{ $Self->{AuthConfig} } ) ) ) {
 
@@ -295,7 +471,7 @@ sub PreAuth {
             next CONFIG if ( !$Config->{BackendObject}->can('PreAuth') );
 
             # get pre auth data from backend
-            my $PreAuthData = $Config->{BackendObject}->PreAuth(%Param);
+            my $PreAuthData = $Config->{BackendObject}->PreAuth( %Param );
 
             # return data if we got a defined result
             return $PreAuthData if ( defined( $PreAuthData ) );
@@ -321,26 +497,39 @@ The authentication function.
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # get needed objects
-    my $UserObject   = $Kernel::OM->Get('User');
-    my $ConfigObject = $Kernel::OM->Get('Config');
+    # check needed stuff
+    for my $Needed ( qw(UsageContext) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
 
     my $User;
 
     AUTHREG:
-    foreach my $AuthReg ( sort keys %{$Self->{AuthConfig}} ) {
+    for my $AuthReg ( sort( keys(  %{ $Self->{AuthConfig} } ) ) ) {
 
         CONFIG:
-        foreach my $Config ( @{$Self->{AuthConfig}->{$AuthReg}} ) {
+        for my $Config ( @{ $Self->{AuthConfig}->{ $AuthReg } } ) {
 
-            next CONFIG if !$Config->{Enabled} || !$Config->{BackendObject};
-            next CONFIG if defined $Config->{UsageContext} && $Config->{UsageContext} ne $Param{UsageContext};
+            next CONFIG if (
+                !$Config->{Enabled}
+                || !$Config->{BackendObject}
+            );
+            next CONFIG if (
+                defined $Config->{UsageContext}
+                && $Config->{UsageContext} ne $Param{UsageContext}
+            );
 
             # check auth backend
-            $User = $Config->{BackendObject}->Auth(%Param);
+            $User = $Config->{BackendObject}->Auth( %Param );
 
             # next on no success
-            next CONFIG if !$User;
+            next CONFIG if ( !$User );
 
             # Sync will happen before two factor authentication (if configured)
             # because user might not exist before being created in sync (see bug #11966).
@@ -348,61 +537,114 @@ sub Auth {
             # in a new or updated user but no information or permission leak.
 
             # if $AuthSyncBackend is defined but empty, don't sync with any backend
-            if ( IsArrayRefWithData($Config->{Sync}) ) {
+            if ( IsArrayRefWithData( $Config->{Sync} ) ) {
 
                 SYNC_CONFIG:
-                foreach my $SyncConfig ( @{$Config->{Sync}} ) {
-                    next SYNC_CONFIG if !$SyncConfig->{Enabled} || !$SyncConfig->{BackendObject};
+                for my $SyncConfig ( @{ $Config->{Sync} } ) {
+                    next SYNC_CONFIG if (
+                        !$SyncConfig->{Enabled}
+                        || !$SyncConfig->{BackendObject}
+                    );
 
                     # sync configured backend
-                    $SyncConfig->{BackendObject}->Sync( %Param, User => $User );
+                    $SyncConfig->{BackendObject}->Sync(
+                        %Param,
+                        User => $User
+                    );
                 }
             }
 
             # If we have no UserID at this point
             # it means auth was ok but user didn't exist before
             # and wasn't created in sync module.
-            # We will skip two factor authentication even if configured
-            # because we don't have user data to compare the otp anyway.
-            # This will not count as a failed login.
-            my $UserID = $UserObject->UserLookup(
+            # This counts as a failed login
+            my $UserID = $Kernel::OM->Get('User')->UserLookup(
                 UserLogin => $User,
             );
-            last CONFIG if !$UserID;
+            if ( !$UserID ) {
+                $User = undef;
 
-            # check 2factor auth backends
-            my $TwoFactorAuth;
-            TWOFACTORSOURCE:
-            for my $Count ( '', 1 .. 10 ) {
-
-                # return on no config setting
-                next TWOFACTORSOURCE if !$Self->{"AuthTwoFactorBackend$Count"};
-
-                # 2factor backend
-                my $AuthOk = $Self->{"AuthTwoFactorBackend$Count"}->Auth(
-                    TwoFactorToken => $Param{TwoFactorToken},
-                    User           => $User,
-                    UserID         => $UserID,
-                    Silent         => $Param{Silent}
-                );
-                $TwoFactorAuth = $AuthOk ? 'passed' : 'failed';
-
-                last TWOFACTORSOURCE if $AuthOk;
+                next CONFIG;
             }
 
-            # if at least one 2factor auth backend was checked but none was successful,
-            # it counts as a failed login
-            if ( $TwoFactorAuth && $TwoFactorAuth ne 'passed' ) {
-                $User = undef;
-                last CONFIG;
+            # handle multi factor auth
+            if ( IsHashRefWithData( $Self->{MultiFactorAuthConfig} ) ) {
+
+                # only handle multi factor auth, if auth backend can provide a auth method type
+                if ( $Config->{BackendObject}->can('GetAuthMethod') ) {
+
+                    # get AuthMethod of auth backend
+                    my $AuthMethod = $Config->{BackendObject}->GetAuthMethod();
+                    if (
+                        ref( $AuthMethod ) eq 'HASH'
+                        && $AuthMethod->{Type}
+                    ) {
+
+                        # init multi factor auth state
+                        my $MFAState = undef;
+
+                        MFAREG:
+                        for my $MFAuthReg ( sort( keys( %{ $Self->{MultiFactorAuthConfig} } ) ) ) {
+
+                            MFACONFIG:
+                            for my $MFAConfig ( @{ $Self->{MultiFactorAuthConfig}->{ $MFAuthReg } } ) {
+                                next MFACONFIG if (
+                                    !$MFAConfig->{Enabled}
+                                    || !$MFAConfig->{BackendObject}
+                                );
+                                next MFACONFIG if (
+                                    defined $MFAConfig->{UsageContext}
+                                    && $MFAConfig->{UsageContext} ne $Param{UsageContext}
+                                );
+                                next MFACONFIG if (
+                                    defined $MFAConfig->{AuthType}
+                                    && $MFAConfig->{AuthType} ne $AuthMethod->{Type}
+                                );
+
+                                # check multi factor auth backend
+                                my $MFAResult = $MFAConfig->{BackendObject}->MFAuth(
+                                    %Param,
+                                    User   => $User,
+                                    UserID => $UserID
+                                );
+                                if ( defined( $MFAResult ) ) {
+                                    $MFAState = $MFAResult;
+                                }
+
+                                # no more checks needed when one mfa check was successful
+                                if ( $MFAState ) {
+                                    last MFAREG;
+                                }
+                            }
+                        }
+
+                        # if at least one multi factor auth backend was checked but none was successful,
+                        # it counts as a failed login
+                        if (
+                            defined( $MFAState )
+                            && !$MFAState
+                        ) {
+                            $User = undef;
+
+                            next CONFIG;
+                        }
+                    }
+                }
             }
 
             # remember auth backend
-            $UserObject->SetPreferences(
+            my $Success = $Kernel::OM->Get('User')->SetPreferences(
                 Key    => 'UserAuthBackend',
                 Value  => $Config->{Name},
                 UserID => $UserID,
             );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Error while setting preference "UserAuthBackend"'
+                );
+                return 0;
+            }
 
             last AUTHREG;
         }
@@ -411,13 +653,13 @@ sub Auth {
     # check usage context
     if ( $Param{UsageContext} && $User ) {
         # remember failed logins
-        my $UserID = $UserObject->UserLookup(
+        my $UserID = $Kernel::OM->Get('User')->UserLookup(
             UserLogin => $User,
         );
 
         return if !$UserID;
 
-        my %UserData = $UserObject->GetUserData(
+        my %UserData = $Kernel::OM->Get('User')->GetUserData(
             UserID => $UserID,
             Valid  => 1,
         );
@@ -439,14 +681,14 @@ sub Auth {
 
         if ( $Param{User} ) {
             # remember failed logins
-            my $UserID = $UserObject->UserLookup(
+            my $UserID = $Kernel::OM->Get('User')->UserLookup(
                 UserLogin => $Param{User},
                 Silent    => 1,
             );
 
             return if !$UserID;
 
-            my %UserData = $UserObject->GetUserData(
+            my %UserData = $Kernel::OM->Get('User')->GetUserData(
                 UserID => $UserID,
                 Valid  => 1,
             );
@@ -454,35 +696,39 @@ sub Auth {
             my $Count = $UserData{Preferences}->{UserLoginFailed} || 0;
             $Count++;
 
-            $UserObject->SetPreferences(
+            $Kernel::OM->Get('User')->SetPreferences(
                 Key    => 'UserLoginFailed',
                 Value  => $Count,
                 UserID => $UserID,
             );
 
             # set agent to invalid-temporarily if max failed logins reached
-            my $Config = $ConfigObject->Get('PreferencesGroups');
+            my $Config = $Kernel::OM->Get('Config')->Get('PreferencesGroups');
             my $PasswordMaxLoginFailed;
 
-            if ( $Config && $Config->{Password} && $Config->{Password}->{PasswordMaxLoginFailed} ) {
+            if (
+                $Config
+                && $Config->{Password}
+                && $Config->{Password}->{PasswordMaxLoginFailed}
+            ) {
                 $PasswordMaxLoginFailed = $Config->{Password}->{PasswordMaxLoginFailed};
             }
 
-            return if !%UserData;
-            return if !$PasswordMaxLoginFailed;
-            return if $Count < $PasswordMaxLoginFailed;
+            return if ( !%UserData );
+            return if ( !$PasswordMaxLoginFailed );
+            return if ( $Count < $PasswordMaxLoginFailed );
 
             my $ValidID = $Kernel::OM->Get('Valid')->ValidLookup(
                 Valid => 'invalid-temporarily',
             );
 
-            my $Update = $UserObject->UserUpdate(
+            my $Update = $Kernel::OM->Get('User')->UserUpdate(
                 %UserData,
                 ValidID      => $ValidID,
                 ChangeUserID => 1,
             );
 
-            return if !$Update;
+            return if ( !$Update );
 
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
@@ -493,7 +739,7 @@ sub Auth {
         else {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Login failed.",
+                Message  => 'Login failed',
             );
         }
 
@@ -501,27 +747,110 @@ sub Auth {
     }
 
     # remember login attributes
-    my $UserID = $UserObject->UserLookup(
+    my $UserID = $Kernel::OM->Get('User')->UserLookup(
         UserLogin => $User,
     );
-
-    return $User if !$UserID;
+    return $User if ( !$UserID );
 
     # reset failed logins
-    $UserObject->SetPreferences(
+    my $Success = $Kernel::OM->Get('User')->SetPreferences(
         Key    => 'UserLoginFailed',
         Value  => 0,
         UserID => $UserID,
     );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Error while setting preference "UserLoginFailed"'
+        );
+    }
 
     # last login preferences update
-    $UserObject->SetPreferences(
+    $Success = $Kernel::OM->Get('User')->SetPreferences(
         Key    => 'UserLastLogin',
         Value  => $Kernel::OM->Get('Time')->SystemTime(),
         UserID => $UserID,
     );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Error while setting preference "UserLastLogin"'
+        );
+    }
 
     return $User;
+}
+
+=item MFASecretGenerate()
+
+generate secret for MFA
+    my $Success = $AuthObject->MFASecretGenerate(
+        MFAuth => 'MFA_TOTP_andOTP',
+        UserID => 1,
+    );
+
+Returns:
+
+    $Success = 1;
+
+=cut
+
+sub MFASecretGenerate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(MFAuth UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return 0;
+        }
+    }
+
+    # handle multi factor auth
+    if ( IsHashRefWithData( $Self->{MultiFactorAuthConfig} ) ) {
+
+        MFAREG:
+        for my $MFAuthReg ( sort( keys( %{ $Self->{MultiFactorAuthConfig} } ) ) ) {
+
+            MFACONFIG:
+            for my $MFAConfig ( @{ $Self->{MultiFactorAuthConfig}->{ $MFAuthReg } } ) {
+                next MFACONFIG if (
+                    !$MFAConfig->{Enabled}
+                    || !$MFAConfig->{BackendObject}
+                );
+                next MFACONFIG if ( !$MFAConfig->{BackendObject}->can('GenerateSecret') );
+
+                my $Secret = $MFAConfig->{BackendObject}->GenerateSecret(
+                    MFAuth => $Param{MFAuth}
+                );
+
+                if ( defined( $Secret ) ) {
+                    # set secret in user preferences
+                    my $Success = $Kernel::OM->Get('User')->SetPreferences(
+                        Key    => $Param{MFAuth} . '_Secret',
+                        Value  => $Secret,
+                        UserID => $Param{UserID},
+                    );
+                    if ( !$Success ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => 'Error while setting preference "' .  $Param{MFAuth} . '_Secret"'
+                        );
+                        return 0;
+                    }
+
+                    # return success
+                    return 1;
+                }
+            }
+        }
+    }
+
+    # no backend has generated a secret
+    return 0;
 }
 
 =item GetLastErrorMessage()

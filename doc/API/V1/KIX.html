@@ -18308,6 +18308,10 @@ pre code {
                "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 a new access token will be generated for this user.",
                "type" : "integer"
             },
+            "ExecMFAGenerateSecret" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set with a valid secret new mfa secret will be generated for this user.",
+               "type" : "string"
+            },
             "IsAgent" : {
                "type" : "integer"
             },
@@ -49189,6 +49193,10 @@ pre code {
             "ExecGenerateToken" : {
                "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 a new access token will be generated for this user.",
                "type" : "integer"
+            },
+            "ExecMFAGenerateSecret" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set with a valid secret new mfa secret will be generated for this user.",
+               "type" : "string"
             },
             "IsAgent" : {
                "type" : "integer"
