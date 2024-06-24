@@ -135,8 +135,31 @@ sub _CheckFields {
     my ($Self, %Param) = @_;
 
     for my $Type ( keys %{$Param{Search}} ) {
+        if ( ref( $Param{Search}->{ $Type } ) ne 'ARRAY' ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid Search! Search type has to provide an array.",
+                );
+            }
+            return;
+        }
+
         my @Items;
         for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
+            if (
+                ref( $SearchItem ) ne 'HASH'
+                || !defined( $SearchItem->{Field} )
+                || !defined( $SearchItem->{Value} )
+            ) {
+                if ( !$Param{Silent} ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
+                    );
+                }
+                return;
+            }
             if ( $Param{Draft}->{$SearchItem->{Field}} ) {
                 $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
             }
