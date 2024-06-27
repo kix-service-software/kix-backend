@@ -2821,16 +2821,23 @@ sub _CheckBasePermission {
 
     # add corresponding permission filter
     my %Filter = $Self->_CreateFilterForObject(
-        Filter   => {},
         Object   => $Result->{Object},
         Field    => $Result->{Attribute},
         Operator => 'IN',
         Value    => $Result->{ObjectIDs},
+        Creator  => 'BasePermission',
     );
     if ( !%Filter ) {
         # we can't generate the filter, so this is a false
         $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
         return;
+    }
+
+    if ( $Self->can('ExecuteBasePermissionModules') ) {
+        $Self->ExecuteBasePermissionModules(
+            %Param,
+            Filter => \%Filter
+        );
     }
 
     if ( $Self->{RequestMethod} ne 'GET' ) {
@@ -3460,15 +3467,16 @@ sub _CheckPermissionCondition {
 create a filter
 
     my %Filter = $CommonObject->_CreateFilterForObject(
-        Filter         => {},            # optional, if given the method adds the new filter the the existing one
+        Filter         => {},            # optional, if given the method adds the new filter to the given reference. Still returns only the new filter
         Object         => 'Ticket',
         Field          => 'QueueID',
         Operator       => 'EQ',
         Value          => 12,
-        Not            => 0|1,           # optional, default 0
-        UseAnd         => 0|1,           # optional, default 0
-        StopAfterMatch => 0|1,           # optional, default 0
-        AlwaysTrue     => 1              # optional, used for Wildcards
+        Not            => 0|1,                     # optional, default 0
+        UseAnd         => 0|1,                     # optional, default 0
+        StopAfterMatch => 0|1,                     # optional, default 0
+        AlwaysTrue     => 1,                       # optional, used for Wildcards
+        Creator        => 'BasePermission',        # optional
     );
 
 =cut

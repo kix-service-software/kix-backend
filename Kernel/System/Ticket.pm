@@ -1223,6 +1223,7 @@ Get ticket info
     my %Ticket = $TicketObject->TicketGet(
         TicketID      => 123,
         DynamicFields => 0,         # Optional, default 0. To include the dynamic field values for this ticket on the return structure.
+                                    # Provide an array ref with dynamic field names to only get the specified fields
         UserID        => 123,
         Silent        => 0,         # Optional, default 0. To suppress the warning if the ticket does not exist.
     );
@@ -1295,7 +1296,14 @@ sub TicketGet {
     $Param{Extended}      //= 0;
     $Param{DynamicFields} //= 0;
 
-    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::' . $Param{DynamicFields};
+    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::';
+    
+    if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+        $CacheKey .= join('::', @{$Param{DynamicFields}});
+    }
+    else {
+        $CacheKey .= $Param{DynamicFields};
+    }
 
     my $Cached = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
@@ -1362,9 +1370,17 @@ sub TicketGet {
         my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
         my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
-        # get all dynamic fields for the object type Ticket
+        my $FieldFilterRef = undef;
+        if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+            my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
+
+            $FieldFilterRef = \%FieldFilter;
+        }
+
+        # get all dynamic fields for the object type Ticket (with optional filter)
         my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
-            ObjectType => 'Ticket'
+            ObjectType => 'Ticket',
+            FieldFilter => $FieldFilterRef,
         );
 
         DYNAMICFIELD:
