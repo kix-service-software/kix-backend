@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -65,7 +65,7 @@ sub new {
     $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Automation::Debug') || 0;
 
     $Self->{DumpConfig} = $Kernel::OM->Get('Config')->Get('Automation::DumpConfig') || { Indent => '  ' };
-    
+
     $Self->{MinimumLogLevel} = $Param{MinimumLogLevel} || $Kernel::OM->Get('Config')->Get('Automation::MinimumLogLevel');
 
     # load all logging backends
@@ -107,12 +107,12 @@ sub new {
     return $Self;
 }
 
-=item ExecuteEventbasedJobs()
+=item ExecuteJobsForEvent()
 
 Execute all relevant eventbased jobs for a given type
 
 Example:
-    my $Success = $Object->ExecuteEventbasedJobs(
+    my $Success = $Object->ExecuteJobsForEvent(
         Type      => 'Ticket',
         Event     => 'TicketCreate',
         Data      => {
@@ -138,13 +138,38 @@ sub ExecuteJobsForEvent {
         }
     }
 
-    # get all valid jobs
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "ExecuteJobsForEvent: executing jobs for event \"%s\"", $Param{Event});
+    }
+
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
+
+    # get all relevant jobs
     my %JobList = $Self->JobList(
+        Event => $Param{Event},
         Valid => 1
     );
 
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "  ExecuteJobsForEvent: checking %i jobs for execution", scalar keys %JobList);
+    }
+
+    my $ExecutedJobCount = 0;
+
     # sort by names to enable simple ordering by user
     foreach my $JobID ( sort { $JobList{$a} cmp $JobList{$b} } keys %JobList ) {
+
+        if ( $Self->{Debug} ) {
+            $Self->_Debug(sprintf "  ExecuteJobsForEvent: determining if job \"%s\" is executable", $JobList{$JobID});
+        }
+
+        my $JobStartTime;
+        if ( $Self->{Debug} ) {
+            $JobStartTime = time();
+        }
 
         my %Job = $Self->JobGet(
             ID => $JobID
@@ -158,23 +183,35 @@ sub ExecuteJobsForEvent {
             %Param,
         );
 
+        if ( $Self->{Debug} ) {
+            $Self->_Debug(sprintf "  ExecuteJobsForEvent: executable check took %i ms", (time() - $JobStartTime) * 1000);
+        }
+
         if ( $CanExecute ) {
 
-            my $StartTime;
+            my $JobStartTime;
             if ( $Self->{Debug} ) {
-                $StartTime = Time::HiRes::time();
+                $JobStartTime = time();
+                $Self->_Debug(sprintf "  ExecuteJobsForEvent: executing job \"%s\"", $Job{Name});
             }
+
             # execute the job in a new Automation instance
             my $AutomationObject = $Kernel::OM->GetModuleFor('Automation')->new(%{$Self});
 
+            $ExecutedJobCount++;
             my $Result = $AutomationObject->JobExecute(
                 ID => $JobID,
+                Async => $Job{IsAsynchronous},
                 %Param,
             );
             if ( $Self->{Debug} ) {
-                $Self->_Debug(sprintf "ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $StartTime) * 1000);
+                $Self->_Debug(sprintf "  ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $JobStartTime) * 1000);
             }
         }
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "ExecuteJobsForEvent: executing %i jobs took %i ms", $ExecutedJobCount, (time() - $StartTime) * 1000);
     }
 
     return 1;
@@ -484,7 +521,7 @@ sub _Debug {
 
     return if !$Self->{Debug};
 
-    printf STDERR "%f (%5i) %-15s %s\n", Time::HiRes::time(), $$, "[Automation]", "$Message";
+    printf STDERR "%f (%5i) %-15s %s\n", time(), $$, "[Automation]", "$Message";
 }
 
 1;

@@ -19439,8 +19439,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }
@@ -25250,6 +25249,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "IsAsynchronous" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "LastExecutionTime" : {
                "type" : "string",
                "readOnly" : true
@@ -25290,6 +25293,7 @@ pre code {
             "CreateTime",
             "Filter",
             "ID",
+            "IsAsynchronous",
             "Name",
             "Type",
             "ValidID"
@@ -25451,6 +25455,7 @@ pre code {
                 }
             ],
             "ID": 1,
+            "IsAsynchronous": 0,
             "LastExecutionTime": "",
             "MacroIDs": [],
             "Name": "Some Job",
@@ -25466,6 +25471,7 @@ pre code {
             "ExecPlanIDs": [ 2 ],
             "Filter": null,
             "ID": 2,
+            "IsAsynchronous": 1,
             "LastExecutionTime": "2019-10-01 14:00:00",
             "MacroIDs": [ 2,4 ],
             "Name": "Another Job",
@@ -25517,6 +25523,9 @@ pre code {
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
                "type" : "array"
+            },
+            "IsAsynchronous" : {
+               "type" : "integer"
             },
             "MacroIDs" : {
                "type" : "array",
@@ -25783,6 +25792,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "IsAsynchronous" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "LastExecutionTime" : {
                "type" : "string",
                "readOnly" : true
@@ -25823,6 +25836,7 @@ pre code {
             "CreateTime",
             "Filter",
             "ID",
+            "IsAsynchronous",
             "Name",
             "Type",
             "ValidID"
@@ -25983,6 +25997,7 @@ pre code {
             }
         ],
         "ID": 1,
+        "IsAsynchronous": 0,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
         "Macros": [
@@ -26058,6 +26073,9 @@ pre code {
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
                "type" : "array"
+            },
+            "IsAsynchronous" : {
+               "type" : "integer"
             },
             "Name" : {
                "type" : "string"
@@ -47929,8 +47947,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }
@@ -49421,8 +49438,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }

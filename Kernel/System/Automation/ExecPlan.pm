@@ -851,6 +851,7 @@ sub _LoadExecPlanTypeBackend {
                 Message  => "Unable to create instance of $Backend!"
             );
         }
+        $BackendObject->{Debug} = $Self->{Debug};
 
         $Self->{ExecPlanTypeModules}->{$Param{Name}} = $BackendObject;
     }

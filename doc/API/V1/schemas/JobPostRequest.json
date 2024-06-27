@@ -20,6 +20,9 @@
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
                "type" : "array"
             },
+            "IsAsynchronous" : {
+               "type" : "integer"
+            },
             "MacroIDs" : {
                "type" : "array",
                "item" : {
