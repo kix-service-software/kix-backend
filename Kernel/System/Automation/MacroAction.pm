@@ -1082,6 +1082,7 @@ sub _LoadMacroActionTypeBackend {
 
         # give the macro action backend module it's own config to work with
         $BackendObject->{ModuleConfig} = $Backends->{$Param{Name}};
+        $BackendObject->{Debug}        = $Self->{Debug};
 
         $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
     }

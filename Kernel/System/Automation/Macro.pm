@@ -992,8 +992,9 @@ sub _LoadMacroTypeBackend {
         }
 
         # add referrer data
-        $BackendObject->{JobID}   = $Self->{JobID};
-        $BackendObject->{RunID}   = $Self->{RunID};
+        $BackendObject->{JobID} = $Self->{JobID};
+        $BackendObject->{RunID} = $Self->{RunID};
+        $BackendObject->{Debug} = $Self->{Debug};
 
         $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;
     }

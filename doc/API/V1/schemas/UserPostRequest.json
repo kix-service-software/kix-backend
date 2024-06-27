@@ -62,8 +62,7 @@
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }

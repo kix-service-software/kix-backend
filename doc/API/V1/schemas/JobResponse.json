@@ -144,6 +144,10 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "IsAsynchronous" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "LastExecutionTime" : {
                "type" : "string",
                "readOnly" : true
@@ -184,6 +188,7 @@
             "CreateTime",
             "Filter",
             "ID",
+            "IsAsynchronous",
             "Name",
             "Type",
             "ValidID"

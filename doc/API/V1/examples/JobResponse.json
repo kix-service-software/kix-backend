@@ -19,6 +19,7 @@
             }
         ],
         "ID": 1,
+        "IsAsynchronous": 0,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
         "Macros": [

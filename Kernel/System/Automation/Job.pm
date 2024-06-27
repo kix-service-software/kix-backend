@@ -11,6 +11,8 @@ package Kernel::System::Automation::Job;
 use strict;
 use warnings;
 
+use Time::HiRes qw(time);
+
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::AsynchronousExecutor);
@@ -426,10 +428,11 @@ sub JobUpdate {
 
 =item JobList()
 
-returns a hash of all jobs
+returns a hash of all relevant jobs
 
     my %Jobs = $AutomationObject->JobList(
-        Valid => 1          # optional
+        Valid => 1                  # optional
+        Event => 'TicketCreate'     # optional
     );
 
 the result looks like
@@ -449,7 +452,7 @@ sub JobList {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # create cache key
-    my $CacheKey = 'JobList::' . $Valid;
+    my $CacheKey = 'JobList::' . $Valid . '::' . ($Param{Event}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -458,10 +461,19 @@ sub JobList {
     );
     return %{$Cache} if $Cache;
 
-    my $SQL = 'SELECT id, name FROM job';
+    my $SQL = 'SELECT j.id, j.name FROM job j';
 
     if ( $Param{Valid} ) {
-        $SQL .= ' WHERE valid_id = 1'
+        $SQL .= ' WHERE j.valid_id = 1'
+    }
+    if ( $Param{Event} ) {
+        # quote event string with surrounding quotes
+        # TODO: quote % in event string as well
+        my $EventString = $Kernel::OM->Get('DB')->Quote( '"' . $Param{Event} . '"', 'Like' );
+
+        $SQL .= " AND EXISTS (
+                    SELECT ep.id FROM job_exec_plan jep, exec_plan ep 
+                     WHERE jep.job_id = j.id AND jep.exec_plan_id = ep.id AND ep.type = 'EventBased' AND ep.parameters LIKE '%$EventString%')";
     }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
@@ -1079,6 +1091,11 @@ sub JobIsExecutable {
         }
     }
 
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
+
     my @ExecPlanList = $Self->JobExecPlanList(
         JobID => $Param{ID}
     );
@@ -1091,6 +1108,10 @@ sub JobIsExecutable {
             ID    => $ExecPlanID,
         );
         last if $CanExecute;
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    JobIsExecutable: checking %i execution plans took %i ms", scalar @ExecPlanList, (time() - $StartTime) * 1000);
     }
 
     return $CanExecute;
@@ -1125,6 +1146,9 @@ sub JobExecute {
 
     my $Result;
     if ( $Param{Async} ) {
+        if ( $Self->{Debug} ) {
+            $Self->_Debug(sprintf "JobExecute: executing job %i asynchronously", $Param{ID});
+        }
         # execute asynchronously
         $Self->AsyncCall(
             FunctionName   => '_JobExecute',
@@ -1157,6 +1181,11 @@ sub _JobExecute {
 
     # add JobID for log reference
     $Self->{JobID} = $Param{ID};
+
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
 
     # update execution time of job
     my $Success = $Self->_JobLastExecutionTimeSet(
@@ -1191,13 +1220,25 @@ sub _JobExecute {
         return;
     }
 
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    _JobExecute: preparations and creating job run took %i ms", (time() - $StartTime) * 1000);
+    }
+
     # add RunID for log reference
     $Self->{RunID} = $RunID;
+
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
 
     # get all assigned macros
     my @MacroIDs = $Self->JobMacroList(
         JobID => $Param{ID}
     );
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    _JobExecute: getting macro list took %i ms", (time() - $StartTime) * 1000);
+    }
 
     # return success if we have nothing to do
     my $Warning = 0;
@@ -1208,6 +1249,10 @@ sub _JobExecute {
         );
         $Warning = 1;
     } else {
+
+        if ( $Self->{Debug} ) {
+            $StartTime = time();
+        }
 
         # check the macro if they are executable, return success if not
         my $ExecutableMacroCount = 0;
@@ -1290,6 +1335,9 @@ sub _JobExecute {
                     Message  => "job execution finished successfully.",
                     UserID   => $Param{UserID},
                 );
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug(sprintf "    _JobExecute: executing %i macros took %i ms", scalar @MacroIDs, (time() - $StartTime) * 1000);
+                }
             }
         }
     }
@@ -1805,6 +1853,7 @@ sub _LoadJobTypeBackend {
         # add referrer data
         $BackendObject->{JobID} = $Self->{JobID};
         $BackendObject->{RunID} = $Self->{RunID};
+        $BackendObject->{Debug} = $Self->{Debug};
 
         $Self->{JobTypeModules}->{$Param{Name}} = $BackendObject;
     }
