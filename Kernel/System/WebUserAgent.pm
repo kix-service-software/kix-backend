@@ -135,6 +135,14 @@ If you need to set credentials
         SkipSSLVerification => 1, # (optional)
     );
 
+If you need to use a specific proxy (this overrides the global config):
+
+    my %Response = $WebUserAgentObject->Request(
+        URL      => 'http://example.com/somedata.xml',
+        Proxy    => 'proxy.example.com:3128',
+        UseProxy => 1                                   # (0|1). Defaults to 1 if undefined. 0 ignores proxy settings
+    );
+
 =cut
 
 sub Request {
@@ -192,9 +200,18 @@ sub Request {
         $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
     );
 
-    # set proxy
-    if ( $Self->{Proxy} ) {
-        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Self->{Proxy} );
+    # set UseProxy to 1 if undefined
+    $Param{UseProxy} //= 1;
+
+    # set proxy if required
+    if (
+        $Param{UseProxy}
+        && (
+            $Param{Proxy}
+            || $Self->{Proxy}
+        )
+    ) {
+        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], ( $Param{Proxy} || $Self->{Proxy} ) );
     }
 
     if ( $Param{Type} eq 'GET' ) {
