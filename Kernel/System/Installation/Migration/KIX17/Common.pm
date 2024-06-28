@@ -679,7 +679,19 @@ sub _RunParallel {
                 $Self->{Debug} = $Param{Debug};
 
                 while ( (my $Item = $Param{WorkQueue}->dequeue) ne "END_OF_QUEUE") {
-                    my $Result = $Sub->($Self, Item => $Item, %Param);
+                    my $Result;
+                    eval {
+                        $Result = $Sub->($Self, Item => $Item, %Param);
+                    };
+                    if ( !defined( $Result ) ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => 'Undefined result. Item = ' . Data::Dumper::Dumper( $Item )
+                        );
+
+                        # handle entries with undefined result as error
+                        $Result = 'Error';
+                    }
 
                     # abort if we don't have a state
                     last if $Self->_GetMigrationState()->{Status} eq 'aborting';
