@@ -98,6 +98,33 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Contact.OrganisationIDs" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Organisation::OrganisationGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Contact.PrimaryOrganisationID" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Organisation::OrganisationGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Contact.AssignedUserID" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::User::UserGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Contact.AssignedConfigItems" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>

@@ -342,18 +342,6 @@ sub ArticleCreate {
         $Param{Body} =~ s/(\r\n|\n\r)/\n/g;
         $Param{Body} =~ s/\r/\n/g;
 
-        # initialize parameter for attachments, so that the content pushed into that ref from
-        # EmbeddedImagesExtract will stay available
-        if ( !$Param{Attachment} ) {
-            $Param{Attachment} = [];
-        }
-
-        # check for base64 images in body and process them
-        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
-            DocumentRef    => \$Param{Body},
-            AttachmentsRef => $Param{Attachment},
-        );
-
         # create MessageID
         if (!$Param{MessageID}) {
             my $Time      = $Kernel::OM->Get('Time')->SystemTime();
@@ -1252,7 +1240,7 @@ sub ArticleIndex {
                         AND art.article_sender_type_id = ast.id
                         AND ast.name = ?'
                     . ($Param{CustomerVisible} ? ' AND art.customer_visible = 1' : '') .
-                    ' ORDER BY art.id',
+                    ' ORDER BY art.incoming_time',
             Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
         );
     } else {
@@ -1262,7 +1250,7 @@ sub ArticleIndex {
                 FROM article
                 WHERE ticket_id = ?'
                 . ($Param{CustomerVisible} ? ' AND customer_visible = 1' : '') .
-                ' ORDER BY id',
+                ' ORDER BY incoming_time',
             Bind => [ \$Param{TicketID} ],
         );
     }

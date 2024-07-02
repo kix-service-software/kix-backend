@@ -62,6 +62,10 @@ sub new {
     $Type =~ /^.*?::(V1::.*?)$/;
     $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::'.$1);
 
+    $Self->{'Cache::Debug'}      = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    $Self->{'API::Debug'}        = $Kernel::OM->Get('Config')->Get('API::Debug');
+    $Self->{'Permission::Debug'} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
+
     return $Self;
 }
 =item RunOperation()
@@ -797,7 +801,8 @@ include a sub-resource only if a property exists and has a true value (due to pe
 
     $CommonObject->IncludeSubResourceIfProperty(
         SubResource => '...',
-        Property    => '...'
+        Property    => '...',
+        AdditionalParameters => {},         # optional
     );
 
 =cut
@@ -821,7 +826,73 @@ sub IncludeSubResourceIfProperty {
             next;
         }
         $Self->_Debug( $Self->{LevelIndent}, "including sub-resource \"$SubResource\" only if property \"$Param{Property}\"" );
-        $Self->{IncludeSubResourceIfProperty}->{lc($SubResource)} = $Param{Property};
+        $Self->{IncludeSubResourceIfProperty}->{lc($SubResource)} = {
+            Property             => $Param{Property},
+            AdditionalParameters => $Param{AdditionalParameters}
+        };
+    }
+}
+
+=item AutoExpandProperty()
+
+automatically expand a property later in the response
+
+    $CommonObject->AutoExpandProperty(
+        Property    => '...',
+        AdditionalParameters => {},         # optional
+    );
+
+=cut
+
+sub AutoExpandProperty {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Property)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'ExtendProperty.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    $Self->_Debug( $Self->{LevelIndent}, "automatically expanding property \"$Param{Property}\"" );
+    $Self->{AutoExpandProperty}->{$Param{Property}} = {
+        AdditionalParameters => $Param{AdditionalParameters}
+    };
+    # add property to expansions
+    $Self->{Expand}->{$Param{Property}} = 1;
+}
+
+=item PreventInclude()
+
+prevent include
+
+    $CommonObject->PreventInclude(
+        Include    => '...' || [...],
+    );
+
+=cut
+
+sub PreventInclude {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Include)) {
+        if ( !$Param{$Needed} ) {
+            return $Self->_Error(
+                Code    => 'PreventInclude.MissingParameter',
+                Message => "$Needed parameter is missing!",
+            );
+        }
+    }
+
+    my @Includes = IsArrayRefWithData($Param{Include}) ? @{$Param{Include}} : ( $Param{Include} );
+
+    foreach my $Include ( @Includes ) {
+        $Self->_Debug( $Self->{LevelIndent}, "preventing include \"$Include\"" );
+        delete $Self->{Include}->{$Include};
     }
 }
 
@@ -865,7 +936,10 @@ sub AddCacheDependency {
         if ( exists $Self->{CacheDependencies}->{$Type} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
+
+        if ( $Kernel::OM->Get('Config')->Get('Cache::Debug') ) {
+            $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
+        }
         $Self->{CacheDependencies}->{$Type} = 1;
     }
 }
@@ -902,6 +976,7 @@ sub AddCacheKeyExtension {
 
     foreach my $Extension ( @{ $Param{Extension} } ) {
         push( @{ $Self->{CacheKeyExtensions} }, $Extension );
+        $Self->_Debug($Self->{LevelIndent}, "adding cache key extension \"$Extension\"");
     }
 }
 
@@ -1581,8 +1656,8 @@ sub ExecOperation {
                 $Self->AddCacheDependency( Type => $CacheDep );
             }
         }
-        if ( $Kernel::OM->Get('Config')->Get('API::Debug') ) {
-            $Self->_Debug( $Self->{LevelIndent}, "    cache type $Self->{OperationConfig}->{CacheType} now depends on: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
+        if ( $Self->{'Cache::Debug'} ) {
+            $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    cache type $Self->{OperationConfig}->{CacheType} now depends on: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
         }
     }
 
@@ -2185,7 +2260,7 @@ sub _ApplyInclude {
                     my $Index = 0;
                     ITEM:
                     foreach my $Item ( @{$Param{Data}->{$Object}} ) {
-                        if ( $Self->{IncludeSubResourceIfProperty}->{lc($Include)} && !$Item->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}} ) {
+                        if ( IsHashRefWithData($Self->{IncludeSubResourceIfProperty}->{lc($Include)}) && !$Item->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{Property}} ) {
                             $Param{Data}->{$Object}->[ $Index++ ]->{$Include} = [];
                             next ITEM;
                         }
@@ -2195,6 +2270,7 @@ sub _ApplyInclude {
                             OperationType => $IncludeOperation,
                             Data          => {
                                 %{ $Self->{RequestData} },
+                                %{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{AdditionalParameters} || {}},
                                 $Self->{OperationConfig}->{ObjectID} => $Item->{$Self->{OperationConfig}->{ObjectID}} || $Item->{ID},
                                 }
                         );
@@ -2210,7 +2286,7 @@ sub _ApplyInclude {
                     }
                 }
                 else {
-                    if ( $Self->{IncludeSubResourceIfProperty}->{lc($Include)} && !$Param{Data}->{$Object}->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}} ) {
+                    if ( IsHashRefWithData($Self->{IncludeSubResourceIfProperty}->{lc($Include)}) && !$Param{Data}->{$Object}->{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{Property}} ) {
                         $Param{Data}->{$Object}->{$Include} = [];
                         next OBJECT;
                     }
@@ -2220,6 +2296,7 @@ sub _ApplyInclude {
                         OperationType => $IncludeOperation,
                         Data          => {
                             %{ $Self->{RequestData} },
+                            %{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{AdditionalParameters} || {}},
                             $Self->{OperationConfig}->{ObjectID} => $Param{Data}->{$Object}->{ $Self->{OperationConfig}->{ObjectID} } || $Param{Data}->{$Object}->{ID}
                         }
                     );
@@ -2336,11 +2413,14 @@ sub _ApplyExpand {
         return;
     }
 
+    $Self->{_ExpandedProperties} //= {};
+
     my $GenericExpands = $Kernel::OM->Get('Config')->Get('API::Operation::GenericExpand');
 
     if ( IsHashRefWithData($GenericExpands) ) {
         foreach my $Object ( keys %{ $Param{Data} } ) {
             foreach my $AttributeToExpand ( keys %{ $Self->{Expand} } ) {
+                next if $Self->{_ExpandedProperties}->{$Object . '.' . $AttributeToExpand};
                 next if !$GenericExpands->{ $Object . '.' . $AttributeToExpand } && !$GenericExpands->{$AttributeToExpand};
 
                 $Self->_Debug( $Self->{LevelIndent}, "GenericExpand: $AttributeToExpand" );
@@ -2364,6 +2444,7 @@ sub _ApplyExpand {
                         if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
                             return $Result;
                         }
+                        $Self->{_ExpandedProperties}->{$Object . '.' . $AttributeToExpand} = 1;
                     }
                 }
             }
@@ -2396,7 +2477,36 @@ sub _ExpandObject {
     }
 
     my @Array;
-    if ( IsArrayRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
+    my @UnresolvedContacts;
+    if ( $Param{ExpanderConfig}->{Type} eq 'EmailAddressList' ) {
+        return 1 if !IsStringWithData( $Data->{ $Param{AttributeToExpand} } );
+
+        # doing some special handling here
+        if ( !$Self->{EmailParserObject} ) {
+            $Self->{EmailParserObject} = Kernel::System::EmailParser->new(
+                Mode => 'Standalone',
+            );
+        }
+        if ( $Self->{EmailParserObject} ) {
+            my $Counter = 0;
+            for my $EmailSplit ( $Self->{EmailParserObject}->SplitAddressLine( Line => $Data->{ $Param{AttributeToExpand} } ) ) {
+                my $Email = $Self->{EmailParserObject}->GetEmailAddress( Email => $EmailSplit );
+
+                my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    Email  => $Email,
+                    Silent => 1
+                );
+                if ( $ContactID ) {
+                    push @Array, $ContactID 
+                }
+                else {
+                    push @UnresolvedContacts, { Index => $Counter, Value => $EmailSplit };
+                }
+                $Counter++;
+            }
+        }
+    }
+    elsif ( IsArrayRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
         @Array = @{ $Data->{ $Param{AttributeToExpand} } };
     }
     elsif ( IsHashRefWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
@@ -2409,8 +2519,10 @@ sub _ExpandObject {
     }
     elsif ( IsStringWithData( $Data->{ $Param{AttributeToExpand} } ) ) {
 
+        my $Value = $Data->{ $Param{AttributeToExpand} };
+
         # convert scalar into our data array for further use
-        @Array = ( $Data->{ $Param{AttributeToExpand} } );
+        @Array = ( $Value );
     }
     else {
         # no data available to expand
@@ -2449,6 +2561,13 @@ sub _ExpandObject {
             $ExecData{$TargetAttr} = $Data->{$SourceAttr},
         }
     }
+    if ( $Self->{AutoExpandProperty}->{$Param{AttributeToExpand}}->{AdditionalParameters} ) {
+        my %AddParams = %{$Self->{AutoExpandProperty}->{$Param{AttributeToExpand}}->{AdditionalParameters}};
+        %ExecData = (
+            %ExecData,
+            %AddParams
+        );
+    }
 
     my $StoreTo = $Param{ExpanderConfig}->{StoreTo} || $Param{AttributeToExpand};
 
@@ -2462,6 +2581,13 @@ sub _ExpandObject {
 
     # extract the relevant data from result
     my $ResultData = $Result->{Data}->{ ( ( keys %{ $Result->{Data} } )[0] ) };
+
+    if ( $Param{ExpanderConfig}->{Type} eq 'EmailAddressList' && @UnresolvedContacts ) {
+        foreach my $UnresolvedContact ( @UnresolvedContacts ) {
+            splice @{$ResultData}, $UnresolvedContact->{Index}, 0, $UnresolvedContact->{Value};
+        }
+    }
+
 
     if ( $Param{AttributeToExpand} =~ /[.:]/ ) {
         # we need to flatten the result data
@@ -2716,6 +2842,10 @@ sub _CacheRequest {
             Value    => $Param{Data},
             TTL      => 60 * 60 * 24 * 7,                        # 7 days
         );
+
+        if ( $Kernel::OM->Get('Config')->Get('Cache::Debug') ) {
+            $Kernel::OM->Get('Cache')->_Debug($Self->{LevelIndent}, "caching API response using key: $CacheKey");
+        }
     }
 
     return 1;
@@ -3763,7 +3893,7 @@ sub _CanRunParallel {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('API::Debug') );
+    return if ( !$Self->{'API::Debug'} );
 
     $Indent ||= '';
 
@@ -3773,7 +3903,7 @@ sub _Debug {
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('Permission::Debug') );
+    return if ( !$Self->{'Permission::Debug'} );
 
     $Indent ||= '';
 
