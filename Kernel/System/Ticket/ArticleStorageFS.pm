@@ -930,11 +930,11 @@ sub ArticleAttachment {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ArticleID FileID UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(ArticleID FileID UserID)) {
+        if ( !$Param{ $Needed } ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!",
+                Message  => "Need $Needed!",
             );
             return;
         }
@@ -944,133 +944,161 @@ sub ArticleAttachment {
     $Param{ArticleID} = quotemeta( $Param{ArticleID} );
     $Param{ArticleID} =~ s/\0//g;
 
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
-    # read cache
-    if ( $Self->{ArticleStorageCache} ) {
-
-        my $Cache = $CacheObject->Get(
-            Type           => 'ArticleStorageFS_' . $Param{ArticleID},
-            Key            => 'ArticleAttachment' . $Param{FileID},
-            CacheInMemory  => 0,
-            CacheInBackend => 1,
-        );
-
-        return %{$Cache} if $Cache;
-    }
-
-    # get attachment index
-    my %Index = $Self->ArticleAttachmentIndex(
-        ArticleID => $Param{ArticleID},
-        UserID    => $Param{UserID},
-    );
-
     # get content path
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
-    my %Data        = %{ $Index{ $Param{FileID} } };
-    my $Counter     = 0;
 
-    # get main object
-    my $MainObject = $Kernel::OM->Get('Main');
+    # init data variable
+    my %Data = ();
 
-    my @List = $MainObject->DirectoryRead(
+    # get file list from directory
+    my @FileList = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}",
         Filter    => "*",
         Silent    => 1,
     );
 
-    if (@List) {
+    # check if directory has file entries
+    if ( @FileList ) {
 
-        # get encode object
-        my $EncodeObject = $Kernel::OM->Get('Encode');
+        # init counter, used as FileID
+        my $FileID = 0;
 
+        # process file list
         FILENAME:
-        for my $Filename (@List) {
-            next FILENAME if $Filename =~ /\.content_alternative$/;
-            next FILENAME if $Filename =~ /\.content_id$/;
-            next FILENAME if $Filename =~ /\.content_type$/;
-            next FILENAME if $Filename =~ /\/plain.txt$/;
-            next FILENAME if $Filename =~ /\.disposition$/;
+        for my $Filename ( @FileList ) {
+            # skip meta data files
+            next FILENAME if (
+                $Filename =~ /\.content_alternative$/
+                || $Filename =~ /\.content_id$/
+                || $Filename =~ /\.content_type$/
+                || $Filename =~ /\/plain.txt$/
+                || $Filename =~ /\.disposition$/
+            );
 
-            # add the info the the hash
-            $Counter++;
-            if ( $Counter == $Param{FileID} ) {
+            # increment counter
+            $FileID += 1;
 
+            # check for relevant file
+            if ( $FileID == $Param{FileID} ) {
+
+                # prepare general meta data
+                if ( !$Param{NoMeta} ) {
+                    # get filename and strip path
+                    $Data{Filename} = $Filename;
+                    $Data{Filename} =~ s!^.*/!!;
+
+                    # human readable file size
+                    my $FileSize    = -s $Filename || 0;
+                    if ( $FileSize > ( 1024 * 1024 ) ) {
+                        $Data{FileSize} = sprintf "%.1f MBytes", ( $FileSize / ( 1024 * 1024 ) );
+                    }
+                    elsif ( $FileSize > 1024 ) {
+                        $Data{FileSize} = sprintf "%.1f KBytes", ( ( $FileSize / 1024 ) );
+                    }
+                    else {
+                        $Data{FileSize} = $FileSize . ' Bytes';
+                    }
+                    $Data{FileSizeRaw} = $FileSize;
+                }
+
+                # check if meta file '.content_type' is avaiable
                 if ( -e "$Filename.content_type" ) {
 
-                    # read content type
-                    my $Content = $MainObject->FileRead(
-                        Location => "$Filename.content_type",
-                    );
-                    return if !$Content;
-                    $Data{ContentType} = ${$Content};
-
+                    # check if content is requested
+                    # always get content-type for encoding together with content
                     if ( !$Param{NoContent} ) {
                         # read content
-                        $Content = $MainObject->FileRead(
+                        my $Content1 = $Kernel::OM->Get('Main')->FileRead(
                             Location => $Filename,
                             Mode     => 'binmode',
                         );
-                        return if !$Content;
-                        $Data{Content} = ${$Content};
-                    }
+                        return if !$Content1;
+                        $Data{Content} = ${ $Content1 };
 
-                    # content id (optional)
-                    if ( -e "$Filename.content_id" ) {
-                        my $Content = $MainObject->FileRead(
-                            Location => "$Filename.content_id",
+                        # read content-type
+                        my $Content2 = $Kernel::OM->Get('Main')->FileRead(
+                            Location => "$Filename.content_type",
                         );
-                        if ($Content) {
-                            $Data{ContentID} = ${$Content};
-                        }
+                        return if !$Content2;
+                        $Data{ContentType} = ${ $Content2 };
                     }
 
-                    # alternative (optional)
-                    if ( -e "$Filename.content_alternative" ) {
-                        my $Content = $MainObject->FileRead(
-                            Location => "$Filename.content_alternative",
+                    # check if meta data is requested
+                    if ( !$Param{NoMeta} ) {
+                        # check if content-type is already set
+                        if ( !$Data{ContentType} ) {
+                            # read content type
+                            my $Content = $Kernel::OM->Get('Main')->FileRead(
+                                Location => "$Filename.content_type",
+                            );
+                            return if !$Content;
+                            $Data{ContentType} = ${ $Content };
+                        }
+
+                        # init mapping for optional meta data
+                        my %MetaMap = (
+                            ContentID          => 'content_id',
+                            ContentAlternative => 'content_alternative',
+                            Disposition        => 'disposition',
                         );
-                        if ($Content) {
-                            $Data{Alternative} = ${$Content};
+
+                        # process optional meta data
+                        for my $MetaAttribute ( keys( %MetaMap ) ) {
+                            # prepare file name
+                            my $MetaFilename = $Filename . '.' . $MetaMap{ $MetaAttribute };
+
+                            # init attribute with empty value
+                            $Data{ $MetaAttribute } = '';
+
+                            # check meta file existance
+                            if ( -e $MetaFilename ) {
+                                # read meta file content
+                                my $Content = $Kernel::OM->Get('Main')->FileRead(
+                                    Location => $MetaFilename,
+                                );
+
+                                # set attribut if meta file has content
+                                if ($Content) {
+                                    $Data{ $MetaAttribute } = ${ $Content };
+                                }
+                            }
                         }
-                    }
 
-                    # disposition
-                    if ( -e "$Filename.disposition" ) {
-                        my $Content = $MainObject->FileRead(
-                            Location => "$Filename.disposition",
-                        );
-                        if ($Content) {
-                            $Data{Disposition} = ${$Content};
+                        # if no content disposition is set
+                        if ( !$Data{Disposition} ) {
+                            # images with content id should be inline
+                            if (
+                                $Data{ContentID}
+                                && $Data{ContentType} =~ m{image}i
+                            ) {
+                                $Data{Disposition} = 'inline';
+                            }
+
+                            # converted article body should be inline
+                            elsif ( $Filename =~ m{file-[12]} ) {
+                                $Data{Disposition} = 'inline'
+                            }
+
+                            # all others including attachments with content id that are not images
+                            #   should NOT be inline
+                            else {
+                                $Data{Disposition} = 'attachment';
+                            }
                         }
-                    }
-
-                    # if no content disposition is set images with content id should be inline
-                    elsif ( $Data{ContentID} && $Data{ContentType} =~ m{image}i ) {
-                        $Data{Disposition} = 'inline';
-                    }
-
-                    # converted article body should be inline
-                    elsif ( $Filename =~ m{file-[12]} ) {
-                        $Data{Disposition} = 'inline'
-                    }
-
-                    # all others including attachments with content id that are not images
-                    #   should NOT be inline
-                    else {
-                        $Data{Disposition} = 'attachment';
                     }
                 }
+                # no meta file '.content_type' is avaiable
+                # get content if requested
                 elsif ( !$Param{NoContent} ) {
-
                     # read content
-                    my $Content = $MainObject->FileRead(
+                    my $Content = $Kernel::OM->Get('Main')->FileRead(
                         Location => $Filename,
                         Mode     => 'binmode',
                         Result   => 'ARRAY',
                     );
                     return if !$Content;
+
+                    # get content-type from first line of file
                     $Data{ContentType} = $Content->[0];
                     my $Counter = 0;
                     for my $Line ( @{$Content} ) {
@@ -1080,27 +1108,19 @@ sub ArticleAttachment {
                         $Counter++;
                     }
                 }
-                if (
-                    $Data{ContentType} =~ /plain\/text/i
-                    && $Data{ContentType} =~ /(utf\-8|utf8)/i
-                    )
-                {
-                    $EncodeObject->EncodeInput( \$Data{Content} );
+
+                # remove new line character from end of content-type
+                if ( $Data{ContentType} ) {
+                    chomp( $Data{ContentType} );
                 }
 
-                chomp $Data{ContentType};
-
-                # set cache
-                if ( $Self->{ArticleStorageCache} ) {
-
-                    $CacheObject->Set(
-                        Type           => 'ArticleStorageFS_' . $Param{ArticleID},
-                        TTL            => $Self->{ArticleStorageCacheTTL},
-                        Key            => 'ArticleAttachment' . $Param{FileID},
-                        Value          => \%Data,
-                        CacheInMemory  => 0,
-                        CacheInBackend => 1,
-                    );
+                # encode plain text
+                if (
+                    !$Param{NoContent}
+                    && $Data{ContentType} =~ /plain\/text/i
+                    && $Data{ContentType} =~ /(?:utf\-8|utf8)/i
+                ) {
+                    $Kernel::OM->Get('Encode')->EncodeInput( \$Data{Content} );
                 }
 
                 return %Data;
@@ -1180,23 +1200,9 @@ sub ArticleAttachment {
     if ( !$Data{Content} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message =>
-                "$!: $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/$Data{Filename}!",
+            Message  => "$!: $Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}/$Data{Filename}!",
         );
         return;
-    }
-
-    # set cache
-    if ( $Self->{ArticleStorageCache} ) {
-
-        $CacheObject->Set(
-            Type           => 'ArticleStorageFS_' . $Param{ArticleID},
-            TTL            => $Self->{ArticleStorageCacheTTL},
-            Key            => 'ArticleAttachment' . $Param{FileID},
-            Value          => \%Data,
-            CacheInMemory  => 0,
-            CacheInBackend => 1,
-        );
     }
 
     return %Data;
