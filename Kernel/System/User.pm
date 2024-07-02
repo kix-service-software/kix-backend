@@ -2086,7 +2086,6 @@ sub UpdateCounters {
                 }
             ],
             Watched => [
-                $BaseTicketFilter,
                 {
                     Field    => 'WatcherUserID',
                     Operator => 'EQ',
@@ -2094,7 +2093,6 @@ sub UpdateCounters {
                 }
             ],
             WatchedAndUnseen => [
-                $BaseTicketFilter,
                 {
                     Field    => 'WatcherUserID',
                     Operator => 'EQ',
