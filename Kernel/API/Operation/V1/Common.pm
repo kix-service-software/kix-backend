@@ -2314,8 +2314,11 @@ sub _ApplyInclude {
         }
     }
 
+    $Self->{_IncludedProperties} //= {};
+
     # handle generic includes
     my $GenericIncludes = $Kernel::OM->Get('Config')->Get('API::Operation::GenericInclude');
+
     if ( IsHashRefWithData($GenericIncludes) ) {
         foreach my $Include ( keys %{ $Self->{Include} } ) {
             next if !$GenericIncludes->{$Include};
@@ -2346,6 +2349,7 @@ sub _ApplyInclude {
 
             # do it for every object in the response
             foreach my $Object ( keys %{ $Param{Data} } ) {
+                next if $Self->{_IncludedProperties}->{$Object . '.' . $Include};
                 next if !$Param{Data}->{$Object};
 
                 if ( IsArrayRefWithData( $Param{Data}->{$Object} ) ) {
@@ -2389,6 +2393,8 @@ sub _ApplyInclude {
                         }
                     }
                 }
+
+                $Self->{_IncludedProperties}->{$Object . '.' . $Include} = 1;
             }
 
             $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
@@ -2441,10 +2447,13 @@ sub _ApplyExpand {
                             Data              => $ItemData
                         );
 
-                        if ( IsHashRefWithData($Result) && !$Result->{Success} ) {
-                            return $Result;
+                        if ( IsHashRefWithData($Result)  ) {
+                            if ( !$Result->{Success} ) {
+                                return $Result;
+                            }
+
+                            $Self->{_ExpandedProperties}->{$Object . '.' . $AttributeToExpand} = 1;
                         }
-                        $Self->{_ExpandedProperties}->{$Object . '.' . $AttributeToExpand} = 1;
                     }
                 }
             }
