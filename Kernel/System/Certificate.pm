@@ -1224,10 +1224,6 @@ sub Verify {
                 }
             }
 
-            if ( IsArrayRefWithData($Verified{Content}) ) {
-                $Content = $Verified{Content};
-            }
-
             # sender email does not match signing certificate!
             if ( !$SignerSenderMatch ) {
                 my $Message = $Verified{Error};
