@@ -14,9 +14,9 @@ use strict;
 use warnings;
 
 use HTTP::Headers;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use List::Util qw(first);
 use LWP::UserAgent;
-use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -61,11 +61,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get database object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    $Self->{Timeout} = $Param{Timeout} || $ConfigObject->Get('WebUserAgent::Timeout') || 15;
-    $Self->{Proxy}   = $Param{Proxy}   || $ConfigObject->Get('WebUserAgent::Proxy')   || '';
+    $Self->{Timeout} = $Param{Timeout} || $Kernel::OM->Get('Config')->Get('WebUserAgent::Timeout') || 15;
+    $Self->{Proxy}   = $Param{Proxy}   || $Kernel::OM->Get('Config')->Get('WebUserAgent::Proxy')   || '';
 
     return $Self;
 }
@@ -192,12 +189,9 @@ sub Request {
     # set timeout
     $UserAgent->timeout( $Self->{Timeout} );
 
-    # get database object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     # set user agent
     $UserAgent->agent(
-        $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
+        $Kernel::OM->Get('Config')->Get('Product') . ' ' . $Kernel::OM->Get('Config')->Get('Version')
     );
 
     # set UseProxy to 1 if undefined

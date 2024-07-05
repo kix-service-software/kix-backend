@@ -12,6 +12,9 @@ use strict;
 use warnings;
 
 use CGI;
+use Data::Dumper;
+use HTTP::Request;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use LWP::UserAgent;
 use Time::HiRes;
 
@@ -58,10 +61,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get needed objects
-    $Self->{LogObject} = $Kernel::OM->Get('Log');
-    $Self->{CacheObject} = $Kernel::OM->Get('Cache');
-
     $Self->{DisableClientNotifications} = $Param{DisableClientNotifications};
 
     $Self->{NotificationCount} = 0;
@@ -102,7 +101,7 @@ sub NotifyClients {
     # get RequestID
     my $RequestID = $ENV{HTTP_KIX_REQUEST_ID} || '';
 
-    $Self->{CacheObject}->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type          => 'ClientNotification',
         Key           => $$.'_'.$Timestamp.'_'.$RequestID,
         Value         => {
@@ -149,12 +148,12 @@ sub NotificationSend {
     return if $Self->{DisableClientNotifications};
 
     # get cached events
-    my @Keys = $Self->{CacheObject}->GetKeysForType(
+    my @Keys = $Kernel::OM->Get('Cache')->GetKeysForType(
         Type => 'ClientNotification',
     );
     return 1 if !@Keys;
 
-    my @EventList = $Self->{CacheObject}->GetMulti(
+    my @EventList = $Kernel::OM->Get('Cache')->GetMulti(
         Type          => 'ClientNotification',
         Keys          => \@Keys,
         UseRawKey     => 1,
@@ -164,7 +163,7 @@ sub NotificationSend {
     
     # delete the cached events we sent
     foreach my $Key ( @Keys ) {
-        $Self->{CacheObject}->Delete(
+        $Kernel::OM->Get('Cache')->Delete(
             Type          => 'ClientNotification',
             Key           => $Key,
             UseRawKey     => 1,
@@ -184,7 +183,7 @@ sub NotificationSend {
     return if !@ClientIDs;
 
     # inform the daemon worker of the work to be done
-    $Self->{CacheObject}->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type          => 'ClientNotificationToSend',
         Key           => $$.Time::HiRes::time(),
         Value         => {
@@ -222,7 +221,7 @@ sub NotificationSendWorker {
     }
 
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] sending client notifications: ".Data::Dumper::Dumper(\%Param)
         );
@@ -236,7 +235,7 @@ sub NotificationSendWorker {
     if ( IsArrayRef($Param{ClientIDs}) ) {
         # inform the relevant registered clients
         foreach my $ClientID ( @{$Param{ClientIDs}} ) {
-            $Self->{LogObject}->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'debug',
                 Message  => "Sending ". @PreparedEventList . " notifications to client \"$ClientID\" (" . (join(', ', @StatsParts)) . ').'
             );
@@ -248,7 +247,7 @@ sub NotificationSendWorker {
         }
     }
     else {
-        my $Result = $Self->{CacheObject}->{CacheObject}->_RedisCall(
+        my $Result = $Kernel::OM->Get('Cache')->{CacheObject}->_RedisCall(
             'publish',
             'KIXFrontendNotify',
             $EventList,
@@ -278,30 +277,28 @@ sub _NotificationSendToClient {
     );
 
     if ( !$Self->{UserAgent} ) {
-        my $ConfigObject       = $Kernel::OM->Get('Config');
-        my $WebUserAgentObject = $Kernel::OM->Get('WebUserAgent');
-
         # create user agent with short timeout
         $Self->{UserAgent} = LWP::UserAgent->new(timeout => 10);
 
         # set user agent
         $Self->{UserAgent}->agent(
-            $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
+            $Kernel::OM->Get('Config')->Get('Product') . ' ' . $Kernel::OM->Get('Config')->Get('Version')
         );
 
         # set timeout
-        $Self->{UserAgent}->timeout( $WebUserAgentObject->{Timeout} );
+        $Self->{UserAgent}->timeout( $Kernel::OM->Get('WebUserAgent')->{Timeout} );
 
         # disable SSL host verification
-        if ( $ConfigObject->Get('WebUserAgent::DisableSSLVerification') ) {
+        if ( $Kernel::OM->Get('Config')->Get('WebUserAgent::DisableSSLVerification') ) {
             $Self->{UserAgent}->ssl_opts(
                 verify_hostname => 0,
+                SSL_verify_mode => SSL_VERIFY_NONE,
             );
         }
 
         # set proxy
-        if ( $WebUserAgentObject->{Proxy} ) {
-            $Self->{UserAgent}->proxy( [ 'http', 'https', 'ftp' ], $WebUserAgentObject->{Proxy} );
+        if ( $Kernel::OM->Get('WebUserAgent')->{Proxy} ) {
+            $Self->{UserAgent}->proxy( [ 'http', 'https', 'ftp' ], $Kernel::OM->Get('WebUserAgent')->{Proxy} );
         }
     }
 
@@ -313,15 +310,15 @@ sub _NotificationSendToClient {
 
     $Request->content($Param{EventList});
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] executing request to client: ".$Request->as_string()
         );
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] LWP object: ".Data::Dumper::Dumper($Self->{UserAgent})
         );
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] ENV: ".Data::Dumper::Dumper(\%ENV)
         );
@@ -329,7 +326,7 @@ sub _NotificationSendToClient {
     my $Response = $Self->{UserAgent}->request($Request);
 
     if ( $Kernel::OM->Get('Config')->Get('ClientNotification::Debug') ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => "[ClientNotification] client response: ".$Response->as_string()
         );
