@@ -12,7 +12,7 @@
                 <Item Key="ResponseSchema">TicketResponse</Item>
                 <Item Key="CacheType">API_tickets</Item>
                 <Item Key="CacheTypeDependency">Ticket</Item>
-                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LinkCount; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangeBy; Unseen; UntilTime; WatcherID]</Item>
+                <Item Key="FieldSet::Default">Ticket.[TicketNumber; Title; TicketID; StateID; PriorityID; LinkCount; LockID; QueueID; OrganisationID; ContactID; OwnerID; ResponsibleID; TypeID; SLAID; Age; PendingTimeUnix; PendingTime; Created; CreateBy; Changed; ChangeBy; Unseen; UntilTime; WatcherID; StatePrevious; StateIDPrevious]</Item>
                 <Item Key="FieldSet::Short">Ticket.[TicketNumber; TicketID]</Item>
             </Hash>
         </Setting>
@@ -307,32 +307,85 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.Articles" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.OwnerID" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Operation">V1::Ticket::ArticleGet</Item>
-                <Item Key="AddParams">TicketID</Item>
+                <Item Key="Operation">V1::User::UserGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.History" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.ResponsibleID" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Operation">V1::Ticket::HistoryGet</Item>
-                <Item Key="AddParams">TicketID</Item>
+                <Item Key="Operation">V1::User::UserGet</Item>
             </Hash>
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Attachments" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###CreatedBy" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>
-                <Item Key="Operation">V1::Ticket::ArticleAttachmentGet</Item>
-                <Item Key="AddParams">TicketID,ArticleID</Item>
+                <Item Key="Operation">V1::User::UserGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###ChangedBy" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::User::UserGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Ticket.ContactID" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.To" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+                <Item Key="Type">EmailAddressList</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.From" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+                <Item Key="Type">EmailAddressList</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Cc" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+                <Item Key="Type">EmailAddressList</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Article.Bcc" Required="0" Valid="1">
+        <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Operation">V1::Contact::ContactGet</Item>
+                <Item Key="Type">EmailAddressList</Item>
             </Hash>
         </Setting>
     </ConfigItem>
