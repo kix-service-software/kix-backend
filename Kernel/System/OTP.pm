@@ -87,7 +87,7 @@ sub GenerateTOTP {
     $Param{Base32Secret} = uc( $Param{Base32Secret} );
 
     # validate Base32Secret
-    if ( $Param{Base32Secret} !~ m/^[A-Z2-7=]+$/ ) {
+    if ( $Param{Base32Secret} !~ m/^[A-Z2-7]+=*$/ ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

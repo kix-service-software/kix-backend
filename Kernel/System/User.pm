@@ -1778,7 +1778,7 @@ sub SetPreferences {
         || (
             defined( $User{Preferences}->{ $Param{Key} } )
             && defined( $Param{Value} )
-            && $User{ $Param{Preferences}->{Key} } eq $Param{Value}
+            && $User{Preferences}->{ $Param{Key} } eq $Param{Value}
         )
     );
 

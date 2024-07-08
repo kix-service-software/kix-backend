@@ -92,10 +92,12 @@ sub MFAuth {
     # check needed stuff
     for my $Needed ( qw(User UserID) ) {
         if ( !$Param{ $Needed } ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return 0;
         }
     }
@@ -118,27 +120,33 @@ sub MFAuth {
         }
 
         # otherwise login counts as failed
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "MFA Secret not set for user $Param{User}."
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "MFA Secret not set for user $Param{User}."
+            );
+        }
         return 0;
     }
 
     # check if MFAToken is given
     if ( ref( $Param{MFAToken} ) ne 'HASH' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Parameter MFAToken has to be a HASH!'
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Parameter MFAToken has to be a HASH!'
+            );
+        }
         return 0;
     }
     for my $Needed ( qw(Type Value) ) {
         if ( !$Param{MFAToken}->{ $Needed } ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed in MFAToken!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed in MFAToken!"
+                );
+            }
             return 0;
         }
     }
@@ -156,7 +164,8 @@ sub MFAuth {
             TimeStep     => $Self->{TOTPTimeStep},
             Digits       => $Self->{TOTPDigits},
             Algorithm    => $Self->{TOTPAlgorithm},
-            Previous     => $Previous
+            Previous     => $Previous,
+            Silent       => $Param{Silent}
         );
 
         # check token
@@ -175,10 +184,12 @@ sub GenerateSecret {
     # check needed stuff
     for my $Needed ( qw(MFAuth) ) {
         if ( !$Param{ $Needed } ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Need $Needed!"
+                );
+            }
             return;
         }
     }

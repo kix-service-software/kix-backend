@@ -12,13 +12,18 @@ use utf8;
 
 use vars (qw($Self));
 
+# get timezone offset
+use Time::Local;
+my @Time = localtime(time);
+my $TZOffset = timegm(@Time) - timelocal(@Time);
+
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # set fixed time for test
 $Helper->FixedTimeSet(
     $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-        String => '2014-01-01 12:00:00',
+        String => '2014-01-01 12:00:00 +' . $TZOffset . 's',
     ),
 );
 
@@ -72,7 +77,7 @@ my @Tests = (
         Input  => {
             Base32Secret => 'SECRET234',
         },
-        Output => '876948',
+        Output => '603764',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, TimeStep 60s',
@@ -80,7 +85,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             TimeStep     => 60,
         },
-        Output => '371471',
+        Output => '029357',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, eigth Digits',
@@ -88,7 +93,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Digits       => 8,
         },
-        Output => '67876948',
+        Output => '88603764',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, Algorithm SHA256',
@@ -96,7 +101,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Algorithm    => 'SHA256',
         },
-        Output => '732950',
+        Output => '311578',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, Algorithm SHA512',
@@ -104,7 +109,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Algorithm    => 'SHA512',
         },
-        Output => '529007',
+        Output => '062740',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, previous OTP',
@@ -112,7 +117,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Previous     => 1,
         },
-        Output => '909756',
+        Output => '009220',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, one before previous OTP',
@@ -120,7 +125,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Previous     => 2,
         },
-        Output => '441849',
+        Output => '138460',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, next OTP',
@@ -128,7 +133,7 @@ my @Tests = (
             Base32Secret => 'SECRET234',
             Previous     => -1,
         },
-        Output => '519952',
+        Output => '209916',
     },
     {
         Name   => 'GenerateTOTP - Valid Base32Secret, all parameter',
@@ -139,7 +144,7 @@ my @Tests = (
             Algorithm    => 'SHA1',
             Previous     => 3,
         },
-        Output => '2225250',
+        Output => '0589532',
     },
 );
 
@@ -152,8 +157,8 @@ for my $Test (@Tests) {
 
     if ( $Test->{Output} ) {
         $Self->Is(
-            $Test->{Output},
             $TOTP,
+            $Test->{Output},
             $Test->{Name},
         );
     }
