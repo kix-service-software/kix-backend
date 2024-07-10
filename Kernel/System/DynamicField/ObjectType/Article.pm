@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -120,6 +120,105 @@ sub PostValueSet {
         Bind => [ \$Param{UserID}, \$Article{TicketID} ],
     );
 
+    my $HistoryValue    = defined $Param{Value}    ? $Param{Value}    : '';
+    my $HistoryOldValue = defined $Param{OldValue} ? $Param{OldValue} : '';
+
+    # get dynamic field backend object
+    my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
+
+    # get value for storing
+    my $ValueStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        DynamicFieldConfig => $Param{DynamicFieldConfig},
+        Value              => $HistoryValue,
+        Silent             => $Param{Silent} || 0,
+    );
+    $HistoryValue = $ValueStrg->{Value};
+
+    my $OldValueStrg = $DynamicFieldBackendObject->ReadableValueRender(
+        DynamicFieldConfig => $Param{DynamicFieldConfig},
+        Value              => $HistoryOldValue,
+        Silent             => $Param{Silent} || 0,
+    );
+    $HistoryOldValue = $OldValueStrg->{Value};
+
+    my $FieldName;
+    if ( !defined $Param{DynamicFieldConfig}->{Name} ) {
+        $FieldName = q{};
+    }
+    else {
+        $FieldName = $Param{DynamicFieldConfig}->{Name};
+    }
+
+    my $FieldNameLength       = length $FieldName       || 0;
+    my $HistoryValueLength    = length $HistoryValue    || 0;
+    my $HistoryOldValueLength = length $HistoryOldValue || 0;
+
+# Name in ticket_history is like this form "\%\%FieldName\%\%$FieldName\%\%Value\%\%$HistoryValue\%\%OldValue\%\%$HistoryOldValue" up to 200 chars
+# \%\%FieldName\%\% is 13 chars
+# \%\%Value\%\% is 9 chars
+# \%\%OldValue\%\%$HistoryOldValue is 12
+# we have for info part of ticket history data ($FieldName+$HistoryValue+$OldValue) up to 166 chars
+# in this code is made substring. The same number of characters is provided for both of part in Name ($FieldName and $HistoryValue and $OldVAlue) up to 55 chars
+# if $FieldName and $HistoryValue and $OldVAlue is cut then info is up to 50 chars plus [...] (5 chars)
+# First it is made $HistoryOldValue, then it is made $FieldName, and then  $HistoryValue
+# Length $HistoryValue can be longer then 55 chars, also is for $OldValue.
+
+    my $NoCharacters = 166;
+
+    if ( ( $FieldNameLength + $HistoryValueLength + $HistoryOldValueLength ) > $NoCharacters ) {
+
+        # OldValue is maybe less important
+        # At first it is made HistoryOldValue
+        # and now it is possible that for HistoryValue would FieldName be more than 55 chars
+        if ( length($HistoryOldValue) > 55 ) {
+            $HistoryOldValue = substr( $HistoryOldValue, 0, 50 );
+            $HistoryOldValue .= '[...]';
+        }
+
+        # limit FieldName to 55 chars if is necessary
+        my $FieldNameLength = int( ( $NoCharacters - length($HistoryOldValue) ) / 2 );
+        my $ValueLength = $FieldNameLength;
+        if ( length($FieldName) > $FieldNameLength ) {
+
+            # HistoryValue will be at least 55 chars or more, if is FieldName or HistoryOldValue less than 55 chars
+            if ( length($HistoryValue) > $ValueLength ) {
+                $FieldNameLength = $FieldNameLength - 5;
+                $FieldName = substr( $FieldName, 0, $FieldNameLength );
+                $FieldName .= '[...]';
+                $ValueLength = $ValueLength - 5;
+                $HistoryValue = substr( $HistoryValue, 0, $ValueLength );
+                $HistoryValue .= '[...]';
+            }
+            else {
+                $FieldNameLength = $NoCharacters - length($HistoryOldValue) - length($HistoryValue) - 5;
+                $FieldName = substr( $FieldName, 0, $FieldNameLength );
+                $FieldName .= '[...]';
+            }
+        }
+        else {
+            $ValueLength = $NoCharacters - length($HistoryOldValue) - length($FieldName) - 5;
+            if ( length($HistoryValue) > $ValueLength ) {
+                $HistoryValue = substr( $HistoryValue, 0, $ValueLength );
+                $HistoryValue .= '[...]';
+            }
+        }
+    }
+
+    $HistoryValue    //= '';
+    $HistoryOldValue //= '';
+
+    # history insert
+    $TicketObject->HistoryAdd(
+        TicketID    => $Article{TicketID},
+        ArticleID   => $Param{ObjectID},
+        HistoryType => 'ArticleDynamicFieldUpdate',
+        Name =>
+            "\%\%FieldName\%\%$FieldName"
+            . "\%\%Value\%\%$HistoryValue"
+            . "\%\%OldValue\%\%$HistoryOldValue",
+        CreateUserID => $Param{UserID},
+    );
+
     # clear ticket cache
     $TicketObject->_TicketCacheClear( TicketID => $Article{TicketID} );
 
@@ -148,10 +247,6 @@ sub PostValueSet {
 }
 
 1;
-
-
-
-
 
 =back
 

@@ -184,10 +184,25 @@ sub Run {
 
             if ( $Attribute =~ m{\A DynamicField_(.*) \z}msx ) {
                 if ( $ArticleRaw{$Attribute} ) {
-                    push @DynamicFields, {
-                        Name  => $1,
-                        Value => $ArticleRaw{$Attribute},
-                    };
+                    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+                        Name => $1,
+                    );
+                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
+
+                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
+
+                        my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
+                            Config          => $DynamicFieldConfig,
+                            Value           => $ArticleRaw{$Attribute},
+                            NoDisplayValues => [ split(',', $Param{Data}->{NoDynamicFieldDisplayValues}||'') ]
+                        );
+
+                        if (IsHashRefWithData($PreparedValue)) {
+                            push(@DynamicFields, $PreparedValue);
+                        }
+
+                    }
                 }
                 next ATTRIBUTE;
             }
