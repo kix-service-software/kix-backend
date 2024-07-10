@@ -380,6 +380,24 @@ sub _GetTicketData {
         );
     }
 
+    # add array of article ids
+    if ( $Param{Data}->{include}->{ArticleIDs} ) {
+        my @ArticleIndex = $TicketObject->ArticleIndex(
+            TicketID => $TicketID,
+            UserID   => $Self->{Authorization}->{UserID},
+        );
+
+        # filter for customer assigned articles if necessary
+        @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
+            TicketID               => $Param{Data}->{TicketID},
+            ObjectType             => 'TicketArticle',
+            ObjectIDList           => \@ArticleIndex,
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        );
+        $TicketData{ArticleIDs} = \@ArticleIndex;
+    }
+
     #FIXME: workaround KIX2018-3308
     if ($TicketData{ContactID}) {
         $TicketData{ContactID}      = "" . $TicketData{ContactID};

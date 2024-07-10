@@ -224,6 +224,7 @@ ObjectSearch::Database::FAQArticle                                            = 
 ObjectSearch::Database::GeneralCatalog                                        = Kernel::System::ObjectSearch::Database::GeneralCatalog
 ObjectSearch::Database::Organisation                                          = Kernel::System::ObjectSearch::Database::Organisation
 ObjectSearch::Database::Ticket                                                = Kernel::System::ObjectSearch::Database::Ticket
+ObjectSearch::Database::Article                                               = Kernel::System::ObjectSearch::Database::Article
 Organisation                                                                  = Kernel::System::Organisation
 OTP                                                                           = Kernel::System::OTP
 PDF                                                                           = Kernel::System::PDF
