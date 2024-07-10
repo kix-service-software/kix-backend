@@ -318,7 +318,7 @@ sub _ArticleCreate {
 
         foreach my $Attachment ( @{$Article->{Attachments}} ) {
             $Attachment->{Content} = MIME::Base64::decode_base64( $Attachment->{Content} );
-            $Attachment->{Disposition} = 'attachment';
+            $Attachment->{Disposition} //= 'attachment';
         }
     }
 
@@ -378,17 +378,17 @@ sub _ArticleCreate {
 
         DYNAMICFIELD:
         foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-            my $Result = $Self->SetDynamicFieldValue(
+            my $Result = $Self->_SetDynamicFieldValue(
                 %{$DynamicField},
-                TicketID  => $Ticket->{TicketID},
-                ArticleID => $ArticleID,
-                UserID    => $Param{UserID},
+                ObjectID   => $ArticleID,
+                ObjectType => 'Article',
+                UserID     => $Self->{Authorization}->{UserID},
             );
 
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     Code    => 'Operation.InternalError',
-                    Message => "Dynamic Field $DynamicField->{Name} could not be set, please contact the system administrator",
+                    Message => "Dynamic Field $DynamicField->{Name} could not be set ($Result->{Message})",
                 );
             }
         }

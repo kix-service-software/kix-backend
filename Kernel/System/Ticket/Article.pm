@@ -2115,6 +2115,7 @@ sub ArticleUpdate {
         CustomerVisible => 'customer_visible',
         SenderTypeID    => 'article_sender_type_id',
         IncomingTime    => 'incoming_time',
+        ContentType     => 'a_content_type',
     );
 
     # db update

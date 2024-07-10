@@ -1627,6 +1627,7 @@
                 <Item Key="Unlock" Translatable="1">Unlocked ticket.</Item>
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
                 <Item Key="ArticleDelete" Translatable="1">Article ID %s - %s deleted.</Item>
+                <Item Key="ArticleDynamicFieldUpdate" Translatable="1">Updated: %s=%s;%s=%s;%s=%s;</Item>
             </Hash>
         </Setting>
     </ConfigItem>
