@@ -502,9 +502,11 @@ sub _CheckValue {
 Create a Data suitable for VersionAdd.
 
     my $NewData = $CommonObject->ConvertDataToInternal(
-        Definition => $DefinitionHashRef,
-        Data       => $DataHashRef,
-        Child      => 1,                    # or 0, optional
+        ClassID      => $ClassID,
+        ConfigItemID => $ConfigItemID,
+        Definition   => $DefinitionHashRef,
+        Data         => $DataHashRef,
+        Child        => 1,                    # or 0, optional
     );
 
     returns:
@@ -516,146 +518,172 @@ Create a Data suitable for VersionAdd.
 sub ConvertDataToInternal {
     my ( $Self, %Param ) = @_;
 
-    my $Data  = $Param{Data};
-    my $Child = $Param{Child};
+    # isolate data
+    my $Data = $Param{Data};
 
-    my $NewData = {};
+    # init variables
+    my $NewData              = {};
 
-    for my $RootKey ( sort keys %{$Data} ) {
+    # init RestorePreviousValue on parent call
+    if ( !$Param{Child} ) {
+        $Param{RestorePreviousValue} = {};
+    }
+
+    ROOTKEY:
+    for my $RootKey ( keys( %{ $Data } ) ) {
 
         # get attribute definition
         my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
             Key           => $RootKey,
             XMLDefinition => $Param{Definition},
         );
+        next ROOTKEY if ( !%AttrDef );
 
-        if ( ref $Data->{$RootKey} eq 'ARRAY' ) {
-            my @NewXMLParts;
-            $NewXMLParts[0] = undef;
+        # check if we have already created an instance of this type
+        if ( !$Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} } ) {
+            # create module instance
+            my $Module = 'ITSMConfigItem::XML::Type::' . $AttrDef{Input}->{Type};
+            my $Object = $Kernel::OM->Get( $Module );
 
-            for my $ArrayItem ( @{ $Data->{$RootKey} } ) {
-                if ( ref $ArrayItem eq 'HASH' && $AttrDef{Input}->{Type} ne 'Attachment' ) {
-
-                    # extract the root key from the hash and assign it to content key
-                    my $Content = delete $ArrayItem->{$RootKey};
-
-                    # start recursion
-                    my $NewDataPart = $Self->ConvertDataToInternal(
-                        Definition => $Param{Definition},
-                        Data       => $ArrayItem,
-                        Child      => 1,
-                    );
-                    push @NewXMLParts, {
-                        Content => $Content,
-                        %{$NewDataPart},
-                    };
-                }
-                elsif ( ref $ArrayItem eq '' || $AttrDef{Input}->{Type} eq 'Attachment' ) {
-                    my $Value = $ArrayItem;
-
-                    # attribute type Attachment needs some special handling
-                    if ($AttrDef{Input}->{Type} eq 'Attachment') {
-                        # check if we have already created an instance of this type
-                        if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
-                            # create module instance
-                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
-                            my $Object = $Kernel::OM->Get($Module);
-
-                            if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
-                                return $Self->_Error(
-                                    Code    => "Operation.InternalError",
-                                    Message => "Unable to create instance of attribute type module for parameter $RootKey!",
-                                );
-                            }
-                            $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
-                        }
-
-                        # check if we have a special handling method to prepare the value
-                        if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('InternalValuePrepare') ) {
-                            $Value = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->InternalValuePrepare(
-                                Value => $Value
-                            );
-                        }
-                    }
-
-                    push @NewXMLParts, {
-                        Content => $Value,
-                    };
-                }
+            # check that we got the expected object
+            if ( ref( $Object ) ne $Kernel::OM->GetModuleFor( $Module )) {
+                return $Self->_Error(
+                    Code    => "Operation.InternalError",
+                    Message => "Unable to create instance of attribute type module for parameter $RootKey!",
+                );
             }
-
-            # assamble the final value from the parts array
-            $NewData->{$RootKey} = \@NewXMLParts;
+            $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} } = $Object;
         }
 
-        if ( ref $Data->{$RootKey} eq 'HASH' ) {
+        # init new xml parts with undef item on index 0
+        my @NewXMLParts = ( undef );
 
-            my @NewXMLParts;
-            $NewXMLParts[0] = undef;
+        # normalize data to array
+        my @DataEntries;
+        if ( ref( $Data->{ $RootKey } ) eq 'ARRAY' ) {
+            @DataEntries = @{ $Data->{ $RootKey } };
+        }
+        else {
+            @DataEntries = ( $Data->{ $RootKey } );
+        }
 
-            # attribute type Attachment needs some special handling
-            if ($AttrDef{Input}->{Type} eq 'Attachment') {
-                my $Value = $Data->{$RootKey};
+        # process data entries
+        for my $Entry ( @DataEntries ) {
+            if ( ref( $Entry ) eq 'HASH' ) {
 
-                # check if we have already created an instance of this type
-                if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
-                    # create module instance
-                    my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
-                    my $Object = $Kernel::OM->Get($Module);
-
-                    if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
-                        return $Self->_Error(
-                            Code    => "Operation.InternalError",
-                            Message => "Unable to create instance of attribute type module for parameter $RootKey!",
-                        );
+                # extract content from entry
+                my $Content;
+                # get content from own attribute key
+                if ( defined( $Entry->{ $RootKey } ) ) {
+                    $Content = delete( $Entry->{ $RootKey } );
+                }
+                # check if we have a special handling method to extract the content
+                if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('GetHashContentAttributes') ) {
+                    my @HashContentAttributes = $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->GetHashContentAttributes();
+                    for my $Attribute ( @HashContentAttributes ) {
+                        $Content->{ $Attribute } = delete( $Entry->{ $Attribute } );
                     }
-                    $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
                 }
 
                 # check if we have a special handling method to prepare the value
-                if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('InternalValuePrepare') ) {
-                    $Value = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->InternalValuePrepare(
-                        Value => $Value
+                if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('InternalValuePrepare') ) {
+                    $Content = $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->InternalValuePrepare(
+                        ClassID      => $Param{ClassID},
+                        Definition   => \%AttrDef,
+                        Value        => $Content,
+                        UserID       => $Self->{Authorization}->{UserID},
+                        UsageContext => $Self->{Authorization}->{UserType},
                     );
+
+                    # check if value of previos version should be restored
+                    if (
+                        ref( $Content ) eq 'HASH'
+                        && $Content->{RestorePreviousValue}
+                    ) {
+                        $Param{RestorePreviousValue}->{ $RootKey } = 1;
+
+                        $Content = '';
+                    }
                 }
-                push @NewXMLParts, {
-                    Content => $Value
-                };
-            } else {
 
-                # extract the root key from the hash and assign it to content key
-                my $Content = delete $Data->{$RootKey}->{$RootKey};
-
-                # start recursion
+                # process sub data
                 my $NewDataPart = $Self->ConvertDataToInternal(
-                    Definition => $Param{Definition},
-                    Data       => $Data->{$RootKey},
-                    Child      => 1,
+                    ClassID              => $Param{ClassID},
+                    ConfigItemID         => $Param{ConfigItemID},
+                    RestorePreviousValue => $Param{RestorePreviousValue},
+                    Definition           => $Param{Definition},
+                    Data                 => $Entry,
+                    Child                => 1,
                 );
+
+                # add content to new xml parts
+                push(
+                    @NewXMLParts,
+                    {
+                        %{ $NewDataPart },
+                        Content => $Content,
+                    }
+                );
+            }
+            # handle content
+            else {
+                # check if we have a special handling method to prepare the value
+                if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('InternalValuePrepare') ) {
+                    $Entry = $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->InternalValuePrepare(
+                        ClassID      => $Param{ClassID},
+                        Definition   => \%AttrDef,
+                        Value        => $Entry,
+                        UserID       => $Self->{Authorization}->{UserID},
+                        UsageContext => $Self->{Authorization}->{UserType},
+                    );
+
+                    # check if value of previous version should be restored
+                    if (
+                        ref( $Entry ) eq 'HASH'
+                        && $Entry->{RestorePreviousValue}
+                    ) {
+                        $Param{RestorePreviousValue}->{ $RootKey } = 1;
+
+                        $Entry = '';
+                    }
+                }
+
                 push @NewXMLParts, {
-                    Content => $Content,
-                    %{$NewDataPart},
+                    Content => $Entry
                 };
             }
 
             # assamble the final value from the parts array
-            $NewData->{$RootKey} = \@NewXMLParts;
-        }
-
-        elsif ( ref $Data->{$RootKey} eq '' ) {
-
-            $NewData->{$RootKey} = [
-                undef,
-                {
-                    Content => $Data->{$RootKey},
-                }
-                ],
+            $NewData->{ $RootKey } = \@NewXMLParts;
         }
     }
 
     # return only the part on recursion
-    if ($Child) {
+    if ( $Param{Child} ) {
         return $NewData;
+    }
+
+    # check if previous version data has to be restored
+    if ( IsHashRefWithData( $Param{RestorePreviousValue} ) ) {
+        # get last version
+        my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
+            ConfigItemID => $Param{ConfigItemID},
+            XMLDataGet   => 1,
+        );
+
+        # check if already a version exists
+        if (
+            IsHashRefWithData( $VersionData )
+            && IsArrayRefWithData( $VersionData->{XMLData} )
+        ) {
+            $Self->_RestorePreviousValue(
+                XMLDefinition        => $Param{Definition},
+                XMLDataPrev          => $VersionData->{XMLData}->[1]->{Version}->[1],
+                XMLData              => $NewData,
+                RestorePreviousValue => $Param{RestorePreviousValue},
+                Silent               => $Param{Silent}
+            );
+        }
     }
 
     # return the complete Data as needed for version add
@@ -675,6 +703,7 @@ sub ConvertDataToInternal {
 Creates a readible Data.
 
     my $NewData = $CommonObject->ConvertDataToExternal(
+        ClassID    => $ClassID,
         Definition => $DefinitionHashRef,
         Data       => $DataHashRef,
     );
@@ -688,159 +717,118 @@ Creates a readible Data.
 sub ConvertDataToExternal {
     my ( $Self, %Param ) = @_;
 
+    # isolate data
     my $Data = $Param{Data};
 
-    my $NewData;
-    my $Content;
+    # init new data hash
+    my $NewData = {};
+
     ROOTHASH:
-    for my $RootHash ( @{$Data} ) {
-        next ROOTHASH if !defined $RootHash;
-        delete $RootHash->{TagKey};
+    for my $RootHash ( @{ $Data } ) {
+        next ROOTHASH if ( !defined( $RootHash ) );
 
-        for my $RootHashKey ( sort keys %{$RootHash} ) {
+        # delete TagKey from data
+        delete( $RootHash->{TagKey} );
 
+        ROOTHASHKEY:
+        for my $RootHashKey ( keys( %{ $RootHash } ) ) {
             # get attribute definition
             my %AttrDef = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeDefByKey(
                 Key           => $RootHashKey,
                 XMLDefinition => $Param{Definition},
             );
+            next ROOTHASHKEY if ( !%AttrDef );
 
-            my $AttributeName = $RootHashKey;
+            next ROOTHASHKEY if (
+                !$AttrDef{CustomerVisible}
+                && IsHashRefWithData( $Self->{Authorization} )
+                && $Self->{Authorization}->{UserType} eq 'Customer'
+            );
 
-            # ignore attribute if user is logged in as Customer and attribute should not be visible
-            next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$AttrDef{CustomerVisible};
+            # check if we have already created an instance of this type
+            if ( !$Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} } ) {
+                # create module instance
+                my $Module = 'ITSMConfigItem::XML::Type::' . $AttrDef{Input}->{Type};
+                my $Object = $Kernel::OM->Get( $Module );
 
+                # check that we got the expected object
+                if ( ref( $Object ) ne $Kernel::OM->GetModuleFor( $Module )) {
+                    return $Self->_Error(
+                        Code    => "Operation.InternalError",
+                        Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
+                    );
+                }
+                $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} } = $Object;
+            }
+
+            # init counter
+            my $Counter;
             if ( $AttrDef{CountMax} && $AttrDef{CountMax} > 1 ) {
+                # we have multiple items, set defined value
+                $Counter = 0;
+            }
 
-                # we have multiple items
-                my $Counter = 0;
-                ARRAYITEM:
-                for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
-                    next ARRAYITEM if !defined $ArrayItem;
+            # process data entries
+            ARRAYITEM:
+            for my $ArrayItem ( @{ $RootHash->{ $RootHashKey } } ) {
+                next ARRAYITEM if ( !defined( $ArrayItem ) );
 
-                    delete $ArrayItem->{TagKey};
+                # delete TagKey from entry
+                delete $ArrayItem->{TagKey};
 
-                    $Content = delete $ArrayItem->{Content} || '';
+                # get content from entry
+                my $Content = delete $ArrayItem->{Content} || '';
 
-                    # look if we have a sub structure
-                    if ( $AttrDef{Sub} ) {
-                        $NewData->{$RootHashKey}->[$Counter]->{$RootHashKey} = $Content;
+                # check if we have a special handling method to prepare the value
+                if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('ExternalValuePrepare') ) {
+                    $Content = $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->ExternalValuePrepare(
+                        ClassID      => $Param{ClassID},
+                        Item         => \%AttrDef,
+                        Value        => $Content,
+                        UserID       => $Self->{Authorization}->{UserID},
+                        UsageContext => $Self->{Authorization}->{UserType},
+                    );
+                }
 
-                        # start recursion
-                        for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
+                # check if we have a sub structure
+                if ( $AttrDef{Sub} ) {
+                    # start recursion
+                    for my $ArrayItemKey ( keys( %{ $ArrayItem } ) ) {
 
-                            my $NewDataPart = $Self->ConvertDataToExternal(
-                                Definition => $Param{Definition},
-                                Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
-                                RootKey    => $RootHashKey,
-                                ForDisplay => $Param{ForDisplay},
-                            );
-                            for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$RootHashKey}->[$Counter]->{$Key} = $NewDataPart->{$Key};
+                        my $NewDataPart = $Self->ConvertDataToExternal(
+                            ClassID    => $Param{ClassID},
+                            Definition => $Param{Definition},
+                            Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
+                            RootKey    => $RootHashKey,
+                        );
+                        for my $Key ( keys( %{ $NewDataPart } ) ) {
+                            if ( defined( $Counter ) ) {
+                                $NewData->{ $RootHashKey }->[ $Counter ]->{ $Key } = $NewDataPart->{ $Key };
+                            }
+                            else {
+                                $NewData->{ $RootHashKey }->{ $Key } = $NewDataPart->{ $Key };
                             }
                         }
+                    }
+
+                    if ( defined( $Counter ) ) {
+                        $NewData->{ $RootHashKey }->[ $Counter ]->{ $RootHashKey } = $Content;
                     }
                     else {
-                        # get display values if ForDisplay=! is given or attribute type is Attachment
-                        if ( $Param{ForDisplay} || $AttrDef{Input}->{Type} eq 'Attachment' ) {
-                            # check if we have already created an instance of this type
-                            if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
-                                # create module instance
-                                my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
-                                my $Object = $Kernel::OM->Get($Module);
-
-                                if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
-                                    return $Self->_Error(
-                                        Code    => "Operation.InternalError",
-                                        Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
-                                    );
-                                }
-                                $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
-                            }
-
-                            # check if we have a special handling method to prepare the value
-                            if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('ValueLookup') ) {
-                                $Content = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->ValueLookup(
-                                    Item  => \%AttrDef,
-                                    Value => $Content
-                                );
-                            }
-                        }
-
-                        $NewData->{$RootHashKey}->[$Counter] = $Content;
+                        $NewData->{ $RootHashKey }->{ $RootHashKey } = $Content;
                     }
-
-                    $Counter++;
                 }
-            }
-            else {
-                # we've got a single item
-
-                ARRAYITEM:
-                for my $ArrayItem ( @{ $RootHash->{$RootHashKey} } ) {
-                    next ARRAYITEM if !defined $ArrayItem;
-
-                    delete $ArrayItem->{TagKey};
-
-                    $Content = delete $ArrayItem->{Content} || '';
-
-                    # get display values if ForDisplay=! is given or attribute type is Attachment
-                    if ( $Param{ForDisplay} || ($AttrDef{Input} && $AttrDef{Input}->{Type} && $AttrDef{Input}->{Type} eq 'Attachment') ) {
-                        # check if we have already created an instance of this type
-                        if ( !$Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} ) {
-                            # create module instance
-                            my $Module = 'ITSMConfigItem::XML::Type::'.$AttrDef{Input}->{Type};
-                            my $Object = $Kernel::OM->Get($Module);
-
-                            if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
-                                return $Self->_Error(
-                                    Code    => "Operation.InternalError",
-                                    Message => "Unable to create instance of attribute type module for parameter $RootHashKey!",
-                                );
-                            }
-                            $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}} = $Object;
-                        }
-
-                        # check if we have a special handling method to prepare the value
-                        if ( $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->can('ValueLookup') ) {
-                            $Content = $Self->{AttributeTypeModules}->{$AttrDef{Input}->{Type}}->ValueLookup(
-                                Item  => \%AttrDef,
-                                Value => $Content
-                            );
-                        }
+                else {
+                    if ( defined( $Counter ) ) {
+                        $NewData->{ $RootHashKey }->[ $Counter ] = $Content;
                     }
-
-                    $NewData->{$RootHashKey} = $Content;
-
-                    # look if we have a sub structure
-                    if ( $AttrDef{Sub} ) {
-                        # start recursion
-                        for my $ArrayItemKey ( sort keys %{$ArrayItem} ) {
-
-                            my $NewDataPart = $Self->ConvertDataToExternal(
-                                Definition => $Param{Definition},
-                                Data       => [ undef, { $ArrayItemKey => $ArrayItem->{$ArrayItemKey} } ],
-                                RootKey    => $RootHashKey,
-                                ForDisplay => $Param{ForDisplay},
-                            );
-
-                            if (ref $NewData->{$RootHashKey} ne 'HASH') {
-                                # prepare hash for sub result
-                                if ( $NewData->{$RootHashKey} ) {
-                                    $NewData->{$RootHashKey} = {
-                                        $RootHashKey => $NewData->{$RootHashKey}
-                                    };
-                                }
-                                else {
-                                    $NewData->{$RootHashKey} = {};
-                                }
-                            }
-
-                            for my $Key ( sort keys %{$NewDataPart} ) {
-                                $NewData->{$RootHashKey}->{$Key} = $NewDataPart->{$Key};
-                            }
-                        }
+                    else {
+                        $NewData->{ $RootHashKey } = $Content;
                     }
+                }
+
+                if ( defined( $Counter ) ) {
+                    $Counter += 1;
                 }
             }
         }
@@ -908,7 +896,6 @@ sub _CheckDefinition {
             Code    => 'BadRequest',
             Message  => 'Invalid definition! You have a syntax error in the definition.',
         );
-        return;
     }
 
     # definition must be an array
@@ -917,7 +904,6 @@ sub _CheckDefinition {
             Code    => 'BadRequest',
             Message => 'Invalid definition! Definition is not an array reference.',
         );
-        return;
     }
 
     # check each definition attribute
@@ -984,6 +970,82 @@ sub _CheckDefinition {
     }
 
     return $Self->_Success();
+}
+
+sub _RestorePreviousValue {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    return if ( !$Param{XMLDefinition} );
+    return if ( !$Param{XMLData} );
+    return if ( !$Param{XMLDataPrev} );
+    return if ( ref( $Param{XMLDefinition} ) ne 'ARRAY' );    # the attributes of the config item class
+    return if ( ref( $Param{XMLData} ) ne 'HASH' );           # hash with values that should be imported
+    return if ( ref( $Param{XMLDataPrev} ) ne 'HASH' );       # hash with current values of the config item
+
+    # isolate XMLData and XMLDataPrev
+    my $XMLData     = $Param{XMLData};
+    my $XMLDataPrev = $Param{XMLDataPrev};
+
+    ITEM:
+    for my $Item ( @{ $Param{XMLDefinition} } ) {
+        for my $Counter ( 1 .. $Item->{CountMax} ) {
+            # skip to next item if previous and current data is not defined
+            next ITEM if (
+                !exists( $XMLData->{ $Item->{Key} }->[ $Counter ] )
+                && !exists( $XMLDataPrev->{ $Item->{Key} }->[ $Counter ] )
+            );
+
+            # start recursion, if "Sub" was found
+            if ( $Item->{Sub} ) {
+                $XMLData->{ $Item->{Key} }->[ $Counter ] ||= {};    # empty container, in case there is no current data
+
+                my $Success = $Self->_RestorePreviousValue(
+                    XMLDefinition        => $Item->{Sub},
+                    XMLData              => $XMLData->{ $Item->{Key} }->[ $Counter ],
+                    XMLDataPrev          => $XMLDataPrev->{ $Item->{Key} }->[ $Counter ],
+                    RestorePreviousValue => $Param{RestorePreviousValue},
+                    Silent               => $Param{Silent}
+                );
+                return if ( !$Success );
+
+                # no current data and previous data should not be restored
+                if (
+                    (
+                        !exists( $XMLDataPrev->{ $Item->{Key} }->[ $Counter ] )
+                        || !$Param{RestorePreviousValue}->{ $Item->{Key} }
+                    )
+                    && (
+                        !IsArrayRefWithData( $XMLData->{ $Item->{Key} } )
+                        || !IsHashRefWithData( $XMLData->{ $Item->{Key} }->[ $Counter ] )
+                    )
+                ) {
+                        # empty container added during sub-handling above - remove it
+                        delete( $XMLData->{ $Item->{Key} }->[ $Counter ] );
+
+                        next ITEM;
+                }
+            }
+
+            # handle empty field
+            if (
+                !defined( $XMLData->{ $Item->{Key} }->[ $Counter ]->{Content} )
+                || $XMLData->{ $Item->{Key} }->[ $Counter ]->{Content} eq ''
+            ) {
+                # check if existing old value should be restored
+                if (
+                    $Param{RestorePreviousValue}->{ $Item->{Key} }
+                    && IsArrayRefWithData( $XMLDataPrev->{ $Item->{Key} } )
+                    && IsHashRefWithData( $XMLDataPrev->{ $Item->{Key} }->[ $Counter ] )
+                    && defined( $XMLDataPrev->{ $Item->{Key} }->[ $Counter ]->{Content} )
+                ) {
+                    $XMLData->{ $Item->{Key} }->[ $Counter ]->{Content} = $XMLDataPrev->{ $Item->{Key} }->[ $Counter ]->{Content};
+                }
+            }
+        }
+    }
+
+    return 1;
 }
 
 1;

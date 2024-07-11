@@ -277,7 +277,7 @@ sub ExportDataGet {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(TemplateID UserID)) {
+    for my $Argument (qw(TemplateID UserID UsageContext)) {
         if ( !$Param{$Argument} ) {
             return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
@@ -540,6 +540,10 @@ sub ExportDataGet {
         # translate xmldata to a 2d hash
         my %XMLData2D;
         $Self->_ExportXMLDataPrepare(
+            ClassID       => $ObjectData->{ClassID},
+            ConfigItemID  => $ConfigItemID,
+            UserID        => $Param{UserID},
+            UsageContext  => $Param{UsageContext},
             XMLDefinition => $DefinitionData->{DefinitionRef},
             XMLData       => $VersionData->{XMLData}->[1]->{Version}->[1],
             XMLData2D     => \%XMLData2D,
@@ -627,6 +631,7 @@ Fields with the digit '0' are not empty.
         ImportDataRow => $ArrayRef,
         Counter       => 367,
         UserID        => 1,
+        UsageContext  => 'Agent',
     );
 
 An empty C<ConfigItemID> indicates failure. Otherwise it indicates the
@@ -644,7 +649,7 @@ sub ImportDataSave {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(TemplateID ImportDataRow Counter UserID)) {
+    for my $Argument (qw(TemplateID ImportDataRow Counter UserID UsageContext)) {
         if ( !$Param{$Argument} ) {
             return if $Param{Silent};
             $Kernel::OM->Get('Log')->Log(
@@ -1007,6 +1012,7 @@ sub ImportDataSave {
             },
             UsingWildcards => 0,
             UserID         => $Param{UserID},
+            UsageContext   => $Param{UsageContext},
             Silent         => $Param{Silent}
         );
 
@@ -1149,10 +1155,13 @@ sub ImportDataSave {
 
     # Edit XMLDataPrev, so that the values in XMLData2D take precedence.
     my $MergeOk = $Self->_ImportXMLDataMerge(
+        ClassID                      => $ObjectData->{ClassID},
         XMLDefinition                => $DefinitionData->{DefinitionRef},
         XMLDataPrev                  => $VersionData->{XMLData}->[1]->{Version}->[1],
         XMLData2D                    => \%XMLData2D,
         EmptyFieldsLeaveTheOldValues => $EmptyFieldsLeaveTheOldValues,
+        UserID                       => $Param{UserID},
+        UsageContext                 => $Param{UsageContext},
         Silent                       => $Param{Silent}
     );
 
@@ -1586,8 +1595,12 @@ sub _ExportXMLDataPrepare {
             # prepare value
             if (defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}) {
                 $Param{XMLData2D}->{$Key} = $Kernel::OM->Get('ITSMConfigItem')->XMLExportValuePrepare(
-                    Item  => $Item,
-                    Value => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
+                    ClassID       => $Param{ClassID},
+                    ConfigItemID  => $Param{ConfigItemID},
+                    UserID        => $Param{UserID},
+                    UsageContext  => $Param{UsageContext},
+                    Item          => $Item,
+                    Value         => $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content},
                 );
             }
 
@@ -1595,6 +1608,10 @@ sub _ExportXMLDataPrepare {
 
             # start recursion, if "Sub" was found
             $Self->_ExportXMLDataPrepare(
+                ClassID       => $Param{ClassID},
+                ConfigItemID  => $Param{ConfigItemID},
+                UserID        => $Param{UserID},
+                UsageContext  => $Param{UsageContext},
                 XMLDefinition => $Item->{Sub},
                 XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
                 XMLData2D     => $Param{XMLData2D},
@@ -1705,13 +1722,14 @@ sub _ImportXMLDataMerge {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    return if !$Param{XMLDefinition};
-    return if !$Param{XMLData2D};
-    return if !$Param{XMLDataPrev};
-    return if ref $Param{XMLDefinition} ne 'ARRAY';    # the attributes of the config item class
-    return if ref $Param{XMLData2D} ne 'HASH';         # hash with values that should be imported
-    return if ref $Param{XMLDataPrev} ne 'HASH';       # hash with current values of the config item
+    return if ( !$Param{XMLDefinition} );
+    return if ( !$Param{XMLData2D} );
+    return if ( !$Param{XMLDataPrev} );
+    return if ( ref( $Param{XMLDefinition} ) ne 'ARRAY' );    # the attributes of the config item class
+    return if ( ref( $Param{XMLData2D} ) ne 'HASH' );         # hash with values that should be imported
+    return if ( ref( $Param{XMLDataPrev} ) ne 'HASH' );       # hash with current values of the config item
 
+    # isolate XMLDataPrev
     my $XMLData = $Param{XMLDataPrev};
 
     # default value for prefix
@@ -1719,26 +1737,28 @@ sub _ImportXMLDataMerge {
 
     ITEM:
     for my $Item ( @{ $Param{XMLDefinition} } ) {
-
         # init offset, to add values on "next" free/empty array element
         my $Offset = 0;
 
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
-
             # create inputkey
             my $Key = $Param{Prefix} . $Item->{Key} . q{::} . $Counter;
 
             # start recursion, if "Sub" was found
             if ( $Item->{Sub} ) {
-                $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ]
-                    ||= {};    # empty container, in case there is no previous data
+                # empty container, in case there is no previous data
+                $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ] ||= {};
+
                 my $MergeOk = $Self->_ImportXMLDataMerge(
+                    ClassID                      => $Param{ClassID},
                     XMLDefinition                => $Item->{Sub},
                     XMLData2D                    => $Param{XMLData2D},
                     XMLDataPrev                  => $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ],
                     Prefix                       => $Key . q{::},
                     EmptyFieldsLeaveTheOldValues => $Param{EmptyFieldsLeaveTheOldValues},
+                    UserID                       => $Param{UserID},
+                    UsageContext                 => $Param{UsageContext},
                     Silent                       => $Param{Silent}
                 );
 
@@ -1747,45 +1767,67 @@ sub _ImportXMLDataMerge {
 
             # when the data point is not part of the input definition,
             # then do not overwrite the previous setting.
-            if (!exists $Param{XMLData2D}->{$Key}) {
+            if ( !exists( $Param{XMLData2D}->{ $Key } ) ) {
                 if ( $Item->{Sub} ) {
 
                     # if there is no (old) value and neither children - remove it and use position for next
                     if (
-                        !IsArrayRefWithData($XMLData->{ $Item->{Key} }) ||
-                        !IsHashRefWithData($XMLData->{ $Item->{Key} }->[ $Counter - $Offset ])
+                        !IsArrayRefWithData( $XMLData->{ $Item->{Key} } )
+                        || !IsHashRefWithData( $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ] )
                     ) {
                         # empty container added during sub-handling above - remove it
-                        splice(@{$XMLData->{ $Item->{Key} }}, ($Counter - $Offset), 1);
+                        splice( @{ $XMLData->{ $Item->{Key} } }, ( $Counter - $Offset ), 1 );
                         $Offset++;
                     }
                 }
                 next COUNTER;
             }
 
+            # prepare value
+            my $Value = $Kernel::OM->Get('ITSMConfigItem')->XMLImportValuePrepare(
+                ClassID      => $Param{ClassID},
+                Item         => $Item,
+                Value        => $Param{XMLData2D}->{$Key},
+                UserID       => $Param{UserID},
+                UsageContext => $Param{UsageContext},
+                Silent       => $Param{Silent}
+            );
+
+            # check if value of previous version should be restored
+            my $RestorePreviousValue = 0;
+            if (
+                ref( $Value ) eq 'HASH'
+                && $Value->{RestorePreviousValue}
+            ) {
+                $RestorePreviousValue = 1;
+
+                $Value = '';
+            }
+
             # handling if an empty field is imported
             if (
-                !defined $Param{XMLData2D}->{$Key}
-                || $Param{XMLData2D}->{$Key} eq q{}
+                !defined( $Value )
+                || $Value eq ''
             ) {
 
                 # if current is "leaf"-attribute (has no children)
                 if ( !$Item->{Sub} ) {
-
                     # if there is no old value - use position for next
                     if (
-                        !IsArrayRefWithData($XMLData->{ $Item->{Key} })
-                        || !IsHashRefWithData($XMLData->{ $Item->{Key} }->[ $Counter - $Offset ])
+                        !IsArrayRefWithData( $XMLData->{ $Item->{Key} } )
+                        || !IsHashRefWithData( $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ] )
                     ) {
                         $Offset++;
                     }
 
                     # there is an old value
                     else {
-
                         # but it should be removed, do it and use position for next
-                        if (!$Param{EmptyFieldsLeaveTheOldValues} ) {
-                            splice(@{$XMLData->{ $Item->{Key} }}, ($Counter - $Offset), 1);
+                        if (
+                            !$Param{EmptyFieldsLeaveTheOldValues}
+                            && !$RestorePreviousValue
+                        ) {
+                            splice( @{ $XMLData->{ $Item->{Key} } }, ( $Counter - $Offset ), 1 );
                             $Offset++;
                         }
                         # else do nothing (keep value and its postion for itself)
@@ -1794,18 +1836,21 @@ sub _ImportXMLDataMerge {
                 } else {
 
                     # remove old value if requested (remove content and tagkey (old value))
-                    if (!$Param{EmptyFieldsLeaveTheOldValues}) {
-                        delete $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ]->{Content};
-                        delete $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ]->{TagKey};
+                    if (
+                        !$Param{EmptyFieldsLeaveTheOldValues}
+                        && !$RestorePreviousValue
+                    ) {
+                        delete( $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ]->{Content} );
+                        delete( $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ]->{TagKey} );
                     }
 
                     # if there is no (old) value and neither children - remove it and use position for next
                     if (
-                        !IsArrayRefWithData($XMLData->{ $Item->{Key} })
-                        || !IsHashRefWithData($XMLData->{ $Item->{Key} }->[ $Counter - $Offset ])
+                        !IsArrayRefWithData( $XMLData->{ $Item->{Key} } )
+                        || !IsHashRefWithData( $XMLData->{ $Item->{Key} }->[ $Counter - $Offset ] )
                     ) {
                         # empty container added during sub-handling above - remove it
-                        splice(@{$XMLData->{ $Item->{Key} }}, ($Counter - $Offset), 1);
+                        splice( @{ $XMLData->{ $Item->{Key} } }, ( $Counter - $Offset ), 1 );
                         $Offset++;
                     }
                 }
@@ -1814,9 +1859,9 @@ sub _ImportXMLDataMerge {
                 if (
                     $Counter == $Item->{CountMax}
                     && $XMLData->{ $Item->{Key} }
-                    && scalar(@{$XMLData->{ $Item->{Key} }}) == 1
+                    && scalar( @{ $XMLData->{ $Item->{Key} } } ) == 1
                 ) {
-                    delete %{$XMLData}{ $Item->{Key} };
+                    delete( $XMLData->{ $Item->{Key} } );
                 }
 
                 # do next, no value handling needed
@@ -1825,28 +1870,20 @@ sub _ImportXMLDataMerge {
 
             # dummy attribute does not need any value
             next COUNTER if (
-                IsHashRefWithData($Item->{Input})
+                IsHashRefWithData( $Item->{Input} )
                 && $Item->{Input}->{Type}
                 && $Item->{Input}->{Type} eq 'Dummy'
             );
 
-            # prepare value
-            my $Value = $Kernel::OM->Get('ITSMConfigItem')->XMLImportValuePrepare(
-                Item   => $Item,
-                Value  => $Param{XMLData2D}->{$Key},
-                Silent => $Param{Silent}
-            );
-
             # let merge fail, when a value cannot be prepared
-            return if !defined $Value;
-
+            return if ( !defined( $Value ) );
 
             # do not set value if empty but required in CI-class... (try with next imported value)
             if (
                 !$Value
                 && $Item->{Input}->{Required}
             ) {
-                splice(@{$XMLData->{ $Item->{Key} }}, ($Counter - $Offset), 1);
+                splice( @{ $XMLData->{ $Item->{Key} } }, ( $Counter - $Offset ), 1 );
                 $Offset++;
                 next COUNTER;
             }
@@ -1857,9 +1894,9 @@ sub _ImportXMLDataMerge {
 
         if (
             $XMLData->{ $Item->{Key} }
-            && scalar(@{$XMLData->{ $Item->{Key} }}) == 1
+            && scalar( @{ $XMLData->{ $Item->{Key} } } ) == 1
         ) {
-            delete %{$XMLData}{ $Item->{Key} };
+            delete( $XMLData->{ $Item->{Key} } );
         }
     }
 
