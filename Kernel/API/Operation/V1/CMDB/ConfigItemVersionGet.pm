@@ -150,8 +150,9 @@ sub Run {
                 );
 
                 $Version->{Data} = $Self->ConvertDataToExternal(
+                    ClassID    => $ConfigItem->{ClassID},
                     Definition => $VersionData->{XMLDefinition},
-                    Data       => $VersionData->{XMLData}->[1]->{Version}
+                    Data       => $VersionData->{XMLData}->[1]->{Version},
                 );
             }
 
@@ -165,8 +166,9 @@ sub Run {
                 my $Data = $Version->{Data};
                 if ( !IsHashRefWithData($Data) ) {
                     $Data = $Self->ConvertDataToExternal(
+                        ClassID    => $ConfigItem->{ClassID},
                         Definition => $VersionData->{XMLDefinition},
-                        Data       => $VersionData->{XMLData}->[1]->{Version}
+                        Data       => $VersionData->{XMLData}->[1]->{Version},
                     );
                 }
 
@@ -188,7 +190,7 @@ sub Run {
 
         if ( scalar(@VersionList) == 0 ) {
             return $Self->_Error(
-                Code => 'Object.NotFound'
+                Code => 'Object.NotFound',
             );
         }
         elsif ( scalar(@VersionList) == 1 ) {
@@ -211,55 +213,58 @@ sub _PrepareData {
 
     # create sorted structure with data
     my @Result = ();
-    for my $DefItem ( @{$Definition} ) {
+    for my $DefItem ( @{ $Definition } ) {
         my $ItemKey = $DefItem->{Key};
 
         # don't look at details if we don't have any value for this
-        next if !$Data->{$ItemKey};
+        next if ( !$Data->{ $ItemKey } );
 
         # ignore attribute if user is logged in as Customer and attribute should not be visible
-        next if IsHashRefWithData($Self->{Authorization}) && $Self->{Authorization}->{UserType} eq 'Customer' && !$DefItem->{CustomerVisible};
+        next if (
+            IsHashRefWithData( $Self->{Authorization} )
+            && $Self->{Authorization}->{UserType} eq 'Customer'
+            && !$DefItem->{CustomerVisible}
+        );
 
-        if ( ref $Data->{$ItemKey} eq 'ARRAY' ) {
-            for my $ArrayItem ( @{ $Data->{$ItemKey} } ) {
+        if ( ref( $Data->{ $ItemKey } ) eq 'ARRAY' ) {
+            for my $ArrayItem ( @{ $Data->{ $ItemKey } } ) {
                 my $ResultItem = {
                     Key   => $ItemKey,
                     Label => $DefItem->{Name},
                     Type  => $DefItem->{Input}->{Type}
                 };
 
-                if ( ref $ArrayItem eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
-                    $ResultItem->{Value} = $ArrayItem->{$ItemKey},
+                if ( ref( $ArrayItem ) eq 'HASH' ) {
+                    $ResultItem->{Value} = $ArrayItem->{ $ItemKey };
                     $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
                         Item  => $DefItem,
-                        Value => $ArrayItem->{$ItemKey},
+                        Value => $ArrayItem->{ $ItemKey },
                     );
-                    if ( defined $DefItem->{Sub} ) {
+                    if ( defined( $DefItem->{Sub} ) ) {
                         # start recursion for each array item
                         my $PreparedResult = $Self->_PrepareData(
                             Definition => $DefItem->{Sub},
                             Data       => $ArrayItem,
                         );
-                        if ( IsArrayRefWithData($PreparedResult) ) {
+                        if ( IsArrayRefWithData( $PreparedResult ) ) {
                             $ResultItem->{Sub} = $PreparedResult;
                         }
                     }
                 }
-                elsif ( ref $ArrayItem eq '' || $DefItem->{Input}->{Type} eq 'Attachment' ) {        # attribute type Attachment needs some special handling
-                    $ResultItem->{Value} = $ArrayItem;
-                    if ( $DefItem->{Input}->{Type} ne 'Attachment' ) {
-                        $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
-                            Item  => $DefItem,
-                            Value => $ArrayItem,
-                        );
-                    }
-                    if ( defined $DefItem->{Sub} ) {
+                elsif ( ref $ArrayItem eq '' ) {
+                    $ResultItem->{Value}        = $ArrayItem;
+                    $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                        Item  => $DefItem,
+                        Value => $ArrayItem,
+                    );
+
+                    if ( defined( $DefItem->{Sub} ) ) {
                         # start recursion for each array item
                         my $PreparedResult = $Self->_PrepareData(
                             Definition => $DefItem->{Sub},
                             Data       => $ArrayItem,
                         );
-                        if ( IsArrayRefWithData($PreparedResult) ) {
+                        if ( IsArrayRefWithData( $PreparedResult ) ) {
                             $ResultItem->{Sub} = $PreparedResult;
                         }
                     }
@@ -269,58 +274,57 @@ sub _PrepareData {
                     return;
                 }
 
-                push(@Result, $ResultItem);
+                push( @Result, $ResultItem );
             }
         }
-        elsif ( ref $Data->{$ItemKey} eq 'HASH' && $DefItem->{Input}->{Type} ne 'Attachment' ) {        # attribute type Attachment needs some special handling
+        elsif ( ref( $Data->{ $ItemKey } ) eq 'HASH' ) {
             my $ResultItem = {
                 Key   => $ItemKey,
                 Label => $DefItem->{Name},
                 Type  => $DefItem->{Input}->{Type}
             };
-            if (exists $Data->{$ItemKey}->{$ItemKey}) {
-                $ResultItem->{Value} = $Data->{$ItemKey}->{$ItemKey};
+            if ( exists( $Data->{ $ItemKey }->{ $ItemKey } ) ) {
+                $ResultItem->{Value}        = $Data->{ $ItemKey }->{ $ItemKey };
                 $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
                     Item  => $DefItem,
-                    Value => $Data->{$ItemKey}->{$ItemKey},
+                    Value => $Data->{ $ItemKey }->{ $ItemKey },
                 );
             }
-            if ( defined $DefItem->{Sub} ) {
+            if ( defined( $DefItem->{Sub} ) ) {
                 # start recursion for each array item
                 my $PreparedResult = $Self->_PrepareData(
                     Definition => $DefItem->{Sub},
-                    Data       => $Data->{$ItemKey},
+                    Data       => $Data->{ $ItemKey },
                 );
-                if ( IsArrayRefWithData($PreparedResult) ) {
+                if ( IsArrayRefWithData( $PreparedResult ) ) {
                     $ResultItem->{Sub} = $PreparedResult;
                 }
             }
-            push(@Result, $ResultItem);
+            push( @Result, $ResultItem );
         }
         else {
             my $ResultItem = {
                 Key   => $ItemKey,
                 Label => $DefItem->{Name},
-                Value => $Data->{$ItemKey},
-                Type  => $DefItem->{Input}->{Type}
+                Value => $Data->{ $ItemKey },
+                Type  => $DefItem->{Input}->{Type},
             };
-            if ( $DefItem->{Input}->{Type} ne 'Attachment' ) {
-                $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
-                    Item  => $DefItem,
-                    Value => $Data->{$ItemKey},
-                );
-            }
+            $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                Item  => $DefItem,
+                Value => $Data->{ $ItemKey },
+            );
+
             if ( defined $DefItem->{Sub} ) {
                 # start recursion for each array item
                 my $PreparedResult = $Self->_PrepareData(
                     Definition => $DefItem->{Sub},
                     Data       => $Data->{ItemKey},
                 );
-                if ( IsArrayRefWithData($PreparedResult) ) {
+                if ( IsArrayRefWithData( $PreparedResult ) ) {
                     $ResultItem->{Sub} = $PreparedResult;
                 }
             }
-            push(@Result, $ResultItem);
+            push( @Result, $ResultItem );
         }
     }
 
@@ -329,23 +333,24 @@ sub _PrepareData {
 
 sub _GetDisplayValue {
     my ($Self, %Param) = @_;
+
     my $Result;
 
     # check if we have already created an instance of this type
-    if ( !$Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} ) {
+    if ( !$Self->{AttributeTypeModules}->{ $Param{Item}->{Input}->{Type} } ) {
         # create module instance
-        my $Module = 'ITSMConfigItem::XML::Type::'.$Param{Item}->{Input}->{Type};
-        my $Object = $Kernel::OM->Get($Module);
+        my $Module = 'ITSMConfigItem::XML::Type::' . $Param{Item}->{Input}->{Type};
+        my $Object = $Kernel::OM->Get( $Module );
 
-        if (ref $Object ne $Kernel::OM->GetModuleFor($Module)) {
+        if ( ref( $Object ) ne $Kernel::OM->GetModuleFor( $Module )) {
             return;
         }
-        $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}} = $Object;
+        $Self->{AttributeTypeModules}->{ $Param{Item}->{Input}->{Type} } = $Object;
     }
 
     # check if we have a special handling method to prepare the value
-    if ( $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}}->can('ValueLookup') ) {
-        $Result = $Self->{AttributeTypeModules}->{$Param{Item}->{Input}->{Type}}->ValueLookup(
+    if ( $Self->{AttributeTypeModules}->{ $Param{Item}->{Input}->{Type} }->can('ValueLookup') ) {
+        $Result = $Self->{AttributeTypeModules}->{ $Param{Item}->{Input}->{Type} }->ValueLookup(
             Item  => $Param{Item},
             Value => $Param{Value},
         );

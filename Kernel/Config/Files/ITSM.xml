@@ -429,4 +429,13 @@
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="ITSM::ConfigItem::XML::Type::Text###EncryptedText" Required="0" Valid="1">
+        <Description Translatable="1">Defines text attributes that should use encrypted internal values. As key you have to define the class + ":::" + attribute key to encrypt. As value you have to define a comma separated list of roles that are allowed to read and write this attribute. ATTENTION: Delete the cache after changing this config!</Description>
+        <Group>ITSM</Group>
+        <SubGroup>Core::ITSMConfigItem</SubGroup>
+        <Setting>
+            <Hash></Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>
