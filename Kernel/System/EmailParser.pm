@@ -248,6 +248,42 @@ sub GetParam {
     return $ReturnLine;
 }
 
+=item GetEmailHead()
+
+To get the senders email address back.
+
+    my $HeadRef = $ParserObject->GetEmailHead();
+
+=cut
+
+sub GetEmailHead {
+    my ( $Self, %Param ) = @_;
+
+    if ( !$Self->{Email} ) {
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Email is needed!',
+        );
+        return;
+    }
+
+    my $Head = $Self->{Email}->head();
+
+    if ( $Param{NoSMIMEContent} ) {
+        $Head->delete('MIME-Version');
+        $Head->delete('Content-Type');
+        $Head->delete('Content-Disposition');
+        $Head->delete('Content-Description');
+        $Head->delete('Content-Transfer-Encoding');
+    }
+
+    my @NewHeader = map { "$_\n" } split( /\n/, $Head->as_string());
+
+    # return email header
+    return \@NewHeader;
+}
+
 =item GetEmailAddress()
 
 To get the senders email address back.

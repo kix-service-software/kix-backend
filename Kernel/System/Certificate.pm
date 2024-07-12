@@ -753,6 +753,13 @@ sub Decrypt {
                     }
                 }
                 elsif ( $Decrypt{Successful} ) {
+
+                    # replaces crypted body
+                    my $NewContent = $EmailParser->GetEmailHead(
+                        NoSMIMEContent => 1
+                    );
+                    push ( @{$NewContent}, @{$Decrypt{Content}} );
+
                     if ( $Self->{Debug} ) {
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'debug',
@@ -766,7 +773,7 @@ sub Decrypt {
                                 Value => 1
                             }
                         ],
-                        Content    => $Decrypt{Content},
+                        Content    => $NewContent,
                         Successful => 1
                     }
                 }
