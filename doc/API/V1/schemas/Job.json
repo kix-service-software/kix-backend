@@ -76,6 +76,21 @@
          "type" : "string",
          "readOnly" : true
       },
+      "SortOrder" : {
+         "description" : "Used to sort found objects (see \"Filter\").",
+         "type" : "object",
+         "properties" : {
+            "Attribute" : {
+               "type" : "string"
+            },
+            "Descanding" : {
+               "type" : "integer"
+            }
+         },
+         "required" : [
+            "Attribute"
+         ]
+      },
       "Type" : {
          "type" : "string",
          "readOnly" : true
@@ -94,6 +109,7 @@
       "ID",
       "IsAsynchronous",
       "Name",
+      "SortOrder",
       "Type",
       "ValidID"
    ],

@@ -2479,6 +2479,7 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="sort_order" Required="false" Size="200" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="is_async" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>

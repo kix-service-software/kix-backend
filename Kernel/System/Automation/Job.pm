@@ -93,18 +93,19 @@ returns a hash with the job data
 This returns something like:
 
     %JobData = (
-        'ID'                => 2,
-        'Type'              => 'Ticket',
-        'Name'              => 'Test',
-        'Filter'            => [],
-        'IsAsynchronous'    => 0|1,
-        'Comment'           => '...',
-        'LastExecutionTime' => '2019-10-21 12:00:00',
-        'ValidID'           => '1',
-        'CreateTime'        => '2010-04-07 15:41:15',
-        'CreateBy'          => 1,
-        'ChangeTime'        => '2010-04-07 15:41:15',
-        'ChangeBy'          => 1
+        ID                => 2,
+        Type              => 'Ticket',
+        Name              => 'Test',
+        Filter            => [],
+        SortOrder         => {},
+        IsAsynchronous    => 0|1,
+        Comment           => '...',
+        LastExecutionTime => '2019-10-21 12:00:00',
+        ValidID           => '1',
+        CreateTime        => '2010-04-07 15:41:15',
+        CreateBy          => 1,
+        ChangeTime        => '2010-04-07 15:41:15',
+        ChangeBy          => 1
     );
 
 =cut
@@ -130,7 +131,7 @@ sub JobGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name, type, filter, comments, is_async, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
+        SQL   => "SELECT id, name, type, filter, sort_order, comments, is_async, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -143,14 +144,15 @@ sub JobGet {
             Name              => $Row[1],
             Type              => $Row[2],
             Filter            => $Row[3],
-            Comment           => $Row[4],
-            IsAsynchronous    => $Row[5],
-            ValidID           => $Row[6],
-            LastExecutionTime => $Row[7],
-            CreateTime        => $Row[8],
-            CreateBy          => $Row[9],
-            ChangeTime        => $Row[10],
-            ChangeBy          => $Row[11],
+            SortOrder         => $Row[4],
+            Comment           => $Row[5],
+            IsAsynchronous    => $Row[6],
+            ValidID           => $Row[7],
+            LastExecutionTime => $Row[8],
+            CreateTime        => $Row[9],
+            CreateBy          => $Row[10],
+            ChangeTime        => $Row[11],
+            ChangeBy          => $Row[12],
         );
 
         if ( $Result{Filter} ) {
@@ -161,6 +163,13 @@ sub JobGet {
             if (!IsArrayRef($Result{Filter})) {
                 $Result{Filter} = [$Result{Filter}];
             }
+        }
+
+        if ( $Result{SortOrder} ) {
+            # decode JSON
+            $Result{SortOrder} = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Result{SortOrder}
+            );
         }
     }
 
@@ -193,13 +202,19 @@ adds a new job
         Type           => 'Ticket',
         Filter         => [                                         # optional
             {
-                Queue => [ 'SomeQueue' ],
-            },
-            {
-                Queue => [ 'SomeOtherQueue'],
-                Type  => [ 'SomeType' ]
+                AND => [
+                    {
+                        Field     => 'TypeID',
+                        Operator  => 'EQ',
+                        Value     => 2
+                    }
+                ]
             }
         ],
+        SortOrder      => {                                         # optional
+            Field     => 'QueueID',
+            Direction => 'descending'
+        }
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -260,12 +275,27 @@ sub JobAdd {
         }
     }
 
+    # prepare sortorder as JSON
+    my $SortOrder;
+    if ( $Param{SortOrder} ) {
+        $SortOrder = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{SortOrder}
+        );
+        if ( !$SortOrder ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not add job, SortOrder is invalid.",
+            );
+            return;
+        }
+    }
+
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO job (name, type, filter, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO job (name, type, filter, sort_order, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{Type}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Type}, \$Filter, \$SortOrder, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -307,13 +337,19 @@ updates a job
         Type           => 'Ticket',                                 # optional
         Filter         => [                                         # optional
             {
-                Queue => [ 'SomeQueue' ],
-            },
-            {
-                Queue => [ 'SomeOtherQueue'],
-                Type  => [ 'SomeType' ]
+                AND => [
+                    {
+                        Field     => 'TypeID',
+                        Operator  => 'EQ',
+                        Value     => 2
+                    }
+                ]
             }
         ],
+        SortOrder      => {                                         # optional
+            Field     => 'QueueID',
+            Direction => 'ascending'
+        },
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -365,7 +401,7 @@ sub JobUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Type Name Filter Comment IsAsynchronous ValidID) ) {
+    for my $Key ( qw(Type Name Filter SortOrder Comment IsAsynchronous ValidID) ) {
 
         next KEY if (
             (
@@ -403,11 +439,26 @@ sub JobUpdate {
         }
     }
 
+    # prepare sortorder as JSON
+    my $SortOrder;
+    if ( $Param{SortOrder} ) {
+        $SortOrder = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{SortOrder}
+        );
+        if ( !$SortOrder ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not update job, SortOrder is invalid.",
+            );
+            return;
+        }
+    }
+
     # update Job in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, comments = ?, is_async = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, sort_order = ?, comments = ?, is_async = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Type}, \$Param{Name}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Type}, \$Param{Name}, \$Filter, \$SortOrder, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -472,7 +523,7 @@ sub JobList {
         my $EventString = $Kernel::OM->Get('DB')->Quote( '"' . $Param{Event} . '"', 'Like' );
 
         $SQL .= " AND EXISTS (
-                    SELECT ep.id FROM job_exec_plan jep, exec_plan ep 
+                    SELECT ep.id FROM job_exec_plan jep, exec_plan ep
                      WHERE jep.job_id = j.id AND jep.exec_plan_id = ep.id AND ep.type = 'EventBased' AND ep.parameters LIKE '%$EventString%')";
     }
 
@@ -1289,6 +1340,7 @@ sub _JobExecute {
                 @ObjectIDs = $BackendObject->Run(
                     Data      => $Param{Data},
                     Filter    => $Job{Filter},
+                    SortOrder => $Job{SortOrder},
                     UserID    => $Param{UserID},
                 );
 

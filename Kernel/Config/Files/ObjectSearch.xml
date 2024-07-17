@@ -912,7 +912,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <!-- EO FAQ OBJECTSEARCH ATTRIBUTES -->
+    <!-- EO CERTIFICATE OBJECTSEARCH ATTRIBUTES -->
 
     <!-- GENERAL CATALOG OBJECTSEARCH ATTRIBUTES -->
     <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::GeneralCatalog::Module###General" Required="1" Valid="1" ConfigLevel="200">

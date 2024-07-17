@@ -58,6 +58,9 @@ sub ParameterDefinition {
             Type => 'HASH',
             Required => 1
         },
+        'Job::SortOrder::Field' => {
+            RequiredIf => ['Job::SortOrder']
+        },
     }
 }
 
@@ -133,6 +136,7 @@ sub Run {
             IsAsynchronous => exists $Job->{IsAsynchronous} ? $Job->{IsAsynchronous} : $JobData{IsAsynchronous},
             Name           => $Job->{Name} || $JobData{Name},
             Filter         => exists $Job->{Filter} ? $Job->{Filter} : $JobData{Filter},
+            SortOrder      => exists $Job->{SortOrder} ? $Job->{SortOrder} : $JobData{SortOrder},
             Comment        => exists $Job->{Comment} ? $Job->{Comment} : $JobData{Comment},
             ValidID        => exists $Job->{ValidID} ? $Job->{ValidID} : $JobData{ValidID},
             UserID         => $Self->{Authorization}->{UserID},
