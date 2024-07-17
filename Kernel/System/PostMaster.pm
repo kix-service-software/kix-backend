@@ -248,7 +248,7 @@ sub Run {
                     TicketID  => undef,
                 );
                 if ( !$Run ) {
-                    $Self->{LogObject}->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message => "Execute Run() of PreFilterModule "
                             . "$Jobs{$Job}->{Module} not successfully!",
