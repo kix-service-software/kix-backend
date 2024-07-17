@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="job">
+        <ColumnAdd Name="sort_order" Required="false" Size="200" Type="VARCHAR"/>
+    </TableAlter>
+
+</database>

@@ -76,6 +76,19 @@
          "type": "string",
          "readOnly": true
       },
+      "SortOrder": {
+         "type": "object",
+         "description": "Used to sort found objects (see \"Filter\").",
+         "properties": {
+            "Field": {
+               "type": "string"
+            },
+            "Direction": {
+               "type": "string",
+               "description": "ascending or descanding"
+            }
+         },
+      },
       "Type": {
          "type": "string",
          "readOnly": true
@@ -94,6 +107,7 @@
       "ID",
       "IsAsynchronous",
       "Name",
+      "SortOrder",
       "Type",
       "ValidID"
    ]

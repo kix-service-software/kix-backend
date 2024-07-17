@@ -54,6 +54,10 @@
             }
         ],
         "Name": "Some Job",
+        "SortOrder": {
+            "Field": "TypeID",
+            "Direction": "ascending"
+        },
         "Type": "Ticket",
         "ValidID": 1
     }

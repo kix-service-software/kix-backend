@@ -38,18 +38,6 @@ Handles ticket based jobs.
 
 =cut
 
-=item Run()
-
-Run this job module. Returns the list of TicketIDs to run this job on.
-
-Example:
-    my @TicketIDs = $Object->Run(
-        Filter => {}         # optional, filter for objects
-        Data   => {},        # optional, contains the relevant data given by an event or otherwise
-        UserID => 123,
-    );
-
-=cut
 
 sub _Run {
     my ( $Self, %Param ) = @_;
@@ -91,16 +79,38 @@ sub _Run {
                 ObjectType => 'Ticket',
                 Result     => 'ARRAY',
                 Search     => $Search,
+                Sort       => $Param{Sort},
                 UserID     => 1,
                 UserType   => 'Agent'
             );
             push(@TicketIDs, @TicketIDsPart);
         }
         @TicketIDs = $Kernel::OM->Get('Main')->GetUnique(@TicketIDs);
+
+        # do additional "search" to sort all results combined
+        if (IsArrayRefWithData($Param{Sort}) && scalar(@{$Filters}) > 1) {
+            @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Ticket',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        {
+                            Field    => 'TicketID',
+                            Operator => 'IN',
+                            Value    => \@TicketIDs
+                        }
+                    ]
+                },
+                Sort       => $Param{Sort},
+                UserID     => 1,
+                UserType   => 'Agent'
+            );
+        }
     } else {
         @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
             ObjectType => 'Ticket',
             Result     => 'ARRAY',
+            Sort       => $Param{Sort},
             UserID     => 1,
             UserType   => 'Agent'
         );

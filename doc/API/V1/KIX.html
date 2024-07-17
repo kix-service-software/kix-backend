@@ -25277,6 +25277,21 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Attribute" : {
+                     "type" : "string"
+                  },
+                  "Descanding" : {
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Attribute"
+               ]
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -25295,6 +25310,7 @@ pre code {
             "ID",
             "IsAsynchronous",
             "Name",
+            "SortOrder",
             "Type",
             "ValidID"
          ]
@@ -25536,6 +25552,21 @@ pre code {
             "Name" : {
                "type" : "string"
             },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Attribute" : {
+                     "type" : "string"
+                  },
+                  "Descanding" : {
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Attribute"
+               ]
+            },
             "Type" : {
                "description" : "",
                "type" : "string"
@@ -25559,6 +25590,10 @@ pre code {
         "Comment": "some comment",
         "Name": "new job",
         "Type": "Ticket",
+        "SortOrder": {
+            "Attribute": "TypeID",
+            "Descanding": 1
+        },
         "ValidID": 1
     }
 }</code></pre></div></div><div class="tab-pane" id="system_automation_jobs_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_automation_jobs_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Job has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: JobPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -25820,6 +25855,21 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Attribute" : {
+                     "type" : "string"
+                  },
+                  "Descanding" : {
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Attribute"
+               ]
+            },
             "Type" : {
                "type" : "string",
                "readOnly" : true
@@ -25838,6 +25888,7 @@ pre code {
             "ID",
             "IsAsynchronous",
             "Name",
+            "SortOrder",
             "Type",
             "ValidID"
          ]
@@ -26032,6 +26083,10 @@ pre code {
             }
         ],
         "Name": "Some Job",
+        "SortOrder": {
+            "Attribute": "TypeID",
+            "Descanding": 1
+        },
         "Type": "Ticket",
         "ValidID": 1
     }
@@ -26079,6 +26134,21 @@ pre code {
             },
             "Name" : {
                "type" : "string"
+            },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Attribute" : {
+                     "type" : "string"
+                  },
+                  "Descanding" : {
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Attribute"
+               ]
             },
             "Type" : {
                "description" : "",
