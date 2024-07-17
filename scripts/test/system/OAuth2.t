@@ -484,7 +484,12 @@ my %Response = $WebUserAgentObject->Request(
 $Self->Is(
     $Response{Status},
     '200 OK',
-    'Response of AuthURL - State'
+    'Response of AuthURL - Status'
+);
+$Self->Is(
+    $Response{HTTPCode},
+    '200',
+    'Response of AuthURL - Status code'
 );
 $Self->Is(
     ${$Response{Content}},
@@ -589,7 +594,12 @@ $Self->IsDeeply(
 $Self->Is(
     $Response{Status},
     '200 OK',
-    'Response of AuthURL - State'
+    'Response of AuthURL - Status'
+);
+$Self->Is(
+    $Response{HTTPCode},
+    '200',
+    'Response of AuthURL - Status code'
 );
 $Self->Is(
     ${$Response{Content}},

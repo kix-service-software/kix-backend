@@ -987,10 +987,10 @@ sub RequestToken {
     );
 
     # Server did not accept the request.
-    if ( $Response{Status} ne '200 OK' ) {
+    if ( $Response{HTTPCode} != 200 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Got: '$Response{Status}'!",
+            Message  => "Got: '$Response{Status}'! Expected status code 200.",
         );
         return;
     }

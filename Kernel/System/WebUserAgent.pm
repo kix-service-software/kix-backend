@@ -99,9 +99,10 @@ alternatively, you can use an arrayref like this:
 returns
 
     %Response = (
-        Success => 1,           # 1 or 0
-        Status  => '200 OK',    # http status
-        Content => $ContentRef, # content of requested URL
+        Success  => 1,           # 1 or 0
+        Status   => '200 OK',    # http status
+        HTTPCode => 200,         # http status code
+        Content  => $ContentRef, # content of requested URL
     );
 
 You can even pass some headers
@@ -261,9 +262,10 @@ sub Request {
 
     # return request
     return (
-        Success => 1,
-        Status  => $Response->status_line(),
-        Content => \$ResponseContent,
+        Success  => 1,
+        Status   => $Response->status_line(),
+        HTTPCode => $Response->code(),
+        Content  => \$ResponseContent,
     );
 }
 
