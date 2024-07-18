@@ -352,45 +352,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/ticket/queues/2             | 2     | 1      |      
       | /tickets/*{Ticket.QueueID IN [1,2]} | 15    | 2      |
 
-  Scenario: get the list of existing permissions of Ticket Agent (w/o teams)
-    When I query the collection of permissions with roleid 16
-    Then the response code is 200
-    And the response contains 32 items of type "Permission"
-    And the response contains the following items of type Permission
-      | Target                                                       | Value | TypeID |
-      | /contacts                                                    | 2     | 1      |
-      | /links                                                       | 15    | 1      |
-      | /organisations                                               | 2     | 1      |
-      | /reporting                                                   | 2     | 1      |
-      | /reporting/reportdefinitions                                 | 2     | 1      |
-      | /reporting/reportdefinitions/*                               | 0     | 1      |
-      | /reporting/reportdefinitions/3                               | 2     | 1      |
-      | /reporting/reportdefinitions/4                               | 2     | 1      |
-      | /reporting/reportdefinitions/5                               | 2     | 1      |
-      | /reporting/reportdefinitions/6                               | 2     | 1      |
-      | /reporting/reportdefinitions/7                               | 2     | 1      |
-      | /reporting/reportdefinitions/8                               | 2     | 1      |
-      | /reporting/reports                                           | 2     | 1      |
-      | /reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}  | 0     | 2      |
-      | /system/communication                                        | 2     | 1      |
-      | /system/communication/*                                      | 0     | 1      |
-      | /system/communication/channels                               | 2     | 1      |
-      | /system/communication/sendertypes                            | 2     | 1      |
-      | /system/communication/systemaddresses                        | 2     | 1      |
-      | /system/htmltopdf                                            | 2     | 1      |
-      | /system/htmltopdf/convert                                    | 2     | 1      |
-      | /system/textmodules                                          | 2     | 1      |
-      | /system/ticket/*                                             | 0     | 1      |
-      | /system/ticket                                               | 2     | 1      |
-      | /system/ticket/locks                                         | 2     | 1      |
-      | /system/ticket/priorities                                    | 2     | 1      |
-      | /system/ticket/queues                                        | 2     | 1      |
-      | /system/ticket/queues/*                                      | 0     | 1      |
-      | /system/ticket/states                                        | 2     | 1      |
-      | /system/ticket/types                                         | 2     | 1      |
-      | /tickets                                                     | 15    | 1      |
-      | /tickets/*{Ticket.QueueID GT 0}                              | 0     | 2      |
-
   Scenario: get the list of existing permissions of Ticket Agent Base Permission
     When I query the collection of permissions with roleid 18
     Then the response code is 200

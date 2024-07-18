@@ -39,7 +39,7 @@ When qr/I query the collection of roles$/, sub {
 Then qr/the roles output is "(.*?)"/, sub {
    my $Name=$1;
    my $array=S->{ResponseContent}->{Role};
-   my @AttributeValue =( "Agent User", "Asset Maintainer", "Asset Reader", "Customer", "Customer Manager", "Customer Reader", "FAQ Admin", "FAQ Editor", "FAQ Reader", "Report Manager", "Report User", "Superuser", "System Admin", "Textmodule Admin", "Ticket Agent", "Ticket Agent Base Permission", "Ticket Agent (Servicedesk)", "Ticket Agent (w/o teams)", "Ticket Reader", "Webform Ticket Creator" );
+   my @AttributeValue =( "Agent User", "Asset Maintainer", "Asset Reader", "Customer", "Customer Manager", "Customer Reader", "FAQ Admin", "FAQ Editor", "FAQ Reader", "Report Manager", "Report User", "Superuser", "System Admin", "Textmodule Admin", "Ticket Agent", "Ticket Agent Base Permission", "Ticket Agent (Servicedesk)", "Ticket Reader", "Webform Ticket Creator" );
 
    foreach $hash_ref (@$array) {
       if ($hash_ref->{Name} eq $Name ){

@@ -32,7 +32,7 @@ _UpdateTicketAgentRole();
 sub _UpdateTicketAgentRole {
 
     my $RoleObject = $Kernel::OM->Get('Role');
-    my @Roles = ('Ticket Agent', 'Ticket Reader', 'Ticket Agent (w/o teams)');
+    my @Roles = ('Ticket Agent', 'Ticket Reader');
 
     foreach my $RoleName ( @Roles ) {
         my $RoleID = $RoleObject->RoleLookup(Role => $RoleName);
