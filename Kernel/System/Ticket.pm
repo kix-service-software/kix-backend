@@ -2466,25 +2466,44 @@ sub TicketCustomerSet {
     # db organisation id update
     if ( defined $Param{OrganisationID} ) {
 
-        my $Ok = $DBObject->Do(
-            SQL => 'UPDATE ticket SET organisation_id = ?, '
-                . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
-            Bind => [ \$Param{OrganisationID}, \$Param{UserID}, \$Param{TicketID} ]
-        );
+        my $Ok;
+        if ( $Param{OrganisationID} eq '' ) {
+            $Ok = $DBObject->Do(
+                SQL => 'UPDATE ticket SET organisation_id = null, '
+                    . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
+                Bind => [ \$Param{UserID}, \$Param{TicketID} ]
+            );
+        } else {
+            $Ok = $DBObject->Do(
+                SQL => 'UPDATE ticket SET organisation_id = ?, '
+                    . ' change_time = current_timestamp, change_by = ? WHERE id = ?',
+                Bind => [ \$Param{OrganisationID}, \$Param{UserID}, \$Param{TicketID} ]
+            );
+        }
 
         if ($Ok) {
             $Param{History} = "OrganisationID=$Param{OrganisationID};";
         }
+        
     }
 
     # db contact update
     if ( defined $Param{ContactID} ) {
+        my $Ok;
 
-        my $Ok = $DBObject->Do(
-            SQL => 'UPDATE ticket SET contact_id = ?, '
-                . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-            Bind => [ \$Param{ContactID}, \$Param{UserID}, \$Param{TicketID} ],
-        );
+         if ( $Param{ContactID} eq '' ) {
+            $Ok = $DBObject->Do(
+                SQL => 'UPDATE ticket SET contact_id = null, '
+                    . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
+                Bind => [ \$Param{UserID}, \$Param{TicketID} ],
+            );
+         } else {
+            $Ok = $DBObject->Do(
+                SQL => 'UPDATE ticket SET contact_id = ?, '
+                    . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
+                Bind => [ \$Param{ContactID}, \$Param{UserID}, \$Param{TicketID} ],
+            );
+         }
 
         if ($Ok) {
             $Param{History} .= "ContactID=$Param{ContactID};";
