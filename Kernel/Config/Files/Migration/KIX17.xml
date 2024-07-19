@@ -183,6 +183,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Asset::Version" Required="0" Valid="1">
+        <Description Translatable="1">Object handler registration for data migration.</Description>
+        <Group>Migration</Group>
+        <SubGroup>KIX17</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Installation::Migration::KIX17::Asset::Version</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Migration::Source::KIX17###Asset::HistoryType" Required="0" Valid="1">
         <Description Translatable="1">Object handler registration for data migration.</Description>
         <Group>Migration</Group>
