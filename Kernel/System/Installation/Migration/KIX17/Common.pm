@@ -792,6 +792,16 @@ sub GetOIDMapping {
     );
 }
 
+sub GetOIDAdditionalData {
+    my ( $Self, %Param ) = @_;
+
+    return $Kernel::OM->Get('Migration')->GetOIDAdditionalData(
+        Source   => $Self->{Source},
+        SourceID => $Self->{SourceID},
+        %Param,
+    );
+}
+
 sub CreateOIDMapping {
     my ( $Self, %Param ) = @_;
 
