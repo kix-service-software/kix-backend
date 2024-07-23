@@ -235,10 +235,20 @@ sub _PrepareData {
                 };
 
                 if ( ref( $ArrayItem ) eq 'HASH' ) {
-                    $ResultItem->{Value} = $ArrayItem->{ $ItemKey };
+                    # get content from own attribute key
+                    if ( defined( $ArrayItem->{ $ItemKey } ) ) {
+                        $ResultItem->{Value} = delete( $ArrayItem->{ $ItemKey } );
+                    }
+                    # check if we have a special handling method to extract the content
+                    elsif ( $Self->{AttributeTypeModules}->{ $DefItem->{Input}->{Type} }->can('GetHashContentAttributes') ) {
+                        my @HashContentAttributes = $Self->{AttributeTypeModules}->{ $DefItem->{Input}->{Type} }->GetHashContentAttributes();
+                        for my $Attribute ( @HashContentAttributes ) {
+                            $ResultItem->{Value}->{ $Attribute } = delete( $ArrayItem->{ $Attribute } );
+                        }
+                    }
                     $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
                         Item  => $DefItem,
-                        Value => $ArrayItem->{ $ItemKey },
+                        Value => $ResultItem->{Value},
                     );
                     if ( defined( $DefItem->{Sub} ) ) {
                         # start recursion for each array item
