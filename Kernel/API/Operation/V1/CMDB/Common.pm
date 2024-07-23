@@ -578,7 +578,7 @@ sub ConvertDataToInternal {
                     $Content = delete( $Entry->{ $RootKey } );
                 }
                 # check if we have a special handling method to extract the content
-                if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('GetHashContentAttributes') ) {
+                elsif ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('GetHashContentAttributes') ) {
                     my @HashContentAttributes = $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->GetHashContentAttributes();
                     for my $Attribute ( @HashContentAttributes ) {
                         $Content->{ $Attribute } = delete( $Entry->{ $Attribute } );
