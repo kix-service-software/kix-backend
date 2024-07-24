@@ -87,7 +87,7 @@
                "type": "string",
                "description": "ascending or descanding"
             }
-         },
+         }
       },
       "Type": {
          "type": "string",
