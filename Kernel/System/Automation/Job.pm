@@ -520,11 +520,11 @@ sub JobList {
     if ( $Param{Event} ) {
         # quote event string with surrounding quotes
         # TODO: quote % in event string as well
-        my $EventString = $Kernel::OM->Get('DB')->Quote( '"' . $Param{Event} . '"', 'Like' );
+        my $EventString = '%' . $Kernel::OM->Get('DB')->Quote( '"' . $Param{Event} . '"', 'Like' ) . '%';
 
         $SQL .= " AND EXISTS (
                     SELECT ep.id FROM job_exec_plan jep, exec_plan ep
-                     WHERE jep.job_id = j.id AND jep.exec_plan_id = ep.id AND ep.type = 'EventBased' AND ep.parameters LIKE '%$EventString%')";
+                     WHERE jep.job_id = j.id AND jep.exec_plan_id = ep.id AND ep.type = 'EventBased' AND ep.parameters LIKE '$EventString')";
     }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
