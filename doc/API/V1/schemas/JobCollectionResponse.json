@@ -141,7 +141,8 @@
             },
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type" : "array"
+               "type" : "array",
+               "readOnly" : true
             },
             "ID" : {
                "type" : "integer",
@@ -179,16 +180,20 @@
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
-                     "type" : "string"
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
                   }
                },
                "required" : [
-                  "Attribute"
-               ]
+                  "Field"
+               ],
+               "readOnly" : true
             },
             "Type" : {
                "type" : "string",
