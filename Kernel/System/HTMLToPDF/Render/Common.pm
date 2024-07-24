@@ -39,18 +39,13 @@ sub new {
     return $Self;
 }
 
-sub _ReplacePlaceholders {
+sub ReplacePlaceholders {
     my ( $Self, %Param ) = @_;
-
-    my $LogObject     = $Kernel::OM->Get('Log');
-    my $TimeObject    = $Kernel::OM->Get('Time');
-    my $ContactObject = $Kernel::OM->Get('Contact');
-    my $LayoutObject  = $Kernel::OM->Get('Output::HTML::Layout');
 
     # check needed stuff
     for my $Needed (qw(String)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "Need $Needed!"
             );
@@ -64,155 +59,278 @@ sub _ReplacePlaceholders {
     );
 
     # replace Font
-    while ($Result{Text} =~ m{<Font_([^>]+)>}sm ) {
-        my $Font = $1;
-        $Result{Text} =~ s/<Font_$Font>//gsm;
-        if ( $Font eq 'Bold' ) {
-            $Result{Class} = 'ProportionalBold';
-        }
-        if ( $Font eq 'Italic' ) {
-            $Result{Class} = 'ProportionalItalic';
-        }
-        if ( $Font eq 'BoldItalic' ) {
-            $Result{Class} = 'ProportionalBoldItalic';
-        }
-        if ( $Font eq 'Mono' ) {
-            $Result{Class} = 'Monospaced';
-        }
-        if ( $Font eq 'MonoBold' ) {
-            $Result{Class} = 'MonospacedBold';
-        }
-        if ( $Font eq 'MonoItalic' ) {
-            $Result{Class} = 'MonospacedItalic';
-        }
-        if ( $Font eq 'MonoBoldItalic' ) {
-            $Result{Class} = 'MonospacedBoldItalic';
-        }
-    }
+    $Self->_ReplaceFont(
+        Result => \%Result
+    );
 
     # replace custom classes
-    while ($Result{Text} =~ m{<Class_([^>]+)>}sm ) {
-        my $Class = $1;
-        $Result{Text} =~ s/<Class_$Class>//gsm;
-        $Result{Class} .= " $Class";
-    }
+    $Self->_ReplaceClass(
+        Result => \%Result
+    );
 
     # replace current user and time
-    if ( $Result{Text} =~ m{<Current_Time>}smx ) {
-        my $Time = $TimeObject->CurrentTimestamp();
-        if ( $Param{Translate} ) {
-            $Time = $LayoutObject->{LanguageObject}->FormatTimeString( $Time, "DateFormat" );
+    $Result{Text} = $Self->_ReplaceSpecialCurrent(
+        Text      => $Result{Text},
+        Translate => $Param{Translate},
+        UserID    => $Param{UserID}
+    );
+
+    # replace count
+    $Result{Text} = $Self->_ReplaceCount(
+        Text   => $Result{Text},
+        Count  => $Param{Count}
+    );
+
+    # replace filename time
+    $Result{Text} = $Self->_ReplaceSpecialTime(
+        Text => $Result{Text}
+    );
+
+    # replace specific keys
+    $Result{Text} = $Self->_ReplaceSpecialKey(
+        Text       => $Result{Text},
+        Object     => $Param{Object},
+        ReplaceKey => $Param{ReplaceKey}
+    );
+
+    # replace object placeholders
+    $Result{Text} = $Self->_ReplaceObjectAttributes(
+        Text   => $Result{Text},
+        Datas  => $Param{Datas},
+        Object => $Param{Object}
+    );
+
+    return %Result;
+}
+
+sub _ReplaceFont {
+    my ( $Self, %Param ) = @_;
+
+    while ($Param{Result}->{Text} =~ m{<Font_([^>]+)>}sm ) {
+        my $Font = $1;
+        $Param{Result}->{Text} =~ s/<Font_$Font>//gsm;
+        if ( $Font eq 'Bold' ) {
+            $Param{Result}->{Class} = 'ProportionalBold';
         }
-        $Result{Text} =~ s/<Current_Time>/$Time/gxsm;
+        if ( $Font eq 'Italic' ) {
+            $Param{Result}->{Class} = 'ProportionalItalic';
+        }
+        if ( $Font eq 'BoldItalic' ) {
+            $Param{Result}->{Class} = 'ProportionalBoldItalic';
+        }
+        if ( $Font eq 'Mono' ) {
+            $Param{Result}->{Class} = 'Monospaced';
+        }
+        if ( $Font eq 'MonoBold' ) {
+            $Param{Result}->{Class} = 'MonospacedBold';
+        }
+        if ( $Font eq 'MonoItalic' ) {
+            $Param{Result}->{Class} = 'MonospacedItalic';
+        }
+        if ( $Font eq 'MonoBoldItalic' ) {
+            $Param{Result}->{Class} = 'MonospacedBoldItalic';
+        }
     }
-    if ( $Result{Text} =~ m{<Current_User>}smx ) {
-        my %Contact = $ContactObject->ContactGet(
+
+    return 1;
+}
+
+sub _ReplaceSpecialCurrent {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    if ( $Text =~ m{<Current_Time>}smx ) {
+        my $Time = $Kernel::OM->Get('Time')->CurrentTimestamp();
+        if ( $Param{Translate} ) {
+            $Time = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
+                $Time,
+                "DateFormat"
+            );
+        }
+        $Text =~ s/<Current_Time>/$Time/gxsm;
+    }
+
+    if ( $Text =~ m{<Current_User>}smx ) {
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Param{UserID}
         );
         if ( %Contact ) {
-            $Result{Text} =~ s/<Current_User>/$Contact{Fullname}/gsxm;
+            $Text =~ s/<Current_User>/$Contact{Fullname}/gsxm;
         }
         else {
-            $Result{Text} =~ s/<Current_User>//gsxm;
+            $Text =~ s/<Current_User>//gsxm;
         }
     }
 
-    # replace count
-    if ( $Result{Text} =~ m{<Count>}smx ) {
+    return $Text;
+}
 
-        if ( defined $Param{Count} ) {
-            $Result{Text} =~ s/<Count>/$Param{Count}/gsxm;
-        }
-        else {
-            $Result{Text} =~ s/<Count>//gsxm;
-        }
+sub _ReplaceCount {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    return $Text if ( $Text !~ m{<Count>}smx );
+
+
+    if ( defined $Param{Count} ) {
+        $Text =~ s/<Count>/$Param{Count}/gsxm;
     }
-    # replace filename time
-    if ( $Result{Text} =~ m{<TIME_}smx ) {
-        my @Time = $TimeObject->SystemTime2Date(
-            SystemTime => $TimeObject->SystemTime()
-        );
-
-        if ( $Result{Text} =~ m{<TIME_YYMMDD_hhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . q{_}
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
-        }
-
-        if ( $Result{Text} =~ m{<TIME_YYMMDD}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3];
-            $Result{Text} =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
-        }
-
-        if ( $Result{Text} =~ m{<TIME_YYMMDDhhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
-        }
-
-        $Result{Text} =~ s/<TIME_.*>//gsxm;
+    else {
+        $Text =~ s/<Count>//gsxm;
     }
 
-    # replace object attributes
-    if (
-        $Param{Datas}
-        && $Param{Object}
-    ) {
-        for my $Tag ( sort keys %{$Param{Datas}} ) {
-            my $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Key';
-            if ( $Result{Text} =~ m/$Pattern/smg ) {
-                $Result{Text} =~ s/$Pattern/$Tag/smg;
-                $Result{Text} =~ s/$Pattern/-/smg;
+    return $Text;
+}
+
+sub _ReplaceClass {
+    my ( $Self, %Param ) = @_;
+
+    while ($Param{Result}->{Text} =~ m{<Class_([^>]+)>}sm ) {
+        my $Class = $1;
+        $Param{Result}->{Text} =~ s/<Class_$Class>//gsm;
+        $Param{Result}->{Class} .= " $Class";
+    }
+
+    return 1;
+}
+
+sub _ReplaceSpecialTime {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    return $Text if $Text !~ m{<TIME_}smx;
+
+    my @Time = $Kernel::OM->Get('Time')->SystemTime2Date(
+        SystemTime => $Kernel::OM->Get('Time')->SystemTime()
+    );
+
+    if ( $Text =~ m{<TIME_YYMMDD_hhmm}smx ) {
+        my $TimeStamp = $Time[5]
+            . $Time[4]
+            . $Time[3]
+            . q{_}
+            . $Time[2]
+            .$Time[1];
+        $Text =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
+    }
+
+    if ( $Text =~ m{<TIME_YYMMDD}smx ) {
+        my $TimeStamp = $Time[5]
+            . $Time[4]
+            . $Time[3];
+        $Text =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
+    }
+
+    if ( $Text =~ m{<TIME_YYMMDDhhmm}smx ) {
+        my $TimeStamp = $Time[5]
+            . $Time[4]
+            . $Time[3]
+            . $Time[2]
+            .$Time[1];
+        $Text =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
+    }
+
+    $Text =~ s/<TIME_.*>//gsxm;
+
+    return $Text;
+}
+
+sub _ReplaceObjectAttributes {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    return $Text if ( !$Param{Datas} || !$Param{Object} );
+
+    for my $Tag ( sort keys %{$Param{Datas}} ) {
+        my $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Key';
+        if ( $Text =~ m/$Pattern/smg ) {
+            $Text =~ s/$Pattern/$Tag/smg;
+            $Text =~ s/$Pattern/-/smg;
+        }
+
+        $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Value(:?[.](\d+)|)';
+        if ( $Text =~ m/$Pattern/smg ) {
+            my $Index = $1;
+            my $Value;
+
+            if ( $Tag =~ /^DynamicField_/sm ) {
+                $Value = $Param{Datas}->{$Tag}->{Value};
             }
-
-            $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Value(:?[.](\d+)|)';
-            if ( $Result{Text} =~ m/$Pattern/smg ) {
-                my $Index = $1;
-                my $Value;
-
-                if ( $Tag =~ /^DynamicField_/sm ) {
-                    $Value = $Param{Datas}->{$Tag}->{Value};
-                }
-                elsif ( $Index ) {
-                    if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
-                        $Value = $Param{Datas}->{$Tag}->[$Index];
-                    }
-                    else {
-                        $Value = $Param{Datas}->{$Tag};
-                    }
+            elsif ( $Index ) {
+                if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
+                    $Value = $Param{Datas}->{$Tag}->[$Index];
                 }
                 else {
-                    if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
-                        $Value = join( q{,}, $Param{Datas}->{$Tag});
-                    }
-                    else {
-                        $Value = $Param{Datas}->{$Tag};
-                    }
+                    $Value = $Param{Datas}->{$Tag};
                 }
-                if ( $Tag =~ /^(?:Create|Change)(?:d|Time)$/sm ) {
-                    $Value = $LayoutObject->{LanguageObject}->FormatTimeString( $Value, "DateFormat" );
-                }
-                $Result{Text} =~ s/$Pattern/$Value/smg;
-                $Result{Text} =~ s/$Pattern/-/smg;
             }
+            else {
+                if ( ref $Param{Datas}->{$Tag} eq 'ARRAY' ) {
+                    $Value = join( q{,}, $Param{Datas}->{$Tag});
+                }
+                else {
+                    $Value = $Param{Datas}->{$Tag};
+                }
+            }
+            if ( $Tag =~ /^(?:Create|Change)(?:d|Time)$/sm ) {
+                $Value = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
+                    $Value,
+                    "DateFormat"
+                );
+            }
+            $Text =~ s/$Pattern/$Value/smg;
+            $Text =~ s/$Pattern/-/smg;
         }
-        # replace not exists placeholders of that object
-        my $Pattern = $Param{Object} . '[.].*[.]Key';
-        my $Pattern2 = $Param{Object} . '[.].*[.]Value(:?[.]\d+|)';
-        $Result{Text} =~ s/$Pattern/-/smg;
-        $Result{Text} =~ s/$Pattern2/-/smg;
     }
 
-    return %Result;
+    # replace not exists placeholders of that object
+    my $Pattern = $Param{Object} . '[.].*[.]Key';
+    my $Pattern2 = $Param{Object} . '[.].*[.]Value(:?[.]\d+|)';
+    $Text =~ s/$Pattern/-/smg;
+    $Text =~ s/$Pattern2/-/smg;
+
+    return $Text;
+}
+
+sub _ReplaceSpecialKey {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    return $Text if ( !$Param{ReplaceKey} );
+
+    my $List = {
+        CreateBy    => 'Created by',
+        CreatedBy   => 'Created by',
+        ChangeBy    => 'Changed by',
+        ChangedBy   => 'Changed by',
+        CreatedTime => 'Created at',
+        ChangeTime  => 'Change at',
+        ChangedTime => 'Change at',
+    };
+
+    my $ObjectKeys = $Self->{ReplaceableLabel};
+
+    if (
+        defined $ObjectKeys
+        && IsHashRefWithData($ObjectKeys)
+    ) {
+        $List = { %{$List}, %{$ObjectKeys} };
+    }
+
+    for my $Pattern ( sort keys %{$List} ) {
+        if ( $Text =~ m/$Pattern/smg ) {
+            my $Replace = $List->{$Pattern};
+            $Text =~ s/$Pattern/$Replace/smg;
+            last;
+        }
+    }
+
+    return $Text;
 }
 
 1;
