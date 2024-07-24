@@ -1282,31 +1282,6 @@ sub _Success {
         }
         $Headers{'X-Total-Count'} = $TotalCount if defined $TotalCount;
 
-        # apply offset and limit only for collections
-        if ( !$Self->{PermissionCheckOnly} && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor}) && $Self->{OperationRouteMapping}->{$Self->{OperationType}} !~ /\/:\w+$/ ) {
-            # honor an offset, if we have one
-            if ( IsHashRefWithData( $Self->{Offset} ) ) {
-                my $StartTime = Time::HiRes::time();
-
-                $Self->_ApplyOffset(
-                    Data => \%Param,
-                );
-
-                $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
-            }
-
-            # honor a limiter, if we have one
-            if ( IsHashRefWithData( $Self->{Limit} ) ) {
-                my $StartTime = Time::HiRes::time();
-
-                $Self->_ApplyLimit(
-                    Data => \%Param,
-                );
-
-                $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
-            }
-        }
-
         # honor a filter, if we have one
         if ( IsHashRefWithData( $Self->{Filter} ) ) {
             my $StartTime = Time::HiRes::time();
@@ -1330,6 +1305,31 @@ sub _Success {
             );
 
             $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", TimeDiff($StartTime)));
+        }
+
+        # apply offset and limit only for collections
+        if ( !$Self->{PermissionCheckOnly} && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor}) && $Self->{OperationRouteMapping}->{$Self->{OperationType}} !~ /\/:\w+$/ ) {
+            # honor an offset, if we have one
+            if ( IsHashRefWithData( $Self->{Offset} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyOffset(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying offset took %i ms", TimeDiff($StartTime)));
+            }
+
+            # honor a limiter, if we have one
+            if ( IsHashRefWithData( $Self->{Limit} ) ) {
+                my $StartTime = Time::HiRes::time();
+
+                $Self->_ApplyLimit(
+                    Data => \%Param,
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         # honor a field selector, if we have one
