@@ -42,6 +42,7 @@
       },
       "Filter": {
         "type": "array",
+        "readOnly": true,
         "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details)."
       },
       "ID": {
@@ -78,16 +79,22 @@
       },
       "SortOrder": {
          "type": "object",
+         "readOnly": true,
          "description": "Used to sort found objects (see \"Filter\").",
          "properties": {
             "Field": {
-               "type": "string"
+               "type": "string",
+               "readOnly": true
             },
             "Direction": {
                "type": "string",
-               "description": "ascending or descanding"
+               "readOnly": true,
+               "description": "ascending or descending"
             }
-         }
+         },
+         "required" : [
+            "Field"
+         ]
       },
       "Type": {
          "type": "string",

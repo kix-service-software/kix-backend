@@ -25243,7 +25243,8 @@ pre code {
             },
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type" : "array"
+               "type" : "array",
+               "readOnly" : true
             },
             "ID" : {
                "type" : "integer",
@@ -25281,16 +25282,20 @@ pre code {
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
-                     "type" : "string"
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
                   }
                },
                "required" : [
-                  "Attribute"
-               ]
+                  "Field"
+               ],
+               "readOnly" : true
             },
             "Type" : {
                "type" : "string",
@@ -25556,15 +25561,16 @@ pre code {
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
                      "type" : "string"
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string"
                   }
                },
                "required" : [
-                  "Attribute"
+                  "Field"
                ]
             },
             "Type" : {
@@ -25591,8 +25597,8 @@ pre code {
         "Name": "new job",
         "Type": "Ticket",
         "SortOrder": {
-            "Attribute": "TypeID",
-            "Descanding": 1
+            "Field": "TypeID",
+            "Direction": "ascending"
         },
         "ValidID": 1
     }
@@ -25821,7 +25827,8 @@ pre code {
             },
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type" : "array"
+               "type" : "array",
+               "readOnly" : true
             },
             "ID" : {
                "type" : "integer",
@@ -25859,16 +25866,20 @@ pre code {
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
-                     "type" : "string"
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
                   }
                },
                "required" : [
-                  "Attribute"
-               ]
+                  "Field"
+               ],
+               "readOnly" : true
             },
             "Type" : {
                "type" : "string",
@@ -26084,8 +26095,8 @@ pre code {
         ],
         "Name": "Some Job",
         "SortOrder": {
-            "Attribute": "TypeID",
-            "Descanding": 1
+            "Field": "TypeID",
+            "Direction": "ascending"
         },
         "Type": "Ticket",
         "ValidID": 1
@@ -26139,15 +26150,16 @@ pre code {
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
                      "type" : "string"
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string"
                   }
                },
                "required" : [
-                  "Attribute"
+                  "Field"
                ]
             },
             "Type" : {

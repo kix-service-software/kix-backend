@@ -36,15 +36,16 @@
                "description" : "Used to sort found objects (see \"Filter\").",
                "type" : "object",
                "properties" : {
-                  "Attribute" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
                      "type" : "string"
                   },
-                  "Descanding" : {
-                     "type" : "integer"
+                  "Field" : {
+                     "type" : "string"
                   }
                },
                "required" : [
-                  "Attribute"
+                  "Field"
                ]
             },
             "Type" : {
