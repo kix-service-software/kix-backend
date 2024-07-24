@@ -115,15 +115,15 @@ sub Render {
 
                     my %HTML = $Self->Render(
                         %ListKeys,
-                        UserID     => $Param{UserID},
-                        Block      => $Block->{Blocks},
-                        Result     => 'Content',
-                        Object     => $Block->{Object} || $Object,
-                        Expands    => $Block->{Expand},
-                        Count      => $Count,
-                        Filters    => $Param{Filters},
-                        Allows     => $Param{Allows},
-                        Ignores    => $Param{Ignores}
+                        UserID  => $Param{UserID},
+                        Block   => $Block->{Blocks},
+                        Result  => 'Content',
+                        Object  => $Block->{Object} || $Object,
+                        Expands => $Block->{Expand},
+                        Count   => $Count,
+                        Filters => $Param{Filters},
+                        Allows  => $Param{Allows},
+                        Ignores => $Param{Ignores}
                     );
 
                     next ID if !%HTML;
@@ -150,13 +150,14 @@ sub Render {
         elsif ( $Block->{Type} ) {
             my %HTML = $Self->{"Render$Block->{Type}"}->Run(
                 %Keys,
-                Data    => $BlockData,
-                Block   => $Block,
-                UserID  => $Param{UserID},
-                Count   => $Param{Count},
-                Allows  => $Param{Allows},
-                Ignores => $Param{Ignores},
-                Object  => $Block->{Object} || $Object
+                Data             => $BlockData,
+                Block            => $Block,
+                UserID           => $Param{UserID},
+                Count            => $Param{Count},
+                Allows           => $Param{Allows},
+                Ignores          => $Param{Ignores},
+                Object           => $Block->{Object} || $Object,
+                ReplaceableLabel => $Self->{"Backend$Object"}->ReplaceableLabel()
             );
             $Css     .= $HTML{Css};
             $Content .= $HTML{HTML};

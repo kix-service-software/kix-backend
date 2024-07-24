@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -84,15 +84,16 @@ one or more ticket entries in one call.
 
     my $Result = $OperationObject->Run(
         Data => {
-            Name                 => 'some text',
-            ID                   => '123',
-            Filters              => 'JSON string',
-            Allows               => 'JSON string',
-            Ignores              => 'JSON string',
-            Expends              => 'String or ARRAY',
-            Filename             => 'same name',
-            IdentifierType       => 'IDKey or IDNumber',
-            IdentifierIDOrNumber => '132'
+            TemplateName         => 'some text',         # required (or TemplateID), name of original template
+            TemplateID           => '123',               # required (or TemplateName), id of original template
+            Filters              => 'JSON string',       # optional, filters that restrict the data for the template
+            Allows               => 'JSON string',       # optional, overrides the "Allows" of the tables
+            Ignores              => 'JSON string',       # optional, overrides the "Ignores" of the tables
+            Expends              => 'String or ARRAY',   # optional, overrides the "Expends" of template object
+            Filename             => 'same name',         # optional, defines the file name of the PDF
+            IdentifierType       => 'IDKey or IDNumber', # required, determines the identification type through which the object obtains its data
+            IdentifierIDOrNumber => '132',               # required, determines the identification value that the object should fetch.
+            FallbackTemplate     => 'some template name' # optional, fallback template if no entry was found for the original template.
         },
     );
 
@@ -130,7 +131,6 @@ sub Run {
         );
     }
 
-
     for my $Attribute ( qw(IdentifierType IdentifierIDorNumber) ) {
         next if $Param{Data}->{$Attribute};
         return $Self->_Error(
@@ -143,6 +143,22 @@ sub Run {
     my %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
         %TemplateParam
     );
+
+    if (
+        !%Template
+        && defined $Param{Data}->{FallbackTemplate}
+        && $Param{Data}->{FallbackTemplate}
+    ) {
+        %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
+            %Param,
+            Name => $Param{Data}->{FallbackTemplate}
+        );
+
+        if ( %Template ) {
+            $TemplateParam{ID}   = $Template{ID};
+            $TemplateParam{Name} = $Template{Name};
+        }
+    }
 
     if ( !%Template ) {
         return $Self->_Error(

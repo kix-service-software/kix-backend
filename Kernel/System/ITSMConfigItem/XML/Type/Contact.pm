@@ -107,14 +107,31 @@ sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
-    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-        ID => $Param{Value}
-    );
 
-    if ( IsHashRefWithData( \%Contact ) && $Contact{Email} ) {
-        return $Contact{Email};
+    my $Result = $Param{Value};
+    if (
+        defined $Param{Result}
+        && $Param{Result} eq 'DisplayValue'
+    ) {
+        $Result = $Self->ValueLookup(
+            Value => $Param{Value}
+        );
     }
-    return $Param{Value};
+    else {
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+            ID => $Param{Value}
+        );
+
+        if (
+            IsHashRefWithData( \%Contact )
+            && $Contact{Email}
+        ) {
+            $Result = $Contact{Email};
+        }
+    }
+
+
+    return $Result;
 }
 
 =item ImportSearchValuePrepare()
