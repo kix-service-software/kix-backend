@@ -109,7 +109,10 @@ sub LogFileGet {
     $LogFile{FilesizeRaw} = 0 + $Stat->size();
 
     # human readable file size
-    if ( $LogFile{FilesizeRaw} ) {
+    if (
+        defined( $LogFile{FilesizeRaw} )
+        && $LogFile{FilesizeRaw} =~ m/^[0-9]+$/
+    ) {
         if ( $LogFile{FilesizeRaw} > ( 1024 * 1024 ) ) {
             $LogFile{Filesize} = sprintf "%.1f MBytes", ( $LogFile{FilesizeRaw} / ( 1024 * 1024 ) );
         }
