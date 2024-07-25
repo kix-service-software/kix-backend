@@ -325,6 +325,55 @@ sub ValidateConfig {
     return 1;
 }
 
+=item SetDefaults()
+
+Uses defaults of action options (if given) to set empty parameters in config
+
+Example:
+    my $Result = $Self->SetDefaults(
+        Config => {}                # required
+    );
+
+=cut
+
+sub SetDefaults {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(Config)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+            );
+            return;
+        }
+    }
+
+    if (ref $Param{Config} ne 'HASH') {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Config is no object!",
+        );
+        return;
+    }
+
+    my %Definition = $Self->DefinitionGet();
+
+    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
+        for my $Option ( values %{$Definition{Options}}) {
+
+            # set default value if not given
+            if ( !exists $Param{Config}->{$Option->{Name}} && defined $Option->{DefaultValue} ) {
+                $Param{Config}->{$Option->{Name}} = $Option->{DefaultValue};
+            }
+        }
+    }
+
+    return 1;
+
+}
+
 sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
@@ -351,10 +400,6 @@ sub _CheckParams {
 
     if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
         for my $Option ( values %{$Definition{Options}}) {
-            # set default value if not given
-            if ( !exists $Param{Config}->{$Option->{Name}} && defined $Option->{DefaultValue} ) {
-                $Param{Config}->{$Option->{Name}} = $Option->{DefaultValue};
-            }
 
             # check if the value is given, if required
             if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {

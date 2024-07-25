@@ -1753,7 +1753,6 @@ sub ArticleGet {
                 next DYNAMICFIELD if !$DynamicFieldConfig;
                 next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
                 next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
-                next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
 
                 # get the current value for each dynamic field
                 my $Value = $DynamicFieldBackendObject->ValueGet(

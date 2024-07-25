@@ -14,10 +14,6 @@ use vars (qw($Self));
 
 use Kernel::System::VariableCheck qw(:all);
 
-my $ContactObject    = $Kernel::OM->Get('Contact');
-my $AutomationObject = $Kernel::OM->Get('Automation');
-my $TicketObject     = $Kernel::OM->Get('Ticket');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -38,13 +34,15 @@ my %Data = (
     DFTextTargetName      => 'DFSetTargetText',
 
     DFSelectionSourceName        => 'DFSetSourceSelection',
-    DFSelectionContactSourceName => 'DFSetContactSelection'
+    DFSelectionContactSourceName => 'DFSetContactSelection',
+
+    DFTextTargetNameArticle => 'DFSetTargetTextArticle'
 );
 
-my $TicketID = _AddObjects();
+my ($TicketID, $ArticleID) = _AddObjects();
 
 if ($TicketID) {
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $TicketID,
         DynamicFields => 1,
         UserID        => 1,
@@ -64,7 +62,7 @@ if ($TicketID) {
             'Check target text DF',
         );
 
-        my $MacroID = $AutomationObject->MacroAdd(
+        my $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
             Name    => 'DFSet Tests',
             Type    => 'Ticket',
             ValidID => 1,
@@ -76,10 +74,11 @@ if ($TicketID) {
         );
 
         if ($MacroID) {
-            my $MacroActionID = $AutomationObject->MacroActionAdd(
+            my $MacroActionID = $Kernel::OM->Get('Automation')->MacroActionAdd(
                 MacroID    => $MacroID,
                 Type       => 'DynamicFieldSet',
                 Parameters => {
+                    ObjectID           => $TicketID, # use ObjectID parameter for first execution
                     DynamicFieldName   => $Data{DFSelectionTargetName},
                     DynamicFieldValue  => 'Key1',
                     DynamicFieldAppend => 0
@@ -92,14 +91,14 @@ if ($TicketID) {
                 'MacroActionAdd',
             );
             if ($MacroActionID) {
-                my %MacroAction = $AutomationObject->MacroActionGet(
+                my %MacroAction = $Kernel::OM->Get('Automation')->MacroActionGet(
                     ID => $MacroActionID
                 );
 
                 if (IsHashRefWithData(\%MacroAction)) {
 
                     # update macro - set ExecOrder
-                    my $Success = $AutomationObject->MacroUpdate(
+                    my $Success = $Kernel::OM->Get('Automation')->MacroUpdate(
                         ID        => $MacroID,
                         ExecOrder => [ $MacroActionID ],
                         UserID    => 1,
@@ -109,8 +108,8 @@ if ($TicketID) {
                         'MacroUpdate - ExecOrder',
                     );
 
-                    ###### 1st execute
-                    $Success = $AutomationObject->MacroExecute(
+                    ###### 1st execute - with ObjectID parameter
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -119,7 +118,7 @@ if ($TicketID) {
                         $Success,
                         '1st MacroExecute',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -145,8 +144,8 @@ if ($TicketID) {
                         }
                     }
 
-                    ###### 2nd execute
-                    $AutomationObject->MacroActionUpdate(
+                    ###### 2nd execute (without ObjectID parameter - should use default "${ObjectID}")
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -155,7 +154,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -164,7 +163,7 @@ if ($TicketID) {
                         $Success,
                         '2nd MacroExecute',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -191,7 +190,7 @@ if ($TicketID) {
                     }
 
                     ###### 3rd execute
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -200,7 +199,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 1          # now append
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -209,7 +208,7 @@ if ($TicketID) {
                         $Success,
                         '3rd MacroExecute',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -242,7 +241,7 @@ if ($TicketID) {
 
                     ## value by placeholders
                     ###### by other dynamic field (with key placeholder)
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -251,7 +250,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -260,7 +259,7 @@ if ($TicketID) {
                         $Success,
                         'key placeholder (MacroExecute)',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -286,7 +285,7 @@ if ($TicketID) {
                         }
                     }
                     ###### by other dynamic field (with object value placeholder)
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -295,7 +294,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -304,7 +303,7 @@ if ($TicketID) {
                         $Success,
                         'object value placeholder (MacroExecute)',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -330,7 +329,7 @@ if ($TicketID) {
                         }
                     }
                     ###### by contact dynamic field (with key placeholder)
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -339,7 +338,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -348,7 +347,7 @@ if ($TicketID) {
                         $Success,
                         'contact DF placeholder (MacroExecute)',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -374,7 +373,7 @@ if ($TicketID) {
                         }
                     }
                     ###### for text DF by other dynamic field (only key placeholder)
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -383,7 +382,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -392,7 +391,7 @@ if ($TicketID) {
                         $Success,
                         'text DF (MacroExecute) - key placeholder',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -418,7 +417,7 @@ if ($TicketID) {
                         }
                     }
                     ###### for text DF by other dynamic field (only value placeholder)
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -427,7 +426,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -436,7 +435,7 @@ if ($TicketID) {
                         $Success,
                         'text DF (MacroExecute) - value placeholder',
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -462,7 +461,7 @@ if ($TicketID) {
                         }
                     }
                     ###### for text DF by other dynamic field (value & key placeholder) # check if key placeholder is not alone, textual replacement should happen
-                    $AutomationObject->MacroActionUpdate(
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
@@ -471,7 +470,7 @@ if ($TicketID) {
                             DynamicFieldAppend => 0
                         }
                     );
-                    $Success = $AutomationObject->MacroExecute(
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
                         ID       => $MacroID,
                         ObjectID => $TicketID,
                         UserID   => 1,
@@ -480,7 +479,7 @@ if ($TicketID) {
                         $Success,
                         'text DF (MacroExecute) - value & key placeholder'
                     );
-                    %Ticket = $TicketObject->TicketGet(
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                         TicketID      => $TicketID,
                         DynamicFields => 1,
                         UserID        => 1,
@@ -505,6 +504,106 @@ if ($TicketID) {
                             );
                         }
                     }
+
+                    ## article tests
+                    if ($ArticleID) {
+                        ###### use ArticleID as ObjectID in parameters, but execute macro still with TicketID
+                        $Kernel::OM->Get('Automation')->MacroActionUpdate(
+                            %MacroAction,
+                            UserID => 1,
+                            Parameters => {
+                                ObjectID => $ArticleID,
+                                DynamicFieldName   => $Data{DFTextTargetNameArticle},
+                                DynamicFieldValue  => "FirstArticleTest",
+                                DynamicFieldAppend => 0
+                            }
+                        );
+                        $Success = $Kernel::OM->Get('Automation')->MacroExecute(
+                            ID       => $MacroID,
+                            ObjectID => $TicketID,
+                            UserID   => 1,
+                        );
+                        $Self->True(
+                            $Success,
+                            'article text DF (MacroExecute) - ArticleID as ObjectID'
+                        );
+                        my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                            ArticleID     => $ArticleID,
+                            DynamicFields => 1,
+                            UserID        => 1,
+                            Silent        => 1
+                        );
+                        if (IsHashRefWithData(\%Article)) {
+                            my $TextValue = $Article{'DynamicField_'.$Data{DFTextTargetNameArticle}};
+                            $Self->True(
+                                IsArrayRefWithData($TextValue) ? 1 : 0,
+                                'Check target text DF (article)',
+                            );
+                            if (IsArrayRefWithData($TextValue)) {
+                                $Self->Is(
+                                    scalar(@{$TextValue}),
+                                    1,
+                                    'Check target text DF (article)'
+                                );
+                                $Self->Is(
+                                    $TextValue->[0],
+                                    'FirstArticleTest',
+                                    'Check target text DF (article, value check)'
+                                );
+                            }
+                        }
+
+                        ###### use placeholder for article as ObjectID in parameters and append new value
+                        $Kernel::OM->Get('Automation')->MacroActionUpdate(
+                            %MacroAction,
+                            UserID => 1,
+                            Parameters => {
+                                ObjectID => '<KIX_LAST_ArticleID>',
+                                DynamicFieldName   => $Data{DFTextTargetNameArticle},
+                                DynamicFieldValue  => "SecondArticleTest",
+                                DynamicFieldAppend => 1
+                            }
+                        );
+                        $Success = $Kernel::OM->Get('Automation')->MacroExecute(
+                            ID       => $MacroID,
+                            ObjectID => $TicketID,
+                            UserID   => 1,
+                        );
+                        $Self->True(
+                            $Success,
+                            'article text DF (MacroExecute) - ArticleID placeholder as ObjectID'
+                        );
+                        %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                            ArticleID     => $ArticleID,
+                            DynamicFields => 1,
+                            UserID        => 1,
+                            Silent        => 1
+                        );
+                        if (IsHashRefWithData(\%Article)) {
+                            my $TextValue = $Article{'DynamicField_'.$Data{DFTextTargetNameArticle}};
+                            $Self->True(
+                                IsArrayRefWithData($TextValue) ? 1 : 0,
+                                'Check target text DF (article, by placeholder)',
+                            );
+                            if (IsArrayRefWithData($TextValue)) {
+                                $Self->Is(
+                                    scalar(@{$TextValue}),
+                                    2,
+                                    'Check target text DF (article, by placeholder)'
+                                );
+                                $Self->Is(
+                                    $TextValue->[0],
+                                    'FirstArticleTest',
+                                    'Check target text DF (article, by placeholder, first value)'
+                                );
+                                $Self->Is(
+                                    $TextValue->[1],
+                                    'SecondArticleTest',
+                                    'Check target text DF (article, by placeholder, second value)'
+                                );
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -512,7 +611,7 @@ if ($TicketID) {
 }
 
 sub _AddObjects {
-    my $ContactID = $ContactObject->ContactAdd(
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
         Firstname             => 'DFSetFirstname',
         Lastname              => 'DFSetLastname',
         Email                 => 'dfset@text.com',
@@ -541,6 +640,25 @@ sub _AddObjects {
     );
     return if (!$TicketID_1);
 
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID         => $TicketID_1,
+        ChannelID        => 1,
+        CustomerVisible  => 0,
+        SenderType       => 'agent',
+        Subject          => 'DFSetArticleSubject',
+        Body             => 'DFSetArticleBody',
+        Charset          => 'utf-8',
+        MimeType         => 'text/plain',
+        HistoryType      => 'AddNote',
+        HistoryComment   => 'test article!',
+        UserID           => 1
+    );
+    $Self->True(
+        $ArticleID,
+        '_AddObjects - create aarticle'
+    );
+    return if (!$ArticleID);
+
     my $DF1ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
         Name            => $Data{DFSelectionSourceName},
         Label           => $Data{DFSelectionSourceName},
@@ -559,7 +677,7 @@ sub _AddObjects {
     );
     $Self->True(
         $DF1ID,
-        '_AddObjectss - create dynamic field 1'
+        '_AddObjects - create dynamic field 1'
     );
     return if (!$DF1ID);
     my $DynamicField1Config = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -567,7 +685,7 @@ sub _AddObjects {
     );
     $Self->True(
         IsHashRefWithData($DynamicField1Config),
-        '_AddObjectss - get dynamic field 1 config'
+        '_AddObjects - get dynamic field 1 config'
     );
     return if (!IsHashRefWithData($DynamicField1Config));
 
@@ -589,7 +707,7 @@ sub _AddObjects {
     );
     $Self->True(
         $DF2ID,
-        '_AddObjectss - create dynamic field 2'
+        '_AddObjects - create dynamic field 2'
     );
     return if (!$DF2ID);
     my $DynamicField2Config = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -597,7 +715,7 @@ sub _AddObjects {
     );
     $Self->True(
         IsHashRefWithData($DynamicField2Config),
-        '_AddObjectss - get dynamic field 2 config'
+        '_AddObjects - get dynamic field 2 config'
     );
     return if (!IsHashRefWithData($DynamicField2Config));
 
@@ -619,7 +737,7 @@ sub _AddObjects {
     );
     $Self->True(
         $DF3ID,
-        '_AddObjectss - create dynamic field 3'
+        '_AddObjects - create dynamic field 3'
     );
     return if (!$DF3ID);
     my $DynamicField3Config = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -627,7 +745,7 @@ sub _AddObjects {
     );
     $Self->True(
         IsHashRefWithData($DynamicField3Config),
-        '_AddObjectss - get dynamic field 3 config'
+        '_AddObjects - get dynamic field 3 config'
     );
     return if (!IsHashRefWithData($DynamicField3Config));
 
@@ -648,7 +766,7 @@ sub _AddObjects {
     );
     $Self->True(
         $DF4ID,
-        '_AddObjectss - create dynamic field 4'
+        '_AddObjects - create dynamic field 4'
     );
     return if (!$DF4ID);
     my $DynamicField4Config = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -656,9 +774,38 @@ sub _AddObjects {
     );
     $Self->True(
         IsHashRefWithData($DynamicField4Config),
-        '_AddObjectss - get dynamic field 4 config'
+        '_AddObjects - get dynamic field 4 config'
     );
     return if (!IsHashRefWithData($DynamicField4Config));
+
+    my $DF5ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+        Name            => $Data{DFTextTargetNameArticle},
+        Label           => $Data{DFTextTargetNameArticle},
+        FieldType       => 'Text',
+        ObjectType      => 'Article',
+        Config          => {
+                CountMin => 0,
+                CountMax => 2,
+                CountDefault => 0,
+                ItemSeparator => q{#},
+                DefaultValue => undef
+        },
+        ValidID         => 1,
+        UserID          => 1
+    );
+    $Self->True(
+        $DF5ID,
+        '_AddObjects - create dynamic field 5'
+    );
+    return if (!$DF5ID);
+    my $DynamicField5Config = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+        ID => $DF5ID
+    );
+    $Self->True(
+        IsHashRefWithData($DynamicField5Config),
+        '_AddObjects - get dynamic field 5 config'
+    );
+    return if (!IsHashRefWithData($DynamicField5Config));
 
     my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicField1Config,
@@ -676,7 +823,7 @@ sub _AddObjects {
     );
     return if (!$Success);
 
-    return $TicketID_1;
+    return ($TicketID_1, $ArticleID);
 }
 
 # rollback transaction on database
