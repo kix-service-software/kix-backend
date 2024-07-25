@@ -50,6 +50,13 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Sets a dynamic field value of a ticket.'));
     $Self->AddOption(
+        Name         => 'ObjectID',
+        Label        => Kernel::Language::Translatable('Object ID'),
+        Description  => Kernel::Language::Translatable('The ID of the object to which the value of the dynamic field should be set. If omitted, "${ObjectID}" is used'),
+        Required     => 0,
+        DefaultValue => '${ObjectID}'
+    );
+    $Self->AddOption(
         Name        => 'DynamicFieldName',
         Label       => Kernel::Language::Translatable('Dynamic Field Name'),
         Description => Kernel::Language::Translatable('The name of the dynamic field.'),
@@ -93,17 +100,6 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
-        TicketID      => $Param{TicketID},
-        DynamicFields => 1
-    );
-
-    if (!%Ticket) {
-        return;
-    }
-
     # get required DynamicField config
     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         Name => $Param{Config}->{DynamicFieldName},
@@ -119,15 +115,54 @@ sub Run {
         return;
     }
 
+    my $ObjectID = $Self->_ReplaceValuePlaceholder(
+        %Param,
+        Value => $Param{Config}->{ObjectID}
+    );
+
+    # use fallback if not set
+    $ObjectID ||= $Param{ObjectID} || $Self->{RootObjectID};
+
+    if (!$ObjectID) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "No ObjectID given!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
+    my %Object;
+    if ( $DynamicFieldConfig->{ObjectType} eq 'Ticket' ) {
+        %Object = $Kernel::OM->Get('Ticket')->TicketGet(
+            TicketID      => $ObjectID,
+            DynamicFields => 1
+        );
+    } elsif ( $DynamicFieldConfig->{ObjectType} eq 'Article' ) {
+        %Object = $Kernel::OM->Get('Ticket')->ArticleGet(
+            ArticleID     => $ObjectID,
+            DynamicFields => 1,
+        );
+    }
+
+    if (!%Object) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "Couldn't get $DynamicFieldConfig->{ObjectType} with id \"$ObjectID\"!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
+
     my @NewValue = $Self->_PrepareValue(
         %Param,
-        Ticket => \%Ticket
+        Object => \%Object
     );
 
     # set the new value
     my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
         DynamicFieldConfig => $DynamicFieldConfig,
-        ObjectID           => $Param{TicketID},
+        ObjectID           => $ObjectID,
         Value              => \@NewValue,
         UserID             => $Param{UserID},
     );
@@ -163,11 +198,11 @@ sub _PrepareValue {
         }
     }
 
-    if ($Param{Config}->{DynamicFieldAppend} && $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} }) {
-        if (IsArrayRefWithData($Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} })) {
-            unshift(@NewValue, @{ $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} } });
+    if ($Param{Config}->{DynamicFieldAppend} && $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} }) {
+        if (IsArrayRefWithData($Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} })) {
+            unshift(@NewValue, @{ $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} } });
         } else {
-            unshift(@NewValue, $Param{Ticket}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} });
+            unshift(@NewValue, $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} });
         }
     }
 

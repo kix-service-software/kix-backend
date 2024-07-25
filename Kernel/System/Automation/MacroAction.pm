@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -759,6 +759,11 @@ sub MacroActionExecute {
         $BackendObject->UnsetRepeatExecution();
 
         my %Parameters = %{$MacroAction{Parameters} || {}};
+
+        # set defaults - do it now if variables are used as defaults
+        $BackendObject->SetDefaults(
+            Config => \%Parameters
+        );
 
         # replace result variables
         if (IsHashRefWithData($Self->{MacroResults})) {
