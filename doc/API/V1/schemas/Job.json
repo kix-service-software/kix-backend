@@ -27,7 +27,7 @@
       "ExecPlanIDs" : {
          "description" : "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          },
          "readOnly" : true
@@ -35,7 +35,7 @@
       "ExecPlans" : {
          "description" : "assigned execution plans - added via include \"ExecPlans\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_ExecPlan_json"
          },
          "readOnly" : true
@@ -60,7 +60,7 @@
       "MacroIDs" : {
          "description" : "IDs of assigned macros - added via include \"MacroIDs\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          },
          "readOnly" : true
@@ -68,7 +68,7 @@
       "Macros" : {
          "description" : "assigned macros - added via include \"Macros\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_Macro_json"
          },
          "readOnly" : true
@@ -160,7 +160,7 @@
                   "Event" : {
                      "description" : "list of events, e.g. \"TicketCreate\"",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "string"
                      },
                      "readOnly" : true
@@ -173,7 +173,7 @@
                   "Weekday" : {
                      "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "integer"
                      },
                      "readOnly" : true
@@ -272,7 +272,7 @@
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -300,7 +300,7 @@
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true

@@ -45,7 +45,7 @@
          "properties" : {
             "AvailableLanguages" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                },
                "readOnly" : true
@@ -73,7 +73,7 @@
             "Languages" : {
                "description" : "added via include \"Languages\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TranslationLanguage_json"
                },
                "readOnly" : true

@@ -12,7 +12,7 @@
         },
         "ExecOrder": {
            "type": "array",
-           "item": {
+           "items": {
               "type": "number"
            },
            "description": "Order of corresponding macro actions as IDs."

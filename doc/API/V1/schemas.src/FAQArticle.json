@@ -95,7 +95,7 @@
         "Keywords": {
             "type": "array",
             "readOnly": true,
-            "item": {
+            "items": {
                 "type": "string"
             }
         },

@@ -12,7 +12,7 @@
             },
             "Images" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemImagePostItem_json"
                }
             },

@@ -39,7 +39,7 @@
             "Weekday": {
               "type": "array",
               "readOnly": true,
-              "item": {
+              "items": {
                 "type": "integer"
               },
               "description": "List of weekday: 0 = sunday, 1 = monday, ..."
@@ -52,7 +52,7 @@
             "Event": {
                "type": "array",
                "readOnly": true,
-               "item": {
+               "items": {
                   "type": "string"
                },
                "description": "list of events, e.g. \"TicketCreate\""

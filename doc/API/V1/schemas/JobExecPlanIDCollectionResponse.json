@@ -7,7 +7,7 @@
       "ExecPlanID" : {
          "description" : "List of IDs of assigned execution plans of the job",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          }
       }

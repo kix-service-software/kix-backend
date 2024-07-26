@@ -29,7 +29,7 @@
             },
             "Parameters" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "object",
                   "patternProperties" : {
                      "^[a-zA-Z]+$" : {
@@ -123,7 +123,7 @@
       "Reports" : {
          "description" : "added via include \"Reports\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_Report_json"
          },
          "readOnly" : true
@@ -204,7 +204,7 @@
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "readOnly" : true,
                         "type:" : "string"
                      },
@@ -238,7 +238,7 @@
             "Results" : {
                "description" : "added via include \"Results\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ReportResult_json"
                },
                "readOnly" : true

@@ -6,7 +6,7 @@
   "properties": {
     "AvailableLanguages": {
       "type": "array",
-      "item": {
+      "items": {
         "type": "string"
       },
       "readOnly": true
@@ -39,7 +39,7 @@
       "type": "array",
       "description": "added via include \"Languages\"",
       "readOnly": true,
-      "item": {
+      "items": {
         "$ref": "TranslationLanguage.json"
       }
     }

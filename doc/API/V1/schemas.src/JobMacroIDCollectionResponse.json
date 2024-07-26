@@ -6,7 +6,7 @@
   "properties": {
     "MacroID": {
       "type": "array",
-      "item": {
+      "items": {
         "type": "integer"
       },
       "description": "List of IDs of assigned macros of the job"

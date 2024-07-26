@@ -9,7 +9,7 @@
       "properties": {
         "Articles": {
           "type": "array",
-          "item": {
+          "items": {
             "$ref": "TicketArticlePostItem.json"
           }
         },

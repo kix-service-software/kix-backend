@@ -22,7 +22,7 @@
             "properties": {
                 "Parameters": {
                     "type": "array",
-                    "item": {
+                    "items": {
                         "type": "object",
                         "patternProperties": {
                             "^[a-zA-Z]+$": {
@@ -124,7 +124,7 @@
             "type": "array",
             "description": "added via include \"Reports\"",
             "readOnly": true,
-            "item": {
+            "items": {
                 "$ref": "Report.json"
             }
         },

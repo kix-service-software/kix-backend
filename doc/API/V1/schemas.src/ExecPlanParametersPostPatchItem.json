@@ -6,7 +6,7 @@
   "properties": {
     "Weekday": {
       "type": "array",
-      "item": {
+      "items": {
         "type": "integer"
       },
       "description": "List of weekday: 0 = sunday, 1 = monday, ..."
@@ -17,7 +17,7 @@
     },
     "Event": {
        "type": "array",
-       "item": {
+       "items": {
           "type": "string"
        },
        "description": "list of events, e.g. \"TicketCreate\""

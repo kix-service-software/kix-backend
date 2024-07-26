@@ -15,13 +15,13 @@
             },
             "Permissions" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_PermissionPostItem_json"
                }
             },
             "UserIDs" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             },

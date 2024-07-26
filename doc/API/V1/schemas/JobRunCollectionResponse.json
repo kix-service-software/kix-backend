@@ -121,7 +121,7 @@
             "Logs" : {
                "description" : "execution logs of this run - added via include \"Logs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_JobRunLog_json"
                },
                "readOnly" : true
