@@ -1221,6 +1221,9 @@ sub _ExecuteVariableFilters {
                     $JqExpression =~ s/&quot;/"/g;
                     $Value = `echo '$Value' | jq -r '$JqExpression'`;
                     chomp $Value;
+
+                    # special characters must be re-encoded because the result is decoded twice after the system call
+                    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
                 }
                 else {
                     $Kernel::OM->Get('Log')->Log(
