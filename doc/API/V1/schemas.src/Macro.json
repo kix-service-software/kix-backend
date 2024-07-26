@@ -8,7 +8,7 @@
       "type": "array",
       "description": "added via include \"Actions\"",
       "readOnly": true,
-      "item": {
+      "items": {
         "$ref": "MacroAction.json"
       }
     },
@@ -35,7 +35,7 @@
     "ExecOrder": {
       "type": "array",
       "readOnly": true,
-      "item": {
+      "items": {
         "type": "integer"
       },
       "description": "Order of corresponding macro actions as IDs."

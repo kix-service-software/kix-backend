@@ -36,7 +36,7 @@
       "Preferences" : {
          "description" : "added via include \"Preferences\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_UserPreference_json"
          },
          "readOnly" : true
@@ -44,7 +44,7 @@
       "RoleIDs" : {
          "description" : "added via include \"RoleIDs\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          },
          "readOnly" : true

@@ -15,7 +15,7 @@
                     "properties": {
                         "Parameters": {
                             "type": "array",
-                            "item": {
+                            "items": {
                                 "type": "object",
                                 "patternProperties": {
                                     "^[a-zA-Z]+$": {

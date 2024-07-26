@@ -78,14 +78,14 @@
         "History": {
             "type": "array",
             "description": "added via include \"History\"",
-            "item": {
+            "items": {
                 "$ref": "ConfigItemHistory.json"
             }
         },
         "Images": {
             "type": "array",
             "description": "added via include \"Images\"",
-            "item": {
+            "items": {
                 "$ref": "ConfigItemImage.json"
             }
         },
@@ -96,7 +96,7 @@
         "Versions": {
             "type": "array",
             "description": "added via include \"Versions\"",
-            "item": {
+            "items": {
                 "$ref": "ConfigItemVersion.json"
             }
         }

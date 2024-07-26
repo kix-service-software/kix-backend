@@ -9,7 +9,7 @@
       "properties": {
         "IDs": {
           "type": "array",
-          "item": {
+          "items": {
             "anyOf": [
               { "type": "string" },
               { "type": "integer" }

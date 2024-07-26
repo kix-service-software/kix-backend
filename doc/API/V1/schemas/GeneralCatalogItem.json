@@ -39,7 +39,7 @@
       "Preferences" : {
          "description" : "preferences of this item",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
          },
          "readOnly" : true

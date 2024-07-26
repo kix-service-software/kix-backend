@@ -16,7 +16,7 @@
         },
         "Images": {
           "type": "array",
-          "item": {
+          "items": {
             "$ref": "ConfigItemImagePostItem.json"
           }
         }
