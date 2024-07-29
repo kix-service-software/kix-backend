@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -95,14 +95,14 @@ sub Run {
 
         $Param{Ticket} = \%Ticket;
 
-        $Self->{ViewableStates} = { 
+        $Self->{ViewableStates} = {
             reverse $Kernel::OM->Get('State')->StateGetStatesByType(
                 Type   => 'Viewable',
                 Result => 'HASH',
             )
         };
 
-        if ( !$Self->{ViewableStates}->{$Ticket{StateType}} ) {
+        if ( !$Self->{ViewableStates}->{$Ticket{State}} ) {
             # delete all user counters for this object for the ticket owner and leave
             $Kernel::OM->Get('User')->DeleteUserCounterObject(
                 Category => 'Ticket',
@@ -202,8 +202,8 @@ sub HandleTicketStateUpdate {
 sub HandleTicketFlagSet {
     my ($Self, %Param) = @_;
 
-    my ( $OwnerID, $Owner ) = $Kernel::OM->Get('Ticket')->OwnerCheck( 
-        TicketID => $Param{Ticket}->{TicketID} 
+    my ( $OwnerID, $Owner ) = $Kernel::OM->Get('Ticket')->OwnerCheck(
+        TicketID => $Param{Ticket}->{TicketID}
     );
 
     if ( $Param{Data}->{Key} eq 'Seen' && $OwnerID == $Param{UserID} ) {
