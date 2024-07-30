@@ -7595,17 +7595,6 @@ Notes:
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="LostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Activates lost password feature for agents, in the agent interface.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <Option SelectedID="1">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::Timeout" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Sets the timeout (in seconds) for http/ftp downloads.</Description>
         <Group>Framework</Group>
@@ -7798,58 +7787,6 @@ Notes:
         <SubGroup>Core</SubGroup>
         <Setting>
             <String Regex="">kix@&lt;KIX_CONFIG_FQDN&gt;</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="NotificationSubjectLostPasswordToken" Required="1" Valid="1">
-        <Description Translatable="1">Defines the subject for notification mails sent to agents, with token about new requested password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <String Regex="">New KIX password request</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="NotificationBodyLostPasswordToken" Required="1" Valid="1">
-        <Description Translatable="1">Defines the body text for notification mails sent to agents, with token about new requested password (after using this link the new password will be sent).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <TextArea>Hi &lt;KIX_USERFIRSTNAME&gt;,
-
-You or someone impersonating you has requested to change your KIX
-password.
-
-If you want to do this, click on the link below. You will receive another email containing the password.
-
-&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN&gt;/&lt;KIX_CONFIG_ScriptAlias&gt;index.pl?Action=LostPassword;Token=&lt;KIX_TOKEN&gt;
-
-If you did not request a new password, please ignore this email.
-            </TextArea>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="NotificationSubjectLostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Defines the subject for notification mails sent to agents, about new password.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <String Regex="">New KIX password</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="NotificationBodyLostPassword" Required="1" Valid="1">
-        <Description Translatable="1">Defines the body text for notification mails sent to agents, about new password (after using this link the new password will be sent).</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent</SubGroup>
-        <Setting>
-            <TextArea>Hi &lt;KIX_USERFIRSTNAME&gt;,
-
-
-Here's your new KIX password.
-
-New password: &lt;KIX_NEWPW&gt;
-
-You can log in via the following URL:
-
-&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN&gt;/&lt;KIX_CONFIG_ScriptAlias&gt;index.pl
-            </TextArea>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketNotification::SendAsynchronously" Required="1" Valid="1" ConfigLevel="200">
