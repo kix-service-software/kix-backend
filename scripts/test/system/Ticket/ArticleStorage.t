@@ -128,9 +128,9 @@ for my $Backend (qw(DB FS)) {
             );
 
             my %Data = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                ArticleID => $ArticleID,
-                FileID    => 1,
-                UserID    => 1,
+                ArticleID    => $ArticleID,
+                AttachmentID => 1,
+                UserID       => 1,
             );
             $Self->True(
                 $Data{Content},

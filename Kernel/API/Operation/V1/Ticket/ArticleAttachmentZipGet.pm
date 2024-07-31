@@ -149,9 +149,9 @@ sub Run {
     for my $AttachmentNr ( keys %ArticleAttachments ) {
 
         my %Attachment = $TicketObject->ArticleAttachment(
-            ArticleID => $Param{Data}->{ArticleID},
-            FileID    => $AttachmentNr,
-            UserID   => $Self->{Authorization}->{UserID},
+            ArticleID    => $Param{Data}->{ArticleID},
+            AttachmentID => $AttachmentNr,
+            UserID       => $Self->{Authorization}->{UserID},
         );
 
         next if ( $Attachment{Filename} eq 'file-2' );

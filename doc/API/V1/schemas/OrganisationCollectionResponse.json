@@ -513,6 +513,10 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",

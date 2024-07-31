@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="article">
+        <ColumnAdd Name="attachment_count" Required="false" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="article_attachment">
+        <ColumnDrop Name="content"/>
+    </TableAlter>
+
+</database>

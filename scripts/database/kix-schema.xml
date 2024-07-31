@@ -899,6 +899,7 @@
     <Column Name="a_body" Required="true" Size="1800000" Type="VARCHAR"/>
     <Column Name="incoming_time" Required="true" Type="INTEGER"/>
     <Column Name="content_path" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="attachment_count" Required="false" Type="INTEGER"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -1001,7 +1002,6 @@
     <Column Name="content_id" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="content_alternative" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="disposition" Required="false" Size="15" Type="VARCHAR"/>
-    <Column Name="content" Required="true" Type="LONGBLOB"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
