@@ -16,7 +16,7 @@ use vars (qw($Self));
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Ticket::ArticleDynamicField';
-my $FieldType       = 'Text';
+my $FieldType       = 'TextArea';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -66,7 +66,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 0, # no sort supported
-        Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
         ValueType    => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -213,40 +213,6 @@ for my $UserType ( qw(Agent Customer) ) {
             ],
             'Where' => [
                 'dfv_left0.value_text != \'\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator IN',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator !IN',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => '!IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text NOT IN (\'Test\')'
             ]
         }
     },

@@ -16,7 +16,7 @@ use vars (qw($Self));
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Ticket::ArticleDynamicField';
-my $FieldType       = 'Text';
+my $FieldType       = 'Multiselect';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -47,7 +47,12 @@ my $DynamicFieldID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
     Label         => 'UnitTest',
     FieldType     => $FieldType,
     ObjectType    => 'Article',
-    Config        => {},
+    Config        => {
+        PossibleValues => {
+            'Test1' => 'Test1',
+            'Test2' => 'Test2'
+        }
+    },
     ValidID       => 1,
     UserID        => 1,
 );
@@ -65,8 +70,8 @@ $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
         IsSearchable => 1,
-        IsSortable   => 0, # no sort supported
-        Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        IsSortable   => 0,
+        Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
         ValueType    => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -247,6 +252,74 @@ for my $UserType ( qw(Agent Customer) ) {
             ],
             'Where' => [
                 'dfv_left0.value_text NOT IN (\'Test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LT',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'LT',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_text < \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LTE',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'LTE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_text <= \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GT',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'GT',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_text > \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GTE',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'GTE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_text >= \'Test\''
             ]
         }
     },
@@ -569,18 +642,96 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value empty string',
+        Name     => 'Search: Field DynamicField_UnitTest / Operator IN / Value Test2',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
-                    Operator => 'NE',
-                    Value    => ''
+                    Operator => 'IN',
+                    Value    => ['Test2']
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator IN / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'IN',
+                    Value    => ['Test2']
                 }
             ]
         },
         UserType => 'Customer',
-        Expected => [$TicketID1] # article of second ticket is NOT customer visible
+        Expected => [] # article of second ticket is NOT customer visible
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator !IN / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => '!IN',
+                    Value    => ['Test2']
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LT / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LT',
+                    Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LTE / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LTE',
+                    Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GT / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GT',
+                    Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GTE / Value Test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GTE',
+                    Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
     },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator STARTSWITH / Value Test',
@@ -594,6 +745,20 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator STARTSWITH / Value Test',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'STARTSWITH',
+                    Value    => 'Test'
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => [$TicketID1] # article of second ticket is NOT customer visible
     },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value t2',

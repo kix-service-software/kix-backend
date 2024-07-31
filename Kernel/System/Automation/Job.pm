@@ -678,7 +678,7 @@ sub JobDelete {
 returns a list of all Macro ids assigned to given Job
 
     my @MacroIDs = $AutomationObject->JobMacroList(
-        ID => 123
+        JobID => 123
     );
 
 =cut

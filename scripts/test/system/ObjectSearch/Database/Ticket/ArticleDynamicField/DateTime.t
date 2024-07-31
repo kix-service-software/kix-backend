@@ -16,7 +16,7 @@ use vars (qw($Self));
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Ticket::ArticleDynamicField';
-my $FieldType       = 'Text';
+my $FieldType       = 'DateTime';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -65,12 +65,18 @@ $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
         IsSearchable => 1,
-        IsSortable   => 0, # no sort supported
-        Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        ValueType    => ''
+        IsSortable   => 0,
+        Operators    => ['EQ','NE','GT','GTE','LT','LTE'],
+        ValueType    => 'DATETIME'
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# set fixed time to have predetermined verifiable results
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2014-01-01 00:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
 
 # check Search
 my @SearchTests = (
@@ -86,6 +92,15 @@ my @SearchTests = (
             Operator => 'EQ',
             Value    => undef
 
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search: Value invalid',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EQ',
+            Value    => 'Test'
         },
         Expected     => undef
     },
@@ -149,11 +164,11 @@ for my $UserType ( qw(Agent Customer) ) {
     }
     my @JoinTests = (
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ / absolute value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => 'EQ',
-            Value    => 'Test'
+            Value    => '2014-01-01 00:00:00'
         },
         Expected     => {
             'Join' => [
@@ -161,16 +176,16 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text = \'Test\''
+                'dfv_left0.value_date = \'2014-01-01 00:00:00\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ / Value empty string',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => 'EQ',
-            Value    => ''
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -178,16 +193,17 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
-            ]
+                'dfv_left0.value_date = \'2014-01-01 01:00:00\''
+            ],
+            'IsRelative' => 1
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE / absolute value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => 'NE',
-            Value    => 'Test'
+            Value    => '2014-01-01 00:00:00'
         },
         Expected     => {
             'Join' => [
@@ -195,16 +211,16 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text != \'Test\' OR dfv_left0.value_text IS NULL)'
+                '(dfv_left0.value_date != \'2014-01-01 00:00:00\' OR dfv_left0.value_date IS NULL)'
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE / Value empty string',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => 'NE',
-            Value    => ''
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -212,16 +228,34 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text != \'\''
+                '(dfv_left0.value_date != \'2014-01-01 01:00:00\' OR dfv_left0.value_date IS NULL)'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LT / absolute value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'LT',
+            Value    => '2014-01-01 00:00:00'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_date < \'2014-01-01 00:00:00\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator IN',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LT / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
-            Operator => 'IN',
-            Value    => ['Test']
+            Operator => 'LT',
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -229,16 +263,34 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text IN (\'Test\')'
+                'dfv_left0.value_date < \'2014-01-01 01:00:00\''
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GT / absolute value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'GT',
+            Value    => '2014-01-01 00:00:00'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_date > \'2014-01-01 00:00:00\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator !IN',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GT / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
-            Operator => '!IN',
-            Value    => ['Test']
+            Operator => 'GT',
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -246,16 +298,34 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text NOT IN (\'Test\')'
+                'dfv_left0.value_date > \'2014-01-01 01:00:00\''
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LTE / absolute value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'LTE',
+            Value    => '2014-01-01 00:00:00'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_date <= \'2014-01-01 00:00:00\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator STARTSWITH',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LTE / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
+            Operator => 'LTE',
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -263,16 +333,34 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'Test%\''
+                'dfv_left0.value_date <= \'2014-01-01 01:00:00\''
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GTE / absolute value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'GTE',
+            Value    => '2014-01-01 00:00:00'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                'dfv_left0.value_date >= \'2014-01-01 00:00:00\''
             ]
         }
     },
     {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator ENDSWITH',
+        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GTE / relative value',
         Search       => {
             Field    => 'DynamicField_UnitTest',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
+            Operator => 'GTE',
+            Value    => '+1h'
         },
         Expected     => {
             'Join' => [
@@ -280,42 +368,9 @@ for my $UserType ( qw(Agent Customer) ) {
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'%Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator CONTAINS',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                'dfv_left0.value_date >= \'2014-01-01 01:00:00\''
             ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'%Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LIKE',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'Test\''
-            ]
+            'IsRelative' => 1
         }
     }
     );
@@ -395,7 +450,7 @@ $Self->True(
 my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
     ObjectID           => $ArticleID1,
-    Value              => 'Test1',
+    Value              => '2014-01-01 00:00:00',
     UserID             => 1,
 );
 $Self->True(
@@ -440,7 +495,7 @@ $Self->True(
 my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
     ObjectID           => $ArticleID2,
-    Value              => 'Test2',
+    Value              => '2014-01-02 00:00:00',
     UserID             => 1,
 );
 $Self->True(
@@ -474,13 +529,13 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EQ / Value Test1',
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EQ / Value 2014-01-01 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'EQ',
-                    Value    => 'Test1'
+                    Value    => '2014-01-01 00:00:00'
                 }
             ]
         },
@@ -488,13 +543,13 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EQ / Value Test1',
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EQ / Value 2014-01-01 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'EQ',
-                    Value    => 'Test1'
+                    Value    => '2014-01-01 00:00:00'
                 }
             ]
         },
@@ -502,13 +557,13 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EQ / Value Test2',
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EQ / Value 2014-01-02 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'EQ',
-                    Value    => 'Test2'
+                    Value    => '2014-01-02 00:00:00'
                 }
             ]
         },
@@ -516,13 +571,13 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EQ / Value Test2',
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EQ / Value 2014-01-02 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'EQ',
-                    Value    => 'Test2'
+                    Value    => '2014-01-02 00:00:00'
                 }
             ]
         },
@@ -530,109 +585,174 @@ my @IntegrationSearchTests = (
         Expected => [] # article of second ticket is NOT customer visible
     },
     {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value empty string',
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value +1d',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'EQ',
-                    Value    => ''
-                }
-            ]
-        },
-        Expected => [$TicketID3]
-    },
-    {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value Test2',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'DynamicField_UnitTest',
-                    Operator => 'NE',
-                    Value    => 'Test2'
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID3]
-    },
-    {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value empty string',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'DynamicField_UnitTest',
-                    Operator => 'NE',
-                    Value    => ''
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2]
-    },
-    {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value empty string',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'DynamicField_UnitTest',
-                    Operator => 'NE',
-                    Value    => ''
-                }
-            ]
-        },
-        UserType => 'Customer',
-        Expected => [$TicketID1] # article of second ticket is NOT customer visible
-    },
-    {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator STARTSWITH / Value Test',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'DynamicField_UnitTest',
-                    Operator => 'STARTSWITH',
-                    Value    => 'Test'
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID2]
-    },
-    {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value t2',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'DynamicField_UnitTest',
-                    Operator => 'ENDSWITH',
-                    Value    => 't2'
+                    Value    => '+1d'
                 }
             ]
         },
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator CONTAINS / Value est',
+        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value 2014-01-02 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
-                    Operator => 'CONTAINS',
-                    Value    => 'est'
+                    Operator => 'NE',
+                    Value    => '2014-01-02 00:00:00'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'NE',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LT / Value 2014-01-02 00:00:00',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LT',
+                    Value    => '2014-01-02 00:00:00'
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LT / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LT',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GT / Value 2014-01-02 00:00:00',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GT',
+                    Value    => '2014-01-02 00:00:00'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GT / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GT',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LTE / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LTE',
+                    Value    => '+1d'
                 }
             ]
         },
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: Field DynamicField_UnitTest / Operator LIKE / Value Test*',
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LTE / Value 2014-01-02 00:00:00',
         Search   => {
             'AND' => [
                 {
                     Field    => 'DynamicField_UnitTest',
-                    Operator => 'LIKE',
-                    Value    => 'Test*'
+                    Operator => 'LTE',
+                    Value    => '2014-01-02 00:00:00'
                 }
             ]
         },
         Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LTE / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LTE',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GTE / Value 2014-01-02 00:00:00',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GTE',
+                    Value    => '2014-01-02 00:00:00'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator GTE / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GTE',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator GTE / Value +1d',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'GTE',
+                    Value    => '+1d'
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => []
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
@@ -652,6 +772,63 @@ for my $Test ( @IntegrationSearchTests ) {
 
 # test Sort
 # attributes of this backend are not sortable
+
+my $TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 00:00:00',
+    'Timestamp before first relative search'
+);
+my @FirstResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GTE',
+                Value    => '+1d'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@FirstResult,
+    [$TicketID2],
+    'Result of first relative search'
+);
+$Helper->FixedTimeAddSeconds(60);
+$TimeStamp = $Kernel::OM->Get('Time')->CurrentTimestamp();
+$Self->Is(
+    $TimeStamp,
+    '2014-01-01 00:01:00',
+    'Timestamp before second relative search'
+);
+my @SecondResult = $ObjectSearch->Search(
+    ObjectType => 'Ticket',
+    Result     => 'ARRAY',
+    Search     => {
+        'AND' => [
+            {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GTE',
+                Value    => '+1d'
+            }
+        ]
+    },
+    UserType   => 'Agent',
+    UserID     => 1,
+);
+$Self->IsDeeply(
+    \@SecondResult,
+    [],
+    'Result of second relative search'
+);
+
+# reset fixed time
+$Helper->FixedTimeUnset();
 
 # rollback transaction on database
 $Helper->Rollback();
