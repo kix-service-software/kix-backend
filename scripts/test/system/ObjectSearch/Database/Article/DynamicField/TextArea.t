@@ -257,7 +257,6 @@ my @SearchTests = (
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
-        BoolOperator => $Test->{BoolOperator},
         BoolOperator => 'AND',
         UserID       => 1,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
@@ -335,7 +334,7 @@ my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
     StateID        => 1,
     TypeID         => 1,
     OrganisationID => 1,
-    ArticleID      => 1,
+    ContactID      => 1,
     OwnerID        => 1,
     ResponsibleID  => 1,
     UserID         => 1
@@ -416,7 +415,7 @@ $Self->True(
     'Created third article without df value'
 );
 
-# discard article object to process events
+# discard ticket object to process events
 $Kernel::OM->ObjectsDiscard(
     Objects => ['Ticket'],
 );
