@@ -110,9 +110,9 @@ sub DataGet {
             );
 
             my %AttachmentHTML = $TicketObject->ArticleAttachment(
-                ArticleID => $Article{ArticleID},
-                FileID    => $Article{AttachmentIDOfHTMLBody},
-                UserID    => $Param{UserID},
+                ArticleID    => $Article{ArticleID},
+                AttachmentID => $Article{AttachmentIDOfHTMLBody},
+                UserID       => $Param{UserID},
             );
 
             my $Charset = $AttachmentHTML{ContentType} || q{};
@@ -168,9 +168,9 @@ sub DataGet {
 
                     # get whole attachment
                     my %AttachmentPicture = $TicketObject->ArticleAttachment(
-                        ArticleID => $Article{ArticleID},
-                        FileID    => $AttachmentID,
-                        UserID    => $Param{UserID},
+                        ArticleID    => $Article{ArticleID},
+                        AttachmentID => $AttachmentID,
+                        UserID       => $Param{UserID},
                     );
                     ## encode content zo base64
                     my $Base64Content = encode_base64($AttachmentPicture{Content});

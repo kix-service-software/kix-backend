@@ -1,5 +1,6 @@
 {
     "Article": {
+        "AttachmentCount": 2,
         "ArticleID": 31,
         "Bcc": "admin@localhost",
         "BccRealname": "admin@localhost",

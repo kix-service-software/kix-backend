@@ -219,9 +219,9 @@ sub _HandleTicket {
                     FILE_ID:
                     for my $FileID ( sort keys %Index ) {
                         my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                            ArticleID => $Param{Data}->{ArticleID},
-                            FileID    => $FileID,
-                            UserID    => $Param{UserID},
+                            ArticleID    => $Param{Data}->{ArticleID},
+                            AttachmentID => $FileID,
+                            UserID       => $Param{UserID},
                         );
                         next FILE_ID if !%Attachment;
 

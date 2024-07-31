@@ -508,9 +508,9 @@ sub _GetRichtextData {
 
             # get attachment data
             my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                ArticleID => $Param{Article}->{ArticleID},
-                FileID    => $AttachmentID,
-                UserID    => $Param{UserID},
+                ArticleID    => $Param{Article}->{ArticleID},
+                AttachmentID => $AttachmentID,
+                UserID       => $Param{UserID},
             );
 
             if ( IsHashRefWithData( \%Attachment ) ) {
