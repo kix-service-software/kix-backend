@@ -1,89 +1,89 @@
 {
-   "$id": "JobResponse.json",
-   "$schema": "http://json-schema.org/draft-07/schema",
-   "description": "A response for a job GET request.",
-   "type": "object",
-   "properties": {
-      "Job": {
-         "$ref": "#/definitions/_Job_json"
+   "$id" : "JobResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a job GET request.",
+   "type" : "object",
+   "properties" : {
+      "Job" : {
+         "$ref" : "#/definitions/_Job_json"
       }
    },
-   "required": [
+   "required" : [
       "Job"
    ],
-   "definitions": {
-      "_ExecPlan_json": {
-         "$id": "ExecPlan.json",
-         "$schema": "http://json-schema.org/draft-07/schema",
-         "description": "The execution plan object.",
-         "type": "object",
-         "properties": {
-            "ChangeBy": {
-               "type": "integer",
-               "readOnly": true
+   "definitions" : {
+      "_ExecPlan_json" : {
+         "$id" : "ExecPlan.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The execution plan object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "ChangeTime": {
-               "type": "string",
-               "readOnly": true
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Comment": {
-               "type": "string",
-               "readOnly": true
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "CreateBy": {
-               "type": "integer",
-               "readOnly": true
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "CreateTime": {
-               "type": "string",
-               "readOnly": true
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ID": {
-               "type": "integer",
-               "readOnly": true
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "Name": {
-               "type": "string",
-               "readOnly": true
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Parameters": {
-               "description": "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert",
-               "type": "object",
-               "properties": {
-                  "Event": {
-                     "description": "list of events, e.g. \"TicketCreate\"",
-                     "type": "array",
-                     "items": {
-                        "type": "string"
+            "Parameters" : {
+               "description" : "Parameters of the execution plan, when and/or by what the corresponding job of this execution plan will be triggert",
+               "type" : "object",
+               "properties" : {
+                  "Event" : {
+                     "description" : "list of events, e.g. \"TicketCreate\"",
+                     "type" : "array",
+                     "items" : {
+                        "type" : "string"
                      },
-                     "readOnly": true
+                     "readOnly" : true
                   },
-                  "Time": {
-                     "description": "time for the weekdays as \"hh:mm:ss\"",
-                     "type": "string",
-                     "readOnly": true
+                  "Time" : {
+                     "description" : "time for the weekdays as \"hh:mm:ss\"",
+                     "type" : "string",
+                     "readOnly" : true
                   },
-                  "Weekday": {
-                     "description": "List of weekday: 0 = sunday, 1 = monday, ...",
-                     "type": "array",
-                     "items": {
-                        "type": "integer"
+                  "Weekday" : {
+                     "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
+                     "type" : "array",
+                     "items" : {
+                        "type" : "integer"
                      },
-                     "readOnly": true
+                     "readOnly" : true
                   }
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "Type": {
-               "type": "string",
-               "readOnly": true
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ValidID": {
-               "type": "integer",
-               "readOnly": true
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
-         "required": [
+         "required" : [
             "ChangeBy",
             "ChangeTime",
             "CreateBy",
@@ -94,114 +94,114 @@
             "ValidID"
          ]
       },
-      "_Job_json": {
-         "$id": "Job.json",
-         "$schema": "http://json-schema.org/draft-07/schema",
-         "description": "The job object.",
-         "type": "object",
-         "properties": {
-            "ChangeBy": {
-               "type": "integer",
-               "readOnly": true
+      "_Job_json" : {
+         "$id" : "Job.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The job object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "ChangeTime": {
-               "type": "string",
-               "readOnly": true
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Comment": {
-               "type": "string",
-               "readOnly": true
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "CreateBy": {
-               "type": "integer",
-               "readOnly": true
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "CreateTime": {
-               "type": "string",
-               "readOnly": true
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ExecPlanIDs": {
-               "description": "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
-               "type": "array",
-               "items": {
-                  "type": "integer"
+            "ExecPlanIDs" : {
+               "description" : "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "ExecPlans": {
-               "description": "assigned execution plans - added via include \"ExecPlans\"",
-               "type": "array",
-               "items": {
-                  "$ref": "#/definitions/_ExecPlan_json"
+            "ExecPlans" : {
+               "description" : "assigned execution plans - added via include \"ExecPlans\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_ExecPlan_json"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "Filter": {
-               "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type": "array",
-               "readOnly": true
+            "Filter" : {
+               "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
+               "type" : "array",
+               "readOnly" : true
             },
-            "ID": {
-               "type": "integer",
-               "readOnly": true
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "IsAsynchronous": {
-               "type": "integer",
-               "readOnly": true
+            "IsAsynchronous" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "LastExecutionTime": {
-               "type": "string",
-               "readOnly": true
+            "LastExecutionTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "MacroIDs": {
-               "description": "IDs of assigned macros - added via include \"MacroIDs\"",
-               "type": "array",
-               "items": {
-                  "type": "integer"
+            "MacroIDs" : {
+               "description" : "IDs of assigned macros - added via include \"MacroIDs\"",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "Macros": {
-               "description": "assigned macros - added via include \"Macros\"",
-               "type": "array",
-               "items": {
-                  "$ref": "#/definitions/_Macro_json"
+            "Macros" : {
+               "description" : "assigned macros - added via include \"Macros\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_Macro_json"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "Name": {
-               "type": "string",
-               "readOnly": true
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "SortOrder": {
-               "description": "Used to sort found objects (see \"Filter\").",
-               "type": "object",
-               "properties": {
-                  "Direction": {
-                     "description": "ascending or descending",
-                     "type": "string",
-                     "readOnly": true
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
                   },
-                  "Field": {
-                     "type": "string",
-                     "readOnly": true
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
                   }
                },
-               "required": [
+               "required" : [
                   "Field"
                ],
-               "readOnly": true
+               "readOnly" : true
             },
-            "Type": {
-               "type": "string",
-               "readOnly": true
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ValidID": {
-               "type": "integer",
-               "readOnly": true
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
-         "required": [
+         "required" : [
             "ChangeBy",
             "ChangeTime",
             "CreateBy",
@@ -215,58 +215,58 @@
             "ValidID"
          ]
       },
-      "_MacroAction_json": {
-         "$id": "MacroAction.json",
-         "$schema": "http://json-schema.org/draft-07/schema",
-         "description": "The macro action object.",
-         "type": "object",
-         "properties": {
-            "ChangeBy": {
-               "type": "integer",
-               "readOnly": true
+      "_MacroAction_json" : {
+         "$id" : "MacroAction.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro action object.",
+         "type" : "object",
+         "properties" : {
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "ChangeTime": {
-               "type": "string",
-               "readOnly": true
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Comment": {
-               "type": "string",
-               "readOnly": true
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "CreateBy": {
-               "type": "integer",
-               "readOnly": true
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "CreateTime": {
-               "type": "string",
-               "readOnly": true
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ID": {
-               "type": "integer",
-               "readOnly": true
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "MacroID": {
-               "description": "ID of the corresponding macro.",
-               "type": "integer"
+            "MacroID" : {
+               "description" : "ID of the corresponding macro.",
+               "type" : "integer"
             },
-            "Parameters": {
-               "description": "",
-               "type": "object"
+            "Parameters" : {
+               "description" : "",
+               "type" : "object"
             },
-            "ResultVariables": {
-               "description": "An optional mapping of named results of the macro action and their variable names.",
-               "type": "object"
+            "ResultVariables" : {
+               "description" : "An optional mapping of named results of the macro action and their variable names.",
+               "type" : "object"
             },
-            "Type": {
-               "type": "string",
-               "readOnly": true
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ValidID": {
-               "type": "integer",
-               "readOnly": true
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
-         "required": [
+         "required" : [
             "ChangeBy",
             "ChangeTime",
             "CreateBy",
@@ -277,66 +277,66 @@
             "ValidID"
          ]
       },
-      "_Macro_json": {
-         "$id": "Macro.json",
-         "$schema": "http://json-schema.org/draft-07/schema",
-         "description": "The macro object.",
-         "type": "object",
-         "properties": {
-            "Actions": {
-               "description": "added via include \"Actions\"",
-               "type": "array",
-               "items": {
-                  "$ref": "#/definitions/_MacroAction_json"
+      "_Macro_json" : {
+         "$id" : "Macro.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The macro object.",
+         "type" : "object",
+         "properties" : {
+            "Actions" : {
+               "description" : "added via include \"Actions\"",
+               "type" : "array",
+               "items" : {
+                  "$ref" : "#/definitions/_MacroAction_json"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "ChangeBy": {
-               "type": "integer",
-               "readOnly": true
+            "ChangeBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "ChangeTime": {
-               "type": "string",
-               "readOnly": true
+            "ChangeTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Comment": {
-               "type": "string",
-               "readOnly": true
+            "Comment" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "CreateBy": {
-               "type": "integer",
-               "readOnly": true
+            "CreateBy" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "CreateTime": {
-               "type": "string",
-               "readOnly": true
+            "CreateTime" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ExecOrder": {
-               "description": "Order of corresponding macro actions as IDs.",
-               "type": "array",
-               "items": {
-                  "type": "integer"
+            "ExecOrder" : {
+               "description" : "Order of corresponding macro actions as IDs.",
+               "type" : "array",
+               "items" : {
+                  "type" : "integer"
                },
-               "readOnly": true
+               "readOnly" : true
             },
-            "ID": {
-               "type": "integer",
-               "readOnly": true
+            "ID" : {
+               "type" : "integer",
+               "readOnly" : true
             },
-            "Name": {
-               "type": "string",
-               "readOnly": true
+            "Name" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "Type": {
-               "type": "string",
-               "readOnly": true
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
             },
-            "ValidID": {
-               "type": "integer",
-               "readOnly": true
+            "ValidID" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
-         "required": [
+         "required" : [
             "ChangeBy",
             "ChangeTime",
             "CreateBy",

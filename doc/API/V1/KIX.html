@@ -1,6 +1,6 @@
 <!DOCTYPE HTML><html><head><title>KIX REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.6.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
       // --
-// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -16,7 +16,7 @@ $(document).ready(function() {
   $('h2.response-title > a').each(function(i, response) {
     $(this).parent().siblings('.response-nav').append('<a class="badge response-code" href="#' + $(this).parent().attr('id') + '">' + response.innerHTML + '</a>');
   });
-
+  
   // add toggle of schema and examples
   $('.schemas.toggleable, .examples.toggleable').each(function(i, item) {
     $(this).hide();
@@ -94,7 +94,7 @@ $(document).ready(function() {
 });
 
       // --
-// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -113,7 +113,7 @@ $(document).ready(function() {
     function isCollapsable(arg) {
       return arg instanceof Object && Object.keys(arg).length > 0;
     }
-
+  
     /**
      * Check if a string represents a valid url
      * @return boolean
@@ -122,7 +122,7 @@ $(document).ready(function() {
        var regexp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
        return regexp.test(string);
     }
-
+  
     /**
      * Transform a json object into html representation
      * @return string
@@ -199,7 +199,7 @@ $(document).ready(function() {
       }
       return html;
     }
-
+  
     $.fn.jsonHighlight = function(json) {
 
         // jQuery chaining
@@ -209,7 +209,7 @@ $(document).ready(function() {
             var html = json2html(json, { withQuotes: true, noToggle: true });
 
             // Insert HTML in target DOM element
-            $(this).html(html);
+            $(this).html(html);    
         });
     };
 
@@ -220,18 +220,18 @@ $(document).ready(function() {
      */
     $.fn.jsonBrowse = function(json, options) {
       options = options || {};
-
+  
       // jQuery chaining
       return this.each(function() {
-
+  
         // Transform to HTML
         var html = json2html(json, options);
         if (isCollapsable(json))
           html = '<a href></a>' + html;
-
+  
         // Insert HTML in target DOM element
         $(this).html(html);
-
+  
         // Bind click on toggle buttons
         $(this).off('click');
         $(this).on('click', 'a.json-toggle', function() {
@@ -247,13 +247,13 @@ $(document).ready(function() {
           }
           return false;
         });
-
+  
         // Simulate click on toggle button when placeholder is clicked
         $(this).on('click', 'a.json-placeholder', function() {
           $(this).siblings('a.json-toggle').click();
           return false;
         });
-
+  
         if (options.collapsed == true) {
           // Trigger click to collapse all nodes
           $(this).find('a.json-toggle').click();
@@ -265,7 +265,7 @@ $(document).ready(function() {
     </script><style>
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+ * Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright KIX Service Software GmbH
@@ -310,7 +310,7 @@ pre > code ul.json-dict {
 table,
 .table
 .param-table {
-  border-collapse: collapse;
+  border-collapse: collapse;  
   border-color: #ddd;
   border: 0;
   width: 100%;
@@ -513,7 +513,7 @@ pre code {
 }
       /**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+ * Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
  * --
  * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
  * @copyright KIX Service Software GmbH
@@ -528,7 +528,7 @@ pre code {
 .json-body {
     margin: 10px 20px;
   }
-
+  
   ul.json-dict, ol.json-array {
     list-style-type: none;
     margin: 0 0 0 1px;
@@ -583,7 +583,7 @@ pre code {
     -webkit-transform: rotate(0deg);
     font-size: 10px;
   }
-
+  
   /* Collapsable placeholder links */
   a.json-placeholder {
     color: #aaa;
@@ -593,7 +593,7 @@ pre code {
   a.json-placeholder:hover {
     text-decoration: underline;
   }
-
+  
     </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>KIX REST API</h1><h2><small>Version v1</small></h2><div class="chapter"><h2 id="description"><a href="#description">Description</a></h2><p>This API can be used to communicate with the KIX backend (core) application. It has been designed with respect to the structure and relationships of the internal business objects.</p><p>At this stage it is not intended to be a perfect REST API following any concept out there. Therefore it doesn&#39;t support full discoverability yet and also not all response headers (like counts etc.) are available.</p><p>Nonetheless it&#39;s an extremely powerful API to support any client-to-server communication necessary to handle KIX. Additionally it can easily be expanded by extensions.</p></div><div class="chapter"><h2 id="base_uri"><a href="#base_uri">Base URI</a></h2><pre class="base-uri">http://{fqdn}:{port}/api/v1</pre><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fqdn</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The FQDN of the KIX backend server.</p></td></tr><tr><td class="uri">port</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td><p>The port the KIX backend server uses.</p></td></tr></tbody></table></div><div class="chapter"><h2 id="getting_started"><a href="#getting_started">Getting started</a></h2><p>First of all you need to authenticate and create a new user session represented by a so called WebToken. This is done by doing a <a href="#sessions_post"><code>POST</code></a> request to the <a href="#auth"><code>/auth</code></a> resource including an <code>AuthRequest</code> object.</p><p>If the system was able to authenticate the user it will respond with an <code>AuthResponse</code> object containing the resulting WebToken. Use this token for all secured resources. You can find the relevant information in the security section of each request description.</p></div><div class="chapter"><h2 id="responses"><a href="#responses">Responses</a></h2><p>In case of a successful execution of the request the API responds with an appropriate HTTP code and the corresponding JSON response as the content. If an error occurs the API returns a simple error object. You can find the structure of these objects in the response description for each API resource.</p></div><div class="chapter"><h2 id="permissions"><a href="#permissions">Permissions</a></h2></div><div class="chapter"><h2 id="populate_queries"><a href="#populate_queries">Populate queries</a></h2><h3 id="query-collections">Query collections</h3><p>When querying collections you can use some special functions to influence the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#search_objects">search</a></li><li><a href="#limit_results">offset</a></li><li><a href="#limit_results">limit</a></li><li><a href="#filter_results">filter</a></li><li><a href="#sort_results">sort</a></li></ul><h3 id="query-items">Query items</h3><p>When requesting items there are also special functions to change the resulting response. Those special functions are (in order of execution)</p><ul><li><a href="#select_fields">fields</a></li><li><a href="#include_additional_information">include</a></li><li><a href="#expand_referenced_objects">expand</a></li></ul><p>Please note that when querying collections the collection resource uses the corresponding item resource to populate the data of each item to prepare the response. Therefore you can use those special functions in queries of the corresponding collection resource as well.</p></div><div class="chapter"><h2 id="search_objects"><a href="#search_objects">Search objects</a></h2><p>Some collection resources support the query parameter <code>search</code> which means that you can define the properties of objects that will be searched in the backends datasources. In contrast to the optional <a href="#filter_results"><code>filter</code></a> the <code>search</code> function depends on the abilities of the core modules and the underlying datasources (DBMS) with their relationships. Therefore not everything that can be done with <a href="#filter_results"><code>filters</code></a> can be done with a <code>search</code> function. But since searches are executed at datasource level they can improve the performance of a request significantly.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?search={...}</code></pre><p>The search definition is a JSON object identical to a <a href="#filter_results"><code>filter</code></a> function. Please see the <a href="#filter_results"><code>filter</code></a> function for a detailed description of this structure.</p><p>Whether a collection resource supports the <code>search</code> function and which properties can be searched (fields/object attributes, operators, etc.) can be found in the description of the relevant resource.</p></div><div class="chapter"><h2 id="filter_results"><a href="#filter_results">Filter results</a></h2><p>You can use an optional <code>filter</code> function to filter the items in the response of collections. The <code>filter</code> function will be executed at API level and therefore is a lot more powerful in terms of complexity than the <a href="#search_objects"><code>search</code></a> function. Also the <code>filter</code> function is available for all collection resources. Since it works on all the data coming back from the datasource level please carefully tune the combination of <a href="#search_objects"><code>search</code></a> and <code>filter</code> to achieve the best performance.</p><p><strong>Usage in URL</strong></p><pre><code class="language-bash">.../&lt;resource&gt;?filter={...}</code></pre><p>The filter definition is a JSON object in the following form:</p><pre><code class="language-bash">{
 "&lt;Object&gt;": {
 "AND": [
@@ -866,9 +866,9 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ClientRegistration": [
-        {
+        { 
             "ClientID": "KIX-Frontend",
-            "Authentication": "test123",
+            "Authentication": "test123", 
             "CallbackURL": "https://kix.example.org/backendfeedback"
         }
     ]
@@ -998,7 +998,7 @@ pre code {
    ]
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "ClientRegistration": {
+    "ClientRegistration": { 
         "ClientID": "KIX-Frontend",
         "Authorization": "test123",
         "NotificationURL": "http://kix-frontend.example.org/notifications",
@@ -1178,9 +1178,9 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "ClientRegistration": {
+    "ClientRegistration": { 
         "ClientID": "KIX-Frontend",
-        "Authorization": "test123",
+        "Authorization": "test123", 
         "NotificationURL": "https://kix.example.org/backendfeedback",
         "NotificationInterval": 10
     }
@@ -1688,7 +1688,7 @@ pre code {
             "LinkCount": 0,
             "Name": "notebook1",
             "Number": "1022000001"
-
+            
         },
         {
             "ChangeBy": 1,
@@ -1856,7 +1856,7 @@ pre code {
       "ConfigItemID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ConfigItemID": 3
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -2403,7 +2403,7 @@ pre code {
       "ConfigItemID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ConfigItemID": 3
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -3150,7 +3150,7 @@ pre code {
   "SubSubAttributKey1": "..."
 }
 }
-}</code></pre><p><strong>Format of the PreparedData array items</strong></p><pre><code class="language-bash">{
+}</code></pre><p><strong>Format of the PreparedData array items</strong></p><pre><code class="language-bash">{ 
 "Key": "&lt;the key from the attribute definition&gt;",
 "Label": "&lt;the name from the attribute definition&gt;",
 "Type": "&lt;the type from the attribute definition&gt;",
@@ -3501,7 +3501,7 @@ pre code {
       "VersionID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "VersionID": 3
 }</code></pre></div></div><h2 class="response-title" id="cmdb_configitems__configitemid__versions_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -9779,18 +9779,18 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Translation": [
-        {
+        { 
             "Pattern": "Incident",
             "Languages": {
                 "de": "Störung"
             }
         },
-        {
+        { 
             "Pattern": "Delete this item ?",
             "Languages": {
                 "de": "Diesen Eintrag löschen ?"
             }
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="i18n_translations_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -17036,7 +17036,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{  
     "Session": {
         "AllowedOperations": [],
         "CreateTime": "2018-08-28 11:34:55",
@@ -18356,7 +18356,7 @@ pre code {
       "UserID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserID": 3
 }</code></pre></div></div><h2 class="response-title" id="session_user_patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -19377,16 +19377,16 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": [
-        {
+        { 
             "UserID": 3,
             "ID": "UserLanguage",
             "Value": "de"
         },
-        {
+        { 
             "UserID": 1,
             "ID": "UserLanguage",
             "Value": "en"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="session_user_preferences_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -19463,7 +19463,7 @@ pre code {
       "UserPreferenceID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreferenceID": "UserLanguage"
 }</code></pre></div></div><h2 class="response-title" id="session_user_preferences_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -19600,7 +19600,7 @@ pre code {
       "UserPreference"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreference": {
         "Value": "de"
     }
@@ -19618,7 +19618,7 @@ pre code {
       "UserPreferenceID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreferenceID": "UserLanguage"
 }</code></pre></div></div><h2 class="response-title" id="session_user_preferences__preferenceid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -21097,7 +21097,7 @@ pre code {
       "TicketID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketID": 3
 }</code></pre></div></div><h2 class="response-title" id="tickets_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -22122,7 +22122,7 @@ pre code {
       "TicketID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketID": 3
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -22963,7 +22963,7 @@ pre code {
       "ArticleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ArticleID": 3
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -23582,7 +23582,7 @@ pre code {
       "ArticleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ArticleID": 3
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles__articleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -24206,7 +24206,7 @@ pre code {
       "FlagName"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "FlagName": "Seen"
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles__articleid__flags_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -24370,7 +24370,7 @@ pre code {
       "FlagName"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "FlagName": "Seen"
 }</code></pre></div></div><h2 class="response-title" id="tickets__ticketid__articles__articleid__flags__flagname__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -26829,7 +26829,7 @@ pre code {
             "State": "finished",
             "StateID": 2
         }
-    ]
+    ]    
 }</code></pre></div></div><h2 class="response-title" id="system_automation_jobs__jobid__runs_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
@@ -27943,7 +27943,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Macro": [
         {
-            "Actions": [
+            "Actions": [ 
                 {
                     "ChangeBy": 1,
                     "ChangeTime": "2019-10-10 09:13:05",
@@ -28096,7 +28096,7 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Macro": {
-        "Actions": [
+        "Actions": [ 
             {
                 "Comment": "some comment",
                 "Name": "new macro",
@@ -29965,7 +29965,7 @@ pre code {
       "ConfigItemClassID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ConfigItemClassID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_cmdb_classes__classid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -31427,26 +31427,26 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Channel": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
             "ID": 1,
-            "Name": "note",
+            "Name": "note", 
             "ValidID": 1
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
             "ID": 2,
-            "Name": "email",
+            "Name": "email", 
             "ValidID": 1
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_communication_channels_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -31541,15 +31541,15 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Channel": {
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
-        "Comment": "...",
+        "Comment": "...", 
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
         "ID": 1,
-        "Name": "note",
+        "Name": "note", 
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_communication_channels__channelid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -33122,7 +33122,7 @@ pre code {
             },
             "Name": "Ticket pending reminder notification (locked)",
             "ValidID": 1
-        },
+        },        
         {
             "ChangeBy": 1,
             "ChangeTime": "2019-06-28 16:04:57",
@@ -33732,14 +33732,14 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "SenderType": [
-        {
+        { 
             "ID": 1,
             "Name": "system"
         },
         {
             "ID": 2,
             "Name": "agent"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_communication_sendertypes_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -33800,7 +33800,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "SenderType": {
         "ID": 1,
         "Name": "system"
@@ -33926,7 +33926,7 @@ pre code {
 			"Realname": "[TD-Email-002] Temporarily Invalid E-Mail address",
 			"QueueID": 1,
 			"ValidID": 3
-		}
+		}     
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_communication_systemaddresses_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -34002,7 +34002,7 @@ pre code {
       "SystemAddressID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "SystemAddressID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_communication_systemaddresses_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -34122,7 +34122,7 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "SystemAddress": {
+    "SystemAddress": { 
         "ChangeBy": 1,
         "ChangeTime": "2019-05-09 15:27:10",
         "Comment": "Standard Address.",
@@ -34204,7 +34204,7 @@ pre code {
       "SystemAddressID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "SystemAddressID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_communication_systemaddresses__systemaddressid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -38189,18 +38189,18 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Translation": [
-        {
+        { 
             "Pattern": "Incident",
             "Languages": {
                 "de": "Störung"
             }
         },
-        {
+        { 
             "Pattern": "Delete this item ?",
             "Languages": {
                 "de": "Diesen Eintrag löschen ?"
             }
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_i18n_translations_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -38455,16 +38455,16 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TranslationLanguage": [
-        {
+        { 
             "PatternID": 3,
             "Language": "de",
             "Value": "Das ist ein Test."
         },
-        {
+        { 
             "PatternID": 3,
             "Language": "en",
             "Value": "This is a test."
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_i18n_translations__translationid__languages_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -38534,7 +38534,7 @@ pre code {
       "Language"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Language": "de"
 }</code></pre></div></div><h2 class="response-title" id="system_i18n_translations__translationid__languages_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -38671,7 +38671,7 @@ pre code {
       "TranslationLanguage"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TranslationLanguage": {
         "Value": "Das ist ein Test"
     }
@@ -38689,7 +38689,7 @@ pre code {
       "Language"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Language": "de"
 }</code></pre></div></div><h2 class="response-title" id="system_i18n_translations__translationid__languages__language__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -39447,7 +39447,7 @@ pre code {
 			"ItemID": 24,
 			"Name": "Location",
 			"ValidID": 1
-		}
+		}   
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_generalcatalog_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -39560,7 +39560,7 @@ pre code {
       "GeneralCatalogItemID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "GeneralCatalogItemID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_generalcatalog_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -39846,7 +39846,7 @@ pre code {
       "GeneralCatalogItemID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "GeneralCatalogItemID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_generalcatalog__generalcatalogitemid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -41254,28 +41254,28 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "ObjectIcon": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
             "Content": "...",
-            "ContentType": "image/png",
+            "ContentType": "image/png", 
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
             "ID": 1,
-            "Object": "TicketType",
+            "Object": "TicketType", 
             "ObjectID": "1"
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
             "Content": "...",
-            "ContentType": "image/png",
+            "ContentType": "image/png", 
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
             "ID": 2,
-            "Object": "TicketType",
+            "Object": "TicketType", 
             "ObjectID": "2"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_objecticons_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -41355,7 +41355,7 @@ pre code {
       "ObjectIconID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ObjectIconID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_objecticons_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -41474,15 +41474,15 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "ObjectIcon": {
+    "ObjectIcon": { 
         "ChangeBy": 1,
         "ChangeTime": "2018-10-28 08:12:17",
         "Content": "...",
-        "ContentType": "image/png",
+        "ContentType": "image/png", 
         "CreateBy": 1,
         "CreateTime": "2018-10-28 08:10:01",
         "ID": 2,
-        "Object": "TicketType",
+        "Object": "TicketType", 
         "ObjectID": "2"
     }
 }</code></pre></div></div><h2 class="response-title" id="system_objecticons__objecticonid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -41554,7 +41554,7 @@ pre code {
       "ObjectIconID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "ObjectIconID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_objecticons__objecticonid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -42080,7 +42080,7 @@ pre code {
       "RoleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "RoleID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_roles_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -42473,7 +42473,7 @@ pre code {
       "RoleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "RoleID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_roles__roleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -42951,7 +42951,7 @@ pre code {
       "PermissionID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "PermissionID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_roles__roleid__permissions_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -43166,7 +43166,7 @@ pre code {
       "PermissionID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "PermissionID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_roles__roleid__permissions__permissionid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -43407,7 +43407,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{  
     "Session": {
         "AllowedOperations": [],
         "CreateTime": "2018-08-28 11:34:55",
@@ -43714,7 +43714,7 @@ pre code {
       "TextModuleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TextModuleID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_textmodules_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -44002,7 +44002,7 @@ pre code {
       "TextModuleID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TextModuleID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_textmodules__textmoduleid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -44183,7 +44183,7 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Lock": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
             "CreateBy": 1,
@@ -44192,7 +44192,7 @@ pre code {
             "Name": "unlock",
             "ValidID": 1
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
             "CreateBy": 1,
@@ -44200,7 +44200,7 @@ pre code {
             "ID": 2,
             "Name": "lock",
             "ValidID": 1
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_locks_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -44284,7 +44284,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Lock": {
         "ChangeBy": 1,
         "ChangeTime": "2018-10-28 08:12:17",
@@ -44392,26 +44392,26 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Priority": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
             "ID": 1,
-            "Name": "1 very low",
+            "Name": "1 very low", 
             "ValidID": 1
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
             "ID": 2,
-            "Name": "2 low",
+            "Name": "2 low", 
             "ValidID": 1
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_priorities_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -44484,7 +44484,7 @@ pre code {
       "PriorityID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "PriorityID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_ticket_priorities_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -44604,14 +44604,14 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "Priority": {
+    "Priority": { 
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
-        "Comment": "...",
+        "Comment": "...", 
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
         "ID": 1,
-        "Name": "1 very low",
+        "Name": "1 very low", 
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_priorities__priorityid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -44681,7 +44681,7 @@ pre code {
       "PriorityID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "PriorityID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_ticket_priorities__priorityid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -45768,28 +45768,28 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketState": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
             "ID": 1,
-            "Name": "new",
-            "TypeID": 1,
+            "Name": "new", 
+            "TypeID": 1, 
             "ValidID": 1
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
             "ID": 2,
-            "Name": "open",
-            "TypeID": 2,
+            "Name": "open", 
+            "TypeID": 2, 
             "ValidID": 1
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_states_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -45867,7 +45867,7 @@ pre code {
       "TicketStateID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketStateID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_states_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -45956,14 +45956,14 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "StateType": [
-        {
+        { 
             "ID": 1,
             "Name": "new"
         },
         {
             "ID": 2,
             "Name": "open"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_states_types_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -46024,7 +46024,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "StateType": {
         "ID": 2,
         "Name": "open"
@@ -46127,15 +46127,15 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "TicketState": {
+    "TicketState": { 
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
-        "Comment": "...",
+        "Comment": "...", 
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
         "ID": 1,
-        "Name": "new",
-        "TypeID": 1,
+        "Name": "new", 
+        "TypeID": 1, 
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_states__stateid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -46208,7 +46208,7 @@ pre code {
       "TicketStateID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketStateID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_states__stateid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -46402,26 +46402,26 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "TicketType": [
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-09-28 09:17:03",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-08-28 11:34:55",
             "ID": 1,
-            "Name": "Incident",
+            "Name": "Incident", 
             "ValidID": 1
         },
-        {
+        { 
             "ChangeBy": 1,
             "ChangeTime": "2018-10-28 08:12:17",
-            "Comment": "...",
+            "Comment": "...", 
             "CreateBy": 1,
             "CreateTime": "2018-10-28 08:10:01",
             "ID": 2,
-            "Name": "Problem",
+            "Name": "Problem", 
             "ValidID": 1
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_types_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -46494,7 +46494,7 @@ pre code {
       "TicketTypeID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketTypeID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_ticket_types_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -46616,14 +46616,14 @@ pre code {
    }
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
-    "TicketType": {
+    "TicketType": { 
         "ChangeBy": 1,
         "ChangeTime": "2018-09-28 09:17:03",
-        "Comment": "...",
+        "Comment": "...", 
         "CreateBy": 1,
         "CreateTime": "2018-08-28 11:34:55",
         "ID": 1,
-        "Name": "Incident",
+        "Name": "Incident", 
         "ValidID": 1
     }
 }</code></pre></div></div><h2 class="response-title" id="system_ticket_types__typeid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -46693,7 +46693,7 @@ pre code {
       "TicketTypeID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "TicketTypeID": 3
 }
 </code></pre></div></div><h2 class="response-title" id="system_ticket_types__typeid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -48059,7 +48059,7 @@ pre code {
       "UserID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_users_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -49341,7 +49341,7 @@ pre code {
       "UserID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserID": 3
 }</code></pre></div></div><h2 class="response-title" id="system_users__userid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -49458,16 +49458,16 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "UserPreference": [
-        {
+        { 
             "UserID": 3,
             "ID": "UserLanguage",
             "Value": "de"
         },
-        {
+        { 
             "UserID": 1,
             "ID": "UserLanguage",
             "Value": "en"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_users__userid__preferences_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -49544,7 +49544,7 @@ pre code {
       "UserPreferenceID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreferenceID": "UserLanguage"
 }</code></pre></div></div><h2 class="response-title" id="system_users__userid__preferences_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -49681,7 +49681,7 @@ pre code {
       "UserPreference"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreference": {
         "Value": "de"
     }
@@ -49699,7 +49699,7 @@ pre code {
       "UserPreferenceID"
    ]
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "UserPreferenceID": "UserLanguage"
 }</code></pre></div></div><h2 class="response-title" id="system_users__userid__preferences__preferenceid__patch_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -50023,14 +50023,14 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Valid": [
-        {
+        { 
             "ID": 1,
             "Name": "valid"
         },
         {
             "ID": 2,
             "Name": "invalid"
-        }
+        }        
     ]
 }</code></pre></div></div><h2 class="response-title" id="system_valid_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
@@ -50087,7 +50087,7 @@ pre code {
       }
    }
 }
-</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{ 
     "Valid": {
         "ID": 2,
         "Name": "invalid"
