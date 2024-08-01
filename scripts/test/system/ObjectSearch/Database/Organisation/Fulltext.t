@@ -43,11 +43,18 @@ $Self->IsDeeply(
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
 
 # check Search
 my @SearchTests = (
@@ -60,7 +67,7 @@ my @SearchTests = (
         Name         => 'Search: Value undef',
         Search       => {
             Field    => 'Name',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => undef
 
         },
@@ -70,7 +77,7 @@ my @SearchTests = (
         Name         => 'Search: Field undef',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -79,7 +86,7 @@ my @SearchTests = (
         Name         => 'Search: Field invalid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
         Expected     => undef
@@ -103,153 +110,6 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator STARTSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field' => 'Name',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Number',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Street',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Zip',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'City',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Country',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Url',
-                        'Operator' => 'STARTSWITH',
-                        'Value' => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator ENDSWITH',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field' => 'Name',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Number',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Street',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Zip',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'City',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Country',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Url',
-                        'Operator' => 'ENDSWITH',
-                        'Value' => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Fulltext / Operator CONTAINS',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field' => 'Name',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Number',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Street',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Zip',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'City',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Country',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Url',
-                        'Operator' => 'CONTAINS',
-                        'Value' => 'Test'
-                    }
-                ]
-            }
-        }
-    },
-    {
         Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
@@ -257,45 +117,9 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Search' => {
-                'OR' => [
-                    {
-                        'Field' => 'Name',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Number',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Street',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Zip',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'City',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Country',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    },
-                    {
-                        'Field' => 'Url',
-                        'Operator' => 'LIKE',
-                        'Value' => 'Test'
-                    }
-                ]
-            }
+            'Where' => [
+                '(LOWER(o.name) = LOWER(\'Test\') OR LOWER(o.number) = LOWER(\'Test\') OR LOWER(o.street) = LOWER(\'Test\') OR LOWER(o.city) = LOWER(\'Test\') OR LOWER(o.zip) = LOWER(\'Test\') OR LOWER(o.url) = LOWER(\'Test\') OR LOWER(o.country) = LOWER(\'Test\')) '
+            ]
         }
     }
 );
@@ -427,25 +251,12 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value substr($TestData2,0,4)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$OrganisationID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator STARTSWITH / Value substr($TestData2,0,4)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'STARTSWITH',
+                    Operator => 'LIKE',
                     Value    => substr($TestData2,0,4)
                 }
             ]
@@ -453,25 +264,12 @@ my @IntegrationSearchTests = (
         Expected => [$OrganisationID1,$OrganisationID2,$OrganisationID3,$OrganisationID4]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value substr($TestData2,-5)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$OrganisationID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator ENDSWITH / Value substr($TestData2,-5)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'ENDSWITH',
+                    Operator => 'LIKE',
                     Value    => substr($TestData2,-5)
                 }
             ]
@@ -479,25 +277,12 @@ my @IntegrationSearchTests = (
         Expected => [$OrganisationID2]
     },
     {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value $TestData2',
+        Name     => 'Search: Field Fulltext / Operator LIKE / Value substr($TestData2,2,-2)',
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
-                    Value    => $TestData2
-                }
-            ]
-        },
-        Expected => [$OrganisationID2]
-    },
-    {
-        Name     => 'Search: Field Fulltext / Operator CONTAINS / Value substr($TestData2,2,-2)',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Fulltext',
-                    Operator => 'CONTAINS',
+                    Operator => 'LIKE',
                     Value    => substr($TestData2,2,-2)
                 }
             ]

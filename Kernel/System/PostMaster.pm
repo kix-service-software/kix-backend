@@ -248,7 +248,7 @@ sub Run {
                     TicketID  => undef,
                 );
                 if ( !$Run ) {
-                    $Self->{LogObject}->Log(
+                    $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
                         Message => "Execute Run() of PreFilterModule "
                             . "$Jobs{$Job}->{Module} not successfully!",
@@ -711,16 +711,27 @@ sub GetEmailParams {
         }
     }
 
-    # get body
-    $GetParam{Body} = $Self->{ParserObject}->GetMessageBody();
+    # Checks whether there is a decryption problem, if so, then the article content is changed.
+    if ( $Self->{ParserObject}->GetParam( WHAT => 'DecryptErr' ) ) {
+        # get body
+        $GetParam{Body} = 'Could not decrypt message';
 
-    # get content type
-    $GetParam{'Content-Type'} = $Self->{ParserObject}->GetReturnContentType();
-    $GetParam{Charset} = $Self->{ParserObject}->GetReturnCharset();
+        # get content type
+        $GetParam{'Content-Type'} = 'text/plain';
+        $GetParam{Charset} = 'utf-8';
+    }
+    else {
+        # get body
+        $GetParam{Body} = $Self->{ParserObject}->GetMessageBody();
 
-    # get attachments
-    my @Attachments = $Self->{ParserObject}->GetAttachments();
-    $GetParam{Attachment} = \@Attachments;
+        # get attachments
+        my @Attachments = $Self->{ParserObject}->GetAttachments();
+        $GetParam{Attachment} = \@Attachments;
+
+        # get content type
+        $GetParam{'Content-Type'} = $Self->{ParserObject}->GetReturnContentType();
+        $GetParam{Charset} = $Self->{ParserObject}->GetReturnCharset();
+    }
 
     return \%GetParam;
 }

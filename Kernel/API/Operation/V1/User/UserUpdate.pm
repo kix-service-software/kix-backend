@@ -74,6 +74,9 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => [ 0, 1 ]
         },
+        'User::ExecMFAGenerateSecret' => {
+            RequiresValueIfUsed => 1
+        },
     }
 }
 
@@ -157,6 +160,14 @@ sub Run {
     if ( $User->{ExecGenerateToken} ) {
         my $Success = $Kernel::OM->Get('User')->TokenGenerate(
             UserID => $UserData{UserID}
+        );
+    }
+
+    # create mfa secret
+    if ( $User->{ExecMFAGenerateSecret} ) {
+        my $Success = $Kernel::OM->Get('Auth')->MFASecretGenerate(
+            MFAuth    => $User->{ExecMFAGenerateSecret},
+            UserID    => $UserData{UserID}
         );
     }
 

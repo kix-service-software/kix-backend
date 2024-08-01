@@ -14,6 +14,7 @@ use strict;
 use warnings;
 
 use HTTP::Headers;
+use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use List::Util qw(first);
 use LWP::UserAgent;
 
@@ -60,11 +61,8 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get database object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    $Self->{Timeout} = $Param{Timeout} || $ConfigObject->Get('WebUserAgent::Timeout') || 15;
-    $Self->{Proxy}   = $Param{Proxy}   || $ConfigObject->Get('WebUserAgent::Proxy')   || '';
+    $Self->{Timeout} = $Param{Timeout} || $Kernel::OM->Get('Config')->Get('WebUserAgent::Timeout') || 15;
+    $Self->{Proxy}   = $Param{Proxy}   || $Kernel::OM->Get('Config')->Get('WebUserAgent::Proxy')   || '';
 
     return $Self;
 }
@@ -101,9 +99,10 @@ alternatively, you can use an arrayref like this:
 returns
 
     %Response = (
-        Success => 1,           # 1 or 0
-        Status  => '200 OK',    # http status
-        Content => $ContentRef, # content of requested URL
+        Success  => 1,           # 1 or 0
+        Status   => '200 OK',    # http status
+        HTTPCode => 200,         # http status code
+        Content  => $ContentRef, # content of requested URL
     );
 
 You can even pass some headers
@@ -134,6 +133,14 @@ If you need to set credentials
         SkipSSLVerification => 1, # (optional)
     );
 
+If you need to use a specific proxy (this overrides the global config):
+
+    my %Response = $WebUserAgentObject->Request(
+        URL      => 'http://example.com/somedata.xml',
+        Proxy    => 'proxy.example.com:3128',
+        UseProxy => 1                                   # (0|1). Defaults to 1 if undefined. 0 ignores proxy settings
+    );
+
 =cut
 
 sub Request {
@@ -156,6 +163,7 @@ sub Request {
     {
         $UserAgent->ssl_opts(
             verify_hostname => 0,
+            SSL_verify_mode => SSL_VERIFY_NONE,
         );
     }
 
@@ -182,17 +190,23 @@ sub Request {
     # set timeout
     $UserAgent->timeout( $Self->{Timeout} );
 
-    # get database object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     # set user agent
     $UserAgent->agent(
-        $ConfigObject->Get('Product') . ' ' . $ConfigObject->Get('Version')
+        $Kernel::OM->Get('Config')->Get('Product') . ' ' . $Kernel::OM->Get('Config')->Get('Version')
     );
 
-    # set proxy
-    if ( $Self->{Proxy} ) {
-        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], $Self->{Proxy} );
+    # set UseProxy to 1 if undefined
+    $Param{UseProxy} //= 1;
+
+    # set proxy if required
+    if (
+        $Param{UseProxy}
+        && (
+            $Param{Proxy}
+            || $Self->{Proxy}
+        )
+    ) {
+        $UserAgent->proxy( [ 'http', 'https', 'ftp' ], ( $Param{Proxy} || $Self->{Proxy} ) );
     }
 
     if ( $Param{Type} eq 'GET' ) {
@@ -248,9 +262,10 @@ sub Request {
 
     # return request
     return (
-        Success => 1,
-        Status  => $Response->status_line(),
-        Content => \$ResponseContent,
+        Success  => 1,
+        Status   => $Response->status_line(),
+        HTTPCode => $Response->code(),
+        Content  => \$ResponseContent,
     );
 }
 

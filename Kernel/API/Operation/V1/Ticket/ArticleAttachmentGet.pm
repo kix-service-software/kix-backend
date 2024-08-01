@@ -138,9 +138,10 @@ sub Run {
     foreach my $AttachmentID ( @{$Param{Data}->{AttachmentID}} ) {
 
         my %Attachment = $TicketObject->ArticleAttachment(
-            ArticleID          => $Param{Data}->{ArticleID},
-            FileID             => $AttachmentID,
-            UserID             => $Self->{Authorization}->{UserID},
+            ArticleID    => $Param{Data}->{ArticleID},
+            AttachmentID => $AttachmentID,
+            UserID       => $Self->{Authorization}->{UserID},
+            NoContent    => $Param{Data}->{include}->{Content} ? 0 : 1,
         );
 
         # check if article attachment exists
@@ -150,15 +151,12 @@ sub Run {
             );
         }
 
-        # add ID to result
-        $Attachment{ID} = $AttachmentID;
-
-        if ( !$Param{Data}->{include}->{Content} ) {
-            delete $Attachment{Content};
+        if ( $Param{Data}->{include}->{Content} ) {
+            # encode content base64
+            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} );
         }
         else {
-            # encode content base64
-            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} ),
+            delete $Attachment{Content};
         }
 
         # add

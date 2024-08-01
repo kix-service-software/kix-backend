@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -24,6 +24,13 @@ sub Run {
 
     my $LayoutObject            = $Kernel::OM->Get('Output::HTML::Layout');
     my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
+
+    if (
+        IsHashRefWithData( $Param{ReplaceableLabel} )
+        && !defined $Self->{ReplaceableLabel}
+    ) {
+        $Self->{ReplaceableLabel} = $Param{ReplaceableLabel};
+    }
 
     my $Block = $Param{Block};
     my $Css   = q{};
@@ -79,12 +86,20 @@ sub Run {
             Allows  => $Param{Allows}
         );
     }
+    elsif ( $Block->{SubType} eq 'XMLStructure' ) {
+        $Self->_TableXMLStructure(
+            Block   => $Block,
+            Data    => $Param{Data},
+            Ignores => $Param{Ignores},
+            Allows  => $Param{Allows}
+        );
+    }
     else {
         $Self->_TableKeyValue(
             Block   => $Block,
             Data    => $Param{Data},
             Ignores => $Param{Ignores},
-            Allows  => $Param{Allows},
+            Allows  => $Param{Allows}
         );
     }
 
@@ -121,7 +136,7 @@ sub _TableCustom {
             Name => 'BodyRow'
         );
         for my $Cell ( keys @Columns ) {
-            my %Entry = $Self->_ReplacePlaceholders(
+            my %Entry = $Self->ReplacePlaceholders(
                 String => $Row->[$Cell],
                 Datas  => $Param{Data},
                 Object => $Param{Object}
@@ -131,11 +146,17 @@ sub _TableCustom {
                 $Entry{Text} = $LayoutObject->{LanguageObject}->Translate($Entry{Text});
             }
 
+            my $Classes = $AddClass[$Cell];
+            if ( $Entry{Class} ) {
+                $Classes .= q{ } if $Classes;
+                $Classes .= $Entry{Class};
+            }
+
             $LayoutObject->Block(
                 Name => 'BodyCol',
                 Data => {
                     Value => $Entry{Text},
-                    Class => $AddClass[$Cell]
+                    Class => $Classes
                 }
             );
         }
@@ -159,13 +180,13 @@ sub _TableKeyValue {
     );
 
     $Self->_RenderBody(
-        Columns   => \@Columns,
-        AddClass  => \%AddClass,
-        Block     => $Block,
-        SubType   => 'KeyValue',
-        Datas     => $Param{Data},
-        Ignores   => $Param{Ignores},
-        Allows    => $Param{Allows}
+        Columns  => \@Columns,
+        AddClass => \%AddClass,
+        Block    => $Block,
+        SubType  => 'KeyValue',
+        Datas    => $Param{Data},
+        Ignores  => $Param{Ignores},
+        Allows   => $Param{Allows}
     );
 
     return 1;
@@ -198,6 +219,51 @@ sub _TableDataSet {
     return 1;
 }
 
+sub _TableXMLStructure {
+    my ($Self, %Param) = @_;
+
+    my $Block = $Param{Block};
+
+    for my $Line ( @{ $Param{Data} } ) {
+        $Kernel::OM->Get('Output::HTML::Layout')->Block(
+            Name => 'BodyRow'
+        );
+        my $KeyText   = $Line->{Key};
+        my $ValueText = $Line->{Value} || q{};
+        if ( $Block->{Translate} ) {
+            $KeyText   = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->Translate($KeyText);
+            if ( $Line->{IsDate} ) {
+                $ValueText = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString($ValueText . ' 00:00:00' ,'DateFormatShort');
+            }
+            if ( $Line->{IsDateTime} ) {
+                $ValueText = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString($ValueText,'DateFormat');
+            }
+            else {
+                $ValueText = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->Translate($ValueText);
+            }
+        }
+
+        $Kernel::OM->Get('Output::HTML::Layout')->Block(
+            Name => 'BodyCol',
+            Data => {
+                Value => $KeyText . q{:},
+                Class => 'Col1 ' . $Line->{Class},
+                Span  => $Line->{FullRow} ? 2 : q{}
+            }
+        );
+
+        $Kernel::OM->Get('Output::HTML::Layout')->Block(
+            Name => 'BodyCol',
+            Data => {
+                Value => $ValueText,
+                Class => 'Col2'
+            }
+        );
+    }
+
+    return 1;
+}
+
 sub _RenderHeader {
     my ($Self, %Param) = @_;
 
@@ -209,7 +275,7 @@ sub _RenderHeader {
     if ( IsArrayRefWithData($Block->{Columns}) ) {
         for my $Column ( @{$Block->{Columns}} ) {
             next if !$Column && $Param{SubType} ne 'Custom';
-            my %Entry = $Self->_ReplacePlaceholders(
+            my %Entry = $Self->ReplacePlaceholders(
                 String => $Column,
                 Datas  => $Param{Datas},
                 Object => $Param{Object}
@@ -288,13 +354,14 @@ sub _RenderBody {
             );
 
             $Self->_ColumnValueGet(
-                Columns   => $Param{Columns},
-                Key       => $Key,
-                Data      => $Datas,
-                Translate => $Block->{Translate},
-                Join      => $Block->{Join},
-                Count     => $Count,
-                Classes   => $Param{AddClass}
+                Columns    => $Param{Columns},
+                Key        => $Key,
+                Data       => $Datas,
+                Translate  => $Block->{Translate},
+                Join       => $Block->{Join},
+                ReplaceKey => $Block->{ReplaceKey},
+                Count      => $Count,
+                Classes    => $Param{AddClass}
             );
             $Count++;
         }
@@ -339,7 +406,6 @@ sub _RenderBody {
     return 1;
 }
 
-
 sub _CheckAttribute {
     my ($Self, %Param) = @_;
 
@@ -370,12 +436,13 @@ sub _ColumnValueGet {
 
     my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
 
-    my $Columns   = $Param{Columns};
-    my $Key       = $Param{Key};
-    my $Data      = $Param{Data};
-    my $Translate = $Param{Translate};
-    my $Join      = $Param{Join};
-    my $Classes   = $Param{Classes};
+    my $Columns    = $Param{Columns};
+    my $Key        = $Param{Key};
+    my $Data       = $Param{Data};
+    my $Translate  = $Param{Translate};
+    my $ReplaceKey = $Param{ReplaceKey};
+    my $Join       = $Param{Join};
+    my $Classes    = $Param{Classes};
 
     for my $Column ( @{$Columns} ) {
         my $Value;
@@ -389,6 +456,12 @@ sub _ColumnValueGet {
             $Value = $Key;
             if ( $Key =~ /^DynamicField_/sm ) {
                 $Value = $Data->{$Key}->{Label};
+            }
+            elsif ( $ReplaceKey ) {
+                $Value = $Self->_ReplaceSpecialKey(
+                    Text       => $Value,
+                    ReplaceKey => $ReplaceKey
+                );
             }
         }
 

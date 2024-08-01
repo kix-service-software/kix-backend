@@ -1,0 +1,36 @@
+{
+   "$id" : "MarkObjectAsSeenPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The request object to mark an object as seen (if supported).",
+   "type" : "object",
+   "properties" : {
+      "MarkObjectAsSeen" : {
+         "type" : "object",
+         "properties" : {
+            "IDs" : {
+               "type" : "array",
+               "items" : {
+                  "anyOf" : [
+                     {
+                        "type" : "string"
+                     },
+                     {
+                        "type" : "integer"
+                     }
+                  ]
+               }
+            },
+            "ObjectType" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "IDs",
+            "ObjectType"
+         ]
+      }
+   },
+   "required" : [
+      "MarkObjectAsSeen"
+   ]
+}

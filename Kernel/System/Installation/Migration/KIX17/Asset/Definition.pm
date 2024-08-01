@@ -21,6 +21,7 @@ our @ObjectDependencies = (
     'Config',
     'DB',
     'Log',
+    'SysConfig',
 );
 
 our %TypeMapping = (
@@ -37,7 +38,7 @@ our %TypeMapping = (
     'Dummy'               => 'Dummy',
     'DummyX'              => 'Dummy',
     'DynamicField'        => 'Text',
-    'EncryptedText'       => 'Text',
+    'EncryptedText'       => \&_MigrateEncryptedText,
     'GeneralCatalog'      => 'GeneralCatalog',
     'Integer'             => 'Text',
     'QueueReference'      => 'Text',
@@ -81,7 +82,10 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # get source data
-    my $SourceData = $Self->GetSourceData(Type => 'configitem_definition', OrderBy => 'ID desc');
+    my $SourceData = $Self->GetSourceData(
+        Type    => 'configitem_definition',
+        OrderBy => 'ID desc'
+    );
 
     # bail out if we don't have something to todo
     return if !IsArrayRefWithData($SourceData);
@@ -90,11 +94,12 @@ sub Run {
         Class => 'ITSM::ConfigItem::Class',
     ) || {};
 
-    my $MainObject = $Kernel::OM->Get('Main');
+    $Self->InitProgress(
+        Type      => $Param{Type},
+        ItemCount => scalar( @{ $SourceData } )
+    );
 
-    $Self->InitProgress(Type => $Param{Type}, ItemCount => scalar(@{$SourceData}));
-
-    foreach my $Item ( @{$SourceData} ) {
+    for my $Item ( @{ $SourceData } ) {
 
         # check if this object is already mapped
         my $MappedID = $Self->GetOIDMapping(
@@ -102,7 +107,8 @@ sub Run {
             SourceObjectID => $Item->{id}
         );
         if ( $MappedID ) {
-            $Self->UpdateProgress($Param{Type}, 'Ignored');
+            $Self->UpdateProgress( $Param{Type}, 'Ignored' );
+
             next;
         }
 
@@ -122,24 +128,27 @@ sub Run {
         if ( !$ID ) {
             # replace attribute type
             my $Definition = $Self->_ReplaceAttributeTypes(
+                ClassID    => $Item->{class_id},
                 Definition => eval $Item->{configitem_definition}
             );
             # add new attribute "CIAttachments"
-            push @{$Definition}, {
-                Key              => 'CIAttachments',
-                Name             => 'CI Attachments',
-                Searchable       => 1,
-                CustomerVisible  => 0,
-                Input            => {
-                    Type => 'Attachment',
-                },
-                CountMin => 0,
-                CountDefault => 0,
-                CountMax => 32,
-            };
-            $Item->{configitem_definition} = $MainObject->Dump(
-                $Definition
+            push(
+                @{ $Definition },
+                {
+                    Key              => 'CIAttachments',
+                    Name             => 'CI Attachments',
+                    Searchable       => 1,
+                    CustomerVisible  => 0,
+                    CountMin         => 0,
+                    CountDefault     => 0,
+                    CountMax         => 32,
+                    Input            => {
+                        Type => 'Attachment',
+                    },
+
+                }
             );
+            $Item->{configitem_definition} = $Kernel::OM->Get('Main')->Dump( $Definition );
             $Item->{configitem_definition} =~ s/^\$VAR1 = //g;
 
             $ID = $Self->Insert(
@@ -151,10 +160,10 @@ sub Run {
         }
 
         if ( $ID ) {
-            $Self->UpdateProgress($Param{Type}, 'OK');
+            $Self->UpdateProgress( $Param{Type}, 'OK' );
         }
         else {
-            $Self->UpdateProgress($Param{Type}, 'Error');
+            $Self->UpdateProgress( $Param{Type}, 'Error' );
         }
     }
 
@@ -165,39 +174,49 @@ sub _ReplaceAttributeTypes {
     my ( $Self, %Param ) = @_;
     my @Result;
 
-    return if !$Param{Definition} || !IsArrayRefWithData($Param{Definition});
+    return if (
+        !$Param{Definition}
+        || !IsArrayRefWithData( $Param{Definition} )
+    );
 
-    foreach my $Attr ( @{$Param{Definition}} ) {
+    for my $Attr ( @{ $Param{Definition} } ) {
         # if the target typ is undef we have to ignore the whole attribute
-        next if exists $TypeMapping{$Attr->{Input}->{Type}} && !$TypeMapping{$Attr->{Input}->{Type}};
+        next if (
+            exists( $TypeMapping{ $Attr->{Input}->{Type} } )
+            && !$TypeMapping{ $Attr->{Input}->{Type} }
+        );
 
-        if ( IsCodeRef($TypeMapping{$Attr->{Input}->{Type}}) ) {
+        if ( IsCodeRef( $TypeMapping{ $Attr->{Input}->{Type} } ) ) {
             $Attr->{Input}->{MigratedType} = $Attr->{Input}->{Type};
-            $Attr = $TypeMapping{$Attr->{Input}->{Type}}->(
+
+            $Attr = $TypeMapping{ $Attr->{Input}->{Type} }->(
                 $Self,
-                Attribute => $Attr
+                ClassID   => $Param{ClassID},
+                Attribute => $Attr,
             );
         }
         else {
             # if no mapping exists we migrate to Text
-            if ( !$TypeMapping{$Attr->{Input}->{Type}} ) {
+            if ( !$TypeMapping{ $Attr->{Input}->{Type} } ) {
                 $Attr->{Input}->{MigratedType} = $Attr->{Input}->{Type};
-                $Attr->{Input}->{Type} = 'Text';
+                $Attr->{Input}->{Type}         = 'Text';
             }
-            elsif ( $TypeMapping{$Attr->{Input}->{Type}} ne $Attr->{Input}->{Type} ) {
+            elsif ( $TypeMapping{ $Attr->{Input}->{Type} } ne $Attr->{Input}->{Type} ) {
                 $Attr->{Input}->{MigratedType} = $Attr->{Input}->{Type};
+
                 # assign new type
-                $Attr->{Input}->{Type} = $TypeMapping{$Attr->{Input}->{Type}};
+                $Attr->{Input}->{Type} = $TypeMapping{ $Attr->{Input}->{Type} };
             }
 
-            if ( IsArrayRefWithData($Attr->{Sub}) ) {
+            if ( IsArrayRefWithData( $Attr->{Sub} ) ) {
                 $Attr->{Sub} = $Self->_ReplaceAttributeTypes(
+                    ClassID    => $Param{ClassID},
                     Definition => $Attr->{Sub}
                 );
             }
         }
 
-        push @Result, $Attr;
+        push( @Result, $Attr );
     }
 
     return \@Result;
@@ -205,11 +224,12 @@ sub _ReplaceAttributeTypes {
 
 sub _MigrateBaselineReference {
     my ( $Self, %Param ) = @_;
+
     my %Result;
 
     # check needed params
     for my $Needed (qw(Attribute)) {
-        if ( !$Param{$Needed} ) {
+        if ( !$Param{ $Needed } ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
@@ -218,24 +238,28 @@ sub _MigrateBaselineReference {
         }
     }
 
-    %Result = %{$Param{Attribute}};
+    %Result = %{ $Param{Attribute} };
 
     $Result{Input}->{Type} = 'CIClassReference';
 
     if ( $Result{Input}->{ReferencedCIClassName} ) {
         if ( !$Self->{SourceClassList} ) {
-            my $SourceData = $Self->GetSourceData(Type => 'general_catalog', Where => "general_catalog_class='ITSM::ConfigItem::Class'", NoProgress => 1);
-            if ( IsArrayRefWithData($SourceData) ) {
-                $Self->{SourceClassList} = { map { $_->{name} => $_->{id} } @{$SourceData} };
+            my $SourceData = $Self->GetSourceData(
+                Type       => 'general_catalog',
+                Where      => "general_catalog_class='ITSM::ConfigItem::Class'",
+                NoProgress => 1
+            );
+            if ( IsArrayRefWithData( $SourceData ) ) {
+                $Self->{SourceClassList} = { map { $_->{name} => $_->{id} } @{ $SourceData } };
             }
         }
 
-        my @Value = IsArrayRefWithData($Result{Input}->{ReferencedCIClassName}) ? {$Result{Input}->{ReferencedCIClassName}} : ( $Result{Input}->{ReferencedCIClassName} );
+        my @Value = IsArrayRefWithData( $Result{Input}->{ReferencedCIClassName} ) ? { $Result{Input}->{ReferencedCIClassName} } : ( $Result{Input}->{ReferencedCIClassName} );
         my @MigratedReferences;
-        foreach my $ReferencedCIClassName ( @Value ) {
+        for my $ReferencedCIClassName ( @Value ) {
             my $MappedID = $Self->GetOIDMapping(
                 ObjectType     => 'general_catalog',
-                SourceObjectID => $Self->{SourceClassList}->{$ReferencedCIClassName}
+                SourceObjectID => $Self->{SourceClassList}->{ $ReferencedCIClassName }
             );
             if ( !$MappedID ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -245,11 +269,53 @@ sub _MigrateBaselineReference {
                 next;
             }
 
-            push @MigratedReferences, $Self->{ClassList}->{$MappedID};
+            push( @MigratedReferences, $Self->{ClassList}->{ $MappedID } );
         }
 
         $Result{Input}->{ReferencedCIClassName} = \@MigratedReferences;
     }
+
+    return \%Result;
+}
+
+sub _MigrateEncryptedText {
+    my ( $Self, %Param ) = @_;
+
+    my %Result;
+
+    # check needed params
+    for my $Needed (qw(ClassID Attribute)) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # add template for encrypted text role definition to SysConfig
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
+        Name => 'ITSM::ConfigItem::XML::Type::Text###EncryptedText',
+    );
+
+    $OptionData{Default}->{ $Self->{ClassList}->{ $Param{ClassID} } . ':::' . $Param{Attribute}->{Key} } = '';
+
+    # update option
+    my $Success = $Kernel::OM->Get('SysConfig')->OptionUpdate(
+        %OptionData,
+        UserID => 1
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not modify "ITSM::ConfigItem::XML::Type::Text###EncryptedText". Add entry for "' . $Self->{ClassList}->{ $Param{ClassID} } . ':::' . $Param{Attribute}->{Key} . '" manually, if required'
+        );
+    }
+
+    %Result = %{ $Param{Attribute} };
+
+    $Result{Input}->{Type} = 'Text';
 
     return \%Result;
 }

@@ -73,6 +73,15 @@
                 <Item Key="Validates">ContentType</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="Parameters">
+{
+    "MimeTypes": {
+        "application/x-pkcs12": "p12,pfx",
+        "application/x-pem-file": "pem",
+        "application/x-iwork-keynote-sffkey": "key"
+    }
+}
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -194,6 +203,15 @@
                 <Item Key="Validates">MimeType</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="Parameters">
+{
+    "MimeTypes": {
+        "application/x-pkcs12": "p12,pfx",
+        "application/x-pem-file": "pem",
+        "application/x-iwork-keynote-sffkey": "key"
+    }
+}
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>

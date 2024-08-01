@@ -110,10 +110,20 @@ sub Run {
     # get already prepared CI data from ConfigItemGet operation
     if ( @ConfigItemList ) {
 
+        # inform the API core of the total number of config items
+        $Self->SetTotalItemCount(
+            ConfigItem => scalar @ConfigItemList
+        );
+
+        # restrict data to the request window
+        my %PagedResult = $Self->ApplyPaging(
+            ConfigItem => \@ConfigItemList
+        );
+
         my $GetResult = $Self->ExecOperation(
             OperationType => 'V1::CMDB::ConfigItemGet',
             Data          => {
-                ConfigItemID           => join(q{,}, @ConfigItemList),
+                ConfigItemID           => join(q{,}, @{$PagedResult{ConfigItem}}),
                 RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
             }
         );

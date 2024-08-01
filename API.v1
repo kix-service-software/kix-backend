@@ -34,6 +34,10 @@
 /system/automation/macros/types                                                            | GET              | V1::Automation::MacroTypeSearch                  |
 /system/automation/macros/types/:MacroType/actiontypes                                     | GET              | V1::Automation::MacroActionTypeSearch            |
 /system/automation/macros/types/:MacroType/actiontypes/:MacroActionType                    | GET              | V1::Automation::MacroActionTypeGet               |
+/system/certificate                                                                        | GET              | V1::Certificate::CertificateSearch
+/system/certificate                                                                        | POST             | V1::Certificate::CertificateCreate
+/system/certificate/:CertificateID                                                         | GET              | V1::Certificate::CertificateGet
+/system/certificate/:CertificateID                                                         | DELETE           | V1::Certificate::CertificateDelete
 /system/cmdb/classes                                                                       | GET              | V1::CMDB::ClassSearch                            |
 /system/cmdb/classes                                                                       | POST             | V1::CMDB::ClassCreate                            |
 /system/cmdb/classes/:ClassID                                                              | DELETE           | V1::CMDB::ClassDelete                            |
@@ -279,6 +283,7 @@
 /reporting/reports/:ReportID/results/:ReportResultID                                       | DELETE           | V1::Reporting::ReportResultDelete                |
 /session                                                                                   | DELETE           | V1::Session::SessionDelete                       |
 /session                                                                                   | GET              | V1::Session::SessionGet                          |
+/session/markobjectasseen                                                                  | POST             | V1::Session::MarkObjectAsSeen                    |
 /session/user                                                                              | GET              | V1::Session::UserGet                             |
 /session/user                                                                              | PATCH            | V1::Session::UserUpdate                          |
 /session/user/counters                                                                     | GET              | V1::Session::UserCountersGet                     |

@@ -35,7 +35,7 @@
     "Match": {
       "type": "array",
       "readOnly": true,
-      "item": {
+      "items": {
         "type": "object",
         "properties": {
           "Key": {
@@ -56,7 +56,7 @@
     "Set": {
       "type": "array",
       "readOnly": true,
-      "item": {
+      "items": {
         "type": "object",
         "properties": {
           "Key": {

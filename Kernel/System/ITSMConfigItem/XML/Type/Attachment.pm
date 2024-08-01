@@ -50,55 +50,19 @@ sub new {
     return $Self;
 }
 
-=item ValueLookup()
-
-get the xml data of a version
-
-    my $Value = $BackendObject->ValueLookup(
-        Item => $ItemRef,
-        Value => 1.1.1.1,
-    );
-
-=cut
-
-sub ValueLookup {
+sub GetHashContentAttributes {
     my ( $Self, %Param ) = @_;
 
-    return if !$Param{Value};
-
-    my $StoredAttachment = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGet(
-        ID => $Param{Value},
+    my @HashContentAttributes = qw(
+        AttachmentID
+        Filename
+        ContentType
+        Content
+        Filesize
+        FilesizeRaw
     );
 
-    if (!$StoredAttachment) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
-        );
-        return;
-    }
-
-    my %Attachment = (
-        AttachmentID => $Param{Value},
-        Filename     => $StoredAttachment->{Filename},
-        ContentType  => $StoredAttachment->{Preferences}->{Datatype},
-        FilesizeRaw  => 0 + (bytes::length ${$StoredAttachment->{ContentRef}}),
-    );
-
-    # human readable file size
-    if ( $Attachment{FilesizeRaw} ) {
-        if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
-            $Attachment{Filesize} = sprintf "%.1f MBytes", ( $Attachment{FilesizeRaw} / ( 1024 * 1024 ) );
-        }
-        elsif ( $Attachment{FilesizeRaw} > 1024 ) {
-            $Attachment{Filesize} = sprintf "%.1f KBytes", ( ( $Attachment{FilesizeRaw} / 1024 ) );
-        }
-        else {
-            $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
-        }
-    }
-
-    return \%Attachment;
+    return @HashContentAttributes;
 }
 
 =item InternalValuePrepare()
@@ -145,6 +109,60 @@ sub InternalValuePrepare {
     );
 
     return $AttDirID;
+}
+
+=item ExternalValuePrepare()
+
+prepare "internal" value to "external"
+
+    my $AttachmentDirID = $BackendObject->ExternalValuePrepare(
+        Value => {
+            Filename    => '...',
+            ContentType => '...'
+            Content     => '...'            # base64 coded
+        }
+    );
+
+=cut
+
+sub ExternalValuePrepare {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Param{Value};
+
+    my $StoredAttachment = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGet(
+        ID => $Param{Value},
+    );
+
+    if (!$StoredAttachment) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
+        );
+        return;
+    }
+
+    my %Attachment = (
+        AttachmentID => $Param{Value},
+        Filename     => $StoredAttachment->{Filename},
+        ContentType  => $StoredAttachment->{Preferences}->{Datatype},
+        FilesizeRaw  => 0 + (bytes::length ${$StoredAttachment->{ContentRef}}),
+    );
+
+    # human readable file size
+    if ( $Attachment{FilesizeRaw} ) {
+        if ( $Attachment{FilesizeRaw} > ( 1024 * 1024 ) ) {
+            $Attachment{Filesize} = sprintf "%.1f MBytes", ( $Attachment{FilesizeRaw} / ( 1024 * 1024 ) );
+        }
+        elsif ( $Attachment{FilesizeRaw} > 1024 ) {
+            $Attachment{Filesize} = sprintf "%.1f KBytes", ( ( $Attachment{FilesizeRaw} / 1024 ) );
+        }
+        else {
+            $Attachment{Filesize} = $Attachment{FilesizeRaw} . ' Bytes';
+        }
+    }
+
+    return \%Attachment;
 }
 
 =item ExportSearchValuePrepare()

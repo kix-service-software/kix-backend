@@ -109,6 +109,11 @@ sub Run {
     } 
     while ($WorkersActive > 0);
 
+    # start migration of metadata from FS to DB (async to minimize performance impact on the attachment migration itself)
+    $Kernel::OM->Get('Ticket')->ArticleStorageSwitch(
+        ForcePID => 1
+    );
+
     $Self->Print("<green>Done.</green>\n");
 
     return $Self->ExitCodeOk();

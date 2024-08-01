@@ -29,16 +29,6 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 
 my $Home = $ConfigObject->Get('Home');
 
-my $SkipCryptSMIME;
-if ( !$ConfigObject->Get('SMIME') ) {
-    $SkipCryptSMIME = 1;
-}
-
-my $SkipCryptPGP;
-if ( !$ConfigObject->Get('PGP') ) {
-    $SkipCryptPGP = 1;
-}
-
 my %SkipModules;
 if ( !$MainObject->Require('SLA', Silent => 1) ) {
     $SkipModules{SLA} = {
@@ -91,10 +81,6 @@ for my $Directory ( sort @DirectoriesToSearch ) {
 
             # skip if the function for the object was already checked before
             next OPERATION if $OperationChecked{"$1->$2()"};
-
-            # skip crypt object if it is not configured
-            next OPERATION if $1 eq 'Crypt::SMIME'          && $SkipCryptSMIME;
-            next OPERATION if $1 eq 'Crypt::PGP'            && $SkipCryptPGP;
             next OPERATION if $SkipModules{$1}->{$Location};
 
             # load object

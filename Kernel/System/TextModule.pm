@@ -97,15 +97,17 @@ sub new {
 Adds a new TextModule
 
     my $HashRef = $TextModuleObject->TextModuleAdd(
-        Name       => 'some short name',
-        Text       => 'some blabla...',
-        Category   => ''                  #optional
-        Language   => 'de',               #optional
-        Keywords   => 'key1, key2, key3', #optional
-        Comment    => '',                 #optional
-        Subject    => '',                 #optional
-        UserID     => 1,
-        ValidID    => 1,
+        Name          => 'some short name',
+        Text          => 'some blabla...',
+        Category      => ''                  #optional
+        Language      => 'de',               #optional
+        Keywords      => 'key1, key2, key3', #optional
+        Comment       => '',                 #optional
+        Subject       => '',                 #optional
+        UserID        => 1,
+        ValidID       => 1,
+        QueueIDs      => [...],              #optional
+        TicketTypeIDs => [...]               #optional
     );
 
 =cut
@@ -163,6 +165,29 @@ sub TextModuleAdd {
             $ID = $Row[0];
         }
 
+        my %TMParameter = (
+            'QueueIDs' => {
+                'Table'  => 'text_module_queue',
+                'Column' => 'queue_id'
+            },
+            'TicketTypeIDs' => {
+                'Table'  => 'text_module_ticket_type',
+                'Column' => 'ticket_type_id'
+            }
+        );        
+
+        for my $Parameter ( keys( %TMParameter ) ) {
+            if ( IsArrayRefWithData( $Param{ $Parameter } ) ) {
+                my $InsertSQL = 'INSERT INTO ' . $TMParameter{ $Parameter }->{Table} . ' (text_module_id, ' . $TMParameter{ $Parameter }->{Column} . ') VALUES (?, ?)';
+                for my $Entry ( @{ $Param{ $Parameter } } ) {
+                    my $InsertResult = $Self->{DBObject}->Do(
+                        SQL  => $InsertSQL,
+                        Bind => [ \$ID, \$Entry ],
+                    );
+                }
+            }
+        }
+
         # push client callback event
         $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'CREATE',
@@ -215,8 +240,7 @@ sub TextModuleGet {
     }
 
     # sql
-    my $SQL
-        = 'SELECT name, valid_id, keywords, category, comment, text, '
+    my $SQL = 'SELECT name, valid_id, keywords, category, comment, text, '
         . 'language, subject, create_time, create_by, change_time, change_by '
         . 'FROM text_module '
         . 'WHERE id = ?';
@@ -227,6 +251,7 @@ sub TextModuleGet {
     );
 
     if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+
         my %Data = (
             ID                  => $Param{ID},
             Name                => $Data[0],
@@ -240,8 +265,36 @@ sub TextModuleGet {
             CreateTime          => $Data[8],
             CreateBy            => $Data[9],
             ChangeTime          => $Data[10],
-            ChangeBy            => $Data[11],
+            ChangeBy            => $Data[11]
         );
+
+        my %TMParameter = (
+            'QueueIDs' => {
+                'Table'  => 'text_module_queue',
+                'Column' => 'queue_id'
+            },
+            'TicketTypeIDs' => {
+                'Table'  => 'text_module_ticket_type',
+                'Column' => 'ticket_type_id'
+            }
+        );        
+
+        for my $Parameter ( keys( %TMParameter ) ) {
+            # init parameter with empty array
+            $Data{ $Parameter } = [];
+
+            # prepare sql statement
+            my $ParameterSQL = 'SELECT ' . $TMParameter{ $Parameter }->{Column} . ' FROM ' . $TMParameter{ $Parameter }->{Table} . ' WHERE text_module_id = ?';
+            return if !$Self->{DBObject}->Prepare(
+                SQL  => $ParameterSQL,
+                Bind => [ \$Param{ID} ]
+            );
+
+            # fetch data
+            while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+                push( @{ $Data{ $Parameter } }, $Row[0] );
+            }
+        }
 
         # set cache
         $Self->{CacheObject}->Set(
@@ -261,16 +314,18 @@ sub TextModuleGet {
 Updates an existing TextModule
 
     my $HashRef = $TextModuleObject->TextModuleUpdate(
-        ID         => 1234,               #required
-        Name       => 'some short name',  #required
-        ValidID    => 1,                  #required
-        Text       => 'some blabla...',   #required
-        UserID     => 1,                  #required
-        Subject    => '',                 #optional
-        Category   => '',                 #optional
-        Language   => 'de',               #optional
-        Keywords   => 'key1, key2, key3', #optional
-        Comment    => '',                 #optional
+        ID            => 1234,               #required
+        Name          => 'some short name',  #required
+        ValidID       => 1,                  #required
+        Text          => 'some blabla...',   #required
+        UserID        => 1,                  #required
+        Subject       => '',                 #optional
+        Category      => '',                 #optional
+        Language      => 'de',               #optional
+        Keywords      => 'key1, key2, key3', #optional
+        Comment       => '',                 #optional
+        QueueIDs      => [...],              #optional
+        TicketTypeIDs => [...]               #optional
     );
 
 =cut
@@ -310,7 +365,35 @@ sub TextModuleUpdate {
     );
 
     # handle update result...
-    if ($DBUpdate) {
+    if ($DBUpdate) {        
+
+        my %TMParameter = (
+            'QueueIDs' => {
+                'Table'  => 'text_module_queue',
+                'Column' => 'queue_id'
+            },
+            'TicketTypeIDs' => {
+                'Table'  => 'text_module_ticket_type',
+                'Column' => 'ticket_type_id'
+            }
+        );
+        for my $Parameter ( keys( %TMParameter ) ) {
+            my $DeleteSQL    = 'DELETE FROM ' . $TMParameter{ $Parameter }->{Table} . ' WHERE text_module_id = ?';
+            my $DeleteResult = $Self->{DBObject}->Do(
+                SQL  => $DeleteSQL,
+                Bind => [ \$Param{ID} ],
+            );
+
+            if ( IsArrayRefWithData( $Param{ $Parameter } ) ) {
+                my $InsertSQL = 'INSERT INTO ' . $TMParameter{ $Parameter }->{Table} . ' (text_module_id, ' . $TMParameter{ $Parameter }->{Column} . ') VALUES (?, ?)';
+                for my $Entry ( @{ $Param{ $Parameter } } ) {
+                    my $InsertResult = $Self->{DBObject}->Do(
+                        SQL  => $InsertSQL,
+                        Bind => [ \$Param{ID}, \$Entry ],
+                    );
+                }
+            }
+        }
 
         # delete cache
         $Self->{CacheObject}->CleanUp(
@@ -360,6 +443,20 @@ sub TextModuleDelete {
         Type => $Self->{CacheType}
     );
 
+    # delete queue references
+    my $SQL = "DELETE FROM text_module_queue WHERE text_module_id = ?";
+    my $DBDelete = $Self->{DBObject}->Do(
+        SQL  => $SQL,
+        Bind => [ \$Param{ID} ],
+    );
+
+    # delete ticket type references
+    my $SQL = "DELETE FROM text_module_ticket_type WHERE text_module_id = ?";
+    my $DBDelete = $Self->{DBObject}->Do(
+        SQL  => $SQL,
+        Bind => [ \$Param{ID} ],
+    );
+
     my $Result = $Self->{DBObject}->Do(
         SQL  => 'DELETE FROM text_module WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -380,10 +477,13 @@ sub TextModuleDelete {
 Returns all TextModuleIDs depending on given parameters.
 
     my $TextModuleIDs = $TextModuleObject->TextModuleList(
-        Name          => '...'   #optional
-        Category      => '...',  #optional
-        Language      => 'de',   #optional
-        ValidID        => 1,     #optional: 1 is assumed as default
+        Name             => '...'   #optional
+        Category         => '...',  #optional
+        Language         => 'de',   #optional
+        ValidID          => 1,      #optional: 1 is assumed as default
+        QueueIDs         => [1],    #optional
+        TicketTypeIDs    => [1],    #optional
+        WithDependencies => 1       #optional
     );
 
 =cut
@@ -399,28 +499,28 @@ sub TextModuleList {
     my $CacheKey = 'TextModuleList::';
     my @Params;
     foreach my $ParamKey (
-        qw{Category Name Language ValidID}
-        )
-    {
+        qw{Category Name Language ValidID QueueIDs TicketTypeIDs WithDependencies}
+    ) {
         if ( $Param{$ParamKey} ) {
             push( @Params, $Param{$ParamKey} );
         }
         else {
             push( @Params, '' );
         }
-    }
+    }    
+
     $CacheKey .= join( '::', @Params );
     my $Cache = $Self->{CacheObject}->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return $Cache if $Cache;
+    return $Cache if $Cache;    
 
     # set valid
     if ( exists( $Param{ValidID} ) ) {
         push(@SQLWhere, 'valid_id = ?');
         push(@BindVars, \$Param{ValidID});
-    }
+    }   
 
     if ( $Param{Name} ) {
         push(@SQLWhere, 'name = ?');
@@ -430,6 +530,20 @@ sub TextModuleList {
     if ( $Param{Language} ) {
         push(@SQLWhere, 'language = ?');
         push(@BindVars, \$Param{Language});
+    }
+    
+    if ( IsArrayRefWithData($Param{QueueIDs}) ) {
+        push(@SQLWhere, '(id IN (SELECT text_module_id FROM text_module_queue tmq WHERE tmq.queue_id IN (' . join(', ', @{ $Param{QueueIDs} }) . ')) OR NOT EXISTS (SELECT * FROM text_module_queue tmq WHERE tmq.text_module_id = id))'); 
+    }
+    elsif ( $Param{WithDependencies} ) {
+        push(@SQLWhere, 'NOT EXISTS (SELECT * FROM text_module_queue tmq WHERE tmq.text_module_id = id)');
+    }
+
+    if ( IsArrayRefWithData($Param{TicketTypeIDs}) ) {
+        push(@SQLWhere, '(id IN (SELECT text_module_id FROM text_module_ticket_type tmtt WHERE tmtt.ticket_type_id IN (' . join(', ', @{ $Param{TicketTypeIDs} }) . ')) OR NOT EXISTS (SELECT * FROM text_module_ticket_type tmtt WHERE tmtt.text_module_id = id))');
+    }
+    elsif ( $Param{WithDependencies} ) {
+        push(@SQLWhere, 'NOT EXISTS (SELECT * FROM text_module_ticket_type tmtt WHERE tmtt.text_module_id = id)');
     }
 
     # create SQL-String

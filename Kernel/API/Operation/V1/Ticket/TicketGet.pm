@@ -336,6 +336,21 @@ sub _GetTicketData {
         );
     }
 
+    # add previous state
+    if ( $Param{Data}->{include}->{StatePrevious} ) {
+        $TicketData{StatePrevious} = $TicketObject->GetPreviousTicketState(
+            TicketID => $TicketID,
+        ) || undef;
+        if ( $TicketData{StatePrevious} ) {
+            $TicketData{StateIDPrevious} = 0 + $Kernel::OM->Get('State')->StateLookup(
+                State => $TicketData{StatePrevious},
+            );
+        }
+        else {
+            $TicketData{StateIDPrevious} = undef;
+        }
+    }
+
     # add unseen information
     if ( $Param{Data}->{include}->{Unseen} ) {
         my $Exists = $TicketObject->TicketUserFlagExists(
@@ -363,6 +378,24 @@ sub _GetTicketData {
             Object => 'Ticket',
             Key    => $TicketID
         );
+    }
+
+    # add array of article ids
+    if ( $Param{Data}->{include}->{ArticleIDs} ) {
+        my @ArticleIndex = $TicketObject->ArticleIndex(
+            TicketID => $TicketID,
+            UserID   => $Self->{Authorization}->{UserID},
+        );
+
+        # filter for customer assigned articles if necessary
+        @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
+            TicketID               => $Param{Data}->{TicketID},
+            ObjectType             => 'TicketArticle',
+            ObjectIDList           => \@ArticleIndex,
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        );
+        $TicketData{ArticleIDs} = \@ArticleIndex;
     }
 
     #FIXME: workaround KIX2018-3308

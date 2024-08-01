@@ -525,6 +525,99 @@ sub GetOIDMapping {
     return $ID;
 }
 
+sub GetOIDAdditionalData {
+    my ( $Self, %Param ) = @_;
+
+    # check needed params
+    for my $Needed (qw(Source SourceID ObjectType)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    if ( !$Param{SourceObjectID} && !$Param{ObjectID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need SourceObjectID or ObjectID!"
+        );
+        return;
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](GetOIDAdditionalData) getting OID additional data (ObjectID=".($Param{ObjectID}||'').', SourceObjectID='.($Param{SourceObjectID}||'').')');
+    }
+
+    # check cache
+    my $CacheType = 'MigrationOIDAdditionalData_'.$Param{ObjectType};
+    my $CacheKey  = $Param{Source} . '::' . $Param{SourceID} . '::' . $Param{ObjectType} . '::' . ($Param{SourceObjectID}||'') . '::' . ($Param{ObjectID}||'');
+    if ( !$Param{NoCache} ) {
+        my $Cache = $Kernel::OM->Get('Cache')->Get(
+            Type => $CacheType,
+            Key  => $CacheKey,
+            %{$Self->{CacheOptions}->{$Param{Source}}->{$Param{SourceID}}->{$Param{ObjectType}} || {}},
+        );
+        if ( $Cache ) {
+            if ( $Self->{Debug} ) {
+                $Self->_Debug("[$Param{ObjectType}](GetOIDAdditionalData) OID additional data: $Cache");
+            }
+            return $Cache;
+        }
+    }
+
+    # get the mapped ID
+    if ( $Param{SourceObjectID} ) {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL  => 'SELECT additional_data FROM migration WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
+            Bind => [
+                \$Param{Source}, \$Param{SourceID}, \$Param{ObjectType}, \$Param{SourceObjectID},
+            ],
+            Limit => 1,
+        );
+    }
+    else {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL  => 'SELECT additional_data FROM migration WHERE source = ? AND source_id = ? AND object_type = ? AND object_id = ?',
+            Bind => [
+                \$Param{Source}, \$Param{SourceID}, \$Param{ObjectType}, \$Param{ObjectID},
+            ],
+            Limit => 1,
+        );
+    }
+
+    my $AdditionalDataJSON;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $AdditionalDataJSON = $Row[0];
+    }
+
+    my $AdditionalData;
+    if ( $AdditionalDataJSON ) {
+        $AdditionalData = $Kernel::OM->Get('JSON')->Decode(
+            Data => $AdditionalDataJSON
+        );
+    }
+
+    if ( !$Param{NoCache} && $AdditionalDataJSON ) {
+        # set cache
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $CacheType,
+            TTL   => undef,
+            Key   => $CacheKey,
+            Value => $AdditionalData,
+            %{$Self->{CacheOptions}->{$Param{Source}}->{$Param{SourceID}}->{$Param{ObjectType}} || {}},
+        ); 
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("[$Param{ObjectType}](GetOIDAdditionalData) OID mapping: $AdditionalDataJSON");
+    }
+
+    return $AdditionalData;
+}
+
 sub CreateOIDMapping {
     my ( $Self, %Param ) = @_;
 

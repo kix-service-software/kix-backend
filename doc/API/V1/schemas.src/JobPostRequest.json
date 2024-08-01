@@ -12,7 +12,7 @@
         },
         "ExecPlanIDs": {
           "type": "array",
-          "item": {
+          "items": {
             "type": "integer"
           }
         },
@@ -20,14 +20,33 @@
           "type": "array",
           "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details)."
         },
+        "IsAsynchronous": {
+          "type": "integer"
+        },
         "MacroIDs": {
           "type": "array",
-          "item": {
+          "items": {
             "type": "integer"
           }
         },
         "Name": {
           "type": "string"
+        },
+        "SortOrder": {
+          "type": "object",
+          "description": "Used to sort found objects (see \"Filter\").",
+          "properties": {
+            "Field": {
+              "type": "string"
+            },
+            "Direction": {
+              "type": "string",
+              "description": "ascending or descending"
+            }
+          },
+          "required": [
+            "Field"
+          ]
         },
         "Type": {
           "type": "string",

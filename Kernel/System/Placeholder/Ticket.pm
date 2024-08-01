@@ -78,6 +78,27 @@ sub _Replace {
             $Param{Ticket}->{Organisation} = IsHashRefWithData(\%Org) ? $Org{Name} : '';
         }
 
+        # handle previous state if requested
+        if (
+            $Param{Ticket}->{TicketID}
+            && $Param{Text} =~ /$Self->{Start}KIX_TICKET_StatePrevious$Self->{End}/i
+        ) {
+            # determine previous state
+            $Param{Ticket}->{StatePrevious} = $Kernel::OM->Get('Ticket')->GetPreviousTicketState(
+                TicketID   => $Param{Ticket}->{TicketID},
+            ) || $Param{Ticket}->{State};
+        }
+        if (
+            $Param{Ticket}->{TicketID}
+            && $Param{Text} =~ /$Self->{Start}KIX_TICKET_StateIDPrevious$Self->{End}/i
+        ) {
+            # determine previous state id
+            $Param{Ticket}->{StateIDPrevious} = $Kernel::OM->Get('Ticket')->GetPreviousTicketState(
+                TicketID   => $Param{Ticket}->{TicketID},
+                ResultType => 'ID',
+            ) || $Param{Ticket}->{StateID};
+        }
+
         # replace it
         $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Param{Ticket} } );
     }

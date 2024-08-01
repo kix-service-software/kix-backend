@@ -7,7 +7,7 @@
       "MacroID" : {
          "description" : "List of IDs of assigned macros of the job",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          }
       }

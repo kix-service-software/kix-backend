@@ -447,11 +447,22 @@ sub _CollectAPIMetrics {
 
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
-    # analyze API metrics logs of past 7 days
-    my @Files = split /\n/, `ls $Home/var/log/metrics/api_metrics.log.*`;
+    # analyze API metrics logs of past 2 days
+    my $Today = (split / /, $Kernel::OM->Get('Time')->CurrentTimestamp())[0];
+    my $Yesterday = (split / /, $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+        SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Today . ' 00:00:00 -1d',
+        )
+    ))[0];
+
+    my @Files = (
+        "$Home/var/log/metrics/api_metrics.log.$Yesterday",
+        "$Home/var/log/metrics/api_metrics.log.$Today"
+    );
 
     FILE:
     foreach my $File (@Files) {
+        next FILE if ( !-e $File );
 
         my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,

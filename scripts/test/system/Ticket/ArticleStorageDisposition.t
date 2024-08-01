@@ -475,9 +475,9 @@ for my $Backend (qw(DB FS)) {
 
         # get the attachment individually
         my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-            ArticleID => $ArticleID,
-            FileID    => $AttachmentID,
-            UserID    => $UserID,
+            ArticleID    => $ArticleID,
+            AttachmentID => $AttachmentID,
+            UserID       => $UserID,
         );
 
         # add the missing content to the test expected resutls

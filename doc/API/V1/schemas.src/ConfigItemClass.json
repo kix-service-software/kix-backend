@@ -65,7 +65,7 @@
     "Definitions": {
       "type": "array",
       "description": "added via include \"Definitions\"",
-      "item": {
+      "items": {
         "$ref": "ConfigItemClassDefinition.json"
       }
     }

@@ -126,24 +126,35 @@ prepare value for export
 sub ExportValuePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check what should be exported: Number, ID or Name
-    my $CustOrganisationContent =
-        $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::Organisation::Content');
+    my $Result;
+    if (
+        defined $Param{Result}
+        && $Param{Result} eq 'DisplayValue'
+    ) {
+        $Result = $Self->ValueLookup(
+            Value => $Param{Value}
+        );
+    }
+    else {
+        # check what should be exported: Number, ID or Name
+        my $CustOrganisationContent =
+            $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::Organisation::Content');
 
-    return $Param{Value} if ( !$CustOrganisationContent || ( $CustOrganisationContent eq 'ID' ) );
+        return $Param{Value} if ( !$CustOrganisationContent || ( $CustOrganisationContent eq 'ID' ) );
 
-    # get Organisation data
-    my %Organisation = $Self->{OrganisationObject}->OrganisationGet(
-        ID => $Param{Value},
-    );
+        # get Organisation data
+        my %Organisation = $Self->{OrganisationObject}->OrganisationGet(
+            ID => $Param{Value},
+        );
 
-    # get Organisation attribute content
-    my $OrganisationDataStr = $Organisation{$CustOrganisationContent};
+        # get Organisation attribute content
+        $Result = $Organisation{$CustOrganisationContent};
+        $Result =~ s/\s+$//g;
+        $Result =~ s/^\s+//g;
 
-    $OrganisationDataStr =~ s/\s+$//g;
-    $OrganisationDataStr =~ s/^\s+//g;
+    }
 
-    return $OrganisationDataStr;
+    return $Result;
 }
 
 =item ImportSearchValuePrepare()

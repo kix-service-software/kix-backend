@@ -141,8 +141,10 @@ sub Run {
     my $FormattedData;
     if ( $Version->{Data} ) {
         $FormattedData = $Self->ConvertDataToInternal(
-            Definition => $DefinitionData->{DefinitionRef},
-            Data       => $Version->{Data},
+            ClassID      => $ConfigItem->{ClassID},
+            ConfigItemID => $Param{Data}->{ConfigItemID},
+            Definition   => $DefinitionData->{DefinitionRef},
+            Data         => $Version->{Data},
         );
     }
 

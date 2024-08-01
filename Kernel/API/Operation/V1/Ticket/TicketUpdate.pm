@@ -448,13 +448,13 @@ sub _TicketUpdate {
     }
 
     # update Ticket->ContactID && Ticket->OrganisationID
-    if ( $Ticket->{ContactID} || $Ticket->{OrganisationID} ) {
+    if ( defined $Ticket->{ContactID} || defined $Ticket->{OrganisationID} ) {        
 
         # set values to empty if they are not defined
         $TicketData{ContactID}      = $TicketData{ContactID} || '';
         $TicketData{OrganisationID} = $TicketData{OrganisationID} || '';
-        $Ticket->{ContactID}        = $Ticket->{ContactID} || $TicketData{ContactID} ||'';
-        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID} || $TicketData{OrganisationID} || '';
+        $Ticket->{ContactID}        = $Ticket->{ContactID} || '';
+        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID} || '';
 
         my $Success;
         if (

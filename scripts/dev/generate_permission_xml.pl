@@ -53,11 +53,10 @@ my %RoleList = (
     'Customer'                      => 13,
     'Report User'                   => 14,
     'Report Manager'                => 15,
-    'Ticket Agent (w/o teams)'      => 16,
-    'Ticket Agent (Servicedesk)'    => 17,
-    'Ticket Agent Base Permission'  => 18,
-    'Textmodule Admin'              => 19,
-    'FAQ Admin'                     => 20,
+    'Ticket Agent (Servicedesk)'    => 16,
+    'Ticket Agent Base Permission'  => 17,
+    'Textmodule Admin'              => 18,
+    'FAQ Admin'                     => 19,
 );
 
 my %PermissionTypeList = (

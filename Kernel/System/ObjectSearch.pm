@@ -63,6 +63,9 @@ sub new {
     # create backend object
     $Self->{Backend} = $ObjectSearchModule->new( %{ $Self } );
 
+    # set object search debug
+    $Self->{Debug} = $Kernel::OM->Get('Config')->Get('ObjectSearch::Debug') || 0;
+
     return $Self;
 }
 
@@ -260,7 +263,7 @@ sub Search {
         SortKeys => 1
     );
 
-    if ( $Param{Debug} ) {
+    if ( $Self->{Debug} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'debug',
             Message  => 'ObjectSearch CacheKey:'
@@ -297,7 +300,7 @@ sub Search {
     # let backend process search
     my ( $SearchResult, $IsRelative ) = $Self->{Backend}->Search(
         %Param,
-        ObjectType => $ObjectType,
+        ObjectType => $ObjectType
     );
 
     if ( !defined( $SearchResult ) ) {

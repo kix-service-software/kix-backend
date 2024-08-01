@@ -87,9 +87,9 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?|RoleIDs)$/ ) {
                     $UserSearch{$SearchType} //= [];
-                    push @{$UserSearch{$SearchType}}, $SearchItem;
+                    push(@{$UserSearch{$SearchType}}, $SearchItem);
                 }
             }
         }
@@ -104,7 +104,16 @@ sub Run {
             Field => 'HasPermission',
             Value => $Param{Data}->{requiredPermission},
         );
-        push @{$UserSearch{AND}}, \%SearchItem;
+        $UserSearch{AND} //= [];
+        push(@{$UserSearch{AND}}, \%SearchItem);
+
+        if ( $Self->{Authorization}->{UserType} eq 'Agent' ) {
+            my %UserSearchItem = (
+                Field => 'ExcludeUsersByRoleIDsIgnoreUserIDs',
+                Value => [$Self->{Authorization}->{UserID}],
+            );
+            push(@{$UserSearch{AND}}, \%UserSearchItem);
+        }
     }
 
     my $Limit = $Self->{SearchLimit}->{User} || $Self->{SearchLimit}->{'__COMMON'};
@@ -267,6 +276,19 @@ sub _GetSearchParam {
     }
     elsif ( $Param{SearchItem}->{Field} eq 'HasPermission' ) {
         $SearchParam{HasPermission} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'ExcludeUsersByRoleIDsIgnoreUserIDs' ) {
+        $SearchParam{ExcludeUsersByRoleIDsIgnoreUserIDs} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'RoleIDs' ) {
+        if ( !IsArrayRef($Value) ) {
+            $Value = [$Value];
+        }
+        if ( $Param{SearchItem}->{Not} ) {
+            $SearchParam{NotRoleIDs} = $Value;
+        } else {
+            $SearchParam{RoleIDs} = $Value;
+        }
     }
     else {
         $SearchParam{Search} = $Value;

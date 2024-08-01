@@ -84,19 +84,32 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my @ArticleIndex = $TicketObject->ArticleIndex(
-        TicketID        => $Param{Data}->{TicketID},
-        UserID          => $Self->{Authorization}->{UserID},
+    my %Search = %{$Self->{Search}->{Article} || {}};
+
+    # add TicketID to search
+    $Search{AND} //= [];
+    push @{$Search{AND}}, { Field => 'TicketID', Operator => 'EQ', Value => $Param{Data}->{TicketID} };
+
+    my @ArticleIndex = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Article',
+        Result     => 'ARRAY',
+        Search     => \%Search,
+        Limit      => $Self->{SearchLimit}->{Article} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Article} || $Self->{DefaultSort}->{Article},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
     );
 
     # filter for customer assigned articles if necessary
-    @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
-        TicketID               => $Param{Data}->{TicketID},
-        ObjectType             => 'TicketArticle',
-        ObjectIDList           => \@ArticleIndex,
-        UserID                 => $Self->{Authorization}->{UserID},
-        RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
-    );
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        @ArticleIndex = $Self->_FilterCustomerUserVisibleObjectIds(
+            TicketID               => $Param{Data}->{TicketID},
+            ObjectType             => 'TicketArticle',
+            ObjectIDList           => \@ArticleIndex,
+            UserID                 => $Self->{Authorization}->{UserID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        );
+    }
 
     if ( @ArticleIndex ) {
 
