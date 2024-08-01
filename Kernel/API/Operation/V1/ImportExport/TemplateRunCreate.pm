@@ -126,7 +126,7 @@ sub Run {
             TemplateID    => $Param{Data}->{TemplateID},
             SourceContent => $TemplateRun->{ImportFileContent},
             UserID        => $Self->{Authorization}->{UserID},
-            UsageContext  => $Self->{Authorization}->{Type},
+            UsageContext  => $Self->{Authorization}->{UserType},
         );
 
         if ( !$TaskID ) {
@@ -151,7 +151,7 @@ sub Run {
         my $Result = $Kernel::OM->Get('ImportExport')->Export(
             TemplateID   => $Param{Data}->{TemplateID},
             UserID       => $Self->{Authorization}->{UserID},
-            UsageContext => $Self->{Authorization}->{Type},
+            UsageContext => $Self->{Authorization}->{UserType},
         );
 
         if ( !$Result ) {
