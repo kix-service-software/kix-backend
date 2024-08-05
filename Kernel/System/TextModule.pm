@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -174,7 +174,7 @@ sub TextModuleAdd {
                 'Table'  => 'text_module_ticket_type',
                 'Column' => 'ticket_type_id'
             }
-        );        
+        );
 
         for my $Parameter ( keys( %TMParameter ) ) {
             if ( IsArrayRefWithData( $Param{ $Parameter } ) ) {
@@ -277,7 +277,7 @@ sub TextModuleGet {
                 'Table'  => 'text_module_ticket_type',
                 'Column' => 'ticket_type_id'
             }
-        );        
+        );
 
         for my $Parameter ( keys( %TMParameter ) ) {
             # init parameter with empty array
@@ -365,7 +365,7 @@ sub TextModuleUpdate {
     );
 
     # handle update result...
-    if ($DBUpdate) {        
+    if ($DBUpdate) {
 
         my %TMParameter = (
             'QueueIDs' => {
@@ -507,20 +507,23 @@ sub TextModuleList {
         else {
             push( @Params, '' );
         }
-    }    
+    }
 
     $CacheKey .= join( '::', @Params );
     my $Cache = $Self->{CacheObject}->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return $Cache if $Cache;    
+    return $Cache if $Cache;
+
+    # create SQL-String
+    my $SQL = "SELECT tm.id FROM text_module tm";
 
     # set valid
     if ( exists( $Param{ValidID} ) ) {
         push(@SQLWhere, 'valid_id = ?');
         push(@BindVars, \$Param{ValidID});
-    }   
+    }
 
     if ( $Param{Name} ) {
         push(@SQLWhere, 'name = ?');
@@ -531,23 +534,24 @@ sub TextModuleList {
         push(@SQLWhere, 'language = ?');
         push(@BindVars, \$Param{Language});
     }
-    
+
     if ( IsArrayRefWithData($Param{QueueIDs}) ) {
-        push(@SQLWhere, '(id IN (SELECT text_module_id FROM text_module_queue tmq WHERE tmq.queue_id IN (' . join(', ', @{ $Param{QueueIDs} }) . ')) OR NOT EXISTS (SELECT * FROM text_module_queue tmq WHERE tmq.text_module_id = id))'); 
+        $SQL .= ' LEFT JOIN text_module_queue tmq ON tmq.text_module_id = tm.id';
+        push(@SQLWhere, '(tmq.queue_id IN (' . join(', ', @{ $Param{QueueIDs} }) . ') OR tmq.text_module_id IS NULL)');
     }
     elsif ( $Param{WithDependencies} ) {
-        push(@SQLWhere, 'NOT EXISTS (SELECT * FROM text_module_queue tmq WHERE tmq.text_module_id = id)');
+        $SQL .= ' LEFT JOIN text_module_queue tmq ON tmq.text_module_id = tm.id';
+        push(@SQLWhere, 'tmq.text_module_id IS NULL');
     }
 
     if ( IsArrayRefWithData($Param{TicketTypeIDs}) ) {
-        push(@SQLWhere, '(id IN (SELECT text_module_id FROM text_module_ticket_type tmtt WHERE tmtt.ticket_type_id IN (' . join(', ', @{ $Param{TicketTypeIDs} }) . ')) OR NOT EXISTS (SELECT * FROM text_module_ticket_type tmtt WHERE tmtt.text_module_id = id))');
+        $SQL .= ' LEFT JOIN text_module_ticket_type tmtt ON tmtt.text_module_id = tm.id';
+        push(@SQLWhere, '(tmtt.ticket_type_id IN (' . join(', ', @{ $Param{TicketTypeIDs} }) . ') OR tmtt.text_module_id IS NULL)');
     }
     elsif ( $Param{WithDependencies} ) {
-        push(@SQLWhere, 'NOT EXISTS (SELECT * FROM text_module_ticket_type tmtt WHERE tmtt.text_module_id = id)');
+        $SQL .= ' LEFT JOIN text_module_ticket_type tmtt ON tmtt.text_module_id = tm.id';
+        push(@SQLWhere, 'tmtt.text_module_id IS NULL');
     }
-
-    # create SQL-String
-    my $SQL = "SELECT id FROM text_module";
 
     if ( @SQLWhere ) {
         $SQL .= ' WHERE '.join(' AND ', @SQLWhere);

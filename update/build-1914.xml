@@ -2,6 +2,7 @@
 <database Name="kix">
 
     <TableCreate Name="text_module_queue">
+        <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
         <Column Name="text_module_id" Required="true" Type="INTEGER" />
         <Column Name="queue_id" Required="true" Type="INTEGER" />
         <ForeignKey ForeignTable="queue">
@@ -13,6 +14,7 @@
     </TableCreate>
 
     <TableCreate Name="text_module_ticket_type">
+        <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
         <Column Name="text_module_id" Required="true" Type="INTEGER" />
         <Column Name="ticket_type_id" Required="true" Type="SMALLINT" />
         <ForeignKey ForeignTable="ticket_type">
