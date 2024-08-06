@@ -1274,6 +1274,77 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
     }
 }
 
+## Tests for KIX2018-11925, check that failing PreFilterModules do not break execution
+@Tests = (
+    {
+        Name     => 'Failing PreFilterModule without FollowUp',
+        Email    => 'From: Sender <sender@example.com>
+To: Some Name <recipient@example.com>
+Envelope-To: Some EnvelopeTo Name <envelopeto@example.com>
+Subject: some subject
+
+Some Content in Body
+',
+        FollowUpReturnValue => undef
+    },
+    {
+        Name     => 'Failing PreFilterModule with FollowUp',
+        Email    => 'From: Sender <sender@example.com>
+To: Some Name <recipient@example.com>
+Envelope-To: Some EnvelopeTo Name <envelopeto@example.com>
+Subject: some subject
+
+Some Content in Body
+',
+        FollowUpReturnValue => 1
+    },
+);
+for my $Test (@Tests) {
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
+        Value => {
+            Module      => 'scripts::test::system::PostMaster::Filter::UnitTest',
+            Set         => {
+                'X-KIX-Ignore' => 'yes'
+            },
+            ReturnValue => undef
+        },
+    );
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::CheckFollowUpModule###' . $Test->{Name},
+        Value => {
+            Module      => 'scripts::test::system::FollowUpCheck::Filter::UnitTest',
+            ReturnValue => $Test->{FollowUpReturnValue}
+        },
+    );
+
+    my @Return;
+    {
+        my $PostMasterObject = Kernel::System::PostMaster->new(
+            Email => \$Test->{Email},
+        );
+
+        @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
+    }
+
+    $Self->Is(
+        $Return[0] || 0,
+        5,
+        "KIX2018-11925 Run() - Ignore",
+    );
+
+    # remove filter
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
+        Value => undef,
+    );
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::CheckFollowUpModule###' . $Test->{Name},
+        Value => undef,
+    );
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 
