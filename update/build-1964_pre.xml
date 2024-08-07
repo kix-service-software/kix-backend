@@ -5,8 +5,4 @@
         <ColumnAdd Name="attachment_count" Required="false" Type="INTEGER"/>
     </TableAlter>
 
-    <TableAlter Name="article_attachment">
-        <ColumnDrop Name="content"/>
-    </TableAlter>
-
 </database>
