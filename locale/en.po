@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-8-7 11:23+0000\n"
-"PO-Revision-Date: 2023-04-19 10:19+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"PO-Revision-Date: 2024-08-08 14:39+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
 "Language: en\n"
@@ -6153,7 +6153,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "ZIP, City, Country"
-msgstr ""
+msgstr "ZIP, City, Country"
 
 #. manual entry from templates.pot.manual
 msgid "accepted"
