@@ -22,7 +22,7 @@ use Kernel::System::Role::Permission;
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-1911',
+        LogPrefix => 'framework_update-to-build-1913',
     },
 );
 
@@ -46,7 +46,7 @@ sub _AddNewPermissions {
         {
             Role   => 'System Admin',
             Type   => 'Resource',
-            Target => '/certificate',
+            Target => '/certificates',
             Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
                 + Kernel::System::Role::Permission::PERMISSION->{CREATE}
                 + Kernel::System::Role::Permission::PERMISSION->{DELETE},
