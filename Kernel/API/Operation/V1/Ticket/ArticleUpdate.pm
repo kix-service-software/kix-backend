@@ -351,8 +351,10 @@ sub _ArticleUpdate {
 
         # skip unchanged attribute
         next if(
-            defined( $Param{OldArticle}->{ $Attribute } )
-            && $Param{OldArticle}->{ $Attribute } && $Article->{ $Attribute }
+            !DataIsDifferent(
+                Data1 => $Article->{ $Attribute },
+                Data2 => $Param{OldArticle}->{ $Attribute }
+            )
         );
 
         # update attribute
