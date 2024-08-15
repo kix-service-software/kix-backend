@@ -123,11 +123,16 @@ sub Describe {
     );
     $Self->AddOption(
         Name        => 'DynamicFieldList',
-        Label       => Kernel::Language::Translatable('Dynamic Fields'),
+        Label       => Kernel::Language::Translatable('Ticket Dynamic Fields'),
         Description => Kernel::Language::Translatable('The dynamic fields of the new ticket.'),
         Required    => 0,
     );
+
+    # delete Option 'Subject' from ArticleCreate since Title is used in this MA for it
     delete $Self->{Definition}->{Options}->{Subject};
+
+    # override Label of Option 'ArticleDynamicFieldList' from ArticleCreate to clarify the related object
+    $Self->{Definition}->{Options}->{ArticleDynamicFieldList}->{Label} = Kernel::Language::Translatable('Article Dynamic Fields');
 
     $Self->AddResult(
         Name        => 'NewTicketID',
