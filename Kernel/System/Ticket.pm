@@ -1290,7 +1290,7 @@ sub TicketGet {
     $Param{DynamicFields} //= 0;
 
     my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::';
-    
+
     if ( IsArrayRefWithData($Param{DynamicFields}) ) {
         $CacheKey .= join('::', @{$Param{DynamicFields}});
     }
@@ -1521,6 +1521,11 @@ sub _TicketCacheClear {
         $CacheObject->CleanUp(
             Type => $Self->{CacheType},
         );
+
+        # cleanup search cache
+        $CacheObject->CleanUp(
+            Type => "ObjectSearch_Ticket",
+        );
         return 1;
     }
 
@@ -1535,20 +1540,33 @@ sub _TicketCacheClear {
     my @Keys = $CacheObject->GetKeysForType(
         Type => "TicketCache".$Param{TicketID},
     );
-    return if !@Keys;
+    if ( @Keys ) {
+        my @Values = $CacheObject->GetMulti(
+            Type          => "TicketCache".$Param{TicketID},
+            Keys          => \@Keys,
+            UseRawKey     => 1,
+            NoStatsUpdate => 1,
+        );
 
-    my @Values = $CacheObject->GetMulti(
-        Type          => "TicketCache".$Param{TicketID},
-        Keys          => \@Keys,
-        UseRawKey     => 1,
-        NoStatsUpdate => 1,
-    );
+        for my $Value ( @Values ) {
+            next if !$Value;
+            my ( $Type, $Key ) = split(/::/, $Value, 2);
 
-    # delete metadata
-    $CacheObject->CleanUp(
-        Type          => "TicketCache".$Param{TicketID},
-        NoStatsUpdate => 1,
-    );
+            next if !$Type || !$Key;
+
+            # reset cache
+            $CacheObject->Delete(
+                Type => $Type,
+                Key  => $Key
+            );
+        }
+
+        # delete metadata
+        $CacheObject->CleanUp(
+            Type          => "TicketCache".$Param{TicketID},
+            NoStatsUpdate => 1,
+        );
+    }
 
     # clear semaphore
     $CacheObject->ClearSemaphore(
@@ -1560,24 +1578,15 @@ sub _TicketCacheClear {
     $CacheObject->CleanUp(
         Type => "ObjectSearch_Ticket",
     );
+    # cleanup search cache also for article
+    $CacheObject->CleanUp(
+        Type => "ObjectSearch_Article",
+    );
 
     # cleanup index cache
     $CacheObject->CleanUp(
         Type => "TicketIndex",
     );
-
-    foreach my $Value ( @Values ) {
-        next if !$Value;
-        my ( $Type, $Key ) = split(/::/, $Value, 2);
-
-        next if !$Type || !$Key;
-
-        # reset cache
-        $CacheObject->Delete(
-            Type => $Type,
-            Key  => $Key
-        );
-    }
 
     return 1;
 }
@@ -2477,7 +2486,6 @@ sub TicketCustomerSet {
         if ($Ok) {
             $Param{History} = "OrganisationID=$Param{OrganisationID};";
         }
-        
     }
 
     # db contact update
