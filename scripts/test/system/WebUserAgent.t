@@ -212,7 +212,7 @@ for my $Test (@Tests) {
 
             if ( $Test->{Matches} ) {
                 $Self->True(
-                    ( ${ $Response{Content} } =~ $Test->{Matches} ) || undef,
+                    ( ref( $Response{Content} ) eq 'SCALAR' ) ? ( ${ $Response{Content} } =~ $Test->{Matches} ) : undef,
                     "$Test->{Name} - Matches",
                 );
             }

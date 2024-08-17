@@ -57,7 +57,7 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
+    my $Send = $Kernel::OM->Get('Email')->Send(
         From       => 'john.smith@example.com',
         To         => 'john.smith2@example.com',
         Subject    => 'some subject',
@@ -67,6 +67,8 @@ for my $Test (@Tests) {
         References => $Test->{Header},
         InReplyTo  => $Test->{Header},
     );
+    my $Header = $Send->{HeadRef};
+    my $Body   = $Send->{BodyRef};
 
     my ($ReferencesHeader) = $$Header =~ m{^(References:.*?)(^\S|\z)}xms;
     my ($InReplyToHeader)  = $$Header =~ m{^(In-Reply-To:.*?)(^\S|\z)}xms;
@@ -94,7 +96,7 @@ $Kernel::OM->Get('Config')->Set(
     Value => 0,
 );
 
-my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
+my $Send = $Kernel::OM->Get('Email')->Send(
     From    => 'john.smith@example.com',
     To      => 'john.smith2@example.com',
     Subject => 'some subject',
@@ -102,6 +104,8 @@ my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
     Type    => 'text/html',
     Charset => 'utf8',
 );
+my $Header = $Send->{HeadRef};
+my $Body   = $Send->{BodyRef};
 
 my ($XMailerHeader)    = $$Header =~ m{^X-Mailer:\s+(.*?)$}ixms;
 my ($XPoweredByHeader) = $$Header =~ m{^X-Powered-By:\s+(.*?)$}ixms;
@@ -126,7 +130,7 @@ $Kernel::OM->Get('Config')->Set(
     Value => 1,
 );
 
-( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
+$Send = $Kernel::OM->Get('Email')->Send(
     From     => 'john.smith@example.com',
     To       => 'john.smith2@example.com',
     Subject  => 'some subject',
@@ -134,6 +138,8 @@ $Kernel::OM->Get('Config')->Set(
     MimeType => 'text/html',
     Charset  => 'utf8',
 );
+$Header = $Send->{HeadRef};
+$Body   = $Send->{BodyRef};
 
 ($XMailerHeader)    = $$Header =~ m{^X-Mailer:\s+(.*?)$}ixms;
 ($XPoweredByHeader) = $$Header =~ m{^X-Powered-By:\s+(.*?)$}ixms;
