@@ -1,0 +1,9 @@
+  displayName: "[System] Certificate"
+  description: !include ../../descriptions/resources/system/certificate.md
+  type: { collection: { typeName: Certificate } }
+  /{certificateId}:
+      type: { item-nopatch: { typeName: Certificate } }
+      uriParameters:
+        certificateId:
+          displayName: CertificateID
+          type: integer

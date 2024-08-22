@@ -209,9 +209,28 @@ sub _MailParse {
     }
 
     # get configured items
-    my @DynamicFieldContentTicket  = split( /[,]/sm , $Self->{Config}->{'DynamicFieldContent::Ticket'} );
-    my @DynamicFieldContentArticle = split( /[,]/sm , $Self->{Config}->{'DynamicFieldContent::Article'} );
-    my @DynamicFieldContent        = ( @DynamicFieldContentTicket, @DynamicFieldContentArticle );
+    my @DynamicFieldContent;
+    my @SysConfigDFContent = (
+        'DynamicFieldContent::Ticket',
+        'DynamicFieldContent::Article'
+    );
+    CONFIG:
+    for my $Config ( @SysConfigDFContent ) {
+        next CONFIG if !defined $Self->{Config}->{$Config};
+        next CONFIG if !$Self->{Config}->{$Config};
+
+        my @DynamicFields = split( /[,]/sm , $Self->{Config}->{$Config} );
+
+        FIELD:
+        for my $Field ( @DynamicFields ) {
+            next FIELD if !$Field;
+
+            push(
+                @DynamicFieldContent,
+                $Field
+            );
+        }
+    }
 
     # init hash to remember matched items
     my %AlreadyMatched;

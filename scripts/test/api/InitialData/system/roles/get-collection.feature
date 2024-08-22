@@ -30,7 +30,6 @@ Feature: GET request to the /system/roles resource
 #      | Ticket Agent                 |
 #      | Ticket Agent Base Permission |
 #      | Ticket Agent (Servicedesk)   |
-#      | Ticket Agent (w/o teams)     |
 #      | Ticket Reader                |
 #      | Webform Ticket Creator       |
 
@@ -58,6 +57,5 @@ Feature: GET request to the /system/roles resource
       | Ticket Agent                 | same as Ticket Reader, but additionally allows to create new or edit any existing ticket and allows to CREATE, UPDATE, DELETE links                                          | 1       |
       | Ticket Agent Base Permission | allows basic ticket access, but requires team specific roles with base permissions                                                                                           | 1       |
       | Ticket Agent (Servicedesk)   | allows working on tickets in team "Servicedesk", but requires role "Ticket Agent (w/o teams)" in order to grant access                                                       | 1       |
-      | Ticket Agent (w/o teams)     | allows basic ticket access, but requires team specific roles                                                                                                                 | 1       |
       | Ticket Reader                | allows to read any ticket in any queue and allows to READ links                                                                                                              | 1       |
       | Webform Ticket Creator       | allows to create new tickets by using the "Customer Portal Light" webform mechanism                                                                                          | 1       |

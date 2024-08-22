@@ -68,7 +68,13 @@ sub ParameterDefinition {
         'TextModule::Language' => {
             RequiresValueIfUsed => 1,
             OneOf => \@LanguageIDs
-        }
+        },
+        'TextModule::QueueIDs' => {
+            Required => 0
+        },
+        'TextModule::TicketTypeIDs' => {
+            Required => 0
+        },
     }
 }
 
@@ -88,7 +94,9 @@ perform TextModuleCreate Operation. This will return the created TextModuleID.
                     'some', 'keyword'
                 ],                                  # optional
                 Subject             => '...',       # optional
-                ValidID             => 1            # optional
+                ValidID             => 1,           # optional
+                QueueIDs            => [...],       # optional
+                TicketTypeIDs       => [...]        # optional
             },
         },
     );
@@ -133,6 +141,8 @@ sub Run {
         Subject            => $TextModule->{Subject} || '',
         Keywords           => IsArrayRefWithData($TextModule->{Keywords}) ? join(' ', @{$TextModule->{Keywords}}) : '',
         Comment            => $TextModule->{Comment} || '',
+        QueueIDs           => $TextModule->{QueueIDs},
+        TicketTypeIDs      => $TextModule->{TicketTypeIDs},
         ValidID            => $TextModule->{ValidID} || 1,
         UserID             => $Self->{Authorization}->{UserID},
     );

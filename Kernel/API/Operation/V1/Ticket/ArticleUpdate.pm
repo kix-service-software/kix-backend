@@ -122,23 +122,20 @@ sub Run {
         Data => $Param{Data}->{Article}
     );
 
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Article = $TicketObject->ArticleGet(
+    my %OldArticle = $Kernel::OM->Get('Ticket')->ArticleGet(
         ArticleID     => $Param{Data}->{ArticleID},
         DynamicFields => 0,
     );
 
     # check if article exists
-    if ( !%Article ) {
+    if ( !%OldArticle ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
     }
 
     # check if article belongs to the given ticket
-    if ( $Article{TicketID} != $Param{Data}->{TicketID} ) {
+    if ( $OldArticle{TicketID} != $Param{Data}->{TicketID} ) {
         return $Self->_Error(
             Code => 'Object.NotFound',
         );
@@ -146,10 +143,11 @@ sub Run {
 
     # everything is ok, let's update the article
     return $Self->_ArticleUpdate(
-        TicketID  => $Param{Data}->{TicketID},
-        ArticleID => $Param{Data}->{ArticleID},
-        Article   => $Article,
-        UserID    => $Self->{Authorization}->{UserID},
+        TicketID   => $Param{Data}->{TicketID},
+        ArticleID  => $Param{Data}->{ArticleID},
+        Article    => $Article,
+        OldArticle => \%OldArticle,
+        UserID     => $Self->{Authorization}->{UserID},
     );
 }
 
@@ -163,6 +161,7 @@ update a ticket with its dynamic fields
         TicketID          => 123,
         ArticleID         => 123,
         Article           => { },                # all article parameters
+        OldArticle        => { },                # data of article before update
         UserID            => 123,
     );
 
@@ -186,73 +185,146 @@ update a ticket with its dynamic fields
 sub _ArticleUpdate {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-    my $Article    = $Param{Article};
-    my %OldArticle = $TicketObject->ArticleGet(
-        ArticleID => $Param{ArticleID},
-        UserID    => $Param{UserID}
-    );
+    # isolate article parameter
+    my $Article = $Param{Article};
 
-    if ( !$Article->{Body} ) {
-        $Article->{Body}     = $OldArticle{Body};
-        $Article->{HTMLBody} = $Self->_GetBodyRichtext(
-            Article => $Article,
+    # get current richtext body if attachments are given, but no new body
+    # updating attachments will delete all current entries, so file-2 has to be prepared
+    if (
+        defined( $Article->{Attachments} )
+        && !$Article->{Body}
+    ) {
+        # prepare old richtext body and content type
+        ( $Article->{Body}, $Article->{ContentType} ) = $Self->_GetRichtextData(
+            Article => $Param{OldArticle},
             UserID  => $Param{UserID}
         );
-    } else {
+    }
 
-        # replace placeholders
-        $Article->{Body} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            RichText => $Article->{MimeType} =~ m/text\/html/i ? 1 : 0,
-            Text     => $Article->{Body},
-            TicketID => $Param{TicketID},
-            Data     => {},
-            UserID   => $Param{UserID},
-        );
-        if (
-            IsHashRefWithData($Article->{OrigHeader})
-            && $Article->{OrigHeader}->{Body}
-        ) {
-            $Article->{OrigHeader}->{Body} = $Article->{Body};
+    # prepare body data
+    if ( $Article->{Body} ) {
+
+        # check ContentType vs. Charset & MimeType
+        if ( !$Article->{ContentType} ) {
+            for my $Needed ( qw(Charset MimeType) ) {
+                if ( !$Article->{ $Needed } ) {
+                    return $Self->_Error(
+                        Code    => 'Object.UnableToUpdate',
+                        Message => "Need ContentType or MimeType and Charset when updating Body!",
+                    );
+                }
+            }
+            $Article->{ContentType} = $Article->{MimeType} . '; charset=' . $Article->{Charset};
+        }
+        else {
+            if ( $Article->{ContentType} =~ /charset=/i ) {
+                my $Charset = $Article->{ContentType};
+                $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+                $Charset =~ s/"|'//g;
+                $Charset =~ s/(.+?);.*/$1/g;
+
+                # only change if we extracted a charset
+                $Article->{Charset} = $Charset || $Article->{Charset};
+            }
+
+            if ( $Param{ContentType} =~ /^(\w+\/\w+)/i ) {
+                my $MimeType = $1;
+                $MimeType =~ s/"|'//g;
+
+                # only change if we extracted a mime type
+                $Article->{MimeType} = $MimeType || $Article->{MimeType};
+            }
+        }
+
+        # correct charset if necessary
+        if ( $Article->{Charset} ) {
+            $Article->{Charset} =~ s/utf8/utf-8/i;
+        }
+        # fallback for Charset
+        else {
+            $Article->{Charset} = 'utf-8';
+        }
+
+        # if no attachment list is definend, get current attachments to keep them
+        if ( !defined( $Article->{Attachments} ) ) {
+            my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+                ContentPath                => $Param{OldArticle}->{ContentPath},
+                ArticleID                  => $Param{ArticleID},
+                UserID                     => $Param{UserID},
+                Article                    => $Article,
+                StripPlainBodyAsAttachment => 3,
+            );
+
+            if ( %AttachmentIndex ) {
+
+                # get already prepared Article data from ArticleGet operation
+                my $GetResult = $Self->ExecOperation(
+                    OperationType            => 'V1::Ticket::ArticleAttachmentGet',
+                    SuppressPermissionErrors => 1,
+                    Data                     => {
+                        TicketID               => $Param{TicketID},
+                        ArticleID              => $Param{ArticleID},
+                        AttachmentID           => join(',', sort keys %AttachmentIndex),
+                        include                => 'Content'
+                    }
+                );
+                if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+                    return $Self->_Error(
+                        Code    => 'Object.UnableToUpdate',
+                        Message => "Could not get current attachments to update article body!",
+                    );
+                }
+
+                # normalize attachment result to array
+                if ( defined( $GetResult->{Data}->{Attachment} ) ) {
+                    my @AttachmentList = IsArrayRef($GetResult->{Data}->{Attachment}) ? @{$GetResult->{Data}->{Attachment}} : ( $GetResult->{Data}->{Attachment} );
+
+                    $Article->{Attachments} = \@AttachmentList;
+                }
+                # init attachment as empty array
+                else {
+                    $Article->{Attachments} = [];
+                }
+            }
         }
 
         # process html article
         if ( $Article->{MimeType} =~ /text\/html/i ) {
 
             # add html article as attachment
-            my $Attach = {
+            my $Attachment = {
                 Content     => $Article->{Body},
                 ContentType => "text/html; charset=\"$Article->{Charset}\"",
                 Filename    => 'file-2',
             };
-            push @{ $Article->{Attachments} }, $Attach;
+            push( @{ $Article->{Attachments} }, $Attachment );
 
              # get ascii body
-            $Article->{MimeType} = 'text/plain';
+            $Article->{MimeType}    = 'text/plain';
             $Article->{ContentType} =~ s/html/plain/i;
-            $Article->{Body} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
+            $Article->{Body}        = $Kernel::OM->Get('HTMLUtils')->ToAscii(
                 String => $Article->{Body},
             );
         }
-        elsif ( $Article->{MimeType} && $Article->{MimeType} eq "application/json" ) {
+        elsif ( $Article->{MimeType} eq "application/json" ) {
 
             # Keep JSON body unchanged
         }
 
         # if body isn't text, attach body as attachment (mostly done by OE) :-/
-        elsif ( $Article->{MimeType} && $Article->{MimeType} !~ /\btext\b/i ) {
+        elsif ( $Article->{MimeType} !~ /\btext\b/i ) {
 
             # add non text as attachment
             my $FileName = 'unknown';
             if ( $Article->{ContentType} =~ /name="(.+?)"/i ) {
                 $FileName = $1;
             }
-            my $Attach = {
+            my $Attachment = {
                 Content     => $Article->{Body},
                 ContentType => $Article->{ContentType},
                 Filename    => $FileName,
             };
-            push @{ $Article->{Attachments} }, $Attach;
+            push( @{ $Article->{Attachments} }, $Attachment );
 
             # set ascii body
             $Article->{MimeType}    = 'text/plain';
@@ -267,23 +339,32 @@ sub _ArticleUpdate {
     }
 
     # update normal attributes
-    foreach my $Attribute (
+    for my $Attribute (
         qw(
             Subject Body From To Cc Bcc
             IncomingTime ReplyTo CustomerVisible
-            SenderType SenderTypeID
+            SenderType SenderTypeID ContentType
         )
     ) {
-        next if !defined $Article->{$Attribute};
+        # skip undefined attribute
+        next if( !defined( $Article->{ $Attribute } ) );
 
-        my $Success = $TicketObject->ArticleUpdate(
+        # skip unchanged attribute
+        next if(
+            !DataIsDifferent(
+                Data1 => $Article->{ $Attribute },
+                Data2 => $Param{OldArticle}->{ $Attribute }
+            )
+        );
+
+        # update attribute
+        my $Success = $Kernel::OM->Get('Ticket')->ArticleUpdate(
             ArticleID => $Param{ArticleID},
             Key       => $Attribute,
-            Value     => $Article->{$Attribute},
+            Value     => $Article->{ $Attribute },
             UserID    => $Param{UserID},
             TicketID  => $Param{TicketID},
         );
-
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToUpdate',
@@ -292,30 +373,27 @@ sub _ArticleUpdate {
         }
     }
 
-    if (
-        defined $Article->{Attachments}
-        || defined $Article->{Body}
-    ) {
-
+    # update attachment list
+    if ( defined( $Article->{Attachments} ) ) {
         # delete all (old) attachments
-        my $UpdateSuccessful = $TicketObject->ArticleDeleteAttachment(
+        my $DeleteSuccessful = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
             ArticleID => $Param{ArticleID},
             UserID    => $Param{UserID},
         );
-
-        if ( !$UpdateSuccessful ) {
+        if ( !$DeleteSuccessful ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToUpdate',
                 Message => "Unable to delete article attachments",
             );
         }
 
-        # write attachments
-        for my $Attachment (@{$Article->{Attachments}}) {
-
+        # write (new) attachments
+        for my $Attachment ( @{ $Article->{Attachments} } ) {
+            # decode attachment content from base64
             if ($Attachment->{Filename} !~ m/^(?:file-[12]|pasted[-]\d+[-]\d+[.].*)$/smx) {
                 $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
             }
+            # extract embedded images from file-2
             elsif (
                 $Attachment->{ContentType} eq "text/html; charset=\"$Article->{Charset}\""
                 && $Attachment->{Filename} eq 'file-2'
@@ -326,18 +404,24 @@ sub _ArticleUpdate {
                 );
             }
 
-            # write existing file to backend
-            $UpdateSuccessful = $TicketObject->ArticleWriteAttachment(
-                %{$Attachment},
+            # write file to backend
+            my $UpdateSuccessful = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+                %{ $Attachment },
                 ArticleID => $Param{ArticleID},
                 UserID    => $Param{UserID},
             );
+            if ( !$UpdateSuccessful ) {
+                ## ToDo: inform requester, that writing of attachment failed
+            }
         }
     }
 
     # check if we have to move the article
-    if ( IsStringWithData($Article->{TicketID}) && $Article->{TicketID} != $Param{TicketID} ) {
-        my $Success = $TicketObject->ArticleMove(
+    if (
+        IsStringWithData( $Article->{TicketID} )
+        && $Article->{TicketID} != $Param{TicketID}
+    ) {
+        my $Success = $Kernel::OM->Get('Ticket')->ArticleMove(
             TicketID  => $Param{TicketID},
             ArticleID => $Param{ArticleID},
             UserID    => $Param{UserID},
@@ -350,64 +434,44 @@ sub _ArticleUpdate {
         }
     }
 
-    # check if we have to update the incoming time
-    if ( IsStringWithData($Article->{IncomingTime}) ) {
-        my $Success = $TicketObject->ArticleMove(
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
-            UserID    => $Param{UserID},
-        );
-        if ( !$Success ) {
-            return $Self->_Error(
-                Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article",
-            );
-        }
-    }
-
     # check if we have to update the TimeUnit
     if ( IsStringWithData($Article->{TimeUnit}) ) {
-
         # delete old time account values
-        my $DeleteSuccess = $TicketObject->TicketAccountedTimeDelete(
+        my $DeleteSuccess = $Kernel::OM->Get('Ticket')->TicketAccountedTimeDelete(
             TicketID  => $Param{TicketID},
             ArticleID => $Param{ArticleID},
         );
-
         if ( !$DeleteSuccess ) {
             return $Self->_Error(
                 Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article (TimeUnit)",
+                Message      => "Unable to update article (delete current TimeUnit)",
             );
         }
 
         # set new time account value
-        my $UpdateSuccess = $TicketObject->TicketAccountTime(
+        my $UpdateSuccess = $Kernel::OM->Get('Ticket')->TicketAccountTime(
             TicketID  => $Param{TicketID},
             ArticleID => $Param{ArticleID},
             TimeUnit  => $Article->{TimeUnit},
             UserID    => $Param{UserID},
         );
-
         if ( !$UpdateSuccess ) {
             return $Self->_Error(
                 Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article (TimeUnit)",
+                Message      => "Unable to update article (set new TimeUnit)",
             );
         }
     }
 
     # set dynamic fields
-    if ( IsArrayRefWithData($Article->{DynamicFields}) ) {
-
-        DYNAMICFIELD:
-        foreach my $DynamicField ( @{$Article->{DynamicFields}} ) {
-            my $Result = $Self->SetDynamicFieldValue(
-                %{$DynamicField},
-                ArticleID => $Param{ArticleID},
-                UserID    => $Param{UserID},
+    if ( IsArrayRefWithData( $Article->{DynamicFields} ) ) {
+        for my $DynamicField ( @{ $Article->{DynamicFields} } ) {
+            my $Result = $Self->_SetDynamicFieldValue(
+                %{ $DynamicField },
+                ObjectID   => $Param{ArticleID},
+                ObjectType => 'Article',
+                UserID     => $Self->{Authorization}->{UserID},
             );
-
             if ( !$Result->{Success} ) {
                 return $Self->_Error(
                     Code         => 'Object.UnableToUpdate',
@@ -422,91 +486,71 @@ sub _ArticleUpdate {
     );
 }
 
-
-sub _GetBodyRichtext {
+sub _GetRichtextData {
     my ( $Self, %Param ) = @_;
 
-    my $BodyRichtext = q{};
+    # init result variables with plain text values
+    my $RichtextBody        = $Param{Article}->{Body};
+    my $RichtextContentType = $Param{Article}->{ContentType};
 
-    my %AttachmentIndex = $Self->{TicketObject}->ArticleAttachmentIndex(
+    # get attachment index
+    my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
         Article                    => $Param{Article},
         ArticleID                  => $Param{Article}->{ArticleID},
         StripPlainBodyAsAttachment => 2,
         UserID                     => $Param{UserID},
     );
-
-    if (IsHashRefWithData(\%AttachmentIndex)) {
+    if ( IsHashRefWithData( \%AttachmentIndex ) ) {
         my @InlineAttachments;
 
-        for my $AttachmentID ( keys %AttachmentIndex ) {
+        # process attachments
+        for my $AttachmentID ( keys( %AttachmentIndex ) ) {
+            # skip everything but file-2
+            next if ( $AttachmentIndex{ $AttachmentID }->{Filename} ne 'file-2' );
 
-            # only inline attachments relevant
-            next if (
-                !$AttachmentIndex{ $AttachmentID }->{Disposition}
-                || $AttachmentIndex{ $AttachmentID }->{Disposition} ne 'inline'
+            # get attachment data
+            my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                ArticleID    => $Param{Article}->{ArticleID},
+                AttachmentID => $AttachmentID,
+                UserID       => $Param{UserID},
             );
 
-            if ( $AttachmentIndex{$AttachmentID}->{Filename} eq 'file-2') {
-                my %Attachment = $Self->{TicketObject}->ArticleAttachment(
-                    ArticleID => $Param{Article}->{ArticleID},
-                    FileID    => $AttachmentID,
-                    UserID    => $Param{UserID},
+            if ( IsHashRefWithData( \%Attachment ) ) {
+                # prepare content for encoding
+                my $Charset = $Attachment{ContentType} || q{};
+                $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+                $Charset =~ s/"|'//g;
+                $Charset =~ s/(.+?);.*/$1/g;
+
+                # convert html body to correct charset
+                my $Body = $Kernel::OM->Get('Kernel::System::Encode')->Convert(
+                    Text  => $Attachment{Content},
+                    From  => $Charset,
+                    To    => 'utf-8',
+                    Check => 1,
                 );
 
-                if (IsHashRefWithData(\%Attachment)) {
-                    my $Charset = $Attachment{ContentType} || q{};
-                    $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
-                    $Charset =~ s/"|'//g;
-                    $Charset =~ s/(.+?);.*/$1/g;
-
-                    # convert html body to correct charset
-                    my $Body = $Kernel::OM->Get('Kernel::System::Encode')->Convert(
-                        Text  => $Attachment{Content},
-                        From  => $Charset,
-                        To    => 'utf-8',
-                        Check => 1,
-                    );
-
-                    # add url quoting
-                    $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
-                        String => $Body,
-                    );
-
-                    # strip head, body and meta elements
-                    $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStrip(
-                        String => $Body,
-                    );
-                    $BodyRichtext = $Body;
-                }
-            } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
-                my %Attachment = $Self->{TicketObject}->ArticleAttachment(
-                    ArticleID => $Param{Article}->{ArticleID},
-                    FileID    => $AttachmentID,
-                    UserID    => $Param{UserID},
+                # add url quoting
+                $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->LinkQuote(
+                    String => $Body,
                 );
-                if (IsHashRefWithData(\%Attachment)) {
-                    push(@InlineAttachments, \%Attachment);
-                }
-            }
-        }
 
-        if ($BodyRichtext && scalar @InlineAttachments) {
-            for my $Attachment ( @InlineAttachments ) {
-                my $Content = MIME::Base64::encode_base64( $Attachment->{Content} );
+                # strip head, body and meta elements
+                $Body = $Kernel::OM->Get('Kernel::System::HTMLUtils')->DocumentStrip(
+                    String => $Body,
+                );
 
-                my $ContentType = $Attachment->{ContentType};
-                $ContentType =~ s/"/\'/g;
+                # set richtext parameter
+                $RichtextBody        = $Body;
+                $RichtextContentType = $Attachment{ContentType};
 
-                my $ReplaceString = "data:$ContentType;base64,$Content";
-
-                # remove < and > arround id (eg. <123456> ==> 1323456)
-                my $ContentID = substr($Attachment->{ContentID}, 1, -1);
-                $BodyRichtext =~ s/cid:$ContentID/$ReplaceString/g;
+                # preparation is done
+                last;
             }
         }
     }
 
-    return $BodyRichtext;
+    return ( $RichtextBody, $RichtextContentType );
 }
 
 1;

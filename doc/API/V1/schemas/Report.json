@@ -9,7 +9,7 @@
          "properties" : {
             "OutputFormats" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "readOnly" : true,
                   "type:" : "string"
                },
@@ -43,7 +43,7 @@
       "Results" : {
          "description" : "added via include \"Results\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_ReportResult_json"
          },
          "readOnly" : true

@@ -1179,10 +1179,10 @@ sub _FulltextCondition {
     my @Array     = split( // , $Value );
     my $SQL       = q{};
     my $Word      = q{};
-    my $Not       = 0;;
+    my $Not       = 0;
 
     # Quoting ESCAPE character backslash
-    my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+    my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
     my $Escape = " ESCAPE '\\'";
     if ( $QuoteBack ) {
         $Escape =~ s/\\/$QuoteBack\\/g;

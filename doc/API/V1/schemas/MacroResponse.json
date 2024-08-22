@@ -83,7 +83,7 @@
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -111,7 +111,7 @@
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true

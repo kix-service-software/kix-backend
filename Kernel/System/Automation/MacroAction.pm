@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -760,6 +760,11 @@ sub MacroActionExecute {
 
         my %Parameters = %{$MacroAction{Parameters} || {}};
 
+        # set defaults - do it now if variables are used as defaults
+        $BackendObject->SetDefaults(
+            Config => \%Parameters
+        );
+
         # replace result variables
         if (IsHashRefWithData($Self->{MacroResults})) {
             $Self->_ReplaceResultVariables(
@@ -1082,6 +1087,7 @@ sub _LoadMacroActionTypeBackend {
 
         # give the macro action backend module it's own config to work with
         $BackendObject->{ModuleConfig} = $Backends->{$Param{Name}};
+        $BackendObject->{Debug}        = $Self->{Debug};
 
         $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}} = $BackendObject;
     }
@@ -1215,6 +1221,9 @@ sub _ExecuteVariableFilters {
                     $JqExpression =~ s/&quot;/"/g;
                     $Value = `echo '$Value' | jq -r '$JqExpression'`;
                     chomp $Value;
+
+                    # special characters must be re-encoded because the result is decoded twice after the system call
+                    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
                 }
                 else {
                     $Kernel::OM->Get('Log')->Log(

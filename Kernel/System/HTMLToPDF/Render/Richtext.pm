@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -63,7 +63,7 @@ sub Run {
     if ( ref $Block->{Value} eq 'ARRAY' ) {
         my @Values;
         for my $Entry ( @{$Param{Data}->{Value}} ) {
-            my %Result = $Self->_ReplacePlaceholders(
+            my %Result = $Self->ReplacePlaceholders(
                 String    => $Entry,
                 UserID    => $Param{UserID},
                 Count     => $Param{Count},
@@ -91,7 +91,7 @@ sub Run {
         $Value = join( ($Block->{Join} // q{ }), @Values);
     }
     else {
-        my %Result = $Self->_ReplacePlaceholders(
+        my %Result = $Self->ReplacePlaceholders(
             String    => $Block->{Value},
             UserID    => $Param{UserID},
             Count     => $Param{Count},

@@ -169,13 +169,24 @@ sub ExportValuePrepare {
             }
         }
     }
+    my $Result;
+    if (
+        defined $Param{Result}
+        && $Param{Result} eq 'DisplayValue'
+    ) {
+        # lookup CI number for given CI ID
+        $Result = $Self->ValueLookup(
+            Value => $Param{Value},
+        );
+    }
+    else {
+        # lookup CI number for given CI ID
+        $Result = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            ConfigItemID => $Param{Value},
+        );
+    }
 
-    # lookup CI number for given CI ID
-    my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
-        ConfigItemID => $Param{Value},
-    );
-
-    return $ConfigItemNumber || q{};
+    return $Result || q{};
 }
 
 =item ImportSearchValuePrepare()

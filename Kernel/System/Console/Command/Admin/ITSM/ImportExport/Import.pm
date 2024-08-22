@@ -104,6 +104,7 @@ sub Run {
         TemplateID    => $TemplateID,
         SourceContent => $SourceContent,
         UserID        => 1,
+        UsageContext  => 'Agent',
     );
 
     if ( !$Result ) {

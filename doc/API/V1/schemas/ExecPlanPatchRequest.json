@@ -38,7 +38,7 @@
             "Event" : {
                "description" : "list of events, e.g. \"TicketCreate\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                }
             },
@@ -49,7 +49,7 @@
             "Weekday" : {
                "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             }

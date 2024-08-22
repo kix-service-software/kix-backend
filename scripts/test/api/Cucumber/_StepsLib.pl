@@ -147,6 +147,7 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
+
                 C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
         }
         $Index++

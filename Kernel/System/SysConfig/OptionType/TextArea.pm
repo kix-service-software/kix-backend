@@ -47,8 +47,8 @@ sub ValidateSetting {
     my ( $Self, %Param ) = @_;
     my $DefaultValue;
 
-    if ( IsHashRefWithData($Param{Setting}) ) {
-        $DefaultValue = $Param{Setting}->{content};
+    if ( IsHashRef($Param{Setting}) ) {
+        $DefaultValue = $Param{Setting}->{content} || '';
     }
     else {
         $DefaultValue = $Param{Setting};

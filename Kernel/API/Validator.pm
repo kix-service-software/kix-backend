@@ -67,10 +67,19 @@ sub new {
             if ( !IsArrayRefWithData( $Self->{Validators}->{$ValidatedAttribute} ) ) {
                 $Self->{Validators}->{$ValidatedAttribute} = [];
             }
+
+            my $Parameters;
+            if ( $ValidatorList->{$Validator}->{Parameters} ) {
+                $Parameters = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $ValidatorList->{$Validator}->{Parameters}
+                );
+            }
+
             push @{$Self->{Validators}->{$ValidatedAttribute}}, {
                 BackendObject          => $BackendObject,
                 ConsiderOperationRegEx => $ValidatorList->{$Validator}->{ConsiderOperationRegEx},
-                IgnoreOperationRegEx   => $ValidatorList->{$Validator}->{IgnoreOperationRegEx}
+                IgnoreOperationRegEx   => $ValidatorList->{$Validator}->{IgnoreOperationRegEx},
+                Parameters             => $Parameters
             };
         }
     }
@@ -185,6 +194,7 @@ sub _ValidateAttribute {
                 Attribute        => $Param{Attribute},
                 ParentAttribute  => $Param{ParentAttribute},
                 Operation        => $Param{Operation},
+                Parameters       => $Validator->{Parameters},
                 Data             => {
                     $Param{Attribute} => $Value
                 }

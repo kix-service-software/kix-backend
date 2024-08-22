@@ -171,672 +171,664 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             Value => "Kernel::System::Ticket::Number::$NumberModule",
         );
 
-        # use different storage backends
-        for my $StorageModule (qw(ArticleStorageDB ArticleStorageFS)) {
+        # Recreate Ticket object for every loop.
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+
+        # add rand postmaster filter
+        my $FilterRand1 = 'filter' . $Helper->GetRandomID();
+        my $FilterRand2 = 'filter' . $Helper->GetRandomID();
+        my $FilterRand3 = 'filter' . $Helper->GetRandomID();
+        my $FilterRand4 = 'filter' . $Helper->GetRandomID();
+        $PostMasterFilter->FilterAdd(
+            Name           => $FilterRand1,
+            StopAfterMatch => 0,
+            ValidID        => 1,
+            UserID         => 1,
+            Match          => {
+                Subject => 'test',
+                To      => 'EMAILADDRESS:darthvader@test.org',
+            },
+            Set => {
+                'X-KIX-Queue'        => 'Service Desk',
+                'X-KIX-TicketKey1'   => 'Key1',
+                'X-KIX-TicketValue1' => 'Text1',
+            },
+        );
+        $PostMasterFilter->FilterAdd(
+            Name           => $FilterRand2,
+            StopAfterMatch => 0,
+            ValidID        => 1,
+            UserID         => 1,
+            Match          => {
+                Subject => 'test',
+                To      => 'EMAILADDRESS:darthvader2@test.org',
+            },
+            Set => {
+                'X-KIX-TicketKey2'   => 'Key2',
+                'X-KIX-TicketValue2' => 'Text2',
+            },
+        );
+        $PostMasterFilter->FilterAdd(
+            Name           => $FilterRand3,
+            StopAfterMatch => 0,
+            ValidID        => 1,
+            UserID         => 1,
+            Match          => {
+                Subject => 'test 1',
+                To      => 'test.org',
+            },
+            Set => {
+                'X-KIX-TicketKey3'   => 'Key3',
+                'X-KIX-TicketValue3' => 'Text3',
+            },
+        );
+        $PostMasterFilter->FilterAdd(
+            Name           => $FilterRand4,
+            StopAfterMatch => 0,
+            ValidID        => 1,
+            UserID         => 1,
+            Match          => {
+                Subject => 'NOT REGEX',
+                To      => 'darthvader@test.org',
+            },
+            Not => {
+                To => 1,
+            },
+            Set => {
+                'X-KIX-Ignore' => 'yes',
+            },
+        );
+
+        # get rand sender address
+        my $UserRand1 = 'example-user' . $Helper->GetRandomID() . '@example.com';
+
+        FILE:
+        for my $File (qw(1 2 3 5 6 11 17 18 21 22 23)) {
+
+            my $NamePrefix = "#$NumberModule $TicketSubjectConfig $File ";
+
+            # new ticket check
+            my $Location = $Kernel::OM->Get('Config')->Get('Home')
+                . "/scripts/test/system/sample/PostMaster/PostMaster-Test$File.box";
+            my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
+                Location => $Location,
+                Mode     => 'binmode',
+                Result   => 'ARRAY',
+            );
+            my @Content;
+            for my $Line ( @{$ContentRef} ) {
+                if ( $Line =~ /^From:/ ) {
+                    $Line = "From: \"Some Realname\" <$UserRand1>\n";
+                }
+                push @Content, $Line;
+            }
+
+            # follow up check
+            my @ContentNew = ();
+            for my $Line (@Content) {
+                push @ContentNew, $Line;
+            }
+            my @Return;
+
             $Kernel::OM->Get('Config')->Set(
-                Key   => 'Ticket::StorageModule',
-                Value => "Kernel::System::Ticket::$StorageModule",
+                Key   => 'PostmasterDefaultState',
+                Value => 'new'
             );
-
-            # Recreate Ticket object for every loop.
-            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-            # add rand postmaster filter
-            my $FilterRand1 = 'filter' . $Helper->GetRandomID();
-            my $FilterRand2 = 'filter' . $Helper->GetRandomID();
-            my $FilterRand3 = 'filter' . $Helper->GetRandomID();
-            my $FilterRand4 = 'filter' . $Helper->GetRandomID();
-            $PostMasterFilter->FilterAdd(
-                Name           => $FilterRand1,
-                StopAfterMatch => 0,
-                ValidID        => 1,
-                UserID         => 1,
-                Match          => {
-                    Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader@test.org',
-                },
-                Set => {
-                    'X-KIX-Queue'        => 'Service Desk',
-                    'X-KIX-TicketKey1'   => 'Key1',
-                    'X-KIX-TicketValue1' => 'Text1',
-                },
-            );
-            $PostMasterFilter->FilterAdd(
-                Name           => $FilterRand2,
-                StopAfterMatch => 0,
-                ValidID        => 1,
-                UserID         => 1,
-                Match          => {
-                    Subject => 'test',
-                    To      => 'EMAILADDRESS:darthvader2@test.org',
-                },
-                Set => {
-                    'X-KIX-TicketKey2'   => 'Key2',
-                    'X-KIX-TicketValue2' => 'Text2',
-                },
-            );
-            $PostMasterFilter->FilterAdd(
-                Name           => $FilterRand3,
-                StopAfterMatch => 0,
-                ValidID        => 1,
-                UserID         => 1,
-                Match          => {
-                    Subject => 'test 1',
-                    To      => 'test.org',
-                },
-                Set => {
-                    'X-KIX-TicketKey3'   => 'Key3',
-                    'X-KIX-TicketValue3' => 'Text3',
-                },
-            );
-            $PostMasterFilter->FilterAdd(
-                Name           => $FilterRand4,
-                StopAfterMatch => 0,
-                ValidID        => 1,
-                UserID         => 1,
-                Match          => {
-                    Subject => 'NOT REGEX',
-                    To      => 'darthvader@test.org',
-                },
-                Not => {
-                    To => 1,
-                },
-                Set => {
-                    'X-KIX-Ignore' => 'yes',
-                },
-            );
-
-            # get rand sender address
-            my $UserRand1 = 'example-user' . $Helper->GetRandomID() . '@example.com';
-
-            FILE:
-            for my $File (qw(1 2 3 5 6 11 17 18 21 22 23)) {
-
-                my $NamePrefix = "#$NumberModule $StorageModule $TicketSubjectConfig $File ";
-
-                # new ticket check
-                my $Location = $Kernel::OM->Get('Config')->Get('Home')
-                    . "/scripts/test/system/sample/PostMaster/PostMaster-Test$File.box";
-                my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
-                    Location => $Location,
-                    Mode     => 'binmode',
-                    Result   => 'ARRAY',
-                );
-                my @Content;
-                for my $Line ( @{$ContentRef} ) {
-                    if ( $Line =~ /^From:/ ) {
-                        $Line = "From: \"Some Realname\" <$UserRand1>\n";
-                    }
-                    push @Content, $Line;
-                }
-
-                # follow up check
-                my @ContentNew = ();
-                for my $Line (@Content) {
-                    push @ContentNew, $Line;
-                }
-                my @Return;
-
-                $Kernel::OM->Get('Config')->Set(
-                    Key   => 'PostmasterDefaultState',
-                    Value => 'new'
-                );
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                if ( $File != 22 ) {
-                    $Self->Is(
-                        $Return[0] || 0,
-                        1,
-                        $NamePrefix . ' Run() - NewTicket',
-                    );
-
-                    $Self->True(
-                        $Return[1] || 0,
-                        $NamePrefix . ' Run() - NewTicket/TicketID',
-                    );
-                }
-                else {
-                    $Self->Is(
-                        $Return[0] || 0,
-                        5,
-                        $NamePrefix . ' Run() - NewTicket',
-                    );
-
-                    $Self->False(
-                        $Return[1],
-                        $NamePrefix . ' Run() - NewTicket/TicketID',
-                    );
-
-                    next FILE;
-                }
-
-                # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-                my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-                    TicketID      => $Return[1],
-                    DynamicFields => 1,
-                );
-                my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
-                    TicketID => $Return[1],
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
                 );
 
-                if ( $File == 1 ) {
-                    my @Tests = (
-                        {
-                            Key    => 'Queue',
-                            Result => 'Service Desk',
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeKey1',
-                            Result => [ 'Key1' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeText1',
-                            Result => [ 'Text1' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeKey2',
-                            Result => undef,
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeText2',
-                            Result => undef,
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeKey3',
-                            Result => [ 'Key3' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeText3',
-                            Result => [ 'Text3' ],
-                        },
-                    );
-                    for my $Test (@Tests) {
-                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
-                            $Self->IsDeeply(
-                                $Ticket{ $Test->{Key} },
-                                $Test->{Result},
-                                $NamePrefix . " $Test->{Key} check",
-                            );
-                        }
-                        else {
-                            $Self->Is(
-                                $Ticket{ $Test->{Key} },
-                                $Test->{Result},
-                                $NamePrefix . " $Test->{Key} check",
-                            );
-                        }
-                    }
-                }
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
 
-                if ( $File == 3 ) {
-
-                    # check body
-                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                        ArticleID     => $ArticleIDs[0],
-                        DynamicFields => 1,
-                    );
-                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
-                    $Self->Is(
-                        $MD5,
-                        'd89998aae29c79cdadd4666c294028f1',
-                        $NamePrefix . ' md5 body check',
-                    );
-
-                    # check attachments
-                    my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-                        ArticleID => $ArticleIDs[0],
-                        UserID    => 1,
-                    );
-                    my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                        ArticleID => $ArticleIDs[0],
-                        FileID    => 2,
-                        UserID    => 1,
-                    );
-                    $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
-                    $Self->Is(
-                        $MD5,
-                        '4e78ae6bffb120669f50bca56965f552',
-                        $NamePrefix . ' md5 attachment check',
-                    );
-
-                }
-
-                if ( $File == 5 ) {
-
-                    # check body
-                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                        ArticleID     => $ArticleIDs[0],
-                        DynamicFields => 1,
-                    );
-                    my @Tests = (
-                        {
-                            Key    => 'DynamicField_TicketFreeKey1',
-                            Result => [ 'Test' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeText1',
-                            Result => [ 'ABC' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeKey2',
-                            Result => [ 'Test2' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeText2',
-                            Result => [ 'ABC2' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime1',
-                            Result => [ '2008-01-12 13:14:15' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime2',
-                            Result => [ '2008-01-12 13:15:16' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime3',
-                            Result => [ '2008-01-12 13:16:17' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime4',
-                            Result => [ '2008-01-12 13:17:18' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime5',
-                            Result => [ '2008-01-12 13:18:19' ],
-                        },
-                        {
-                            Key    => 'DynamicField_TicketFreeTime6',
-                            Result => [ '2008-01-12 13:19:20' ],
-                        },
-                    );
-                    for my $Test (@Tests) {
-                        if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
-                            $Self->IsDeeply(
-                                $Ticket{ $Test->{Key} },
-                                $Test->{Result},
-                                $NamePrefix . " $Test->{Key} check",
-                            );
-                        }
-                        else {
-                            $Self->Is(
-                                $Ticket{ $Test->{Key} },
-                                $Test->{Result},
-                                $NamePrefix . " $Test->{Key} check",
-                            );
-                        }
-                    }
-                }
-
-                if ( $File == 6 ) {
-
-                    # check body
-                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                        ArticleID     => $ArticleIDs[0],
-                        DynamicFields => 1,
-                    );
-                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
-                    $Self->Is(
-                        $MD5,
-                        'b527ca4a8b9d69df321a04ab429b206d',
-                        $NamePrefix . ' md5 body check',
-                    );
-
-                    # check attachments
-                    my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-                        ArticleID => $ArticleIDs[0],
-                        UserID    => 1,
-                    );
-                    my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                        ArticleID => $ArticleIDs[0],
-                        FileID    => 2,
-                        UserID    => 1,
-                    );
-                    $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
-                    $Self->Is(
-                        $MD5,
-                        '0596f2939525c6bd50fc2b649e40fbb6',
-                        $NamePrefix . ' md5 attachment check',
-                    );
-
-                }
-                if ( $File == 11 ) {
-
-                    # check body
-                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
-                        ArticleID     => $ArticleIDs[0],
-                        DynamicFields => 1,
-                    );
-                    my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
-
-                    $Self->Is(
-                        $MD5,
-                        'aba34ca02b07ab3042817188b6a840e4',
-                        $NamePrefix . ' md5 body check',
-                    );
-                }
-
-                # send follow up #1
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
-                            TicketNumber => $Ticket{TicketNumber},
-                            Subject      => $Line,
-                        );
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                $Kernel::OM->Get('Config')->Set(
-                    Key   => 'PostmasterFollowUpState',
-                    Value => 'new'
-                );
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
+            if ( $File != 22 ) {
                 $Self->Is(
                     $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp',
+                    1,
+                    $NamePrefix . ' Run() - NewTicket',
                 );
+
                 $Self->True(
                     $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-                    TicketID      => $Return[1],
-                    DynamicFields => 1,
-                );
-                $Self->Is(
-                    $Ticket{State} || 0,
-                    'new',
-                    $NamePrefix . ' Run() - FollowUp/State check',
-                );
-                my $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
-                    State    => 'pending reminder',
-                    TicketID => $Return[1],
-                    UserID   => 1,
-                );
-                $Self->True(
-                    $StateSet || 0,
-                    $NamePrefix . ' StateSet() - pending reminder',
-                );
-
-                # send follow up #2
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
-                            TicketNumber => $Ticket{TicketNumber},
-                            Subject      => $Line,
-                        );
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                $Self->Is(
-                    $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp',
-                );
-                $Self->True(
-                    $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                # send follow up #3
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: '
-                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
-                            . ": $Ticket{TicketNumber}";
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                $Self->Is(
-                    $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp (Ticket::Hook#: xxxxxxxxxx)',
-                );
-                $Self->True(
-                    $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                # send follow up #4
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: '
-                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
-                            . ":$Ticket{TicketNumber}";
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                $Self->Is(
-                    $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp (Ticket::Hook#:xxxxxxxxxx)',
-                );
-                $Self->True(
-                    $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                $Kernel::OM->Get('Config')->Set(
-                    Key   => 'PostmasterFollowUpState',
-                    Value => 'open'
-                );
-
-                # send follow up #5
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: '
-                            . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
-                            . $Ticket{TicketNumber};
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                $Self->Is(
-                    $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp (Ticket::Hook#xxxxxxxxxx)',
-                );
-                $Self->True(
-                    $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-                    TicketID      => $Return[1],
-                    DynamicFields => 1,
-                );
-                $Self->Is(
-                    $Ticket{State} || 0,
-                    'open',
-                    $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpState check',
-                );
-                $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
-                    State    => 'closed',
-                    TicketID => $Return[1],
-                    UserID   => 1,
-                );
-                $Self->True(
-                    $StateSet || 0,
-                    $NamePrefix . ' StateSet() - closed',
-                );
-
-                # send follow up #3
-                @Content = ();
-                for my $Line (@ContentNew) {
-                    if ( $Line =~ /^Subject:/ ) {
-                        $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
-                            TicketNumber => $Ticket{TicketNumber},
-                            Subject      => $Line,
-                        );
-                    }
-                    if ( $Line =~ /^(Message-ID:)/i ) {
-                        my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                        my $Random = rand 999999;
-                        my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                        if (IsHashRefWithData($FQDN)) {
-                            $FQDN = $FQDN->{Backend}
-                        }
-                        $Line = "$1 <$Time.$Random\@$FQDN>";
-                    }
-                    push @Content, $Line;
-                }
-                {
-                    my $PostMasterObject = Kernel::System::PostMaster->new(
-                        Email => \@Content,
-                    );
-
-                    @Return = $PostMasterObject->Run();
-                    @Return = @{ $Return[0] || [] };
-                }
-
-                $Self->Is(
-                    $Return[0] || 0,
-                    2,
-                    $NamePrefix . ' Run() - FollowUp',
-                );
-                $Self->True(
-                    $Return[1] || 0,
-                    $NamePrefix . ' Run() - FollowUp/TicketID',
-                );
-
-                # new/clear ticket object
-                $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-                %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-                    TicketID      => $Return[1],
-                    DynamicFields => 1,
-                );
-                $Self->Is(
-                    $Ticket{State} || 0,
-                    'open',
-                    $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpStateClosed check',
-                );
-
-                # delete ticket
-                my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
-                    TicketID => $Return[1],
-                    UserID   => 1,
-                );
-                $Self->True(
-                    $Delete || 0,
-                    $NamePrefix . ' TicketDelete()',
+                    $NamePrefix . ' Run() - NewTicket/TicketID',
                 );
             }
-            $PostMasterFilter->FilterDelete( Name => $FilterRand1 );
-            $PostMasterFilter->FilterDelete( Name => $FilterRand2 );
-            $PostMasterFilter->FilterDelete( Name => $FilterRand3 );
-            $PostMasterFilter->FilterDelete( Name => $FilterRand4 );
+            else {
+                $Self->Is(
+                    $Return[0] || 0,
+                    5,
+                    $NamePrefix . ' Run() - NewTicket',
+                );
+
+                $Self->False(
+                    $Return[1],
+                    $NamePrefix . ' Run() - NewTicket/TicketID',
+                );
+
+                next FILE;
+            }
+
+            # new/clear ticket object
+            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+
+            my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
+            );
+            my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
+                TicketID => $Return[1],
+            );
+
+            if ( $File == 1 ) {
+                my @Tests = (
+                    {
+                        Key    => 'Queue',
+                        Result => 'Service Desk',
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeKey1',
+                        Result => [ 'Key1' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeText1',
+                        Result => [ 'Text1' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeKey2',
+                        Result => undef,
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeText2',
+                        Result => undef,
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeKey3',
+                        Result => [ 'Key3' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeText3',
+                        Result => [ 'Text3' ],
+                    },
+                );
+                for my $Test (@Tests) {
+                    if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
+                        $Self->IsDeeply(
+                            $Ticket{ $Test->{Key} },
+                            $Test->{Result},
+                            $NamePrefix . " $Test->{Key} check",
+                        );
+                    }
+                    else {
+                        $Self->Is(
+                            $Ticket{ $Test->{Key} },
+                            $Test->{Result},
+                            $NamePrefix . " $Test->{Key} check",
+                        );
+                    }
+                }
+            }
+
+            if ( $File == 3 ) {
+
+                # check body
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID     => $ArticleIDs[0],
+                    DynamicFields => 1,
+                );
+                my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
+                $Self->Is(
+                    $MD5,
+                    'd89998aae29c79cdadd4666c294028f1',
+                    $NamePrefix . ' md5 body check',
+                );
+
+                # check attachments
+                my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+                    ArticleID => $ArticleIDs[0],
+                    UserID    => 1,
+                );
+                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                    ArticleID    => $ArticleIDs[0],
+                    AttachmentID => 2,
+                    UserID       => 1,
+                );
+                $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
+                $Self->Is(
+                    $MD5,
+                    '4e78ae6bffb120669f50bca56965f552',
+                    $NamePrefix . ' md5 attachment check',
+                );
+
+            }
+
+            if ( $File == 5 ) {
+
+                # check body
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID     => $ArticleIDs[0],
+                    DynamicFields => 1,
+                );
+                my @Tests = (
+                    {
+                        Key    => 'DynamicField_TicketFreeKey1',
+                        Result => [ 'Test' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeText1',
+                        Result => [ 'ABC' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeKey2',
+                        Result => [ 'Test2' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeText2',
+                        Result => [ 'ABC2' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime1',
+                        Result => [ '2008-01-12 13:14:15' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime2',
+                        Result => [ '2008-01-12 13:15:16' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime3',
+                        Result => [ '2008-01-12 13:16:17' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime4',
+                        Result => [ '2008-01-12 13:17:18' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime5',
+                        Result => [ '2008-01-12 13:18:19' ],
+                    },
+                    {
+                        Key    => 'DynamicField_TicketFreeTime6',
+                        Result => [ '2008-01-12 13:19:20' ],
+                    },
+                );
+                for my $Test (@Tests) {
+                    if ( $Test->{Key} =~ /^DynamicField_/ && $Test->{Result} ) {
+                        $Self->IsDeeply(
+                            $Ticket{ $Test->{Key} },
+                            $Test->{Result},
+                            $NamePrefix . " $Test->{Key} check",
+                        );
+                    }
+                    else {
+                        $Self->Is(
+                            $Ticket{ $Test->{Key} },
+                            $Test->{Result},
+                            $NamePrefix . " $Test->{Key} check",
+                        );
+                    }
+                }
+            }
+
+            if ( $File == 6 ) {
+
+                # check body
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID     => $ArticleIDs[0],
+                    DynamicFields => 1,
+                );
+                my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
+                $Self->Is(
+                    $MD5,
+                    'b527ca4a8b9d69df321a04ab429b206d',
+                    $NamePrefix . ' md5 body check',
+                );
+
+                # check attachments
+                my %Index = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+                    ArticleID => $ArticleIDs[0],
+                    UserID    => 1,
+                );
+                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                    ArticleID    => $ArticleIDs[0],
+                    AttachmentID => 2,
+                    UserID       => 1,
+                );
+                $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
+                $Self->Is(
+                    $MD5,
+                    '0596f2939525c6bd50fc2b649e40fbb6',
+                    $NamePrefix . ' md5 attachment check',
+                );
+
+            }
+            if ( $File == 11 ) {
+
+                # check body
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID     => $ArticleIDs[0],
+                    DynamicFields => 1,
+                );
+                my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Article{Body} ) || '';
+
+                $Self->Is(
+                    $MD5,
+                    'aba34ca02b07ab3042817188b6a840e4',
+                    $NamePrefix . ' md5 body check',
+                );
+            }
+
+            # send follow up #1
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+                        TicketNumber => $Ticket{TicketNumber},
+                        Subject      => $Line,
+                    );
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpState',
+                Value => 'new'
+            );
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            # new/clear ticket object
+            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
+            );
+            $Self->Is(
+                $Ticket{State} || 0,
+                'new',
+                $NamePrefix . ' Run() - FollowUp/State check',
+            );
+            my $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
+                State    => 'pending reminder',
+                TicketID => $Return[1],
+                UserID   => 1,
+            );
+            $Self->True(
+                $StateSet || 0,
+                $NamePrefix . ' StateSet() - pending reminder',
+            );
+
+            # send follow up #2
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+                        TicketNumber => $Ticket{TicketNumber},
+                        Subject      => $Line,
+                    );
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            # send follow up #3
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: '
+                        . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
+                        . ": $Ticket{TicketNumber}";
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp (Ticket::Hook#: xxxxxxxxxx)',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            # send follow up #4
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: '
+                        . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
+                        . ":$Ticket{TicketNumber}";
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp (Ticket::Hook#:xxxxxxxxxx)',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpState',
+                Value => 'open'
+            );
+
+            # send follow up #5
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: '
+                        . $Kernel::OM->Get('Config')->Get('Ticket::Hook')
+                        . $Ticket{TicketNumber};
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp (Ticket::Hook#xxxxxxxxxx)',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            # new/clear ticket object
+            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
+            );
+            $Self->Is(
+                $Ticket{State} || 0,
+                'open',
+                $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpState check',
+            );
+            $StateSet = $Kernel::OM->Get('Ticket')->TicketStateSet(
+                State    => 'closed',
+                TicketID => $Return[1],
+                UserID   => 1,
+            );
+            $Self->True(
+                $StateSet || 0,
+                $NamePrefix . ' StateSet() - closed',
+            );
+
+            # send follow up #3
+            @Content = ();
+            for my $Line (@ContentNew) {
+                if ( $Line =~ /^Subject:/ ) {
+                    $Line = 'Subject: ' . $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+                        TicketNumber => $Ticket{TicketNumber},
+                        Subject      => $Line,
+                    );
+                }
+                if ( $Line =~ /^(Message-ID:)/i ) {
+                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+                    my $Random = rand 999999;
+                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+                    if (IsHashRefWithData($FQDN)) {
+                        $FQDN = $FQDN->{Backend}
+                    }
+                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                }
+                push @Content, $Line;
+            }
+            {
+                my $PostMasterObject = Kernel::System::PostMaster->new(
+                    Email => \@Content,
+                );
+
+                @Return = $PostMasterObject->Run();
+                @Return = @{ $Return[0] || [] };
+            }
+
+            $Self->Is(
+                $Return[0] || 0,
+                2,
+                $NamePrefix . ' Run() - FollowUp',
+            );
+            $Self->True(
+                $Return[1] || 0,
+                $NamePrefix . ' Run() - FollowUp/TicketID',
+            );
+
+            # new/clear ticket object
+            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
+            );
+            $Self->Is(
+                $Ticket{State} || 0,
+                'open',
+                $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpStateClosed check',
+            );
+
+            # delete ticket
+            my $Delete = $Kernel::OM->Get('Ticket')->TicketDelete(
+                TicketID => $Return[1],
+                UserID   => 1,
+            );
+            $Self->True(
+                $Delete || 0,
+                $NamePrefix . ' TicketDelete()',
+            );
         }
+        $PostMasterFilter->FilterDelete( Name => $FilterRand1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand2 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand3 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand4 );
     }
 }
 

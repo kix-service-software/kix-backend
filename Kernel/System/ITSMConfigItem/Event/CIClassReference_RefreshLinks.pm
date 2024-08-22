@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -124,7 +124,7 @@ sub Run {
         my %ConfigItemsToAdd;
 
         #-----------------------------------------------------------------------
-        #  delete links most likely created from previous version of this attribute...
+        # delete links most likely created from previous version of this attribute...
         if ( $OldVersionData && %RelAttrOldVersion ) {
             for my $CurrKeyname ( keys(%RelAttrOldVersion) ) {
 
@@ -152,7 +152,7 @@ sub Run {
         }
 
         #-----------------------------------------------------------------------
-        #  create new linkes for attributes if the new version
+        # create new linkes for attributes if the new version
         for my $CurrKeyname ( keys(%RelAttrNewVersion) ) {
 
             $CIReferenceAttrDataRef = $Self->_GetAttributeDataByKey(
@@ -162,7 +162,7 @@ sub Run {
                 Content => 1,    #need the CI-ID, not the shown value
             );
 
-            my $CurrLinkType = $RelAttrOldVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType};
+            my $CurrLinkType = $RelAttrNewVersion{$CurrKeyname}->[0]->{ReferencedCIClassLinkType};
 
             #-----------------------------------------------------------------------
             # create all links from available data...
@@ -171,7 +171,7 @@ sub Run {
                 my @ReferenceCIIDs = @{ $CIReferenceAttrDataRef->{$SearchResult} };
                 for my $CurrCIReferenceID (@ReferenceCIIDs) {
 
-                    #create link between this CI and current CIReference-attribute...
+                    # create link between this CI and current CIReference-attribute...
                     if ( $CurrCIReferenceID && $Param{ConfigItemID} ) {
 
                         if (

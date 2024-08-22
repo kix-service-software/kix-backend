@@ -58,9 +58,7 @@ sub ParameterDefinition {
             Type     => 'HASH',
             Required => 1
         },
-        'UserPreference::Value' => {
-            Required => 1
-        },
+        'UserPreference::Value' => {},
     }
 }
 

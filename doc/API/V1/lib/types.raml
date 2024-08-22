@@ -2,6 +2,12 @@
   AuthRequest: !include ../types/Auth/AuthRequest.raml
   AuthResponse: !include ../types/Auth/AuthResponse.raml
 
+# Certificate
+  CertificateResponse: !include ../types/Certificate/CertificateResponse.raml
+  CertificateCollectionResponse: !include ../types/Certificate/CertificateCollectionResponse.raml
+  CertificatePostRequest: !include ../types/Certificate/CertificatePostRequest.raml
+  CertificatePostResponse: !include ../types/Certificate/CertificatePostResponse.raml
+
 # Channel
   ChannelResponse: !include ../types/Channel/ChannelResponse.raml
   ChannelCollectionResponse: !include ../types/Channel/ChannelCollectionResponse.raml
@@ -44,8 +50,8 @@
   ConfigItemImagePostResponse: !include ../types/ConfigItemImage/ConfigItemImagePostResponse.raml
 
 # ConfigItemLinkGraph
-  ConfigItemLinkGraphPostRequest: !include ../types/Graph/ConfigItemLinkGraphPostRequest.raml
-  ConfigItemLinkGraphPostResponse: !include ../types/Graph/ConfigItemLinkGraphPostResponse.raml
+  ConfigItemLinkGraphPostRequest: !include ../types/ConfigItemLinkGraph/ConfigItemLinkGraphPostRequest.raml
+  ConfigItemLinkGraphPostResponse: !include ../types/ConfigItemLinkGraph/ConfigItemLinkGraphPostResponse.raml
 
 # ConfigItemVersion
   ConfigItemVersionResponse: !include ../types/ConfigItemVersion/ConfigItemVersionResponse.raml
@@ -67,7 +73,7 @@
   ContactPostPatchResponse: !include ../types/Contact/ContactPostPatchResponse.raml
 
 # Counter
-  CounterResponse: !include ../types/Auth/CounterResponse.raml
+  CounterResponse: !include ../types/Counter/CounterResponse.raml
 
 # DataSource
   DataSourceResponse: !include ../types/DataSource/DataSourceResponse.raml
@@ -245,6 +251,9 @@
   MailFilterPostRequest: !include ../types/MailFilter/MailFilterPostRequest.raml
   MailFilterPatchRequest: !include ../types/MailFilter/MailFilterPatchRequest.raml
   MailFilterPostPatchResponse: !include ../types/MailFilter/MailFilterPostPatchResponse.raml
+
+# MarkObjectAsSeen
+  MarkObjectAsSeenPostRequest: !include ../types/MarkObjectAsSeen/MarkObjectAsSeenPostRequest.raml
 
 # Notification
   NotificationResponse: !include ../types/Notification/NotificationResponse.raml

@@ -2106,7 +2106,7 @@ sub Export {
     my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
-    for my $Argument (qw(TemplateID UserID)) {
+    for my $Argument (qw(TemplateID UserID UsageContext)) {
         if ( !$Param{$Argument} ) {
             $LogObject->Log(
                 Priority => 'error',
@@ -2158,8 +2158,9 @@ sub Export {
 
     # get export data
     my $ExportData = $ObjectBackend->ExportDataGet(
-        TemplateID => $Param{TemplateID},
-        UserID     => $Param{UserID},
+        TemplateID   => $Param{TemplateID},
+        UserID       => $Param{UserID},
+        UsageContext => $Param{UsageContext},
     );
 
     # get format data
@@ -2261,6 +2262,7 @@ import function
         TemplateID    => 123,
         SourceContent => $StringRef,  # (optional)
         UserID        => 1,
+        UsageContext  => 'Agent',
     );
 
 =cut
@@ -2272,7 +2274,7 @@ sub Import {
     my $LogObject = $Kernel::OM->Get('Log');
 
     # check needed stuff
-    for my $Argument (qw(TemplateID UserID)) {
+    for my $Argument (qw(TemplateID UserID UsageContext)) {
         if ( !$Param{$Argument} ) {
             $LogObject->Log(
                 Priority => 'error',
@@ -2365,6 +2367,7 @@ sub Import {
             ImportDataRow => $ImportDataRow,
             Counter       => $Result{Counter},
             UserID        => $Param{UserID},
+            UsageContext  => $Param{UsageContext},
         );
 
         if ( !$ID ) {
@@ -2432,7 +2435,7 @@ sub ImportTaskCreate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Argument (qw(TemplateID SourceContent UserID)) {
+    for my $Argument (qw(TemplateID SourceContent UserID UsageContext)) {
         if ( !$Param{$Argument} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2474,7 +2477,8 @@ sub ImportTaskCreate {
             Params   => {
                 TemplateID    => $Param{TemplateID},
                 SourceContent => \$FileContent,
-                UserID        => $Param{UserID}
+                UserID        => $Param{UserID},
+                UsageContext  => $Param{UsageContext},
             },
         }
     );

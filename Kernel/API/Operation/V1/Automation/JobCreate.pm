@@ -68,6 +68,9 @@ sub ParameterDefinition {
         'Job::Name' => {
             Required => 1
         },
+        'Job::SortOrder::Field' => {
+            RequiredIf => ['Job::SortOrder']
+        },
     }
 }
 
@@ -129,6 +132,7 @@ sub Run {
         Type           => $Job->{Type},
         IsAsynchronous => $Job->{IsAsynchronous},
         Filter         => $Job->{Filter},
+        SortOrder      => $Job->{SortOrder},
         Comment        => $Job->{Comment} || '',
         ValidID        => $Job->{ValidID} || 1,
         UserID         => $Self->{Authorization}->{UserID}

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -19,6 +19,7 @@ use MIME::QuotedPrint;
 use MIME::Base64;
 use MIME::Words qw(:all);
 use Email::Address::XS;
+use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
 
@@ -80,26 +81,61 @@ sub new {
     # if email is given
     if ( $Param{Email} ) {
 
-        # check if Email is an array ref
+        my @Email;
+        # check if Email is an scalar ref
         if ( ref $Param{Email} eq 'SCALAR' ) {
-            my @Content = split /\n/, ${ $Param{Email} };
+            my @Content = split( /\n/, ${ $Param{Email} } );
             for my $Line (@Content) {
                 $Line .= "\n";
             }
-            $Param{Email} = \@Content;
+            @Email = @Content;
         }
 
-        # check if Email is an array ref
-        if ( ref $Param{Email} eq '' ) {
-            my @Content = split /\n/, $Param{Email};
+        # check if Email is not an ref
+        elsif ( ref $Param{Email} eq q{} ) {
+            my @Content = split( /\n/, $Param{Email} );
             for my $Line (@Content) {
                 $Line .= "\n";
             }
-            $Param{Email} = \@Content;
+            @Email = @Content;
+        }
+        else {
+            @Email = @{$Param{Email}}
         }
 
+        if ( !$Param{NoDecrypt} ) {
+            # decrypt email if needed
+            my $DecryptedRef = $Kernel::OM->Get('Certificate')->Decrypt(
+                Content => \@Email,
+                Type    => 'Email'
+            );
+
+            if ( IsHashRefWithData($DecryptedRef) ) {
+                $Self->{Decrypt} = $DecryptedRef->{Flags};
+                @Email = @{$DecryptedRef->{Content}};
+                $Self->{DecryptErr} = !$DecryptedRef->{Successful};
+            }
+            elsif ( !$DecryptedRef ) {
+                # sets DecryptErr to 1 if a decryption problem exists
+                # Can be queried as WHAT in GetParam.
+                $Self->{DecryptErr} = 1;
+            }
+        }
+
+        if ( !$Param{NoVerify} ) {
+            # verify email if needed
+            my $VerifyRef = $Kernel::OM->Get('Certificate')->Verify(
+                Type    => 'Email',
+                Content => \@Email
+            );
+
+            if ( IsHashRefWithData($VerifyRef) ) {
+                $Self->{Verify} = $VerifyRef->{Flags};
+                @Email = @{$VerifyRef->{Content}};
+            }
+        }
         # create Mail::Internet object
-        $Self->{Email} = Mail::Internet->new( $Param{Email} );
+        $Self->{Email} = Mail::Internet->new( \@Email );
 
         # create a Mail::Header object with email
         $Self->{HeaderObject} = $Self->{Email}->head();
@@ -165,9 +201,21 @@ sub GetParam {
         return;
     }
 
+    # First we need to check Decrypt and Verify
+    # since these values are not part of the header object
+    if ( $What =~ /^(Decrypt|Verify)$/ ) {
+        return $Self->{$What} || q{};
+    }
+
+    # Return boolean if a decryption problem exists
+    # Is required in the PostMaster
+    if ( $What eq 'DecryptErr' ) {
+        return $Self->{$What} || 0;
+    }
+
     $Self->{HeaderObject}->unfold();
     $Self->{HeaderObject}->combine($What);
-    my $Line = $Self->{HeaderObject}->get($What) || '';
+    my $Line = $Self->{HeaderObject}->get($What) || q{};
     chomp($Line);
     my $ReturnLine;
 
@@ -179,7 +227,7 @@ sub GetParam {
             $Address->phrase( $Self->_DecodeString( String => $Address->phrase() ) );
             $Address->address( $Self->_DecodeString( String => $Address->address() ) );
             $Address->comment( $Self->_DecodeString( String => $Address->comment() ) );
-            $ReturnLine .= ', ' if $ReturnLine;
+            $ReturnLine .= q{, } if $ReturnLine;
             $ReturnLine .= $Address->format();
         }
     }
@@ -187,7 +235,7 @@ sub GetParam {
         $ReturnLine = $Self->_DecodeString( String => $Line );
     }
 
-    $ReturnLine //= '';
+    $ReturnLine //= q{};
 
     # debug
     if ( $Self->{Debug} > 1 ) {
@@ -198,6 +246,42 @@ sub GetParam {
     }
 
     return $ReturnLine;
+}
+
+=item GetEmailHead()
+
+To get the senders email address back.
+
+    my $HeadRef = $ParserObject->GetEmailHead();
+
+=cut
+
+sub GetEmailHead {
+    my ( $Self, %Param ) = @_;
+
+    if ( !$Self->{Email} ) {
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Email is needed!',
+        );
+        return;
+    }
+
+    my $Head = $Self->{Email}->head();
+
+    if ( $Param{NoSMIMEContent} ) {
+        $Head->delete('MIME-Version');
+        $Head->delete('Content-Type');
+        $Head->delete('Content-Disposition');
+        $Head->delete('Content-Description');
+        $Head->delete('Content-Transfer-Encoding');
+    }
+
+    my @NewHeader = map { "$_\n" } split( /\n/, $Head->as_string());
+
+    # return email header
+    return \@NewHeader;
 }
 
 =item GetEmailAddress()
@@ -213,7 +297,7 @@ To get the senders email address back.
 sub GetEmailAddress {
     my ( $Self, %Param ) = @_;
 
-    my $Email = '';
+    my $Email = q{};
     for my $EmailSplit ( $Self->_MailAddressParse( Email => $Param{Email} ) ) {
         $Email = $EmailSplit->address();
     }
@@ -237,7 +321,7 @@ To get the senders realname back.
 
 sub GetRealname {
     my ( $Self, %Param ) = @_;
-    my $Realname = '';
+    my $Realname = q{};
 
     # find "NamePart, NamePart" <some@example.com> (get not recognized by Email::Address::XS)
     if ( $Param{Email} =~ /"(.+?)"\s+?\<.+?@.+?\..+?\>/ ) {
@@ -335,7 +419,7 @@ sub GetCharset {
 
     # find charset
     $Self->{HeaderObject}->unfold();
-    my $Line = $Self->{HeaderObject}->get('Content-Type') || '';
+    my $Line = $Self->{HeaderObject}->get('Content-Type') || q{};
     chomp $Line;
     my %Data = $Self->GetContentTypeParams( ContentType => $Line );
 
@@ -354,10 +438,10 @@ sub GetCharset {
         }
 
         # remember charset
-        $Self->{Charset} = '';
+        $Self->{Charset} = q{};
 
         # return charset
-        return '';
+        return q{};
     }
 
     # return charset if it can be detected
@@ -467,7 +551,7 @@ sub GetMessageBody {
                 Message  => 'It\'s a plain (not mime) email!',
             );
         }
-        my $BodyStrg = join( '', @{ $Self->{Email}->body() } );
+        my $BodyStrg = join( q{}, @{ $Self->{Email}->body() } );
 
         # quoted printable!
         if ( $Self->GetParam( WHAT => 'Content-Transfer-Encoding' ) =~ /quoted-printable/i ) {
@@ -558,7 +642,7 @@ sub GetMessageBody {
             # return empty attachment
             $Self->{Charset}     = 'iso-8859-1';
             $Self->{ContentType} = 'text/plain';
-            return '-';
+            return q{-};
         }
     }
 
@@ -611,8 +695,8 @@ sub PartsAttachments {
     my $Part               = $Param{Part}               || $Self->{ParserParts};
     my $PartCounter        = $Param{PartCounter}        || 0;
     my $SubPartCounter     = $Param{SubPartCounter}     || 0;
-    my $ContentAlternative = $Param{ContentAlternative} || '';
-    my $ContentMixed       = $Param{ContentMixed}       || '';
+    my $ContentAlternative = $Param{ContentAlternative} || q{};
+    my $ContentMixed       = $Param{ContentMixed}       || q{};
     $Self->{PartCounter}++;
     if ( $Part->parts() > 0 ) {
 
@@ -666,7 +750,7 @@ sub PartsAttachments {
         $PartData{Charset} = $Data{Charset};
     }
     else {
-        $PartData{Charset} = '';
+        $PartData{Charset} = q{};
     }
 
     # get content (if possible)
@@ -706,7 +790,7 @@ sub PartsAttachments {
             }
         }
         else {
-            $PartData{Charset} = '';
+            $PartData{Charset} = q{};
         }
 
         # check if reserved filename file-1 or file-2 is already used
@@ -731,7 +815,7 @@ sub PartsAttachments {
             $Subject = substr( $Subject, 0, 246 );
         }
 
-        if ( $Subject eq '' ) {
+        if ( $Subject eq q{} ) {
             $Self->{NoFilenamePartCounter}++;
             $Subject = "Unbenannt-$Self->{NoFilenamePartCounter}";
         }
@@ -978,12 +1062,12 @@ sub _DecodeString {
     my $BufferedString;
     my $PrevEncoding;
 
-    $BufferedString = '';
+    $BufferedString = q{};
 
     # call MIME::Words::decode_mimewords()
     for my $Entry ( decode_mimewords( $Param{String} ) ) {
         if (
-            $BufferedString ne ''
+            $BufferedString ne q{}
             && ( !$PrevEncoding || !$Entry->[1] || lc($PrevEncoding) ne lc( $Entry->[1] ) )
             )
         {
@@ -995,13 +1079,13 @@ sub _DecodeString {
                 From  => $Encoding,
                 Check => 1,
             );
-            $BufferedString = '';
+            $BufferedString = q{};
         }
         $BufferedString .= $Entry->[0];
         $PrevEncoding = $Entry->[1];
     }
 
-    if ( $BufferedString ne '' ) {
+    if ( $BufferedString ne q{} ) {
         my $Encoding = $EncodeObject->FindAsciiSupersetEncoding(
             Encodings => [ $PrevEncoding, $Param{Encode}, $Self->GetCharset() ],
         );

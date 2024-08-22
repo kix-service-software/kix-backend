@@ -1,0 +1,13 @@
+{
+    "Certificate": {
+        "File": {
+            "Content": "base64 coded file content",
+            "ContentType": "application/x-pem-file",
+            "Filename": "somename.pem",
+            "Filesize": 2122
+        },
+        "Type": "Cert",
+        "CType": "SMIME",
+        "Passphrase": "some secret"
+    }
+}

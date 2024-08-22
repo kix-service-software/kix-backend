@@ -148,20 +148,20 @@ sub Run {
         $Self->{Data}->{QueueIDs} = [ $Self->QueueCreate( $Self->GetOption('queues')) ];
     }
 
-    # customer users
-    if ( !$Self->GetOption('contacts') ) {
-        $Self->{Data}->{ContactIDs} = [ $Self->ContactGet() ];
-    }
-    else {
-        $Self->{Data}->{ContactIDs} = [ $Self->ContactCreate( $Self->GetOption('contacts') ) ];
-    }
-
     # customer companies
     if ( !$Self->GetOption('organisations') ) {
         $Self->{Data}->{OrganisationIDs} = [ $Self->OrganisationGet() ];
     }
     else {
         $Self->{Data}->{OrganisationIDs} = [ $Self->OrganisationCreate( $Self->GetOption('organisations') ) ];
+    }
+
+    # customer users
+    if ( !$Self->GetOption('contacts') ) {
+        $Self->{Data}->{ContactIDs} = [ $Self->ContactGet() ];
+    }
+    else {
+        $Self->{Data}->{ContactIDs} = [ $Self->ContactCreate( $Self->GetOption('contacts') ) ];
     }
 
     if ( $Self->GetOption('tickets') ) {

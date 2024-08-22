@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2024-4-18 08:16+0000\n"
+"POT-Creation-Date: 2024-8-16 04:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -623,10 +623,6 @@ msgid "Ticket Agent (Servicedesk)"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Ticket Agent (w/o teams)"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent Base Permission"
 msgstr ""
 
@@ -1223,6 +1219,10 @@ msgid "DoNotSendEmail"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "Dynamic Fields"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "From"
 msgstr ""
 
@@ -1260,6 +1260,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "The ID of the new article."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
+msgid "The dynamic fields of the new article."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
@@ -1304,6 +1308,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Dynamic Field Value"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
+msgid "Object ID"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
@@ -1423,11 +1431,11 @@ msgid "(Optional) The pending time in seconds. Will be added to the actual time 
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Creates an ticket."
+msgid "Article Dynamic Fields"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Dynamic Fields"
+msgid "Creates an ticket."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1508,6 +1516,10 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
 msgid "The title of the new ticket and subject of the first article."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
+msgid "Ticket Dynamic Fields"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
@@ -1744,10 +1756,6 @@ msgstr ""
 
 #. Perl Module: update/build-1455.pl
 msgid "System State"
-msgstr ""
-
-#. Perl Module: update/build-1507.pl
-msgid "allows basic ticket access, but requires team specific roles"
 msgstr ""
 
 #. Perl Module: update/build-1507.pl
@@ -2191,10 +2199,6 @@ msgid "300 (Beginner)"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Activates lost password feature for agents, in the agent interface."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Additional and extended TextModule methods."
 msgstr ""
 
@@ -2295,6 +2299,10 @@ msgid "Alternative to"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Article"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
 msgstr ""
 
@@ -2320,10 +2328,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "CSV"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Cache time in seconds for the SSL certificate attributes."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2368,10 +2372,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Configure any additional readonly mirror databases that you want to use."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Configure your own log text for PGP."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2475,15 +2475,7 @@ msgid "Defines if CSV-mappings are re-created on next package reinstallation or 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines if agents should be allowed to login if they have no shared secret stored in their preferences and therefore are not using two-factor authentication."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines if the new FAQ-article is linked with the source ticket."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines if the previously valid token should be accepted for authentication. This is slightly less secure but gives users 30 seconds more time to enter their one-time password."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2499,10 +2491,6 @@ msgid "Defines the address of a dedicated DNS server, if necessary, for the \"Ch
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the agent preferences key where the shared secret key is stored."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the allowed content types for file uploads (attachments) as RegEx pattern."
 msgstr ""
 
@@ -2512,14 +2500,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the auth modules and their order of execution."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the body text for notification mails sent to agents, about new password (after using this link the new password will be sent)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the body text for notification mails sent to agents, with token about new requested password (after using this link the new password will be sent)."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2651,6 +2631,10 @@ msgid "Defines the module to send emails. \"Sendmail\" directly uses the sendmai
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the multi factor auth modules and their order of execution."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the name of the application, shown in the web interface, tabs and title bar of the web browser."
 msgstr ""
 
@@ -2727,14 +2711,6 @@ msgid "Defines the path and TTF-File to handle proportional font in PDF document
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the path to PGP binary."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the path to open ssl binary. It may need a HOME env ($ENV{HOME} = '/var/lib/wwwrun';)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the procmail.rc to be used. The rc file will be generated in /tmp."
 msgstr ""
 
@@ -2751,23 +2727,11 @@ msgid "Defines the standard size of PDF pages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the subject for notification mails sent to agents, about new password."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the subject for notification mails sent to agents, with token about new requested password."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the system administrator's email address. It will be displayed in the error screens of the application."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the system identifier. Every ticket number and http session string contains this ID. This ensures that only tickets which belong to your system will be processed as follow-ups (useful when communicating between two instances of KIX)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the two-factor module to authenticate agents."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2871,6 +2835,10 @@ msgid "Enable cache statistics."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Enable certificate debugging."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable client notification debugging."
 msgstr ""
 
@@ -2888,18 +2856,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Enable permission debugging."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enables PGP support. When PGP support is enabled for signing and encrypting mail, it is HIGHLY recommended that the web server runs as the KIX user. Otherwise, there will be problems with the privileges when accessing .gnupg folder."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enables S/MIME support."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Enables fetch S/MIME from Contact backend support."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3087,10 +3043,6 @@ msgid "If the triggering articles to-address is defined as key, only those asset
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "If this option is enabled, then the decrypted data will be stored in the database if they are displayed in AgentTicketZoom."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Includes"
 msgstr ""
 
@@ -3187,10 +3139,6 @@ msgid "Module registration for dynamic field attribute placeholders."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Module to decrypt PGP-encrypted mails before any other processing."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Module to generate ITSM config item statistics."
 msgstr ""
 
@@ -3248,14 +3196,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Out Of Office Substitute"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "PGP Key"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "PGP Key Upload"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3323,10 +3263,6 @@ msgid "Removes relevant caches if assigned objects/configitems mapping is change
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Renew existing SMIME certificates from customer backend. Note: SMIME and SMIME::FetchFromCustomer needs to be active in SysConfig and customer backend needs to be configured to fetch UserSMIMECertificate attribute."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Reprocess mails from spool directory that could not be imported in the first place."
 msgstr ""
 
@@ -3336,14 +3272,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "ResolveDynamicFieldValue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "S/MIME Certificate"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "S/MIME Certificate Upload"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3391,10 +3319,6 @@ msgid "Set this config parameter to \"Yes\", if you want to add a suffix with th
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Set this to yes if you trust in all your public and private pgp keys, even if they are not certified with a trusted signature."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Sets the configuration level of the administrator. Depending on the config level, some sysconfig options will be not shown. The config levels are in in ascending order: Expert, Advanced, Beginner. The higher the config level is (e.g. Beginner is the highest), the less likely is it that the user can accidentally configure the system in a way that it is not usable any more."
 msgstr ""
 
@@ -3416,14 +3340,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Sets the minutes a notification is shown for notice about upcoming system maintenance period."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Sets the options for PGP binary."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Sets the password for private PGP key."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3500,14 +3416,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Sort order for the age of the follow up tickets."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Specifies the directory where SSL certificates are stored."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Specifies the directory where private SSL certificates are stored."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3795,6 +3703,10 @@ msgid "Defines regular expressions individually for each ConfigItem class to che
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid "Defines text attributes that should use encrypted internal values. As key you have to define the class + \":::\" + attribute key to encrypt. As value you have to define a comma separated list of roles that are allowed to read and write this attribute. ATTENTION: Delete the cache after changing this config!"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Defines the backend module used for attachment storage."
 msgstr ""
 
@@ -3967,6 +3879,14 @@ msgid "Object handler registration for data migration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for articles."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for certificates."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for confg items."
 msgstr ""
 
@@ -3979,6 +3899,10 @@ msgid "Defines the backend module that should be used to search for faq articles
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for general catalog items."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for objects."
 msgstr ""
 
@@ -3988,6 +3912,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for tickets."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Enable ObjectSearch debugging."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
@@ -4323,6 +4251,10 @@ msgid "Event module registration. For more performance you can define a trigger 
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Exclude users based on their role id if requested with required permissions (e.g. for owner/responsible assignment)"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Executes follow-up checks on In-Reply-To or References headers for mails that don't have a ticket number in the subject."
 msgstr ""
 
@@ -4467,19 +4399,11 @@ msgid "Module registration for user attribute placeholders such as owner, respon
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to fetch contacts SMIME certificates of incoming messages."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to filter and manipulate incoming messages. Block/ignore all spam email with From: noreply@ address."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module to filter and manipulate incoming messages. Get a 4 digit number to ticket free text, use regex in Match e. g. From =&gt; '(.+?)@.+?', and use () as [***] in Set =&gt;."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Module to filter encrypted bodies of incoming messages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4579,10 +4503,6 @@ msgid "Right"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Saves the attachments of articles. \"DB\" stores all data in the database (not recommended for storing big attachments). \"FS\" stores the data on the filesystem; this is faster but the KIX applications should not be running as root. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when \"FS\" is used."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Selects the ticket number generator module. \"AutoIncrement\" increments the ticket number, the SystemID and the counter are used with SystemID.counter format (e.g. 1010138, 1010139). With \"Date\" the ticket numbers will be generated by the current date, the SystemID and the counter. The format looks like Year.Month.Day.SystemID.counter (e.g. 200206231010138, 200206231010139). With \"DateChecksum\"  the counter will be appended as checksum to the string of date and SystemID. The checksum will be rotated on a daily basis. The format looks like Year.Month.Day.SystemID.Counter.CheckSum (e.g. 2002070110101520, 2002070110101535). \"Random\" generates randomized ticket numbers in the format \"SystemID.Random\" (e.g. 100057866352, 103745394596)."
 msgstr ""
 
@@ -4675,15 +4595,11 @@ msgid "Specifies the ContentType fallback for article attachments."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Specifies the directory to store the data in, if \"FS\" was selected for TicketStorageModule."
+msgid "Specifies the directory to store the article attachment data."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Specifies user id of the postmaster data base."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Specifies whether all storage backends should be checked when looking for attachments. This is only required for installations where some attachments are in the file system, and others in the database."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

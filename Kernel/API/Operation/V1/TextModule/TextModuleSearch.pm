@@ -58,11 +58,11 @@ sub Run {
 
     # prepare search if given
     my %SearchParam;
-    if ( IsArrayRefWithData($Self->{Search}->{TextModule}->{AND}) && !defined $Self->{Search}->{TextModule}->{OR} ) {
+    if ( IsArrayRefWithData($Self->{Search}->{TextModule}->{AND})) {
         foreach my $SearchItem ( @{$Self->{Search}->{TextModule}->{AND}} ) {
             # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
-            next if ($SearchItem->{Field} !~ /^(Name|Category|Language|ValidID)$/g);
-            next if ($SearchItem->{Operator} ne 'EQ');
+            next if ($SearchItem->{Field} !~ /^(Name|Category|Language|ValidID|QueueIDs|TicketTypeIDs|WithDependencies)$/g);
+            next if ($SearchItem->{Operator} ne 'EQ' && $SearchItem->{Operator} ne 'IN');
 
             $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};
         }

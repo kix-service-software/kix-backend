@@ -1532,7 +1532,7 @@ sub GetUnique {
 
 =item GetCombinedList()
 
-returns combined array of two lists
+returns combined array of two lists - value order may be changed
 
     my @CombinedList = $MainObject->GetCombinedList(
         ListA => \@Array,
@@ -1560,6 +1560,48 @@ sub GetCombinedList {
     }
 
     return $Param{Union} ? keys %Union : keys %Isect;
+}
+
+=item GetCombinedListKeepOrder()
+
+returns combined array of two lists and keeps order (ListA is crucial)
+
+    my @CombinedList = $MainObject->GetCombinedListKeepOrder(
+        ListA     => \@Array,
+        ListB     => \@Array,
+        Union     => 0|1                # Default: 0
+    );
+
+    e.g.
+        ListA = [ 1, 2, 3, 4 ]
+        ListB = [ 2, 4, 5 ]
+
+        as union = [1, 2, 3, 4, 5 ]
+        as intersect = [ 2, 4 ]
+
+
+=cut
+
+sub GetCombinedListKeepOrder {
+    my ( $Self, %Param ) = @_;
+
+    my (%Known, @Union, @Isect);
+
+    # switch lists if necessary (last list defines order on intersection)
+    my @List = $Param{Union} ?
+        ( $Self->GetUnique( @{ $Param{ListA} } ), $Self->GetUnique( @{ $Param{ListB} } ) ) :
+        ( $Self->GetUnique( @{ $Param{ListB} } ), $Self->GetUnique( @{ $Param{ListA} } ) );
+
+    for my $E ( @List ) {
+        if($Known{$E}) {
+            push(@Isect,$E);
+        } else {
+            push(@Union,$E);
+            $Known{$E} = 1;
+        }
+    }
+
+    return $Param{Union} ? @Union : @Isect;
 }
 
 =begin Internal:

@@ -218,28 +218,8 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/log/TicketCounter.log</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::StorageModule" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Saves the attachments of articles. "DB" stores all data in the database (not recommended for storing big attachments). "FS" stores the data on the filesystem; this is faster but the KIX applications should not be running as root. You can switch between the modules even on a system that is already in production without any loss of data. Note: Searching for attachment names is not supported when "FS" is used.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option Location="Kernel/System/Ticket/ArticleStorage*.pm" SelectedID="Kernel::System::Ticket::ArticleStorageFS">
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::StorageModule::CheckAllBackends" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Specifies whether all storage backends should be checked when looking for attachments. This is only required for installations where some attachments are in the file system, and others in the database.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::Ticket</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ArticleDir" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Specifies the directory to store the data in, if "FS" was selected for TicketStorageModule.</Description>
+        <Description Translatable="1">Specifies the directory to store the article attachment data.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
@@ -1627,6 +1607,7 @@
                 <Item Key="Unlock" Translatable="1">Unlocked ticket.</Item>
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
                 <Item Key="ArticleDelete" Translatable="1">Article ID %s - %s deleted.</Item>
+                <Item Key="ArticleDynamicFieldUpdate" Translatable="1">Updated: %s=%s;%s=%s;%s=%s;</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2349,28 +2330,6 @@ Thanks for your help!
                 <Item Key="DynamicFieldName">Name_X</Item>
                 <Item Key="SenderType" Translatable="1">system</Item>
                 <Item Key="ArticleType" Translatable="1">note-report</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-DecryptBody" Required="0" Valid="0">
-        <Description Translatable="1">Module to filter encrypted bodies of incoming messages.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::Decrypt</Item>
-                <Item Key="StoreDecryptedBody">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PostMaster::PreFilterModule###000-SMIMEFetchFromCustomer" Required="0" Valid="1">
-        <!-- rkaiser - T#2017020290001194 - changed customer user to contact -->
-        <Description Translatable="1">Module to fetch contacts SMIME certificates of incoming messages.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Core::PostMaster</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::PostMaster::Filter::SMIMEFetchFromCustomer</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3148,6 +3107,15 @@ Thanks for your help!
         <SubGroup>Core::Ticket</SubGroup>
         <Setting>
             <String Regex="">99</String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ExcludeUsersByRoleIDs" Required="0" Valid="0">
+        <Description Translatable="1">Exclude users based on their role id if requested with required permissions (e.g. for owner/responsible assignment)</Description>
+        <Setting>
+            <Array>
+                <Item>1</Item>
+                <Item>2</Item>
+            </Array>
         </Setting>
     </ConfigItem>
 </kix_config>

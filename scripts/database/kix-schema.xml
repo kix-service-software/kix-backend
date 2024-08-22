@@ -899,6 +899,7 @@
     <Column Name="a_body" Required="true" Size="1800000" Type="VARCHAR"/>
     <Column Name="incoming_time" Required="true" Type="INTEGER"/>
     <Column Name="content_path" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="attachment_count" Required="false" Type="INTEGER"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -1001,7 +1002,6 @@
     <Column Name="content_id" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="content_alternative" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="disposition" Required="false" Size="15" Type="VARCHAR"/>
-    <Column Name="content" Required="true" Type="LONGBLOB"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
@@ -1568,7 +1568,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="virtual_fs_id" Required="true" Type="BIGINT"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="350" Type="VARCHAR"/>
+    <Column Name="preferences_value" Required="false" Size="1800000" Type="VARCHAR"/>
     <Index Name="virtual_fs_preferences_virtual_fs_id">
         <IndexColumn Name="virtual_fs_id"/>
     </Index>
@@ -2326,6 +2326,30 @@
     </ForeignKey>
 </Table>
 
+<Table Name="text_module_queue">
+    <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
+    <Column Name="text_module_id" Required="true" Type="INTEGER" />
+    <Column Name="queue_id" Required="true" Type="INTEGER" />
+    <ForeignKey ForeignTable="queue">
+        <Reference Local="queue_id" Foreign="id" />
+    </ForeignKey>
+    <ForeignKey ForeignTable="text_module">
+        <Reference Local="text_module_id" Foreign="id" />
+    </ForeignKey>
+</Table>
+
+<Table Name="text_module_ticket_type">
+    <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
+    <Column Name="text_module_id" Required="true" Type="INTEGER" />
+    <Column Name="ticket_type_id" Required="true" Type="SMALLINT" />
+    <ForeignKey ForeignTable="ticket_type">
+        <Reference Local="ticket_type_id" Foreign="id" />
+    </ForeignKey>
+    <ForeignKey ForeignTable="text_module">
+        <Reference Local="text_module_id" Foreign="id" />
+    </ForeignKey>
+</Table>
+
 <!-- client_registration - api client registration information -->
 <Table Name="client_registration">
     <Column Name="client_id" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true"/>
@@ -2457,6 +2481,7 @@
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
     <Column Name="filter" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="sort_order" Required="false" Size="200" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="is_async" Required="false" Type="INTEGER" Default="0"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>

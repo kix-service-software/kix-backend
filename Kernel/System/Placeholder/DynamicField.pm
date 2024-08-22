@@ -56,7 +56,7 @@ sub _Replace {
     # get all supported object types
     my $ObjectTypes = $Kernel::OM->Get('Config')->Get('DynamicFields::ObjectType') || {};
 
-    for my $ObjectType ( sort keys %{$ObjectTypes}, 'Owner', 'Responsible', 'Current' ) {
+    for my $ObjectType ( sort keys %{$ObjectTypes}, 'Owner', 'Responsible', 'Current', 'FIRST', 'LAST', 'AGENT', 'CUSTOMER' ) {
         my $Tag = $Self->{Start} . 'KIX_'.uc($ObjectType).'_DynamicField_';
 
         # use right tag, but with backward compatibility
@@ -157,6 +157,99 @@ sub _Replace {
                             ObjectType => $ObjectType
                         );
                     }
+                }
+            }
+            elsif ( $ObjectType eq 'Article' ) {
+                $Param{ArticleID} ||= IsHashRefWithData($Param{Data}) ? $Param{Data}->{ArticleID} : undef;
+                $Param{ArticleID} ||= IsHashRefWithData($Param{DataAgent}) ? $Param{DataAgent}->{ArticleID} : undef;
+                if (IsArrayRefWithData($Param{ArticleID})) {
+                    $Param{ArticleID} = $Param{ArticleID}->[0];
+                }
+                if ( $Param{ArticleID} ) {
+                    my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
+                        ArticleID     => $Param{ArticleID},
+                        DynamicFields => 1,
+                        UserID        => $Param{UserID}
+                    );
+                    if (%Article) {
+                        $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                            %Param,
+                            Tag        => $Tag,
+                            Object     => \%Article,
+                            ObjectType => $ObjectType
+                        );
+                    }
+                }
+            }
+
+            # special articles
+            elsif ( $ObjectType eq 'FIRST' && $Param{TicketID} ) {
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleFirstArticle(
+                    TicketID      => $Param{TicketID},
+                    DynamicFields => 1,
+                    UserID        => $Param{UserID}
+                );
+                if (%Article) {
+                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                        %Param,
+                        Tag        => $Tag,
+                        Object     => \%Article,
+                        ObjectType => 'Article'
+                    );
+                }
+            }
+            elsif ( $ObjectType eq 'LAST' && $Param{TicketID} ) {
+                my %Article = $Kernel::OM->Get('Ticket')->ArticleLastArticle(
+                    TicketID      => $Param{TicketID},
+                    DynamicFields => 1,
+                    UserID        => $Param{UserID}
+                );
+                if (%Article) {
+                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                        %Param,
+                        Tag        => $Tag,
+                        Object     => \%Article,
+                        ObjectType => 'Article'
+                    );
+                }
+            }
+            elsif ( $ObjectType eq 'AGENT' && $Param{TicketID} ) {
+                my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
+                    SenderType => 'agent',
+                    TicketID   => $Param{TicketID}
+                );
+                my %Article = @ArticleIDs ? $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID     => $ArticleIDs[-1],
+                    DynamicFields => 1,
+                    UserID        => $Param{UserID}
+                ) : ();
+                if (%Article) {
+                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                        %Param,
+                        Tag        => $Tag,
+                        Object     => \%Article,
+                        ObjectType => 'Article'
+                    );
+                }
+            }
+            elsif ( $ObjectType eq 'CUSTOMER' && $Param{TicketID} ) {
+                my @ArticleIDs = $Kernel::OM->Get('Ticket')->ArticleIndex(
+                    SenderType      => 'external',
+                    CustomerVisible => 1,
+                    TicketID        => $Param{TicketID}
+                );
+                my %Article = @ArticleIDs ? $Kernel::OM->Get('Ticket')->ArticleGet(
+                    ArticleID => $ArticleIDs[-1],
+                    DynamicFields => 1,
+                    UserID        => $Param{UserID}
+                ) : ();
+                if (%Article) {
+                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                        %Param,
+                        Tag        => $Tag,
+                        Object     => \%Article,
+                        ObjectType => 'Article'
+                    );
                 }
             }
 

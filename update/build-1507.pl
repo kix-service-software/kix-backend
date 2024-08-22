@@ -42,11 +42,6 @@ sub _CreateRoles {
 
     my @NewRoles = (
         {
-            Name => 'Ticket Agent (w/o teams)',
-            Comment => Kernel::Language::Translatable('allows basic ticket access, but requires team specific roles'),
-            UsageContext => 1
-        },
-        {
             Name => 'Ticket Agent (Servicedesk)',
             Comment => Kernel::Language::Translatable('allows working on tickets in team "Servicedesk", but requires role "Ticket Agent (w/o teams)" in order to grant access'),
             UsageContext => 1,
@@ -95,126 +90,6 @@ sub _CreateRoles {
             Type   => 'Object',
             Target => '/tickets/*{Ticket.QueueID IN [1,2]}',
             Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/tickets',
-            Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/*',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/locks',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/priorities',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/queues',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/states',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/types',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/communication',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/communication/*',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/communication/channels',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/communication/sendertypes',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/communication/systemaddresses',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/organisations',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/contacts',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/links',
-            Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/textmodules',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{READ}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/system/ticket/queues/*',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Resource',
-            Target => '/tickets',
-            Value  => Kernel::System::Role::Permission::PERMISSION_CRUD
-        },
-        {
-            Role   => 'Ticket Agent (w/o teams)',
-            Type   => 'Object',
-            Target => '/tickets/*{Ticket.QueueID GT 0}',
-            Value  => Kernel::System::Role::Permission::PERMISSION->{NONE}
         },
     );
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,7 @@ package Kernel::System::ImportExport::FormatBackend::CSV;
 
 use strict;
 use warnings;
+use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'ImportExport',
@@ -301,8 +302,14 @@ sub ImportDataGet {
     # have a look at http://bugs.otrs.org/show_bug.cgi?id=9270
     while ( !eof($FH) ) {
         my $Column = $ParseObject->getline($FH);
-        push @ImportData, $Column;
-        $LineCount++;
+        if (
+            IsArrayRefWithData($Column) &&
+            # ignore empty lines
+            (scalar(@{$Column}) != 1 || $Column->[0] ne '')
+        ) {
+            push @ImportData, $Column;
+            $LineCount++;
+        }
     }
 
     # error handling

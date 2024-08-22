@@ -54,7 +54,7 @@ sub GetSupportedAttributes {
         Fulltext => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['LIKE']
         },
     };
 }
@@ -78,44 +78,6 @@ sub Search {
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
-
-    # prepare value for query condition
-    my $Value;
-    my @ORGroups = split(/[|]/smx,$Param{Search}->{Value});
-    for my $Group ( @ORGroups ) {
-        next if !defined $Group;
-        next if $Group eq q{};
-
-        if ( $Value ) {
-            $Value .= q{||};
-        }
-        $Value .= q{(}
-            . $Group
-            . q{)};
-    }
-
-    if ( $Value ) {
-        $Value = q{(}
-            . $Value
-            . q{)};
-    }
-
-    my %SearchMapping = (
-        CONTAINS => {
-            SearchPrefix      => q{*},
-            SearchSuffix      => q{*},
-            NoWildcardReplace => 1
-        },
-        ENDSWITH => {
-            SearchPrefix      => q{*},
-            NoWildcardReplace => 1
-        },
-        STARTSWITH => {
-            SearchSuffix      => q{*},
-            NoWildcardReplace => 1
-        },
-        LIKE => {}
-    );
 
     my @SQLJoin;
     my $UserTable        = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
@@ -155,16 +117,22 @@ sub Search {
         $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaTable;
     }
 
-    my $Condition = $Kernel::OM->Get('DB')->QueryCondition(
-        Key => [
+    # fixed search in the  following columns:
+    # Firstname, Lastname, E-Mail, E-Mail1-5 Title, Phone, Fax, Mobile,
+    # Street, City, Zip and Country
+    # inlcudes related columns of other tables:
+    # table users: Login
+    # table organisation: Number and Name
+    my $Condition = $Self->_FulltextCondition(
+        Columns => [
             'c.firstname', 'c.lastname',
             'c.email','c.email1','c.email2','c.email3','c.email4','c.email5',
             'c.title','c.phone','c.fax','c.mobile',
             'c.street','c.city','c.zip','c.country',
             "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
         ],
-        %{$SearchMapping{$Param{Search}->{Operator}}},
-        Value => $Value
+        Value   => $Param{Search}->{Value},
+        Silent  => $Param{Silent}
     );
 
     return {

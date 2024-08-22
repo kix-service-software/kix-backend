@@ -55,7 +55,7 @@
       "Definitions" : {
          "description" : "added via include \"Definitions\"",
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
          }
       },

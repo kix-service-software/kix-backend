@@ -32,16 +32,13 @@ Kernel::System::ObjectSearch::Database::Ticket::ArticleAttachment - attribute mo
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    my $StorageModule = $Kernel::OM->Get('Config')->Get('Ticket::StorageModule');
-    if ( $StorageModule =~ /::ArticleStorageDB$/ ) {
-        return {
-            AttachmentName => {
-                IsSearchable => 1,
-                IsSortable   => 0,
-                Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
-            }
-        };
-    }
+    return {
+        AttachmentName => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        }
+    };
 
     return {};
 }

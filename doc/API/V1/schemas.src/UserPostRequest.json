@@ -15,7 +15,7 @@
                 },
                 "Preferences": {
                     "type": "array",
-                    "item": {
+                    "items": {
                         "$ref": "UserPreferencePostItem.json"
                     }
                 },
@@ -31,7 +31,7 @@
                 },
                 "RoleIDs": {
                     "type": "array",
-                    "item": {
+                    "items": {
                         "type": "integer"
                     }
                 },

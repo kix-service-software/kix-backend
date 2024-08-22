@@ -48,7 +48,6 @@ Feature: GET request to the /system/roles resource
       | Name                         |
       | Webform Ticket Creator       |
       | Ticket Reader                |
-      | Ticket Agent (w/o teams)     |
       | Ticket Agent (Servicedesk)   |
       | Ticket Agent Base Permission |
       | Ticket Agent                 |
