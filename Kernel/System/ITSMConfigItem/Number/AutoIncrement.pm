@@ -27,17 +27,17 @@ All auto increment config item number functions
 
 =cut
 
-=item _ConfigItemNumberCreate()
+=item ConfigItemNumberCreate()
 
 create a new config item number
 
-    my $Number = $BackendObject->_ConfigItemNumberCreate(
+    my $Number = $ConfigItemObject->ConfigItemNumberCreate(
         ClassID => 123,
     );
 
 =cut
 
-sub _ConfigItemNumberCreate {
+sub ConfigItemNumberCreate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -65,7 +65,7 @@ sub _ConfigItemNumberCreate {
         my $Number = $SystemID . $Param{ClassID} . sprintf( "%06d", ( $CurrentCounter + $Cipher ) );
 
         # find existing number
-        my $Duplicate = $Self->ConfigItemNumberLookup(
+        my $Duplicate = $Self->ConfigItemLookup(
             ConfigItemNumber => $Number,
         );
 
