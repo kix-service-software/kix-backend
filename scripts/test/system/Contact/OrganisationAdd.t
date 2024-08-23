@@ -20,7 +20,8 @@ $Helper->BeginWork();
 
 # create organisation
 my $OrgaID  = _CreateOrganisation(
-    Pattern => [
+    NumberPrefix => 1,
+    Pattern      => [
         'main.*.com',
         '*.org',
         'test.net'
@@ -28,7 +29,8 @@ my $OrgaID  = _CreateOrganisation(
 );
 
 my $OrgaID2 = _CreateOrganisation(
-    Pattern => [
+    NumberPrefix => 2,
+    Pattern      => [
         '*.example.com',
         '*.de',
         '*.org'
@@ -45,6 +47,27 @@ my @Tests = (
         Number => '#01 ',
         Name   => 'Create Contact: without organisation',
         Type   => 'Create',
+        Config => {
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => ''
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
+        },
         Setting => {
             Contact => $Contacts[0]
         },
@@ -61,7 +84,25 @@ my @Tests = (
             Email   => 'text@example.com'
         },
         Config => {
-            'Contact::Organisation::Mapping###MailDomain' => 1
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 1,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => ''
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Result => {
             PrimaryOrganisationID => undef
@@ -72,6 +113,27 @@ my @Tests = (
         Number => '#03 ',
         Name   => 'Update Contact: enable method "MailDomain" (organisation is set)',
         Type   => 'Update',
+        Config => {
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 1,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => ''
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
+        },
         Setting => {
             Contact => $Contacts[0],
             Email => 'text@test.example.com'
@@ -84,6 +146,27 @@ my @Tests = (
         Number => '#04 ',
         Name   => 'Create Contact: enable method "MailDomain" (multiple organisations are set)',
         Type   => 'Create',
+        Config => {
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 1,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => ''
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
+        },
         Setting => {
             Contact => $Contacts[5],
             Email => 'text@example.org'
@@ -91,8 +174,8 @@ my @Tests = (
         Result => {
             PrimaryOrganisationID => $OrgaID->{ID},
             OrganisationIDs       => [
-                $OrgaID2->{ID},
-                $OrgaID->{ID}
+                $OrgaID->{ID},
+                $OrgaID2->{ID}
             ]
         }
     },
@@ -101,7 +184,25 @@ my @Tests = (
         Name   => 'Create Contact: enable method "MailDomain" and "Personal" (organisation is set)',
         Type   => 'Create',
         Config => {
-            'Contact::Organisation::Mapping###Personal' => 1
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 1,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 0,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => ''
+                    },
+                    {
+                        Active => 1,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[1],
@@ -116,8 +217,25 @@ my @Tests = (
         Name   => 'Create Contact: disable method "MailDomain" enable method "Default" (no defined default) and "Personal" (organisation is set)',
         Type   => 'Create',
         Config => {
-            'Contact::Organisation::Mapping###MailDomain' => 0,
-            'Contact::Organisation::Mapping###Default' => 1
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => undef
+                    },
+                    {
+                        Active => 1,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[2],
@@ -133,7 +251,25 @@ my @Tests = (
         Name   => 'Create Contact: disable method "Personal","MailDomain" and enable method "Default" and no defined default (no organisation is set)',
         Type   => 'Create',
         Config => {
-            'Contact::Organisation::Mapping###Personal' => 0,
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => undef
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[3],
@@ -146,10 +282,28 @@ my @Tests = (
     },
     {
         Number => '#08 ',
-        Name   => 'Update Contact: set default organisation as ID (not exists) for method "Personal" (no organisation is set)',
+        Name   => 'Update Contact: set default organisation as ID (not exists) for method "Default" (no organisation is set)',
         Type   => 'Update',
         Config => {
-            'Contact::Organisation::Default' => 100,
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => 100
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[3],
@@ -162,10 +316,28 @@ my @Tests = (
     },
     {
         Number => '#09 ',
-        Name   => 'Update Contact: set default organisation as Number (not exists) for method "Personal" (no organisation is set)',
+        Name   => 'Update Contact: set default organisation as Number (not exists) for method "Default" (no organisation is set)',
         Type   => 'Update',
         Config => {
-            'Contact::Organisation::Default' => 'UT0815',
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => 'UT0815'
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[3],
@@ -178,10 +350,28 @@ my @Tests = (
     },
     {
         Number => '#10 ',
-        Name   => 'Update Contact: set default organisation as Name (not exists) for method "Personal" (no organisation is set)',
+        Name   => 'Update Contact: set default organisation as Name (not exists) for method "Default" (no organisation is set)',
         Type   => 'Update',
         Config => {
-            'Contact::Organisation::Default' => 'Unit Test GmbH',
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => 'Unit Test GmbH'
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[3],
@@ -194,10 +384,28 @@ my @Tests = (
     },
     {
         Number => '#11 ',
-        Name   => 'Update Contact: set default organisation as ID (exists) for method "Personal" (organisation is set)',
+        Name   => 'Update Contact: set default organisation as ID (exists) for method "Default" (organisation is set)',
         Type   => 'Update',
         Config => {
-            'Contact::Organisation::Default' => $OrgaID->{ID},
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => $OrgaID->{ID}
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[3],
@@ -209,10 +417,28 @@ my @Tests = (
     },
     {
         Number => '#12 ',
-        Name   => 'Create Contact: set default organisation as Name (exists) for method "Personal" (organisation is set)',
+        Name   => 'Create Contact: set default organisation as Name (exists) for method "Default" (organisation is set)',
         Type   => 'Create',
         Config => {
-            'Contact::Organisation::Default' => $OrgaID2->{Name},
+            'Contact::EventModulePost###800-AutoAssignOrganisation' => {
+                Module         => 'Kernel::System::Contact::Event::AutoAssignOrganisation',
+                Event          => '(ContactAdd|ContactUpdate)',
+                MappingMethods => [
+                    {
+                        Active => 0,
+                        Method => 'MailDomain'
+                    },
+                    {
+                        Active              => 1,
+                        Method              => 'DefaultOrganisation',
+                        DefaultOrganisation => $OrgaID2->{Name}
+                    },
+                    {
+                        Active => 0,
+                        Method => 'PersonalOrganisation'
+                    }
+                ]
+            }
         },
         Setting => {
             Contact => $Contacts[4],
@@ -340,12 +566,12 @@ for my $Test ( @Tests ) {
             ) {
                 $OrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                     Number => $Test->{Result}->{$Key},
-                    Silent => $Test->{Silent}
+                    Silent => 1
                 );
             }
             $Self->Is(
-                $OrgID,
                 $Contact{$Key},
+                $OrgID,
                 $Test->{Number}
                     . q{ - }
                     . $Test->{Name}
@@ -353,8 +579,8 @@ for my $Test ( @Tests ) {
         }
         if ( $Key eq 'OrganisationIDs' ) {
             $Self->IsDeeply(
-                $Test->{Result}->{$Key},
                 $Contact{$Key},
+                $Test->{Result}->{$Key},
                 $Test->{Number}
                     . q{ - }
                     . $Test->{Name}
@@ -367,7 +593,7 @@ sub _CreateOrganisation {
     my (%Param) = @_;
 
     my $Rand      = $Helper->GetRandomID();
-    my $OrgNumber = 'UT' . $Rand;
+    my $OrgNumber = 'UT' . $Param{NumberPrefix} . $Rand;
     my $OrgName   = 'Unit Test ' . $Rand;
     my $ID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
         Number => $OrgNumber,
