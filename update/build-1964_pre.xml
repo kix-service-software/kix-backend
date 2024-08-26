@@ -5,4 +5,8 @@
         <ColumnAdd Name="attachment_count" Required="false" Type="INTEGER"/>
     </TableAlter>
 
+    <TableAlter Name="article_attachment">
+        <ColumnChange NameOld="content" NameNew="content" Required="false" Type="LONGBLOB"/>
+    </TableAlter>
+
 </database>
