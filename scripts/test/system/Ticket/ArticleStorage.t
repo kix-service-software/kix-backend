@@ -161,6 +161,100 @@ for my $File (
     }
 }
 
+# filename collision checks
+# Store file 2 times
+my $FileName               = "[Terminology Guide äöß].pdf";
+my $Content                = '123';
+my $FileNew                = $FileName;
+my $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+    Content     => $Content,
+    Filename    => $FileNew,
+    ContentType => 'image/png',
+    ArticleID   => $ArticleID,
+    UserID      => 1,
+);
+$Self->True(
+    $ArticleWriteAttachment,
+    "ArticleWriteAttachment() - collision check created $FileNew",
+);
+
+$ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+    Content     => $Content,
+    Filename    => $FileNew,
+    ContentType => 'image/png',
+    ArticleID   => $ArticleID,
+    UserID      => 1,
+);
+$Self->True(
+    $ArticleWriteAttachment,
+    "ArticleWriteAttachment() - collision check created $FileNew second time",
+);
+
+my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
+
+my $TargetFilename = '[Terminology Guide äöß]';
+
+$Self->Is(
+    scalar keys %AttachmentIndex,
+    2,
+    "ArticleWriteAttachment() - collision check number of attachments",
+);
+
+my ($Entry1) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename.pdf" } keys %AttachmentIndex;
+my ($Entry2) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename-1.pdf" } keys %AttachmentIndex;
+
+$Self->IsDeeply(
+    $AttachmentIndex{$Entry1},
+    {
+        'ContentAlternative' => '',
+        'ContentID'          => '',
+        'ContentType'        => 'image/png',
+        'Filename'           => "$TargetFilename.pdf",
+        'Filesize'           => '3 Bytes',
+        'FilesizeRaw'        => '3',
+        'Disposition'        => 'attachment',
+    },
+    "ArticleAttachmentIndex - collision check entry 1",
+);
+
+$Self->IsDeeply(
+    $AttachmentIndex{$Entry2},
+    {
+        'ContentAlternative' => '',
+        'ContentID'          => '',
+        'ContentType'        => 'image/png',
+        'Filename'           => "$TargetFilename-1.pdf",
+        'Filesize'           => '3 Bytes',
+        'FilesizeRaw'        => '3',
+        'Disposition'        => 'attachment',
+    },
+    "ArticleAttachmentIndex - collision check entry 2",
+);
+
+my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
+
+$Self->True(
+    $Delete,
+    "ArticleDeleteAttachment()",
+);
+
+%AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
+
+$Self->IsDeeply(
+    \%AttachmentIndex,
+    {},
+    "ArticleAttachmentIndex() after delete",
+);
+
 # rollback transaction on database
 $Helper->Rollback();
 
