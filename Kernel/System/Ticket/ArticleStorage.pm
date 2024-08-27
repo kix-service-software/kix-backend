@@ -328,14 +328,54 @@ sub ArticleWriteAttachment {
         }
     }
 
-    # get ticket id of article
-    my $TicketID = $Self->ArticleGetTicketID(
-        ArticleID => $Param{ArticleID}
+    # cleanup filename
+    $Param{Filename} =~ s/ /_/g;
+    $Param{Filename} =~ s/^\.//g;
+    $Param{Filename} = $Kernel::OM->Get('Main')->FilenameCleanUp(
+        Filename => $Param{Filename},
+        Type     => 'Local',
     );
 
+    # get attachment index of article
     my %Index = $Self->ArticleAttachmentIndex(
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
+    );
+
+    # map already used filenames
+    my %UsedFile;
+    for my $Key ( keys( %Index ) ) {
+        $UsedFile{ $Index{ $Key }->{Filename} } = 1;
+    }
+
+    # prepare unique filename for article
+    my $Filename  = $Param{Filename};
+    my $Extension = '';
+    if ( $Param{Filename} =~ /^(.*)(\..+?)$/ ) {
+        $Filename  = $1;
+        $Extension = $2;
+    }
+    my $SuffixCounter = 0;
+    while ( $UsedFile{ $Param{Filename} } ) {
+        # increment counter
+        $SuffixCounter += 1;
+
+        # prevent endless loop
+        if ( $SuffixCounter > 1000 ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to prepare unique filename for \"$Filename$Extension\" (ArticleID $Param{ArticleID})!",
+            );
+            return;
+        }
+
+        # prepare new filename
+        $Param{Filename} = $Filename . '-' . $SuffixCounter . $Extension;
+    }
+
+    # get ticket id of article
+    my $TicketID = $Self->ArticleGetTicketID(
+        ArticleID => $Param{ArticleID}
     );
 
     my $Content = $Param{Content} || '';
