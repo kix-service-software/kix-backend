@@ -18,7 +18,7 @@ use Net::LDAP::Util qw(escape_filter_value);
 
 our @ObjectDependencies = (
     'Config',
-    'Encode',
+    'LDAPUtils',
     'Log',
 );
 
@@ -74,8 +74,16 @@ sub Auth {
         return;
     }
 
-    $Param{User} = $Self->_ConvertTo( $Param{User}, $Self->{DestCharset} );
-    $Param{Pw}   = $Self->_ConvertTo( $Param{Pw},   $Self->{DestCharset} );
+    $Param{User} = $Kernel::OM->Get('LDAPUtils')->Convert(
+        Text => $Param{User},
+        From => 'utf-8',
+        To   => $Self->{DestCharset},
+    );
+    $Param{Pw}   = $Kernel::OM->Get('LDAPUtils')->Convert(
+        Text => $Param{Pw},
+        From => 'utf-8',
+        To   => $Self->{DestCharset},
+    );
 
     # get params
     my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
@@ -176,8 +184,11 @@ sub Auth {
                     Priority => 'error',
                     Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
                 );
+
+                # take down session
                 $LDAP->unbind();
                 $LDAP->disconnect();
+
                 return;
             }
         }
@@ -186,8 +197,11 @@ sub Auth {
                 Priority => 'error',
                 Message  => "AuthAttr Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
             );
+
+            # take down session
             $LDAP->unbind();
             $LDAP->disconnect();
+
             return;
         }
     }
@@ -226,8 +240,11 @@ sub Auth {
                     Priority => 'error',
                     Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
                 );
+
+                # take down session
                 $LDAP->unbind();
                 $LDAP->disconnect();
+
                 return;
             }
 
@@ -246,6 +263,7 @@ sub Auth {
                 # take down session
                 $LDAP->unbind();
                 $LDAP->disconnect();
+
                 return;
             }
         }
@@ -260,11 +278,16 @@ sub Auth {
             # take down session
             $LDAP->unbind();
             $LDAP->disconnect();
+
             return;
         }
     }
 
-    $User = $Self->_ConvertTo($User, $Self->{DestCharset});
+    $User = $Kernel::OM->Get('LDAPUtils')->Convert(
+        Text => $User,
+        From => 'utf-8',
+        To   => $Self->{DestCharset},
+    );
 
     # check if user need to be in a group!
     if ( $Self->{AccessAttr} && $Self->{GroupDN} ) {
@@ -300,6 +323,7 @@ sub Auth {
             # take down session
             $LDAP->unbind();
             $LDAP->disconnect();
+
             return;
         }
 
@@ -322,6 +346,7 @@ sub Auth {
             # take down session
             $LDAP->unbind();
             $LDAP->disconnect();
+
             return;
         }
     }
@@ -344,6 +369,7 @@ sub Auth {
         # take down session
         $LDAP->unbind();
         $LDAP->disconnect();
+
         return;
     }
 
@@ -358,48 +384,6 @@ sub Auth {
     $LDAP->disconnect();
 
     return $User;
-}
-
-sub _ConvertTo {
-    my ( $Self, $Text, $Charset ) = @_;
-
-    return if !defined $Text;
-
-    # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Encode');
-
-    if ( !$Charset || !$Self->{DestCharset} ) {
-        $EncodeObject->EncodeInput( \$Text );
-        return $Text;
-    }
-
-    # convert from input charset ($Charset) to directory charset ($Self->{DestCharset})
-    return $EncodeObject->Convert(
-        Text => $Text,
-        From => $Charset,
-        To   => $Self->{DestCharset},
-    );
-}
-
-sub _ConvertFrom {
-    my ( $Self, $Text, $Charset ) = @_;
-
-    return if !defined $Text;
-
-    # get encode object
-    my $EncodeObject = $Kernel::OM->Get('Encode');
-
-    if ( !$Charset || !$Self->{DestCharset} ) {
-        $EncodeObject->EncodeInput( \$Text );
-        return $Text;
-    }
-
-    # convert from directory charset ($Self->{DestCharset}) to input charset ($Charset)
-    return $EncodeObject->Convert(
-        Text => $Text,
-        From => $Self->{DestCharset},
-        To   => $Charset,
-    );
 }
 
 1;
