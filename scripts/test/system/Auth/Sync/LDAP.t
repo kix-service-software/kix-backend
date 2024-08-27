@@ -15,12 +15,23 @@ use utf8;
 use vars (qw($Self));
 
 use Test::Net::LDAP::Util qw(ldap_mockify);
+use MIME::Base64 qw(decode_base64);
 
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 # begin transaction on database
 $Helper->BeginWork();
+
+# prepare data for test image
+my $TestImageBase64 = <<'END';
+/9j/4AAQSkZJRgABAQEAZABkAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYF
+BgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoK
+CgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCAABAAEDASIA
+AhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEB
+AAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AL+AA//Z
+END
+my $TestImage       = decode_base64($TestImageBase64);
 
 # prepare test organisations
 my $OrganisationID1 =  $Kernel::OM->Get('Organisation')->OrganisationAdd(
@@ -79,7 +90,8 @@ my $SyncConfig = {
         'Phone'                 => 'telephoneNumber',
         'Street'                => 'street',
         'Zip'                   => 'postalCode',
-        'Comment'               => 'CONCAT:{sn}, {givenName} / {street}, {postalCode} {l}'
+        'Comment'               => 'CONCAT:{sn}, {givenName} / {street}, {postalCode} {l}',
+        'ImgThumbNail'          => 'TOBASE64:jpegPhoto'
     }
 };
 
@@ -103,7 +115,8 @@ my %TestUsers = (
         ],
         l           => 'Chemnitz',
         postalCode  => '09113',
-        street      => 'Schönherrstr. 8'
+        street      => 'Schönherrstr. 8',
+        jpegPhoto   => $TestImage
     ]
 );
 
@@ -268,6 +281,30 @@ ldap_mockify {
         $Contact{DynamicField_Source},
         [ 'LDAP: top, person, organizationalPerson, inetOrgPerson' ],
         'Contact has correct DynamicField_Source'
+    );
+
+    my $ObjIDs = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
+        Object   => 'Contact',
+        ObjectID => $Contact{ID},
+    );
+    $Self->Is(
+        scalar( @{ $ObjIDs } ),
+        1,
+        'Contact has one icon'
+    );
+
+    my %ObjectIcon = $Kernel::OM->Get('ObjectIcon')->ObjectIconGet(
+        ID => $ObjIDs->[0],
+    );
+    $Self->Is(
+        $ObjectIcon{ContentType},
+        'image/jpeg',
+        'Contact icon has correct ContentType'
+    );
+    $Self->Is(
+        $ObjectIcon{Content},
+        $TestImageBase64,
+        'Contact icon has correct Content'
     );
 };
 
