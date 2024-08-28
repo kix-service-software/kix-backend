@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-8-16 04:48+0000\n"
-"PO-Revision-Date: 2024-08-08 14:39+0000\n"
+"PO-Revision-Date: 2024-08-28 10:39+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -5282,7 +5282,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email"
-msgstr "E-Mail"
+msgstr "Email"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Email sent to \"%s\"."
