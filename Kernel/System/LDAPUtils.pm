@@ -307,23 +307,28 @@ sub ApplyContactMappingToLDAPResult {
                 # do we have to look up organisation id?
                 if ( $Key eq "PrimaryOrganisationID" || $Key eq "OrganisationIDs" ) {
                     my $FoundOrgID;
-                    if ( $AttributeEntry !~ /^SET:/i ) {
-                        $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-                            Number => $Value,
-                            Silent => 1,
-                        );
-                        if ( $FoundOrgID ) {
-                            $Value = $FoundOrgID;
+                    if ( $Value ) {
+                        if ( $AttributeEntry !~ /^SET:/i ) {
+                            $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                Number => $Value,
+                                Silent => 1,
+                            );
+                            if ( $FoundOrgID ) {
+                                $Value = $FoundOrgID;
+                            }
+                        }
+                        if ( !$FoundOrgID ) {
+                            $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                ID     => $Value,
+                                Silent => 1,
+                            );
+                            if ( !$FoundOrgID ) {
+                                $Value = $Param{FallbackUnknownOrgID};
+                            }
                         }
                     }
-                    if ( !$FoundOrgID ) {
-                        $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-                            ID     => $Value,
-                            Silent => 1,
-                        );
-                        if ( !$FoundOrgID ) {
-                            $Value = $Param{FallbackUnknownOrgID};
-                        }
+                    else {
+                        $Value = $Param{FallbackUnknownOrgID};
                     }
                 }
 
