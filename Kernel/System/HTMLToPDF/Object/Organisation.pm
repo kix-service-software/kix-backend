@@ -90,6 +90,9 @@ sub DataGet {
         %Organisation = %{$Param{Data}};
     }
 
+    # Copies the object ID to the IDKey identifier so that the IDKey can be used everywhere
+    $Organisation{OrganisationID} = $Organisation{ID};
+
     my $DynamicFields;
     if ( %Expands ) {
         for my $Expand ( keys %Expands ) {

@@ -62,23 +62,28 @@ sub Run {
 
     if ( ref $Block->{Value} eq 'ARRAY' ) {
         my @Values;
-        for my $Entry ( @{$Param{Data}->{Value}} ) {
+        for my $Entry ( @{$Block->{Value}} ) {
             my %Result = $Self->ReplacePlaceholders(
                 String    => $Entry,
                 UserID    => $Param{UserID},
                 Count     => $Param{Count},
                 Translate => $Block->{Translate},
                 Object    => $Param{Object},
-                Datas     => $Datas
+                Datas     => $Datas,
+                ReplaceAs => $Block->{ReplaceAs} // q{-}
             );
 
             my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                Text     => $Result{Text},
-                $IDKey   => $Param{$IDKey},
-                Data     => {},
-                UserID   => $Param{UserID},
-                RichText => 1
+                Text            => $Result{Text},
+                ObjectType      => $Param{Object},
+                ObjectID        => $Param{$IDKey},
+                Data            => {},
+                UserID          => $Param{UserID},
+                RichText        => 1,
+                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
             );
+
+            next if $TmpValue eq q{};
 
             $TmpValue =~ s{<p>(<img\salt=""\ssrc=".*\"\s\/>)<\/p>}{$1}gsmx;
 
@@ -97,15 +102,18 @@ sub Run {
             Count     => $Param{Count},
             Translate => $Block->{Translate},
             Object    => $Param{Object},
-            Datas     => $Datas
+            Datas     => $Datas,
+            ReplaceAs => $Block->{ReplaceAs} // q{-}
         );
 
         $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-            Text     => $Result{Text},
-            $IDKey   => $Param{$IDKey},
-            Data     => {},
-            UserID   => $Param{UserID},
-            RichText => 1
+            Text       => $Result{Text},
+            ObjectType => $Param{Object},
+            ObjectID   => $Param{$IDKey},
+            Data       => {},
+            UserID     => $Param{UserID},
+            RichText   => 1,
+            ReplaceAs  => $Block->{ReplaceAs} // q{-}
         );
 
         $Value =~ s{<p>(<img\salt=""\ssrc=".*\"\s\/>)<\/p>}{$1}gsmx;

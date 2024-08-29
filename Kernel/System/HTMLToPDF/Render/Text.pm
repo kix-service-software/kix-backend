@@ -70,7 +70,8 @@ sub Run {
                 Count     => $Param{Count},
                 Translate => $Block->{Translate},
                 Object    => $Param{Object},
-                Datas     => $Datas
+                Datas     => $Datas,
+                ReplaceAs => $Block->{ReplaceAs} // q{-}
             );
 
             if ( !$Class ) {
@@ -78,16 +79,20 @@ sub Run {
             }
 
             my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                Text     => $Result{Text},
-                $IDKey   => $Param{$IDKey},
-                Data     => {},
-                UserID   => $Param{UserID},
-                RichText => 1
+                Text            => $Result{Text},
+                ObjectType      => $Param{Object},
+                ObjectID        => $Param{$IDKey},
+                Data            => {},
+                UserID          => $Param{UserID},
+                RichText        => 1,
+                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Block->{Translate} ) {
                 $TmpValue = $LayoutObject->{LanguageObject}->Translate($TmpValue);
             }
+
+            next if ( $TmpValue eq q{} );
 
             push( @Values, $TmpValue);
         }
@@ -100,7 +105,8 @@ sub Run {
             Count     => $Param{Count},
             Translate => $Block->{Translate},
             Object    => $Param{Object},
-            Datas     => $Datas
+            Datas     => $Datas,
+            ReplaceAs => $Block->{ReplaceAs} // q{-}
         );
 
         if ( !$Class ) {
@@ -108,11 +114,13 @@ sub Run {
         }
 
         $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-            Text     => $Result{Text},
-            $IDKey   => $Param{$IDKey},
-            Data     => {},
-            UserID   => $Param{UserID},
-            RichText => 1
+            Text            => $Result{Text},
+            ObjectType      => $Param{Object},
+            ObjectID        => $Param{$IDKey},
+            Data            => {},
+            UserID          => $Param{UserID},
+            RichText        => 1,
+            ReplaceNotFound => $Block->{ReplaceAs} // q{-}
         );
     }
 
