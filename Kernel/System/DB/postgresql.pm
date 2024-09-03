@@ -474,7 +474,7 @@ sub TableAlter {
             push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP DEFAULT";
 
             # remove required
-            push @SQL, "ALTER TABLE $Table ALTER $Tag->{Name} DROP NOT NULL";
+            push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP NOT NULL";
 
             # investigate the default value
             my $Default = '';
