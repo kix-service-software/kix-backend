@@ -392,9 +392,9 @@ sub ArticleWriteAttachment {
     }
 
     my $Disposition;
-    my $Filename;
+    my $FilenamePart;
     if ( $Param{Disposition} ) {
-        ( $Disposition, $Filename ) = split ';', $Param{Disposition};
+        ( $Disposition, $FilenamePart ) = split ';', $Param{Disposition};
     }
     $Disposition //= '';
 

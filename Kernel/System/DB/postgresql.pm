@@ -473,6 +473,9 @@ sub TableAlter {
             # remove possible default
             push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP DEFAULT";
 
+            # remove required
+            push @SQL, "ALTER TABLE $Table ALTER $Tag->{Name} DROP NOT NULL";
+
             # investigate the default value
             my $Default = '';
             if ( $Tag->{Type} =~ /int/i ) {
