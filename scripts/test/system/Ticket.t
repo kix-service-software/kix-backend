@@ -237,13 +237,11 @@ $Self->True(
     'ArticleGet()',
 );
 
-for my $Key (qw( Body Subject From To ReplyTo )) {
+for my $Key (qw( Body Subject From To Cc Bcc ReplyTo )) {
     my $Success = $TicketObject->ArticleUpdate(
         ArticleID => $ArticleID,
-        Key       => $Key,
-        Value     => "New $Key",
+        $Key      => "New $Key",
         UserID    => 1,
-        TicketID  => $TicketID,
     );
     $Self->True(
         $Success,
@@ -259,10 +257,8 @@ for my $Key (qw( Body Subject From To ReplyTo )) {
     # set old value
     $Success = $TicketObject->ArticleUpdate(
         ArticleID => $ArticleID,
-        Key       => $Key,
-        Value     => $Article{$Key},
+        $Key      => $Key,
         UserID    => 1,
-        TicketID  => $TicketID,
     );
 }
 
