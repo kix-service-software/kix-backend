@@ -135,11 +135,9 @@ sub Run {
     ) {
         # set article visible for customer
         my $Success = $Kernel::OM->Get('Ticket')->ArticleUpdate(
-            TicketID  => $Param{Data}->{TicketID},
-            ArticleID => $Param{Data}->{ArticleID},
-            Key       => 'CustomerVisible',
-            Value     => 1,
-            UserID    => 1,
+            ArticleID       => $Param{Data}->{ArticleID},
+            CustomerVisible => 1,
+            UserID          => 1,
         );
         if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(
