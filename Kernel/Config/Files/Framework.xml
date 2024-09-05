@@ -9262,6 +9262,46 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###TicketTeamDuration" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">TicketTeamDuration</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::TicketTeamDuration</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###TicketTeamCount" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">TicketTeamCount</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::TicketTeamCount</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###TicketStateDuration" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">TicketStateDuration</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::TicketStateDuration</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Reporting::DataSource::GenericSQL::OutputHandler###TicketStateCount" Required="0" Valid="1">
+        <Description Translatable="1">Registration of an output handler for reporting data source GenericSQL.</Description>
+        <Group>Reporting</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">TicketStateCount</Item>
+                <Item Key="Module">Kernel::System::Reporting::DataSource::GenericSQL::OutputHandler::TicketStateCount</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="Reporting::OutputFormat###CSV" Required="0" Valid="1">
         <Description Translatable="1">Registration of an output format for reporting.</Description>

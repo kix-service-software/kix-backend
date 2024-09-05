@@ -5379,6 +5379,113 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">9</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Duration in State and Team</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists of tickets with their durations in specified states and teams.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+    "DataSource": {
+        "SQL": {
+            "any": "base64(U0VMRUNUIAogICAgdC50biBBUyAiVGlja2V0TnVtYmVyIiwKICAgIHRvcmcubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwKICAgIHQudGl0bGUgQVMgIlRpdGxlIiwKICAgIHRzLm5hbWUgQVMgIkN1cnJlbnRTdGF0ZSIsCiAgICB0cS5uYW1lIEFTICJDdXJyZW50VGVhbSIsCiAgICB0LmlkIEFTICJTdGF0ZUR1cmF0aW9uTmV3IiwKICAgIHQuaWQgQVMgIlN0YXRlQ291bnROZXciLAogICAgdC5pZCBBUyAiU3RhdGVEdXJhdGlvbk9wZW4iLAogICAgdC5pZCBBUyAiU3RhdGVDb3VudE9wZW4iLAogICAgdC5pZCBBUyAiU3RhdGVEdXJhdGlvblBlbmRpbmdSZW1pbmRlciIsCiAgICB0LmlkIEFTICJTdGF0ZUNvdW50UGVuZGluZ1JlbWluZGVyIiwKICAgIHQuaWQgQVMgIlRlYW1EdXJhdGlvblNlcnZpY2VEZXNrIiwKICAgIHQuaWQgQVMgIlRlYW1Db3VudFNlcnZpY2VEZXNrIgoKRlJPTSB0aWNrZXQgQVMgdApMRUZUIEpPSU4gb3JnYW5pc2F0aW9uIEFTIHRvcmcgT04gdC5vcmdhbmlzYXRpb25faWQgPSB0b3JnLmlkCklOTkVSIEpPSU4gdGlja2V0X3N0YXRlIEFTIHRzIE9OIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKSU5ORVIgSk9JTiBxdWV1ZSBBUyB0cSBPTiB0LnF1ZXVlX2lkID0gdHEuaWQKICAgICAgICAgICAgICAKV0hFUkUgKCAnJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdD8wfScgPSAnMCcgT1IgdC5vcmdhbmlzYXRpb25faWQgSU4gKCR7UGFyYW1ldGVycy5PcmdhbmlzYXRpb25JRExpc3Q / MH0pICkKICBBTkQgKCAnJHtQYXJhbWV0ZXJzLlR5cGVJRExpc3Q / MH0nID0gJzAnIE9SIHQudHlwZV9pZCBJTiAoJHtQYXJhbWV0ZXJzLlR5cGVJRExpc3Q / MH0pICkKICBBTkQgKCAnJHtQYXJhbWV0ZXJzLlN0YXRlSURMaXN0PzB9JyA9ICcwJyBPUiB0LnRpY2tldF9zdGF0ZV9pZCBJTiAoJHtQYXJhbWV0ZXJzLlN0YXRlSURMaXN0PzB9KSApCgpPUkRFUiBCWSB0LnRuOw ==)"
+        },
+        "OutputHandler":[
+            {
+                "States":[
+                    "new ",
+                    "open",
+                    "pending reminder"
+                ],
+                "Columns":[
+                    "StateDurationNew",
+                    "StateDurationOpen",
+                    "StateDurationPendingReminder"
+                ],
+                "Name": "TicketStateDuration"
+            },
+            {
+                "Name": "TicketStateCount",
+                "States":[
+                    "new",
+                    "open",
+                    "pending reminder"
+                ],
+                "Columns":[
+                    "StateCountNew",
+                    "StateCountOpen",
+                    "StateCountPendingReminder"
+                ]
+            },
+            {
+                "Name":"TicketTeamDuration",
+                "RelevantStates":["open"],
+                "StopStates":["closed"],
+                "Columns":["TeamDurationServiceDesk"],
+                "Teams":["Service Desk"]
+            },
+            {
+                "Columns":["TeamCountServiceDesk"],
+                "Teams":["Service Desk"],
+                "Name":"TicketTeamCount"
+            }
+        ]
+    },
+    "OutputFormats":{
+        "CSV":{
+            "Separator":", ",
+            "Quote":"\"",
+            "IncludeColumnHeader":1
+        }
+    },
+    "Parameters":[
+        {
+            "References":"Organisation.ID",
+            "Multiple":1,
+            "Default":null,
+            "DataType":"NUMERIC",
+            "ReadOnly":0,
+            "Label":"Organisations",
+            "Required":0,
+            "Name":"OrganisationIDList",
+            "PossibleValues":null
+        },
+        {
+            "References":"TicketType.ID",
+            "DataType":"NUMERIC",
+            "Multiple":1,
+            "Default":null,
+            "Required":0,
+            "Label":"Ticket Types",
+            "PossibleValues":null,
+            "Name":"TypeIDList",
+            "Description":null,
+            "ReadOnly":0
+        },
+        {
+            "ReadOnly":0,
+            "Description":null,
+            "PossibleValues":null,
+            "Name":"StateIDList",
+            "Required":0,
+            "Label":"Ticket States",
+            "DataType":"NUMERIC",
+            "Default":null,
+            "Multiple":1,
+            "References":"TicketState.ID"
+        }
+    ]
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
 <!-- assign type to initial organisation -->
 <Insert Table="dynamic_field_value">
     <Data Key="id" Type="AutoIncrement">1</Data>
@@ -7885,6 +7992,16 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/9]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{}]]></Data>
     <Data Key="value">0</Data>
@@ -7906,7 +8023,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9]}]]></Data>
     <Data Key="value">3</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -7916,7 +8033,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9]}]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
