@@ -370,7 +370,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
             }
 
-            if ( $File == 3 ) {
+            elsif ( $File == 3 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -389,11 +389,22 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     ArticleID => $ArticleIDs[0],
                     UserID    => 1,
                 );
-                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                    ArticleID    => $ArticleIDs[0],
-                    AttachmentID => 2,
-                    UserID       => 1,
-                );
+                my $FileIndex = 1;
+                my %Attachment;
+                for my $AttachmentID ( sort{ $a <=> $b }( keys( %Index ) ) ) {
+                    if ( $FileIndex < 2 ) {
+                        $FileIndex += 1;
+                    }
+                    else {
+                        %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                            ArticleID    => $ArticleIDs[0],
+                            AttachmentID => $AttachmentID,
+                            UserID       => 1,
+                        );
+
+                        last;
+                    }
+                }
                 $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                 $Self->Is(
                     $MD5,
@@ -403,7 +414,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
             }
 
-            if ( $File == 5 ) {
+            elsif ( $File == 5 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -470,7 +481,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
             }
 
-            if ( $File == 6 ) {
+            elsif ( $File == 6 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -489,11 +500,22 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     ArticleID => $ArticleIDs[0],
                     UserID    => 1,
                 );
-                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                    ArticleID    => $ArticleIDs[0],
-                    AttachmentID => 2,
-                    UserID       => 1,
-                );
+                my $FileIndex = 1;
+                my %Attachment;
+                for my $AttachmentID ( sort{ $a <=> $b }( keys( %Index ) ) ) {
+                    if ( $FileIndex < 2 ) {
+                        $FileIndex += 1;
+                    }
+                    else {
+                        %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                            ArticleID    => $ArticleIDs[0],
+                            AttachmentID => $AttachmentID,
+                            UserID       => 1,
+                        );
+
+                        last;
+                    }
+                }
                 $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                 $Self->Is(
                     $MD5,
@@ -502,7 +524,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 );
 
             }
-            if ( $File == 11 ) {
+            elsif ( $File == 11 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
