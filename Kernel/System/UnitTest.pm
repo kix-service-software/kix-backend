@@ -264,7 +264,7 @@ sub Run {
             $Self->{OutputBuffer} = "$File is no Unit Test File! \n \$EVAL_ERROR:\n$@\n---\n\$EXTENDED_OS_ERROR\n$^E\n---\n\$CHILD_ERROR\n$?\n";
 
             if ($Self->{Output}->{Allure}) {
-                $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
+                $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}), $File);
             }
         }
         else {
@@ -297,14 +297,14 @@ sub Run {
                     if ($@) {
                         $Self->_Print(0, "ERROR: Error in $File: $@");
                         if ($Self->{Output}->{Allure}) {
-                            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
+                            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}), $File);
                         }
                     }
                     else {
                         $Self->_Print(0, "ERROR: $File did not return a true value.");
                         if ($Self->{Output}->{Allure}) {
                             $Self->{OutputBuffer} = "Did not return a true value.\n " . $Self->{OutputBuffer};
-                            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
+                            $Self->_Print(-2, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}), $File);
                         }
                     }
                 }
@@ -529,7 +529,7 @@ sub _PrintSummary {
 }
 
 sub _Print {
-    my ($Self, $Test, $Name) = @_;
+    my ($Self, $Test, $Name, $File) = @_;
 
     if (
         $Test
@@ -540,13 +540,14 @@ sub _Print {
     }
 
     $Name ||= '->>No Name!<<-';
+    $File ||= '->>No Filename!<<-';
 
     my $TestStep = $Name;
     $TestStep =~ s/^(.*?)\s\(.+?\)$/$1/s;
 
     if ($Self->{Output}->{Allure}) {
 
-        $Self->{runningTestId} = $Self->{Adapter}->NewTest($Name, q{}, $Self->{runningContainerId});
+        $Self->{runningTestId} = $Self->{Adapter}->NewTest($Name, q{}, $Self->{runningContainerId}, $File);
         $Self->{Adapter}->SetTestSubSuite($Self->{runningTestId}, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
         $Self->{Adapter}->SetTestStartTime($Self->{runningTestId}, $Self->{StartTime});
         $Self->{Adapter}->SetTestStopTime($Self->{runningTestId}, int(time() * 1000));
@@ -563,7 +564,7 @@ sub _Print {
             $Self->{Adapter}->SetTestFailed($Self->{runningTestId});
             if ($Self->{OutputBuffer}) {
                 $Self->{Adapter}->SetTestTrace($Self->{runningTestId}, $Self->{OutputBuffer});
-                $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name");
+                $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name \n $Self->{OutputBuffer}");
             }
         }
 
@@ -577,7 +578,7 @@ sub _Print {
         if ($Test == -2) {
             $Self->{Adapter}->SetTestBroken($Self->{runningTestId});
             $Self->{Adapter}->SetTestTrace($Self->{runningTestId}, $Self->{OutputBuffer});
-            $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name \n");
+            $Self->{Adapter}->SetTestMessage($Self->{runningTestId}, "Error in File: $Name \n $Self->{OutputBuffer}");
         }
         $Self->_ResetSelfOutputBuffer;
         $Self->{StartTime} = int(time() * 1000);
