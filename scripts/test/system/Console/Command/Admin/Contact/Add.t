@@ -28,11 +28,11 @@ $Kernel::OM->Get('Config')->Set(
 );
 
 my $OrgaName   = $Helper->GetRandomID();
-my $OrgeNumber = $Helper->GetRandomID();
+my $OrgaNumber = $Helper->GetRandomID();
 
 # create test organisation
 my $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
-    Number  => $OrgeNumber,
+    Number  => $OrgaNumber,
     Name    => $OrgaName,
     ValidID => 1,
     UserID  => 1,
@@ -61,7 +61,7 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-login', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-organisation', $OrgaName,
+    '--primary-organisation', $OrgaNumber,
 );
 $Self->Is(
     $ExitCode,
@@ -73,7 +73,7 @@ $Self->Is(
 $ExitCode = $CommandObject->Execute(
     '--user-login', $RandomName, '--first-name', 'Test',
     '--last-name', 'Test', '--email-address', $RandomName . '@test.test',
-    '--primary-organisation', $OrgaName,
+    '--primary-organisation', $OrgaNumber,
 );
 $Self->Is(
     $ExitCode,

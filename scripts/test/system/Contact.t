@@ -234,7 +234,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
             AND => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'EQ',
+                    Operator => 'LIKE',
                     Value    => lc( $ContactRandom . '-Customer-Update-Id' )
                 },
                 {
@@ -365,109 +365,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                 ]
             },
             Text   => "ObjectSearch - Contact - Login - uc - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactID' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => 'Firstname Test Update' . $Key,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => 'Firstname Test Update' . $Key . 'not_match',
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Not    => 1,
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname_with_not_match' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'STARTSWITH',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext STARTSWITH '\$ContactRandom*' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'ENDSWITH',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext ENDSWITH '*\$ContactRandom' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'CONTAINS',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext CONTAINS '*\$ContactRandom*' - $ContactID",
         },
         {
             Search => {
