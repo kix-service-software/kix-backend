@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-8-28 10:33+0000\n"
-"PO-Revision-Date: 2024-08-28 10:39+0000\n"
-"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
+"PO-Revision-Date: 2024-09-10 13:50+0000\n"
+"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1434,7 +1434,7 @@ msgstr "Sendertyp"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Show in Customer Portal"
-msgstr "Im Kundenportal anzeigen"
+msgstr "Im Kundenportal verfügbar"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Subject"
