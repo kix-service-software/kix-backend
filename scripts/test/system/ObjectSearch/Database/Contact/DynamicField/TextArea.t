@@ -37,6 +37,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data before creation of test field'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # begin transaction on database
 $Helper->BeginWork();
 
@@ -517,7 +520,7 @@ my @IntegrationSortTests = (
                 Field => 'DynamicField_UnitTest'
             }
         ],
-        Expected => [$ContactID1, $ContactID2, 1,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,1,$ContactID3] : [1,$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction ascending',
@@ -527,7 +530,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1, $ContactID2, 1,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,1,$ContactID3] : [1,$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction descending',
@@ -537,7 +540,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [1,$ContactID3, $ContactID2, $ContactID1]
+        Expected => $OrderByNull eq 'LAST' ? [1,$ContactID3,$ContactID2,$ContactID1] : [$ContactID2,$ContactID1,1,$ContactID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

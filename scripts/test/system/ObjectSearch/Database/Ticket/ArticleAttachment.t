@@ -36,26 +36,6 @@ for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     );
 }
 
-# make sure config 'Ticket::StorageModule' is 'Kernel::System::Ticket::ArticleStorageFS'
-$Kernel::OM->Get('Config')->Set(
-    Key   => 'Ticket::StorageModule',
-    Value => 'Kernel::System::Ticket::ArticleStorageFS'
-);
-
-# check GetSupportedAttributes
-my $InactiveAttributeList = $AttributeObject->GetSupportedAttributes();
-$Self->IsDeeply(
-    $InactiveAttributeList,
-    {},
-    'GetSupportedAttributes provides expected data when "Ticket::StorageModule" is not  "Kernel::System::Ticket::ArticleStorageDB"'
-);
-
-# make sure config 'Ticket::StorageModule' is 'Kernel::System::Ticket::ArticleStorageDB'
-$Kernel::OM->Get('Config')->Set(
-    Key   => 'Ticket::StorageModule',
-    Value => 'Kernel::System::Ticket::ArticleStorageDB'
-);
-
 # check GetSupportedAttributes
 my $ActiveAttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
@@ -67,8 +47,24 @@ $Self->IsDeeply(
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
-    'GetSupportedAttributes provides expected data when "Ticket::StorageModule" is "Kernel::System::Ticket::ArticleStorageDB"'
+    'GetSupportedAttributes provides expected data'
 );
+
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -137,7 +133,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) = \'test\''
+                $CaseSensitive ? 'LOWER(att.filename) = \'test\'' : 'att.filename = \'test\''
             ]
         }
     },
@@ -155,7 +151,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                '(LOWER(att.filename) = \'\' OR att.filename IS NULL)'
+                $CaseSensitive ? '(LOWER(att.filename) = \'\' OR att.filename IS NULL)' : '(att.filename = \'\' OR att.filename IS NULL)'
             ]
         }
     },
@@ -173,7 +169,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                '(LOWER(att.filename) != \'test\' OR att.filename IS NULL)'
+                $CaseSensitive ? '(LOWER(att.filename) != \'test\' OR att.filename IS NULL)' : '(att.filename != \'test\' OR att.filename IS NULL)'
             ]
         }
     },
@@ -191,7 +187,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) != \'\''
+                $CaseSensitive ? 'LOWER(att.filename) != \'\'' : 'att.filename != \'\''
             ]
         }
     },
@@ -209,7 +205,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(att.filename) IN (\'test\')' : 'att.filename IN (\'test\')'
             ]
         }
     },
@@ -227,7 +223,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(att.filename) NOT IN (\'test\')' : 'att.filename NOT IN (\'test\')'
             ]
         }
     },
@@ -245,7 +241,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'test%\'' : 'att.filename LIKE \'test%\''
             ]
         }
     },
@@ -263,7 +259,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'%test\'' : 'att.filename LIKE \'%test\''
             ]
         }
     },
@@ -281,7 +277,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'%test%\'' : 'att.filename LIKE \'%test%\''
             ]
         }
     },
@@ -299,7 +295,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'test\'' : 'att.filename LIKE \'test\''
             ]
         }
     },
@@ -317,7 +313,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) = \'test\''
+                $CaseSensitive ? 'LOWER(att.filename) = \'test\'' : 'att.filename = \'test\''
             ]
         }
     },
@@ -335,7 +331,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                '(LOWER(att.filename) = \'\' OR att.filename IS NULL)'
+                $CaseSensitive ? '(LOWER(att.filename) = \'\' OR att.filename IS NULL)' : '(att.filename = \'\' OR att.filename IS NULL)'
             ]
         }
     },
@@ -353,7 +349,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                '(LOWER(att.filename) != \'test\' OR att.filename IS NULL)'
+                $CaseSensitive ? '(LOWER(att.filename) != \'test\' OR att.filename IS NULL)' : '(att.filename != \'test\' OR att.filename IS NULL)'
             ]
         }
     },
@@ -371,7 +367,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) != \'\''
+                $CaseSensitive ? 'LOWER(att.filename) != \'\'' : 'att.filename != \'\''
             ]
         }
     },
@@ -389,7 +385,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(att.filename) IN (\'test\')' : 'att.filename IN (\'test\')'
             ]
         }
     },
@@ -407,7 +403,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(att.filename) NOT IN (\'test\')' : 'att.filename NOT IN (\'test\')'
             ]
         }
     },
@@ -425,7 +421,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'test%\'' : 'att.filename LIKE \'test%\''
             ]
         }
     },
@@ -443,7 +439,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'%test\'' : 'att.filename LIKE \'%test\''
             ]
         }
     },
@@ -461,7 +457,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'%test%\'' : 'att.filename LIKE \'%test%\''
             ]
         }
     },
@@ -479,7 +475,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
             ],
             'Where' => [
-                'LOWER(att.filename) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(att.filename) LIKE \'test\'' : 'att.filename LIKE \'test\''
             ]
         }
     }

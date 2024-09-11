@@ -89,6 +89,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # set fixed time to have predetermined verifiable results
 my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
     String => '2014-01-01 12:00:00',
@@ -410,7 +429,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) = \'test\' OR LOWER(touc.firstname) = \'test\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) = \'test\' OR LOWER(touc.firstname) = \'test\')' : '(touc.lastname = \'test\' OR touc.firstname = \'test\')'
             ]
         }
     },
@@ -427,7 +446,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) != \'test\' OR LOWER(touc.firstname) != \'test\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) != \'test\' OR LOWER(touc.firstname) != \'test\')' : '(touc.lastname != \'test\' OR touc.firstname != \'test\')'
             ]
         }
     },
@@ -444,7 +463,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) IN (\'test\') OR LOWER(touc.firstname) IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(touc.lastname) IN (\'test\') OR LOWER(touc.firstname) IN (\'test\'))' : '(touc.lastname IN (\'test\') OR touc.firstname IN (\'test\'))'
             ]
         }
     },
@@ -461,7 +480,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) NOT IN (\'test\') OR LOWER(touc.firstname) NOT IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(touc.lastname) NOT IN (\'test\') OR LOWER(touc.firstname) NOT IN (\'test\'))' : '(touc.lastname NOT IN (\'test\') OR touc.firstname NOT IN (\'test\'))'
             ]
         }
     },
@@ -478,7 +497,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) LIKE \'test%\' OR LOWER(touc.firstname) LIKE \'test%\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'test%\' OR LOWER(touc.firstname) LIKE \'test%\')' : '(touc.lastname LIKE \'test%\' OR touc.firstname LIKE \'test%\')'
             ]
         }
     },
@@ -495,7 +514,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) LIKE \'%test\' OR LOWER(touc.firstname) LIKE \'%test\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'%test\' OR LOWER(touc.firstname) LIKE \'%test\')' : '(touc.lastname LIKE \'%test\' OR touc.firstname LIKE \'%test\')'
             ]
         }
     },
@@ -512,7 +531,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) LIKE \'%test%\' OR LOWER(touc.firstname) LIKE \'%test%\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'%test%\' OR LOWER(touc.firstname) LIKE \'%test%\')' : '(touc.lastname LIKE \'%test%\' OR touc.firstname LIKE \'%test%\')'
             ]
         }
     },
@@ -529,7 +548,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'Where' => [
-                '(LOWER(touc.lastname) LIKE \'test\' OR LOWER(touc.firstname) LIKE \'test\')'
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'test\' OR LOWER(touc.firstname) LIKE \'test\')' : '(touc.lastname LIKE \'test\' OR touc.firstname LIKE \'test\')'
             ]
         }
     },
@@ -786,7 +805,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) = \'test\' OR LOWER(truc.firstname) = \'test\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) = \'test\' OR LOWER(truc.firstname) = \'test\')' : '(truc.lastname = \'test\' OR truc.firstname = \'test\')'
             ]
         }
     },
@@ -820,7 +839,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) != \'test\' OR LOWER(truc.firstname) != \'test\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) != \'test\' OR LOWER(truc.firstname) != \'test\')' : '(truc.lastname != \'test\' OR truc.firstname != \'test\')'
             ]
         }
     },
@@ -837,7 +856,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) IN (\'test\') OR LOWER(truc.firstname) IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(truc.lastname) IN (\'test\') OR LOWER(truc.firstname) IN (\'test\'))' : '(truc.lastname IN (\'test\') OR truc.firstname IN (\'test\'))'
             ]
         }
     },
@@ -854,7 +873,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) NOT IN (\'test\') OR LOWER(truc.firstname) NOT IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(truc.lastname) NOT IN (\'test\') OR LOWER(truc.firstname) NOT IN (\'test\'))' : '(truc.lastname NOT IN (\'test\') OR truc.firstname NOT IN (\'test\'))'
             ]
         }
     },
@@ -888,7 +907,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) LIKE \'test%\' OR LOWER(truc.firstname) LIKE \'test%\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'test%\' OR LOWER(truc.firstname) LIKE \'test%\')' : '(truc.lastname LIKE \'test%\' OR truc.firstname LIKE \'test%\')'
             ]
         }
     },
@@ -922,7 +941,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) LIKE \'%test\' OR LOWER(truc.firstname) LIKE \'%test\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'%test\' OR LOWER(truc.firstname) LIKE \'%test\')' : '(truc.lastname LIKE \'%test\' OR truc.firstname LIKE \'%test\')'
             ]
         }
     },
@@ -956,7 +975,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) LIKE \'%test%\' OR LOWER(truc.firstname) LIKE \'%test%\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'%test%\' OR LOWER(truc.firstname) LIKE \'%test%\')' : '(truc.lastname LIKE \'%test%\' OR truc.firstname LIKE \'%test%\')'
             ]
         }
     },
@@ -990,7 +1009,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'Where' => [
-                '(LOWER(truc.lastname) LIKE \'test\' OR LOWER(truc.firstname) LIKE \'test\')'
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'test\' OR LOWER(truc.firstname) LIKE \'test\')' : '(truc.lastname LIKE \'test\' OR truc.firstname LIKE \'test\')'
             ]
         }
     },
@@ -2261,7 +2280,7 @@ my @IntegrationSortTests = (
                 Field => 'Owner'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field Owner / Direction ascending',
@@ -2271,7 +2290,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field Owner / Direction descending',
@@ -2281,7 +2300,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field OwnerName',
@@ -2290,7 +2309,7 @@ my @IntegrationSortTests = (
                 Field => 'OwnerName'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction ascending',
@@ -2300,7 +2319,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction descending',
@@ -2310,7 +2329,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleID',
@@ -2348,7 +2367,7 @@ my @IntegrationSortTests = (
                 Field => 'Responsible'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field Responsible / Direction ascending',
@@ -2358,7 +2377,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field Responsible / Direction descending',
@@ -2368,7 +2387,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleName',
@@ -2377,7 +2396,7 @@ my @IntegrationSortTests = (
                 Field => 'ResponsibleName'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction ascending',
@@ -2387,7 +2406,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction descending',
@@ -2397,7 +2416,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

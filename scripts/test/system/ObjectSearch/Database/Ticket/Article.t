@@ -116,6 +116,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 # set config 'Ticket::SearchIndexModule' to RuntimeDB
 $Kernel::OM->Get('Config')->Set(
@@ -526,7 +542,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) = \'test\''
+                    $CaseSensitive ? 'LOWER(tac.name) = \'test\'' : 'tac.name = \'test\''
                 ]
             }
         },
@@ -543,7 +559,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    '(LOWER(tac.name) = \'\' OR tac.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(tac.name) = \'\' OR tac.name IS NULL)' : '(tac.name = \'\' OR tac.name IS NULL)'
                 ]
             }
         },
@@ -560,7 +576,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    '(LOWER(tac.name) != \'test\' OR tac.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(tac.name) != \'test\' OR tac.name IS NULL)' : '(tac.name != \'test\' OR tac.name IS NULL)'
                 ]
             }
         },
@@ -577,7 +593,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) != \'\''
+                    $CaseSensitive ? 'LOWER(tac.name) != \'\'' : 'tac.name != \'\''
                 ]
             }
         },
@@ -594,7 +610,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(tac.name) IN (\'test\')' : 'tac.name IN (\'test\')'
                 ]
             }
         },
@@ -611,7 +627,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(tac.name) NOT IN (\'test\')' : 'tac.name NOT IN (\'test\')'
                 ]
             }
         },
@@ -628,7 +644,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'test%\'' : 'tac.name LIKE \'test%\''
                 ]
             }
         },
@@ -645,7 +661,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'%test\'' : 'tac.name LIKE \'%test\''
                 ]
             }
         },
@@ -662,7 +678,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'%test%\'' : 'tac.name LIKE \'%test%\''
                 ]
             }
         },
@@ -679,7 +695,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(tac.name) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'test\'' : 'tac.name LIKE \'test\''
                 ]
             }
         },
@@ -856,7 +872,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) = \'test\''
+                    $CaseSensitive ? 'LOWER(tast.name) = \'test\'' : 'tast.name = \'test\''
                 ]
             }
         },
@@ -873,7 +889,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    '(LOWER(tast.name) = \'\' OR tast.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(tast.name) = \'\' OR tast.name IS NULL)' : '(tast.name = \'\' OR tast.name IS NULL)'
                 ]
             }
         },
@@ -890,7 +906,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    '(LOWER(tast.name) != \'test\' OR tast.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(tast.name) != \'test\' OR tast.name IS NULL)' : '(tast.name != \'test\' OR tast.name IS NULL)'
                 ]
             }
         },
@@ -907,7 +923,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) != \'\''
+                    $CaseSensitive ? 'LOWER(tast.name) != \'\'' : 'tast.name != \'\''
                 ]
             }
         },
@@ -924,7 +940,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(tast.name) IN (\'test\')' : 'tast.name IN (\'test\')'
                 ]
             }
         },
@@ -941,7 +957,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(tast.name) NOT IN (\'test\')' : 'tast.name NOT IN (\'test\')'
                 ]
             }
         },
@@ -958,7 +974,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'test%\'' : 'tast.name LIKE \'test%\''
                 ]
             }
         },
@@ -975,7 +991,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'%test\'' : 'tast.name LIKE \'%test\''
                 ]
             }
         },
@@ -992,7 +1008,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'%test%\'' : 'tast.name LIKE \'%test%\''
                 ]
             }
         },
@@ -1009,7 +1025,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(tast.name) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'test\'' : 'tast.name LIKE \'test\''
                 ]
             }
         },
@@ -1185,7 +1201,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) = \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) = \'test\'' : 'ta.a_from = \'test\''
                 ]
             }
         },
@@ -1201,7 +1217,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_from) = \'\' OR ta.a_from IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_from) = \'\' OR ta.a_from IS NULL)' : '(ta.a_from = \'\' OR ta.a_from IS NULL)'
                 ]
             }
         },
@@ -1217,7 +1233,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_from) != \'test\' OR ta.a_from IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_from) != \'test\' OR ta.a_from IS NULL)' : '(ta.a_from != \'test\' OR ta.a_from IS NULL)'
                 ]
             }
         },
@@ -1233,7 +1249,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) != \'\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) != \'\'' : 'ta.a_from != \'\''
                 ]
             }
         },
@@ -1249,7 +1265,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_from) IN (\'test\')' : 'ta.a_from IN (\'test\')'
                 ]
             }
         },
@@ -1265,7 +1281,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_from) NOT IN (\'test\')' : 'ta.a_from NOT IN (\'test\')'
                 ]
             }
         },
@@ -1281,7 +1297,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'test%\'' : 'ta.a_from LIKE \'test%\''
                 ]
             }
         },
@@ -1297,7 +1313,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'%test\'' : 'ta.a_from LIKE \'%test\''
                 ]
             }
         },
@@ -1313,7 +1329,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'%test%\'' : 'ta.a_from LIKE \'%test%\''
                 ]
             }
         },
@@ -1329,7 +1345,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_from) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'test\'' : 'ta.a_from LIKE \'test\''
                 ]
             }
         },
@@ -1345,7 +1361,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) = \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) = \'test\'' : 'ta.a_to = \'test\''
                 ]
             }
         },
@@ -1361,7 +1377,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_to) = \'\' OR ta.a_to IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_to) = \'\' OR ta.a_to IS NULL)' : '(ta.a_to = \'\' OR ta.a_to IS NULL)'
                 ]
             }
         },
@@ -1377,7 +1393,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_to) != \'test\' OR ta.a_to IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_to) != \'test\' OR ta.a_to IS NULL)' : '(ta.a_to != \'test\' OR ta.a_to IS NULL)'
                 ]
             }
         },
@@ -1393,7 +1409,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) != \'\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) != \'\'' : 'ta.a_to != \'\''
                 ]
             }
         },
@@ -1409,7 +1425,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_to) IN (\'test\')' : 'ta.a_to IN (\'test\')'
                 ]
             }
         },
@@ -1425,7 +1441,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_to) NOT IN (\'test\')' : 'ta.a_to NOT IN (\'test\')'
                 ]
             }
         },
@@ -1441,7 +1457,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'test%\'' : 'ta.a_to LIKE \'test%\''
                 ]
             }
         },
@@ -1457,7 +1473,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'%test\'' : 'ta.a_to LIKE \'%test\''
                 ]
             }
         },
@@ -1473,7 +1489,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'%test%\'' : 'ta.a_to LIKE \'%test%\''
                 ]
             }
         },
@@ -1489,7 +1505,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_to) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'test\'' : 'ta.a_to LIKE \'test\''
                 ]
             }
         },
@@ -1505,7 +1521,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) = \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) = \'test\'' : 'ta.a_cc = \'test\''
                 ]
             }
         },
@@ -1521,7 +1537,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_cc) = \'\' OR ta.a_cc IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_cc) = \'\' OR ta.a_cc IS NULL)' : '(ta.a_cc = \'\' OR ta.a_cc IS NULL)'
                 ]
             }
         },
@@ -1537,7 +1553,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_cc) != \'test\' OR ta.a_cc IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_cc) != \'test\' OR ta.a_cc IS NULL)' : '(ta.a_cc != \'test\' OR ta.a_cc IS NULL)'
                 ]
             }
         },
@@ -1553,7 +1569,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) != \'\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) != \'\'' : 'ta.a_cc != \'\''
                 ]
             }
         },
@@ -1569,7 +1585,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_cc) IN (\'test\')' : 'ta.a_cc IN (\'test\')'
                 ]
             }
         },
@@ -1585,7 +1601,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_cc) NOT IN (\'test\')' : 'ta.a_cc NOT IN (\'test\')'
                 ]
             }
         },
@@ -1601,7 +1617,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'test%\'' : 'ta.a_cc LIKE \'test%\''
                 ]
             }
         },
@@ -1617,7 +1633,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'%test\'' : 'ta.a_cc LIKE \'%test\''
                 ]
             }
         },
@@ -1633,7 +1649,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'%test%\'' : 'ta.a_cc LIKE \'%test%\''
                 ]
             }
         },
@@ -1649,7 +1665,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_cc) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'test\'' : 'ta.a_cc LIKE \'test\''
                 ]
             }
         },
@@ -1665,7 +1681,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) = \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) = \'test\'' : 'ta.a_subject = \'test\''
                 ]
             }
         },
@@ -1681,7 +1697,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_subject) = \'\' OR ta.a_subject IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_subject) = \'\' OR ta.a_subject IS NULL)' : '(ta.a_subject = \'\' OR ta.a_subject IS NULL)'
                 ]
             }
         },
@@ -1697,7 +1713,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_subject) != \'test\' OR ta.a_subject IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_subject) != \'test\' OR ta.a_subject IS NULL)' : '(ta.a_subject != \'test\' OR ta.a_subject IS NULL)'
                 ]
             }
         },
@@ -1713,7 +1729,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) != \'\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) != \'\'' : 'ta.a_subject != \'\''
                 ]
             }
         },
@@ -1729,7 +1745,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_subject) IN (\'test\')' : 'ta.a_subject IN (\'test\')'
                 ]
             }
         },
@@ -1745,7 +1761,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_subject) NOT IN (\'test\')' : 'ta.a_subject NOT IN (\'test\')'
                 ]
             }
         },
@@ -1761,7 +1777,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'test%\'' : 'ta.a_subject LIKE \'test%\''
                 ]
             }
         },
@@ -1777,7 +1793,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'%test\'' : 'ta.a_subject LIKE \'%test\''
                 ]
             }
         },
@@ -1793,7 +1809,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'%test%\'' : 'ta.a_subject LIKE \'%test%\''
                 ]
             }
         },
@@ -1809,7 +1825,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_subject) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'test\'' : 'ta.a_subject LIKE \'test\''
                 ]
             }
         },
@@ -1825,7 +1841,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) = \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) = \'test\'' : 'ta.a_body = \'test\''
                 ]
             }
         },
@@ -1841,7 +1857,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_body) = \'\' OR ta.a_body IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_body) = \'\' OR ta.a_body IS NULL)' : '(ta.a_body = \'\' OR ta.a_body IS NULL)'
                 ]
             }
         },
@@ -1857,7 +1873,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    '(LOWER(ta.a_body) != \'test\' OR ta.a_body IS NULL)'
+                    $CaseSensitive ? '(LOWER(ta.a_body) != \'test\' OR ta.a_body IS NULL)' : '(ta.a_body != \'test\' OR ta.a_body IS NULL)'
                 ]
             }
         },
@@ -1873,7 +1889,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) != \'\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) != \'\'' : 'ta.a_body != \'\''
                 ]
             }
         },
@@ -1889,7 +1905,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_body) IN (\'test\')' : 'ta.a_body IN (\'test\')'
                 ]
             }
         },
@@ -1905,7 +1921,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(ta.a_body) NOT IN (\'test\')' : 'ta.a_body NOT IN (\'test\')'
                 ]
             }
         },
@@ -1921,7 +1937,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'test%\'' : 'ta.a_body LIKE \'test%\''
                 ]
             }
         },
@@ -1937,7 +1953,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'%test\'' : 'ta.a_body LIKE \'%test\''
                 ]
             }
         },
@@ -1953,7 +1969,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'%test%\'' : 'ta.a_body LIKE \'%test%\''
                 ]
             }
         },
@@ -1969,7 +1985,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'LOWER(ta.a_body) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'test\'' : 'ta.a_body LIKE \'test\''
                 ]
             }
         },
@@ -1986,7 +2002,8 @@ for my $UserType ( qw(Agent Customer) ) {
                 ],
                 'Where' => [
                     'ta.incoming_time = 1388577600'
-                ]
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -2019,7 +2036,8 @@ for my $UserType ( qw(Agent Customer) ) {
                 ],
                 'Where' => [
                     'ta.incoming_time < 1388577600'
-                ]
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -2052,7 +2070,8 @@ for my $UserType ( qw(Agent Customer) ) {
                 ],
                 'Where' => [
                     'ta.incoming_time > 1388577600'
-                ]
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -2085,7 +2104,8 @@ for my $UserType ( qw(Agent Customer) ) {
                 ],
                 'Where' => [
                     'ta.incoming_time <= 1388577600'
-                ]
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -2118,7 +2138,8 @@ for my $UserType ( qw(Agent Customer) ) {
                 ],
                 'Where' => [
                     'ta.incoming_time >= 1388577600'
-                ]
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -2564,7 +2585,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) = \'test\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) = \'test\'' : 's_tac.name = \'test\''
                 ]
             }
         },
@@ -2581,7 +2602,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    '(LOWER(s_tac.name) = \'\' OR s_tac.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(s_tac.name) = \'\' OR s_tac.name IS NULL)' : '(s_tac.name = \'\' OR s_tac.name IS NULL)'
                 ]
             }
         },
@@ -2598,7 +2619,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    '(LOWER(s_tac.name) != \'test\' OR s_tac.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(s_tac.name) != \'test\' OR s_tac.name IS NULL)' : '(s_tac.name != \'test\' OR s_tac.name IS NULL)'
                 ]
             }
         },
@@ -2615,7 +2636,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) != \'\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) != \'\'' : 's_tac.name != \'\''
                 ]
             }
         },
@@ -2632,7 +2653,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(s_tac.name) IN (\'test\')' : 's_tac.name IN (\'test\')'
                 ]
             }
         },
@@ -2649,7 +2670,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(s_tac.name) NOT IN (\'test\')' : 's_tac.name NOT IN (\'test\')'
                 ]
             }
         },
@@ -2666,7 +2687,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) LIKE \'test%\'' : 's_tac.name LIKE \'test%\''
                 ]
             }
         },
@@ -2683,7 +2704,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) LIKE \'%test\'' : 's_tac.name LIKE \'%test\''
                 ]
             }
         },
@@ -2700,7 +2721,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) LIKE \'%test%\'' : 's_tac.name LIKE \'%test%\''
                 ]
             }
         },
@@ -2717,7 +2738,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tac.name) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(s_tac.name) LIKE \'test\'' : 's_tac.name LIKE \'test\''
                 ]
             }
         },
@@ -2894,7 +2915,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) = \'test\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) = \'test\'' : 's_tast.name = \'test\''
                 ]
             }
         },
@@ -2911,7 +2932,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    '(LOWER(s_tast.name) = \'\' OR s_tast.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(s_tast.name) = \'\' OR s_tast.name IS NULL)' : '(s_tast.name = \'\' OR s_tast.name IS NULL)'
                 ]
             }
         },
@@ -2928,7 +2949,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    '(LOWER(s_tast.name) != \'test\' OR s_tast.name IS NULL)'
+                    $CaseSensitive ? '(LOWER(s_tast.name) != \'test\' OR s_tast.name IS NULL)' : '(s_tast.name != \'test\' OR s_tast.name IS NULL)'
                 ]
             }
         },
@@ -2945,7 +2966,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) != \'\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) != \'\'' : 's_tast.name != \'\''
                 ]
             }
         },
@@ -2962,7 +2983,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(s_tast.name) IN (\'test\')' : 's_tast.name IN (\'test\')'
                 ]
             }
         },
@@ -2979,7 +3000,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) NOT IN (\'test\')'
+                    $CaseSensitive ? 'LOWER(s_tast.name) NOT IN (\'test\')' : 's_tast.name NOT IN (\'test\')'
                 ]
             }
         },
@@ -2996,7 +3017,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) LIKE \'test%\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) LIKE \'test%\'' : 's_tast.name LIKE \'test%\''
                 ]
             }
         },
@@ -3013,7 +3034,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) LIKE \'%test\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) LIKE \'%test\'' : 's_tast.name LIKE \'%test\''
                 ]
             }
         },
@@ -3030,7 +3051,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) LIKE \'%test%\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) LIKE \'%test%\'' : 's_tast.name LIKE \'%test%\''
                 ]
             }
         },
@@ -3047,7 +3068,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id'
                 ],
                 'Where' => [
-                    'LOWER(s_tast.name) LIKE \'test\''
+                    $CaseSensitive ? 'LOWER(s_tast.name) LIKE \'test\'' : 's_tast.name LIKE \'test\''
                 ]
             }
         },

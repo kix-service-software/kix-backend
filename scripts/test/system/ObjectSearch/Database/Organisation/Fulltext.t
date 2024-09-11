@@ -50,11 +50,20 @@ $Self->IsDeeply(
 );
 
 # Quoting ESCAPE character backslash
-my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
 my $Escape = "\\";
 if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -118,7 +127,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.name) = LOWER(\'Test\') OR LOWER(o.number) = LOWER(\'Test\') OR LOWER(o.street) = LOWER(\'Test\') OR LOWER(o.city) = LOWER(\'Test\') OR LOWER(o.zip) = LOWER(\'Test\') OR LOWER(o.url) = LOWER(\'Test\') OR LOWER(o.country) = LOWER(\'Test\')) '
+                $CaseSensitive ? '(LOWER(o.name) = LOWER(\'Test\') OR LOWER(o.number) = LOWER(\'Test\') OR LOWER(o.street) = LOWER(\'Test\') OR LOWER(o.city) = LOWER(\'Test\') OR LOWER(o.zip) = LOWER(\'Test\') OR LOWER(o.url) = LOWER(\'Test\') OR LOWER(o.country) = LOWER(\'Test\')) ' : '(o.name = \'Test\' OR o.number = \'Test\' OR o.street = \'Test\' OR o.city = \'Test\' OR o.zip = \'Test\' OR o.url = \'Test\' OR o.country = \'Test\') '
             ]
         }
     }

@@ -50,6 +50,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -112,7 +128,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) = \'test\''
+                $CaseSensitive ? 'LOWER(st.tn) = \'test\'' : 'st.tn = \'test\''
             ]
         }
     },
@@ -125,7 +141,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) != \'test\''
+                $CaseSensitive ? 'LOWER(st.tn) != \'test\'' : 'st.tn != \'test\''
             ]
         }
     },
@@ -138,7 +154,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(st.tn) IN (\'test\')' : 'st.tn IN (\'test\')'
             ]
         }
     },
@@ -151,7 +167,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(st.tn) NOT IN (\'test\')' : 'st.tn NOT IN (\'test\')'
             ]
         }
     },
@@ -164,7 +180,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(st.tn) LIKE \'test%\'' : 'st.tn LIKE \'test%\''
             ]
         }
     },
@@ -177,7 +193,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(st.tn) LIKE \'%test\'' : 'st.tn LIKE \'%test\''
             ]
         }
     },
@@ -190,7 +206,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(st.tn) LIKE \'%test%\'' : 'st.tn LIKE \'%test%\''
             ]
         }
     },
@@ -203,7 +219,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(st.tn) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(st.tn) LIKE \'test\'' : 'st.tn LIKE \'test\''
             ]
         }
     }

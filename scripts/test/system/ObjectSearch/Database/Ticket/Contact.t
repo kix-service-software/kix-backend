@@ -56,6 +56,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -270,7 +289,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) = \'test\' OR LOWER(tcon.firstname) = \'test\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) = \'test\' OR LOWER(tcon.firstname) = \'test\')' : '(tcon.lastname = \'test\' OR tcon.firstname = \'test\')'
             ]
         }
     },
@@ -286,7 +305,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) = \'\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) = \'\' OR tcon.firstname IS NULL)'
+                $CaseSensitive ? '(LOWER(tcon.lastname) = \'\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) = \'\' OR tcon.firstname IS NULL)' : '(tcon.lastname = \'\' OR tcon.lastname IS NULL OR tcon.firstname = \'\' OR tcon.firstname IS NULL)'
             ]
         }
     },
@@ -302,7 +321,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) != \'test\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) != \'test\' OR tcon.firstname IS NULL)'
+                $CaseSensitive ? '(LOWER(tcon.lastname) != \'test\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) != \'test\' OR tcon.firstname IS NULL)' : '(tcon.lastname != \'test\' OR tcon.lastname IS NULL OR tcon.firstname != \'test\' OR tcon.firstname IS NULL)'
             ]
         }
     },
@@ -318,7 +337,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) != \'\' OR LOWER(tcon.firstname) != \'\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) != \'\' OR LOWER(tcon.firstname) != \'\')' : '(tcon.lastname != \'\' OR tcon.firstname != \'\')'
             ]
         }
     },
@@ -334,7 +353,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) IN (\'test\') OR LOWER(tcon.firstname) IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(tcon.lastname) IN (\'test\') OR LOWER(tcon.firstname) IN (\'test\'))' : '(tcon.lastname IN (\'test\') OR tcon.firstname IN (\'test\'))'
             ]
         }
     },
@@ -350,7 +369,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) NOT IN (\'test\') OR LOWER(tcon.firstname) NOT IN (\'test\'))'
+                $CaseSensitive ? '(LOWER(tcon.lastname) NOT IN (\'test\') OR LOWER(tcon.firstname) NOT IN (\'test\'))' : '(tcon.lastname NOT IN (\'test\') OR tcon.firstname NOT IN (\'test\'))'
             ]
         }
     },
@@ -366,7 +385,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) LIKE \'test%\' OR LOWER(tcon.firstname) LIKE \'test%\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'test%\' OR LOWER(tcon.firstname) LIKE \'test%\')' : '(tcon.lastname LIKE \'test%\' OR tcon.firstname LIKE \'test%\')'
             ]
         }
     },
@@ -382,7 +401,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) LIKE \'%test\' OR LOWER(tcon.firstname) LIKE \'%test\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'%test\' OR LOWER(tcon.firstname) LIKE \'%test\')' : '(tcon.lastname LIKE \'%test\' OR tcon.firstname LIKE \'%test\')'
             ]
         }
     },
@@ -398,7 +417,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) LIKE \'%test%\' OR LOWER(tcon.firstname) LIKE \'%test%\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'%test%\' OR LOWER(tcon.firstname) LIKE \'%test%\')' : '(tcon.lastname LIKE \'%test%\' OR tcon.firstname LIKE \'%test%\')'
             ]
         }
     },
@@ -414,7 +433,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'Where' => [
-                '(LOWER(tcon.lastname) LIKE \'test\' OR LOWER(tcon.firstname) LIKE \'test\')'
+                $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'test\' OR LOWER(tcon.firstname) LIKE \'test\')' : '(tcon.lastname LIKE \'test\' OR tcon.firstname LIKE \'test\')'
             ]
         }
     }
@@ -936,7 +955,7 @@ my @IntegrationSortTests = (
                 Field => 'Contact'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1, $TicketID2, $TicketID3, $TicketID4] : [$TicketID4, $TicketID1, $TicketID2, $TicketID3]
     },
     {
         Name     => 'Sort: Field Contact / Direction ascending',
@@ -946,7 +965,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1, $TicketID2, $TicketID3, $TicketID4] : [$TicketID4, $TicketID1, $TicketID2, $TicketID3]
     },
     {
         Name     => 'Sort: Field Contact / Direction descending',
@@ -956,7 +975,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID4, $TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4, $TicketID3, $TicketID2, $TicketID1] : [$TicketID1, $TicketID4, $TicketID3, $TicketID2]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

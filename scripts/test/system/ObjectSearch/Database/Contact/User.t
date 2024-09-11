@@ -67,6 +67,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -244,7 +263,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) = \'testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) = \'testlog\'' : 'u0.login = \'testlog\''
             ]
         }
     },
@@ -260,7 +279,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)'
+                $CaseSensitive ? '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)' : '(u0.login != \'testlog\' OR u0.login IS NULL)'
             ]
         }
     },
@@ -276,7 +295,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) IN (\'testlog\')'
+                $CaseSensitive ? 'LOWER(u0.login) IN (\'testlog\')' : 'u0.login IN (\'testlog\')'
             ]
         }
     },
@@ -292,7 +311,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)'
+                $CaseSensitive ? '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)' : '(u0.login != \'testlog\' OR u0.login IS NULL)'
             ]
         }
     },
@@ -308,7 +327,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'testlog%\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'testlog%\'' : 'u0.login LIKE \'testlog%\''
             ]
         }
     },
@@ -324,7 +343,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'%testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'%testlog\'' : 'u0.login LIKE \'%testlog\''
             ]
         }
     },
@@ -340,7 +359,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'%testlog%\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'%testlog%\'' : 'u0.login LIKE \'%testlog%\''
             ]
         }
     },
@@ -356,7 +375,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'testlog\'' : 'u0.login LIKE \'testlog\''
             ]
         }
     },
@@ -372,7 +391,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) = \'testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) = \'testlog\'' : 'u0.login = \'testlog\''
             ]
         }
     },
@@ -388,7 +407,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)'
+                $CaseSensitive ? '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)' : '(u0.login != \'testlog\' OR u0.login IS NULL)'
             ]
         }
     },
@@ -404,7 +423,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) IN (\'testlog\')'
+                $CaseSensitive ? 'LOWER(u0.login) IN (\'testlog\')' : 'u0.login IN (\'testlog\')'
             ]
         }
     },
@@ -420,7 +439,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)'
+                $CaseSensitive ? '(LOWER(u0.login) != \'testlog\' OR u0.login IS NULL)' : '(u0.login != \'testlog\' OR u0.login IS NULL)'
             ]
         }
     },
@@ -436,7 +455,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'testlog%\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'testlog%\'' : 'u0.login LIKE \'testlog%\''
             ]
         }
     },
@@ -452,7 +471,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'%testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'%testlog\'' : 'u0.login LIKE \'%testlog\''
             ]
         }
     },
@@ -468,7 +487,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'%testlog%\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'%testlog%\'' : 'u0.login LIKE \'%testlog%\''
             ]
         }
     },
@@ -484,7 +503,7 @@ my @SearchTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'Where' => [
-                'LOWER(u0.login) LIKE \'testlog\''
+                $CaseSensitive ? 'LOWER(u0.login) LIKE \'testlog\'' : 'u0.login LIKE \'testlog\''
             ]
         }
     }
@@ -1204,7 +1223,7 @@ my @IntegrationSortTests = (
                 Field => 'Login'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,'1',$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction ascending',
@@ -1214,7 +1233,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,'1',$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction descending',
@@ -1224,7 +1243,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID2,'1',$ContactID3,$ContactID1]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID1,$ContactID2,'1']
     },
     {
         Name     => 'Sort: Field UserLogin',
@@ -1233,7 +1252,7 @@ my @IntegrationSortTests = (
                 Field => 'UserLogin'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,'1',$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction ascending',
@@ -1243,7 +1262,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,'1',$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction descending',
@@ -1253,7 +1272,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID2,'1',$ContactID3,$ContactID1]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID1,$ContactID2,'1']
     }
 );
 for my $Test ( @IntegrationSortTests ) {

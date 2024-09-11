@@ -61,6 +61,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -275,7 +294,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) = \'test\''
+                $CaseSensitive ? 'LOWER(torg.name) = \'test\'' : 'torg.name = \'test\''
             ]
         }
     },
@@ -291,7 +310,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(LOWER(torg.name) = \'\' OR torg.name IS NULL)'
+                $CaseSensitive ? '(LOWER(torg.name) = \'\' OR torg.name IS NULL)' : '(torg.name = \'\' OR torg.name IS NULL)'
             ]
         }
     },
@@ -307,7 +326,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(LOWER(torg.name) != \'test\' OR torg.name IS NULL)'
+                $CaseSensitive ? '(LOWER(torg.name) != \'test\' OR torg.name IS NULL)' : '(torg.name != \'test\' OR torg.name IS NULL)'
             ]
         }
     },
@@ -323,7 +342,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) != \'\''
+                $CaseSensitive ? 'LOWER(torg.name) != \'\'' : 'torg.name != \'\''
             ]
         }
     },
@@ -339,7 +358,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(torg.name) IN (\'test\')' : 'torg.name IN (\'test\')'
             ]
         }
     },
@@ -355,7 +374,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(torg.name) NOT IN (\'test\')' : 'torg.name NOT IN (\'test\')'
             ]
         }
     },
@@ -371,7 +390,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(torg.name) LIKE \'test%\'' : 'torg.name LIKE \'test%\''
             ]
         }
     },
@@ -387,7 +406,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(torg.name) LIKE \'%test\'' : 'torg.name LIKE \'%test\''
             ]
         }
     },
@@ -403,7 +422,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(torg.name) LIKE \'%test%\'' : 'torg.name LIKE \'%test%\''
             ]
         }
     },
@@ -419,7 +438,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(torg.name) LIKE \'test\'' : 'torg.name LIKE \'test\''
             ]
         }
     },
@@ -435,7 +454,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) = \'test\''
+                $CaseSensitive ? 'LOWER(torg.number) = \'test\'' : 'torg.number = \'test\''
             ]
         }
     },
@@ -451,7 +470,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(LOWER(torg.number) = \'\' OR torg.number IS NULL)'
+                $CaseSensitive ? '(LOWER(torg.number) = \'\' OR torg.number IS NULL)' : '(torg.number = \'\' OR torg.number IS NULL)'
             ]
         }
     },
@@ -467,7 +486,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                '(LOWER(torg.number) != \'test\' OR torg.number IS NULL)'
+                $CaseSensitive ? '(LOWER(torg.number) != \'test\' OR torg.number IS NULL)' : '(torg.number != \'test\' OR torg.number IS NULL)'
             ]
         }
     },
@@ -483,7 +502,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) != \'\''
+                $CaseSensitive ? 'LOWER(torg.number) != \'\'' : 'torg.number != \'\''
             ]
         }
     },
@@ -499,7 +518,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(torg.number) IN (\'test\')' : 'torg.number IN (\'test\')'
             ]
         }
     },
@@ -515,7 +534,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(torg.number) NOT IN (\'test\')' : 'torg.number NOT IN (\'test\')'
             ]
         }
     },
@@ -531,7 +550,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(torg.number) LIKE \'test%\'' : 'torg.number LIKE \'test%\''
             ]
         }
     },
@@ -547,7 +566,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(torg.number) LIKE \'%test\'' : 'torg.number LIKE \'%test\''
             ]
         }
     },
@@ -563,7 +582,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(torg.number) LIKE \'%test%\'' : 'torg.number LIKE \'%test%\''
             ]
         }
     },
@@ -579,7 +598,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'Where' => [
-                'LOWER(torg.number) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(torg.number) LIKE \'test\'' : 'torg.number LIKE \'test\''
             ]
         }
     }
@@ -1226,7 +1245,7 @@ my @IntegrationSortTests = (
                 Field => 'OrganisationID'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field OrganisationID / Direction ascending',
@@ -1236,7 +1255,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field OrganisationID / Direction descending',
@@ -1246,7 +1265,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID4, $TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
     },
     {
         Name     => 'Sort: Field Organisation',
@@ -1255,7 +1274,7 @@ my @IntegrationSortTests = (
                 Field => 'Organisation'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field Organisation / Direction ascending',
@@ -1265,7 +1284,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field Organisation / Direction descending',
@@ -1275,7 +1294,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID4, $TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
     },
     {
         Name     => 'Sort: Field OrganisationNumber',
@@ -1284,7 +1303,7 @@ my @IntegrationSortTests = (
                 Field => 'OrganisationNumber'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field OrganisationNumber / Direction ascending',
@@ -1294,7 +1313,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3, $TicketID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3,$TicketID4] : [$TicketID4,$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => 'Sort: Field OrganisationNumber / Direction descending',
@@ -1304,7 +1323,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID4, $TicketID3, $TicketID2, $TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

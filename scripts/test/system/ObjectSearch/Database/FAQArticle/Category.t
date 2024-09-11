@@ -56,6 +56,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -713,7 +716,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CategoryID / Direction ascending',
@@ -724,7 +727,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CategoryID / Direction descending',
@@ -735,7 +738,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Category',
@@ -745,7 +748,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Category / Direction ascending',
@@ -756,7 +759,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Category / Direction descending',
@@ -767,7 +770,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {
