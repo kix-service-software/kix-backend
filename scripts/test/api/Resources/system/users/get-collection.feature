@@ -19,7 +19,7 @@
       | admin@localhost | admin     |
       
   Scenario: get the list of existing users filtered is not an in
-    Given 8 of users 
+    Given 8 of users
     When I query the collection of users with AND-filter of UserEmail "admi" and UserIDs and UserFirstname "M"
     Then the response code is 200
     And the response contains the following items of type User
@@ -32,4 +32,3 @@
     Then the response code is 200
     And the response contains 4 items of type "User"
 
-      

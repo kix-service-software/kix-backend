@@ -48,11 +48,11 @@ sub ValidateSetting {
     my %Setting;
     my $DefaultValue;
 
-    if ( IsHashRefWithData($Param{Setting}) ) {
+    if ( IsHashRef($Param{Setting}) ) {
         %Setting = (
-            Regex => $Param{Setting}->{Regex}
+            Regex => $Param{Setting}->{Regex} || ''
         );
-        $DefaultValue = $Param{Setting}->{content};
+        $DefaultValue = $Param{Setting}->{content} || '';
     }
     else {
         $DefaultValue = $Param{Setting};

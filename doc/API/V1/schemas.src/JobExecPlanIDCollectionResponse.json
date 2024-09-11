@@ -6,7 +6,7 @@
   "properties": {
     "ExecPlanID": {
       "type": "array",
-      "item": {
+      "items": {
         "type": "integer"
       },
       "description": "List of IDs of assigned execution plans of the job"

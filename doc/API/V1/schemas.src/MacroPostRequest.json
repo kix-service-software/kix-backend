@@ -9,7 +9,7 @@
       "properties": {
         "Actions": {
           "type": "array",
-          "item": {
+          "items": {
             "$ref": "MacroActionPostItem.json"
           }
         },

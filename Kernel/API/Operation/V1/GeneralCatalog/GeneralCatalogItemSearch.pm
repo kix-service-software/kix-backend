@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,12 +11,11 @@ package Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemSearch;
 use strict;
 use warnings;
 
-use Kernel::API::Operation::V1::GeneralCatalog::GeneralCatalogItemGet;
-use Kernel::System::VariableCheck qw(:all);
-
 use base qw(
     Kernel::API::Operation::V1::Common
 );
+
+use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
 
@@ -29,6 +28,16 @@ Kernel::API::Operation::GeneralCatalog::GeneralCatalogItemSearch - API GeneralCa
 =over 4
 
 =cut
+
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
 
 =item Run()
 
@@ -56,37 +65,44 @@ perform GeneralCatalogItemSearch Operation. This will return a GeneralCatalogIte
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    $Self->SetDefaultSort(
+        GeneralCatalogItem => [
+            { Field => 'Name' },
+        ]
+    );
+
+    my @GeneralCatalogList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'GeneralCatalog',
+        Result     => 'ARRAY',
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
+        Search     => $Self->{Search}->{GeneralCatalogItem},
+        Sort       => $Self->{Sort}->{GeneralCatalogItem} || $Self->{DefaultSort}->{GeneralCatalogItem},
+        Limit      => $Self->{SearchLimit}->{GeneralCatalogItem} || $Self->{SearchLimit}->{'__COMMON'}
+    );
+
     my @GeneralCatalogDataList;
+    if ( @GeneralCatalogList ) {
 
-    my $GeneralCatalogClassList = $Kernel::OM->Get('GeneralCatalog')->ClassList();
-
-    foreach my $Class ( @$GeneralCatalogClassList ){
-
-	    my $GeneralCatalogItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-	        Class => $Class,
-            Valid => 0,
-	    );
-
-	    # get already prepared GeneralCatalog data from GeneralCatalogGet operation
-	    if ( IsHashRefWithData($GeneralCatalogItemList) ) {
-	        my $GetResult = $Self->ExecOperation(
-	            OperationType            => 'V1::GeneralCatalog::GeneralCatalogItemGet',
-                SuppressPermissionErrors => 1,
-	            Data      => {
-	                GeneralCatalogItemID => join(',', sort keys %$GeneralCatalogItemList),
-	            }
-	        );
-            if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
-                return $GetResult;
+        my $GetResult = $Self->ExecOperation(
+            OperationType            => 'V1::GeneralCatalog::GeneralCatalogItemGet',
+            SuppressPermissionErrors => 1,
+            Data      => {
+                GeneralCatalogItemID => join( q{,}, @GeneralCatalogList),
             }
+        );
+        if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
+            return $GetResult;
+        }
 
-            my @ResultList;
-            if ( defined $GetResult->{Data}->{GeneralCatalogItem} ) {
-                @ResultList = IsArrayRef($GetResult->{Data}->{GeneralCatalogItem}) ? @{$GetResult->{Data}->{GeneralCatalogItem}} : ( $GetResult->{Data}->{GeneralCatalogItem} );
-            }
+        my @ResultList;
+        if ( defined $GetResult->{Data}->{GeneralCatalogItem} ) {
+            @ResultList = IsArrayRef($GetResult->{Data}->{GeneralCatalogItem})
+                ? @{$GetResult->{Data}->{GeneralCatalogItem}}
+                : ( $GetResult->{Data}->{GeneralCatalogItem} );
+        }
 
-	        push @GeneralCatalogDataList, @ResultList;
-	    }
+        push @GeneralCatalogDataList, @ResultList;
     }
 
     if ( IsArrayRefWithData(\@GeneralCatalogDataList) ) {

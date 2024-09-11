@@ -336,6 +336,21 @@ sub _GetTicketData {
         );
     }
 
+    # add previous state
+    if ( $Param{Data}->{include}->{StatePrevious} ) {
+        $TicketData{StatePrevious} = $TicketObject->GetPreviousTicketState(
+            TicketID => $TicketID,
+        ) || undef;
+        if ( $TicketData{StatePrevious} ) {
+            $TicketData{StateIDPrevious} = 0 + $Kernel::OM->Get('State')->StateLookup(
+                State => $TicketData{StatePrevious},
+            );
+        }
+        else {
+            $TicketData{StateIDPrevious} = undef;
+        }
+    }
+
     # add unseen information
     if ( $Param{Data}->{include}->{Unseen} ) {
         my $Exists = $TicketObject->TicketUserFlagExists(

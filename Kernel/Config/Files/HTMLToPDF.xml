@@ -61,6 +61,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Module###Asset" Required="0" Valid="1">
+        <Description Translatable="1">Module registration for configuration print.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Module</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Object::ConfigItem</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###Text" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>

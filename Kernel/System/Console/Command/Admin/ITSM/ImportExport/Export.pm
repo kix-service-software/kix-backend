@@ -63,8 +63,9 @@ sub Run {
 
     # export data
     my $Result = $Kernel::OM->Get('ImportExport')->Export(
-        TemplateID => $TemplateID,
-        UserID     => 1,
+        TemplateID   => $TemplateID,
+        UserID       => 1,
+        UsageContext => 'Agent',
     );
 
     if ( !$Result ) {

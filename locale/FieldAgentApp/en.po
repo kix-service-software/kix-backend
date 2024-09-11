@@ -27,3 +27,57 @@ msgstr "Analytics"
 
 msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
 msgstr "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
+
+msgid "Please select at most {0} items."
+msgstr "Please select at most {0} items."
+
+msgid "Please select at most one item."
+msgstr "Please select at most one item."
+
+msgid "Please select at least {0} items."
+msgstr "Please select at least {0} items."
+
+msgid "Please select at least one item."
+msgstr "Please select at least one item."
+
+msgid "Additional form data"
+msgstr "Additional form data"
+
+msgid "Form Data"
+msgstr "Form Data"
+
+msgid "Form data"
+msgstr "Form data"
+
+msgid "Form data entries"
+msgstr "Form data entries"
+
+msgid "{0} Form data entries"
+msgstr "{0} Form data entries"
+
+msgid "Please select a team first."
+msgstr "Please select a team first."
+
+msgid "assigned to"
+msgstr "assigned to"
+
+msgid "assigned to:"
+msgstr "assigned to:"
+
+msgid "assigned to: {0}"
+msgstr "assigned to: {0}"
+
+msgid "Other Tickets in Team"
+msgstr "Other Tickets in Team"
+
+msgid "Other Tickets"
+msgstr "Other Tickets"
+
+msgid "Not assigned to me"
+msgstr "not assigned to me"
+
+msgid "Location tracking"
+msgstr "Location Tracking"
+
+msgid "Unlocked tickets"
+msgstr "unlocked tickets"

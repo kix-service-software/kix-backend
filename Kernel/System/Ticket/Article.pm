@@ -75,20 +75,6 @@ create an article
                 Filename    => 'lala1.txt',
             },
         ],
-        Sign => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
-        Crypt => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-            Type    => 'SMIME',
-            Key     => '3b630c80',
-        },
         NoAgentNotify    => 0,                                      # if you don't want to send agent notifications
 
         ForceNotificationToUserID   => [ 1, 43, 56 ],               # if you want to force somebody
@@ -399,14 +385,17 @@ sub ArticleCreate {
         $Param{Body} = ' ';
     }
 
+    # init attachment count
+    my $AttachmentCount = 0;
+
     # do db insert
     return if !$DBObject->Do(
         SQL => 'INSERT INTO article '
             . '(ticket_id, channel_id, customer_visible, article_sender_type_id, a_from, a_reply_to, a_to, '
             . 'a_cc, a_bcc, a_subject, a_message_id, a_message_id_md5, a_in_reply_to, a_references, a_body, a_content_type, '
-            . 'content_path, valid_id, incoming_time, create_time, create_by, change_time, change_by) '
+            . 'content_path, attachment_count, valid_id, incoming_time, create_time, create_by, change_time, change_by) '
             . 'VALUES '
-            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{TicketID}, \$Param{ChannelID}, \$Param{CustomerVisible}, \$Param{SenderTypeID},
             \$Param{From},     \$Param{ReplyTo},       \$Param{To},
@@ -414,7 +403,7 @@ sub ArticleCreate {
             \$ArticleInsertFingerprint,    # just for next search; will be updated with correct MessageID
             \$Param{MD5},
             \$Param{InReplyTo}, \$Param{References}, \$Param{Body},
-            \$Param{ContentType}, \$Self->{ArticleContentPath}, \$ValidID,
+            \$Param{ContentType}, \$Self->{ArticleContentPath}, \$AttachmentCount, \$ValidID,
             \$IncomingTime, \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -676,16 +665,21 @@ sub ArticleCreate {
         my $Charset = $Param{Charset};
 
         # send mail
-        my ( $HeadRef, $BodyRef ) = $Kernel::OM->Get('Email')->Send(
+        # If EncryptIfPossible is active, it should be 2 because 1 means it needs to be encrypted
+        my $Send = $Kernel::OM->Get('Email')->Send(
             'Message-ID' => $Param{MessageID},
             %Param,
             MimeType => 'text/html',
             Charset  => $Charset,
-            Body     => $Body
+            Body     => $Body,
+            Encrypt  => $Param{EncryptIfPossible} ? 2 : 0
         );
 
         # return if no mail was able to send
-        if ( !$HeadRef || !$BodyRef ) {
+        if (
+            !$Send->{HeadRef}
+            || !$Send->{BodyRef}
+        ) {
             my $Error = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
                 What => 'Message',
@@ -694,7 +688,7 @@ sub ArticleCreate {
                 Message  => "Impossible to send message to: $Param{'To'} (Error: $Error).",
                 Priority => 'error',
             );
-            # flag article
+            # sets flag NotSentError, because article could not be sent
             $Self->ArticleFlagSet(
                 ArticleID => $ArticleID,
                 Key       => 'NotSentError',
@@ -702,14 +696,36 @@ sub ArticleCreate {
                 UserID    => $Param{UserID},
             );
 
+            # Sets specific article flags
+            for my $Flag ( @{$Send->{Flags}} ) {
+                $Self->ArticleFlagSet(
+                    ArticleID => $ArticleID,
+                    Key       => $Flag->{Key},
+                    Value     => $Flag->{Value},
+                    UserID    => $Param{UserID} || 1,
+                    Silent    => $Param{Silent}
+                );
+            }
+
             # return the ArticleID since we have created the article already but just not sent
             return $ArticleID;
+        }
+
+        # Sets specific article flags
+        for my $Flag ( @{$Send->{Flags}} ) {
+            $Self->ArticleFlagSet(
+                ArticleID => $ArticleID,
+                Key       => $Flag->{Key},
+                Value     => $Flag->{Value},
+                UserID    => $Param{UserID} || 1,
+                Silent    => $Param{Silent}
+            );
         }
 
         # write plain article to fs
         my $Plain = $Self->ArticleWritePlain(
             ArticleID => $ArticleID,
-            Email     => ${$HeadRef} . "\n" . ${$BodyRef},
+            Email     => ${$Send->{HeadRef}} . "\n" . ${$Send->{BodyRef}},
             UserID    => $Param{UserID}
         );
         if ( !$Plain ) {
@@ -866,11 +882,19 @@ sub ArticleGetContentPath {
     }
 
     if ( !$Param{TicketID} ) {
-        # get Article
-        my %Article = $Self->ArticleGet(
+        # get ticket id of article
+        my $TicketID = $Self->ArticleGetTicketID(
             ArticleID => $Param{ArticleID}
         );
-        $Param{TicketID} = $Article{TicketID};
+        if (!$TicketID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No article found with id $Param{ArticleID}!"
+            );
+            return;
+        }
+
+        $Param{TicketID} = $TicketID;
     }
 
     # check key
@@ -909,6 +933,61 @@ sub ArticleGetContentPath {
 
     # return
     return $Result;
+}
+
+=item ArticleGetTicketID()
+
+get ticket id of article
+
+    my $TicketID = $TicketObject->ArticleGetTicketID(
+        ArticleID => 123,
+    );
+
+=cut
+
+sub ArticleGetTicketID {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{ArticleID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ArticleID!'
+        );
+        return;
+    }
+
+    # check key
+    my $CacheKey = 'ArticleGetTicketID::' . $Param{ArticleID};
+
+    # check cache
+    my $Cache = $Self->_TicketCacheGet(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    # sql query
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'SELECT ticket_id FROM article WHERE id = ?',
+        Bind => [ \$Param{ArticleID} ],
+    );
+
+    my $TicketID;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $TicketID = $Row[0];
+    }
+
+    # set cache
+    $Self->_TicketCacheSet(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $TicketID,
+    );
+
+    # return
+    return $TicketID;
 }
 
 =item ArticleSenderTypeList()
@@ -1240,7 +1319,7 @@ sub ArticleIndex {
                         AND art.article_sender_type_id = ast.id
                         AND ast.name = ?'
                     . ($Param{CustomerVisible} ? ' AND art.customer_visible = 1' : '') .
-                    ' ORDER BY art.incoming_time',
+                    ' ORDER BY art.incoming_time, art.id',
             Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
         );
     } else {
@@ -1250,7 +1329,7 @@ sub ArticleIndex {
                 FROM article
                 WHERE ticket_id = ?'
                 . ($Param{CustomerVisible} ? ' AND customer_visible = 1' : '') .
-                ' ORDER BY incoming_time',
+                ' ORDER BY incoming_time, id',
             Bind => [ \$Param{TicketID} ],
         );
     }
@@ -1592,7 +1671,7 @@ sub ArticleGet {
         SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
             sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
             sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
-            sa.channel_id, sa.incoming_time, sa.id, sa.change_time, sa.change_by, sa.customer_visible
+            sa.channel_id, sa.incoming_time, sa.id, sa.change_time, sa.change_by, sa.customer_visible, sa.attachment_count
         FROM article sa
         WHERE ';
 
@@ -1688,6 +1767,7 @@ sub ArticleGet {
         $Data{ChangeTime}       = $Row[18];
         $Data{ChangedBy}        = $Row[19];
         $Data{CustomerVisible}  = $Row[20];
+        $Data{AttachmentCount}  = $Row[21];
 
         if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
             $Data{Charset} = $Data{ContentType};
@@ -1740,7 +1820,6 @@ sub ArticleGet {
                 next DYNAMICFIELD if !$DynamicFieldConfig;
                 next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
                 next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
-                next DYNAMICFIELD if !IsHashRefWithData( $DynamicFieldConfig->{Config} );
 
                 # get the current value for each dynamic field
                 my $Value = $DynamicFieldBackendObject->ValueGet(
@@ -2090,6 +2169,7 @@ sub ArticleUpdate {
         CustomerVisible => 'customer_visible',
         SenderTypeID    => 'article_sender_type_id',
         IncomingTime    => 'incoming_time',
+        ContentType     => 'a_content_type',
     );
 
     # db update
@@ -2219,8 +2299,9 @@ set article flags
         Key       => 'Seen',
         Value     => 1,
         UserID    => 123,
-        Silent    => 1       # optional - if set, no client notification will be triggered
-        NoEvents  => 1       # optional - trigger no events
+        Silent    => 1,       # optional - if set, no client notification will be triggered
+        NoEvents  => 1,       # optional - trigger no events
+        TicketID  => 123      # optional
     );
 
 Events:
@@ -2242,51 +2323,63 @@ sub ArticleFlagSet {
         }
     }
 
-    my %Article = $Self->ArticleGet(
-        ArticleID     => $Param{ArticleID},
-        UserID        => $Param{UserID},
-        DynamicFields => 0,
-    );
+    if (!$Param{TicketID}) {
+        # get ticket id of article
+        my $TicketID = $Self->ArticleGetTicketID(
+            ArticleID => $Param{ArticleID}
+        );
+        if (!$TicketID) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No article found with id $Param{ArticleID}!"
+            );
+            return;
+        }
+
+        $Param{TicketID} =$TicketID;
+    }
 
     my %Flag = $Self->ArticleFlagGet(
-        TicketID => $Article{TicketID},
+        TicketID => $Param{TicketID},
         %Param,
     );
 
     # check if set is needed
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    my $UserID = $Param{UserID};
+    if ( $Param{Key} =~ /^(?:SMIME|NotSend|RetryEncrypt)/smx ) {
+        $UserID = 1;
+    }
 
     # set flag
-    return if !$DBObject->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => '
             DELETE FROM article_flag
             WHERE article_id = ?
                 AND article_key = ?
                 AND create_by = ?',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$UserID ],
     );
 
-    return if !$DBObject->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO article_flag
             (article_id, article_key, article_value, create_time, create_by)
             VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     if ( !$Param{NoEvents} ) {
         $Self->EventHandler(
             Event => 'ArticleFlagSet',
             Data  => {
-                TicketID  => $Article{TicketID},
+                TicketID  => $Param{TicketID},
                 ArticleID => $Param{ArticleID},
                 Key       => $Param{Key},
                 Value     => $Param{Value},
-                UserID    => $Param{UserID},
+                UserID    => $UserID,
             },
             UserID => $Param{UserID},
         );
@@ -2298,7 +2391,7 @@ sub ArticleFlagSet {
             Event     => 'CREATE',
             Namespace => 'Ticket.Article.Flag',
             UserID    => $Param{UserID},
-            ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+            ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
         );
     }
 
@@ -2350,8 +2443,8 @@ sub ArticleFlagDelete {
         }
     }
 
-    # event
-    my %Article = $Self->ArticleGet(
+    # get ticket id of article
+    my $TicketID = $Self->ArticleGetTicketID(
         ArticleID => $Param{ArticleID}
     );
 
@@ -2377,17 +2470,10 @@ sub ArticleFlagDelete {
             Bind => [ \$Param{ArticleID}, \$Param{UserID}, \$Param{Key} ],
         );
 
-        # event
-        my %Article = $Self->ArticleGet(
-            ArticleID     => $Param{ArticleID},
-            UserID        => $Param{UserID},
-            DynamicFields => 0,
-        );
-
         $Self->EventHandler(
             Event => 'ArticleFlagDelete',
             Data  => {
-                TicketID  => $Article{TicketID},
+                TicketID  => $TicketID,
                 ArticleID => $Param{ArticleID},
                 Key       => $Param{Key},
                 UserID    => $Param{UserID},
@@ -2396,14 +2482,14 @@ sub ArticleFlagDelete {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $TicketID );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.Flag',
         UserID    => $Param{UserID},
-        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID}.'::'.$Param{Key},
+        ObjectID  => $TicketID.'::'.$Param{ArticleID}.'::'.$Param{Key},
     );
 
     return 1;
@@ -2448,7 +2534,7 @@ sub ArticleFlagGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     # sql query
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => '
             SELECT article_key, article_value
             FROM article_flag
@@ -2461,6 +2547,25 @@ sub ArticleFlagGet {
     my %Flag;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Flag{ $Row[0] } = $Row[1];
+    }
+
+    if ( $Param{UserID} ne '1' ) {
+        my $UserID = 1;
+        # sql query
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => '
+                SELECT article_key, article_value
+                FROM article_flag
+                WHERE article_id = ?
+                    AND create_by = ?',
+            Bind  => [ \$Param{ArticleID}, \$UserID ],
+            Limit => 1500,
+        );
+
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            next if ( $Row[0] !~ /^(?:SMIME|NotSend|RetryEncrypt)/smx );
+            $Flag{ $Row[0] } = $Row[1];
+        }
     }
 
     $Self->_TicketCacheSet(
@@ -2689,8 +2794,8 @@ sub ArticleAccountedTimeDelete {
         Bind => [ \$Param{ArticleID} ],
     );
 
-    # get article
-    my %Article = $Self->ArticleGet(
+    # get ticket id of article
+    my $TicketID = $Self->ArticleGetTicketID(
         ArticleID => $Param{ArticleID}
     );
 
@@ -2698,7 +2803,7 @@ sub ArticleAccountedTimeDelete {
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
-        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
+        ObjectID  => $TicketID.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2776,9 +2881,9 @@ write an article attachment to storage
 get article attachment (Content, ContentType, Filename and optional ContentID, ContentAlternative)
 
     my %Attachment = $TicketObject->ArticleAttachment(
-        ArticleID => 123,
-        FileID    => 1,   # as returned by ArticleAttachmentIndex
-        UserID    => 123,
+        ArticleID    => 123,
+        AttachmentID => 1,   # as returned by ArticleAttachmentIndex
+        UserID       => 123,
     );
 
 returns:
@@ -2919,9 +3024,9 @@ sub ArticleAttachmentIndex {
 
                 # get html body
                 my %Attachment = $Self->ArticleAttachment(
-                    ArticleID => $Param{ArticleID},
-                    FileID    => $AttachmentIDHTML,
-                    UserID    => $Param{UserID},
+                    ArticleID    => $Param{ArticleID},
+                    AttachmentID => $AttachmentIDHTML,
+                    UserID       => $Param{UserID},
                 );
 
                 ATTACHMENT:
@@ -3225,7 +3330,7 @@ sub _GetAssignedSearchParams {
 sub PrepareArticle {
     my ( $Self, %Param ) = @_;
 
-    $Param{CustomerVisible} = $Param{CustomerVisible} // 0,
+    $Param{CustomerVisible} = $Param{CustomerVisible} // 0;
     $Param{Channel} = $Param{Channel} || 'note';
     $Param{SenderType} = $Param{SenderType} || 'agent';
     $Param{Charset} = $Param{Charset} || 'utf-8';

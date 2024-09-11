@@ -27,7 +27,7 @@
       "ExecPlanIDs": {
         "type": "array",
         "readOnly": true,
-        "item": {
+        "items": {
           "type": "integer"
         },
         "description": "IDs of assigned execution plans - added via include \"ExecPlanIDs\""
@@ -36,15 +36,20 @@
         "type": "array",
         "description": "assigned execution plans - added via include \"ExecPlans\"",
         "readOnly": true,
-        "item": {
+        "items": {
           "$ref": "ExecPlan.json"
         }
       },
       "Filter": {
         "type": "array",
+        "readOnly": true,
         "description": "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details)."
       },
       "ID": {
+         "type": "integer",
+         "readOnly": true
+      },
+      "IsAsynchronous": {
          "type": "integer",
          "readOnly": true
       },
@@ -55,7 +60,7 @@
       "MacroIDs": {
         "type": "array",
         "readOnly": true,
-        "item": {
+        "items": {
           "type": "integer"
         },
         "description": "IDs of assigned macros - added via include \"MacroIDs\""
@@ -64,13 +69,32 @@
         "type": "array",
         "description": "assigned macros - added via include \"Macros\"",
         "readOnly": true,
-        "item": {
+        "items": {
           "$ref": "Macro.json"
         }
       },
       "Name": {
          "type": "string",
          "readOnly": true
+      },
+      "SortOrder": {
+         "type": "object",
+         "readOnly": true,
+         "description": "Used to sort found objects (see \"Filter\").",
+         "properties": {
+            "Field": {
+               "type": "string",
+               "readOnly": true
+            },
+            "Direction": {
+               "type": "string",
+               "readOnly": true,
+               "description": "ascending or descending"
+            }
+         },
+         "required" : [
+            "Field"
+         ]
       },
       "Type": {
          "type": "string",
@@ -88,7 +112,9 @@
       "CreateTime",
       "Filter",
       "ID",
+      "IsAsynchronous",
       "Name",
+      "SortOrder",
       "Type",
       "ValidID"
    ]

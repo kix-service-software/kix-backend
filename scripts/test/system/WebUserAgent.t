@@ -165,6 +165,11 @@ for my $Test (@Tests) {
 
         my $Status = substr $Response{Status}, 0, 3;
 
+        $Self->True(
+            $Status == $Response{HTTPCode},
+            "$Test->{Name} - First three digits of status matching http code",
+        );
+
         if ( !$Test->{Success} ) {
 
             if ( $Try < 5 && $Status eq 500 && $Test->{ErrorNumber} ne 500 ) {

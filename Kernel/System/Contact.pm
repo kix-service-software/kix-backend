@@ -561,6 +561,7 @@ contact id, email oder user id lookup
     my $ID = $ContactObject->ContactLookup(
         Email  => 'some_user_email',
         Silent => 1, # optional, don't generate log entry if user was not found
+        Valid  => 1  # optional, only valid contact, default 0
     );
 
     my $ID = $ContactObject->ContactLookup(
@@ -590,10 +591,30 @@ sub ContactLookup {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    my $ValidSQL = '';
+    my $ValidCachePart = '::Valid::' . ($Param{Valid} || 0);
+    if ($Param{Valid}) {
+        my $ValidID = $Kernel::OM->Get('Valid')->ValidLookup(
+            Valid => 'valid'
+        );
+
+        if ($ValidID) {
+            $ValidSQL = " AND c.valid_id = $ValidID ";
+        } else {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Could not get ID of valid!'
+                );
+            }
+            return;
+        }
+    }
+
     if ( $Param{Email}) {
 
         # check cache
-        my $CacheKey = 'ContactLookup::Email::' . $Param{Email};
+        my $CacheKey = 'ContactLookup::Email::' . $Param{Email} . $ValidCachePart;
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -604,7 +625,7 @@ sub ContactLookup {
         my $Email = lc $Param{Email};
 
         return if !$DBObject->Prepare(
-            SQL   => "SELECT id FROM contact WHERE $Self->{Lower}(email) = ? OR $Self->{Lower}(email1) = ? OR $Self->{Lower}(email2) = ? OR $Self->{Lower}(email3) = ? OR $Self->{Lower}(email4) = ? OR $Self->{Lower}(email5) = ? ORDER BY lastname, firstname",
+            SQL   => "SELECT c.id FROM contact c WHERE ($Self->{Lower}(c.email) = ? OR $Self->{Lower}(c.email1) = ? OR $Self->{Lower}(c.email2) = ? OR $Self->{Lower}(c.email3) = ? OR $Self->{Lower}(c.email4) = ? OR $Self->{Lower}(c.email5) = ?) $ValidSQL ORDER BY c.lastname, c.firstname",
             Bind  => [ \$Email, \$Email, \$Email, \$Email, \$Email, \$Email ],
             Limit => 1,
         );
@@ -641,7 +662,7 @@ sub ContactLookup {
         return if $Param{ID} && $Param{ID} !~ /^\d+$/;
 
         # check cache
-        my $CacheKey = 'ContactLookup::ID::' . $Param{ID};
+        my $CacheKey = 'ContactLookup::ID::' . $Param{ID} . $ValidCachePart;
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -650,7 +671,7 @@ sub ContactLookup {
 
         # build sql query
         return if !$DBObject->Prepare(
-            SQL => "SELECT email FROM contact WHERE id = ?",
+            SQL => "SELECT c.email FROM contact c WHERE c.id = ? $ValidSQL",
             Bind  => [ \$Param{ID} ],
             Limit => 1,
         );
@@ -687,7 +708,7 @@ sub ContactLookup {
         return if $Param{UserID} && $Param{UserID} !~ /^\d+$/;
 
         # check cache
-        my $CacheKey = 'ContactLookup::UserID::' . $Param{UserID};
+        my $CacheKey = 'ContactLookup::UserID::' . $Param{UserID} . $ValidCachePart;
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -695,7 +716,7 @@ sub ContactLookup {
         return $Cache if $Cache;
 
         return if !$DBObject->Prepare(
-            SQL => "SELECT id FROM contact WHERE user_id = ?",
+            SQL => "SELECT c.id FROM contact c WHERE c.user_id = ? $ValidSQL",
             Bind  => [ \$Param{UserID} ],
             Limit => 1,
         );
@@ -729,16 +750,18 @@ sub ContactLookup {
     elsif ($Param{UserLogin}){
 
         # check cache
-        my $CacheKey = 'ContactLookup::UserLogin::' . $Param{UserLogin};
+        my $CacheKey = 'ContactLookup::UserLogin::' . $Param{UserLogin} . $ValidCachePart;
         my $Cache    = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
         );
         return $Cache if $Cache;
 
+        my $UserLogin = lc $Param{UserLogin};
+
         return if !$DBObject->Prepare(
-            SQL => "SELECT c.id FROM contact c, users u WHERE u.id = c.user_id AND u.login = ?",
-            Bind  => [ \$Param{UserLogin} ],
+            SQL => "SELECT c.id FROM contact c, users u WHERE u.id = c.user_id AND $Self->{Lower}(u.login) = ? $ValidSQL",
+            Bind  => [ \$UserLogin ],
             Limit => 1,
         );
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -20,14 +20,13 @@ use MIME::Words;
 
 use Kernel::System::VariableCheck qw(:all);
 
-our @ObjectDependencies = (
-    'Config',
-    'Crypt::PGP',
-    'Crypt::SMIME',
-    'Encode',
-    'HTMLUtils',
-    'Log',
-    'Time',
+our @ObjectDependencies = qw(
+    Certificate
+    Config
+    Encode
+    HTMLUtils
+    Log
+    Time
 );
 
 =head1 NAME
@@ -105,22 +104,6 @@ To send an email without already created header:
                 ContentType => "image/png",
             }
         ],
-        Sign => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-
-            Type => 'SMIME',
-            Key  => '3b630c80',
-        },
-        Crypt => {
-            Type    => 'PGP',
-            SubType => 'Inline|Detached',
-            Key     => '81877F5E',
-
-            Type => 'SMIME',
-            Key  => '3b630c80',
-        },
     );
 
     if ($Sent) {
@@ -188,49 +171,6 @@ sub Send {
 
     # correct charset if necessary (KIX2018-8418)
     $Param{Charset} =~ s/utf8/utf-8/i;
-
-    # get sign options for inline
-    if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Inline' ) {
-
-        my $CryptObject = $Kernel::OM->Get( 'Crypt::' . $Param{Sign}->{Type} );
-
-        return if !$CryptObject;
-
-        my $Body = $CryptObject->Sign(
-            Message => $Param{Body},
-            Key     => $Param{Sign}->{Key},
-            Type    => 'Clearsign',
-            Charset => $Param{Charset},
-        );
-
-        if ($Body) {
-            $Param{Body} = $Body;
-        }
-    }
-
-    # crypt inline
-    if ( $Param{Crypt} && $Param{Crypt}->{Type} eq 'PGP' && $Param{Crypt}->{SubType} eq 'Inline' ) {
-
-        my $CryptObject = $Kernel::OM->Get('Crypt::PGP');
-
-        if ( !$CryptObject ) {
-            $Kernel::OM->Get('Log')->Log(
-                Message  => 'Not possible to create crypt object',
-                Priority => 'error',
-            );
-            return;
-        }
-
-        my $Body = $CryptObject->Crypt(
-            Message => $Param{Body},
-            Key     => $Param{Crypt}->{Key},
-            Type    => $Param{Crypt}->{SubType},
-        );
-
-        if ($Body) {
-            $Param{Body} = $Body;
-        }
-    }
 
     # build header
     my %Header;
@@ -510,207 +450,83 @@ sub Send {
         }
     }
 
-    # get sign options for detached
-    if ( $Param{Sign} && $Param{Sign}->{SubType} && $Param{Sign}->{SubType} eq 'Detached' ) {
+    my @Flags;
+    my %Sign = $Kernel::OM->Get('Certificate')->Sign(
+        %Param,
+        Entity => $Entity
+    );
 
-        my $CryptObject = $Kernel::OM->Get( 'Crypt::' . $Param{Sign}->{Type} );
+    if ( %Sign ) {
+        push( @Flags, @{$Sign{Flags}} );
 
-        if ( !$CryptObject ) {
-            $Kernel::OM->Get('Log')->Log(
-                Message  => 'Not possible to create crypt object',
-                Priority => 'error',
-            );
-            return;
-        }
-
-        if ( $Param{Sign}->{Type} eq 'PGP' ) {
-
-            # determine used digest for proper micalg declaration
-            my $ClearSign = $CryptObject->Sign(
-                Message => 'dummy',
-                Key     => $Param{Sign}->{Key},
-                Type    => 'Clearsign',
-                Charset => $Param{Charset},
-            );
-            my $DigestAlgorithm = 'sha1';
-            if ($ClearSign) {
-                $DigestAlgorithm = lc $1 if $ClearSign =~ m{ \n Hash: [ ] ([^\n]+) \n }xms;
-            }
-
-            # make_multipart -=> one attachment for sign
-            $Entity->make_multipart(
-                "signed; micalg=pgp-$DigestAlgorithm; protocol=\"application/pgp-signature\";",
-                Force => 1,
-            );
-
-            # get string to sign
-            my $T = $Entity->parts(0)->as_string();
-
-            # according to RFC3156 all line endings MUST be CR/LF
-            $T =~ s/\x0A/\x0D\x0A/g;
-            $T =~ s/\x0D+/\x0D/g;
-            my $Sign = $CryptObject->Sign(
-                Message => $T,
-                Key     => $Param{Sign}->{Key},
-                Type    => 'Detached',
-                Charset => $Param{Charset},
-            );
-
-            # it sign failed, remove multi part
-            if ( !$Sign ) {
-                $Entity->make_singlepart();
-            }
-            else {
-
-                # attach signature to email
-                $Entity->attach(
-                    Filename => 'pgp_sign.asc',
-                    Data     => $Sign,
-                    Type     => 'application/pgp-signature',
-                    Encoding => '7bit',
-                );
-            }
-        }
-        elsif ( $Param{Sign}->{Type} eq 'SMIME' ) {
-
-            # make multi part
-            my $EntityCopy = $Entity->dup();
-            $EntityCopy->make_multipart(
-                'mixed;',
-                Force => 1,
-            );
-
-            # get header to remember
-            my $Head = $EntityCopy->head();
-            $Head->delete('MIME-Version');
-            $Head->delete('Content-Type');
-            $Head->delete('Content-Disposition');
-            $Head->delete('Content-Transfer-Encoding');
-            my $Header = $Head->as_string();
-
-            # get string to sign
-            my $T = $EntityCopy->parts(0)->as_string();
-
-            # according to RFC3156 all line endings MUST be CR/LF
-            $T =~ s/\x0A/\x0D\x0A/g;
-            $T =~ s/\x0D+/\x0D/g;
-
-            # remove empty line after multi-part preable as it will be removed later by MIME::Parser
-            #    otherwise signed content will be different than the actual mail and verify will
-            #    fail
-            $T =~ s{(This is a multi-part message in MIME format...\r\n)\r\n}{$1}g;
-
-            my $Sign = $CryptObject->Sign(
-                Message  => $T,
-                Filename => $Param{Sign}->{Key},
-                Type     => 'Detached',
-            );
-            if ($Sign) {
-
-                my $Parser = MIME::Parser->new();
-                $Parser->output_to_core('ALL');
-
-                $Parser->output_dir( $ConfigObject->Get('TempDir') );
-                $Entity = $Parser->parse_data( $Header . $Sign );
-            }
+        if ( $Sign{Entity} ) {
+            $Entity = $Sign{Entity};
         }
     }
+    else {
+        return {
+            HeadRef => undef,
+            BodyRef => undef,
+            Flags   => [
+                {
+                    Key   => 'SMIMESigned',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMESignedError',
+                    Value => "Internal Error!"
+                }
+            ]
+        };
+    }
 
-    # crypt detached!
-    #my $NotCryptedBody = $Entity->body_as_string();
-    if (
-        $Param{Crypt}
-        && $Param{Crypt}->{Type}
-        && $Param{Crypt}->{Type} eq 'PGP'
-        && $Param{Crypt}->{SubType} eq 'Detached'
-        )
-    {
-        my $CryptObject = $Kernel::OM->Get('Crypt::PGP');
+    my %Encrypt = $Kernel::OM->Get('Certificate')->Encrypt(
+        %Param,
+        Entity             => $Entity,
+        IgnoreEmailPattern => $IgnoreEmailPattern
+    );
 
-        return if !$CryptObject;
-
-        # make_multipart -=> one attachment for encryption
-        $Entity->make_multipart(
-            "encrypted; protocol=\"application/pgp-encrypted\";",
-            Force => 1,
-        );
-
-        # crypt it
-        my $Crypt = $CryptObject->Crypt(
-            Message => $Entity->parts(0)->as_string(),
-
-            # Key => '81877F5E',
-            # Key => '488A0B8F',
-            Key => $Param{Crypt}->{Key},
-        );
-
-        # it crypt failed, remove encrypted multi part
-        if ( !$Crypt ) {
-            $Entity->make_singlepart();
+    if ( %Encrypt ) {
+        push( @Flags, @{$Encrypt{Flags}} );
+        if (
+            !$Encrypt{Successful}
+            && $Param{Encrypt} == 1
+        ) {
+            return {
+                HeadRef => undef,
+                BodyRef => undef,
+                Flags   => [
+                    \@Flags,
+                    {
+                        Key   => 'RetryEncrypt',
+                        Value => 1
+                    }
+                ]
+            };
         }
-        else {
-
-            # eliminate all parts
-            $Entity->parts( [] );
-
-            # add crypted parts
-            $Entity->attach(
-                Type        => 'application/pgp-encrypted',
-                Disposition => 'attachment',
-                Data        => [ "Version: 1", "" ],
-                Encoding    => '7bit',
-            );
-            $Entity->attach(
-                Type        => 'application/octet-stream',
-                Disposition => 'inline',
-                Filename    => 'msg.asc',
-                Data        => $Crypt,
-                Encoding    => '7bit',
-            );
+        if ( $Encrypt{Entity} ) {
+            $Entity = $Encrypt{Entity};
         }
     }
-    elsif ( $Param{Crypt} && $Param{Crypt}->{Type} && $Param{Crypt}->{Type} eq 'SMIME' ) {
-
-        my $CryptObject = $Kernel::OM->Get('Crypt::SMIME');
-
-        if ( !$CryptObject ) {
-            $Kernel::OM->Get('Log')->Log(
-                Message  => 'Failed creation of crypt object',
-                Priority => 'error',
-            );
-            return;
-        }
-
-        # make_multipart -=> one attachment for encryption
-        $Entity->make_multipart(
-            'mixed;',
-            Force => 1,
-        );
-
-        # get header to remember
-        my $Head = $Entity->head();
-        $Head->delete('MIME-Version');
-        $Head->delete('Content-Type');
-        $Head->delete('Content-Disposition');
-        $Head->delete('Content-Transfer-Encoding');
-        my $Header = $Head->as_string();
-
-        my $T = $Entity->parts(0)->as_string();
-
-        # according to RFC3156 all line endings MUST be CR/LF
-        $T =~ s/\x0A/\x0D\x0A/g;
-        $T =~ s/\x0D+/\x0D/g;
-
-        # crypt it
-        my $Crypt = $CryptObject->Crypt(
-            Message  => $T,
-            Filename => $Param{Crypt}->{Key},
-        );
-
-        my $Parser = MIME::Parser->new();
-
-        $Parser->output_dir( $ConfigObject->Get('TempDir') );
-        $Entity = $Parser->parse_data( $Header . $Crypt );
+    else {
+        return {
+            HeadRef => undef,
+            BodyRef => undef,
+            Flags   => [
+                {
+                    Key   => 'SMIMEEncrypted',
+                    Value => 1
+                },
+                {
+                    Key   => 'SMIMEEncryptedError',
+                    Value => "Internal Error!"
+                },
+                {
+                    Key   => 'RetryEncrypt',
+                    Value => $Param{Encrypt} ? 1 : 0
+                }
+            ]
+        };
     }
 
     # get header from Entity
@@ -721,7 +537,7 @@ sub Send {
     my @Headers = split( /\n/, $Param{Header} );
 
     # reset orig header
-    $Param{Header} = '';
+    $Param{Header} = q{};
     for my $Line (@Headers) {
         $Line =~ s/^    (.*)$/ $1/;
 
@@ -772,16 +588,19 @@ sub Send {
 
     # set envelope sender for notifications
     if ( $Param{Loop} ) {
-        my $NotificationEnvelopeFrom = $ConfigObject->Get('SendmailNotificationEnvelopeFrom') || '';
-        my $NotificationFallback = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
-        if ( $NotificationEnvelopeFrom || !$NotificationFallback ) {
+        my $NotificationEnvelopeFrom = $ConfigObject->Get('SendmailNotificationEnvelopeFrom') || q{};
+        my $NotificationFallback     = $ConfigObject->Get('SendmailNotificationEnvelopeFrom::FallbackToEmailFrom');
+        if (
+            $NotificationEnvelopeFrom
+            || !$NotificationFallback
+        ) {
             $RealFrom = $NotificationEnvelopeFrom;
         }
     }
 
     # debug
     if ( $Self->{Debug} > 1 ) {
-        my $To = join(',', @ToArray);
+        my $To = join( q{,}, @ToArray );
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
             Message  => "Sent email to '$To' from '$RealFrom'. Subject => '$Param{Subject}';",
@@ -804,15 +623,11 @@ sub Send {
         return;
     }
 
-    # don't push notification for email at the moment
-    # # push client callback event
-    # $Kernel::OM->Get('ClientNotification')->NotifyClients(
-    #     Event     => 'CREATE',
-    #     Namespace => 'Email',
-    #     ObjectID  => $MessageID,
-    # );
-
-    return ( \$Param{Header}, \$Param{Body} );
+    return {
+        HeadRef => \$Param{Header},
+        BodyRef => \$Param{Body},
+        Flags   => \@Flags
+    };
 }
 
 =item Check()

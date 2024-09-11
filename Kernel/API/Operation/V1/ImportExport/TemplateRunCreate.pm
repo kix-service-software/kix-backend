@@ -125,7 +125,8 @@ sub Run {
         $TaskID = $Kernel::OM->Get('ImportExport')->ImportTaskCreate(
             TemplateID    => $Param{Data}->{TemplateID},
             SourceContent => $TemplateRun->{ImportFileContent},
-            UserID        => $Self->{Authorization}->{UserID}
+            UserID        => $Self->{Authorization}->{UserID},
+            UsageContext  => $Self->{Authorization}->{UserType},
         );
 
         if ( !$TaskID ) {
@@ -148,8 +149,9 @@ sub Run {
 
     elsif ( $TemplateRun->{Type} =~ m/^export$/i ) {
         my $Result = $Kernel::OM->Get('ImportExport')->Export(
-            TemplateID => $Param{Data}->{TemplateID},
-            UserID     => 1,
+            TemplateID   => $Param{Data}->{TemplateID},
+            UserID       => $Self->{Authorization}->{UserID},
+            UsageContext => $Self->{Authorization}->{UserType},
         );
 
         if ( !$Result ) {

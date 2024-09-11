@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -18,18 +18,30 @@ use Kernel::System::VariableCheck qw(:all);
 sub Convert {
     my ($Self, %Param) = @_;
 
-    my $LogObject               = $Kernel::OM->Get('Log');
-    my $MainObject              = $Kernel::OM->Get('Main');
-    my $ConfigObject            = $Kernel::OM->Get('Config');
-    my $JSONObject              = $Kernel::OM->Get('JSON');
-    my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
-
     my %Data = $Self->TemplateGet(
         %Param
     );
 
+    if (
+        !%Data
+        && defined $Param{FallbackTemplate}
+        && $Param{FallbackTemplate}
+    ) {
+        %Data = $Self->TemplateGet(
+            %Param,
+            Name => $Param{FallbackTemplate}
+        );
+
+        if ( %Data ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "Template '$Param{TemplateName}' doesn't exists, so the default will be used!"
+            );
+        }
+    }
+
     if ( !%Data ) {
-        $LogObject->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'No definition exists!'
         );
@@ -48,7 +60,7 @@ sub Convert {
     );
 
     if ( IsHashRefWithData($Result) ) {
-        $LogObject->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => $Result->{error}
         );
@@ -56,8 +68,8 @@ sub Convert {
     }
 
     my $Binary        = '/usr/local/bin/wkhtmltopdf';
-    my $Config        = $ConfigObject->Get('HTMLToPDF::wkhtmltopdf');
-    my $TempDir       = $ConfigObject->Get('TempDir');
+    my $Config        = $Kernel::OM->Get('Config')->Get('HTMLToPDF::wkhtmltopdf');
+    my $TempDir       = $Kernel::OM->Get('Config')->Get('TempDir');
     my $Directory     = $TempDir . '/PDFPrint';
     my $ContentType   = 'application/pdf';
     my $FileExtension = '.pdf';
@@ -65,7 +77,7 @@ sub Convert {
     my $Output        = q{};
 
     if ( !-e $Binary ) {
-        $LogObject->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "HTMLToPDF: wkhtmltopdf binary doesn't exist!",
         );
@@ -75,7 +87,7 @@ sub Convert {
     for my $CheckDirectory ( $TempDir, $Directory ) {
         if ( !-e $CheckDirectory ) {
             if ( !mkdir( $CheckDirectory, oct(770) ) ) {
-                $LogObject->Log(
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create directory '$CheckDirectory': $!",
                 );
@@ -96,7 +108,7 @@ sub Convert {
             String => $Filename,
             UserID => $Param{UserID},
         );
-        $Filename = $TemplateGeneratorObject->ReplacePlaceHolder(
+        $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             %Param,
             Text     => $Replaced{Text},
             RichText => 1,
@@ -107,7 +119,7 @@ sub Convert {
 
     for my $Key ( qw(Filters Allows Ignores) ) {
         next if !$Param{$Key};
-        my $Tmp = $JSONObject->Decode(
+        my $Tmp = $Kernel::OM->Get('JSON')->Decode(
             Data => $Param{$Key}
         );
 
@@ -258,12 +270,10 @@ sub _Call {
 sub _FileDelete {
     my ($Self, %Param) = @_;
 
-    my $MainObject = $Kernel::OM->Get('Main');
-
     for my $Data ( @{$Param{Data}} ) {
 
         # delete output file from fs
-        $MainObject->FileDelete(
+        $Kernel::OM->Get('Main')->FileDelete(
             Directory       => $Data->{Directory},
             Filename        => $Data->{Filename},
             Type            => 'Local',
@@ -277,14 +287,12 @@ sub _FileDelete {
 sub _FilenameCreate {
     my ( $Self, %Param ) = @_;
 
-    my $TimeObject = $Kernel::OM->Get('Time');
-
     my $Filename;
     my $Name        = $Param{Name};
     my $Object      = $Param{Object};
     my $IDKey       = $Self->{"Backend$Object"}->{IDKey}     || q{};
     my $NumberKey   = $Self->{"Backend$Object"}->{NumberKey} || q{};
-    my $CurrentTime = $TimeObject->CurrentTimestamp();
+    my $CurrentTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
     $CurrentTime =~ s/[-:]+//gmsx;
     $CurrentTime =~ s/\s+//gmsx;
@@ -320,15 +328,10 @@ sub _CheckParams {
 sub _ReplacePlaceholders {
     my ( $Self, %Param ) = @_;
 
-    my $LogObject     = $Kernel::OM->Get('Log');
-    my $TimeObject    = $Kernel::OM->Get('Time');
-    my $ContactObject = $Kernel::OM->Get('Contact');
-    my $LayoutObject  = $Kernel::OM->Get('Output::HTML::Layout');
-
     # check needed stuff
     for my $Needed (qw(String)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message => "Need $Needed!"
             );
@@ -370,14 +373,14 @@ sub _ReplacePlaceholders {
 
     # replace current user and time
     if ( $Result{Text} =~ m{<Current_Time>}smx ) {
-        my $Time = $TimeObject->CurrentTimestamp();
+        my $Time = $Kernel::OM->Get('Time')->CurrentTimestamp();
         if ( $Param{Translate} ) {
-            $Time = $LayoutObject->{LanguageObject}->FormatTimeString( $Time, "DateFormat" );
+            $Time = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString( $Time, "DateFormat" );
         }
         $Result{Text} =~ s/<Current_Time>/$Time/gxsm;
     }
     if ( $Result{Text} =~ m{<Current_User>}smx ) {
-        my %Contact = $ContactObject->ContactGet(
+        my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
             UserID => $Param{UserID}
         );
         if ( %Contact ) {
@@ -400,8 +403,8 @@ sub _ReplacePlaceholders {
     }
     # replace filename time
     if ( $Result{Text} =~ m{<TIME_}smx ) {
-        my @Time = $TimeObject->SystemTime2Date(
-            SystemTime => $TimeObject->SystemTime()
+        my @Time = $Kernel::OM->Get('Time')->SystemTime2Date(
+            SystemTime => $Kernel::OM->Get('Time')->SystemTime()
         );
 
         if ( $Result{Text} =~ m{<TIME_YYMMDD_hhmm}smx ) {

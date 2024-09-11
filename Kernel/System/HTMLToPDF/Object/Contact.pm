@@ -89,6 +89,9 @@ sub DataGet {
         %Contact = %{$Param{Data}};
     }
 
+    # Copies the object ID to the IDKey identifier so that the IDKey can be used everywhere
+    $Contact{ContactID} = $Contact{ID};
+
     my $DynamicFields;
     if ( %Expands ) {
         for my $Expand ( keys %Expands ) {

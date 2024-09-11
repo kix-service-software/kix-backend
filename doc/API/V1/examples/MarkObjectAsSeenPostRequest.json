@@ -1,0 +1,6 @@
+{
+  "MarkObjectAsSeen": {
+    "IDs": [123],
+    "ObjectType": "Ticket"
+  }
+}

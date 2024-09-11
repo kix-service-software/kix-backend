@@ -155,6 +155,60 @@ sub GetBasePermissionObjectIDs {
     return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
 }
 
+sub ExecuteBasePermissionModules {
+    my ( $Self, %Param ) = @_;
+
+    # we don't have to do the checks if we have no TicketID given
+    return 1 if ( ref( $Param{Data} ) ne 'HASH' || !$Param{Data}->{TicketID} );
+
+    # we don't have to do the checks if we have been called by TicketSearch
+    return 1 if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
+
+    # Filter can only contain a QueueIDs criterion at this point
+    my $Filter = $Param{Filter}; 
+    my $BasePermissionQueueIDs = $Param{Filter}->{Ticket}->{OR}->[0]->{Value};
+
+    # execute additional permission modules for result object
+    my $PermissionModules = $Kernel::OM->Get('Config')->Get('Ticket::BasePermissionModule') || {};
+    PERMISSION_MODULE:
+    foreach my $PermissionModule ( sort keys %{$PermissionModules} ) {
+        next PERMISSION_MODULE if !$PermissionModules->{$PermissionModule}->{Module};
+
+        my $Backend = $PermissionModules->{$PermissionModule}->{Module};
+
+        if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!"
+            );
+            next PERMISSION_MODULE;
+        }
+
+        my $BackendObject = $Backend->new( %{$Self} );
+        if ( !$BackendObject ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!"
+            );
+            next PERMISSION_MODULE;
+        }
+        $BackendObject->{Config} = $PermissionModules->{$PermissionModule};
+
+        my $Result = $BackendObject->Run(
+            %Param, 
+            BasePermissionQueueIDs => $BasePermissionQueueIDs,
+            TicketID               => $Param{Data}->{TicketID},
+            UserID                 => $Self->{Authorization}->{UserID}
+        );
+        next PERMISSION_MODULE if !IsHashRefWithData($Result);
+
+        $Filter->{Ticket}->{OR} //= [];
+        push @{$Filter->{Ticket}->{OR}}, $Result;
+    }
+
+    return $Filter;
+}
+
 =begin Internal:
 
 =item _CheckTicket()

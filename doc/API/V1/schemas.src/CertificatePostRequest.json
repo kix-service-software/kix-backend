@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "CertificatePostRequest.json",
+  "type": "object",
+  "description": "The certificate request object for create.",
+  "properties": {
+    "Certificate": {
+      "type": "object",
+      "properties": {
+        "File": {
+          "type": "object",
+          "properties": {
+            "Content": {
+              "type": "string",
+              "description": "base64 encoded file content string"
+            },
+            "ContentType": {
+              "type": "string"
+            },
+            "Filename": {
+              "type": "string"
+            },
+            "Filesize": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "Content",
+            "ContentType",
+            "Filename"
+          ]
+        },
+        "Type": {
+          "type": "string"
+        },
+        "CType": {
+          "type": "string"
+        },
+        "Passphrase": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "File",
+        "Type"
+      ]
+    }
+  },
+  "required": [
+    "Certificate"
+  ]
+}

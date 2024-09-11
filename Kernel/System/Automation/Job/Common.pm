@@ -61,7 +61,12 @@ sub new {
 Run this job module.
 
 Example:
-    my $Result = $Object->Run();
+    my $Result = $Object->Run(
+        Filter    => {}         # optional, filter for objects
+        Data      => {},        # optional, contains the relevant data given by an event or otherwise
+        SortOrder => {},        # optional, sorting for objects - if supported by specific type
+        UserID    => 123
+    );
 
 =cut
 
@@ -83,7 +88,19 @@ sub Run {
         $Param{Filter} = [$Param{Filter}];
     }
 
-    my @IDs = $Self->_Run(%Param);
+    # prepare sort if given
+    my $Sort;
+    if (IsHashRefWithData($Param{SortOrder}) && $Param{SortOrder}->{Field}) {
+        $Param{SortOrder}->{Direction} ||= 'ascending';
+        $Sort = [
+            {
+                Field     => $Param{SortOrder}->{Field},
+                Direction => $Param{SortOrder}->{Direction}
+            }
+        ];
+    }
+
+    my @IDs = $Self->_Run(%Param, Sort => $Sort);
 
     return @IDs;
 }

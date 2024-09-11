@@ -6,7 +6,7 @@
    "properties" : {
       "Attachments" : {
          "type" : "array",
-         "item" : {
+         "items" : {
             "$ref" : "#/definitions/_TicketArticleAttachmentPostItem_json"
          }
       },

@@ -40,6 +40,27 @@ my $TicketID = _CreateTicket(
     TestName => '_CreateTicket(): ticket create'
 );
 
+my $DFID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+    Name            => 'ArticlePlaceholderTestDF',
+    Label           => 'ArticlePlaceholderTestDF',
+    FieldType       => 'Text',
+    ObjectType      => 'Article',
+    Config          => {},
+    ValidID         => 1,
+    UserID          => 1
+);
+$Self->True(
+    $DFID,
+    'Added dynamic field'
+);
+my $DynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+    ID   => $DFID
+);
+$Self->True(
+    IsHashRefWithData($DynamicField) ? 1 : 0,
+    'Get dynamic field'
+);
+
 my %FirstArticle = (
     TicketID         => $TicketID,
     Channel          => 'email',
@@ -207,6 +228,22 @@ sub _TestRun {
     return 1;
 }
 
+# simple check for dynamic field placeholders - are they possible
+my $Result = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+    RichText  => 0,
+    Text      => "ARTICLE: <KIX_ARTICLE_DynamicField_ArticlePlaceholderTestDF>, FIRST: <KIX_FIRST_DynamicField_ArticlePlaceholderTestDF>, LAST: <KIX_LAST_DynamicField_ArticlePlaceholderTestDF>, AGENT: <KIX_AGENT_DynamicField_ArticlePlaceholderTestDF>, CUSTOMER: <KIX_CUSTOMER_DynamicField_ArticlePlaceholderTestDF>",
+    Data      => {
+        ArticleID => $ArticleFirst{ArticleID}
+    },
+    TicketID  => $TicketID,
+    UserID    => 1
+);
+$Self->Is(
+    $Result,
+    "ARTICLE: $ArticleFirst{Subject}, FIRST: $ArticleFirst{Subject}, LAST: $ArticleLast{Subject}, AGENT: $ArticleLast{Subject}, CUSTOMER: $ArticleFirst{Subject}",
+    'Article dynamic field placeholder test'
+);
+
 sub _CreateTicket {
     my (%Param) = @_;
 
@@ -245,12 +282,24 @@ sub _CreateArticle {
 
     my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
         ArticleID => $ArticleID,
-        UserID   => 1
+        UserID    => 1
     );
 
     $Self->True(
         $ArticleID,
         $Param{TestName}
+    );
+
+    my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+        DynamicFieldConfig => $DynamicField,
+        ObjectID           => $ArticleID,
+        Value              => [$Param{Config}->{Subject}],
+        UserID             => 1
+    );
+
+    $Self->True(
+        $Success,
+        "$Param{TestName} :: set dynamic field"
     );
 
     $Kernel::OM->ObjectsDiscard(

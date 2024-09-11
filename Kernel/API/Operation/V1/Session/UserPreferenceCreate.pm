@@ -58,9 +58,7 @@ sub ParameterDefinition {
         'UserPreference::ID' => {
             Required => 1
         },
-        'UserPreference::Value' => {
-            Required => 1
-        },
+        'UserPreference::Value' => {},
     }
 }
 

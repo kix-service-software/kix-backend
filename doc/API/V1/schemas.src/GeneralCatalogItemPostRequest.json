@@ -18,7 +18,7 @@
         },
         "Preferences": {
           "type": "array",
-          "item": {
+          "items": {
             "$ref": "GeneralCatalogItemPreferencePostItem.json"
           }
         },

@@ -14,7 +14,7 @@
             "OutputFormats": {
                 "type": "array",
                 "readOnly": true,
-                "item": {
+                "items": {
                     "type:": "string",
                     "readOnly": true
                 }
@@ -44,7 +44,7 @@
       "type": "array",
       "description": "added via include \"Results\"",
       "readOnly": true,
-      "item": {
+      "items": {
           "$ref": "ReportResult.json"
       }
     }

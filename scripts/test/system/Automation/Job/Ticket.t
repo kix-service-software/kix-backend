@@ -30,14 +30,14 @@ $ConfigObject->Set(
 
 my %Data = (
     Ticket_1_Title   => 'TicketFilter_1',
-    Ticket_1_TypeID  => 1,
-    Ticket_1_QueueID => 1,
+    Ticket_1_TypeID  => 1, # Unclassified
+    Ticket_1_QueueID => 1, # Service Desk
     Ticket_2_Title   => 'TicketFilter_2',
-    Ticket_2_TypeID  => 2,
-    Ticket_2_QueueID => 2,
+    Ticket_2_TypeID  => 2, # Incident
+    Ticket_2_QueueID => 2, # Monitoring
     Ticket_3_Title   => 'TicketFilter_3',
-    Ticket_3_TypeID  => 3,
-    Ticket_3_QueueID => 3
+    Ticket_3_TypeID  => 3, # Service Request
+    Ticket_3_QueueID => 3  # Junk
 );
 
 my ($TicketID_1, $TicketID_2, $TicketID_3) = _CreateTickets();
@@ -230,12 +230,6 @@ if ($TicketID_1) {
             UserID => 1,
         );
 
-        # only tickets wich are created by this test
-        @ObjectIDs = $MainObject->GetCombinedList(
-            ListA => \@ObjectIDs,
-            ListB => [$TicketID_1, $TicketID_2, $TicketID_3]
-        );
-
         if ($Test->{Expected}->{Count}) {
             $Self->Is(
                 scalar(@ObjectIDs),
@@ -258,6 +252,149 @@ if ($TicketID_1) {
                 );
             }
         }
+    }
+
+    # check sorting
+    @TestData = (
+        {
+            Test      => 'Title asc, without filter, no direction',
+            SortOrder => {
+                Field => 'Title'
+            },
+            Expected  => [$TicketID_1, $TicketID_2, $TicketID_3]
+        },
+        {
+            Test      => 'Title asc, without filter',
+            SortOrder => {
+                Field     => 'Title',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_1, $TicketID_2, $TicketID_3]
+        },
+        {
+            Test      => 'Title desc, without filter',
+            SortOrder => {
+                Field     => 'Title',
+                Direction => 'descending'
+            },
+            Expected  => [$TicketID_3, $TicketID_2, $TicketID_1]
+        },
+        {
+            Test      => 'Title asc, without filter, no direction',
+            SortOrder => {
+                Field => 'TypeID'
+            },
+            Expected  => [$TicketID_1, $TicketID_2, $TicketID_3]
+        },
+        {
+            Test      => 'TypeID asc, without filter',
+            SortOrder => {
+                Field     => 'TypeID',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_1, $TicketID_2, $TicketID_3]
+        },
+        {
+            Test      => 'TypeID desc, without filter',
+            SortOrder => {
+                Field     => 'TypeID',
+                Direction => 'descending'
+            },
+            Expected  => [$TicketID_3, $TicketID_2, $TicketID_1]
+        },
+        {
+            Test      => 'Type asc, without filter',
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_2, $TicketID_3, $TicketID_1]
+        },
+        {
+            Test      => 'Type desc, without filter',
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'descending'
+            },
+            Expected  => [$TicketID_1, $TicketID_3, $TicketID_2]
+        },
+        {
+            Test      => 'Type asc, "Title" filter',
+            Filter    =>[
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ]
+                }
+            ],
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_2, $TicketID_1]
+        },
+        {
+            Test      => 'Type desc, "Title" filter',
+            Filter    =>[
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ]
+                }
+            ],
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'descending'
+            },
+            Expected  => [$TicketID_1, $TicketID_2]
+        },
+        {
+            Test      => 'Type desc, "TypeID" filter',
+            Filter    =>[
+                {
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_2_TypeID}, $Data{Ticket_3_TypeID}] },
+                    ]
+                }
+            ],
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_2, $TicketID_3]
+        },
+        {
+            Test      => 'Type desc, "TypeID" filter',
+            Filter    =>[
+                {
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_2_TypeID}, $Data{Ticket_3_TypeID}] },
+                    ]
+                }
+            ],
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'descending'
+            },
+            Expected  => [$TicketID_3, $TicketID_2]
+        },
+    );
+
+    # run checks
+    foreach my $Test ( @TestData ) {
+        my @ObjectIDs = $JobObject->Run(
+            Filter    => $Test->{Filter},
+            SortOrder => $Test->{SortOrder},
+            UserID    => 1
+        );
+
+        $Self->IsDeeply(
+            \@ObjectIDs,
+            $Test->{Expected},
+            $Test->{Test},
+        );
     }
 }
 

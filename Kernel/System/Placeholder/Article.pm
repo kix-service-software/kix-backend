@@ -259,9 +259,9 @@ sub _ReplaceBodyRichtext {
 
             if ( $AttachmentIndex{$AttachmentID}->{Filename} eq 'file-2') {
                 my %Attachment = $Self->{TicketObject}->ArticleAttachment(
-                    ArticleID => $Param{Article}->{ArticleID},
-                    FileID    => $AttachmentID,
-                    UserID    => $Param{UserID},
+                    ArticleID    => $Param{Article}->{ArticleID},
+                    AttachmentID => $AttachmentID,
+                    UserID       => $Param{UserID},
                 );
 
                 if (IsHashRefWithData(\%Attachment)) {
@@ -296,9 +296,9 @@ sub _ReplaceBodyRichtext {
                 }
             } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
                 my %Attachment = $Self->{TicketObject}->ArticleAttachment(
-                    ArticleID => $Param{Article}->{ArticleID},
-                    FileID    => $AttachmentID,
-                    UserID    => $Param{UserID},
+                    ArticleID    => $Param{Article}->{ArticleID},
+                    AttachmentID => $AttachmentID,
+                    UserID       => $Param{UserID},
                 );
                 if (IsHashRefWithData(\%Attachment)) {
                     push(@InlineAttachments, \%Attachment);

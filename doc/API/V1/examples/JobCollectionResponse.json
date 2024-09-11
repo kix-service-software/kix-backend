@@ -20,6 +20,7 @@
                 }
             ],
             "ID": 1,
+            "IsAsynchronous": 0,
             "LastExecutionTime": "",
             "MacroIDs": [],
             "Name": "Some Job",
@@ -35,6 +36,7 @@
             "ExecPlanIDs": [ 2 ],
             "Filter": null,
             "ID": 2,
+            "IsAsynchronous": 1,
             "LastExecutionTime": "2019-10-01 14:00:00",
             "MacroIDs": [ 2,4 ],
             "Name": "Another Job",

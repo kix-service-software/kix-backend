@@ -19,6 +19,7 @@
             }
         ],
         "ID": 1,
+        "IsAsynchronous": 0,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
         "Macros": [
@@ -53,6 +54,10 @@
             }
         ],
         "Name": "Some Job",
+        "SortOrder": {
+            "Field": "TypeID",
+            "Direction": "ascending"
+        },
         "Type": "Ticket",
         "ValidID": 1
     }

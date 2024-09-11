@@ -40,7 +40,7 @@
       "type": "array",
       "description": "preferences of this item",
       "readOnly": true,
-      "item": {
+      "items": {
         "$ref": "GeneralCatalogItemPreference.json"
       }
     },

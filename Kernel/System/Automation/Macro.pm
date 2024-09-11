@@ -636,7 +636,7 @@ sub MacroExecute {
     my $OrgObjectID;
     if (
         $Self->{MacroResults}->{ObjectID} &&
-        $Self->{MacroResults}->{ObjectID} != $Param{ObjectID}
+        "$Self->{MacroResults}->{ObjectID}" ne "$Param{ObjectID}"
     ) {
         $OrgObjectID = $Self->{MacroResults}->{ObjectID};
         $Self->{MacroResults}->{ObjectID} = $Param{ObjectID};
@@ -669,8 +669,15 @@ sub MacroExecute {
         return 1;
     }
 
+    my $ObjectIDString = $Param{ObjectID};
+    if ( IsHashRef($Param{ObjectID}) || IsArrayRef($Param{ObjectID}) ) {
+        $ObjectIDString = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{ObjectID},
+        );
+    }
+
     $Self->LogInfo(
-        Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}}))." macro actions on ObjectID $Param{ObjectID}.",
+        Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}})).' macro actions on ObjectID "'.$ObjectIDString.'".',
         UserID   => $Param{UserID},
     );
 
@@ -985,8 +992,9 @@ sub _LoadMacroTypeBackend {
         }
 
         # add referrer data
-        $BackendObject->{JobID}   = $Self->{JobID};
-        $BackendObject->{RunID}   = $Self->{RunID};
+        $BackendObject->{JobID} = $Self->{JobID};
+        $BackendObject->{RunID} = $Self->{RunID};
+        $BackendObject->{Debug} = $Self->{Debug};
 
         $Self->{MacroTypeModules}->{$Param{Name}} = $BackendObject;
     }

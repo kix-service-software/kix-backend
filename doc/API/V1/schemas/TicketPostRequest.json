@@ -9,7 +9,7 @@
          "properties" : {
             "Articles" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TicketArticlePostItem_json"
                }
             },
@@ -135,7 +135,7 @@
          "properties" : {
             "Attachments" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TicketArticleAttachmentPostItem_json"
                }
             },

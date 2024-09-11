@@ -1,0 +1,1 @@
+Mark object as seen (e.g. a ticket and its articles)

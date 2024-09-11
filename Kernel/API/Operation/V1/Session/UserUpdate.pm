@@ -143,6 +143,14 @@ sub Run {
         );
     }
 
+    # create mfa secret
+    if ( $User->{ExecMFAGenerateSecret} ) {
+        my $Success = $Kernel::OM->Get('Auth')->MFASecretGenerate(
+            MFAuth => $User->{ExecMFAGenerateSecret},
+            UserID => $Self->{Authorization}->{UserID}
+        );
+    }
+
     return $Self->_Success(
         UserID => $UserData{UserID},
     );

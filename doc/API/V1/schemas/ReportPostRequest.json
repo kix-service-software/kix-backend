@@ -12,7 +12,7 @@
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type:" : "string"
                      }
                   },

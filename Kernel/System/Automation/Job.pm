@@ -11,6 +11,8 @@ package Kernel::System::Automation::Job;
 use strict;
 use warnings;
 
+use Time::HiRes qw(time);
+
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::AsynchronousExecutor);
@@ -91,18 +93,19 @@ returns a hash with the job data
 This returns something like:
 
     %JobData = (
-        'ID'                => 2,
-        'Type'              => 'Ticket',
-        'Name'              => 'Test',
-        'Filter'            => [],
-        'IsAsynchronous'    => 0|1,
-        'Comment'           => '...',
-        'LastExecutionTime' => '2019-10-21 12:00:00',
-        'ValidID'           => '1',
-        'CreateTime'        => '2010-04-07 15:41:15',
-        'CreateBy'          => 1,
-        'ChangeTime'        => '2010-04-07 15:41:15',
-        'ChangeBy'          => 1
+        ID                => 2,
+        Type              => 'Ticket',
+        Name              => 'Test',
+        Filter            => [],
+        SortOrder         => {},
+        IsAsynchronous    => 0|1,
+        Comment           => '...',
+        LastExecutionTime => '2019-10-21 12:00:00',
+        ValidID           => '1',
+        CreateTime        => '2010-04-07 15:41:15',
+        CreateBy          => 1,
+        ChangeTime        => '2010-04-07 15:41:15',
+        ChangeBy          => 1
     );
 
 =cut
@@ -128,7 +131,7 @@ sub JobGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name, type, filter, comments, is_async, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
+        SQL   => "SELECT id, name, type, filter, sort_order, comments, is_async, valid_id, last_exec_time, create_time, create_by, change_time, change_by FROM job WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -141,14 +144,15 @@ sub JobGet {
             Name              => $Row[1],
             Type              => $Row[2],
             Filter            => $Row[3],
-            Comment           => $Row[4],
-            IsAsynchronous    => $Row[5],
-            ValidID           => $Row[6],
-            LastExecutionTime => $Row[7],
-            CreateTime        => $Row[8],
-            CreateBy          => $Row[9],
-            ChangeTime        => $Row[10],
-            ChangeBy          => $Row[11],
+            SortOrder         => $Row[4],
+            Comment           => $Row[5],
+            IsAsynchronous    => $Row[6],
+            ValidID           => $Row[7],
+            LastExecutionTime => $Row[8],
+            CreateTime        => $Row[9],
+            CreateBy          => $Row[10],
+            ChangeTime        => $Row[11],
+            ChangeBy          => $Row[12],
         );
 
         if ( $Result{Filter} ) {
@@ -159,6 +163,13 @@ sub JobGet {
             if (!IsArrayRef($Result{Filter})) {
                 $Result{Filter} = [$Result{Filter}];
             }
+        }
+
+        if ( $Result{SortOrder} ) {
+            # decode JSON
+            $Result{SortOrder} = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Result{SortOrder}
+            );
         }
     }
 
@@ -191,13 +202,19 @@ adds a new job
         Type           => 'Ticket',
         Filter         => [                                         # optional
             {
-                Queue => [ 'SomeQueue' ],
-            },
-            {
-                Queue => [ 'SomeOtherQueue'],
-                Type  => [ 'SomeType' ]
+                AND => [
+                    {
+                        Field     => 'TypeID',
+                        Operator  => 'EQ',
+                        Value     => 2
+                    }
+                ]
             }
         ],
+        SortOrder      => {                                         # optional
+            Field     => 'QueueID',
+            Direction => 'descending'
+        }
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -258,12 +275,27 @@ sub JobAdd {
         }
     }
 
+    # prepare sortorder as JSON
+    my $SortOrder;
+    if ( $Param{SortOrder} ) {
+        $SortOrder = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{SortOrder}
+        );
+        if ( !$SortOrder ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not add job, SortOrder is invalid.",
+            );
+            return;
+        }
+    }
+
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO job (name, type, filter, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO job (name, type, filter, sort_order, comments, is_async, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{Type}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Type}, \$Filter, \$SortOrder, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -305,13 +337,19 @@ updates a job
         Type           => 'Ticket',                                 # optional
         Filter         => [                                         # optional
             {
-                Queue => [ 'SomeQueue' ],
-            },
-            {
-                Queue => [ 'SomeOtherQueue'],
-                Type  => [ 'SomeType' ]
+                AND => [
+                    {
+                        Field     => 'TypeID',
+                        Operator  => 'EQ',
+                        Value     => 2
+                    }
+                ]
             }
         ],
+        SortOrder      => {                                         # optional
+            Field     => 'QueueID',
+            Direction => 'ascending'
+        },
         Comment        => '...',                                    # optional
         IsAsynchronous => 1,                                        # optional
         ValidID        => 1,                                        # optional
@@ -363,7 +401,7 @@ sub JobUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Type Name Filter Comment IsAsynchronous ValidID) ) {
+    for my $Key ( qw(Type Name Filter SortOrder Comment IsAsynchronous ValidID) ) {
 
         next KEY if (
             (
@@ -401,11 +439,26 @@ sub JobUpdate {
         }
     }
 
+    # prepare sortorder as JSON
+    my $SortOrder;
+    if ( $Param{SortOrder} ) {
+        $SortOrder = $Kernel::OM->Get('JSON')->Encode(
+            Data => $Param{SortOrder}
+        );
+        if ( !$SortOrder ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Could not update job, SortOrder is invalid.",
+            );
+            return;
+        }
+    }
+
     # update Job in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, comments = ?, is_async = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE job SET type = ?, name = ?, filter = ?, sort_order = ?, comments = ?, is_async = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Type}, \$Param{Name}, \$Filter, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Type}, \$Param{Name}, \$Filter, \$SortOrder, \$Param{Comment}, \$Param{IsAsynchronous}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -426,10 +479,11 @@ sub JobUpdate {
 
 =item JobList()
 
-returns a hash of all jobs
+returns a hash of all relevant jobs
 
     my %Jobs = $AutomationObject->JobList(
-        Valid => 1          # optional
+        Valid => 1                  # optional
+        Event => 'TicketCreate'     # optional
     );
 
 the result looks like
@@ -449,7 +503,7 @@ sub JobList {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # create cache key
-    my $CacheKey = 'JobList::' . $Valid;
+    my $CacheKey = 'JobList::' . $Valid . '::' . ($Param{Event}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -458,10 +512,19 @@ sub JobList {
     );
     return %{$Cache} if $Cache;
 
-    my $SQL = 'SELECT id, name FROM job';
+    my $SQL = 'SELECT j.id, j.name FROM job j';
 
     if ( $Param{Valid} ) {
-        $SQL .= ' WHERE valid_id = 1'
+        $SQL .= ' WHERE j.valid_id = 1'
+    }
+    if ( $Param{Event} ) {
+        # quote event string with surrounding quotes
+        # TODO: quote % in event string as well
+        my $EventString = '%' . $Kernel::OM->Get('DB')->Quote( '"' . $Param{Event} . '"', 'Like' ) . '%';
+
+        $SQL .= " AND EXISTS (
+                    SELECT ep.id FROM job_exec_plan jep, exec_plan ep
+                     WHERE jep.job_id = j.id AND jep.exec_plan_id = ep.id AND ep.type = 'EventBased' AND ep.parameters LIKE '$EventString')";
     }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
@@ -615,7 +678,7 @@ sub JobDelete {
 returns a list of all Macro ids assigned to given Job
 
     my @MacroIDs = $AutomationObject->JobMacroList(
-        ID => 123
+        JobID => 123
     );
 
 =cut
@@ -1079,6 +1142,11 @@ sub JobIsExecutable {
         }
     }
 
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
+
     my @ExecPlanList = $Self->JobExecPlanList(
         JobID => $Param{ID}
     );
@@ -1091,6 +1159,10 @@ sub JobIsExecutable {
             ID    => $ExecPlanID,
         );
         last if $CanExecute;
+    }
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    JobIsExecutable: checking %i execution plans took %i ms", scalar @ExecPlanList, (time() - $StartTime) * 1000);
     }
 
     return $CanExecute;
@@ -1125,6 +1197,9 @@ sub JobExecute {
 
     my $Result;
     if ( $Param{Async} ) {
+        if ( $Self->{Debug} ) {
+            $Self->_Debug(sprintf "JobExecute: executing job %i asynchronously", $Param{ID});
+        }
         # execute asynchronously
         $Self->AsyncCall(
             FunctionName   => '_JobExecute',
@@ -1157,6 +1232,11 @@ sub _JobExecute {
 
     # add JobID for log reference
     $Self->{JobID} = $Param{ID};
+
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
 
     # update execution time of job
     my $Success = $Self->_JobLastExecutionTimeSet(
@@ -1191,13 +1271,25 @@ sub _JobExecute {
         return;
     }
 
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    _JobExecute: preparations and creating job run took %i ms", (time() - $StartTime) * 1000);
+    }
+
     # add RunID for log reference
     $Self->{RunID} = $RunID;
+
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
 
     # get all assigned macros
     my @MacroIDs = $Self->JobMacroList(
         JobID => $Param{ID}
     );
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    _JobExecute: getting macro list took %i ms", (time() - $StartTime) * 1000);
+    }
 
     # return success if we have nothing to do
     my $Warning = 0;
@@ -1208,6 +1300,10 @@ sub _JobExecute {
         );
         $Warning = 1;
     } else {
+
+        if ( $Self->{Debug} ) {
+            $StartTime = time();
+        }
 
         # check the macro if they are executable, return success if not
         my $ExecutableMacroCount = 0;
@@ -1244,6 +1340,7 @@ sub _JobExecute {
                 @ObjectIDs = $BackendObject->Run(
                     Data      => $Param{Data},
                     Filter    => $Job{Filter},
+                    SortOrder => $Job{SortOrder},
                     UserID    => $Param{UserID},
                 );
 
@@ -1290,6 +1387,9 @@ sub _JobExecute {
                     Message  => "job execution finished successfully.",
                     UserID   => $Param{UserID},
                 );
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug(sprintf "    _JobExecute: executing %i macros took %i ms", scalar @MacroIDs, (time() - $StartTime) * 1000);
+                }
             }
         }
     }
@@ -1805,6 +1905,7 @@ sub _LoadJobTypeBackend {
         # add referrer data
         $BackendObject->{JobID} = $Self->{JobID};
         $BackendObject->{RunID} = $Self->{RunID};
+        $BackendObject->{Debug} = $Self->{Debug};
 
         $Self->{JobTypeModules}->{$Param{Name}} = $BackendObject;
     }

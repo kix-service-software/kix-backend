@@ -3,6 +3,10 @@
         "Comment": "some comment",
         "Name": "new job",
         "Type": "Ticket",
+        "SortOrder": {
+            "Field": "TypeID",
+            "Direction": "ascending"
+        },
         "ValidID": 1
     }
 }

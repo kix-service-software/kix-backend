@@ -103,6 +103,7 @@ sub Run {
                 PrimaryKey     => 'id',
                 Item           => $Item,
                 AutoPrimaryKey => 1,
+                NoOIDMapping   => 1,
             );
         }
 

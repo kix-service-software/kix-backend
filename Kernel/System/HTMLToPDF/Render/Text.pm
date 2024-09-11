@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -64,13 +64,14 @@ sub Run {
     if ( ref $Block->{Value} eq 'ARRAY' ) {
         my @Values;
         for my $Entry ( @{$Block->{Value}} ) {
-            my %Result = $Self->_ReplacePlaceholders(
+            my %Result = $Self->ReplacePlaceholders(
                 String    => $Entry,
                 UserID    => $Param{UserID},
                 Count     => $Param{Count},
                 Translate => $Block->{Translate},
                 Object    => $Param{Object},
-                Datas     => $Datas
+                Datas     => $Datas,
+                ReplaceAs => $Block->{ReplaceAs} // q{-}
             );
 
             if ( !$Class ) {
@@ -78,29 +79,34 @@ sub Run {
             }
 
             my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                Text     => $Result{Text},
-                $IDKey   => $Param{$IDKey},
-                Data     => {},
-                UserID   => $Param{UserID},
-                RichText => 1
+                Text            => $Result{Text},
+                ObjectType      => $Param{Object},
+                ObjectID        => $Param{$IDKey},
+                Data            => {},
+                UserID          => $Param{UserID},
+                RichText        => 1,
+                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Block->{Translate} ) {
                 $TmpValue = $LayoutObject->{LanguageObject}->Translate($TmpValue);
             }
 
+            next if ( $TmpValue eq q{} );
+
             push( @Values, $TmpValue);
         }
         $Value = join( ($Block->{Join} // q{ }), @Values);
     }
     else {
-        my %Result = $Self->_ReplacePlaceholders(
+        my %Result = $Self->ReplacePlaceholders(
             String    => $Block->{Value},
             UserID    => $Param{UserID},
             Count     => $Param{Count},
             Translate => $Block->{Translate},
             Object    => $Param{Object},
-            Datas     => $Datas
+            Datas     => $Datas,
+            ReplaceAs => $Block->{ReplaceAs} // q{-}
         );
 
         if ( !$Class ) {
@@ -108,11 +114,13 @@ sub Run {
         }
 
         $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-            Text     => $Result{Text},
-            $IDKey   => $Param{$IDKey},
-            Data     => {},
-            UserID   => $Param{UserID},
-            RichText => 1
+            Text            => $Result{Text},
+            ObjectType      => $Param{Object},
+            ObjectID        => $Param{$IDKey},
+            Data            => {},
+            UserID          => $Param{UserID},
+            RichText        => 1,
+            ReplaceNotFound => $Block->{ReplaceAs} // q{-}
         );
     }
 

@@ -405,6 +405,10 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -512,6 +516,11 @@
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -527,6 +536,26 @@
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -588,10 +617,15 @@
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -807,6 +841,16 @@
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -946,7 +990,7 @@
             "Preferences" : {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_UserPreference_json"
                },
                "readOnly" : true
@@ -954,7 +998,7 @@
             "RoleIDs" : {
                "description" : "added via include \"RoleIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true

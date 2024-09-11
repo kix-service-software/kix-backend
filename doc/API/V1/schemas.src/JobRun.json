@@ -32,7 +32,7 @@
         "type": "array",
         "description": "execution logs of this run - added via include \"Logs\"",
         "readOnly": true,
-        "item": {
+        "items": {
           "$ref": "JobRunLog.json"
         }
       },

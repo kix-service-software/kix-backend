@@ -1623,14 +1623,14 @@ pre code {
             "History" : {
                "description" : "added via include \"History\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemHistory_json"
                }
             },
             "Images" : {
                "description" : "added via include \"Images\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemImage_json"
                }
             },
@@ -1656,7 +1656,7 @@ pre code {
             "Versions" : {
                "description" : "added via include \"Versions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemVersion_json"
                }
             }
@@ -1740,7 +1740,7 @@ pre code {
             },
             "Images" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemImagePostItem_json"
                }
             },
@@ -2271,14 +2271,14 @@ pre code {
             "History" : {
                "description" : "added via include \"History\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemHistory_json"
                }
             },
             "Images" : {
                "description" : "added via include \"Images\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemImage_json"
                }
             },
@@ -2304,7 +2304,7 @@ pre code {
             "Versions" : {
                "description" : "added via include \"Versions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemVersion_json"
                }
             }
@@ -4284,6 +4284,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -4391,6 +4395,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -4406,6 +4415,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -4467,10 +4496,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -4684,6 +4718,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -5473,6 +5517,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -5580,6 +5628,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -5595,6 +5648,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -5656,10 +5729,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -5873,6 +5951,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -6499,6 +6587,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -6606,6 +6698,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -6621,6 +6718,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -6682,10 +6799,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -6899,6 +7021,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -7311,7 +7443,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                },
                "readOnly" : true
@@ -7696,7 +7828,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                }
             },
@@ -8066,7 +8198,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                },
                "readOnly" : true
@@ -8418,7 +8550,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                }
             },
@@ -10736,6 +10868,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -10843,6 +10979,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -10858,6 +10999,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -10919,10 +11080,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -11136,6 +11302,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -12001,6 +12177,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -12108,6 +12288,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -12123,6 +12308,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -12184,10 +12389,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -12401,6 +12611,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -13210,6 +13430,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -13317,6 +13541,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -13332,6 +13561,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -13393,10 +13642,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -13610,6 +13864,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -13964,6 +14228,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -14071,6 +14339,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -14086,6 +14359,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -14147,10 +14440,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -14364,6 +14662,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -14923,7 +15231,7 @@ pre code {
                   },
                   "Parameters" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "object",
                         "patternProperties" : {
                            "^[a-zA-Z]+$" : {
@@ -15017,7 +15325,7 @@ pre code {
             "Reports" : {
                "description" : "added via include \"Reports\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_Report_json"
                },
                "readOnly" : true
@@ -15098,7 +15406,7 @@ pre code {
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "readOnly" : true,
                         "type:" : "string"
                      },
@@ -15132,7 +15440,7 @@ pre code {
             "Results" : {
                "description" : "added via include \"Results\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ReportResult_json"
                },
                "readOnly" : true
@@ -15261,7 +15569,7 @@ pre code {
                   },
                   "Parameters" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "object",
                         "patternProperties" : {
                            "^[a-zA-Z]+$" : {
@@ -15483,7 +15791,7 @@ pre code {
                   },
                   "Parameters" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "object",
                         "patternProperties" : {
                            "^[a-zA-Z]+$" : {
@@ -15577,7 +15885,7 @@ pre code {
             "Reports" : {
                "description" : "added via include \"Reports\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_Report_json"
                },
                "readOnly" : true
@@ -15658,7 +15966,7 @@ pre code {
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "readOnly" : true,
                         "type:" : "string"
                      },
@@ -15692,7 +16000,7 @@ pre code {
             "Results" : {
                "description" : "added via include \"Results\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ReportResult_json"
                },
                "readOnly" : true
@@ -15819,7 +16127,7 @@ pre code {
                   },
                   "Parameters" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "object",
                         "patternProperties" : {
                            "^[a-zA-Z]+$" : {
@@ -16117,7 +16425,7 @@ pre code {
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "readOnly" : true,
                         "type:" : "string"
                      },
@@ -16151,7 +16459,7 @@ pre code {
             "Results" : {
                "description" : "added via include \"Results\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ReportResult_json"
                },
                "readOnly" : true
@@ -16234,7 +16542,7 @@ pre code {
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type:" : "string"
                      }
                   },
@@ -16407,7 +16715,7 @@ pre code {
                "properties" : {
                   "OutputFormats" : {
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "readOnly" : true,
                         "type:" : "string"
                      },
@@ -16441,7 +16749,7 @@ pre code {
             "Results" : {
                "description" : "added via include \"Results\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ReportResult_json"
                },
                "readOnly" : true
@@ -17249,6 +17557,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -17356,6 +17668,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -17371,6 +17688,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -17432,10 +17769,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -17651,6 +17993,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -17790,7 +18142,7 @@ pre code {
             "Preferences" : {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_UserPreference_json"
                },
                "readOnly" : true
@@ -17798,7 +18150,7 @@ pre code {
             "RoleIDs" : {
                "description" : "added via include \"RoleIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -17988,6 +18340,10 @@ pre code {
                "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 a new access token will be generated for this user.",
                "type" : "integer"
             },
+            "ExecMFAGenerateSecret" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set with a valid secret new mfa secret will be generated for this user.",
+               "type" : "string"
+            },
             "IsAgent" : {
                "type" : "integer"
             },
@@ -18103,7 +18459,42 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="session_user_patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_counters" class="panel"><div class="resource-description"><p>This resource returns the most relevant ticket counters.</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/counters</span> <span class="methods"><a href="#session_user_counters_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_counters_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/counters</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_counters_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_counters_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_counters_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_counters_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_counters_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_counters_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CounterResponse</p></div><h2 class="response-title" id="session_user_counters_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_patch_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_patch_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_user_counters" class="panel"><div class="resource-description"><p>This resource returns the most relevant ticket counters.</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session/user</span><span class="uri">/counters</span> <span class="methods"><a href="#session_user_counters_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_user_counters_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session/user</span><span class="uri">/counters</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_user_counters_get_request" data-toggle="tab">Request</a></li><li><a href="#session_user_counters_get_response" data-toggle="tab">Response</a></li><li><a href="#session_user_counters_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_user_counters_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="session_user_counters_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_counters_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CounterResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "CounterResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The Counter response.",
+   "type" : "object",
+   "properties" : {
+      "Counter" : {
+         "patternProperties" : {
+            "^[a-zA-Z]+$" : {
+               "type" : "object",
+               "patternProperties" : {
+                  "^[a-zA-Z]+$" : {
+                     "type" : "integer",
+                     "readOnly" : true
+                  }
+               },
+               "readOnly" : true
+            }
+         }
+      }
+   },
+   "required" : [
+      "Counter"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Counter": {
+        "Ticket": {
+            "Owned": 5,
+            "OwnedAndLocked": 2,
+            "OwnedAndLockedAndUnseen": 2,
+            "Watched": 2,
+            "WatchedAndUnseen": 2
+        }
+    }
+}</code></pre></div></div><h2 class="response-title" id="session_user_counters_get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "Error.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "An error object.",
@@ -18294,6 +18685,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -18401,6 +18796,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -18416,6 +18816,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -18477,10 +18897,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -18694,6 +19119,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -19040,8 +19475,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }
@@ -19337,7 +19771,94 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="objectsearch" class="panel-title">ObjectSearch</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="supported-attributes">Supported Attributes</h4><p>Returns all supported attributes of the selected object type.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_objectsearch__objecttype_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span> <span class="methods"><a href="#objectsearch__objecttype__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objectsearch__objecttype__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objectsearch__objecttype__get_request" data-toggle="tab">Request</a></li><li><a href="#objectsearch__objecttype__get_response" data-toggle="tab">Response</a></li><li><a href="#objectsearch__objecttype__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objectsearch__objecttype__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objecttype</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objectsearch__objecttype__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectSearchSupportedAttributesResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="session_user_preferences__preferenceid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_user_preferences__preferenceid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_session_markobjectasseen" class="panel"><div class="resource-description"><p>Mark object as seen (e.g. a ticket and its articles)</p></div></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/session</span><span class="uri">/markobjectasseen</span> <span class="methods"><a href="#session_markobjectasseen_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="session_markobjectasseen_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/session</span><span class="uri">/markobjectasseen</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#session_markobjectasseen_post_request" data-toggle="tab">Request</a></li><li><a href="#session_markobjectasseen_post_response" data-toggle="tab">Response</a></li><li><a href="#session_markobjectasseen_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="session_markobjectasseen_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: MarkObjectAsSeenPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "MarkObjectAsSeenPostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The request object to mark an object as seen (if supported).",
+   "type" : "object",
+   "properties" : {
+      "MarkObjectAsSeen" : {
+         "type" : "object",
+         "properties" : {
+            "IDs" : {
+               "type" : "array",
+               "items" : {
+                  "anyOf" : [
+                     {
+                        "type" : "string"
+                     },
+                     {
+                        "type" : "integer"
+                     }
+                  ]
+               }
+            },
+            "ObjectType" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "IDs",
+            "ObjectType"
+         ]
+      }
+   },
+   "required" : [
+      "MarkObjectAsSeen"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+  "MarkObjectAsSeen": {
+    "IDs": [123],
+    "ObjectType": "Ticket"
+  }
+}</code></pre></div></div><div class="tab-pane" id="session_markobjectasseen_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_markobjectasseen_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The MarkObjectAsSeen has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="session_markobjectasseen_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="session_markobjectasseen_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="session_markobjectasseen_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="session_markobjectasseen_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="objectsearch" class="panel-title">ObjectSearch</h3></div><div class="panel-body"><div class="top-resource-description"><h4 id="supported-attributes">Supported Attributes</h4><p>Returns all supported attributes of the selected object type.</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_objectsearch__objecttype_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span> <span class="methods"><a href="#objectsearch__objecttype__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="objectsearch__objecttype__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/objectsearch</span><span class="uri">/{objecttype}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#objectsearch__objecttype__get_request" data-toggle="tab">Request</a></li><li><a href="#objectsearch__objecttype__get_response" data-toggle="tab">Response</a></li><li><a href="#objectsearch__objecttype__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="objectsearch__objecttype__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">objecttype</td><td><center>yes</center></td><td>string</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="objectsearch__objecttype__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ObjectSearchSupportedAttributesResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "ObjectSearchSupportedAttributesResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A response for a object supported attributes GET request.",
@@ -19455,7 +19976,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="objectsearch__objecttype__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>AccountedTime</code></td><td>Adds the sum of all time units for the ticket (its articles)</td></tr><tr><td><code>DynamicFields</code></td><td>Includes the assigned Dynamic Fields and their prepared values. You can disable the preparation of specific DF types with the URI parameter <code>NoDynamicFieldDisplayValues</code>, which is a comma separated list of DF types.</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="objectsearch__objecttype__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="objectsearch__objecttype__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="tickets" class="panel-title">Tickets</h3></div><div class="panel-body"><div class="top-resource-description"><h5 id="supported-includes">Supported Includes</h5><p>In addition to its sub-resources and generic includes this resource supports the following additional includes.</p><table class="table"><thead><tr><th>Include</th><th>Description</th></tr></thead><tbody><tr><td><code>AccountedTime</code></td><td>Adds the sum of all time units for the ticket (its articles)</td></tr><tr><td><code>DynamicFields</code></td><td>Includes the assigned Dynamic Fields and their prepared values. You can disable the preparation of specific DF types with the URI parameter <code>NoDynamicFieldDisplayValues</code>, which is a comma separated list of DF types.</td></tr><tr><td><code>LinkCount</code></td><td>Includes the number of linked objects of this ticket</td></tr><tr><td><code>StatePrevious</code></td><td>Includes the previous state and its ID</td></tr><tr><td><code>Unseen</code></td><td>Includes the property <code>Unseen</code></td></tr><tr><td><code>WatcherID</code></td><td>Includes the ID of the watcher if the current user is watching the ticket</td></tr></tbody></table></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_tickets" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/tickets</span> <span class="methods"><a href="#tickets_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#tickets_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="tickets_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/tickets</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#tickets_get_request" data-toggle="tab">Request</a></li><li><a href="#tickets_get_response" data-toggle="tab">Response</a></li><li><a href="#tickets_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="tickets_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="tickets_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="tickets_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: TicketCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "TicketCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of tickets.",
@@ -19623,6 +20144,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -19730,6 +20255,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -19745,6 +20275,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -19806,10 +20356,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -20023,6 +20578,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -20272,7 +20837,7 @@ pre code {
          "properties" : {
             "Articles" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TicketArticlePostItem_json"
                }
             },
@@ -20398,7 +20963,7 @@ pre code {
          "properties" : {
             "Attachments" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TicketArticleAttachmentPostItem_json"
                }
             },
@@ -20785,6 +21350,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -20892,6 +21461,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -20907,6 +21481,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -20968,10 +21562,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -21185,6 +21784,16 @@ pre code {
             },
             "StateID" : {
                "type" : "integer",
+               "readOnly" : true
+            },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
                "readOnly" : true
             },
             "StateType" : {
@@ -21842,6 +22451,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -21949,6 +22562,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -21964,6 +22582,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -22025,10 +22663,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -22042,6 +22685,7 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Article": [
         {
+            "AttachmentCount": 2,
             "ArticleID": 31,
             "Bcc": "admin@localhost",
             "BccRealname": "admin@localhost",
@@ -22077,6 +22721,7 @@ pre code {
             "Unseen": 1
         },
         {
+            "AttachmentCount": 0,
             "ArticleID": 33,
             "Bcc": "",
             "BccRealname": "",
@@ -22220,7 +22865,7 @@ pre code {
          "properties" : {
             "Attachments" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_TicketArticleAttachmentPostItem_json"
                }
             },
@@ -22581,6 +23226,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -22688,6 +23337,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -22703,6 +23357,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -22764,10 +23438,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -22780,6 +23459,7 @@ pre code {
 }
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Article": {
+        "AttachmentCount": 2,
         "ArticleID": 31,
         "Bcc": "admin@localhost",
         "BccRealname": "admin@localhost",
@@ -24533,7 +25213,7 @@ pre code {
                   "Event" : {
                      "description" : "list of events, e.g. \"TicketCreate\"",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "string"
                      },
                      "readOnly" : true
@@ -24546,7 +25226,7 @@ pre code {
                   "Weekday" : {
                      "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "integer"
                      },
                      "readOnly" : true
@@ -24603,7 +25283,7 @@ pre code {
             "ExecPlanIDs" : {
                "description" : "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -24611,16 +25291,21 @@ pre code {
             "ExecPlans" : {
                "description" : "assigned execution plans - added via include \"ExecPlans\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ExecPlan_json"
                },
                "readOnly" : true
             },
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type" : "array"
+               "type" : "array",
+               "readOnly" : true
             },
             "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsAsynchronous" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -24631,7 +25316,7 @@ pre code {
             "MacroIDs" : {
                "description" : "IDs of assigned macros - added via include \"MacroIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -24639,13 +25324,32 @@ pre code {
             "Macros" : {
                "description" : "assigned macros - added via include \"Macros\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_Macro_json"
                },
                "readOnly" : true
             },
             "Name" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "Field"
+               ],
                "readOnly" : true
             },
             "Type" : {
@@ -24664,7 +25368,9 @@ pre code {
             "CreateTime",
             "Filter",
             "ID",
+            "IsAsynchronous",
             "Name",
+            "SortOrder",
             "Type",
             "ValidID"
          ]
@@ -24740,7 +25446,7 @@ pre code {
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -24768,7 +25474,7 @@ pre code {
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -24825,6 +25531,7 @@ pre code {
                 }
             ],
             "ID": 1,
+            "IsAsynchronous": 0,
             "LastExecutionTime": "",
             "MacroIDs": [],
             "Name": "Some Job",
@@ -24840,6 +25547,7 @@ pre code {
             "ExecPlanIDs": [ 2 ],
             "Filter": null,
             "ID": 2,
+            "IsAsynchronous": 1,
             "LastExecutionTime": "2019-10-01 14:00:00",
             "MacroIDs": [ 2,4 ],
             "Name": "Another Job",
@@ -24884,7 +25592,7 @@ pre code {
             },
             "ExecPlanIDs" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             },
@@ -24892,14 +25600,33 @@ pre code {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
                "type" : "array"
             },
+            "IsAsynchronous" : {
+               "type" : "integer"
+            },
             "MacroIDs" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             },
             "Name" : {
                "type" : "string"
+            },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string"
+                  },
+                  "Field" : {
+                     "type" : "string"
+                  }
+               },
+               "required" : [
+                  "Field"
+               ]
             },
             "Type" : {
                "description" : "",
@@ -24924,6 +25651,10 @@ pre code {
         "Comment": "some comment",
         "Name": "new job",
         "Type": "Ticket",
+        "SortOrder": {
+            "Field": "TypeID",
+            "Direction": "ascending"
+        },
         "ValidID": 1
     }
 }</code></pre></div></div><div class="tab-pane" id="system_automation_jobs_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_automation_jobs_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Job has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: JobPostPatchResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
@@ -25066,7 +25797,7 @@ pre code {
                   "Event" : {
                      "description" : "list of events, e.g. \"TicketCreate\"",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "string"
                      },
                      "readOnly" : true
@@ -25079,7 +25810,7 @@ pre code {
                   "Weekday" : {
                      "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "integer"
                      },
                      "readOnly" : true
@@ -25136,7 +25867,7 @@ pre code {
             "ExecPlanIDs" : {
                "description" : "IDs of assigned execution plans - added via include \"ExecPlanIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -25144,16 +25875,21 @@ pre code {
             "ExecPlans" : {
                "description" : "assigned execution plans - added via include \"ExecPlans\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ExecPlan_json"
                },
                "readOnly" : true
             },
             "Filter" : {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
-               "type" : "array"
+               "type" : "array",
+               "readOnly" : true
             },
             "ID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "IsAsynchronous" : {
                "type" : "integer",
                "readOnly" : true
             },
@@ -25164,7 +25900,7 @@ pre code {
             "MacroIDs" : {
                "description" : "IDs of assigned macros - added via include \"MacroIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -25172,13 +25908,32 @@ pre code {
             "Macros" : {
                "description" : "assigned macros - added via include \"Macros\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_Macro_json"
                },
                "readOnly" : true
             },
             "Name" : {
                "type" : "string",
+               "readOnly" : true
+            },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string",
+                     "readOnly" : true
+                  },
+                  "Field" : {
+                     "type" : "string",
+                     "readOnly" : true
+                  }
+               },
+               "required" : [
+                  "Field"
+               ],
                "readOnly" : true
             },
             "Type" : {
@@ -25197,7 +25952,9 @@ pre code {
             "CreateTime",
             "Filter",
             "ID",
+            "IsAsynchronous",
             "Name",
+            "SortOrder",
             "Type",
             "ValidID"
          ]
@@ -25273,7 +26030,7 @@ pre code {
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -25301,7 +26058,7 @@ pre code {
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -25357,6 +26114,7 @@ pre code {
             }
         ],
         "ID": 1,
+        "IsAsynchronous": 0,
         "LastExecutionTime": "",
         "MacroIDs": [ 1 ],
         "Macros": [
@@ -25391,6 +26149,10 @@ pre code {
             }
         ],
         "Name": "Some Job",
+        "SortOrder": {
+            "Field": "TypeID",
+            "Direction": "ascending"
+        },
         "Type": "Ticket",
         "ValidID": 1
     }
@@ -25433,8 +26195,27 @@ pre code {
                "description" : "List of and/or search criteria (see chapter \"Search objects\" and \"Filter results\" for more details).",
                "type" : "array"
             },
+            "IsAsynchronous" : {
+               "type" : "integer"
+            },
             "Name" : {
                "type" : "string"
+            },
+            "SortOrder" : {
+               "description" : "Used to sort found objects (see \"Filter\").",
+               "type" : "object",
+               "properties" : {
+                  "Direction" : {
+                     "description" : "ascending or descending",
+                     "type" : "string"
+                  },
+                  "Field" : {
+                     "type" : "string"
+                  }
+               },
+               "required" : [
+                  "Field"
+               ]
             },
             "Type" : {
                "description" : "",
@@ -25596,7 +26377,7 @@ pre code {
       "ExecPlanID" : {
          "description" : "List of IDs of assigned execution plans of the job",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          }
       }
@@ -25766,7 +26547,7 @@ pre code {
       "MacroID" : {
          "description" : "List of IDs of assigned macros of the job",
          "type" : "array",
-         "item" : {
+         "items" : {
             "type" : "integer"
          }
       }
@@ -26050,7 +26831,7 @@ pre code {
             "Logs" : {
                "description" : "execution logs of this run - added via include \"Logs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_JobRunLog_json"
                },
                "readOnly" : true
@@ -26366,7 +27147,7 @@ pre code {
                   "Event" : {
                      "description" : "list of events, e.g. \"TicketCreate\"",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "string"
                      },
                      "readOnly" : true
@@ -26379,7 +27160,7 @@ pre code {
                   "Weekday" : {
                      "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "integer"
                      },
                      "readOnly" : true
@@ -26511,7 +27292,7 @@ pre code {
             "Event" : {
                "description" : "list of events, e.g. \"TicketCreate\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                }
             },
@@ -26522,7 +27303,7 @@ pre code {
             "Weekday" : {
                "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             }
@@ -26780,7 +27561,7 @@ pre code {
                   "Event" : {
                      "description" : "list of events, e.g. \"TicketCreate\"",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "string"
                      },
                      "readOnly" : true
@@ -26793,7 +27574,7 @@ pre code {
                   "Weekday" : {
                      "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                      "type" : "array",
-                     "item" : {
+                     "items" : {
                         "type" : "integer"
                      },
                      "readOnly" : true
@@ -26903,7 +27684,7 @@ pre code {
             "Event" : {
                "description" : "list of events, e.g. \"TicketCreate\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                }
             },
@@ -26914,7 +27695,7 @@ pre code {
             "Weekday" : {
                "description" : "List of weekday: 0 = sunday, 1 = monday, ...",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             }
@@ -27151,7 +27932,7 @@ pre code {
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -27179,7 +27960,7 @@ pre code {
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -27304,7 +28085,7 @@ pre code {
          "properties" : {
             "Actions" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroActionPostItem_json"
                }
             },
@@ -27889,7 +28670,7 @@ pre code {
             "Actions" : {
                "description" : "added via include \"Actions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_MacroAction_json"
                },
                "readOnly" : true
@@ -27917,7 +28698,7 @@ pre code {
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -28031,7 +28812,7 @@ pre code {
             "ExecOrder" : {
                "description" : "Order of corresponding macro actions as IDs.",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "number"
                }
             },
@@ -28852,7 +29633,7 @@ pre code {
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
                }
             },
@@ -29133,7 +29914,7 @@ pre code {
             "Definitions" : {
                "description" : "added via include \"Definitions\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_ConfigItemClassDefinition_json"
                }
             },
@@ -30193,7 +30974,440 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_cmdb_classes__classid__definitions__definitionid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_cmdb_classes__classid__definitions__definitionid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_communication_channels" class="panel-title">[System] Communication - Channels</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_communication_channels" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/communication/channels</span> <span class="methods"><a href="#system_communication_channels_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_communication_channels_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/communication/channels</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Channel items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_communication_channels_get_request" data-toggle="tab">Request</a></li><li><a href="#system_communication_channels_get_response" data-toggle="tab">Response</a></li><li><a href="#system_communication_channels_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_communication_channels_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_communication_channels_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_communication_channels_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ChannelCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+}</code></pre></div></div></div><div class="tab-pane" id="system_cmdb_classes__classid__definitions__definitionid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_cmdb_classes__classid__definitions__definitionid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_certificates" class="panel-title">[System] Certificate</h3></div><div class="panel-body"><div class="top-resource-description"><p>Can not resolve ../../descriptions/resources/system/certificate.md</p></div><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_certificates" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/certificates</span> <span class="methods"><a href="#system_certificates_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_certificates_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_certificates_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/certificates</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_certificates_get_request" data-toggle="tab">Request</a></li><li><a href="#system_certificates_get_response" data-toggle="tab">Response</a></li><li><a href="#system_certificates_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_certificates_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_certificates_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CertificateCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "CertificateCollectionResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A list of certificates.",
+   "type" : "object",
+   "properties" : {
+      "Certificate" : {
+         "type" : "array",
+         "items" : {
+            "$ref" : "#/definitions/_Certificate_json"
+         }
+      }
+   },
+   "required" : [
+      "Certificate"
+   ],
+   "definitions" : {
+      "_Certificate_json" : {
+         "$id" : "Certificate.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The certificate object.",
+         "type" : "object",
+         "properties" : {
+            "CType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "EndDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FileID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fingerprint" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Hash" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Issuer" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Modulus" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Serial" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StartDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "FileID",
+            "Filename",
+            "Fingerprint",
+            "Subject",
+            "Type",
+            "CType",
+            "Modulus"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Certificate": [
+        {
+            "Email": "selfsigned@example.de",
+            "FileID": 4,
+            "Filename": "KIX_Cert_4",
+            "Fingerprint": "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
+            "Hash": "791510e5",
+            "Issuer": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+            "Modulus": "9B383D6A49187936214BD3AAF55F9334AA94B42E66BA63021594F056B19E46D21DBFE9868C25AD14C67836E82497DCE5B1F7CB8CF3F253883428EE105E447CA3765BD4D172FB5AF2C3A3A5A6B4FDCA12B5ECC96D7263FB303C48DD8E3D45355D336885D81F0F618CF0D6B3748C7E76B59CD49A6ACDFE9B4DADC65BB1045D8027D416D03520D7F8CB14D05D76D2DECA334811A5747CB5C9632AFDAFFB867D3A9B61775DC8BCE3632AC8E6E247C7F8BACACAE7E6F1B745C8FD0132DF823607D5468A15844BCB643389C50B215D62B8C1B0DBB8F4FB265ED178F0015212494A243124A69F500F72F6DEEF0ACC7FB3196E2DED7BD76A6B743F8B74031A7C3EFA3991421411FA42AFBE8ABE062180BAAC0E9F7CF0E65A8D480DA17BD800935F38A510DF7C87838B014A134DF4371D8C3CA4B2AA93673F3E46698DDB1D2BAF691FB0C68992D96F4F1F83A14D7B9006B609E15FC5D7B68BB7FB1895473E33AF3A113EC85D439026665A277E4AA97C08400CAAD36533C63565670777D2FD77D824089DE74685217236A0DAC0B9066FC274B90A9F8D9F357D8FA08E10A3CB38139881D883DFFADEB6BCA678757155333FB9C9A7523986DEA2539CDE8209E8820480D1E56385333720914BED77BDC1707D3453E9ED24D5BAA81F06EFA0F551C7D58D2DC6BF59D78D222C23D5BC583284515286B48DD5120EF76DE2B6C7F08DA1A94A6A795B",
+            "Serial": "0B9444A6464EE36AC4B6BACD1F7FBC786295FB05",
+            "EndDate": "2030-06-01 14:41:34",
+            "StartDate": "2020-06-03 14:41:34",
+            "Subject": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+            "Type": "Cert",
+            "CType": "SMIME"
+        },
+        {
+            "Email": "selfsigned@example.de",
+            "FileID": 5,
+            "Filename": "KIX_Cert_5",
+            "Fingerprint": "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
+            "Hash": "791510e5",
+            "Issuer": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+            "Modulus": "9B383D6A49187936214BD3AAF55F9334AA94B42E66BA63021594F056B19E46D21DBFE9868C25AD14C67836E82497DCE5B1F7CB8CF3F253883428EE105E447CA3765BD4D172FB5AF2C3A3A5A6B4FDCA12B5ECC96D7263FB303C48DD8E3D45355D336885D81F0F618CF0D6B3748C7E76B59CD49A6ACDFE9B4DADC65BB1045D8027D416D03520D7F8CB14D05D76D2DECA334811A5747CB5C9632AFDAFFB867D3A9B61775DC8BCE3632AC8E6E247C7F8BACACAE7E6F1B745C8FD0132DF823607D5468A15844BCB643389C50B215D62B8C1B0DBB8F4FB265ED178F0015212494A243124A69F500F72F6DEEF0ACC7FB3196E2DED7BD76A6B743F8B74031A7C3EFA3991421411FA42AFBE8ABE062180BAAC0E9F7CF0E65A8D480DA17BD800935F38A510DF7C87838B014A134DF4371D8C3CA4B2AA93673F3E46698DDB1D2BAF691FB0C68992D96F4F1F83A14D7B9006B609E15FC5D7B68BB7FB1895473E33AF3A113EC85D439026665A277E4AA97C08400CAAD36533C63565670777D2FD77D824089DE74685217236A0DAC0B9066FC274B90A9F8D9F357D8FA08E10A3CB38139881D883DFFADEB6BCA678757155333FB9C9A7523986DEA2539CDE8209E8820480D1E56385333720914BED77BDC1707D3453E9ED24D5BAA81F06EFA0F551C7D58D2DC6BF59D78D222C23D5BC583284515286B48DD5120EF76DE2B6C7F08DA1A94A6A795B",
+            "Serial": "0B9444A6464EE36AC4B6BACD1F7FBC786295FB05",
+            "EndDate": "2030-06-01 14:41:34",
+            "StartDate": "2020-06-03 14:41:34",
+            "Subject": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+            "Type": "Cert",
+            "Content": "some base64 content",
+            "CType": "SMIME"
+        }
+    ]
+}</code></pre></div></div><h2 class="response-title" id="system_certificates_get_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_certificates_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_certificates_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/certificates</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_certificates_post_request" data-toggle="tab">Request</a></li><li><a href="#system_certificates_post_response" data-toggle="tab">Response</a></li><li><a href="#system_certificates_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_certificates_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CertificatePostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "CertificatePostRequest.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "The certificate request object for create.",
+   "type" : "object",
+   "properties" : {
+      "Certificate" : {
+         "type" : "object",
+         "properties" : {
+            "CType" : {
+               "type" : "string"
+            },
+            "File" : {
+               "type" : "object",
+               "properties" : {
+                  "Content" : {
+                     "description" : "base64 encoded file content string",
+                     "type" : "string"
+                  },
+                  "ContentType" : {
+                     "type" : "string"
+                  },
+                  "Filename" : {
+                     "type" : "string"
+                  },
+                  "Filesize" : {
+                     "type" : "integer"
+                  }
+               },
+               "required" : [
+                  "Content",
+                  "ContentType",
+                  "Filename"
+               ]
+            },
+            "Passphrase" : {
+               "type" : "string"
+            },
+            "Type" : {
+               "type" : "string"
+            }
+         },
+         "required" : [
+            "File",
+            "Type"
+         ]
+      }
+   },
+   "required" : [
+      "Certificate"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Certificate": {
+        "File": {
+            "Content": "base64 coded file content",
+            "ContentType": "application/x-pem-file",
+            "Filename": "somename.pem",
+            "Filesize": 2122
+        },
+        "Type": "Cert",
+        "CType": "SMIME",
+        "Passphrase": "some secret"
+    }
+}</code></pre></div></div><div class="tab-pane" id="system_certificates_post_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates_post_response_http201">HTTP status code <a href="http://httpstatus.es/201" target="_blank">201</a></h2><div class="response"><p>The Certificate has been created successfully.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: application/json</p></div><h2 class="response-title" id="system_certificates_post_response_http400">HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><div class="response"><p>Please check your request.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_certificates_post_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_certificates_post_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates_post_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div id="panel_system_certificates__certificateid_" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri">/system/certificates</span><span class="uri">/{certificateId}</span> <span class="methods"><a href="#system_certificates__certificateid__get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a> <a href="#system_certificates__certificateid__delete"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_certificates__certificateid__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/certificates</span><span class="uri">/{certificateId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_certificates__certificateid__get_request" data-toggle="tab">Request</a></li><li><a href="#system_certificates__certificateid__get_response" data-toggle="tab">Response</a></li><li><a href="#system_certificates__certificateid__get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_certificates__certificateid__get_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">certificateId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">fields</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The list of fields to be returned in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_certificates__certificateid__get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates__certificateid__get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: CertificateResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "CertificateResponse.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "A response for a certificate GET request.",
+   "type" : "object",
+   "properties" : {
+      "Channel" : {
+         "$ref" : "#/definitions/_Certificate_json"
+      }
+   },
+   "required" : [
+      "Certificate"
+   ],
+   "definitions" : {
+      "_Certificate_json" : {
+         "$id" : "Certificate.json",
+         "$schema" : "http://json-schema.org/draft-07/schema",
+         "description" : "The certificate object.",
+         "type" : "object",
+         "properties" : {
+            "CType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Email" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "EndDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FileID" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "Filename" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Fingerprint" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Hash" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Issuer" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Modulus" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Serial" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "StartDate" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Subject" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "Type" : {
+               "type" : "string",
+               "readOnly" : true
+            }
+         },
+         "required" : [
+            "FileID",
+            "Filename",
+            "Fingerprint",
+            "Subject",
+            "Type",
+            "CType",
+            "Modulus"
+         ]
+      }
+   }
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Certificate": {
+        "Email": "selfsigned@example.de",
+        "FileID": "5",
+        "Filename": "KIX_Cert_5",
+        "Fingerprint": "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
+        "Hash": "791510e5",
+        "Issuer": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+        "Modulus": "9B383D6A49187936214BD3AAF55F9334AA94B42E66BA63021594F056B19E46D21DBFE9868C25AD14C67836E82497DCE5B1F7CB8CF3F253883428EE105E447CA3765BD4D172FB5AF2C3A3A5A6B4FDCA12B5ECC96D7263FB303C48DD8E3D45355D336885D81F0F618CF0D6B3748C7E76B59CD49A6ACDFE9B4DADC65BB1045D8027D416D03520D7F8CB14D05D76D2DECA334811A5747CB5C9632AFDAFFB867D3A9B61775DC8BCE3632AC8E6E247C7F8BACACAE7E6F1B745C8FD0132DF823607D5468A15844BCB643389C50B215D62B8C1B0DBB8F4FB265ED178F0015212494A243124A69F500F72F6DEEF0ACC7FB3196E2DED7BD76A6B743F8B74031A7C3EFA3991421411FA42AFBE8ABE062180BAAC0E9F7CF0E65A8D480DA17BD800935F38A510DF7C87838B014A134DF4371D8C3CA4B2AA93673F3E46698DDB1D2BAF691FB0C68992D96F4F1F83A14D7B9006B609E15FC5D7B68BB7FB1895473E33AF3A113EC85D439026665A277E4AA97C08400CAAD36533C63565670777D2FD77D824089DE74685217236A0DAC0B9066FC274B90A9F8D9F357D8FA08E10A3CB38139881D883DFFADEB6BCA678757155333FB9C9A7523986DEA2539CDE8209E8820480D1E56385333720914BED77BDC1707D3453E9ED24D5BAA81F06EFA0F551C7D58D2DC6BF59D78D222C23D5BC583284515286B48DD5120EF76DE2B6C7F08DA1A94A6A795B",
+        "Serial": "0B9444A6464EE36AC4B6BACD1F7FBC786295FB05",
+        "EndDate": "2030-06-01 14:41:34",
+        "StartDate": "2020-06-03 14:41:34",
+        "Subject": "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
+        "Type": "Cert",
+        "Content": "some base64 content"
+    }
+}</code></pre></div></div><h2 class="response-title" id="system_certificates__certificateid__get_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_certificates__certificateid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates__certificateid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_certificates__certificateid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri">/system/certificates</span><span class="uri">/{certificateId}</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_certificates__certificateid__delete_request" data-toggle="tab">Request</a></li><li><a href="#system_certificates__certificateid__delete_response" data-toggle="tab">Response</a></li><li><a href="#system_certificates__certificateid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_certificates__certificateid__delete_request"><h3>URI Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">certificateId</td><td><center>yes</center></td><td>integer</td><td><ul></ul></td><td></td></tr></tbody></table></div><div class="tab-pane" id="system_certificates__certificateid__delete_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates__certificateid__delete_response_http204">HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><div class="response"><p>The request has been finished successfully.</p></div><h2 class="response-title" id="system_certificates__certificateid__delete_response_http404">HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><div class="response"><p>The requested item could not be found.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div><h2 class="response-title" id="system_certificates__certificateid__delete_response_http409">HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><div class="response"><p>The request could not be finished to to a conflict. Common causes:</p><ul><li>PATCH: some data that is already in use by another item but the attribute value has to be unique</li><li>DELETE: the item could not be deleted because depending items exist.</li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: Error</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
+   "$id" : "Error.json",
+   "$schema" : "http://json-schema.org/draft-07/schema",
+   "description" : "An error object.",
+   "type" : "object",
+   "properties" : {
+      "Code" : {
+         "type" : "string",
+         "readOnly" : true
+      },
+      "Message" : {
+         "type" : "string",
+         "readOnly" : true
+      }
+   },
+   "required" : [
+      "Code",
+      "Message"
+   ]
+}
+</code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
+    "Code": "Object.DependingObjectExists",
+    "Message": "Cannot delete queue. A ticket with this queue already exists."
+}</code></pre></div></div></div><div class="tab-pane" id="system_certificates__certificateid__delete_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_certificates__certificateid__delete_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default resource"><div class="panel-heading"><h3 id="system_communication_channels" class="panel-title">[System] Communication - Channels</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div id="panel_system_communication_channels" class="panel"></div><div class="panel-heading"><h4 class="panel-title"><span class="parent uri"></span><span class="uri">/system/communication/channels</span> <span class="methods"><a href="#system_communication_channels_get"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div class="modal fade" tabindex="0" id="system_communication_channels_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/communication/channels</span></h4></div><div class="modal-body"><div class="alert alert-info"><p>Get all Channel items.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_communication_channels_get_request" data-toggle="tab">Request</a></li><li><a href="#system_communication_channels_get_response" data-toggle="tab">Response</a></li><li><a href="#system_communication_channels_get_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_communication_channels_get_request"><h3>Query Parameters</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">filter</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The filter to be used.</p></td></tr><tr><td class="uri">limit</td><td><center></center></td><td>number</td><td><ul></ul></td><td><p>The limit to be used to limit the number of items in the response.</p></td></tr><tr><td class="uri">offset</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The offset where the item list in the response will start.</p></td></tr><tr><td class="uri">sort</td><td><center></center></td><td>string</td><td><ul></ul></td><td><p>The sort definition to be used to sort the items in the response.</p></td></tr></tbody></table></div><div class="tab-pane" id="system_communication_channels_get_response"><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_communication_channels_get_response_http200">HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><div class="response"><p>The request has been finished.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ChannelCollectionResponse</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
    "$id" : "ChannelCollectionResponse.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "A list of channels.",
@@ -31125,7 +32339,7 @@ pre code {
             },
             "Match" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "object",
                   "properties" : {
                      "Key" : {
@@ -31150,7 +32364,7 @@ pre code {
             },
             "Set" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "object",
                   "properties" : {
                      "Key" : {
@@ -31474,7 +32688,7 @@ pre code {
             },
             "Match" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "object",
                   "properties" : {
                      "Key" : {
@@ -31499,7 +32713,7 @@ pre code {
             },
             "Set" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "object",
                   "properties" : {
                      "Key" : {
@@ -34538,7 +35752,7 @@ pre code {
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
 }</code></pre></div></div></div><div class="tab-pane" id="system_console_get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_console_get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="system_console_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent uri"></span><span class="uri">/system/console</span></h4></div><div class="modal-body"><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>webToken</b><p>The request MUST contain an Authorization header. See tab "Security" for more information.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#system_console_post_request" data-toggle="tab">Request</a></li><li><a href="#system_console_post_response" data-toggle="tab">Response</a></li><li><a href="#system_console_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="system_console_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: ConsoleCommandPostRequest</p><p><strong>Schema</strong>:</p><div class="schemas toggleable"><pre><code>{
-   "$id" : "ConsoleCommand.json",
+   "$id" : "ConsoleCommandPostRequest.json",
    "$schema" : "http://json-schema.org/draft-07/schema",
    "description" : "The console command request object for creation/execution.",
    "type" : "object",
@@ -35813,7 +37027,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                },
                "readOnly" : true
@@ -36460,7 +37674,7 @@ pre code {
             },
             "Keywords" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "string"
                },
                "readOnly" : true
@@ -38230,7 +39444,7 @@ pre code {
             "Preferences" : {
                "description" : "preferences of this item",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
                },
                "readOnly" : true
@@ -38333,7 +39547,7 @@ pre code {
             },
             "Preferences" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_GeneralCatalogItemPreferencePostItem_json"
                }
             },
@@ -38532,7 +39746,7 @@ pre code {
             "Preferences" : {
                "description" : "preferences of this item",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_GeneralCatalogItemPreference_json"
                },
                "readOnly" : true
@@ -38617,7 +39831,7 @@ pre code {
             },
             "Preferences" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_GeneralCatalogItemPreferencePostItem_json"
                }
             },
@@ -40847,13 +42061,13 @@ pre code {
             },
             "Permissions" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_PermissionPostItem_json"
                }
             },
             "UserIDs" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             },
@@ -46062,6 +47276,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -46169,6 +47387,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -46184,6 +47407,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -46245,10 +47488,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -46464,6 +47712,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -46603,7 +47861,7 @@ pre code {
             "Preferences" : {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_UserPreference_json"
                },
                "readOnly" : true
@@ -46611,7 +47869,7 @@ pre code {
             "RoleIDs" : {
                "description" : "added via include \"RoleIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -46783,13 +48041,13 @@ pre code {
             },
             "Preferences" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_UserPreferencePostItem_json"
                }
             },
             "RoleIDs" : {
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                }
             },
@@ -46830,8 +48088,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }
@@ -47316,6 +48573,10 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "Attachments" : {
                "description" : "added via include \"Attachments\"",
                "type" : "array",
@@ -47423,6 +48684,11 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "NotSent" : {
+               "description" : " if article is an outgoing email article which could not be sent",
+               "type" : "integer",
+               "readOnly" : true
+            },
             "NotSentError" : {
                "description" : "error string if article is an outgoing email article which could not be sent",
                "type" : "string",
@@ -47438,6 +48704,26 @@ pre code {
                "readOnly" : true
             },
             "ReplyTo" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMEEncrypted" : {
+               "description" : " if article is an encrypted email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMEEncryptedError" : {
+               "description" : "error string if article is an encrypted email article but could not be decrypted",
+               "type" : "string",
+               "readOnly" : true
+            },
+            "SMIMESigned" : {
+               "description" : " if article is a signed email article",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "SMIMESignedError" : {
+               "description" : "error string if article is a signed email article but could not be verified",
                "type" : "string",
                "readOnly" : true
             },
@@ -47499,10 +48785,15 @@ pre code {
             "MessageID",
             "MimeType",
             "NotSentError",
+            "NotSent",
             "References",
             "ReplyTo",
             "SenderType",
             "SenderTypeID",
+            "SMIMEEncrypted",
+            "SMIMEEncryptedError",
+            "SMIMESigned",
+            "SMIMESignedError",
             "Subject",
             "TicketID",
             "TimeUnits",
@@ -47718,6 +49009,16 @@ pre code {
                "type" : "integer",
                "readOnly" : true
             },
+            "StateIDPrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "integer",
+               "readOnly" : true
+            },
+            "StatePrevious" : {
+               "description" : "added via include \"StatePrevious\"",
+               "type" : "string",
+               "readOnly" : true
+            },
             "StateType" : {
                "type" : "string",
                "readOnly" : true
@@ -47857,7 +49158,7 @@ pre code {
             "Preferences" : {
                "description" : "added via include \"Preferences\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "$ref" : "#/definitions/_UserPreference_json"
                },
                "readOnly" : true
@@ -47865,7 +49166,7 @@ pre code {
             "RoleIDs" : {
                "description" : "added via include \"RoleIDs\"",
                "type" : "array",
-               "item" : {
+               "items" : {
                   "type" : "integer"
                },
                "readOnly" : true
@@ -48054,6 +49355,10 @@ pre code {
             "ExecGenerateToken" : {
                "description" : "ACTION TRIGGER (non-persistent attribute)! If set to 1 a new access token will be generated for this user.",
                "type" : "integer"
+            },
+            "ExecMFAGenerateSecret" : {
+               "description" : "ACTION TRIGGER (non-persistent attribute)! If set with a valid secret new mfa secret will be generated for this user.",
+               "type" : "string"
             },
             "IsAgent" : {
                "type" : "integer"
@@ -48278,8 +49583,7 @@ pre code {
             }
          },
          "required" : [
-            "ID",
-            "Value"
+            "ID"
          ]
       }
    }
@@ -48874,4 +50178,4 @@ pre code {
 </code></pre></div><p><strong>Example</strong>:</p><div class="examples toggleable"><pre><code>{
     "Code": "Object.DependingObjectExists",
     "Message": "Cannot delete queue. A ticket with this queue already exists."
-}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#objectsearch">ObjectSearch</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#virtualfs">VirtualFS</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_dynamicfields">[System] Dynamic Fields</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_htmltopdf_convert">[System] HTMLToPDF Convert</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_oauth2_authcode">[System] OAuth2 - Authorization Code & State</a></li><li><a class="nav-resource" href="#system_oauth2_profiles">[System] OAuth2 - Profiles</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_plugins">[System] Plugins</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>
+}</code></pre></div></div></div><div class="tab-pane" id="system_valid__validid__get_securedby"><h1>Secured by webToken</h1><h3>Headers</h3><table class="param-table"><thead><tr><th>Parameter</th><th><center>Required</center></th><th>Type</th><th>Special</th><th>Description</th></tr></thead><tbody><tr><td class="uri">Authorization</td><td><center>yes</center></td><td>string</td><td><ul><li>pattern:<pre>Token &lt;Token&gt;</pre></li></ul></td><td><p>Used to send the token</p></td></tr></tbody></table><div class="response-nav"><h2>Possible Responses</h2></div><h2 class="response-title" id="system_valid__validid__get_securedBy_http401">HTTP status code <a href="http://httpstatus.es/401" target="_blank">401</a></h2><div class="response"><p>Unauthorized. The given token is invalid.</p></div></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a class="nav-resource" href="#auth">Authentication</a></li><li><a class="nav-resource" href="#clientregistrations">Client Registrations</a></li><li><a class="nav-resource" href="#cmdb">CMDB</a></li><li><a class="nav-resource" href="#contacts">Contacts</a></li><li><a class="nav-resource" href="#faq">FAQ</a></li><li><a class="nav-resource" href="#i18n">i18n</a></li><li><a class="nav-resource" href="#links">Links</a></li><li><a class="nav-resource" href="#organisations">Organisations</a></li><li><a class="nav-resource" href="#reporting">Reporting</a></li><li><a class="nav-resource" href="#session">Current Session</a></li><li><a class="nav-resource" href="#objectsearch">ObjectSearch</a></li><li><a class="nav-resource" href="#tickets">Tickets</a></li><li><a class="nav-resource" href="#virtualfs">VirtualFS</a></li><li><a class="nav-resource" href="#watchers">Watchers</a></li><li><a class="nav-resource" href="#system_automation">[System] Automation</a></li><li><a class="nav-resource" href="#system_cmdb">[System] CMDB</a></li><li><a class="nav-resource" href="#system_certificates">[System] Certificate</a></li><li><a class="nav-resource" href="#system_communication_channels">[System] Communication - Channels</a></li><li><a class="nav-resource" href="#system_communication_mailaccounts">[System] Communication - Mail Accounts</a></li><li><a class="nav-resource" href="#system_communication_mailfilters">[System] Communication - Mail Filters</a></li><li><a class="nav-resource" href="#system_communication_notifications">[System] Communication - Notifications</a></li><li><a class="nav-resource" href="#system_communication_sendertypes">[System] Communication - Sender Types</a></li><li><a class="nav-resource" href="#system_communication_systemaddresses">[System] Communication - System Addresses</a></li><li><a class="nav-resource" href="#system_config">[System] Config</a></li><li><a class="nav-resource" href="#system_console">[System] Console Command</a></li><li><a class="nav-resource" href="#system_dynamicfields">[System] Dynamic Fields</a></li><li><a class="nav-resource" href="#system_faq">[System] FAQ</a></li><li><a class="nav-resource" href="#system_i18n">[System] i18n</a></li><li><a class="nav-resource" href="#system_importexport">[System] ImportExport</a></li><li><a class="nav-resource" href="#system_generalcatalog">[System] General Catalog</a></li><li><a class="nav-resource" href="#system_htmltopdf_convert">[System] HTMLToPDF Convert</a></li><li><a class="nav-resource" href="#system_logs">[System] Logs</a></li><li><a class="nav-resource" href="#system_oauth2_authcode">[System] OAuth2 - Authorization Code & State</a></li><li><a class="nav-resource" href="#system_oauth2_profiles">[System] OAuth2 - Profiles</a></li><li><a class="nav-resource" href="#system_objecticons">[System] Object Icons</a></li><li><a class="nav-resource" href="#system_plugins">[System] Plugins</a></li><li><a class="nav-resource" href="#system_roles">[System] Roles & Permissions</a></li><li><a class="nav-resource" href="#system_sessions">[System] Sessions</a></li><li><a class="nav-resource" href="#system_textmodules">[System] Text Modules</a></li><li><a class="nav-resource" href="#system_ticket_locks">[System] Ticket Locks</a></li><li><a class="nav-resource" href="#system_ticket_priorities">[System] Ticket Priorities</a></li><li><a class="nav-resource" href="#system_ticket_queues">[System] Ticket Queues</a></li><li><a class="nav-resource" href="#system_ticket_states">[System] Ticket States</a></li><li><a class="nav-resource" href="#system_ticket_types">[System] Ticket Types</a></li><li><a class="nav-resource" href="#system_users">[System] Users</a></li><li><a class="nav-resource" href="#system_valid">[System] Valid</a></li></ul></div></div></div></div></body></html>
