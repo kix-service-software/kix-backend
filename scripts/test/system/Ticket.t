@@ -2591,7 +2591,7 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
         );
         $Self->Is(
             $ErrorMessage,
-            "Attribute module for $SearchParam returned an error!",
+            'Got undefined search result!',
             "TicketSearch() (Handling invalid timestamp in '$SearchParam $ParamOption')",
         );
     }
