@@ -34,9 +34,6 @@ $ConfigObject->Set(
     Value => 0,
 );
 
-my $DatabaseCaseSensitive      = $DBObject->{Backend}->{'DB::CaseSensitive'};
-my $SearchCaseSensitiveDefault = $ConfigObject->{Contact}->{Params}->{SearchCaseSensitive};
-
 # create organisation for tests
 my $OrgRand        = 'Example-Organisation-Company' . $Helper->GetRandomID();
 my $OrganisationID = $OrganisationObject->OrganisationAdd(
@@ -235,7 +232,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => lc( $ContactRandom . '-Customer-Update-Id' )
+                    Value    => lc( $ContactRandom )
                 },
                 {
                     Field    => 'Valid',
@@ -250,18 +247,10 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         UserType   => 'Agent'
     );
 
-    if ($DatabaseCaseSensitive) {
-
-        $Self->False(
-            $List{$ContactID},
-            "ObjectSearch - Contact - ContactID - $ContactID (SearchCaseSensitive = 1)",
-        );
-    } else {
-        $Self->True(
-            $List{$ContactID},
-            "ObjectSearch - Contact - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
-        );
-    }
+    $Self->True(
+        $List{$ContactID},
+        "ObjectSearch - Contact - Fulltext=\'" . lc( $ContactRandom ) . "\'- $ContactID is found",
+    );
 
     my @TestData = (
         {

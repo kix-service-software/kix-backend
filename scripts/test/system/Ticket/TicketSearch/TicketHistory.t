@@ -84,12 +84,12 @@ my $TimeObject = $Kernel::OM->Get('Time');
 # the following tests should provoke a join in ticket_history table and the resulting SQL should be valid
 my @Tests = (
     {
-        Name   => "CreatedTypeIDs",
+        Name   => "CreatedTypeID",
         Config => {
             Search => {
                 AND => [
                     {
-                        Field    => 'CreatedTypeIDs',
+                        Field    => 'CreatedTypeID',
                         Operator => 'IN',
                         Type     => 'NUMERIC',
                         Value    => [ 1 ]
@@ -100,12 +100,12 @@ my @Tests = (
         ExpectedTicketIDs => [ $TicketIDs[0], $TicketIDs[1] ],
     },
     {
-        Name   => "CreatedStateIDs",
+        Name   => "CreatedStateID",
         Config => {
             Search => {
                 AND => [
                     {
-                        Field    => 'CreatedStateIDs',
+                        Field    => 'CreatedStateID',
                         Operator => 'IN',
                         Type     => 'NUMERIC',
                         Value    => [ 1 ]
@@ -132,12 +132,12 @@ my @Tests = (
         ExpectedTicketIDs => [ $TicketIDs[0], $TicketIDs[1] ],
     },
     {
-        Name   => "CreatedQueueIDs",
+        Name   => "CreatedQueueID",
         Config => {
             Search => {
                 AND => [
                     {
-                        Field    => 'CreatedQueueIDs',
+                        Field    => 'CreatedQueueID',
                         Operator => 'IN',
                         Type     => 'NUMERIC',
                         Value    => [ 1 ]
@@ -148,12 +148,12 @@ my @Tests = (
         ExpectedTicketIDs => [ $TicketIDs[0], $TicketIDs[1] ],
     },
     {
-        Name   => "CreatedPriorityIDs",
+        Name   => "CreatedPriorityID",
         Config => {
             Search => {
                 AND => [
                     {
-                        Field    => 'CreatedPriorityIDs',
+                        Field    => 'CreatedPriorityID',
                         Operator => 'IN',
                         Type     => 'NUMERIC',
                         Value    => [ 1 ]

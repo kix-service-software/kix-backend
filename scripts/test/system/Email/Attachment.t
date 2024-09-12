@@ -209,7 +209,7 @@ for my $Test (@Tests) {
     my $Name = "#$Count $Test->{Name}";
 
     # call Send and get results
-    my ( $Header, $Body ) = $EmailObject->Send(
+    my $Send = $EmailObject->Send(
         %{ $Test->{Data} },
     );
 
@@ -224,26 +224,26 @@ for my $Test (@Tests) {
         );
     }
 
-    if ( !$Header || ref $Header ne 'SCALAR' ) {
+    if ( !$Send->{HeadRef} || ref $Send->{HeadRef} ne 'SCALAR' ) {
 
         my $String = '';
-        $Header = \$String;
+        $Send->{HeadRef} = \$String;
     }
 
-    if ( !$Body || ref $Body ne 'SCALAR' ) {
+    if ( !$Send->{BodyRef} || ref $Send->{BodyRef} ne 'SCALAR' ) {
 
         my $String = '';
-        $Body = \$String;
+        $Send->{BodyRef} = \$String;
     }
 
     # some MIME::Tools workaround
-    my $Email = ${$Header} . "\n" . ${$Body};
+    my $Email = ${$Send->{HeadRef}} . "\n" . ${$Send->{BodyRef}};
     my @Array = split '\n', $Email;
 
     # Processing with Send headersif constant SEND set to 1
     if ($SEND) {
         my %Result;
-        for my $Header ( split '\n', ${$Body} ) {
+        for my $Header ( split '\n', ${$Send->{BodyRef}} ) {
             if ( $Header =~ /^Content\-Type\:\ (.*?)\;.*?\"(.*?)\"/x ) {
                 $Result{$2} = ( split ': ', $Header )[1];
             }

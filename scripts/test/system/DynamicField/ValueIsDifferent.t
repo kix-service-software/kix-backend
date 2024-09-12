@@ -391,7 +391,7 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Dropdown: Value1 empty, Value2 undef',
@@ -400,7 +400,7 @@ my @Tests = (
             Value1             => q{},
             Value2             => undef,
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Dropdown: Both undefs',
@@ -474,7 +474,7 @@ my @Tests = (
             Value1             => undef,
             Value2             => q{},
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Multiselect: Value1 empty, Value2 undef',
@@ -483,7 +483,7 @@ my @Tests = (
             Value1             => q{},
             Value2             => undef,
         },
-        Success => 1,
+        Success => 0,
     },
     {
         Name   => 'Multiselect: Value1 undef, Value2 empty array',
