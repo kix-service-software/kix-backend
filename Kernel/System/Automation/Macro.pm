@@ -1074,7 +1074,7 @@ sub MacroLogList {
     # check needed stuff
     for my $Needed (qw(MacroID)) {
         if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!"
             );
@@ -1086,18 +1086,18 @@ sub MacroLogList {
     my $CacheKey = 'MacroLogList::' . $Param{MacroID};
 
     # read cache
-    my $Cache = $Kernel::OM->Get('Kernel::System::Cache')->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return @{$Cache} if $Cache;
 
-    return if !$Kernel::OM->Get('Kernel::System::DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => 'SELECT id, job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by FROM automation_log WHERE macro_id = ?',
         Bind => [ \$Param{MacroID} ]
     );
 
-    my $Data = $Kernel::OM->Get('Kernel::System::DB')->FetchAllArrayRef(
+    my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ID', 'JobID', 'RunID', 'MacroID', 'MacroActionID', 'ObjectID', 'Priority', 'Message', 'CreateTime', 'CreateBy' ],
     );
 
@@ -1108,7 +1108,7 @@ sub MacroLogList {
     }
 
     # set cache
-    $Kernel::OM->Get('Kernel::System::Cache')->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result,
