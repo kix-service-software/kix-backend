@@ -41,11 +41,6 @@ for my $Module (qw(StaticDB RuntimeDB)) {
         Value => 0,
     );
 
-    $Kernel::OM->Get('Config')->Set(
-        Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorageDB',
-    );
-
     $Self->True(
         $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module ),
         "$Module - TicketObject loaded the correct backend",

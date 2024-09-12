@@ -209,6 +209,7 @@ my ($Entry2) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename-1.pdf
 $Self->IsDeeply(
     $AttachmentIndex{$Entry1},
     {
+        'ID'                 => $Entry1,
         'ContentAlternative' => '',
         'ContentID'          => '',
         'ContentType'        => 'image/png',
@@ -223,6 +224,7 @@ $Self->IsDeeply(
 $Self->IsDeeply(
     $AttachmentIndex{$Entry2},
     {
+        'ID'                 => $Entry2,
         'ContentAlternative' => '',
         'ContentID'          => '',
         'ContentType'        => 'image/png',
