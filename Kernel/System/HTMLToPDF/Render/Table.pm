@@ -33,6 +33,7 @@ sub Run {
     }
 
     my $Block = $Param{Block};
+    my $IDKey = $Param{IDKey};
     my $Css   = q{};
 
     if (
@@ -76,6 +77,9 @@ sub Run {
             Block   => $Block,
             Data    => $Param{Data},
             Object  => $Param{Object},
+            $IDKey  => $Param{$IDKey},
+            IDKey   => $IDKey,
+            UserID  => $Param{UserID}
         );
     }
     elsif ( $Block->{SubType} eq 'DataSet' ) {
@@ -118,6 +122,7 @@ sub _TableCustom {
     my $LayoutObject  = $Kernel::OM->Get('Output::HTML::Layout');
 
     my $Block = $Param{Block};
+    my $IDKey = $Param{IDKey};
 
     my @AddClass;
     my @Columns;
@@ -137,13 +142,26 @@ sub _TableCustom {
         );
         for my $Cell ( keys @Columns ) {
             my %Entry = $Self->ReplacePlaceholders(
-                String => $Row->[$Cell],
-                Datas  => $Param{Data},
-                Object => $Param{Object}
+                String    => $Row->[$Cell],
+                Datas     => $Param{Data},
+                Object    => $Param{Object},
+                Translate => $Block->{Translate},
+                ReplaceAs => $Block->{ReplaceAs} // q{-}
+            );
+
+            my $Value = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+                Text            => $Entry{Text},
+                ObjectType      => $Param{Object},
+                ObjectID        => $Param{$IDKey},
+                Data            => {},
+                UserID          => $Param{UserID},
+                RichText        => 1,
+                Translate       => $Block->{Translate},
+                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Block->{Translate} ) {
-                $Entry{Text} = $LayoutObject->{LanguageObject}->Translate($Entry{Text});
+                $Value = $LayoutObject->{LanguageObject}->Translate($Value);
             }
 
             my $Classes = $AddClass[$Cell];
@@ -155,7 +173,7 @@ sub _TableCustom {
             $LayoutObject->Block(
                 Name => 'BodyCol',
                 Data => {
-                    Value => $Entry{Text},
+                    Value => $Value,
                     Class => $Classes
                 }
             );
@@ -276,9 +294,11 @@ sub _RenderHeader {
         for my $Column ( @{$Block->{Columns}} ) {
             next if !$Column && $Param{SubType} ne 'Custom';
             my %Entry = $Self->ReplacePlaceholders(
-                String => $Column,
-                Datas  => $Param{Datas},
-                Object => $Param{Object}
+                String    => $Column,
+                Datas     => $Param{Datas},
+                Object    => $Param{Object},
+                Translate => $Block->{Translate},
+                ReplaceAs => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Param{SubType} ne 'Custom' ) {

@@ -1319,7 +1319,7 @@ sub ArticleIndex {
                         AND art.article_sender_type_id = ast.id
                         AND ast.name = ?'
                     . ($Param{CustomerVisible} ? ' AND art.customer_visible = 1' : '') .
-                    ' ORDER BY art.incoming_time',
+                    ' ORDER BY art.incoming_time, art.id',
             Bind => [ \$Param{TicketID}, \$Param{SenderType} ],
         );
     } else {
@@ -1329,7 +1329,7 @@ sub ArticleIndex {
                 FROM article
                 WHERE ticket_id = ?'
                 . ($Param{CustomerVisible} ? ' AND customer_visible = 1' : '') .
-                ' ORDER BY incoming_time',
+                ' ORDER BY incoming_time, id',
             Bind => [ \$Param{TicketID} ],
         );
     }

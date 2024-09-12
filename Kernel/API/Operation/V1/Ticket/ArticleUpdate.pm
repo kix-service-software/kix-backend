@@ -342,7 +342,13 @@ sub _ArticleUpdate {
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Subject Body From To Cc Bcc IncomingTime ReplyTo CustomerVisible SenderType SenderTypeID ContentType) ) {
+    for my $Key (
+        qw(
+            Subject Body From To Cc Bcc
+            IncomingTime ReplyTo CustomerVisible
+            SenderType SenderTypeID ContentType
+        )
+    ) {
         next KEY if (
             !exists( $Article->{ $Key } )
             || (

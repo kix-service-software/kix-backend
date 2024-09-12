@@ -95,9 +95,10 @@ sub ReplacePlaceholders {
 
     # replace object placeholders
     $Result{Text} = $Self->_ReplaceObjectAttributes(
-        Text   => $Result{Text},
-        Datas  => $Param{Datas},
-        Object => $Param{Object}
+        Text      => $Result{Text},
+        Datas     => $Param{Datas},
+        Object    => $Param{Object},
+        ReplaceAs => $Param{ReplaceAs}
     );
 
     return %Result;
@@ -140,15 +141,38 @@ sub _ReplaceSpecialCurrent {
 
     my $Text = $Param{Text};
 
-    if ( $Text =~ m{<Current_Time>}smx ) {
-        my $Time = $Kernel::OM->Get('Time')->CurrentTimestamp();
-        if ( $Param{Translate} ) {
-            $Time = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
-                $Time,
-                "DateFormat"
-            );
+    if ( $Text =~ m{<Current_(?:Time|Date)>}smx ) {
+        my @Data = $Kernel::OM->Get('Time')->SystemTime2Date(
+            SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
+        );
+        my $Time = "$Data[2]:$Data[1]:$Data[0]";
+        my $Date = "$Data[5]-$Data[4]-$Data[3]";
+
+        my $Value;
+        my $Tag = '<Current_Time>';
+        if ( $Text =~ m{$Tag}smx ) {
+            $Value = $Date . q{ } . $Time;
+            if ( $Param{Translate} ) {
+                $Value = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
+                    $Value,
+                    "DateFormat"
+                );
+            }
+            $Text =~ s/$Tag/$Value/gxsm;
         }
-        $Text =~ s/<Current_Time>/$Time/gxsm;
+
+        $Tag = '<Current_Date>';
+        if ( $Text =~ m{$Tag}smx ) {
+            $Value = $Date;
+            if ( $Param{Translate} ) {
+                $Value = $Date . q{ } . $Time;
+                $Value = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
+                    $Value,
+                    "DateFormatShort"
+                );
+            }
+            $Text =~ s/$Tag/$Value/gxsm;
+        }
     }
 
     if ( $Text =~ m{<Current_User>}smx ) {
@@ -241,7 +265,8 @@ sub _ReplaceSpecialTime {
 sub _ReplaceObjectAttributes {
     my ( $Self, %Param ) = @_;
 
-    my $Text = $Param{Text};
+    my $Text      = $Param{Text};
+    my $ReplaceAs = $Param{ReplaceAs} // q{-};
 
     return $Text if ( !$Param{Datas} || !$Param{Object} );
 
@@ -249,7 +274,7 @@ sub _ReplaceObjectAttributes {
         my $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Key';
         if ( $Text =~ m/$Pattern/smg ) {
             $Text =~ s/$Pattern/$Tag/smg;
-            $Text =~ s/$Pattern/-/smg;
+            $Text =~ s/$Pattern/$ReplaceAs/smg;
         }
 
         $Pattern = $Param{Object} . '[.]' . $Tag . '[.]Value(:?[.](\d+)|)';
@@ -279,19 +304,19 @@ sub _ReplaceObjectAttributes {
             if ( $Tag =~ /^(?:Create|Change)(?:d|Time)$/sm ) {
                 $Value = $Kernel::OM->Get('Output::HTML::Layout')->{LanguageObject}->FormatTimeString(
                     $Value,
-                    "DateFormat"
+                    $Index ? "DateFormatShort" : "DateFormat"
                 );
             }
             $Text =~ s/$Pattern/$Value/smg;
-            $Text =~ s/$Pattern/-/smg;
+            $Text =~ s/$Pattern/$ReplaceAs/smg;
         }
     }
 
     # replace not exists placeholders of that object
     my $Pattern = $Param{Object} . '[.].*[.]Key';
     my $Pattern2 = $Param{Object} . '[.].*[.]Value(:?[.]\d+|)';
-    $Text =~ s/$Pattern/-/smg;
-    $Text =~ s/$Pattern2/-/smg;
+    $Text =~ s/$Pattern/$ReplaceAs/smg;
+    $Text =~ s/$Pattern2/$ReplaceAs/smg;
 
     return $Text;
 }
