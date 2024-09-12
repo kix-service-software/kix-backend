@@ -706,7 +706,7 @@ my @IntegrationSortTests = (
                 Field => 'DynamicField_UnitTest'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction ascending',
@@ -716,7 +716,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction descending',
@@ -726,7 +726,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

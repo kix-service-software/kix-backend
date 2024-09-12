@@ -1298,7 +1298,7 @@ my @IntegrationSortTests = (
                 Field => 'CreateBy'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -1308,7 +1308,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -1356,7 +1356,7 @@ my @IntegrationSortTests = (
                 Field => 'ChangeBy'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction ascending',
@@ -1366,7 +1366,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction descending',

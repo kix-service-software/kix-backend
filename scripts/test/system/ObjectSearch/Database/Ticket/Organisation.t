@@ -1265,7 +1265,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID3,$TicketID2,$TicketID1,$TicketID4]
     },
     {
         Name     => 'Sort: Field Organisation',
@@ -1294,7 +1294,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID3,$TicketID2,$TicketID1,$TicketID4]
     },
     {
         Name     => 'Sort: Field OrganisationNumber',
@@ -1323,7 +1323,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID1,$TicketID4,$TicketID3,$TicketID2]
+        Expected => $OrderByNull eq 'LAST' ? [$TicketID4,$TicketID3,$TicketID2,$TicketID1] : [$TicketID3,$TicketID2,$TicketID1,$TicketID4]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

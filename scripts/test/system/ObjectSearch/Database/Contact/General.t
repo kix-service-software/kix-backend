@@ -1348,10 +1348,10 @@ my @SortTests = (
         Attribute => 'Title',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(c.title)' : 'c.title'
+                'LOWER(c.title)'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(c.title)' : 'c.title'
+                'LOWER(c.title)'
             ]
         }
     },
@@ -1360,10 +1360,10 @@ my @SortTests = (
         Attribute => 'Firstname',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(c.firstname)' : 'c.firstname'
+                'LOWER(c.firstname)'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(c.firstname)' : 'c.firstname'
+                'LOWER(c.firstname)'
             ]
         }
     },
@@ -1372,10 +1372,10 @@ my @SortTests = (
         Attribute => 'Lastname',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(c.lastname)' : 'c.lastname'
+                'LOWER(c.lastname)'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(c.lastname)' : 'c.lastname'
+                'LOWER(c.lastname)'
             ]
         }
     },
@@ -1384,10 +1384,10 @@ my @SortTests = (
         Attribute => 'Phone',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.phone,\'\'))' : 'COALESCE(c.phone,\'\')'
+                'LOWER(COALESCE(c.phone,\'\'))'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.phone,\'\'))' : 'COALESCE(c.phone,\'\')'
+                'LOWER(COALESCE(c.phone,\'\'))'
             ]
         }
     },
@@ -1396,10 +1396,10 @@ my @SortTests = (
         Attribute => 'Fax',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.fax,\'\'))' : 'COALESCE(c.fax,\'\')'
+                'LOWER(COALESCE(c.fax,\'\'))'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.fax,\'\'))' : 'COALESCE(c.fax,\'\')'
+                'LOWER(COALESCE(c.fax,\'\'))'
             ]
         }
     },
@@ -1408,10 +1408,10 @@ my @SortTests = (
         Attribute => 'Mobile',
         Expected  => {
             'OrderBy' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.mobile,\'\'))' : 'COALESCE(c.mobile,\'\')'
+                'LOWER(COALESCE(c.mobile,\'\'))'
             ],
             'Select' => [
-                $CaseSensitive ? 'LOWER(COALESCE(c.mobile,\'\'))' : 'COALESCE(c.mobile,\'\')'
+                'LOWER(COALESCE(c.mobile,\'\'))'
             ]
         }
     },

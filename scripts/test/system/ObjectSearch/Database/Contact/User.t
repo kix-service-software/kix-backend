@@ -1223,7 +1223,7 @@ my @IntegrationSortTests = (
                 Field => 'Login'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction ascending',
@@ -1233,7 +1233,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction descending',
@@ -1243,7 +1243,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID1,$ContactID2,'1']
+        Expected => [$ContactID3,$ContactID2,$ContactID1,'1']
     },
     {
         Name     => 'Sort: Field UserLogin',
@@ -1252,7 +1252,7 @@ my @IntegrationSortTests = (
                 Field => 'UserLogin'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction ascending',
@@ -1262,7 +1262,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID2,$ContactID1,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction descending',
@@ -1272,7 +1272,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID1,$ContactID2,'1']
+        Expected => [$ContactID3,$ContactID2,$ContactID1,'1']
     }
 );
 for my $Test ( @IntegrationSortTests ) {

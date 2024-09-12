@@ -2001,7 +2001,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time = 1388577600'
+                    'ta.incoming_time = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
                 ],
                 'IsRelative' => undef
             }
@@ -2018,7 +2018,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time = 1388581200'
+                    'ta.incoming_time = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
                 ],
                 'IsRelative' => 1
             }
@@ -2035,7 +2035,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time < 1388577600'
+                    'ta.incoming_time < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
                 ],
                 'IsRelative' => undef
             }
@@ -2052,7 +2052,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time < 1388581200'
+                    'ta.incoming_time < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
                 ],
                 'IsRelative' => 1
             }
@@ -2069,7 +2069,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time > 1388577600'
+                    'ta.incoming_time > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
                 ],
                 'IsRelative' => undef
             }
@@ -2086,7 +2086,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time > 1388581200'
+                    'ta.incoming_time > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
                 ],
                 'IsRelative' => 1
             }
@@ -2103,7 +2103,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time <= 1388577600'
+                    'ta.incoming_time <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
                 ],
                 'IsRelative' => undef
             }
@@ -2120,7 +2120,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time <= 1388581200'
+                    'ta.incoming_time <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
                 ],
                 'IsRelative' => 1
             }
@@ -2137,7 +2137,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time >= 1388577600'
+                    'ta.incoming_time >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
                 ],
                 'IsRelative' => undef
             }
@@ -2154,7 +2154,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    'ta.incoming_time >= 1388581200'
+                    'ta.incoming_time >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
                 ],
                 'IsRelative' => 1
             }

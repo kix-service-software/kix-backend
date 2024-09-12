@@ -127,7 +127,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? '(LOWER(o.name) = LOWER(\'Test\') OR LOWER(o.number) = LOWER(\'Test\') OR LOWER(o.street) = LOWER(\'Test\') OR LOWER(o.city) = LOWER(\'Test\') OR LOWER(o.zip) = LOWER(\'Test\') OR LOWER(o.url) = LOWER(\'Test\') OR LOWER(o.country) = LOWER(\'Test\')) ' : '(o.name = \'Test\' OR o.number = \'Test\' OR o.street = \'Test\' OR o.city = \'Test\' OR o.zip = \'Test\' OR o.url = \'Test\' OR o.country = \'Test\') '
+                $CaseSensitive ? '(LOWER(o.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.url) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(o.name LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.number LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.street LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.city LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.zip LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.url LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o.country LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

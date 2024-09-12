@@ -72,6 +72,12 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# set fixed time to have predetermined verifiable results
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2014-01-01 12:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
+
 # check Search
 my @SearchTests = (
     {
@@ -371,6 +377,7 @@ $Self->True(
     'Dynamic field value set for first article'
 );
 # second article
+$Helper->FixedTimeAddSeconds(60);
 my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID         => $TicketID,
     ChannelID        => 1,

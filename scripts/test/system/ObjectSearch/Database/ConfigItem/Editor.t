@@ -1242,7 +1242,7 @@ my @IntegrationSortTests = (
                 Field => 'CreateByID'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
+        Expected => [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3]
     },
     {
         Name     => 'Sort: Field CreateByID / Direction ascending',
@@ -1252,7 +1252,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
+        Expected => [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3]
     },
     {
         Name     => 'Sort: Field CreateByID / Direction descending',
@@ -1262,7 +1262,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1] : [$ConfigItemID2, $ConfigItemID1, $ConfigItemID3]
+        Expected => [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1]
     },
     {
         Name     => 'Sort: Field CreateBy',
@@ -1300,7 +1300,7 @@ my @IntegrationSortTests = (
                 Field => 'ChangeByID'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
+        Expected => [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3]
     },
     {
         Name     => 'Sort: Field ChangeByID / Direction ascending',
@@ -1310,7 +1310,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
+        Expected => [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3]
     },
     {
         Name     => 'Sort: Field ChangeByID / Direction descending',
@@ -1320,7 +1320,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1] : [$ConfigItemID2, $ConfigItemID1, $ConfigItemID3]
+        Expected => [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1]
     },
     {
         Name     => 'Sort: Field ChangeBy',
