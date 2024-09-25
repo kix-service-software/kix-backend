@@ -699,7 +699,7 @@ sub ArticleAttachment {
         $Kernel::OM->Get('Encode')->EncodeInput( \$Data{Content} );
     }
 
-    if ( !$Data{Content} ) {
+    if ( !$Data{Content} && $Data{Content} ne '') {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message =>
