@@ -1652,7 +1652,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[New Ticket: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket for team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket for team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">2</Data>
@@ -1660,7 +1660,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">3</Data>
@@ -1668,7 +1668,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received:[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">4</Data>
@@ -1676,7 +1676,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Unlock: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Lock timeout has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Lock timeout has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">5</Data>
@@ -1684,7 +1684,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Owner assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">6</Data>
@@ -1692,7 +1692,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Responsible assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket responsible: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket responsible: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">7</Data>
@@ -1700,7 +1700,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_LAST_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A new article has been added: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; wrote:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A new article has been added: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; wrote:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">8</Data>
@@ -1708,7 +1708,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket assigned to team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket assigned to team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">9</Data>
@@ -1716,7 +1716,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Reminder: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">10</Data>
@@ -1724,7 +1724,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Reminder: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">11</Data>
@@ -1742,7 +1742,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Neues Ticket: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Neues Ticket f&uuml;r Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Neues Ticket f&uuml;r Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">15</Data>
@@ -1750,7 +1750,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">16</Data>
@@ -1758,7 +1758,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">17</Data>
@@ -1766,7 +1766,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Entsperrung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Entsperrzeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Entsperrzeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">18</Data>
@@ -1774,7 +1774,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Bearbeiter zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">19</Data>
@@ -1782,7 +1782,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Verantwortlicher zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Verantwortung f&uuml;r dieses Tickets &uuml;bertragen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Verantwortung f&uuml;r dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">20</Data>
@@ -1790,7 +1790,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_LAST_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">21</Data>
@@ -1798,7 +1798,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket zugeordnet zu Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket zugeordnet zu Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">22</Data>
@@ -1806,7 +1806,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Erinnerung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">23</Data>
@@ -1814,7 +1814,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Erinnerung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">24</Data>
