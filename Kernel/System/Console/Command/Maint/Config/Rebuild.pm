@@ -24,6 +24,13 @@ sub Configure {
 
     $Self->Description('Rebuild the system configuration.');
 
+    $Self->AddOption(
+        Name        => 'debug',
+        Description => "If given, the rebuild process prints progress information to STDERR.",
+        HasValue    => 0,
+        Required    => 0,
+    );
+
     return;
 }
 
@@ -32,12 +39,16 @@ sub Run {
 
     $Self->Print("<yellow>Rebuilding the system configuration...</yellow>\n");
 
-    my $Result = $Kernel::OM->Get('SysConfig')->Rebuild();
+    my %Result = $Kernel::OM->Get('SysConfig')->Rebuild(
+        Debug => $Self->GetOption('debug')
+    );
 
-    if ( !$Result ) {
+    if ( !%Result ) {
         $Self->Print("<red>Error.</red>\n");
         return $Self->ExitCodeError();
     }
+
+    $Self->Print("rebuilt $Result{Total} config options (created $Result{Created}, updated $Result{Updated}, skipped $Result{Skipped}, failed $Result{Failed})\n");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
