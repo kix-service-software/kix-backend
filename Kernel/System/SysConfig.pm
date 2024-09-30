@@ -15,9 +15,11 @@ use warnings;
 
 use File::Basename;
 use XML::Simple;
+use Data::Compare;
 
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::EventHandler;
+use Kernel::System::PerfLog;
 
 use vars qw(@ISA);
 
@@ -61,6 +63,7 @@ sub new {
 
     @ISA = qw(
         Kernel::System::EventHandler
+        Kernel::System::PerfLog
     );
 
     # init of event handler
@@ -881,13 +884,14 @@ sub CleanUp {
 Rebuild the configuration database from XML files.
 
     my $Result = $SysConfigObject->Rebuild(
-        Name => '...',
+        Debug => 1,
     );
 
 =cut
 
 sub Rebuild {
     my ( $Self, %Param ) = @_;
+    my %Result;
 
     my $Home = $ENV{KIX_HOME} || $Kernel::OM->Get('Config')->Get('Home');
     if ( !$Home ) {
@@ -915,13 +919,15 @@ sub Rebuild {
     # get main object
     my $MainObject = $Kernel::OM->Get('Main');
 
-    # This is the sorted configuration XML entry list that we must populate here.
-    $Self->{XMLConfig} = [];
-
     my %HandledKeys;
     my %AllOptions = $Self->OptionGetAll();
 
     foreach my $Directory ( @Directories ) {
+
+        if ( $Param{Debug} ) {
+            print STDERR "Rebuilding config from directory $Directory\n";
+            $Self->Start("rebuild from directory $Directory");
+        }
 
         $Kernel::OM->Get('Log')->Log(
             Priority => 'info',
@@ -959,13 +965,23 @@ sub Rebuild {
             $Data{$File} = $XMLObject->XMLin($ConfigFile);
         }
 
-        my %RebuiltKeys = $Self->_RebuildFromFile(
-            Data => \%Data,
+        my %RebuildResult = $Self->_RebuildFromFile(
+            Data  => \%Data,
+            Debug => $Param{Debug},
         );
         %HandledKeys = (
             %HandledKeys,
-            %RebuiltKeys
+            %{$RebuildResult{HandledKeys}},
         );
+        $Result{Total}   += $RebuildResult{Total};
+        $Result{Created} += $RebuildResult{Created};
+        $Result{Updated} += $RebuildResult{Updated};
+        $Result{Failed}  += $RebuildResult{Failed};
+        $Result{Skipped} += $RebuildResult{Skipped};
+
+        if ( $Param{Debug} ) {
+            $Self->Stop();
+        }
     }
 
     # cleanup all no-longer existing options
@@ -982,13 +998,16 @@ sub Rebuild {
         );
     }
 
-    return 1;
+    return %Result;
 }
 
 sub _RebuildFromFile {
     my ( $Self, %Param ) = @_;
 
     return if !IsHashRefWithData($Param{Data});
+
+    # This is the sorted configuration XML entry list that we must populate here.
+    my @XMLConfig;
 
     my %Data = %{$Param{Data}};
 
@@ -1040,22 +1059,22 @@ sub _RebuildFromFile {
      for my $Init (qw(Framework Application Config Changes Unknown)) {
         for my $Option ( @{ $XMLConfigTMP{$Init} } ) {
             push(
-                @{ $Self->{XMLConfig} },
+                @XMLConfig,
                 $Option
             );
         }
     }
 
-    # Only the last config XML entry should be used, remove any previous ones.
+    # Only the last config XML entry for each option must be used, ignore any previous ones.
     my %Seen;
     my @XMLConfigTmp;
 
     OPTION:
-    for my $Option ( reverse @{ $Self->{XMLConfig} } ) {
+    for my $Option ( reverse @XMLConfig ) {
         next OPTION if !$Option || !$Option->{Name} || $Seen{ $Option->{Name} }++;
         push @XMLConfigTmp, $Option;
     }
-    $Self->{XMLConfig} = \@XMLConfigTmp;
+    @XMLConfig = @XMLConfigTmp;
 
     # read complete list of SysConfig options from database to reduce time in loop
     my %AllOptions = $Self->OptionGetAll();
@@ -1063,11 +1082,18 @@ sub _RebuildFromFile {
     my $JSONObject = $Kernel::OM->Get('JSON');
 
     # update all keys
-    my $Total = @{ $Self->{XMLConfig} };
+    my $Total = scalar @XMLConfig;
     my $Count = 0;
+    my $Created = 0;
+    my $Updated = 0;
+    my $Skipped = 0;
+    my $Failed = 0;
     my %ExistingKeys;
+
+    use Data::Dumper;
     OPTIONRAW:
-    for my $OptionRaw ( @{ $Self->{XMLConfig} } ) {
+    for my $OptionRaw ( @XMLConfig ) {
+        $Count++;
 
         # ignore options without name
         next if !$OptionRaw->{Name};
@@ -1078,12 +1104,17 @@ sub _RebuildFromFile {
         # get Type
         my $Type = (keys %{$OptionRaw->{Setting}})[0];
 
+        if ( $Param{Debug} ) {
+            print STDERR "[$Count/$Total] rebuilding option $OptionRaw->{Name} ($Type)\n";
+        }
+
         # check type
         if ( !$Self->{OptionTypeModules}->{$Type} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Item has unknown type \"$Type\".",
             );
+            $Failed++;
             next;
         }
 
@@ -1113,6 +1144,7 @@ sub _RebuildFromFile {
                     Priority => 'error',
                     Message  => "Unable to extend option \"$Option{Name}\", because it doesn't exist.",
                 );
+                $Failed++;
                 next;
             }
 
@@ -1125,25 +1157,70 @@ sub _RebuildFromFile {
 
         # check if this is a new option
         if ( !$AllOptions{ $Option{Name} } ) {
+            if ( $Param{Debug} ) {
+                print STDERR "    creating option $OptionRaw->{Name}\n";
+            }
+
             # just import the new option
             my $Result = $Self->OptionAdd(
                 %Option,
                 UserID => 1,
             );
+            if ( $Result ) {
+                $Created++
+            }
         }
         else {
-            # we have to update the option
-            my $Result = $Self->OptionUpdate(
-                %{ $AllOptions{ $Option{Name} } },
-                %Option,
-                UserID => 1,
-            );
-        }
+            # check if update is required
+            my $UpdateRequired = 0;
+            KEY:
+            foreach my $Key ( keys %Option ) {
+                next KEY if (!defined $AllOptions{ $Option{Name} }->{$Key} && !defined $Option{$Key});
 
-        $Count++;
+                if ( IsHashRef($Option{$Key}) || IsArrayRef($Option{$Key}) ) {
+                    my $Result = Compare(
+                        $AllOptions{ $Option{Name} }->{$Key}, 
+                        $Option{$Key}
+                    );
+                    if ( !$Result ) {
+                        $UpdateRequired = 1;
+                        last KEY;
+                    }
+                }
+                elsif ( ($AllOptions{ $Option{Name} }->{$Key} || '') ne ($Option{$Key} || '') ) {
+                    $UpdateRequired = 1;
+                    last KEY;
+                }
+            }
+            if ( $UpdateRequired ) {
+                if ( $Param{Debug} ) {
+                    print STDERR "    updating option $OptionRaw->{Name}\n";
+                }
+
+                # we have to update the option
+                my $Result = $Self->OptionUpdate(
+                    %{ $AllOptions{ $Option{Name} } },
+                    %Option,
+                    UserID => 1,
+                );
+                if ( $Result ) {
+                    $Updated++
+                }
+            }
+            else {
+                $Skipped++;
+            }
+        }
     }
 
-    return %ExistingKeys;
+    return (
+        HandledKeys => \%ExistingKeys,
+        Failed      => $Failed,
+        Skipped     => $Skipped,
+        Created     => $Created,
+        Updated     => $Updated,
+        Total       => $Total,
+    );
 }
 
 sub _ObjectSearchCacheCleanUp {
