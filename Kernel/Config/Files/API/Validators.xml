@@ -17,7 +17,7 @@
                 <Item Key="Module">Kernel::API::Validator::ArticleValidator</Item>
                 <Item Key="Validates">ArticleID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(ArticleGet|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(ArticleGet|NotificationCreate|NotificationUpdate|JobGet|JobCreate|JobUpdate|MacroGet|MacroCreate|MacroUpdate|MacroActionGet|MacroActionCreate|MacroActionUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
