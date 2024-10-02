@@ -56,8 +56,8 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
-# get handling of order by null
-my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -609,7 +609,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID3]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => "Search: Field Category / Operator ENDSWITH / Value \$Category2",
@@ -687,7 +687,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2]
+        Expected => $CaseSensitive ? [$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     }
 );
 
@@ -748,7 +748,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Category / Direction ascending',
@@ -759,7 +759,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Category / Direction descending',
@@ -770,7 +770,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => $CaseSensitive ? [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

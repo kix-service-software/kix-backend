@@ -4044,8 +4044,9 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time = 1388577600'
-                ]
+                    's_ta.incoming_time = 1388574000'
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -4060,7 +4061,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time = 1388581200'
+                    's_ta.incoming_time = 1388577600'
                 ],
                 'IsRelative' => 1
             }
@@ -4077,8 +4078,9 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time < 1388577600'
-                ]
+                    's_ta.incoming_time < 1388574000'
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -4093,7 +4095,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time < 1388581200'
+                    's_ta.incoming_time < 1388577600'
                 ],
                 'IsRelative' => 1
             }
@@ -4110,8 +4112,9 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time > 1388577600'
-                ]
+                    's_ta.incoming_time > 1388574000'
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -4126,7 +4129,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time > 1388581200'
+                    's_ta.incoming_time > 1388577600'
                 ],
                 'IsRelative' => 1
             }
@@ -4143,8 +4146,9 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time <= 1388577600'
-                ]
+                    's_ta.incoming_time <= 1388574000'
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -4159,7 +4163,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time <= 1388581200'
+                    's_ta.incoming_time <= 1388577600'
                 ],
                 'IsRelative' => 1
             }
@@ -4176,8 +4180,9 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time >= 1388577600'
-                ]
+                    's_ta.incoming_time >= 1388574000'
+                ],
+                'IsRelative' => undef
             }
         },
         {
@@ -4192,7 +4197,7 @@ for my $UserType ( qw(Agent Customer) ) {
                     'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id' . $JoinArticleSuffix
                 ],
                 'Where' => [
-                    's_ta.incoming_time >= 1388581200'
+                    's_ta.incoming_time >= 1388577600'
                 ],
                 'IsRelative' => 1
             }

@@ -251,7 +251,7 @@ ldap_mockify {
         $ldap->add( $TestGroupDN, attr => $TestGroups{ $TestGroupDN } );
     }
 
-    my $Filter = "($SyncConfig->{UID}=" . escape_filter_value( 'uid=user1,ou=users,dc=example,dc=com' ) . ')';
+    my $Filter = "($SyncConfig->{UID}=" . escape_filter_value( 'syncuser1' ) . ')';
     my $Result = $ldap->search(
         base   => $SyncConfig->{BaseDN},
         filter => $Filter,

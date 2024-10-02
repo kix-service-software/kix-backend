@@ -1574,7 +1574,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => $CaseSensitive ? [$TicketID2] : [$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => "Search: Field Owner / Operator ENDSWITH / Value \$UserLogin2",
@@ -1964,7 +1964,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => $CaseSensitive ? [$TicketID2] : [$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => "Search: Field Responsible / Operator ENDSWITH / Value \$UserLogin2",
@@ -2280,7 +2280,7 @@ my @IntegrationSortTests = (
                 Field => 'Owner'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Owner / Direction ascending',
@@ -2290,7 +2290,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Owner / Direction descending',
@@ -2300,7 +2300,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field OwnerName',
@@ -2309,7 +2309,7 @@ my @IntegrationSortTests = (
                 Field => 'OwnerName'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction ascending',
@@ -2319,7 +2319,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction descending',
@@ -2329,7 +2329,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleID',
@@ -2367,7 +2367,7 @@ my @IntegrationSortTests = (
                 Field => 'Responsible'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Responsible / Direction ascending',
@@ -2377,7 +2377,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Responsible / Direction descending',
@@ -2387,7 +2387,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleName',
@@ -2396,7 +2396,7 @@ my @IntegrationSortTests = (
                 Field => 'ResponsibleName'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction ascending',
@@ -2406,7 +2406,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID2,$TicketID3,$TicketID1]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction descending',
@@ -2416,7 +2416,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $OrderByNull eq 'LAST' ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

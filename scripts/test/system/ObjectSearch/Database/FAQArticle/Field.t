@@ -166,8 +166,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field1) LIKE 'test<br/>\n" : "(f.f_field1 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field1) LIKE 'test\n" : "test%' OR f.f_field1 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field1) LIKE 'test<br/>\n" : "(f.f_field1 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field1) LIKE 'test\n" : "test%' OR f.f_field1 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -194,8 +194,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field1) LIKE '\%test<br/>\n" : "(f.f_field1 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field1) LIKE '\%test\n" : "test' OR f.f_field1 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field1) LIKE '\%test<br/>\n" : "(f.f_field1 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field1) LIKE '\%test\n" : "test' OR f.f_field1 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -222,8 +222,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field1) LIKE '\%test<br/>\n" : "(f.f_field1 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field1) LIKE '\%test\n" : "test%' OR f.f_field1 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field1) LIKE '\%test<br/>\n" : "(f.f_field1 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field1) LIKE '\%test\n" : "test%' OR f.f_field1 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -250,8 +250,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field1) LIKE 'test<br/>\n" : "(f.f_field1 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field1) LIKE 'test\n" : "test' OR f.f_field1 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field1) LIKE 'test<br/>\n" : "(f.f_field1 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field1) LIKE 'test\n" : "test' OR f.f_field1 LIKE 'test\n" )
                 . "test')"
             ]
         }
@@ -278,8 +278,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field2) LIKE 'test<br/>\n" : "(f.f_field2 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field2) LIKE 'test\n" : "test%' OR f.f_field2 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field2) LIKE 'test<br/>\n" : "(f.f_field2 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field2) LIKE 'test\n" : "test%' OR f.f_field2 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -306,8 +306,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field2) LIKE '\%test<br/>\n" : "(f.f_field2 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field2) LIKE '\%test\n" : "test' OR f.f_field2 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field2) LIKE '\%test<br/>\n" : "(f.f_field2 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field2) LIKE '\%test\n" : "test' OR f.f_field2 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -334,8 +334,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field2) LIKE '\%test<br/>\n" : "(f.f_field2 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field2) LIKE '\%test\n" : "test%' OR f.f_field2 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field2) LIKE '\%test<br/>\n" : "(f.f_field2 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field2) LIKE '\%test\n" : "test%' OR f.f_field2 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -362,8 +362,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field2) LIKE 'test<br/>\n" : "(f.f_field2 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field2) LIKE 'test\n" : "test' OR f.f_field2 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field2) LIKE 'test<br/>\n" : "(f.f_field2 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field2) LIKE 'test\n" : "test' OR f.f_field2 LIKE 'test\n" )
                 . "test')"
             ]
         }
@@ -390,8 +390,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field3) LIKE 'test<br/>\n" : "(f.f_field3 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field3) LIKE 'test\n" : "test%' OR f.f_field3 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field3) LIKE 'test<br/>\n" : "(f.f_field3 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field3) LIKE 'test\n" : "test%' OR f.f_field3 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -418,8 +418,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field3) LIKE '\%test<br/>\n" : "(f.f_field3 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field3) LIKE '\%test\n" : "test' OR f.f_field3 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field3) LIKE '\%test<br/>\n" : "(f.f_field3 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field3) LIKE '\%test\n" : "test' OR f.f_field3 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -446,8 +446,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field3) LIKE '\%test<br/>\n" : "(f.f_field3 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field3) LIKE '\%test\n" : "test%' OR f.f_field3 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field3) LIKE '\%test<br/>\n" : "(f.f_field3 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field3) LIKE '\%test\n" : "test%' OR f.f_field3 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -474,8 +474,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field3) LIKE 'test<br/>\n" : "(f.f_field3 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field3) LIKE 'test\n" : "test' OR f.f_field3 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field3) LIKE 'test<br/>\n" : "(f.f_field3 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field3) LIKE 'test\n" : "test' OR f.f_field3 LIKE 'test\n" )
                 . "test')"
             ]
         }
@@ -502,8 +502,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field4) LIKE 'test<br/>\n" : "(f.f_field4 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field4) LIKE 'test\n" : "test%' OR f.f_field4 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field4) LIKE 'test<br/>\n" : "(f.f_field4 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field4) LIKE 'test\n" : "test%' OR f.f_field4 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -530,8 +530,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field4) LIKE '\%test<br/>\n" : "(f.f_field4 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field4) LIKE '\%test\n" : "test' OR f.f_field4 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field4) LIKE '\%test<br/>\n" : "(f.f_field4 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field4) LIKE '\%test\n" : "test' OR f.f_field4 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -558,8 +558,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field4) LIKE '\%test<br/>\n" : "(f.f_field4 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field4) LIKE '\%test\n" : "test%' OR f.f_field4 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field4) LIKE '\%test<br/>\n" : "(f.f_field4 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field4) LIKE '\%test\n" : "test%' OR f.f_field4 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -586,8 +586,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field4) LIKE 'test<br/>\n" : "(f.f_field4 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field4) LIKE 'test\n" : "test' OR f.f_field4 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field4) LIKE 'test<br/>\n" : "(f.f_field4 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field4) LIKE 'test\n" : "test' OR f.f_field4 LIKE 'test\n" )
                 . "test')"
             ]
         }
@@ -614,8 +614,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field5) LIKE 'test<br/>\n" : "(f.f_field5 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field5) LIKE 'test\n" : "test%' OR f.f_field5 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field5) LIKE 'test<br/>\n" : "(f.f_field5 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field5) LIKE 'test\n" : "test%' OR f.f_field5 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -642,8 +642,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field5) LIKE '\%test<br/>\n" : "(f.f_field5 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field5) LIKE '\%test\n" : "test' OR f.f_field5 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field5) LIKE '\%test<br/>\n" : "(f.f_field5 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field5) LIKE '\%test\n" : "test' OR f.f_field5 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -670,8 +670,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field5) LIKE '\%test<br/>\n" : "(f.f_field5 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field5) LIKE '\%test\n" : "test%' OR f.f_field5 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field5) LIKE '\%test<br/>\n" : "(f.f_field5 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field5) LIKE '\%test\n" : "test%' OR f.f_field5 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -698,8 +698,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field5) LIKE 'test<br/>\n" : "(f.f_field5 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field5) LIKE 'test\n" : "test' OR f.f_field5 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field5) LIKE 'test<br/>\n" : "(f.f_field5 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field5) LIKE 'test\n" : "test' OR f.f_field5 LIKE 'test\n" )
                 . "test')"
             ]
         }
@@ -726,8 +726,8 @@ my @SearchTests = (
         },
         Expected     => {
               'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field6) LIKE 'test<br/>\n" : "(f.f_field6 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field6) LIKE 'test\n" : "test%' OR f.f_field6 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field6) LIKE 'test<br/>\n" : "(f.f_field6 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field6) LIKE 'test\n" : "test%' OR f.f_field6 LIKE 'test\n" )
                 . "test%')"
             ]
         }
@@ -754,8 +754,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field6) LIKE '\%test<br/>\n" : "(f.f_field6 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field6) LIKE '\%test\n" : "test' OR f.f_field6 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field6) LIKE '\%test<br/>\n" : "(f.f_field6 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field6) LIKE '\%test\n" : "test' OR f.f_field6 LIKE '\%test\n" )
                 . "test')"
             ]
         }
@@ -782,8 +782,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field6) LIKE '\%test<br/>\n" : "(f.f_field6 LIKE '\%test<br/>\n"
-                . $CaseSensitive ? "test%' OR LOWER(f.f_field6) LIKE '\%test\n" : "test%' OR f.f_field6 LIKE '\%test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field6) LIKE '\%test<br/>\n" : "(f.f_field6 LIKE '\%test<br/>\n" )
+                . ( $CaseSensitive ? "test%' OR LOWER(f.f_field6) LIKE '\%test\n" : "test%' OR f.f_field6 LIKE '\%test\n" )
                 . "test%')"
             ]
         }
@@ -810,8 +810,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? "(LOWER(f.f_field6) LIKE 'test<br/>\n" : "(f.f_field6 LIKE 'test<br/>\n"
-                . $CaseSensitive ? "test' OR LOWER(f.f_field6) LIKE 'test\n" : "test' OR f.f_field6 LIKE 'test\n"
+                ( $CaseSensitive ? "(LOWER(f.f_field6) LIKE 'test<br/>\n" : "(f.f_field6 LIKE 'test<br/>\n" )
+                . ( $CaseSensitive ? "test' OR LOWER(f.f_field6) LIKE 'test\n" : "test' OR f.f_field6 LIKE 'test\n" )
                 . "test')"
             ]
         }

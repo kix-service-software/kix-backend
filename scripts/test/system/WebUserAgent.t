@@ -163,10 +163,10 @@ for my $Test (@Tests) {
             "$Test->{Name} - WebUserAgent check structure from request",
         );
 
-        my $Status = substr $Response{Status}, 0, 3;
-
-        $Self->True(
-            $Status == $Response{HTTPCode},
+        my $Status = substr( $Response{Status}, 0, 3 );
+        $Self->Is(
+            $Status,
+            $Response{HTTPCode},
             "$Test->{Name} - First three digits of status matching http code",
         );
 
