@@ -980,10 +980,11 @@ sub ArticleGetTicketID {
 
     # set cache
     $Self->_TicketCacheSet(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $TicketID,
+        TicketID => $TicketID,
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => $TicketID,
     );
 
     # return
@@ -2173,7 +2174,7 @@ sub ArticleUpdate {
         last KEY;
     }
 
-    # merge 
+    # merge
     %Article = (
         %Article,
         %Param,
@@ -2207,7 +2208,7 @@ sub ArticleUpdate {
         SQL => "UPDATE article SET a_body = ?, a_subject = ?, a_from = ?, a_to = ?, a_cc = ?, a_bcc = ?, a_reply_to = ?, "
             . "customer_visible = ?, article_sender_type_id = ?, incoming_time = ?, a_content_type = ?, "
             . "change_time = current_timestamp, change_by = ? WHERE id = ?",
-        Bind => [ 
+        Bind => [
             \$Article{Body}, \$Article{Subject}, \$Article{From}, \$Article{To}, \$Article{Cc}, \$Article{Bcc}, \$Article{ReplyTo},
             \$Article{CustomerVisible}, \$Article{SenderTypeID}, \$Article{IncomingTime}, \$Article{ContentType}, \$Article{UserID},
             \$Param{ArticleID}
@@ -2807,6 +2808,7 @@ delete accounted time of article
 
     my $Success = $TicketObject->ArticleAccountedTimeDelete(
         ArticleID => $ArticleID,
+        UserID    => 1
     );
 
 =cut
@@ -2815,12 +2817,15 @@ sub ArticleAccountedTimeDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ArticleID!'
-        );
-        return;
+    for my $Needed (qw(ArticleID UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+
+            );
+            return;
+        }
     }
 
     # db query
@@ -2834,11 +2839,26 @@ sub ArticleAccountedTimeDelete {
         ArticleID => $Param{ArticleID}
     );
 
+    # update ticket data
+    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ?, accounted_time = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$AccountedTime, \$TicketID ],
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
         ObjectID  => $TicketID.'::'.$Param{ArticleID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket',
+        ObjectID  => $TicketID,
     );
 
     return 1;

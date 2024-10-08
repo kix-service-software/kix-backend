@@ -1529,7 +1529,7 @@ sub _TicketCacheClear {
         return 1;
     }
 
-    # set sempahore
+    # set semaphore
     my $Value = $Param{TicketID}.Time::HiRes::time();
     $CacheObject->SetSemaphore(
         ID      => "TicketCache".$Param{TicketID},
@@ -6053,6 +6053,22 @@ sub ArticleMove {
         Bind => [ \$Param{TicketID}, \$Param{UserID}, \$Param{ArticleID} ],
     );
 
+    # update accounted time of old ticket
+    my $OldAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ?, accounted_time = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$OldAccountedTime, \$TicketID ],
+    );
+
+    # update accounted time of new ticket
+    my $NewAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ?, accounted_time = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$NewAccountedTime, \$Param{TicketID} ],
+    );
+
     # clear ticket cache
     $Self->_TicketCacheClear( TicketID => $TicketID );
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
@@ -6080,6 +6096,21 @@ sub ArticleMove {
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket',
+        ObjectID  => $TicketID,
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket',
+        ObjectID  => $Param{TicketID},
+    );
+
 
     return 1;
 }
