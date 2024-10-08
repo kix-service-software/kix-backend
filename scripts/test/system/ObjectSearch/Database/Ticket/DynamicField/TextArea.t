@@ -75,6 +75,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -140,7 +143,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text = \'Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) = \'test\'' : 'dfv_left0.value_text = \'test\''
             ]
         }
     },
@@ -156,7 +159,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                $CaseSensitive ? '(LOWER(dfv_left0.value_text) = \'\' OR dfv_left0.value_text IS NULL)' : '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
             ]
         }
     },
@@ -172,7 +175,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text != \'Test\' OR dfv_left0.value_text IS NULL)'
+                $CaseSensitive ? '(LOWER(dfv_left0.value_text) != \'test\' OR dfv_left0.value_text IS NULL)' : '(dfv_left0.value_text != \'test\' OR dfv_left0.value_text IS NULL)'
             ]
         }
     },
@@ -188,7 +191,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text != \'\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) != \'\'' : 'dfv_left0.value_text != \'\''
             ]
         }
     },
@@ -204,7 +207,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'Test%\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'test%\'' : 'dfv_left0.value_text LIKE \'test%\''
             ]
         }
     },
@@ -220,7 +223,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'%Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'%test\'' : 'dfv_left0.value_text LIKE \'%test\''
             ]
         }
     },
@@ -236,7 +239,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'%Test%\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'%test%\'' : 'dfv_left0.value_text LIKE \'%test%\''
             ]
         }
     },
@@ -252,7 +255,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'test\'' : 'dfv_left0.value_text LIKE \'test\''
             ]
         }
     }
@@ -426,6 +429,19 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EQ',
+                    Value    => 'test2'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value empty string',
         Search   => {
             'AND' => [
@@ -446,6 +462,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'NE',
                     Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'NE',
+                    Value    => 'test2'
                 }
             ]
         },
@@ -478,6 +507,19 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator STARTSWITH / Value test',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'STARTSWITH',
+                    Value    => 'test'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value t2',
         Search   => {
             'AND' => [
@@ -485,6 +527,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'ENDSWITH',
                     Value    => 't2'
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value T2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'ENDSWITH',
+                    Value    => 'T2'
                 }
             ]
         },
@@ -504,6 +559,19 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator CONTAINS / Value EST',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'CONTAINS',
+                    Value    => 'EST'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator LIKE / Value Test*',
         Search   => {
             'AND' => [
@@ -511,6 +579,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'LIKE',
                     Value    => 'Test*'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LIKE / Value test*',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LIKE',
+                    Value    => 'test*'
                 }
             ]
         },

@@ -141,7 +141,8 @@ sub SearchSQLSearchFieldGet {
     my ( $Self, %Param ) = @_;
 
     return {
-        Column => "$Param{TableAlias}.value_text"
+        Column          => "$Param{TableAlias}.value_text",
+        CaseInsensitive => 1
     };
 }
 
