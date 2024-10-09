@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-9-10 13:51+0000\n"
-"PO-Revision-Date: 2024-09-10 13:50+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"PO-Revision-Date: 2024-10-09 11:50+0000\n"
+"Last-Translator: fkrahl <Frank.Krahl@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -223,6 +223,8 @@ msgid ""
 "Event based Execution Plan for Job \"Customer Response - reopen from pending"
 "\""
 msgstr ""
+"Eventbasierter Ausführungsplan für den Job „Customer Response - reopen from "
+"pending“"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
@@ -236,10 +238,12 @@ msgstr ""
 msgid ""
 "Event based Execution Plan for Job \"Owner Out Of Office - unlock ticket\""
 msgstr ""
+"Ereignisbasierter Ausführungsplan für den Job „Owner Out Of Office - unlock "
+"ticket“"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Executes all reports that should be created periodically."
-msgstr ""
+msgstr "Führt alle Berichte aus, die regelmäßig erstellt werden sollen."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Expired"
@@ -333,7 +337,7 @@ msgstr "Laptop"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"Customer Response - reopen from pending\""
-msgstr ""
+msgstr "Macro für Job \"Customer Response - reopen from pending\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"KIX Field Agent - Mobile Processing Rejected\""
@@ -341,15 +345,15 @@ msgstr "Macro für Job \"KIX Field Agent - Mobile Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"Owner Out Of Office - unlock ticket\""
-msgstr ""
+msgstr "Macro für Job \"Owner Out Of Office - unlock ticket\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"Periodic Reports\""
-msgstr ""
+msgstr "Macro für Job \"Periodic Reports\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"Customer Response - reopen from pending\""
-msgstr ""
+msgstr "MacroAction für Job \"Customer Response - reopen from pending\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"KIX Field Agent - Mobile Processing Rejected\""
@@ -357,11 +361,11 @@ msgstr "MacroAction für Job \"KIX Field Agent - Mobile Processing Rejected\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"Owner Out Of Office - unlock ticket\""
-msgstr ""
+msgstr "MacroAction für Job \"Owner Out Of Office - unlock ticket\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "MacroAction for Job \"Periodic Reports\""
-msgstr ""
+msgstr "MacroAction für Job \"Periodic Reports\""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Maintenance"
@@ -425,7 +429,7 @@ msgstr "Outlet"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Owner Out Of Office - unlock ticket"
-msgstr ""
+msgstr "Besitzer abwesend – Ticket entsperren"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Pattern"
@@ -453,7 +457,7 @@ msgstr "Periodische Berichte"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Permission type for core object dependency Queue->Ticket."
-msgstr ""
+msgstr "Berechtigungstyp für die Kernobjektabhängigkeit Queue->Ticket."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Permission type that corresponds with a API resource."
