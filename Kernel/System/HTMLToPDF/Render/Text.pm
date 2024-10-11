@@ -65,63 +65,50 @@ sub Run {
         my @Values;
         for my $Entry ( @{$Block->{Value}} ) {
             my %Result = $Self->ReplacePlaceholders(
-                String    => $Entry,
-                UserID    => $Param{UserID},
-                Count     => $Param{Count},
-                Translate => $Block->{Translate},
-                Object    => $Param{Object},
-                Datas     => $Datas,
-                ReplaceAs => $Block->{ReplaceAs} // q{-}
+                String       => $Entry,
+                UserID       => $Param{UserID},
+                Count        => $Param{Count},
+                Translate    => $Block->{Translate},
+                Object       => $Param{Object},
+                ObjectID     => $Param{ObjectID},
+                MainObject   => $Param{MainObject},
+                MainObjectID => $Param{MainObjectID},
+                Datas        => $Datas,
+                ReplaceAs    => $Block->{ReplaceAs} // q{-}
             );
 
             if ( !$Class ) {
                 $Class = $Result{Class};
             }
 
-            my $TmpValue = $TemplateGeneratorObject->ReplacePlaceHolder(
-                Text            => $Result{Text},
-                ObjectType      => $Param{Object},
-                ObjectID        => $Param{$IDKey},
-                Data            => {},
-                UserID          => $Param{UserID},
-                RichText        => 1,
-                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
-            );
-
             if ( $Block->{Translate} ) {
-                $TmpValue = $LayoutObject->{LanguageObject}->Translate($TmpValue);
+               $Result{Text} = $LayoutObject->{LanguageObject}->Translate($Result{Text});
             }
 
-            next if ( $TmpValue eq q{} );
+            next if ( $Result{Text} eq q{} );
 
-            push( @Values, $TmpValue);
+            push( @Values, $Result{Text} );
         }
         $Value = join( ($Block->{Join} // q{ }), @Values);
     }
     else {
         my %Result = $Self->ReplacePlaceholders(
-            String    => $Block->{Value},
-            UserID    => $Param{UserID},
-            Count     => $Param{Count},
-            Translate => $Block->{Translate},
-            Object    => $Param{Object},
-            Datas     => $Datas,
-            ReplaceAs => $Block->{ReplaceAs} // q{-}
+            String       => $Block->{Value},
+            UserID       => $Param{UserID},
+            Count        => $Param{Count},
+            Translate    => $Block->{Translate},
+            Object       => $Param{Object},
+            ObjectID     => $Param{ObjectID},
+            MainObject   => $Param{MainObject},
+            MainObjectID => $Param{MainObjectID},
+            Datas        => $Datas,
+            ReplaceAs    => $Block->{ReplaceAs} // q{-}
         );
 
         if ( !$Class ) {
             $Class = $Result{Class};
         }
-
-        $Value = $TemplateGeneratorObject->ReplacePlaceHolder(
-            Text            => $Result{Text},
-            ObjectType      => $Param{Object},
-            ObjectID        => $Param{$IDKey},
-            Data            => {},
-            UserID          => $Param{UserID},
-            RichText        => 1,
-            ReplaceNotFound => $Block->{ReplaceAs} // q{-}
-        );
+        $Value = $Result{Text};
     }
 
     $LayoutObject->Block(

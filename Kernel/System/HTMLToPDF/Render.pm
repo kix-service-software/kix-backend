@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -20,12 +20,15 @@ sub Render {
 
     return q{} if !IsArrayRefWithData($Param{Block});
 
-    my $HasPage = 0;
-    my $Output  = q{};
-    my $Result  = $Param{Result} || q{};
-    my $Object  = $Param{Object};
-    my $Css     = q{};
-    my $IDKey   = $Param{IDKey} || q{};
+    my $HasPage      = 0;
+    my $Output       = q{};
+    my $IDKey        = $Param{IDKey}  || q{};
+    my $Result       = $Param{Result} || q{};
+    my $Object       = $Param{Object};
+    my $ObjectID     = $Param{ObjectID};
+    my $MainObject   = $Param{MainObject}   || $Object;
+    my $MainObjectID = $Param{MainObjectID} || $ObjectID;
+    my $Css          = q{};
     my %Keys;
 
     if ( $Object ) {
@@ -115,15 +118,18 @@ sub Render {
 
                     my %HTML = $Self->Render(
                         %ListKeys,
-                        UserID  => $Param{UserID},
-                        Block   => $Block->{Blocks},
-                        Result  => 'Content',
-                        Object  => $Block->{Object} || $Object,
-                        Expands => $Block->{Expand},
-                        Count   => $Count,
-                        Filters => $Param{Filters},
-                        Allows  => $Param{Allows},
-                        Ignores => $Param{Ignores}
+                        UserID       => $Param{UserID},
+                        Block        => $Block->{Blocks},
+                        Result       => 'Content',
+                        Object       => $Block->{Object},
+                        ObjectID     => $ID,
+                        MainObject   => $MainObject,
+                        MainObjectID => $MainObjectID,
+                        Expands      => $Block->{Expand},
+                        Count        => $Count,
+                        Filters      => $Param{Filters},
+                        Allows       => $Param{Allows},
+                        Ignores      => $Param{Ignores}
                     );
 
                     next ID if !%HTML;
@@ -135,13 +141,16 @@ sub Render {
             else {
                 my %HTML = $Self->Render(
                     %Param,
-                    Object  => $Block->{Object} || $Object,
-                    Data    => $Block->{Data} || q{},
-                    Block   => $Block->{Blocks},
-                    Result  => 'Content',
-                    Filters => $Param{Filters},
-                    Allows  => $Param{Allows},
-                    Ignores => $Param{Ignores}
+                    Object       => $Block->{Object} || $Object,
+                    ObjectID     => $Keys{$IDKey},
+                    MainObject   => $MainObject,
+                    MainObjectID => $MainObjectID,
+                    Data         => $Block->{Data} || q{},
+                    Block        => $Block->{Blocks},
+                    Result       => 'Content',
+                    Filters      => $Param{Filters},
+                    Allows       => $Param{Allows},
+                    Ignores      => $Param{Ignores}
                 );
                 $Css     .= $HTML{Css};
                 $Content .= $HTML{HTML};
@@ -157,6 +166,9 @@ sub Render {
                 Allows           => $Param{Allows},
                 Ignores          => $Param{Ignores},
                 Object           => $Block->{Object} || $Object,
+                ObjectID         => $Keys{$IDKey},
+                MainObject       => $MainObject,
+                MainObjectID     => $MainObjectID,
                 ReplaceableLabel => $Self->{"Backend$Object"}->ReplaceableLabel()
             );
             $Css     .= $HTML{Css};
