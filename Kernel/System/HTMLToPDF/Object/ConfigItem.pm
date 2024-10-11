@@ -36,7 +36,8 @@ sub GetPossibleExpands {
     return [
         'Version',
         'XMLAttributes',
-        'XMLStructure'
+        'XMLStructure',
+        'XMLContents'
     ];
 }
 
@@ -73,6 +74,7 @@ sub DataGet {
         Version       => '_GetVersion',
         XMLStructure  => '_GetStructure',
         XMLAttributes => '_GetAttributes',
+        XMLContents   => '_GetContents',
     );
 
     if (
@@ -127,7 +129,6 @@ sub DataGet {
         }
     }
 
-    my $DynamicFields;
     if ( %Expands ) {
         for my $Expand ( keys %Expands ) {
             my $Function = $ExpendFunc{$Expand};
@@ -229,6 +230,31 @@ sub _GetAttributes {
     return 1;
 }
 
+sub _GetContents {
+    my ( $Self, %Param ) = @_;
+
+    return 1 if !$Param{Expands};
+    return 1 if IsHashRefWithData($Param{Data}->{Expands}->{XMLContents});
+
+    my $VersionRef = $Kernel::OM->Get('ConfigItem')->VersionGet(
+        ConfigItemID => $Param{ObjectID},
+        XMLDataGet   => 1
+    );
+
+    my %XMLAttr;
+    my @XMLStructure;
+    $Self->_XMLDataGet(
+        XMLDefinition  => $VersionRef->{XMLDefinition},
+        XMLData        => $VersionRef->{XMLData}->[1]->{Version}->[1],
+        Result         => \%XMLAttr,
+        OnlyContents   => 1
+    );
+
+    $Param{Data}->{Expands}->{XMLContents} = \%XMLAttr;
+
+    return 1;
+}
+
 sub _GetStructure {
     my ( $Self, %Param ) = @_;
 
@@ -274,7 +300,8 @@ sub _XMLDataGet {
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
             # create key
-            my $Key = $Param{Prefix} . $Item->{Key} . q{::} . $Counter;
+            my $Key        = $Param{Prefix} . $Item->{Key} . q{::} . $Counter;
+            my $ContentKey = $Param{Prefix} . $Item->{Key};
 
             # prepare value
             if (defined $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}) {
@@ -314,6 +341,12 @@ sub _XMLDataGet {
                 }
                 elsif ( $Param{OnlyAttributes} ) {
                     $Param{Result}->{$Key} = $Value;
+                }
+                elsif ( $Param{OnlyContents} ) {
+                    push(
+                        @{$Param{Result}->{$ContentKey}},
+                        $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content}
+                    );
                 }
             }
 

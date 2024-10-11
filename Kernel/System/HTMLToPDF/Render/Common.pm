@@ -36,7 +36,48 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
+    # check needed objects
+    for my $Key ( keys %Param ) {
+        next if $Key !~ /^Backend/smx;
+        $Self->{$Key} = $Param{$Key};
+    }
+
     return $Self;
+}
+
+sub _GetCSS {
+    my ( $Self, %Param ) = @_;
+
+    my $Block = $Param{Block};
+
+    return q{} if !$Block->{ID};
+    return q{} if $Self->{CSSIDs}->{$Block->{ID}};
+
+    $Kernel::OM->Get('Output::HTML::Layout')->Block(
+        Name => 'CSS',
+        Data => $Block
+    );
+
+    if ( IsArrayRefWithData($Block->{Style}->{Class}) ) {
+        for my $Style ( @{$Block->{Style}->{Class}} ) {
+            next if ( !$Style->{Selector} || !$Style->{CSS} );
+
+            $Kernel::OM->Get('Output::HTML::Layout')->Block(
+                Name => 'StyleClass',
+                Data => {
+                    %{$Block},
+                    %{$Style}
+                }
+            );
+        }
+    }
+
+    my $Css = $Kernel::OM->Get('Output::HTML::Layout')->Output(
+        TemplateFile => "HTMLToPDF/$Param{Template}",
+    );
+    $Self->{CSSIDs}->{$Block->{ID}} = 1;
+
+    return $Css;
 }
 
 sub ReplacePlaceholders {
@@ -99,6 +140,12 @@ sub ReplacePlaceholders {
         Datas     => $Param{Datas},
         Object    => $Param{Object},
         ReplaceAs => $Param{ReplaceAs}
+    );
+
+    # replace KIX placeholders
+    $Result{Text} = $Self->_ReplaceKIX(
+        %Param,
+        Text => $Result{Text}
     );
 
     return %Result;
@@ -354,6 +401,61 @@ sub _ReplaceSpecialKey {
             last;
         }
     }
+
+    return $Text;
+}
+
+sub _ReplaceKIX {
+    my ( $Self, %Param ) = @_;
+
+    my $Text = $Param{Text};
+
+    return $Text if ( !$Text );
+
+    my $ObjectID;
+    my $ObjectType;
+    my %Data = ();
+    if (
+        $Param{Object}
+        && $Param{ObjectID}
+    ) {
+        $ObjectID   = $Param{ObjectID};
+        $ObjectType = $Param{Object};
+        if (
+            $Param{MainObjectID}
+            && $Param{MainObject}
+        ) {
+            my $MainObjectKey = $Param{MainObject} . 'ID';
+            if ( $Param{MainObject} eq 'Asset' ) {
+                $MainObjectKey = 'ConfigItemID';
+            }
+            $Data{$MainObjectKey} = $Param{MainObjectID};
+
+        }
+    }
+    elsif (
+        $Param{MainObjectID}
+        && $Param{MainObject}
+    ) {
+        $ObjectType = $Param{MainObject};
+        if ( $Param{MainObject} eq 'Asset' ) {
+            $ObjectType = 'ITSMConfigItem';
+        }
+        $ObjectID   = $Param{MainObjectID};
+    }
+    else {
+        return $Text;
+    }
+
+    $Text = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        Text            => $Text,
+        ObjectType      => $ObjectType,
+        ObjectID        => $ObjectID,
+        Data            => \%Data,
+        UserID          => $Param{UserID},
+        RichText        => 1,
+        ReplaceNotFound => $Param{ReplaceAs} // q{-}
+    );
 
     return $Text;
 }

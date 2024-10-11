@@ -48,10 +48,11 @@ sub Convert {
         return;
     }
 
+    my $IdentifierKey;
     if ( $Param{IdentifierType} ) {
         my $ObjectParams = $Self->{"Backend$Data{Object}"}->GetParams();
-
-        $Param{$ObjectParams->{$Param{IdentifierType}}} = $Param{IdentifierIDorNumber};
+        $IdentifierKey         = $ObjectParams->{$Param{IdentifierType}};
+        $Param{$IdentifierKey} = $Param{IdentifierIDorNumber};
     }
 
     my $Result = $Self->_CheckParams(
@@ -108,13 +109,15 @@ sub Convert {
             String => $Filename,
             UserID => $Param{UserID},
         );
+
         $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            %Param,
             Text     => $Replaced{Text},
+            Object   => $Data{Object},
+            ObjectID => $Param{$IdentifierKey},
             RichText => 1,
             UserID   => $Param{UserID},
             Data     => {}
-        )
+        );
     }
 
     for my $Key ( qw(Filters Allows Ignores) ) {
@@ -146,15 +149,16 @@ sub Convert {
     for my $Key ( qw(Header Content Footer ) ) {
         $FileDatas{$Key} = $Self->Render(
             %Param,
-            Block     => $Data{Definition}->{$Key},
-            Filename  => $Filename . '_' . $Key,
-            Directory => $Directory,
-            Object    => $Data{Object},
-            Expands   => $Data{Definition}->{Expands},
-            Filters   => $Data{Definition}->{Filters},
-            Allows    => $Data{Definition}->{Allows},
-            Ignores   => $Data{Definition}->{Ignores},
-            IsContent => $Key eq 'Content' ? 1 : 0
+            Block        => $Data{Definition}->{$Key},
+            Filename     => $Filename . '_' . $Key,
+            Directory    => $Directory,
+            Object       => $Data{Object},
+            ObjectID     => $Param{$IdentifierKey},
+            Expands      => $Data{Definition}->{Expands},
+            Filters      => $Data{Definition}->{Filters},
+            Allows       => $Data{Definition}->{Allows},
+            Ignores      => $Data{Definition}->{Ignores},
+            IsContent    => $Key eq 'Content' ? 1 : 0
         );
     }
 
