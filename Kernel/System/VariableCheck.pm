@@ -358,7 +358,7 @@ sub DataIsDifferent {
 
     # check needed stuff
     for (qw(Data1 Data2)) {
-        return if ( !defined $Param{$_} );
+        return if ( !exists $Param{$_} );
     }
 
     # ''

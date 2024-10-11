@@ -110,6 +110,14 @@ sub SetPreferences {
         );
     }
 
+    # TODO: find another solution to delete caches depending on 'MyQueues'
+    # trigger special cache delete for cached ticket searches
+    if ( $Param{Key} eq 'MyQueues' ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => 'ObjectSearch_Ticket',
+        );
+    }
+
     return 1;
 }
 
@@ -209,6 +217,14 @@ sub DeletePreferences {
     if ( $Param{Key} eq 'UserLanguage' ) {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'UserLanguage',
+        );
+    }
+
+    # TODO: find another solution to delete caches depending on 'MyQueues'
+    # trigger special cache delete for cached ticket searches
+    if ( $Param{Key} eq 'MyQueues' ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => 'ObjectSearch_Ticket',
         );
     }
 
