@@ -8,8 +8,6 @@
             <Hash>
                 <Item Key="Parameter">
                     <Array>
-                        <Item>-s</Item>
-                        <Item>A4</Item>
                         <Item>--images</Item>
                         <Item>--enable-internal-links</Item>
                         <Item>--enable-local-file-access</Item>

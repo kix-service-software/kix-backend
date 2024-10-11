@@ -224,7 +224,48 @@ sub _Call {
     # prepare system call
     my @SystemCallArg = ( $Binary );
 
-    # add parameter to system call
+    # add page size parameter
+    if(
+        defined $Page{Format}
+        && $Page{Format}
+    ) {
+        push(
+            @SystemCallArg,
+            '-s',
+            $Page{Format}
+        );
+    }
+    elsif (
+        defined $Page{Height}
+        && defined $Page{Width}
+        && $Page{Height}
+        && $Page{Width}
+    ) {
+        push(
+            @SystemCallArg,
+            '--page-height',
+            $Page{Height},
+            '--page-width',
+            $Page{Width}
+        );
+    }
+    else {
+        push(
+            @SystemCallArg,
+            '-s',
+            'A4'
+        );
+    }
+
+    if ( $Page{Orientation} ) {
+        push(
+            @SystemCallArg,
+            '-O',
+            $Page{Orientation}
+        );
+    }
+
+    # add parameter of the system call from config
     if ( ref( $Config{Parameter} ) eq 'ARRAY' ) {
         push( @SystemCallArg, @{ $Config{Parameter} } );
     }

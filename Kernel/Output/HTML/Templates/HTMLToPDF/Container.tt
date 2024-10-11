@@ -13,7 +13,6 @@
         <style type="text/css">
 [% IF Data.IsContent %]
             @page {
-                size: A4;
                 margin: 0;
             }
 [% END %]
