@@ -1778,7 +1778,10 @@ sub SetPreferences {
         || (
             defined( $User{Preferences}->{ $Param{Key} } )
             && defined( $Param{Value} )
-            && $User{Preferences}->{ $Param{Key} } eq $Param{Value}
+            && !DataIsDifferent(
+                Data1 => $User{Preferences}->{ $Param{Key} },
+                Data2 => $Param{Value}
+            )
         )
     );
 

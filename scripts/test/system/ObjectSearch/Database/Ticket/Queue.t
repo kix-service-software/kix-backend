@@ -51,9 +51,30 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        MyQueues => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ'],
+            ValueType    => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
+);
+
+# begin transaction on database
+$Helper->BeginWork();
+
+# init queue mapping
+my $QueueID1 = 1;
+my $QueueID2 = 2;
+my $QueueID3 = 3;
+
+# set 'MyQueues' for admin user
+$Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'MyQueues',
+    Value  => [ $QueueID1 ],
+    UserID => 1
 );
 
 # check Search
@@ -357,6 +378,48 @@ my @SearchTests = (
                 'tq.name LIKE \'Test\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                'st.queue_id IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                'st.queue_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                '(st.queue_id NOT IN (1) OR st.queue_id IN (1))'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -364,6 +427,65 @@ for my $Test ( @SearchTests ) {
         Search       => $Test->{Search},
         BoolOperator => 'AND',
         UserID       => 1,
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# test with user that has no set 'MyQueues' preference
+my @SearchTestsSpecial = (
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value 1 / Preference not set',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                '1=0'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value 0 / Preference not set',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                '1=1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field MyQueues / Operator EQ / Value [0,1] / Preference not set',
+        Search       => {
+            Field    => 'MyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                '(1=1 OR 1=0)'
+            ]
+        }
+    }
+);
+for my $Test ( @SearchTestsSpecial ) {
+    my $Result = $AttributeObject->Search(
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        UserID       => 2,
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -414,6 +536,11 @@ my @SortTests = (
                 'LOWER(COALESCE(tl0.value, tq.name)) AS TranslateQueue'
             ]
         }
+    },
+    {
+        Name      => 'Sort: Attribute "MyQueues" is not sortable',
+        Attribute => 'MyQueues',
+        Expected  => undef
     }
 );
 for my $Test ( @SortTests ) {
@@ -446,9 +573,6 @@ $Kernel::OM->Get('Config')->Set(
 # get objectsearch object
 my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 
-# begin transaction on database
-$Helper->BeginWork();
-
 # load translations for given language
 my @Translations = $Kernel::OM->Get('Translation')->TranslationList();
 my %TranslationsDE;
@@ -457,9 +581,6 @@ for my $Translation ( @Translations ) {
 }
 
 ## prepare queue mapping
-my $QueueID1 = 1;
-my $QueueID2 = 2;
-my $QueueID3 = 3;
 my $QueueName1 = $Kernel::OM->Get('Queue')->QueueLookup(
     QueueID => $QueueID1
 );
@@ -500,6 +621,12 @@ $Self->Is(
     'QueueID 3 has expected translation (de)'
 );
 
+# set 'MyQueues' for admin user
+$Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'MyQueues',
+    Value  => [ $QueueID1 ],
+    UserID => 1
+);
 
 ## prepare test tickets ##
 # first ticket
@@ -810,6 +937,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2]
+    },
+    {
+        Name     => 'Search: Field MyQueues / Operator EQ / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'MyQueues',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field MyQueues / Operator EQ / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'MyQueues',
+                    Operator => 'EQ',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID2,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
