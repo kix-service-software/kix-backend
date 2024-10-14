@@ -27,10 +27,7 @@ sub Run {
     my $Block = $Param{Block};
     my $Css   = q{};
 
-    if (
-        $Block->{ID}
-        && !$Self->{CSSIDs}->{$Block->{ID}}
-    ) {
+    if ( $Block->{ID} ) {
         $LayoutObject->Block(
             Name => 'CSS',
             Data => $Block
@@ -53,7 +50,12 @@ sub Run {
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Page',
         );
-        $Self->{CSSIDs}->{$Block->{ID}} = 1;
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => 'PDF Convert: Can\'t set CSS for block type "Page", because no given ID.'
+        );
     }
 
     $LayoutObject->Block(
@@ -61,7 +63,7 @@ sub Run {
         Data => {
             Translate => $Block->{Translate},
             PageOf    => $Block->{PageOf},
-            ID        => $Block->{ID}
+            ID        => $Block->{ID} || q{}
         }
     );
 

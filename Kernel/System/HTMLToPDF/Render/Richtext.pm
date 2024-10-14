@@ -30,10 +30,7 @@ sub Run {
     my $Css   = q{};
     my $Value;
 
-    if (
-        $Block->{ID}
-        && !$Self->{CSSIDs}->{$Block->{ID}}
-    ) {
+    if ( $Block->{ID} ) {
         $LayoutObject->Block(
             Name => 'CSS',
             Data => $Block
@@ -56,7 +53,12 @@ sub Run {
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Richtext',
         );
-        $Self->{CSSIDs}->{$Block->{ID}} = 1;
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => 'PDF Convert: Can\'t set CSS for block type "Richtext", because no given ID.'
+        );
     }
 
     if ( ref $Block->{Value} eq 'ARRAY' ) {

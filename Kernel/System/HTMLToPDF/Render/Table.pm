@@ -36,10 +36,7 @@ sub Run {
     my $IDKey = $Param{IDKey};
     my $Css   = q{};
 
-    if (
-        $Block->{ID}
-        && !$Self->{CSSIDs}->{$Block->{ID}}
-    ) {
+    if ( $Block->{ID} ) {
         $LayoutObject->Block(
             Name => 'CSS',
             Data => $Block
@@ -62,7 +59,12 @@ sub Run {
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Table',
         );
-        $Self->{CSSIDs}->{$Block->{ID}} = 1;
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => 'PDF Convert: Can\'t set CSS for block type "Table", because no given ID.'
+        );
     }
 
     $LayoutObject->Block(

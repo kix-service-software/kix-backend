@@ -117,17 +117,13 @@ one or more ticket entries in one call.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my %TemplateParam;
-    if ( $Param{Data}->{TemplateID} ) {
-        $TemplateParam{ID} = $Param{Data}->{TemplateID};
-    }
-    elsif ( $Param{Data}->{TemplateName} ) {
-        $TemplateParam{Name} = $Param{Data}->{TemplateName};
-    }
-    else {
+    if (
+        !$Param{Data}->{TemplateID}
+        && !$Param{Data}->{TemplateName}
+    ) {
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot convert pdf. TemplateName or TemplateID not given.",
+            Message => "Cannot convert pdf. TemplateName and TemplateID not given."
         );
     }
 
@@ -135,63 +131,32 @@ sub Run {
         next if $Param{Data}->{$Attribute};
         return $Self->_Error(
             Code    => 'Object.NotFound',
-            Message => "Cannot convert pdf. IdentifierType or IdentifierIDorNumber not given.",
+            Message => "Cannot convert pdf. IdentifierType and IdentifierIDorNumber not given."
         );
     }
 
-    # get the template data
-    my %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
-        %TemplateParam
+    my %Result = $Kernel::OM->Get('HTMLToPDF')->Print(
+        %{$Param{Data}}
     );
 
-    if (
-        !%Template
-        && defined $Param{Data}->{FallbackTemplate}
-        && $Param{Data}->{FallbackTemplate}
-    ) {
-        %Template = $Kernel::OM->Get('HTMLToPDF')->TemplateGet(
-            %Param,
-            Name => $Param{Data}->{FallbackTemplate}
-        );
-
-        if ( %Template ) {
-            $TemplateParam{ID}   = $Template{ID};
-            $TemplateParam{Name} = $Template{Name};
-        }
-    }
-
-    if ( !%Template ) {
-        return $Self->_Error(
-            Code    => 'Object.NotFound',
-            Message => "Cannot convert pdf. Template does not exist.",
-        );
-    }
-
-    my %File = $Kernel::OM->Get('HTMLToPDF')->Convert(
-        %TemplateParam,
-        Filename             => $Param{Data}->{Filename} || q{},
-        IdentifierType       => $Param{Data}->{IdentifierType},
-        IdentifierIDorNumber => $Param{Data}->{IdentifierIDorNumber},
-        Expands              => $Param{Data}->{Expands} || q{},
-        Filters              => $Param{Data}->{Filters} || q{},
-        Allows               => $Param{Data}->{Allows}  || q{},
-        Ignores              => $Param{Data}->{Ignores} || q{},
-        UserID               => $Param{Data}->{UserID},
-    );
-
-    if ( !%File ) {
+    if ( !%Result ) {
         return $Self->_Error(
             Code => 'Object.UnableToConvert',
         );
     }
+    elsif ( $Result{Code} ) {
+        return $Self->_Error(
+            %Result
+        );
+    }
 
-    if ( !IsBase64($File{Content}) ) {
-        $File{Content} = MIME::Base64::encode_base64($File{Content});
+    if ( !IsBase64($Result{Content}) ) {
+        $Result{Content} = MIME::Base64::encode_base64($Result{Content});
     }
 
     # return result
     return $Self->_Success(
-        HTMLToPDF => \%File,
+        HTMLToPDF => \%Result,
     );
 }
 

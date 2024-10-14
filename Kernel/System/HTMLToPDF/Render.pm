@@ -22,29 +22,33 @@ sub Render {
 
     my $HasPage      = 0;
     my $Output       = q{};
-    my $IDKey        = $Param{IDKey}  || q{};
     my $Result       = $Param{Result} || q{};
     my $Object       = $Param{Object};
     my $ObjectID     = $Param{ObjectID};
     my $MainObject   = $Param{MainObject}   || $Object;
     my $MainObjectID = $Param{MainObjectID} || $ObjectID;
     my $Css          = q{};
+    my $Identifier   = q{};
     my %Keys;
 
     if ( $Object ) {
         for my $Key ( qw{IDKey NumberKey} ) {
-            if ( $Self->{"Backend$Object"}->{$Key} ) {
-                $Keys{$Self->{"Backend$Object"}->{$Key}} = $Param{$Self->{"Backend$Object"}->{$Key}} || q{};
-                $Keys{$Key} = $Self->{"Backend$Object"}->{$Key};
-            }
+            next if !$Self->{"Backend$Object"}->{$Key};
+            my $IKey = $Self->{"Backend$Object"}->{$Key};
+
+            next if !$Param{$IKey};
+
+            $Keys{$IKey} = $Param{$IKey} || q{};
+            $Keys{$Key}  = $IKey;
+            $Identifier  = $IKey;
         }
 
         if (
             !$Self->{$Object . 'Data'}
             || (
-                $IDKey
-                && $Keys{$IDKey}
-                && $Self->{$Object . 'Data'}->{$IDKey} ne $Keys{$IDKey}
+                $Identifier
+                && $Keys{$Identifier}
+                && $Self->{$Object . 'Data'}->{$Identifier} ne $Keys{$Identifier}
             )
         ) {
             $Self->{$Object . 'Data'} = $Self->{"Backend$Object"}->DataGet(
@@ -56,13 +60,6 @@ sub Render {
             );
 
             return if !$Self->{$Object . 'Data'};
-        }
-
-        for my $Key ( qw{IDKey NumberKey} ) {
-            if ( $Self->{"Backend$Object"}->{$Key} ) {
-                my $ParamKey = $Self->{"Backend$Object"}->{$Key};
-                $Keys{$ParamKey} = $Self->{$Object . 'Data'}->{$ParamKey} || q{};
-            }
         }
     }
 
