@@ -278,30 +278,38 @@ sub _ReplaceSpecialTime {
         SystemTime => $Kernel::OM->Get('Time')->SystemTime()
     );
 
-    if ( $Text =~ m{<TIME_YYMMDD_hhmm}smx ) {
-        my $TimeStamp = $Time[5]
-            . $Time[4]
-            . $Time[3]
-            . q{_}
-            . $Time[2]
-            .$Time[1];
-        $Text =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
+    if ( $Text =~ m{<TIME_YY(?:YY)?MMDD_hhmm>}smx ) {
+        my $TimeStamp = sprintf(
+            '%d%02d%02d_%02d%02d',
+            $Time[5],
+            $Time[4],
+            $Time[3],
+            $Time[2],
+            $Time[1]
+        );
+        $Text =~ s/<TIME_YY(?:YY)?MMDD_hhmm>/$TimeStamp/gsxm;
     }
 
-    if ( $Text =~ m{<TIME_YYMMDD}smx ) {
-        my $TimeStamp = $Time[5]
-            . $Time[4]
-            . $Time[3];
-        $Text =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
+    if ( $Text =~ m{<TIME_YY(?:YY)?MMDD>}smx ) {
+        my $TimeStamp = sprintf(
+            '%d%02d%02d',
+            $Time[5],
+            $Time[4],
+            $Time[3]
+        );
+        $Text =~ s/<TIME_YY(?:YY)?MMDD>/$TimeStamp/gsxm;
     }
 
-    if ( $Text =~ m{<TIME_YYMMDDhhmm}smx ) {
-        my $TimeStamp = $Time[5]
-            . $Time[4]
-            . $Time[3]
-            . $Time[2]
-            .$Time[1];
-        $Text =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
+    if ( $Text =~ m{<TIME_YY(?:YY)?MMDDhhmm>}smx ) {
+        my $TimeStamp = sprintf(
+            '%d%02d%02d%02d%02d',
+            $Time[5],
+            $Time[4],
+            $Time[3],
+            $Time[2],
+            $Time[1]
+        );
+        $Text =~ s/<TIME_YY(?:YY)?MMDDhhmm>/$TimeStamp/gsxm;
     }
 
     $Text =~ s/<TIME_.*>//gsxm;

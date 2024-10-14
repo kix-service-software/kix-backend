@@ -120,6 +120,11 @@ sub Convert {
         );
     }
 
+    # discard needed objects
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Output::HTML::Layout'],
+    );
+
     for my $Key ( qw(Filters Allows Ignores) ) {
         next if !$Param{$Key};
         my $Tmp = $Kernel::OM->Get('JSON')->Decode(
@@ -452,30 +457,38 @@ sub _ReplacePlaceholders {
             SystemTime => $Kernel::OM->Get('Time')->SystemTime()
         );
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDD_hhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . q{_}
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDD_hhmm>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d_%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3],
+                $Time[2],
+                $Time[1]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDD_hhmm>/$TimeStamp/gsxm;
         }
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDD}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3];
-            $Result{Text} =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDD>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDD>/$TimeStamp/gsxm;
         }
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDDhhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDDhhmm>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3],
+                $Time[2],
+                $Time[1]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDDhhmm>/$TimeStamp/gsxm;
         }
 
         $Result{Text} =~ s/<TIME_.*>//gsxm;
