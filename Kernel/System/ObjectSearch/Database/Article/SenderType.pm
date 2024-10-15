@@ -103,7 +103,7 @@ sub Sort {
     # check for needed joins
     my @Join;
     if (
-        $Param{Search}->{Field} eq 'SenderType'
+        $Param{Attribute} eq 'SenderType'
         && !$Param{Flags}->{JoinMap}->{ArticleSenderType}
     ) {
         push( @Join, 'LEFT OUTER JOIN article_sender_type ast ON ast.id = a.article_sender_type_id' );
