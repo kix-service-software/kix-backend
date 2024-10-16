@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <kix_config version="1.0" init="Framework">
     <ConfigItem AccessLevel="internal" Name="TempDir" Required="1" Valid="1">
         <Description Translatable="1">The directory to use for temporary files.</Description>
@@ -431,16 +430,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerAutomationTaskManager" Required="1" Valid="1">
-        <Description Translatable="1">The daemon registration for the scheduler automation task manager.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core::Daemon::ModuleRegistration</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Daemon::DaemonModules::SchedulerAutomationTaskManager</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="DaemonModules###SchedulerCronTaskManager" Required="1" Valid="1">
         <Description Translatable="1">The daemon registration for the scheduler cron task manager.</Description>
         <Group>Framework</Group>
@@ -647,8 +636,8 @@
             <Hash>
                 <Item Key="TaskName">Custom1</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -665,8 +654,8 @@
             <Hash>
                 <Item Key="TaskName">Custom2</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -683,8 +672,8 @@
             <Hash>
                 <Item Key="TaskName">Custom3</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -701,8 +690,8 @@
             <Hash>
                 <Item Key="TaskName">Custom4</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -719,8 +708,8 @@
             <Hash>
                 <Item Key="TaskName">Custom5</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -737,8 +726,8 @@
             <Hash>
                 <Item Key="TaskName">Custom6</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -755,8 +744,8 @@
             <Hash>
                 <Item Key="TaskName">Custom7</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -773,8 +762,8 @@
             <Hash>
                 <Item Key="TaskName">Custom8</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -791,8 +780,8 @@
             <Hash>
                 <Item Key="TaskName">Custom9</Item>
                 <Item Key="Schedule">* * * * *</Item>
-                <Item Key="Module"></Item>
-                <Item Key="Function"></Item>
+                <Item Key="Module"/>
+                <Item Key="Function"/>
                 <Item Key="MaximumParallelInstances">1</Item>
                 <Item Key="Params">
                     <Array>
@@ -801,112 +790,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile1" Required="0" Valid="0" ConfigLevel="100">
-        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">AutomationFile1</Item>
-                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>--configuration-module</Item>
-                        <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile2" Required="0" Valid="0" ConfigLevel="100">
-        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">AutomationFile2</Item>
-                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>--configuration-module</Item>
-                        <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile3" Required="0" Valid="0" ConfigLevel="100">
-        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">AutomationFile3</Item>
-                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>--configuration-module</Item>
-                        <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile4" Required="0" Valid="0" ConfigLevel="100">
-        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">AutomationFile4</Item>
-                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>--configuration-module</Item>
-                        <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationFile5" Required="0" Valid="0" ConfigLevel="100">
-        <Description Translatable="1">Run file based generic agent jobs (Note: module name need needs to be specified in -configuration-module param e.g. "Kernel::System::Automation").</Description>
-        <Group>Framework</Group>
-        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="TaskName">AutomationFile5</Item>
-                <Item Key="Schedule">*/20 * * * *</Item> <!-- Default every 20 mins -->
-                <!-- Use a console command here as it does some PID handling -->
-                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob</Item>
-                <Item Key="Function">Execute</Item>
-                <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params">
-                    <Array>
-                        <Item>--configuration-module</Item>
-                        <Item>&lt;ModuleName&gt;</Item>
-                    </Array>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-        <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###CheckOutOfOffice" Required="0" Valid="1" ConfigLevel="100">
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###CheckOutOfOffice" Required="0" Valid="1" ConfigLevel="100">
         <Description Translatable="1">Checks whether the OutOfOffice set by the user has expired and resets it.</Description>
         <Group>Framework</Group>
         <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
@@ -1121,10 +1005,10 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Computer"></Item>
-                <Item Key="Hardware"></Item>
-                <Item Key="Network"></Item>
-                <Item Key="Software"></Item>
+                <Item Key="Computer"/>
+                <Item Key="Hardware"/>
+                <Item Key="Network"/>
+                <Item Key="Software"/>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1286,7 +1170,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketStateWorkflowAutomaticStateAction###FallbackOnErrorState" Required="0" Valid="1">
@@ -1478,7 +1362,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1487,8 +1371,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1517,7 +1401,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1526,8 +1410,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1556,7 +1440,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1565,8 +1449,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1595,7 +1479,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1604,8 +1488,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1634,7 +1518,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1643,8 +1527,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1673,7 +1557,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1682,8 +1566,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1712,7 +1596,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1721,8 +1605,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1751,7 +1635,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1760,8 +1644,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1790,7 +1674,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1799,8 +1683,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1829,7 +1713,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1838,8 +1722,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1868,7 +1752,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1877,8 +1761,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1907,7 +1791,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1916,8 +1800,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1946,7 +1830,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1955,8 +1839,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -1985,7 +1869,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -1994,8 +1878,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -2024,7 +1908,7 @@
             <Hash>
                 <Item Key="Module">Kernel::System::PostMaster::Filter::SystemMonitoringX</Item>
                 <Item Key="DynamicFieldContent::Ticket">SysMonXHost,SysMonXService,SysMonXAddress,SysMonXAlias,SysMonXState</Item>
-                <Item Key="DynamicFieldContent::Article"></Item>
+                <Item Key="DynamicFieldContent::Article"/>
 
                 <Item Key="AffectedAssetName">AffectedAsset</Item>
                 <Item Key="SysMonXStateName">SysMonXState</Item>
@@ -2033,8 +1917,8 @@
                 <Item Key="CreateTicketState">new</Item>
                 <Item Key="CreateSenderType">system</Item>
                 <Item Key="CreateChannel">note</Item>
-                <Item Key="CreateTicketQueue"></Item>
-                <Item Key="CreateTicketSLA"></Item>
+                <Item Key="CreateTicketQueue"/>
+                <Item Key="CreateTicketSLA"/>
 
                 <Item Key="CloseNotIfLocked">0</Item>
                 <Item Key="StopAfterMatch">1</Item>
@@ -2336,7 +2220,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Log/*.pm" SelectedID="Kernel::System::Log::File"></Option>
+            <Option Location="Kernel/System/Log/*.pm" SelectedID="Kernel::System::Log::File"/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LogModule::SysLog::Facility" Required="1" Valid="1">
@@ -2423,7 +2307,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::DoNotSendEmail"></Option>
+            <Option Location="Kernel/System/Email/*.pm" SelectedID="Kernel::System::Email::DoNotSendEmail"/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailModule::CMD" Required="1" Valid="1" ConfigLevel="200">
@@ -2490,7 +2374,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailEnvelopeFrom" Required="0" Valid="0" ConfigLevel="200">
@@ -2498,7 +2382,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailNotificationEnvelopeFrom" Required="0" Valid="0" ConfigLevel="200">
@@ -2506,7 +2390,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Sendmail</SubGroup>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="SendmailNotificationEnvelopeFrom::FallbackToEmailFrom" Required="0" Valid="0" ConfigLevel="200">
@@ -2577,7 +2461,7 @@
                 <Item Key="Module">Kernel::System::Token</Item>
                 <Item Key="Function">CleanUpExpired</Item>
                 <Item Key="MaximumParallelInstances">1</Item>
-                <Item Key="Params"></Item>
+                <Item Key="Params"/>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -3080,13 +2964,13 @@
     </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times to count as working time.
+        <Description Translatable="1">Defines days and times to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time</SubGroup>
         <Setting>
@@ -3575,13 +3459,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar1" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar1</SubGroup>
         <Setting>
@@ -4070,13 +3954,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar2" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar2</SubGroup>
         <Setting>
@@ -4565,13 +4449,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar3" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar3</SubGroup>
         <Setting>
@@ -5060,13 +4944,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar4" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar4</SubGroup>
         <Setting>
@@ -5555,13 +5439,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar5" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar5</SubGroup>
         <Setting>
@@ -6050,13 +5934,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar6" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar6</SubGroup>
         <Setting>
@@ -6545,13 +6429,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar7" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar7</SubGroup>
         <Setting>
@@ -7040,13 +6924,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar8" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar8</SubGroup>
         <Setting>
@@ -7535,13 +7419,13 @@ Notes:
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TimeWorkingHours::Calendar9" Required="0" Valid="1">
-        <Description Translatable="1"><![CDATA[Defines days and times of the indicated calendar, to count as working time.
+        <Description Translatable="1">Defines days and times of the indicated calendar, to count as working time.
 Key: Day of Week (Mon|Tue|Wed|Thu|Fri|Sat|Sun) or Text of Vacation Day
 Value: HH:MM-HH:MM[,HH:MM-HH:MM]
 Notes:
- - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime > TimeVacationDays > Day of Week
+ - Used key for workingtime is choosen in following order: TimeVacationDaysOneTime &gt; TimeVacationDays &gt; Day of Week
    If it is a vacation day and there is no entry for its key, there is no working time for this day
- - If there is no valid definition, or config deactivated, default function of KIX is used.]]></Description>
+ - If there is no valid definition, or config deactivated, default function of KIX is used.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::Time::Calendar9</SubGroup>
         <Setting>
@@ -7567,7 +7451,7 @@ Notes:
         <SubGroup>Core::FileUpload</SubGroup>
         <Description Translatable="1">Defines the allowed file extensions for file uploads (attachments) as RegEx pattern.</Description>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FileUpload::ForbiddenExtensions" Required="1" Valid="1" ConfigLevel="200">
@@ -7575,7 +7459,7 @@ Notes:
         <SubGroup>Core::FileUpload</SubGroup>
         <Description Translatable="1">Defines the forbidden file extensions for file uploads (attachments) as RegEx pattern. This option has priority over FileUpload::AllowedExtensions.</Description>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FileUpload::AllowedContentTypes" Required="1" Valid="1" ConfigLevel="200">
@@ -7583,7 +7467,7 @@ Notes:
         <SubGroup>Core::FileUpload</SubGroup>
         <Description Translatable="1">Defines the allowed content types for file uploads (attachments) as RegEx pattern.</Description>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="FileUpload::ForbiddenContentTypes" Required="1" Valid="1" ConfigLevel="200">
@@ -7591,7 +7475,7 @@ Notes:
         <SubGroup>Core::FileUpload</SubGroup>
         <Description Translatable="1">Defines the forbidden content types for file uploads (attachments) as RegEx pattern. This option has priority over FileUpload::AllowedContentTypes.</Description>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
 
@@ -7608,7 +7492,7 @@ Notes:
         <Group>Framework</Group>
         <SubGroup>Core::WebUserAgent</SubGroup>
         <Setting>
-            <String Regex=""></String>
+            <String Regex=""/>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="WebUserAgent::DisableSSLVerification" Required="1" Valid="1" ConfigLevel="200">
@@ -7851,7 +7735,7 @@ Notes:
         <Description Translatable="1">Defines the auth modules and their order of execution.</Description>
         <Group>Framework</Group>
         <Setting>
-            <Object><![CDATA[[
+            <Object>[
                 {
                     "Enabled": 0,
                     "Name": "LDAP Example",
@@ -7976,7 +7860,7 @@ Notes:
                     }
                 }
             ]
-            ]]>
+            
             </Object>
         </Setting>
     </ConfigItem>
@@ -7984,7 +7868,7 @@ Notes:
         <Description Translatable="1">Defines the multi factor auth modules and their order of execution.</Description>
         <Group>Framework</Group>
         <Setting>
-            <Object><![CDATA[[
+            <Object>[
                 {
                     "Enabled": 0,
                     "Name": "TOTP-Example",
@@ -8001,7 +7885,7 @@ Notes:
                     }
                 }
             ]
-            ]]>
+            
             </Object>
         </Setting>
     </ConfigItem>
@@ -8049,7 +7933,7 @@ Notes:
                 <Item Key="Prio">0500</Item>
                 <Item Key="Area">Agent</Item>
                 <!-- <Item Key="PasswordRegExp">[a-z]|[A-z]|[0-9]|\.|;|,|:|-|\+|#|!|\$|&|\?</Item> -->
-                <Item Key="PasswordRegExp"></Item>
+                <Item Key="PasswordRegExp"/>
                 <Item Key="PasswordMinSize">0</Item>
                 <Item Key="PasswordMin2Lower2UpperCharacters">0</Item>
                 <Item Key="PasswordMin2Characters">0</Item>
@@ -8733,7 +8617,7 @@ Notes:
                         <Item Key="3rd">3rd Option</Item>
                     </Hash>
                 </Item>
-                <Item Key="DataSelected"></Item>
+                <Item Key="DataSelected"/>
                 <Item Key="PrefKey">UserMultipleSelection</Item>
                 <Item Key="Prio">6000</Item>
                 <Item Key="Active">1</Item>
@@ -9028,199 +8912,6 @@ Notes:
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="Automation::MinimumLogLevel" Required="1" Valid="1">
-        <Description Translatable="1">Set minimum loglevel for the automation layer. If you select 'error', just errors are logged. With 'debug' you get all logging messages.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="error">
-                <Item Key="error" Translatable="1">error</Item>
-                <Item Key="notice" Translatable="1">notice</Item>
-                <Item Key="info" Translatable="1">info</Item>
-                <Item Key="debug" Translatable="1">debug</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::Debug" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Enable Automation debugging.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Core</SubGroup>
-        <Setting>
-            <Option SelectedID="0">
-                <Item Key="0" Translatable="1">No</Item>
-                <Item Key="1" Translatable="1">Yes</Item>
-            </Option>
-        </Setting>
-    </ConfigItem>
-
-    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Synchronisation" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a job type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
-                <Item Key="Module">Kernel::System::Automation::Job::Synchronisation</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Reporting" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a job type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Reporting</Item>
-                <Item Key="Module">Kernel::System::Automation::Job::Reporting</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::JobType###Contact" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a job type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Contact</Item>
-                <Item Key="Module">Kernel::System::Automation::Job::Contact</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Synchronisation" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Synchronisation</Item>
-                <Item Key="Module">Kernel::System::Automation::Macro::Synchronisation</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Reporting" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Reporting</Item>
-                <Item Key="Module">Kernel::System::Automation::Macro::Reporting</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroType###Contact" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Contact</Item>
-                <Item Key="Module">Kernel::System::Automation::Macro::Contact</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
-    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanType###EventBased" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Event Based</Item>
-                <Item Key="Module">Kernel::System::Automation::ExecPlan::EventBased</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanType###TimeBased" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a execution plan type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Time Based</Item>
-                <Item Key="Module">Kernel::System::Automation::ExecPlan::TimeBased</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###Loop" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Loop</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Loop</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExecuteMacro" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Execute Macro</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExecuteMacro</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ExtractText" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Extract Text</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ExtractText</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###AssembleObject" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Assemble Object</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::AssembleObject</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###CreateReport" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Create Report</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::CreateReport</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###VariableSet" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Set Variable</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::VariableSet</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###Conditional" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a macro action type for automation.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <Hash>
-                <Item Key="DisplayName" Translatable="1">Conditional</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::Conditional</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroReferenceObject###Job" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a object (module) which uses macros.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <String>Kernel::System::Automation</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::ExecPlanReferenceObject###Job" Required="0" Valid="1">
-        <Description Translatable="1">Registration of a object (module) which uses exec plans.</Description>
-        <Group>Automation</Group>
-        <Setting>
-            <String>Kernel::System::Automation</String>
-        </Setting>
-    </ConfigItem>
-
     <ConfigItem AccessLevel="internal" Name="Reporting::DataSource###GenericSQL" Required="0" Valid="1">
         <Description Translatable="1">Registration of a report type for reporting.</Description>
         <Group>Reporting</Group>
@@ -9423,7 +9114,7 @@ Notes:
             <Hash>
                 <Item Key="Module">Kernel::System::Automation::Event::Handler</Item>
                 <Item Key="Transaction">1</Item>
-                <Item Key="Event"></Item>
+                <Item Key="Event"/>
                 <Item Key="Type">Contact</Item>
             </Hash>
         </Setting>
@@ -9479,7 +9170,7 @@ Notes:
     </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="VirtualFSObjectsMapping" Required="1" Valid="1">
-        <Description Translatable="1"></Description>
+        <Description Translatable="1"/>
         <Group>VirtualFS</Group>
         <SubGroup>Core::VirtualFS</SubGroup>
         <Setting>
