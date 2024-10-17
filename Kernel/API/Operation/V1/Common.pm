@@ -1334,14 +1334,20 @@ sub _Success {
 
         # honor a field selector, if we have one
         if ( IsHashRefWithData( $Self->{Fields} ) ) {
-            my $StartTime = Time::HiRes::time();
+            my $Caller1 = caller(0);
+            my $Caller2 = caller(1);
+            # only apply the field selector, if we are not executed by another operation
+            if ( $Caller1 =~ /::V1::Common$/ || $Caller2 =~ /::V1::Common$/ ) {
 
-            $Self->_ApplyFieldSelector(
-                Data   => \%Param,
-                Fields => $Self->{Fields},
-            );
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+                $Self->_ApplyFieldSelector(
+                    Data   => \%Param,
+                    Fields => $Self->{Fields},
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         if ( !$Self->{PermissionCheckOnly} ) {
