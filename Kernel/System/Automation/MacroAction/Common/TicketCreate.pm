@@ -8,7 +8,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::TicketCreate;
+package Kernel::System::Automation::MacroAction::Common::TicketCreate;
 
 use strict;
 use warnings;
@@ -181,7 +181,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check default incoming parameters
-    return if !$Self->_CheckParams(%Param);
+    return if !$Self->_CheckParams(%Param, NoTicketIDCheckNeeded => 1);
 
     # collect ticket params (organisation have to be before contact)
     my %TicketParam;

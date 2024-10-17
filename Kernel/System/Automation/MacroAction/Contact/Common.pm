@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Automation::MacroAction::Ticket::Common;
+package Kernel::System::Automation::MacroAction::Contact::Common;
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Common);
 
 our @ObjectDependencies = (
-    'Ticket',
+    'Contact',
     'Log',
 );
 
@@ -28,8 +28,8 @@ Check if all required parameters are given.
 
 Example:
     my $Result = $Object->_CheckParams(
-        TicketID => 123,
-        Config   => {
+        ContactID => 123,
+        Config    => {
             ...
         }
     );
@@ -41,54 +41,31 @@ sub _CheckParams {
 
     return if !$Self->SUPER::_CheckParams(%Param);
 
-    return 1 if ($Param{NoTicketIDCheckNeeded});
+    return 1 if ($Param{NoContactIDCheckNeeded});
 
     # check needed stuff
-    if ( !$Param{TicketID} ) {
+    if ( !$Param{ContactID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "_CheckParams: Need TicketID!",
+            Message  => "_CheckParams: Need ContactID!",
         );
         return;
     }
 
-    my $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
-        TicketID => $Param{TicketID},
-        UserID   => 1,
-        Silent   => 1
+    my $Email = $Kernel::OM->Get('Contact')->ContactLookup(
+        ID     => $Param{ContactID},
+        Silent => 1
     );
 
-    if (!$TicketNumber) {
+    if (!$Email) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "_CheckParams: No ticket found with ID '$Param{TicketID}'!",
+            Message  => "_CheckParams: No contact found with ID '$Param{ContactID}'!",
         );
         return;
     }
 
     return 1;
-}
-
-sub _ReplaceValuePlaceholder {
-    my ( $Self, %Param ) = @_;
-
-    %Param = $Self->_PrepareEventData(%Param);
-
-    return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
-}
-
-sub _PrepareEventData {
-    my ( $Self, %Param ) = @_;
-
-    $Param{EventData} ||= IsHashRefWithData($Self->{EventData}) ? $Self->{EventData} : {};
-    if ( !$Param{EventData}->{TicketID} ) {
-        $Param{EventData}->{TicketID}  = $Self->{RootObjectID} || $Param{TicketID};
-    }
-    if ( !$Param{EventData}->{ArticleID} ) {
-        $Param{EventData}->{ArticleID} = $Param{AdditionalData}->{ArticleID} ? $Param{AdditionalData}->{ArticleID}->[0] : q{};
-    }
-
-    return %Param;
 }
 
 1;
