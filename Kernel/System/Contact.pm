@@ -555,23 +555,23 @@ contact id, email oder user id lookup
 
     my $Email = $ContactObject->ContactLookup(
         ID     => 1,
-        Silent => 1, # optional, don't generate log entry if user was not found
+        Silent => 1, # optional, don't generate log entry if contact was not found
     );
 
     my $ID = $ContactObject->ContactLookup(
         Email  => 'some_user_email',
-        Silent => 1, # optional, don't generate log entry if user was not found
+        Silent => 1, # optional, don't generate log entry if contact was not found
         Valid  => 1  # optional, only valid contact, default 0
     );
 
     my $ID = $ContactObject->ContactLookup(
         UserID  => 123,
-        Silent => 1, # optional, don't generate log entry if user was not found
+        Silent => 1, # optional, don't generate log entry if contact was not found
     );
 
     my $ID = $ContactObject->ContactLookup(
         UserLogin => 'some_login',
-        Silent    => 1, # optional, don't generate log entry if user was not found
+        Silent    => 1, # optional, don't generate log entry if contact was not found
     );
 
 =cut

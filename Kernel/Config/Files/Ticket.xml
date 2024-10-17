@@ -2988,7 +2988,7 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="DisplayName" Translatable="1">Create Ticket</Item>
-                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::TicketCreate</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::TicketCreate</Item>
             </Hash>
         </Setting>
     </ConfigItem>

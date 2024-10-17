@@ -378,11 +378,11 @@ sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Config UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(Config UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!",
+                Message  => "Need $Needed!",
             );
             return;
         }
@@ -468,6 +468,20 @@ sub _ReplaceValuePlaceholder {
         ObjectType => $Param{MacroType},
         ObjectID   => $Self->{RootObjectID} || $Param{ObjectID}
     );
+}
+
+sub _ConvertScalar2ArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    my @Data = split( /,/, $Param{Data} );
+
+    # remove any possible heading and tailing white spaces
+    for my $Item (@Data) {
+        $Item =~ s{\A\s+}{};
+        $Item =~ s{\s+\z}{};
+    }
+
+    return \@Data;
 }
 
 1;
