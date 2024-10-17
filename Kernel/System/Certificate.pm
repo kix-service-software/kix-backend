@@ -2425,15 +2425,14 @@ sub _CheckContentType {
     $Head->unfold();
     $Head->combine('Content-Type');
     my $ContentType = $Head->get('Content-Type');
-
     if ( !$ContentType ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Email has no ContentType!"
+                Priority => 'info',
+                Message  => 'E-mail has no ContentType, so "text/plain" is set!'
             );
         }
-        return;
+        return 'text/plain;charset=utf-8';
     }
 
     return $ContentType
