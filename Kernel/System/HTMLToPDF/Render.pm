@@ -139,7 +139,7 @@ sub Render {
                 my %HTML = $Self->Render(
                     %Param,
                     Object       => $Block->{Object} || $Object,
-                    ObjectID     => $Keys{$IDKey},
+                    ObjectID     => $Keys{$Identifier},
                     MainObject   => $MainObject,
                     MainObjectID => $MainObjectID,
                     Data         => $Block->{Data} || q{},
@@ -163,7 +163,7 @@ sub Render {
                 Allows           => $Param{Allows},
                 Ignores          => $Param{Ignores},
                 Object           => $Block->{Object} || $Object,
-                ObjectID         => $Keys{$IDKey},
+                ObjectID         => $Keys{$Identifier},
                 MainObject       => $MainObject,
                 MainObjectID     => $MainObjectID,
                 ReplaceableLabel => $Self->{"Backend$Object"}->ReplaceableLabel()
