@@ -1597,7 +1597,7 @@ sub RecalculateCurrentIncidentState {
             my $VersionList = $Self->VersionList(
                 ConfigItemID => $ConfigItemID,
             );
-    
+
             my $VersionID = $VersionList->[-1];
             $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
             for my $XMLData (qw(0 1)) {
@@ -2089,45 +2089,86 @@ sub SetAttributeContentsByKey {
     # check required params...
     if (
         !$Param{KeyName}
-        ||
-        !length( $Param{NewContent} ) ||
-        ( !$Param{XMLData} ) ||
-        ( !$Param{XMLDefinition} ) ||
-        ( ref $Param{XMLData} ne 'HASH' ) ||
-        ( ref $Param{XMLDefinition} ne 'ARRAY' )
-        )
-    {
+        || !defined $Param{NewContent}
+        || ( !$Param{XMLData} )
+        || ( !$Param{XMLDefinition} )
+        || ( ref $Param{XMLData} ne 'HASH' )
+        || ( ref $Param{XMLDefinition} ne 'ARRAY' )
+    ) {
         return 0;
     }
 
+    my $NewContent = $Param{NewContent};
+    if ( !IsArrayRef($Param{NewContent}) ) {
+        $NewContent = [ $Param{NewContent} ];
+    }
+
+    # Needs for the check if that the root has any content
+    my $HasContent = 0;
     ITEM:
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
+            # Needs for the check if that the item (current position) has any content
+            my $CounterContent = 0;
             # get the value...
             if ( $Item->{Key} eq $Param{KeyName} ) {
-                $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $Param{NewContent};
+                $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $NewContent->[$Counter-1] || undef;
+                if ( $NewContent->[$Counter-1] ) {
+                    $CounterContent = 1;
+                }
+            }
+            elsif ( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} ) {
+                $CounterContent = 1;
             }
 
-            next COUNTER if !$Item->{Sub};
+            if ( $Item->{Sub} ) {
+                # make sure it's a hash ref
+                $Param{XMLData}->{ $Item->{Key} }->[$Counter] //= {};
 
-            # make sure it's a hash ref
-            $Param{XMLData}->{ $Item->{Key} }->[$Counter] //= {};
+                # recurse if subsection available...
+                my $SubResult = $Self->SetAttributeContentsByKey(
+                    KeyName       => $Param{KeyName},
+                    NewContent    => $NewContent,
+                    XMLDefinition => $Item->{Sub},
+                    XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
+                );
 
-            #recurse if subsection available...
-            my $SubResult = $Self->SetAttributeContentsByKey(
-                KeyName       => $Param{KeyName},
-                NewContent    => $Param{NewContent},
-                XMLDefinition => $Item->{Sub},
-                XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
-            );
+                # checks if the item (current position) and his sub element has a content
+                # if not, the item (current position) will be removed.
+                # Has the sub element some content than the current item will be held.
+                if (
+                    !$SubResult
+                    && !$CounterContent
+                ) {
+                    delete $Param{XMLData}->{ $Item->{Key} }->[$Counter];
+                }
+                elsif (
+                    $SubResult
+                    && !$CounterContent
+                ) {
+                    $CounterContent = 1;
+                }
+            }
+            # if the item (current position) has no sub element and content, then it will be removed.
+            elsif ( !$CounterContent ) {
+                delete $Param{XMLData}->{ $Item->{Key} }->[$Counter];
+            }
+
+            # Sets the root content as true if one of the items has any content.
+            if (
+                !$HasContent
+                && $CounterContent
+            ) {
+                $HasContent = 1;
+            }
 
         }
     }
 
-    return 0;
+    return $HasContent;
 }
 
 =item VersionCount()
