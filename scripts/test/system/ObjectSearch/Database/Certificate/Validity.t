@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -699,7 +699,7 @@ my @Files = (
 
 for my $File ( @Files ) {
     my $Content = $Kernel::OM->Get('Main')->FileRead(
-        Directory => $HomeDir . '/scripts/test/system/sample/Certificate',
+        Directory => $HomeDir . '/scripts/test/system/sample/Certificate/Certificates',
         Filename  => $File->{Filename},
         Mode      => 'binmode'
     );
@@ -1091,7 +1091,6 @@ for my $Test ( @IntegrationSearchTests ) {
     );
 }
 
-
 # test Sort
 my @IntegrationSortTests = (
     {
@@ -1183,9 +1182,6 @@ sub _RemoveFiles {
 
     return 1;
 }
-
-# test Sort
-# attributes of this backend are not sortable
 
 # rollback transaction on database
 $Helper->Rollback();

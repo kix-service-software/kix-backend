@@ -1731,7 +1731,7 @@ sub _FetchAttributes {
     my %Filters = (
         Hash        => '(\w{8})',
         Issuer      => 'issuer=\s*(.*)',
-        Fingerprint => '(?:SHA1\sFingerprint|\(stdin\))=(?:\s+|)(.*)',
+        Fingerprint => 'SHA1(?:\sFingerprint|\s*\(stdin\))=\s*(.*)',
         Serial      => 'serial=(.*)',
         Subject     => 'subject=\s*(.*)',
         StartDate   => 'notBefore=(.*)',
