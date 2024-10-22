@@ -250,7 +250,7 @@ my @Files = (
 
 for my $File ( @Files ) {
     my $Content = $Kernel::OM->Get('Main')->FileRead(
-        Directory => $HomeDir . '/scripts/test/system/sample/Certificate',
+        Directory => $HomeDir . '/scripts/test/system/sample/Certificate/Certificates',
         Filename  => $File->{Filename},
         Mode      => 'binmode'
     );
