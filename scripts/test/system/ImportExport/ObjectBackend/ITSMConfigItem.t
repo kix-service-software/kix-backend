@@ -945,8 +945,9 @@ my @ExportDataTests = (
     {
         SourceExportData => {
             ExportDataGet => {
-                UserID => 1,
-                Silent => 1
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
@@ -955,63 +956,79 @@ my @ExportDataTests = (
     {
         SourceExportData => {
             ExportDataGet => {
+                UsageContext => 'Agent',
+                TemplateID   => $TemplateIDs[1],
+                Silent       => 1
+            },
+        },
+    },
+
+    # 3 ImportDataGet doesn't contains all data (check required attributes)
+    {
+        SourceExportData => {
+            ExportDataGet => {
+                UserID     => 1,
                 TemplateID => $TemplateIDs[1],
-                Silent => 1
-            },
-        },
-    },
-
-    # 3 no existing template id is given (check return false)
-    {
-        SourceExportData => {
-            ExportDataGet => {
-                TemplateID => $TemplateIDs[-1] + 1000,
-                UserID     => 1,
                 Silent     => 1
             },
         },
     },
 
-    # 4 no class id is given (check return false)
+    # 4 no existing template id is given (check return false)
     {
         SourceExportData => {
             ExportDataGet => {
-                TemplateID => $TemplateIDs[2],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[-1] + 1000,
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 5  invalid class id is given (check return false)
+    # 5 no class id is given (check return false)
+    {
+        SourceExportData => {
+            ExportDataGet => {
+                TemplateID   => $TemplateIDs[2],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
+            },
+        },
+    },
+
+    # 6  invalid class id is given (check return false)
     {
         SourceExportData => {
             ObjectData => {
                 ClassID => $ConfigItemClassIDs[-1] + 1,
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[2],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[2],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 6 mapping list is empty (check return false)
+    # 7 mapping list is empty (check return false)
     {
         SourceExportData => {
             ObjectData => {
                 ClassID => $ConfigItemClassIDs[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[3],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[3],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 7 all required values are given (number search check)
+    # 8 all required values are given (number search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1026,8 +1043,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1035,7 +1053,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 8 all required values are given (name search check)
+    # 9 all required values are given (name search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1050,8 +1068,9 @@ my @ExportDataTests = (
                 Name => 'UnitTest - ConfigItem 1 Version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1059,7 +1078,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 9 all required values are given (case insensitive name search check)
+    # 10 all required values are given (case insensitive name search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1074,8 +1093,9 @@ my @ExportDataTests = (
                 Name => 'unittest - configitem 1 version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1083,7 +1103,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 10 all required values are given (name and number search check)
+    # 11 all required values are given (name and number search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1099,8 +1119,9 @@ my @ExportDataTests = (
                 Name   => 'UnitTest - ConfigItem 1 Version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1108,7 +1129,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 11 all required values are given (deployment state search check)
+    # 12 all required values are given (deployment state search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1123,8 +1144,9 @@ my @ExportDataTests = (
                 DeplStateIDs => $DeplStateListReverse{Production},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1133,7 +1155,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 12 all required values are given (incident state search check)
+    # 13 all required values are given (incident state search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1148,8 +1170,9 @@ my @ExportDataTests = (
                 InciStateIDs => $InciStateListReverse{Operational},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1158,7 +1181,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 13 all required values are given (combined search check)
+    # 14 all required values are given (combined search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1176,8 +1199,9 @@ my @ExportDataTests = (
                 InciStateIDs => $InciStateListReverse{Operational},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1185,7 +1209,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 14 all required values are given (XML data search check)
+    # 15 all required values are given (XML data search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1206,8 +1230,9 @@ my @ExportDataTests = (
                 GeneralCatalog1 => $GeneralCatalogListReverse{Test1},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1215,7 +1240,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 15 all required values are given (combined all search check)
+    # 16 all required values are given (combined all search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1240,8 +1265,9 @@ my @ExportDataTests = (
                 GeneralCatalog1 => $GeneralCatalogListReverse{Test1},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1249,7 +1275,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 16 all required values are given (check the returned array)
+    # 17 all required values are given (check the returned array)
     {
         SourceExportData => {
             ObjectData => {
@@ -1297,8 +1323,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[6],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[6],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1319,7 +1346,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 17 all required values are given (double element checks)
+    # 18 all required values are given (double element checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1403,8 +1430,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[6],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[6],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1437,7 +1465,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 18 all required values are given (sub element checks)
+    # 19 all required values are given (sub element checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1509,8 +1537,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[2],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1539,7 +1568,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 19 all required values are given (sub element checks with undef values)
+    # 20 all required values are given (sub element checks with undef values)
     {
         SourceExportData => {
             ObjectData => {
@@ -1635,8 +1664,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[2],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1673,7 +1703,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 20 all required values are given (sub element checks with undef values and empty strings)
+    # 21 all required values are given (sub element checks with undef values and empty strings)
     {
         SourceExportData => {
             ObjectData => {
@@ -1769,8 +1799,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[3],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1807,7 +1838,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 21 all required values are given (special character checks)
+    # 22 all required values are given (special character checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1855,8 +1886,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[4],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[8],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[8],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1877,7 +1909,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 22 all required values are given (UTF-8 checks)
+    # 23 all required values are given (UTF-8 checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1925,8 +1957,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[5],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[9],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[9],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1947,7 +1980,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 23 all required values are given (XML data sub element search check)
+    # 24 all required values are given (XML data sub element search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -2020,8 +2053,9 @@ my @ExportDataTests = (
                 Main1Sub1SubSub1 => 'Main1 (1) Sub1 (1) SubSub1 (1)',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [

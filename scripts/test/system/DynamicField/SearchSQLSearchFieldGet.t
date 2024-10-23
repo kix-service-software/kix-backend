@@ -176,7 +176,8 @@ my @Tests = (
             TableAlias         => 'dfv',
         },
         ExpectedResult => {
-            Column => "dfv.value_text"
+            CaseInsensitive => 1,
+            Column          => "dfv.value_text"
         }
     },
     {
@@ -186,7 +187,8 @@ my @Tests = (
             TableAlias         => 'dfv',
         },
         ExpectedResult => {
-            Column => "dfv.value_text"
+            CaseInsensitive => 1,
+            Column          => "dfv.value_text"
         }
     },
     {

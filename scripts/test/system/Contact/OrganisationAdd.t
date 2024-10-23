@@ -296,7 +296,7 @@ my @Tests = (
                     {
                         Active              => 1,
                         Method              => 'DefaultOrganisation',
-                        DefaultOrganisation => 100
+                        DefaultOrganisation => $OrgaID->{ID} + 100
                     },
                     {
                         Active => 0,
@@ -572,18 +572,15 @@ for my $Test ( @Tests ) {
             $Self->Is(
                 $Contact{$Key},
                 $OrgID,
-                $Test->{Number}
-                    . q{ - }
-                    . $Test->{Name}
+                $Test->{Number} . q{ - } . $Test->{Name} . q{ (} . $Key . q{)}
             );
         }
         if ( $Key eq 'OrganisationIDs' ) {
             $Self->IsDeeply(
                 $Contact{$Key},
                 $Test->{Result}->{$Key},
-                $Test->{Number}
-                    . q{ - }
-                    . $Test->{Name}
+                $Test->{Number} . q{ - } . $Test->{Name} . q{ (} . $Key . q{)},
+                1
             );
         }
     }
@@ -604,7 +601,7 @@ sub _CreateOrganisation {
 
     $Self->True(
         $ID,
-        "OrganisationAdd() - $OrgNumber"
+        "OrganisationAdd() - $OrgNumber ($ID)"
     );
     return if ( !$ID );
 
