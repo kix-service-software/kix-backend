@@ -62,14 +62,35 @@ sub GetAuthMethod {
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # do nothing if we have no relevant data for us
-    return if !$Param{User} || !$Param{Pw};
+    # get params
+    my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
+
+    # just a note
+    if ( !$Param{User} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "[Auth::LDAP] No User given. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+        );
+        return;
+    }
+
+    # just a note
+    if ( !$Param{Pw} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "[Auth::LDAP] User '$Param{User}' authentication without Pw. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+        );
+        return;
+    }
 
     # we can't accept email as AuthAttr without unique email addresses
     if ( $Self->{AuthAttr} && $Self->{AuthAttr} =~ /mail/i && !$Self->{EmailUniqueCheck} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "LDAP Auth: AuthAttr \"$Self->{AuthAttr}\" not possible since \"ContactEmailUniqueCheck\" option is not active (Backend: \"$Self->{Config}->{Name}\")!",
+            Message  => "[Auth::LDAP] AuthAttr '$Self->{AuthAttr}' not possible since 'ContactEmailUniqueCheck' option is not active. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         return;
     }
@@ -85,9 +106,6 @@ sub Auth {
         To   => $Self->{DestCharset},
     );
 
-    # get params
-    my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
-
     # remove leading and trailing spaces
     $Param{User} =~ s/^\s+//;
     $Param{User} =~ s/\s+$//;
@@ -95,6 +113,15 @@ sub Auth {
     # Convert username to lower case letters
     if ( $Self->{UserLowerCase} ) {
         $Param{User} = lc $Param{User};
+
+        # just in case for debug
+        if ( $Self->{Debug} > 0 ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "[Auth::LDAP] Converted username to lowercase. "
+                    . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+            );
+        }
     }
 
     # add user suffix
@@ -104,18 +131,19 @@ sub Auth {
         # just in case for debug
         if ( $Self->{Debug} > 0 ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => "User: ($Param{User}) added $Self->{UserSuffix} to username! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
+                Priority => 'debug',
+                Message  => "[Auth::LDAP] Added suffix '$Self->{UserSuffix}' to username. "
+                    . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
         }
     }
 
     # just in case for debug!
-    if ( $Self->{Debug} > 2 ) {
+    if ( $Self->{Debug} > 0 ) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "User: '$Param{User}' tried to authenticate with Pw: '$Param{Pw}' "
-                . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")",
+            Priority => 'debug',
+            Message  => "[Auth::LDAP] User '$Param{User}' tried to authenticate. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
     }
 
@@ -124,7 +152,8 @@ sub Auth {
     if ( !$LDAP ) {
         $Kernel::OM->Get('Log')->Log(
            Priority => 'error',
-           Message  => "Can't connect to $Self->{Host}: $@" . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+           Message  => "[Auth::LDAP] Can't connect to '$Self->{Host}': '$@'! "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         return;
     }
@@ -141,7 +170,8 @@ sub Auth {
     if ( $Result->code() ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'First bind failed! ' . $Result->error() . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            Message  => "[Auth::LDAP] First bind failed: '" . $Result->error() . "'! "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         $LDAP->disconnect();
         return;
@@ -163,8 +193,9 @@ sub Auth {
     if ( $Result->code() ) {
         if ( $Self->{AuthAttr} ne $Self->{UID} ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'debug',
-                Message  => "AuthAttr Search failed. " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\"). Retry Search with UID",
+                Priority => 'notice',
+                Message  => "[Auth::LDAP] AuthAttr Search failed. '" . $Result->error() . "'. Retry Search with UID. "
+                    . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # prepare filter with uid
@@ -182,7 +213,8 @@ sub Auth {
             if ( $Result->code() ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                    Message  => "[Auth::LDAP] UID Search failed: '" . $Result->error() . "'! "
+                        . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
                 );
 
                 # take down session
@@ -195,7 +227,8 @@ sub Auth {
         else {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "AuthAttr Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                Message  => "[Auth::LDAP] AuthAttr Search failed: '" . $Result->error() . "'! "
+                    . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # take down session
@@ -218,9 +251,9 @@ sub Auth {
     if ( !$UserDN || !$User ) {
         if ( $Self->{AuthAttr} ne $Self->{UID} ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'debug',
-                Message  => "User: $Param{User} authentication failed, no LDAP entry with AuthAttr found! "
-                    . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\"). Retry Search with UID",
+                Priority => 'notice',
+                Message  => "[Auth::LDAP] User '$Param{User}' authentication failed, no LDAP entry with AuthAttr found. Retry Search with UID. "
+                    . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # prepare filter with uid
@@ -238,7 +271,8 @@ sub Auth {
             if ( $Result->code() ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => "UID Search failed! " . $Result->error() . " BaseDN='$Self->{BaseDN}', filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                    Message  => "[Auth::LDAP] UID Search failed: '" . $Result->error() . "'! "
+                        . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
                 );
 
                 # take down session
@@ -256,8 +290,8 @@ sub Auth {
                 # failed login note
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
-                    Message  => "User: $Param{User} authentication failed, no LDAP entry with UID found! "
-                        . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                    Message  => "[Auth::LDAP] User '$Param{User}' authentication failed, no LDAP entry with UID found. "
+                        . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
                 );
 
                 # take down session
@@ -271,8 +305,8 @@ sub Auth {
             # failed login note
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "User: $Param{User} authentication failed, no LDAP entry with AuthAttr found! "
-                    . "BaseDN='$Self->{BaseDN}', Filter='$Filter', (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                Message  => "[Auth::LDAP] User '$Param{User}' authentication failed, no LDAP entry with AuthAttr found. "
+                    . "(BaseDN: '$Self->{BaseDN}', Filter: '$Filter', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # take down session
@@ -291,12 +325,12 @@ sub Auth {
 
     # check if user need to be in a group!
     if ( $Self->{AccessAttr} && $Self->{GroupDN} ) {
-
         # just in case for debug
         if ( $Self->{Debug} > 0 ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'notice',
-                Message  => 'check for groupdn!',
+                Priority => 'debug',
+                Message  => "[Auth::LDAP] Check for GroupDN. "
+                    . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
         }
 
@@ -316,8 +350,8 @@ sub Auth {
         if ( $Result2->code() ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Search failed! base='$Self->{GroupDN}', filter='$Filter2', "
-                    . $Result2->error() . "(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                Message  => "[Auth::LDAP] Search failed: '" . $Result2->error() . "'! "
+                    . "(BaseDN: '$Self->{GroupDN}', Filter: '$Filter2', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # take down session
@@ -335,12 +369,11 @@ sub Auth {
 
         # log if there is no LDAP entry
         if ( !$GroupDN ) {
-
             # failed login note
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "User: $Param{User} authentication failed, no LDAP group entry found "
-                    . "GroupDN='$Self->{GroupDN}', Filter='$Filter2'! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+                Message  => "[Auth::LDAP] User '$Param{User}' authentication failed, no LDAP group entry found. "
+                    . "(GroupDN: '$Self->{GroupDN}', Filter: '$Filter2', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
             );
 
             # take down session
@@ -357,13 +390,11 @@ sub Auth {
         password => $Param{Pw}
     );
     if ( $Result->code() ) {
-
         # failed login note
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $Param{User} ($UserDN) authentication failed: '"
-                . $Result->error()
-                . "' (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            Message  => "[Auth::LDAP] User '$Param{User}' ($UserDN) authentication failed: '" . $Result->error() . "'. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
 
         # take down session
@@ -376,7 +407,8 @@ sub Auth {
     # login note
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $Param{User} ($UserDN) authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+        Message  => "[Auth::LDAP] User '$Param{User}' ($UserDN) authentication ok. "
+            . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
     );
 
     # take down session

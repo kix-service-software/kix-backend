@@ -138,9 +138,19 @@ sub Log {
     my $Priority    = lc $Param{Priority}  || 'debug';
     my $PriorityNum = $LogLevel{$Priority} || $LogLevel{debug};
 
+    my $Message = $Param{MSG} || $Param{Message} || '???';
+
+    # remember message
+    $Self->{ $Priority }->{Message} //= [];
+    push( @{ $Self->{ $Priority }->{Message} }, $Message );
+
+    # truncate to 100 entries
+    if ( @{ $Self->{ $Priority }->{Message} } > 100 ) {
+        shift( @{ $Self->{ $Priority }->{Message} } );
+    }
+
     return 1 if $PriorityNum < $Self->{MinimumLevelNum};
 
-    my $Message = $Param{MSG} || $Param{Message} || '???';
     my $Caller = $Param{Caller} || 0;
 
     # returns the context of the current subroutine and sub-subroutine!
@@ -210,30 +220,12 @@ sub Log {
         print STDERR $Error;
 
         # store data for reference
-        $Self->{error}->{Message} //= [];
         $Self->{error}->{Traceback} //= [];
-
-        push @{$Self->{error}->{Message}}, $Message;
         push @{$Self->{error}->{Traceback}}, $Error;
 
         # truncate to 100 entries
-        if ( @{$Self->{error}->{Message}} > 100 ) {
-            shift @{$Self->{error}->{Message}};
-        }
         if ( @{$Self->{error}->{Traceback}} > 100 ) {
             shift @{$Self->{error}->{Traceback}};
-        }
-    }
-
-    # remember to info and notice messages
-    elsif ( lc $Priority eq 'info' || lc $Priority eq 'notice' ) {
-        $Self->{ lc $Priority }->{Message} //= [];
-
-        push @{$Self->{ lc $Priority }->{Message}}, $Message;
-
-        # truncate to 100 entries
-        if ( @{$Self->{ lc $Priority }->{Message}} > 100 ) {
-            shift @{$Self->{ lc $Priority }->{Message}};
         }
     }
 
@@ -255,7 +247,7 @@ to get the last log info back
 sub GetLogEntry {
     my ( $Self, %Param ) = @_;
 
-    my $Index = $Param{Index} || -1;
+    my $Index = $Param{Index} // -1;
 
     return $Self->{ lc $Param{Type} }->{ $Param{What} }[$Index] || '';
 }

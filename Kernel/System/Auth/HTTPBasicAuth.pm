@@ -14,7 +14,6 @@ use strict;
 use warnings;
 
 our @ObjectDependencies = (
-    'Config',
     'Log',
 );
 
@@ -25,9 +24,9 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    $Self->{Debug} = $Param{Config}->{Debug} || 0;
-
-    $Self->{Count} = $Param{Count} || '';
+    $Self->{Replace}       = $Param{Config}->{Replace};
+    $Self->{ReplaceRegExp} = $Param{Config}->{ReplaceRegExp};
+    $Self->{Debug}         = $Param{Config}->{Debug} || 0;
 
     return $Self;
 }
@@ -39,39 +38,58 @@ sub Auth {
     my $User       = $ENV{REMOTE_USER} || $ENV{HTTP_REMOTE_USER};
     my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
 
-    # return on no user
+    # just a note
     if ( !$User ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message =>
-                "User: No \$ENV{REMOTE_USER} or \$ENV{HTTP_REMOTE_USER} !(REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            Message  => "[Auth::HTTPBasicAuth] No User given by environment REMOTE_USER and HTTP_REMOTE_USER! "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         return;
     }
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
+    # just in case for debug
+    if ( $Self->{Debug} > 0 ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "[Auth::HTTPBasicAuth] User '$User' tried to authenticate. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+        );
+    }
 
     # replace login parts
-    my $Replace = $ConfigObject->Get(
-        'AuthModule::HTTPBasicAuth::Replace' . $Self->{Count},
-    );
-    if ($Replace) {
-        $User =~ s/^\Q$Replace\E//;
+    if ( $Self->{Replace} ) {
+        $User =~ s/^\Q$Self->{Replace}\E//;
+
+        # just in case for debug
+        if ( $Self->{Debug} > 0 ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "[Auth::HTTPBasicAuth] Pattern '$Self->{Replace}' removed from given User. "
+                    . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+            );
+        }
     }
 
     # regexp on login
-    my $ReplaceRegExp = $ConfigObject->Get(
-        'AuthModule::HTTPBasicAuth::ReplaceRegExp' . $Self->{Count},
-    );
-    if ($ReplaceRegExp) {
-        $User =~ s/$ReplaceRegExp/$1/;
+    if ( $Self->{ReplaceRegExp} ) {
+        $User =~ s/$Self->{ReplaceRegExp}/$1/;
+
+        # just in case for debug
+        if ( $Self->{Debug} > 0 ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "[Auth::HTTPBasicAuth] Pattern '$Self->{ReplaceRegExp}' replaced by first capture group for given User. "
+                    . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+            );
+        }
     }
 
     # log
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $User authentication ok (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+        Message  => "[Auth::HTTPBasicAuth] User '$User' authentication ok. "
+            . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
     );
 
     return $User;
