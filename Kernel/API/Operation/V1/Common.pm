@@ -2518,7 +2518,7 @@ sub _ExpandObject {
                     Silent => 1
                 );
                 if ( $ContactID ) {
-                    push @Array, $ContactID 
+                    push @Array, $ContactID
                 }
                 else {
                     push @UnresolvedContacts, { Index => $Counter, Value => $EmailSplit };
@@ -2781,16 +2781,22 @@ sub _Trim {
     # remove leading and trailing spaces
     if ( ref( $Param{Data} ) eq 'HASH' ) {
         foreach my $Attribute ( sort keys %{ $Param{Data} } ) {
+            next if IsHashRefWithData($Param{Ignore}) && $Param{Ignore}->{$Attribute};
+
             $Param{Data}->{$Attribute} = $Self->_Trim(
-                Data => $Param{Data}->{$Attribute}
+                Data   => $Param{Data}->{$Attribute},
+                Ignore => $Param{Ignore}
             );
         }
     }
     elsif ( ref( $Param{Data} ) eq 'ARRAY' ) {
         my $Index = 0;
         foreach my $Attribute ( @{ $Param{Data} } ) {
+            next if IsHashRefWithData($Param{Ignore}) && $Param{Ignore}->{$Attribute};
+
             $Param{Data}->[ $Index++ ] = $Self->_Trim(
-                Data => $Attribute
+                Data   => $Attribute,
+                Ignore => $Param{Ignore}
             );
         }
     }
