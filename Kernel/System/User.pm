@@ -870,101 +870,14 @@ sub SetPassword {
     }
 
     my $Pw = $Param{PW} || '';
-    my $CryptedPw = '';
 
-    # get crypt type
-    my $CryptType = $Kernel::OM->Get('Config')->Get('AuthModule::DB::CryptType') || 'sha2';
+    # encode output, needed by sha256_hex() only non utf8 signs
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
 
-    # crypt plain (no crypt at all)
-    if ( $CryptType eq 'plain' ) {
-        $CryptedPw = $Pw;
-    }
-
-    # crypt with UNIX crypt
-    elsif ( $CryptType eq 'crypt' ) {
-
-        # encode output, needed by crypt() only non utf8 signs
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{UserLogin} );
-
-        $CryptedPw = crypt( $Pw, $Param{UserLogin} );
-    }
-
-    # crypt with md5
-    elsif ( $CryptType eq 'md5' || !$CryptType ) {
-
-        # encode output, needed by unix_md5_crypt() only non utf8 signs
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{UserLogin} );
-
-        $CryptedPw = unix_md5_crypt( $Pw, $Param{UserLogin} );
-    }
-
-    # crypt with md5 (compatible with Apache's .htpasswd files)
-    elsif ( $CryptType eq 'apr1' ) {
-
-        # encode output, needed by unix_md5_crypt() only non utf8 signs
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Param{UserLogin} );
-
-        $CryptedPw = apache_md5_crypt( $Pw, $Param{UserLogin} );
-    }
-
-    # crypt with sha1
-    elsif ( $CryptType eq 'sha1' ) {
-
-        my $SHAObject = Digest::SHA->new('sha1');
-
-        # encode output, needed by sha1_hex() only non utf8 signs
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-
-        $SHAObject->add($Pw);
-        $CryptedPw = $SHAObject->hexdigest();
-    }
-
-    # bcrypt
-    elsif ( $CryptType eq 'bcrypt' ) {
-
-        if ( !$Kernel::OM->Get('Main')->Require('Crypt::Eksblowfish::Bcrypt') ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "User: '$User{UserLogin}' tried to store password with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
-            );
-            return;
-        }
-
-        my $Cost = 9;
-        my $Salt = $Kernel::OM->Get('Main')->GenerateRandomString( Length => 16 );
-
-        # remove UTF8 flag, required by Crypt::Eksblowfish::Bcrypt
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-
-        # calculate password hash
-        my $Octets = Crypt::Eksblowfish::Bcrypt::bcrypt_hash(
-            {
-                key_nul => 1,
-                cost    => 9,
-                salt    => $Salt,
-            },
-            $Pw
-        );
-
-        # We will store cost and salt in the password string so that it can be decoded
-        #   in future even if we use a higher cost by default.
-        $CryptedPw = "BCRYPT:$Cost:$Salt:" . Crypt::Eksblowfish::Bcrypt::en_base64($Octets);
-    }
-
-    # crypt with sha256 as fallback
-    else {
-
-        my $SHAObject = Digest::SHA->new('sha256');
-
-        # encode output, needed by sha256_hex() only non utf8 signs
-        $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
-
-        $SHAObject->add($Pw);
-        $CryptedPw = $SHAObject->hexdigest();
-    }
+    # crypt given password with sha 256
+    my $SHAObject = Digest::SHA->new('sha256');
+    $SHAObject->add($Pw);
+    my $CryptedPw = $SHAObject->hexdigest();
 
     # update db
     my $UserLogin = lc $Param{UserLogin};

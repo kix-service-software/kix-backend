@@ -7842,7 +7842,6 @@ Notes:
                         "Type": "mysql",
                         "User": "some_user",
                         "Password": "come_password",
-                        "CryptType": "sha2",
                         "Table": "user",
                         "Columns": {
                             "ID": "id",
@@ -7855,9 +7854,7 @@ Notes:
                     "Enabled": 1,
                     "Name": "Local Database",
                     "Module": "Kernel::System::Auth::DB",
-                    "Config": {
-                        "CryptType": "sha2"
-                    }
+                    "Config": {}
                 }
             ]
             
