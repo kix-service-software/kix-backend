@@ -1264,7 +1264,7 @@ sub _ExecuteVariableFilters {
         }
         elsif (IsHashRefWithData($Self->{VariableFilter})) {
             $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
-            my $Parameter = $+{parameter};
+            my $Parameter = $+{parameter} || '';
 
             # check for stored variable filter value
             if ( $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
