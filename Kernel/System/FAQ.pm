@@ -2519,12 +2519,8 @@ sub _FAQApprovalTicketCreate {
                 Body           => $Body,
                 ContentType    => 'text/plain; charset=utf-8',
                 UserID         => $Param{UserID},
-                HistoryType    =>
-                    $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryType}
-                        || 'AddNote',
-                HistoryComment =>
-                    $ConfigObject->Get('Ticket::Frontend::AgentTicketNote')->{HistoryComment}
-                        || '%%Note',
+                HistoryType    => 'AddNote',
+                HistoryComment => '%%FAQ Approval Request',
                 Silent         => $Param{Silent}
             );
 

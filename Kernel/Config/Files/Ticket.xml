@@ -1575,6 +1575,7 @@
         <SubGroup>Frontend::Agent::Ticket::ViewHistory</SubGroup>
         <Setting>
             <Hash>
+                <Item Key="AddArticle" Translatable="1">Added article.</Item>
                 <Item Key="AddNote" Translatable="1">Added note (%s)</Item>
                 <Item Key="ArchiveFlagUpdate" Translatable="1">Archive state changed: "%s"</Item>
                 <Item Key="Bounce" Translatable="1">Bounced to "%s".</Item>
