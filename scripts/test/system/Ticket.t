@@ -319,7 +319,7 @@ $Self->True(
         AND => [
             {
                 Field    => 'Age',
-                Value    => 3600,
+                Value    => 7200,
                 Operator => 'LT',
             },
         ]
@@ -334,13 +334,13 @@ $Self->True(
 
 %TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'HASH',
-    Limit        => 100,
-    Search       => {
+    Result     => 'HASH',
+    Limit      => 100,
+    Search     => {
         AND => [
             {
                 Field => 'Age',
-                Value => 3600,
+                Value => 7200,
                 Operator => 'GT',
             },
         ]

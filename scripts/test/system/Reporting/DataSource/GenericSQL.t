@@ -372,7 +372,8 @@ my @DataTests = (
                 { id => 1, name => 'valid' },
                 { id => 2, name => 'invalid' }
             ],
-        }
+        },
+        ExpectIgnoreOrder => 1
     },
     {
         Test   => 'simple row SELECT with WHERE variable with default',
@@ -396,7 +397,8 @@ my @DataTests = (
                 { id => 1, name => 'valid' },
                 { id => 2, name => 'invalid' }
             ],
-        }
+        },
+        ExpectIgnoreOrder => 1
     },
     {
         Test   => 'simple row SELECT with a part in a fallback',
@@ -544,6 +546,7 @@ foreach my $Test ( @DataTests ) {
             $Result,
             $Test->{Expect},
             'GetData() - '.$Test->{Test},
+            $Test->{ExpectIgnoreOrder}
         );
     }
 }

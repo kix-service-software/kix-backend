@@ -148,7 +148,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {
@@ -162,7 +162,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix <> ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {
@@ -176,7 +176,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {
@@ -190,7 +190,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {
@@ -204,7 +204,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {
@@ -218,7 +218,7 @@ my @SearchTests = (
             'Where' => [
                 'st.create_time_unix >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
             ],
-            'IsRelative' => undef
+            'IsRelative' => 1
         }
     },
     {

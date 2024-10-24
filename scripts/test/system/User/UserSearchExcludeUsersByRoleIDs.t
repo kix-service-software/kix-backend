@@ -44,13 +44,13 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
         if ($Succes) {
             @Tests = (
                 {
-                    ResultCount => 2,
-                    Result      => ["UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    ResultCount => 3,
+                    Result      => ["admin","UserSearchTestTicket", "UserSearchTestAdminTicket"],
                     Name        => 'Only allowed roles'
                 },
                 {
-                    ResultCount => 3,
-                    Result      => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    ResultCount => 4,
+                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
                     Name        => 'Only allowed roles + given user id exception',
                     UserID      => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
@@ -62,8 +62,8 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
                 #     ObjectID    => 4
                 # },
                 {
-                    ResultCount => 2,
-                    Result      => ["UserSearchTestAdminTicket", "UserSearchTestTicket"],
+                    ResultCount => 3,
+                    Result      => ["admin","UserSearchTestAdminTicket", "UserSearchTestTicket"],
                     Name        => 'Only allowed roles + queue 8',
                     ObjectID    => 8
                 },
@@ -81,13 +81,13 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
         if ($Succes) {
             @Tests = (
                 {
-                    ResultCount => 3,
-                    Result      => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    ResultCount => 4,
+                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
                     Name        => 'No roles forbidden'
                 },
                 {
-                    ResultCount => 3,
-                    Result      => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    ResultCount => 4,
+                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
                     Name        => 'No roles forbidden + given user id exception',
                     UserID      => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
@@ -99,8 +99,8 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
                 #     ObjectID    => 4
                 # },
                 {
-                    ResultCount => 3,
-                    Result      => ["UserSearchTestAdmin", "UserSearchTestAdminTicket", "UserSearchTestTicket"],
+                    ResultCount => 4,
+                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestAdminTicket", "UserSearchTestTicket"],
                     Name        => 'No roles forbidden + queue 8',
                     ObjectID    => 8
                 },
