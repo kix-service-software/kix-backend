@@ -3390,8 +3390,8 @@ sub PrepareArticle {
     $Param{SenderType} = $Param{SenderType} || 'agent';
     $Param{Charset} = $Param{Charset} || 'utf-8';
     $Param{MimeType} = $Param{MimeType} || 'text/html';
-    $Param{HistoryType} = $Param{HistoryType} || 'AddNote';
-    $Param{HistoryComment} = $Param{HistoryComment} || 'Added during job execution.';
+    $Param{HistoryType} = $Param{HistoryType} || 'AddArticle';
+    $Param{HistoryComment} = $Param{HistoryComment} || '%%';
 
     # replace placeholders in non-richtext attributes
     for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
