@@ -36,6 +36,10 @@ sub Describe {
         Supports => [
             'kix_text_module'
         ],
+        DependsOnType => [
+            'ticket_type',
+            'queue',
+        ],
         Depends => {
             'create_by' => 'users',
             'change_by' => 'users',
@@ -84,19 +88,30 @@ sub Run {
 
         # prepare keywords
         my %Keywords = map { my $Tmp = $_; $Tmp =~ s/\s/_/g; $Tmp => 1 } split(/\s*,\s*/, $Item->{keywords});
-        my $AssignedCategoriesData = $Self->GetSourceData(
+
+        # prepare assigned objects (Category, Queue, Type)
+        my $AssignedObjects = $Self->GetSourceData(
             Type       => 'kix_text_module_object_link',
-            Where      => "object_type = 'TextModuleCategory' AND text_module_id = $Item->{id}",
+            Where      => "text_module_id = $Item->{id}",
             NoProgress => 1
         );
-        CATEGORY:
-        foreach my $AssignedObject ( @{$AssignedCategoriesData||[]} ) {
+        my %AssignedObjects;
+        ASSIGNED_OBJECT:
+        foreach my $AssignedObject ( @{$AssignedObjects||[]} ) {
+            next ASSIGNED_OBJECT if !$AssignedObject;
 
-            my $Category = $Categories{$AssignedObject->{object_id}};
-            next if !$Category;
-            $Category =~ s/\s/_/g;       # replace spaces with _
-            $Keywords{$Category} = 1;
+            if ( $AssignedObject->{object_type} eq 'TextModuleCategory' ) {
+                my $Category = $Categories{$AssignedObject->{object_id}};
+                next ASSIGNED_OBJECT if !$Category;
+
+                $Category =~ s/\s/_/g;       # replace spaces with _
+                $Keywords{$Category} = 1;
+            }
+            elsif ( $AssignedObject->{object_type} =~ /^(TicketType|Queue)$/ ) {
+                push @{$AssignedObjects{$AssignedObject->{object_type}}}, $AssignedObject->{object_id};
+            }
         }
+
         $Item->{keywords} = join(' ', sort keys %Keywords);
 
         $Item->{comment} = 'migrated from KIX17';
@@ -119,11 +134,63 @@ sub Run {
         );
 
         if ( $ID ) {
+            $Self->_AssignObjects(
+                ID              => $ID,
+                AssignedObjects => \%AssignedObjects
+            );
+
             $Self->UpdateProgress($Param{Type}, 'OK');
         }
         else {
             $Self->UpdateProgress($Param{Type}, 'Error');
         }
+    }
+
+    return 1;
+}
+
+sub _AssignObjects {
+    my ( $Self, %Param ) = @_;
+
+    # add assigned objects
+    QUEUE:
+    foreach my $SourceQueueID ( @{$Param{AssignedObjects}->{Queue}||[]} ) {
+        my $MappedID = $Self->GetOIDMapping(
+            ObjectType     => 'queue',
+            SourceObjectID => $SourceQueueID,
+        );
+        next QUEUE if !$MappedID;
+
+        my $AssignedObjectID = $Self->Insert(
+            Table          => 'text_module_queue',
+            PrimaryKey     => 'id',
+            Item           => {
+                text_module_id => $Param{ID},
+                queue_id       => $MappedID,
+            },
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
+    }
+
+    TICKET_TYPE:
+    foreach my $TicketTypeID ( @{$Param{AssignedObjects}->{TicketType}||[]} ) {
+        my $MappedID = $Self->GetOIDMapping(
+            ObjectType     => 'ticket_type',
+            SourceObjectID => $TicketTypeID,
+        );
+        next TICKET_TYPE if !$MappedID;
+
+        my $AssignedObjectID = $Self->Insert(
+            Table          => 'text_module_ticket_type',
+            PrimaryKey     => 'id',
+            Item           => {
+                text_module_id => $Param{ID},
+                ticket_type_id => $MappedID,
+            },
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
     }
 
     return 1;
