@@ -103,6 +103,9 @@ sub Search {
             if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'Age' ) {
                 # calculate unixtime
                 $Value = $Kernel::OM->Get('Time')->SystemTime() - $Value;
+
+                # remember that this is a relative search
+                $Param{Search}->{IsRelative} = 1;
             }
             elsif ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'TimeStamp2SystemTime' ) {
                 $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
