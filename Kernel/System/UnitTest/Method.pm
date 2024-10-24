@@ -232,7 +232,7 @@ Returns 1 if the data structures are the same, or undef otherwise.
 =cut
 
 sub IsDeeply {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
+    my ( $Self, $Test, $ShouldBe, $Name, $IgnoreOrder ) = @_;
 
     $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output}->{ASCII});
 
@@ -259,8 +259,9 @@ sub IsDeeply {
     }
 
     my $Diff = $Self->_DataDiff(
-        Data1 => $Test,
-        Data2 => $ShouldBe,
+        Data1       => $Test,
+        Data2       => $ShouldBe,
+        IgnoreOrder => $IgnoreOrder,
     );
     if ( !$Diff ) {
         $Self->_Print( 1, "$Name matches expected value" );
@@ -284,7 +285,7 @@ for inequality instead.
 =cut
 
 sub IsNotDeeply {
-    my ( $Self, $Test, $ShouldBe, $Name ) = @_;
+    my ( $Self, $Test, $ShouldBe, $Name, $IgnoreOrder ) = @_;
 
     $Test = 0 if ($Test && $Test =~ /^\d+$/ && $Test < 0 && $Self->{Output}->{ASCII});
 
@@ -298,8 +299,9 @@ sub IsNotDeeply {
     }
 
     my $Diff = $Self->_DataDiff(
-        Data1 => $Test,
-        Data2 => $ShouldBe,
+        Data1       => $Test,
+        Data2       => $ShouldBe,
+        IgnoreOrder => $IgnoreOrder,
     );
 
     if ( !defined $Test && !defined $ShouldBe ) {
@@ -508,6 +510,11 @@ sub _DataDiff {
         # check if the count is different
         return 1 if $#A ne $#B;
 
+        if ( $Param{IgnoreOrder} ) {
+            @A = sort( @A );
+            @B = sort( @B );
+        }
+
         # compare array
         COUNT:
         for my $Count ( 0 .. $#A ) {
@@ -521,15 +528,17 @@ sub _DataDiff {
             if ( $A[$Count] ne $B[$Count] ) {
                 if ( ref $A[$Count] eq 'ARRAY' || ref $A[$Count] eq 'HASH' ) {
                     return 1 if $Self->_DataDiff(
-                        Data1 => $A[$Count],
-                        Data2 => $B[$Count]
+                        Data1       => $A[$Count],
+                        Data2       => $B[$Count],
+                        IgnoreOrder => $Param{IgnoreOrder},
                     );
                     next COUNT;
                 }
                 elsif ( ref $A[$Count] eq 'SCALAR' && ref $B[$Count] eq 'SCALAR' ) {
                     return 1 if $Self->_DataDiff(
-                        Data1 => ${ $A[$Count] },
-                        Data2 => ${ $A[$Count] }
+                        Data1       => ${ $A[$Count] },
+                        Data2       => ${ $A[$Count] },
+                        IgnoreOrder => $Param{IgnoreOrder},
                     );
                     next COUNT;
                 }
@@ -567,8 +576,9 @@ sub _DataDiff {
             # return if values are different
             if ( ref $A{$Key} eq 'ARRAY' || ref $A{$Key} eq 'HASH' ) {
                 return 1 if $Self->_DataDiff(
-                    Data1 => $A{$Key},
-                    Data2 => $B{$Key}
+                    Data1       => $A{$Key},
+                    Data2       => $B{$Key},
+                    IgnoreOrder => $Param{IgnoreOrder},
                 );
                 delete $A{$Key};
                 delete $B{$Key};
@@ -584,8 +594,9 @@ sub _DataDiff {
 
     if ( ref $Param{Data1} eq 'REF' && ref $Param{Data2} eq 'REF' ) {
         return 1 if $Self->_DataDiff(
-            Data1 => ${ $Param{Data1} },
-            Data2 => ${ $Param{Data2} }
+            Data1       => ${ $Param{Data1} },
+            Data2       => ${ $Param{Data2} },
+            IgnoreOrder => $Param{IgnoreOrder},
         );
         return;
     }
