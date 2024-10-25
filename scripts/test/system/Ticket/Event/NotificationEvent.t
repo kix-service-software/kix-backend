@@ -1254,7 +1254,6 @@ my @Tests = (
         ExpectedResults => [
             {
                 Body    => "someone wrote:
-
 ...text here...
 
 this is a URL: [1]KIXDesk
@@ -1262,7 +1261,8 @@ this is a URL: [1]KIXDesk
 ...and here...
 
 
-[1] https://kixdesk.com",
+[1] https://kixdesk.com=
+",
                 ToArray => [$Contact{Email}],
             },
         ],
