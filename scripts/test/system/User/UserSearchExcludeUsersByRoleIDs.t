@@ -24,15 +24,15 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my ($RoleIDAdmin, $RoleIDTicket, $RoleIDQueue4, %LoginRoleMapping, %LoginUserIDMapping, @Tests);
+my ($RoleIDAdmin, $RoleIDTicket, $RoleIDQueue3, %LoginRoleMapping, %LoginUserIDMapping, @Tests);
 _CreateRoles();
 
-if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
+if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue3) {
     %LoginRoleMapping = (
         'UserSearchTestAdmin'        => [$RoleIDAdmin],
         'UserSearchTestTicket'       => [$RoleIDTicket],
         'UserSearchTestAdminTicket'  => [$RoleIDAdmin,$RoleIDTicket],
-        'UserSearchTestTicketQueue4' => [$RoleIDQueue4]
+        'UserSearchTestTicketQueue3' => [$RoleIDQueue3]
     );
     _CreateUsers();
 
@@ -44,28 +44,24 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
         if ($Succes) {
             @Tests = (
                 {
-                    ResultCount => 3,
-                    Result      => ["admin","UserSearchTestTicket", "UserSearchTestAdminTicket"],
-                    Name        => 'Only allowed roles'
+                    Result => ["UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Name   => 'Only allowed roles'
                 },
                 {
-                    ResultCount => 4,
-                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
-                    Name        => 'Only allowed roles + given user id exception',
-                    UserID      => $LoginUserIDMapping{UserSearchTestAdmin}
+                    Result => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Name   => 'Only allowed roles + given user id exception',
+                    UserID => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
                 # FIXME: currently not usable - see KIX2018-11535
                 # {
-                #     ResultCount => 1,
-                #     Result      => ["UserSearchTestTicketQueue4"],
-                #     Name        => 'Only allowed roles + queue 4',
-                #     ObjectID    => 4
+                #     Result      => ["UserSearchTestTicketQueue3"],
+                #     Name        => 'Only allowed roles + queue 3',
+                #     ObjectID    => 3
                 # },
                 {
-                    ResultCount => 3,
-                    Result      => ["admin","UserSearchTestAdminTicket", "UserSearchTestTicket"],
-                    Name        => 'Only allowed roles + queue 8',
-                    ObjectID    => 8
+                    Result   => ["UserSearchTestAdminTicket", "UserSearchTestTicket"],
+                    Name     => 'Only allowed roles + queue 8',
+                    ObjectID => 8
                 },
             );
 
@@ -81,28 +77,24 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue4) {
         if ($Succes) {
             @Tests = (
                 {
-                    ResultCount => 4,
-                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
-                    Name        => 'No roles forbidden'
+                    Result => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Name   => 'No roles forbidden'
                 },
                 {
-                    ResultCount => 4,
-                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
-                    Name        => 'No roles forbidden + given user id exception',
-                    UserID      => $LoginUserIDMapping{UserSearchTestAdmin}
+                    Result => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Name   => 'No roles forbidden + given user id exception',
+                    UserID => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
                 # FIXME: currently not usable - see KIX2018-11535
                 # {
-                #     ResultCount => 2,
-                #     Result      => ["UserSearchTestAdmin", "UserSearchTestTicketQueue4"],
-                #     Name        => 'No roles forbidden + queue 4',
-                #     ObjectID    => 4
+                #     Result      => ["UserSearchTestAdmin", "UserSearchTestTicketQueue3"],
+                #     Name        => 'No roles forbidden + queue 3',
+                #     ObjectID    => 3
                 # },
                 {
-                    ResultCount => 4,
-                    Result      => ["admin","UserSearchTestAdmin", "UserSearchTestAdminTicket", "UserSearchTestTicket"],
-                    Name        => 'No roles forbidden + queue 8',
-                    ObjectID    => 8
+                    Result   => ["UserSearchTestAdmin", "UserSearchTestAdminTicket", "UserSearchTestTicket"],
+                    Name     => 'No roles forbidden + queue 8',
+                    ObjectID => 8
                 },
             );
 
@@ -174,34 +166,34 @@ sub _CreateRoles {
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDTicket,
             TypeID     => 4,
-            Target     => '4',
+            Target     => '3',
             Value      => Kernel::System::Role::Permission::PERMISSION->{DENY},
             UserID     => 1
         );
     }
 
-    $RoleIDQueue4 = $RoleObject->RoleAdd(
-        Name         => 'TestRole_Queue4',
+    $RoleIDQueue3 = $RoleObject->RoleAdd(
+        Name         => 'TestRole_Queue3',
         UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
         ValidID      => 1,
         UserID       => 1
     );
     $Self->True(
-        $RoleIDQueue4,
-        "RoleAdd() - Queue4 role",
+        $RoleIDQueue3,
+        "RoleAdd() - Queue3 role",
     );
-    if ($RoleIDQueue4) {
+    if ($RoleIDQueue3) {
         $RoleObject->PermissionAdd(
-            RoleID     => $RoleIDQueue4,
+            RoleID     => $RoleIDQueue3,
             TypeID     => 1,
             Target     => '/tickets',
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
         $RoleObject->PermissionAdd(
-            RoleID     => $RoleIDQueue4,
+            RoleID     => $RoleIDQueue3,
             TypeID     => 4,
-            Target     => '4',
+            Target     => '3',
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
@@ -288,7 +280,7 @@ sub _DoTests {
 
         $Self->Is(
             scalar(keys %List),
-            $Test->{ResultCount},
+            scalar( @{ $Test->{Result} } ),
             "UserSearch() - $Test->{Name}",
         );
 

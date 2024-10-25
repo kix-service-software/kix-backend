@@ -199,7 +199,7 @@ sub ImportValuePrepare {
         return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "General catalog lookup of'$Param{Value}' failed!",
+            Message  => "General catalog lookup of '$Param{Value}' failed!",
         );
         return;
     }

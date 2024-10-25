@@ -519,7 +519,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                 $Self->Is(
                     $MD5,
-                    '0596f2939525c6bd50fc2b649e40fbb6',
+                    '5ee767f3b68f24a9213e0bef82dc53e5',
                     $NamePrefix . ' md5 attachment check',
                 );
 

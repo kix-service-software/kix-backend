@@ -195,7 +195,14 @@ my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
     UserID    => 1,
 );
 
+# cleanup filename like article storage
 my $TargetFilename = '[Terminology Guide äöß]';
+$TargetFilename =~ s/ /_/g;
+$TargetFilename =~ s/^\.//g;
+$TargetFilename = $Kernel::OM->Get('Main')->FilenameCleanUp(
+    Filename => $TargetFilename,
+    Type     => 'Local',
+);
 
 $Self->Is(
     scalar keys %AttachmentIndex,

@@ -13,13 +13,6 @@ use utf8;
 use vars (qw($Self));
 use Kernel::System::VariableCheck qw(:all);
 
-# get ticket object
-my $ConfigObject  = $Kernel::OM->Get('Config');
-my $ContactObject = $Kernel::OM->Get('Contact');
-my $OrgaObject    = $Kernel::OM->Get('Organisation');
-my $TicketObject  = $Kernel::OM->Get('Ticket');
-my $UserObject    = $Kernel::OM->Get('User');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -32,24 +25,24 @@ $Self->True(
     $ContactID,
     'Test contact create',
 );
-my %Contact = $ContactObject->ContactGet(
+my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $ContactID
 );
 # without primary
-my $ContactIDWithoutPrimary = $ContactObject->ContactAdd(
+my $ContactIDWithoutPrimary = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname             => 'ContactWithoutPrimary',
     Lastname              => 'ContactWithoutPrimary',
     Email                 => 'ContactWithoutPrimary@localunittest.com',
     ValidID               => 1,
     UserID                => 1,
 );
-my %ContactWithoutPrimary = $ContactObject->ContactGet(
+my %ContactWithoutPrimary = $Kernel::OM->Get('Contact')->ContactGet(
     ID => $ContactIDWithoutPrimary
 );
 
 # create test orga
 my $OrgaNumber = 'knowOrga-' . $Helper->GetRandomID();
-my $OrganisationID = $OrgaObject->OrganisationAdd(
+my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $OrgaNumber,
     Name    => $OrgaNumber,
     ValidID => 1,
@@ -194,7 +187,7 @@ for my $Test (@Tests) {
     my $TestPrefix  = ">> Test $Counter:";
     my $TestPostfix = "(\"$Test->{Title}\")";
 
-    my $TicketID = $TicketObject->TicketCreate(
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
         Title          => $Test->{Title},
         Queue          => 'Junk',
         Lock           => 'unlock',
@@ -209,7 +202,7 @@ for my $Test (@Tests) {
         $TicketID,
         "$TestPrefix TicketCreate() $TestPostfix"
     );
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $TicketID
     );
     $Self->True(
@@ -235,7 +228,7 @@ for my $Test (@Tests) {
             );
             if ($Ticket{ContactID}) {
                 # is email the given ContactID value (which should be used as email for new contact)
-                my $ContactEMail = $ContactObject->ContactLookup(
+                my $ContactEMail = $Kernel::OM->Get('Contact')->ContactLookup(
                     ID     => $Ticket{ContactID},
                     Silent => 1
                 );
@@ -266,7 +259,7 @@ for my $Test (@Tests) {
                 "$TestPrefix Check primary organisation - contact set $TestPostfix"
             );
             if ($Ticket{ContactID}) {
-                my %CheckContact = $ContactObject->ContactGet(
+                my %CheckContact = $Kernel::OM->Get('Contact')->ContactGet(
                     ID => $Ticket{ContactID}
                 );
                 $Self->Is(
@@ -298,7 +291,7 @@ for my $Test (@Tests) {
             );
             if ($Ticket{OrganisationID}) {
                 # is number the given OrganisationID value (which should be used as number for new orga)
-                my $OrganisationNumber = $OrgaObject->OrganisationLookup(
+                my $OrganisationNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                     ID     => $Ticket{OrganisationID},
                     Silent => 1
                 );
@@ -324,7 +317,7 @@ for my $Test (@Tests) {
 
         # check organisation ids of ticket contact
         if ($Test->{CheckContactOrgIDs} && $Ticket{ContactID} && $Test->{OrganisationID}) {
-            my %CheckContact = $ContactObject->ContactGet(
+            my %CheckContact = $Kernel::OM->Get('Contact')->ContactGet(
                 ID => $Ticket{ContactID}
             );
             if (IsHashRefWithData(\%CheckContact)) {
@@ -342,18 +335,18 @@ for my $Test (@Tests) {
 
 # check valid/invalid contact with same email
 # disable unique check
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ContactEmailUniqueCheck',
     Value => 0,
 );
-my $FirstContactID = $ContactObject->ContactAdd(
+my $FirstContactID = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname             => 'First',
     Lastname              => 'Contact',
     Email                 => 'same@testemail.com',
     ValidID               => 1,
     UserID                => 1
 );
-my $SecondContactID = $ContactObject->ContactAdd(
+my $SecondContactID = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname             => 'Second',
     Lastname              => 'Contact',
     Email                 => 'same@testemail.com',
@@ -369,17 +362,17 @@ if ($FirstContactID && $SecondContactID) {
     _SameEmailContactCheck('first contact', $FirstContactID);
 
     # set first contact invalid
-    my %Contact = $ContactObject->ContactGet(ID => $FirstContactID);
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(ID => $FirstContactID);
     if (IsHashRefWithData(\%Contact)) {
-        $ContactObject->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
+        $Kernel::OM->Get('Contact')->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
 
         # create new ticket, now second contact should be used, because first one is invalid
         _SameEmailContactCheck('second contact', $SecondContactID);
 
         # set also second contact invalid
-        %Contact = $ContactObject->ContactGet(ID => $SecondContactID);
+        %Contact = $Kernel::OM->Get('Contact')->ContactGet(ID => $SecondContactID);
         if (IsHashRefWithData(\%Contact)) {
-            $ContactObject->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
+            $Kernel::OM->Get('Contact')->ContactUpdate(%Contact, ValidID => 2, UserID => 1);
 
             # create new ticket, now first contact should be used again, because second one is also invalid
             _SameEmailContactCheck('first contact again', $FirstContactID);
@@ -390,7 +383,7 @@ if ($FirstContactID && $SecondContactID) {
 sub _SameEmailContactCheck {
     my ($Suffix, $CheckContactID) = @_;
 
-    my $TicketID = $TicketObject->TicketCreate(
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
         Title          => 'Same Email Valid/Invalid Test',
         Queue          => 'Junk',
         Lock           => 'unlock',
@@ -405,7 +398,7 @@ sub _SameEmailContactCheck {
         "Same Email: TicketCreate() - $Suffix"
     );
     if ($TicketID) {
-        my %Ticket = $TicketObject->TicketGet(
+        my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID => $TicketID
         );
         $Self->True(

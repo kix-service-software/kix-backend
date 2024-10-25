@@ -319,7 +319,7 @@ $Self->True(
         AND => [
             {
                 Field    => 'Age',
-                Value    => 7200,
+                Value    => 3600,
                 Operator => 'LT',
             },
         ]
@@ -340,7 +340,7 @@ $Self->True(
         AND => [
             {
                 Field => 'Age',
-                Value => 7200,
+                Value => 3600,
                 Operator => 'GT',
             },
         ]
