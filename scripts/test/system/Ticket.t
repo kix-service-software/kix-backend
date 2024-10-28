@@ -30,7 +30,11 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 # set fixed time
-$Helper->FixedTimeSet();
+$Helper->FixedTimeSet(
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => '2014-01-01 14:00:00',
+    ),
+);
 
 my $ContactID = $Helper->TestContactCreate();
 my %Contact = $ContactObject->ContactGet(

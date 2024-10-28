@@ -646,7 +646,7 @@ if ( open( my $DATA, "<", "$Path/$File" ) ) {    ## no critic
     my %Attachments = $TicketObject->ArticleAttachmentIndex(
         ArticleID                  => $ArticleID,
         UserID                     => 1,
-        StripPlainBodyAsAttachment => 3,
+        StripPlainBodyAsAttachment => 2,
     );
 
     my $AttachmentID;

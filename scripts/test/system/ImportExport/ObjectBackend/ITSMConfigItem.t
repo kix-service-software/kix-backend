@@ -397,7 +397,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01',
+                                        Content => '2008-02-01 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -468,7 +468,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01',
+                                        Content => '2008-02-01 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -527,7 +527,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-02',
+                                        Content => '2008-02-02 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -1344,7 +1344,7 @@ my @ExportDataTests = (
                 'Production',
                 'Operational',
                 $TestContact{Email},
-                '2008-02-01',
+                '2008-02-01 00:00:00',
                 '2008-02-01 03:59:00',
                 undef,
                 'Test1',
@@ -1456,8 +1456,8 @@ my @ExportDataTests = (
                 'Operational',
                 $TestContact{Email},
                 $TestContact{Email},
-                '2008-02-01',
-                '2008-02-01',
+                '2008-02-01 00:00:00',
+                '2008-02-01 00:00:00',
                 '2008-02-01 03:59:00',
                 '2008-02-01 03:59:00',
                 undef,
@@ -1819,14 +1819,6 @@ my @ExportDataTests = (
                 'UnitTest - ConfigItem 4 Version 1',
                 'Production',
                 'Operational',
-                q{},
-                q{},
-                q{},
-                undef,
-                undef,
-                undef,
-                q{},
-                undef,
                 undef,
                 undef,
                 undef,
@@ -1836,8 +1828,16 @@ my @ExportDataTests = (
                 q{},
                 undef,
                 undef,
+                undef,
+                undef,
+                undef,
+                undef,
+                undef,
                 q{},
+                undef,
+                undef,
                 q{},
+                undef,
                 undef,
                 q{},
                 undef,
@@ -2253,7 +2253,7 @@ for my $Test (@ExportDataTests) {
             $Self->Is(
                 $Cell,
                 $ReferenceRow->[$CounterColumn],
-                "ExportTest $ExportTestCount: ExportDataGet() ",
+                "ExportTest $ExportTestCount: ExportDataGet() [$CounterColumn]",
             );
 
             $CounterColumn++;

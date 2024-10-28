@@ -64,7 +64,7 @@ $Self->True(
 my %Attachments = $TicketObject->ArticleAttachmentIndex(
     ArticleID                  => $ArticleIDs[0],
     UserID                     => 1,
-    StripPlainBodyAsAttachment => 3,
+    StripPlainBodyAsAttachment => 2,
 );
 
 my $AttachmentID;
