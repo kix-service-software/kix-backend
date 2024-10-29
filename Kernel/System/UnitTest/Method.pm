@@ -510,39 +510,58 @@ sub _DataDiff {
         # check if the count is different
         return 1 if $#A ne $#B;
 
-        if ( $Param{IgnoreOrder} ) {
-            @A = sort( @A );
-            @B = sort( @B );
-        }
-
         # compare array
+        my %UsedCountB;
         COUNT:
         for my $Count ( 0 .. $#A ) {
 
-            # do nothing, it's ok
-            next COUNT if !defined $A[$Count] && !defined $B[$Count];
+            if ( $Param{IgnoreOrder} ) {
+                COUNTB:
+                for my $CountB ( 0 .. $#B ) {
+                    # skip already used entries
+                    next COUNTB if ( $UsedCountB{ $CountB } );
 
-            # return diff, because its different
-            return 1 if !defined $A[$Count] || !defined $B[$Count];
+                    if (
+                        !$Self->_DataDiff(
+                            Data1       => $A[ $Count ],
+                            Data2       => $B[ $CountB ],
+                            IgnoreOrder => $Param{IgnoreOrder},
+                        )
+                    ) {
+                        $UsedCountB{ $CountB } = 1;
 
-            if ( $A[$Count] ne $B[$Count] ) {
-                if ( ref $A[$Count] eq 'ARRAY' || ref $A[$Count] eq 'HASH' ) {
-                    return 1 if $Self->_DataDiff(
-                        Data1       => $A[$Count],
-                        Data2       => $B[$Count],
-                        IgnoreOrder => $Param{IgnoreOrder},
-                    );
-                    next COUNT;
+                        next COUNT;
+                    }
                 }
-                elsif ( ref $A[$Count] eq 'SCALAR' && ref $B[$Count] eq 'SCALAR' ) {
-                    return 1 if $Self->_DataDiff(
-                        Data1       => ${ $A[$Count] },
-                        Data2       => ${ $A[$Count] },
-                        IgnoreOrder => $Param{IgnoreOrder},
-                    );
-                    next COUNT;
-                }
+
                 return 1;
+            }
+            else {
+                # do nothing, it's ok
+                next COUNT if !defined $A[$Count] && !defined $B[$Count];
+
+                # return diff, because its different
+                return 1 if !defined $A[$Count] || !defined $B[$Count];
+
+                if ( $A[$Count] ne $B[$Count] ) {
+                    if ( ref $A[$Count] eq 'ARRAY' || ref $A[$Count] eq 'HASH' ) {
+                        return 1 if $Self->_DataDiff(
+                            Data1       => $A[$Count],
+                            Data2       => $B[$Count],
+                            IgnoreOrder => $Param{IgnoreOrder},
+                        );
+                        next COUNT;
+                    }
+                    elsif ( ref $A[$Count] eq 'SCALAR' && ref $B[$Count] eq 'SCALAR' ) {
+                        return 1 if $Self->_DataDiff(
+                            Data1       => ${ $A[$Count] },
+                            Data2       => ${ $A[$Count] },
+                            IgnoreOrder => $Param{IgnoreOrder},
+                        );
+                        next COUNT;
+                    }
+                    return 1;
+                }
             }
         }
         return;
