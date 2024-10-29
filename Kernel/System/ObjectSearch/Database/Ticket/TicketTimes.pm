@@ -36,10 +36,9 @@ sub GetSupportedAttributes {
 
     return {
         Age            => {
-            IsSearchable => 1,
+            IsSearchable => 0,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            Operators    => []
         },
         CreateTime     => {
             IsSearchable => 1,
@@ -70,11 +69,6 @@ sub Search {
 
     # init mapping
     my %AttributeMapping = (
-        Age            => {
-            Column    => 'st.create_time_unix',
-            ValueType => 'NUMERIC',
-            Convert   => 'Age'
-        },
         CreateTime     => {
             Column    => 'st.create_time_unix',
             ValueType => 'NUMERIC',
@@ -90,7 +84,7 @@ sub Search {
         }
     );
 
-    # prepare given values as array ref and convert if required
+    # prepare given values as array ref and convert values if required
     my $Values = [];
     if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
         push( @{ $Values },  $Param{Search}->{Value}  );
@@ -100,14 +94,7 @@ sub Search {
     }
     if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} ) {
         for my $Value ( @{ $Values } ) {
-            if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'Age' ) {
-                # calculate unixtime
-                $Value = $Kernel::OM->Get('Time')->SystemTime() - $Value;
-
-                # remember that this is a relative search
-                $Param{Search}->{IsRelative} = 1;
-            }
-            elsif ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'TimeStamp2SystemTime' ) {
+            if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'TimeStamp2SystemTime' ) {
                 $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                     String => $Value
                 );

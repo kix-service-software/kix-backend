@@ -322,48 +322,6 @@ $Self->True(
     Search     => {
         AND => [
             {
-                Field    => 'Age',
-                Value    => 3600,
-                Operator => 'LT',
-            },
-        ]
-    },
-    UserType => 'Agent',
-    UserID   => 1,
-);
-$Self->True(
-    $TicketIDs{$TicketID},
-    'TicketSearch() (HASH:Age LT)',
-);
-
-%TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-    ObjectType => 'Ticket',
-    Result     => 'HASH',
-    Limit      => 100,
-    Search     => {
-        AND => [
-            {
-                Field => 'Age',
-                Value => 3600,
-                Operator => 'GT',
-            },
-        ]
-    },
-    UserType => 'Agent',
-    UserID   => 1,
-);
-$Self->False(
-    $TicketIDs{$TicketID},
-    'TicketSearch() (HASH:Age GT)',
-);
-
-%TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-    ObjectType => 'Ticket',
-    Result     => 'HASH',
-    Limit      => 100,
-    Search     => {
-        AND => [
-            {
                 Field => 'TicketID',
                 Value => $TicketID,
                 Operator => 'EQ',
