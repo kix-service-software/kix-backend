@@ -69,9 +69,11 @@ my %Attachments = $TicketObject->ArticleAttachmentIndex(
 
 my $AttachmentID;
 for my $AttachmentsKey ( keys( %Attachments ) ) {
-    $AttachmentID = $AttachmentsKey;
+    if ( $Attachments{ $AttachmentsKey }->{Filename} eq 'Documentación.pdf' ) {
+        $AttachmentID = $AttachmentsKey;
 
-    last;
+        last;
+    }
 }
 
 $Self->IsDeeply(
