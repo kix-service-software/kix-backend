@@ -42,10 +42,9 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Age            => {
-            IsSearchable => 1,
+            IsSearchable => 0,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            Operators    => []
         },
         CreateTime     => {
             IsSearchable => 1,
@@ -85,7 +84,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Value undef',
         Search       => {
-            Field    => 'Age',
+            Field    => 'CreateTime',
             Operator => 'EQ',
             Value    => undef
 
@@ -95,7 +94,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Value invalid',
         Search       => {
-            Field    => 'Age',
+            Field    => 'CreateTime',
             Operator => 'EQ',
             Value    => 'Test'
         },
@@ -122,7 +121,7 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator undef',
         Search       => {
-            Field    => 'Age',
+            Field    => 'CreateTime',
             Operator => undef,
             Value    => '1'
         },
@@ -131,95 +130,20 @@ my @SearchTests = (
     {
         Name         => 'Search: Operator invalid',
         Search       => {
-            Field    => 'Age',
+            Field    => 'CreateTime',
             Operator => 'Test',
             Value    => '1'
         },
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Age / Operator EQ',
+        Name         => 'Search: Field "Age" not searchable',
         Search       => {
             Field    => 'Age',
             Operator => 'EQ',
             Value    => '1'
         },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Age / Operator NE',
-        Search       => {
-            Field    => 'Age',
-            Operator => 'NE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix <> ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Age / Operator LT',
-        Search       => {
-            Field    => 'Age',
-            Operator => 'LT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Age / Operator GT',
-        Search       => {
-            Field    => 'Age',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Age / Operator LTE',
-        Search       => {
-            Field    => 'Age',
-            Operator => 'LTE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field Age / Operator GTE',
-        Search       => {
-            Field    => 'Age',
-            Operator => 'GTE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'st.create_time_unix >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '-1s')
-            ],
-            'IsRelative' => 1
-        }
+        Expected     => undef
     },
     {
         Name         => 'Search: valid search / Field CreateTime / Operator EQ / absolute value',
@@ -918,84 +842,6 @@ $Kernel::OM->ObjectsDiscard(
 
 # test Search
 my @IntegrationSearchTests = (
-    {
-        Name     => 'Search: Field Age / Operator EQ / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'EQ',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID2]
-    },
-    {
-        Name     => 'Search: Field Age / Operator NE / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'NE',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID1,$TicketID3]
-    },
-    {
-        Name     => 'Search: Field Age / Operator LT / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'LT',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID1]
-    },
-    {
-        Name     => 'Search: Field Age / Operator GT / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'GT',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID3]
-    },
-    {
-        Name     => 'Search: Field Age / Operator LTE / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'LTE',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID1, $TicketID2]
-    },
-    {
-        Name     => 'Search: Field Age / Operator GTE / Value 60',
-        Search   => {
-            'AND' => [
-                {
-                    Field    => 'Age',
-                    Operator => 'GTE',
-                    Value    => '60'
-                }
-            ]
-        },
-        Expected => [$TicketID2, $TicketID3]
-    },
     {
         Name     => 'Search: Field CreateTime / Operator EQ / Value 2014-01-01 12:01:00',
         Search   => {
