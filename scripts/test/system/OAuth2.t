@@ -536,8 +536,8 @@ $Self->True(
     $AuthURL,
     'PrepareAuthURL() - specific parameter',
 );
-my $URI = URI->new( $AuthURL );
-my %QueryParameter = $URI->query_form();
+$URI = URI->new( $AuthURL );
+%QueryParameter = $URI->query_form();
 $Self->Is(
     $QueryParameter{'client_id'},
     'ClientID2',
