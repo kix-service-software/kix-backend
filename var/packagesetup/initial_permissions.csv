@@ -162,6 +162,7 @@
 "Customer Manager";"Resource";"/system/objecticons";"x";"x";"x";;
 "Customer Manager";"Resource";"/virtualfs";;"x";;;
 "System Admin";"Resource";"/system";"x";"x";"x";"x";
+"System Admin";"Resource";"/cmdb";"x";"x";"x";"x";
 "System Admin";"Resource";"/auth";"x";;;;
 "System Admin";"Resource";"/session";"x";"x";"x";"x";
 "System Admin";"Resource";"/contacts";"x";"x";"x";"x";
