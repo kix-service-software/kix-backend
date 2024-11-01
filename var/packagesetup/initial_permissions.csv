@@ -212,7 +212,7 @@
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
 "Customer";"Object";"/tickets/*{Ticket.OrganisationID !IN $CurrentUser.Contact.OrganisationIDs}";;;;;
-"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
+"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,PendingTime]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;
