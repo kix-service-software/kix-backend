@@ -109,6 +109,13 @@ sub Run {
                 ObjectID => $Param{Data}->{TicketID},
                 UserID   => $Ticket{OwnerID}
             );
+
+            if ( $Param{Event} eq 'TicketUnsubscribe' ) {
+                # delete the watcher counter
+                $Self->HandleTicketUnsubscribe(
+                    %Param
+                );
+            }
             return 1;
         }
     }
