@@ -320,8 +320,7 @@ sub _SetArticleDynamicFields {
 
             my $ReplacedValue = $Self->_ReplaceValuePlaceholder(
                 %Param,
-                Value => $DynamicField->[1],
-                HandleKeyLikeObjectValue => 1
+                Value => $DynamicField->[1]
             );
 
             next if (!$ReplacedValue);
