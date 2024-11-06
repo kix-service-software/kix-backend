@@ -243,8 +243,9 @@ sub Request {
             );
         }
         return (
-            Success => 0,
-            Status  => $Response->status_line(),
+            Success  => 0,
+            Status   => $Response->status_line(),
+            HTTPCode => $Response->code(),
         );
     }
 
@@ -254,9 +255,10 @@ sub Request {
 
     if ( $Param{Return} && $Param{Return} eq 'REQUEST' ) {
         return (
-            Success => 1,
-            Status  => $Response->status_line(),
-            Content => \$Response->request()->as_string(),
+            Success  => 1,
+            Status   => $Response->status_line(),
+            HTTPCode => $Response->code(),
+            Content  => \$Response->request()->as_string(),
         );
     }
 
