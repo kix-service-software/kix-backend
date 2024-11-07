@@ -271,8 +271,8 @@ if ($Success) {
                             Team                   => '<KIX_TICKET_Queue>',
                             Type                   => '<KIX_TICKET_Type>',
                             DynamicFieldList       => [
-                                [$Data{DFSelectionName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_Key>"],
-                                [$Data{DFTextName},"KEYS: <KIX_TICKET_DynamicField_$Data{DFSelectionName}_Key>"]
+                                [$Data{DFSelectionName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_ObjectValue>"],
+                                [$Data{DFTextName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_Key>"]
                             ],
                             Body => 'some body for TicketCreate test'
                         }
@@ -388,7 +388,7 @@ if ($Success) {
                                 );
                                 $Self->Is(
                                     $TextValue->[0],
-                                    'KEYS: '. join('#', @{ $Data{DFSelectionValue} }),
+                                    join('#', @{ $Data{DFSelectionValue} }),
                                     'Check text DF (clone ticket)'
                                 );
                             }
