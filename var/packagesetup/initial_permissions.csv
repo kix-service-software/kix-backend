@@ -18,6 +18,7 @@
 "Agent User";"Object";"/system/config/*{SysConfigOption.AccessLevel EQ confidential}";;;;;
 "Agent User";"Object";"/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}";;;;;
 "Agent User";"Resource";"/objectsearch";;"x";;;
+"Ticket Reader";"Resource";"/contacts";;"x";;;
 "Ticket Reader";"Resource";"/tickets";;"x";;;
 "Ticket Reader";"Resource";"/tickets/*/articles/*/flags";"x";"x";"x";"x";
 "Ticket Reader";"Resource";"/system/ticket/*";;;;;

@@ -5732,6 +5732,16 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">4</Data>
     <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/tickets]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
