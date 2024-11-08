@@ -593,7 +593,11 @@ sub _DataDiff {
             }
 
             # return if values are different
-            if ( ref $A{$Key} eq 'ARRAY' || ref $A{$Key} eq 'HASH' ) {
+            if (
+                ref( $A{ $Key } ) eq 'ARRAY'
+                || ref( $A{ $Key } ) eq 'HASH'
+                || ref( $A{ $Key } ) eq 'SCALAR'
+            ) {
                 return 1 if $Self->_DataDiff(
                     Data1       => $A{$Key},
                     Data2       => $B{$Key},
