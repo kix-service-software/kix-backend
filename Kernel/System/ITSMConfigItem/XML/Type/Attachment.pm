@@ -11,6 +11,8 @@ package Kernel::System::ITSMConfigItem::XML::Type::Attachment;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use MIME::Base64;
 
 our @ObjectDependencies = (
@@ -63,6 +65,43 @@ sub GetHashContentAttributes {
     );
 
     return @HashContentAttributes;
+}
+
+=item ValueLookup()
+
+get the xml data of a version
+
+    my $Value = $BackendObject->ValueLookup(
+        Value => 11, # (optional)
+    );
+
+=cut
+
+sub ValueLookup {
+    my ( $Self, %Param ) = @_;
+
+    # return empty string, when false value (undef, 0, empty string) is given
+    return q{} if ( !$Param{Value} );
+
+    # return given value, if given value is not a number
+    return $Param{Value} if (
+        !IsStringWithData( $Param{Value} )
+        || $Param{Value} =~ /\D/
+    );
+
+    # get saved properties (attachment directory info)
+    my %AttDirData = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetDirectory(
+        ID => $Param{Value},
+    );
+    if (!%AttDirData) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
+        );
+        return;
+    }
+
+    return $AttDirData{Filename};
 }
 
 =item InternalValuePrepare()
@@ -210,15 +249,11 @@ sub ExportValuePrepare {
 
     if (
         $AttDirData{Preferences}->{FileSizeBytes}
-        &&
-        $AttDirData{Preferences}->{MD5Sum}
-        )
-    {
-
-        my %RealProperties =
-            $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetRealProperties(
+        && $AttDirData{Preferences}->{MD5Sum}
+    ) {
+        my %RealProperties = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetRealProperties(
             %AttDirData,
-            );
+        );
 
         $RetVal       = "(size " . $AttDirData{Preferences}->{FileSizeBytes} . ")";
         $RealMD5Sum   = $RealProperties{RealMD5Sum};
@@ -245,7 +280,7 @@ sub ExportValuePrepare {
         }
 
     }
-    $RetVal = $AttDirData{FileName};
+    $RetVal = $AttDirData{Filename} . ' ' . $RetVal;
 
     #return file information...
     return $RetVal;
