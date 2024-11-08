@@ -172,7 +172,7 @@ sub Run {
         }
 
         push( @{ $Query{Search}->{AND} }, {
-                Field    => 'StateTypeIDs',
+                Field    => 'StateTypeID',
                 Value    => \@StateTypeIDs,
                 Operator => 'IN',
             }
