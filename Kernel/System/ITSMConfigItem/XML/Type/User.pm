@@ -182,6 +182,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     my %UserData = $Self->{UserObject}->GetUserData(
         User => $Param{Value},
     );

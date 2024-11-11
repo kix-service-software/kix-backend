@@ -169,6 +169,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     # get item list
     my $ItemList = $Self->{DynamicFieldObject}->DynamicFieldGet(
         Name => $Param{Item}->{Input}->{Name} || '',

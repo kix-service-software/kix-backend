@@ -215,6 +215,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     # check if content should be Number, ID or Name
     my $CustOrganisationContent =
         $Self->{ConfigObject}->Get('ITSMCIAttributeCollection::Organisation::Content');
@@ -223,37 +226,35 @@ sub ImportValuePrepare {
 
     my $OrganisationDataStr = q{};
 
-    if ($Param{Value} ne q{}) {
-        if ( $CustOrganisationContent eq 'ID') {
+    if ( $CustOrganisationContent eq 'ID') {
 
-            # check if it is a valid Organisation
-            my $Number = $Self->{OrganisationObject}->OrganisationLookup(
-                ID => $Param{Value}
-            );
+        # check if it is a valid Organisation
+        my $Number = $Self->{OrganisationObject}->OrganisationLookup(
+            ID => $Param{Value}
+        );
 
-            if ($Number) {
-                $OrganisationDataStr = $Param{Value};
-            }
-        } elsif ( $CustOrganisationContent eq 'Number') {
+        if ($Number) {
+            $OrganisationDataStr = $Param{Value};
+        }
+    } elsif ( $CustOrganisationContent eq 'Number') {
 
-            # check if it is a valid Organisation
-            my $ID = $Self->{OrganisationObject}->OrganisationLookup(
-                Number => $Param{Value}
-            );
+        # check if it is a valid Organisation
+        my $ID = $Self->{OrganisationObject}->OrganisationLookup(
+            Number => $Param{Value}
+        );
 
-            if ($ID) {
-                $OrganisationDataStr = $ID;
-            }
-        } elsif ( $CustOrganisationContent eq 'Name') {
+        if ($ID) {
+            $OrganisationDataStr = $ID;
+        }
+    } elsif ( $CustOrganisationContent eq 'Name') {
 
-            # check if it is a valid Organisation
-            my $ID = $Self->{OrganisationObject}->OrganisationLookup(
-                Name => $Param{Value}
-            );
+        # check if it is a valid Organisation
+        my $ID = $Self->{OrganisationObject}->OrganisationLookup(
+            Name => $Param{Value}
+        );
 
-            if ($ID) {
-                $OrganisationDataStr = $ID;
-            }
+        if ($ID) {
+            $OrganisationDataStr = $ID;
         }
     }
 

@@ -130,6 +130,10 @@ sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
+
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     return $Param{Value};
 }
 
