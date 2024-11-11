@@ -184,6 +184,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     # get item list
     my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class  => $Param{Item}->{Input}->{Class} || q{},

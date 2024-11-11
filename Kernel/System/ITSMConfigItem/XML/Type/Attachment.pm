@@ -322,6 +322,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     # this attribute is not intended for import yet...
     $Param{Value} = "";
 
