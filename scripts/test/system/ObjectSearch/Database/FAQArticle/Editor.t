@@ -750,7 +750,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3] : [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -761,7 +761,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3] : [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -772,7 +772,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1] : [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1] : [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {
