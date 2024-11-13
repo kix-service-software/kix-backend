@@ -1122,7 +1122,7 @@ sub _ReplaceResultVariables {
         my $VariableFilterValueIndex = 0;
 
         # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xs ) {
+        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|((?:[^\{\}]+|\{(?-1)\})*))?\})(.*?)$/xs ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
@@ -1183,6 +1183,10 @@ sub _ExecuteVariableFilters {
     my $Value = $Param{Data};
 
     foreach my $Filter ( @Filters ) {
+        # cleanup leading and trailing spaces
+        $Filter =~ s/^\s+|\s+$//;
+
+        # skip empty filter
         next if !$Filter;
 
         if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
@@ -1219,11 +1223,11 @@ sub _ExecuteVariableFilters {
                 if ( IsStringWithData( $Value ) ) {
                     $JqExpression =~ s/\s+::\s+/|/g;
                     $JqExpression =~ s/&quot;/"/g;
-                    $Value = `echo '$Value' | jq -r '$JqExpression'`;
-                    chomp $Value;
 
-                    # special characters must be re-encoded because the result is decoded twice after the system call
-                    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
+                    $Value = $Kernel::OM->Get('JSON')->Jq(
+                        Data   => $Value,
+                        Filter => $JqExpression,
+                    );
                 }
                 else {
                     $Kernel::OM->Get('Log')->Log(

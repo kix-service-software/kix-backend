@@ -194,6 +194,46 @@ sub False {
     return \0;
 }
 
+=item Jq()
+
+Execute jq
+
+    my $JSON = $JSONObject->Jq(
+        Data   => $JSONString,
+        Filter => $JqFilter,
+    );
+
+=cut
+
+sub Jq {
+    my ( $Self, %Param ) = @_;
+
+    # check for needed data
+    return if !defined $Param{Data} || !$Param{Filter};
+
+    # store files
+    my ($DataFH, $DataFilename) = $Kernel::OM->Get('FileTemp')->TempFile(
+        Suffix => '.json'
+    );
+    my ($FilterFH, $FilterFilename) = $Kernel::OM->Get('FileTemp')->TempFile(
+        Suffix => '.filter'
+    );
+
+    print {$DataFH} $Param{Data};
+    close $DataFH;
+
+    print {$FilterFH} $Param{Filter};
+    close $FilterFH;
+
+    my $Value = `jq -rf $FilterFilename $DataFilename`;
+    chomp($Value);
+
+    # special characters must be re-encoded because the result is decoded twice after the system call
+    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
+
+    return $Value;
+}
+
 =begin Internal:
 
 =cut
