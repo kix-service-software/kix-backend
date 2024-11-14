@@ -205,11 +205,41 @@ sub SetResult {
         return;
     }
 
-    $Self->{MacroResults} //= {};
+    $Self->{MacroVariables} //= {};
 
     my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
 
-    $Self->{MacroResults}->{$VariableName} = $Param{Value};
+    $Self->{MacroVariables}->{$VariableName} = $Param{Value};
+
+    return 1;
+}
+
+=item SetMacroResult()
+
+Assign a value for a macro result variable.
+
+Example:
+    $Self->SetMacroResult(
+        Name  => 'TicketID',
+        Value => 123,
+    );
+
+=cut
+
+sub SetMacroResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{MacroResults} //= {};
+    $Self->{MacroResults}->{$Param{Name}} = $Param{Value};
 
     return 1;
 }

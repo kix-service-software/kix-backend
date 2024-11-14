@@ -160,7 +160,7 @@ if ($Success) {
 
                     push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} );
 
-                    my $SourceTicketID = $AutomationObject->{MacroResults}->{NewTicketID};
+                    my $SourceTicketID = $AutomationObject->{MacroVariables}->{NewTicketID};
                     $Self->True(
                         $SourceTicketID,
                         'Ticket created and ID in results (source ticket)',
@@ -293,7 +293,7 @@ if ($Success) {
 
                     push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} );
 
-                    my $CloneTicketID = $AutomationObject->{MacroResults}->{NewTicketID};
+                    my $CloneTicketID = $AutomationObject->{MacroVariables}->{NewTicketID};
                     $Self->True(
                         $CloneTicketID,
                         'Ticket created and ID in results (clone ticket)'

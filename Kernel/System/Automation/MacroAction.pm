@@ -737,16 +737,20 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
+    # init MacroResults if not already done
+    $Self->{MacroResults} //= {};
+
     # fallback if not already known
-    $Self->{MacroResults} //= {
+    $Self->{MacroVariables} //= {
         RootObjectID => $Self->{RootObjectID},
         ObjectID     => $Param{ObjectID},
         EventData    => $Self->{EventData}
     };
 
     # we need the result variables and macro results for the assignments
-    $BackendObject->{MacroResults} = $Self->{MacroResults};
+    $BackendObject->{MacroVariables}  = $Self->{MacroVariables};
     $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
+    $BackendObject->{MacroResults}    = $Self->{MacroResults};
 
     # add root object id
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
@@ -765,19 +769,20 @@ sub MacroActionExecute {
             Config => \%Parameters
         );
 
-        # replace result variables
-        if (IsHashRefWithData($Self->{MacroResults})) {
-            $Self->_ReplaceResultVariables(
-                Data   => \%Parameters,
-                UserID => $Param{UserID}
+        # replace variables
+        if (IsHashRefWithData($Self->{MacroVariables})) {
+            $Kernel::OM->Get('Main')->ReplaceVariables(
+                Data      => \%Parameters,
+                Variables => $Self->{MacroVariables},
+                UserID    => $Param{UserID}
             );
         }
 
         my $Success = $BackendObject->Run(
             %Param,
-            MacroType         => $Macro{Type},
-            Config            => \%Parameters,
-            ConfigRaw         => \%{$MacroAction{Parameters} || {}},
+            MacroType => $Macro{Type},
+            Config    => \%Parameters,
+            ConfigRaw => \%{$MacroAction{Parameters} || {}},
         );
 
         if ( !$Success ) {
@@ -1071,7 +1076,7 @@ sub _LoadMacroActionTypeBackend {
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to require $Backend!"
+                Message  => "Unable to require $Backend (MacroAction: $Param{Name})!"
             );
             return;
         }

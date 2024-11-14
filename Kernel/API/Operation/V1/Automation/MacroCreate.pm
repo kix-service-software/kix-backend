@@ -128,6 +128,7 @@ sub Run {
     $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
         Name      => $Macro->{Name},
         Type      => $Macro->{Type},
+        Scope     => $Macro->{Scope},
         Comment   => $Macro->{Comment} || '',
         ValidID   => $Macro->{ValidID} || 1,
         UserID    => $Self->{Authorization}->{UserID}

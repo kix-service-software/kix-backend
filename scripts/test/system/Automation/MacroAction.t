@@ -21,28 +21,6 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $TextContent = $Kernel::OM->Get('Main')->FileRead(
-    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.txt',
-    Mode     => 'binmode'
-);
-$Self->True(
-    $TextContent,
-    'load test.txt',
-);
-my $TestPNGBase64 = ${$TextContent};
-my $PNGContent = $Kernel::OM->Get('Main')->FileRead(
-    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.png',
-    Mode     => 'binmode'
-);
-$Self->True(
-    $PNGContent,
-    'load test.png',
-);
-my $TestPNGBin = ${$PNGContent};
-my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
-    Data => $TestPNGBin
-);
-
 my $NameRandom  = $Helper->GetRandomID();
 my %MacroActions = (
     'test-macroaction-' . $NameRandom . '-1' => {
