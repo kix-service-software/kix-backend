@@ -84,8 +84,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Subject',
-                    Value    => '%short%',
-                    Operator => 'EQ',
+                    Value    => 'short',
+                    Operator => 'CONTAINS',
                 },
             ],
         },
@@ -126,8 +126,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Subject',
-                    Value    => '%fax agreement%',
-                    Operator => 'EQ',
+                    Value    => 'fax agreement',
+                    Operator => 'CONTAINS',
                 },
             ],
         },
@@ -148,8 +148,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Body',
-                    Value    => '%HELP%',
-                    Operator => 'EQ',
+                    Value    => 'HELP',
+                    Operator => 'CONTAINS',
                 },
             ],
         },
@@ -170,8 +170,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Body',
-                    Value    => '%HELP_NOT_FOUND%',
-                    Operator => 'EQ',
+                    Value    => 'HELP_NOT_FOUND',
+                    Operator => 'CONTAINS',
                 },
             ],
         },
@@ -213,8 +213,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Subject',
-                    Value    => '%испытуемый%',
-                    Operator => 'EQ',
+                    Value    => 'испытуемый',
+                    Operator => 'CONTAINS',
                 },
             ],
         },
@@ -235,8 +235,8 @@ Perl modules provide a range of features to help you avoid reinventing the wheel
             'AND' => [
                 {
                     Field    => 'Body',
-                    Value    => '%полный%',
-                    Operator => 'EQ',
+                    Value    => 'полный',
+                    Operator => 'CONTAINS',
                 },
             ],
         },

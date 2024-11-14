@@ -52,7 +52,6 @@ Umlauts: &Auml;&Ouml;&Uuml;&auml;&ouml;&uuml;&szlig;
 END
         },
         Expected => <<'END'
-
 Line 1
 
 This is an URL: [1]KIXDesk 
@@ -60,9 +59,8 @@ This is an URL: [1]KIXDesk
  - Entry 1 
  - Entry 2 
 
- Umlauts: ÄÖÜäöüß 
+Umlauts: ÄÖÜäöüß 
 "Test" <test@kixdesk.com> 
-
 
 [1] https://kixdesk.com
 END
@@ -85,7 +83,6 @@ Umlauts: &Auml;&Ouml;&Uuml;&auml;&ouml;&uuml;&szlig;
 END
         },
         Expected => <<'END'
-
 Line 1
 
 This is an URL: KIXDesk 
@@ -93,7 +90,7 @@ This is an URL: KIXDesk
  - Entry 1 
  - Entry 2 
 
- Umlauts: ÄÖÜäöüß 
+Umlauts: ÄÖÜäöüß 
 "Test" <test@kixdesk.com> 
 END
     },

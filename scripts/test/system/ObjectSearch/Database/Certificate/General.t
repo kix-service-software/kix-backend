@@ -85,6 +85,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -151,7 +167,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -168,7 +184,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -185,7 +201,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -202,7 +218,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -219,7 +235,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -236,7 +252,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -253,7 +269,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test%\'' : 'vfsp0.preferences_value LIKE \'test%\''
             ]
         }
     },
@@ -270,7 +286,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test\'' : 'vfsp0.preferences_value LIKE \'%test\''
             ]
         }
     },
@@ -287,7 +303,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test%\'' : 'vfsp0.preferences_value LIKE \'%test%\''
             ]
         }
     },
@@ -304,7 +320,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Subject\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test\'' : 'vfsp0.preferences_value LIKE \'test\''
             ]
         }
     },
@@ -321,7 +337,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -338,7 +354,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -355,7 +371,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -372,7 +388,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -389,7 +405,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -406,7 +422,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -423,7 +439,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test%\'' : 'vfsp0.preferences_value LIKE \'test%\''
             ]
         }
     },
@@ -440,7 +456,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test\'' : 'vfsp0.preferences_value LIKE \'%test\''
             ]
         }
     },
@@ -457,7 +473,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test%\'' : 'vfsp0.preferences_value LIKE \'%test%\''
             ]
         }
     },
@@ -474,7 +490,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Issuer\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test\'' : 'vfsp0.preferences_value LIKE \'test\''
             ]
         }
     },
@@ -491,7 +507,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -508,7 +524,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -525,7 +541,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -542,7 +558,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -559,7 +575,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -576,7 +592,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -593,7 +609,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test%\'' : 'vfsp0.preferences_value LIKE \'test%\''
             ]
         }
     },
@@ -610,7 +626,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test\'' : 'vfsp0.preferences_value LIKE \'%test\''
             ]
         }
     },
@@ -627,7 +643,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'%test%\'' : 'vfsp0.preferences_value LIKE \'%test%\''
             ]
         }
     },
@@ -644,7 +660,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Email\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) LIKE \'test\'' : 'vfsp0.preferences_value LIKE \'test\''
             ]
         }
     },
@@ -661,7 +677,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -678,7 +694,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -695,7 +711,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -712,7 +728,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -729,7 +745,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -746,7 +762,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'CType\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -763,7 +779,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -780,7 +796,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -797,7 +813,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -814,7 +830,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -831,7 +847,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -848,7 +864,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Type\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -865,7 +881,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -882,7 +898,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -899,7 +915,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -916,7 +932,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -933,7 +949,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -950,7 +966,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Fingerprint\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -967,7 +983,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -984,7 +1000,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -1001,7 +1017,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -1018,7 +1034,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -1035,7 +1051,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -1052,7 +1068,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Modulus\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     },
@@ -1069,7 +1085,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) = \'test\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) = \'test\'' : 'vfsp0.preferences_value = \'test\''
             ]
         }
     },
@@ -1086,7 +1102,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) = \'\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value = \'\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -1103,7 +1119,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)'
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) != \'test\' OR vfsp0.preferences_value IS NULL)' : '(vfsp0.preferences_value != \'test\' OR vfsp0.preferences_value IS NULL)'
             ]
         }
     },
@@ -1120,7 +1136,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) != \'\''
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) != \'\'' : 'vfsp0.preferences_value != \'\''
             ]
         }
     },
@@ -1137,7 +1153,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) IN (\'test\')' : 'vfsp0.preferences_value IN (\'test\')'
             ]
         }
     },
@@ -1154,7 +1170,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key = \'Hash\''
             ],
             'Where' => [
-                'LOWER(vfsp0.preferences_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(vfsp0.preferences_value) NOT IN (\'test\')' : 'vfsp0.preferences_value NOT IN (\'test\')'
             ]
         }
     }
@@ -1396,7 +1412,7 @@ my @Files = (
 
 for my $File ( @Files ) {
     my $Content = $Kernel::OM->Get('Main')->FileRead(
-        Directory => $HomeDir . '/scripts/test/system/sample/Certificate',
+        Directory => $HomeDir . '/scripts/test/system/sample/Certificate/Certificates',
         Filename  => $File->{Filename},
         Mode      => 'binmode'
     );

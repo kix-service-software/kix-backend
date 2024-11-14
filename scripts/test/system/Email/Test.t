@@ -47,7 +47,7 @@ $Self->IsDeeply(
 for ( 1 .. 2 ) {
 
     # call Send and get results
-    my ( $Header, $Body ) = $EmailObject->Send(
+    my $Sent = $EmailObject->Send(
         From     => 'john.smith@example.com',
         To       => 'john.smith2@example.com',
         Subject  => 'some subject',
@@ -57,7 +57,7 @@ for ( 1 .. 2 ) {
     );
 
     $Self->True(
-        $Body,
+        $Sent->{BodyRef},
         "Email delivered to backend",
     );
 }

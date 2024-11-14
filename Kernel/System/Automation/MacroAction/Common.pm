@@ -205,11 +205,41 @@ sub SetResult {
         return;
     }
 
-    $Self->{MacroResults} //= {};
+    $Self->{MacroVariables} //= {};
 
     my $VariableName = $Self->{ResultVariables}->{$Param{Name}} || $Param{Name};
 
-    $Self->{MacroResults}->{$VariableName} = $Param{Value};
+    $Self->{MacroVariables}->{$VariableName} = $Param{Value};
+
+    return 1;
+}
+
+=item SetMacroResult()
+
+Assign a value for a macro result variable.
+
+Example:
+    $Self->SetMacroResult(
+        Name  => 'TicketID',
+        Value => 123,
+    );
+
+=cut
+
+sub SetMacroResult {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{Name} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Got no Name!',
+        );
+        return;
+    }
+
+    $Self->{MacroResults} //= {};
+    $Self->{MacroResults}->{$Param{Name}} = $Param{Value};
 
     return 1;
 }
@@ -378,11 +408,11 @@ sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Config UserID)) {
-        if ( !$Param{$_} ) {
+    for my $Needed (qw(Config UserID)) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!",
+                Message  => "Need $Needed!",
             );
             return;
         }
@@ -426,7 +456,6 @@ Example:
         Translate => 0,                  # optional: 0 will be used if omitted
         UserID    => 1,                  # optional: 1 will be used if omitted
         Data      => {},                 # optional: {} will be used
-        HandleKeyLikeObjectValue => 0    # optional: 0 will be used if omitted - if 1 and "Value" is just a "_Key" placeholder it will considered just like a "_ObjectValue" placeholder (needed for backward compatibility)
     );
 
 =cut
@@ -450,11 +479,6 @@ sub _ReplaceValuePlaceholder {
         }
     };
 
-    # handle DF "_Key" placeholder like "_ObjectValue" if value is just this placeholder (no surrounding text) and param is active
-    if ($Param{HandleKeyLikeObjectValue} && $Param{Value} =~ m/^<KIX_(?:\w|^>)+_DynamicField_(?:\w+?)_Key>$/) {
-        $Param{Value} =~ s/(.+)Key>/${1}ObjectValue>/;
-    }
-
     return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         Text            => $Param{Value},
         RichText        => $Param{Richtext} || 0,
@@ -468,6 +492,20 @@ sub _ReplaceValuePlaceholder {
         ObjectType => $Param{MacroType},
         ObjectID   => $Self->{RootObjectID} || $Param{ObjectID}
     );
+}
+
+sub _ConvertScalar2ArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    my @Data = split( /,/, $Param{Data} );
+
+    # remove any possible heading and tailing white spaces
+    for my $Item (@Data) {
+        $Item =~ s{\A\s+}{};
+        $Item =~ s{\s+\z}{};
+    }
+
+    return \@Data;
 }
 
 1;

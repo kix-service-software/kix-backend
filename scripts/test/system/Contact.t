@@ -34,9 +34,6 @@ $ConfigObject->Set(
     Value => 0,
 );
 
-my $DatabaseCaseSensitive      = $DBObject->{Backend}->{'DB::CaseSensitive'};
-my $SearchCaseSensitiveDefault = $ConfigObject->{Contact}->{Params}->{SearchCaseSensitive};
-
 # create organisation for tests
 my $OrgRand        = 'Example-Organisation-Company' . $Helper->GetRandomID();
 my $OrganisationID = $OrganisationObject->OrganisationAdd(
@@ -234,8 +231,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
             AND => [
                 {
                     Field    => 'Fulltext',
-                    Operator => 'EQ',
-                    Value    => lc( $ContactRandom . '-Customer-Update-Id' )
+                    Operator => 'LIKE',
+                    Value    => lc( $ContactRandom )
                 },
                 {
                     Field    => 'Valid',
@@ -250,18 +247,10 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         UserType   => 'Agent'
     );
 
-    if ($DatabaseCaseSensitive) {
-
-        $Self->False(
-            $List{$ContactID},
-            "ObjectSearch - Contact - ContactID - $ContactID (SearchCaseSensitive = 1)",
-        );
-    } else {
-        $Self->True(
-            $List{$ContactID},
-            "ObjectSearch - Contact - OrganisationID - $ContactID (SearchCaseSensitive = 1)",
-        );
-    }
+    $Self->True(
+        $List{$ContactID},
+        "ObjectSearch - Contact - Fulltext=\'" . lc( $ContactRandom ) . "\'- $ContactID is found",
+    );
 
     my @TestData = (
         {
@@ -365,109 +354,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                 ]
             },
             Text   => "ObjectSearch - Contact - Login - uc - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactID' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => 'Firstname Test Update' . $Key,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'EQ',
-                        Value    => 'Firstname Test Update' . $Key . 'not_match',
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Not    => 1,
-            Text   => "ObjectSearch - Contact - Fulltext '\$ContactRandom+firstname_with_not_match' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'STARTSWITH',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext STARTSWITH '\$ContactRandom*' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'ENDSWITH',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext ENDSWITH '*\$ContactRandom' - $ContactID",
-        },
-        {
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Fulltext',
-                        Operator => 'CONTAINS',
-                        Value    => $ContactRandom,
-                    },
-                    {
-                        Field    => 'Valid',
-                        Operator => 'EQ',
-                        Value    => 'valid'
-                    }
-                ]
-            },
-            Text   =>  "ObjectSearch - Contact - Fulltext CONTAINS '*\$ContactRandom*' - $ContactID",
         },
         {
             Search => {

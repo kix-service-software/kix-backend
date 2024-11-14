@@ -1334,14 +1334,20 @@ sub _Success {
 
         # honor a field selector, if we have one
         if ( IsHashRefWithData( $Self->{Fields} ) ) {
-            my $StartTime = Time::HiRes::time();
+            my $Caller1 = caller(0);
+            my $Caller2 = caller(1);
+            # only apply the field selector, if we are not executed by another operation
+            if ( $Caller1 =~ /::V1::Common$/ || $Caller2 =~ /::V1::Common$/ ) {
 
-            $Self->_ApplyFieldSelector(
-                Data   => \%Param,
-                Fields => $Self->{Fields},
-            );
+                my $StartTime = Time::HiRes::time();
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+                $Self->_ApplyFieldSelector(
+                    Data   => \%Param,
+                    Fields => $Self->{Fields},
+                );
+
+                $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         if ( !$Self->{PermissionCheckOnly} ) {
@@ -2512,7 +2518,7 @@ sub _ExpandObject {
                     Silent => 1
                 );
                 if ( $ContactID ) {
-                    push @Array, $ContactID 
+                    push @Array, $ContactID
                 }
                 else {
                     push @UnresolvedContacts, { Index => $Counter, Value => $EmailSplit };
@@ -2775,16 +2781,22 @@ sub _Trim {
     # remove leading and trailing spaces
     if ( ref( $Param{Data} ) eq 'HASH' ) {
         foreach my $Attribute ( sort keys %{ $Param{Data} } ) {
+            next if IsHashRefWithData($Param{Ignore}) && $Param{Ignore}->{$Attribute};
+
             $Param{Data}->{$Attribute} = $Self->_Trim(
-                Data => $Param{Data}->{$Attribute}
+                Data   => $Param{Data}->{$Attribute},
+                Ignore => $Param{Ignore}
             );
         }
     }
     elsif ( ref( $Param{Data} ) eq 'ARRAY' ) {
         my $Index = 0;
         foreach my $Attribute ( @{ $Param{Data} } ) {
+            next if IsHashRefWithData($Param{Ignore}) && $Param{Ignore}->{$Attribute};
+
             $Param{Data}->[ $Index++ ] = $Self->_Trim(
-                Data => $Attribute
+                Data   => $Attribute,
+                Ignore => $Param{Ignore}
             );
         }
     }

@@ -184,6 +184,9 @@ sub ImportValuePrepare {
 
     return if !defined $Param{Value};
 
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     # get item list
     my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
         Class  => $Param{Item}->{Input}->{Class} || q{},
@@ -199,7 +202,7 @@ sub ImportValuePrepare {
         return if $Param{Silent};
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "General catalog lookup of'$Param{Value}' failed!",
+            Message  => "General catalog lookup of '$Param{Value}' failed!",
         );
         return;
     }

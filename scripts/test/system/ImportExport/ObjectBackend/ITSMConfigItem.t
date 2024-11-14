@@ -27,6 +27,15 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+# create test user login and get the contact id
+my $TestUserLogin = $Helper->TestUserCreate();
+my $TestContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+    UserLogin => $TestUserLogin
+);
+my %TestContact = $Kernel::OM->Get('Contact')->ContactGet(
+    ID => $TestContactID,
+);
+
 # define needed variable
 my $RandomID = $Helper->GetRandomID();
 
@@ -382,13 +391,13 @@ my @ConfigItems = (
                                 Customer1 => [
                                     undef,
                                     {
-                                        Content => 'UnitTest',
+                                        Content => $TestContactID,
                                     },
                                 ],
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01',
+                                        Content => '2008-02-01 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -453,13 +462,13 @@ my @ConfigItems = (
                                 Customer1 => [
                                     undef,
                                     {
-                                        Content => 'UnitTest',
+                                        Content => $TestContactID,
                                     },
                                 ],
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01',
+                                        Content => '2008-02-01 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -518,7 +527,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-02',
+                                        Content => '2008-02-02 00:00:00',
                                     },
                                 ],
                                 DateTime1 => [
@@ -945,8 +954,9 @@ my @ExportDataTests = (
     {
         SourceExportData => {
             ExportDataGet => {
-                UserID => 1,
-                Silent => 1
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
@@ -955,63 +965,79 @@ my @ExportDataTests = (
     {
         SourceExportData => {
             ExportDataGet => {
+                UsageContext => 'Agent',
+                TemplateID   => $TemplateIDs[1],
+                Silent       => 1
+            },
+        },
+    },
+
+    # 3 ImportDataGet doesn't contains all data (check required attributes)
+    {
+        SourceExportData => {
+            ExportDataGet => {
+                UserID     => 1,
                 TemplateID => $TemplateIDs[1],
-                Silent => 1
-            },
-        },
-    },
-
-    # 3 no existing template id is given (check return false)
-    {
-        SourceExportData => {
-            ExportDataGet => {
-                TemplateID => $TemplateIDs[-1] + 1000,
-                UserID     => 1,
                 Silent     => 1
             },
         },
     },
 
-    # 4 no class id is given (check return false)
+    # 4 no existing template id is given (check return false)
     {
         SourceExportData => {
             ExportDataGet => {
-                TemplateID => $TemplateIDs[2],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[-1] + 1000,
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 5  invalid class id is given (check return false)
+    # 5 no class id is given (check return false)
+    {
+        SourceExportData => {
+            ExportDataGet => {
+                TemplateID   => $TemplateIDs[2],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
+            },
+        },
+    },
+
+    # 6  invalid class id is given (check return false)
     {
         SourceExportData => {
             ObjectData => {
                 ClassID => $ConfigItemClassIDs[-1] + 1,
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[2],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[2],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 6 mapping list is empty (check return false)
+    # 7 mapping list is empty (check return false)
     {
         SourceExportData => {
             ObjectData => {
                 ClassID => $ConfigItemClassIDs[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[3],
-                UserID     => 1,
-                Silent     => 1
+                TemplateID   => $TemplateIDs[3],
+                UserID       => 1,
+                UsageContext => 'Agent',
+                Silent       => 1
             },
         },
     },
 
-    # 7 all required values are given (number search check)
+    # 8 all required values are given (number search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1026,8 +1052,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1035,7 +1062,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 8 all required values are given (name search check)
+    # 9 all required values are given (name search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1050,8 +1077,9 @@ my @ExportDataTests = (
                 Name => 'UnitTest - ConfigItem 1 Version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1059,7 +1087,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 9 all required values are given (case insensitive name search check)
+    # 10 all required values are given (case insensitive name search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1074,8 +1102,9 @@ my @ExportDataTests = (
                 Name => 'unittest - configitem 1 version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1083,7 +1112,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 10 all required values are given (name and number search check)
+    # 11 all required values are given (name and number search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1099,8 +1128,9 @@ my @ExportDataTests = (
                 Name   => 'UnitTest - ConfigItem 1 Version 1',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1108,7 +1138,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 11 all required values are given (deployment state search check)
+    # 12 all required values are given (deployment state search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1123,8 +1153,9 @@ my @ExportDataTests = (
                 DeplStateIDs => $DeplStateListReverse{Production},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1133,7 +1164,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 12 all required values are given (incident state search check)
+    # 13 all required values are given (incident state search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1148,8 +1179,9 @@ my @ExportDataTests = (
                 InciStateIDs => $InciStateListReverse{Operational},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1158,7 +1190,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 13 all required values are given (combined search check)
+    # 14 all required values are given (combined search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1176,8 +1208,9 @@ my @ExportDataTests = (
                 InciStateIDs => $InciStateListReverse{Operational},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1185,7 +1218,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 14 all required values are given (XML data search check)
+    # 15 all required values are given (XML data search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1199,15 +1232,16 @@ my @ExportDataTests = (
             SearchData => {
                 Date1           => '2008-02-01',
                 TextArea1       => "Test\nText Array\nTest",
-                Customer1       => 'UnitTest',
+                Customer1       => $TestContactID,
                 Text1           => 'Test Text Test',
                 DateTime1       => '2008-02-01 03:59:00',
                 Integer1        => '1',
                 GeneralCatalog1 => $GeneralCatalogListReverse{Test1},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1215,7 +1249,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 15 all required values are given (combined all search check)
+    # 16 all required values are given (combined all search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -1233,15 +1267,16 @@ my @ExportDataTests = (
                 InciStateIDs    => $InciStateListReverse{Operational},
                 Date1           => '2008-02-01',
                 TextArea1       => "Test\nText Array\nTest",
-                Customer1       => 'UnitTest',
+                Customer1       => $TestContactID,
                 Text1           => 'Test Text Test',
                 DateTime1       => '2008-02-01 03:59:00',
                 Integer1        => '1',
                 GeneralCatalog1 => $GeneralCatalogListReverse{Test1},
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[5],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[5],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1249,7 +1284,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 16 all required values are given (check the returned array)
+    # 17 all required values are given (check the returned array)
     {
         SourceExportData => {
             ObjectData => {
@@ -1297,8 +1332,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[6],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[6],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1307,8 +1343,8 @@ my @ExportDataTests = (
                 'UnitTest - ConfigItem 1 Version 1',
                 'Production',
                 'Operational',
-                'UnitTest',
-                '2008-02-01',
+                $TestContact{Email},
+                '2008-02-01 00:00:00',
                 '2008-02-01 03:59:00',
                 undef,
                 'Test1',
@@ -1319,7 +1355,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 17 all required values are given (double element checks)
+    # 18 all required values are given (double element checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1403,8 +1439,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[0],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[6],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[6],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1417,10 +1454,10 @@ my @ExportDataTests = (
                 'Production',
                 'Operational',
                 'Operational',
-                'UnitTest',
-                'UnitTest',
-                '2008-02-01',
-                '2008-02-01',
+                $TestContact{Email},
+                $TestContact{Email},
+                '2008-02-01 00:00:00',
+                '2008-02-01 00:00:00',
                 '2008-02-01 03:59:00',
                 '2008-02-01 03:59:00',
                 undef,
@@ -1437,7 +1474,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 18 all required values are given (sub element checks)
+    # 19 all required values are given (sub element checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1509,8 +1546,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[2],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1539,7 +1577,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 19 all required values are given (sub element checks with undef values)
+    # 20 all required values are given (sub element checks with undef values)
     {
         SourceExportData => {
             ObjectData => {
@@ -1635,8 +1673,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[2],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1673,7 +1712,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 20 all required values are given (sub element checks with undef values and empty strings)
+    # 21 all required values are given (sub element checks with undef values and empty strings)
     {
         SourceExportData => {
             ObjectData => {
@@ -1769,8 +1808,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[3],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1779,14 +1819,6 @@ my @ExportDataTests = (
                 'UnitTest - ConfigItem 4 Version 1',
                 'Production',
                 'Operational',
-                q{},
-                q{},
-                q{},
-                undef,
-                undef,
-                undef,
-                q{},
-                undef,
                 undef,
                 undef,
                 undef,
@@ -1796,8 +1828,16 @@ my @ExportDataTests = (
                 q{},
                 undef,
                 undef,
+                undef,
+                undef,
+                undef,
+                undef,
+                undef,
                 q{},
+                undef,
+                undef,
                 q{},
+                undef,
                 undef,
                 q{},
                 undef,
@@ -1807,7 +1847,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 21 all required values are given (special character checks)
+    # 22 all required values are given (special character checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1855,8 +1895,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[4],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[8],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[8],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1877,7 +1918,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 22 all required values are given (UTF-8 checks)
+    # 23 all required values are given (UTF-8 checks)
     {
         SourceExportData => {
             ObjectData => {
@@ -1925,8 +1966,9 @@ my @ExportDataTests = (
                 Number => $ConfigItemNumbers[5],
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[9],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[9],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -1947,7 +1989,7 @@ my @ExportDataTests = (
         ],
     },
 
-    # 23 all required values are given (XML data sub element search check)
+    # 24 all required values are given (XML data sub element search check)
     {
         SourceExportData => {
             ObjectData => {
@@ -2020,8 +2062,9 @@ my @ExportDataTests = (
                 Main1Sub1SubSub1 => 'Main1 (1) Sub1 (1) SubSub1 (1)',
             },
             ExportDataGet => {
-                TemplateID => $TemplateIDs[7],
-                UserID     => 1,
+                TemplateID   => $TemplateIDs[7],
+                UserID       => 1,
+                UsageContext => 'Agent',
             },
         },
         ReferenceExportData => [
@@ -2210,7 +2253,7 @@ for my $Test (@ExportDataTests) {
             $Self->Is(
                 $Cell,
                 $ReferenceRow->[$CounterColumn],
-                "ExportTest $ExportTestCount: ExportDataGet() ",
+                "ExportTest $ExportTestCount: ExportDataGet() [$CounterColumn]",
             );
 
             $CounterColumn++;
@@ -2235,6 +2278,7 @@ my @ImportDataTests = (
             ImportDataSave => {
                 ImportDataRow => [],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
@@ -2246,6 +2290,7 @@ my @ImportDataTests = (
             ImportDataSave => {
                 TemplateID => $TemplateIDs[20],
                 UserID     => 1,
+                UsageContext  => 'Agent',
                 Silent     => 1
             },
         },
@@ -2257,17 +2302,18 @@ my @ImportDataTests = (
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[20],
                 ImportDataRow => [],
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 4 import data row must be an array reference (check return false)
+    # 4 ImportDataSave doesn't contains all data (check required attributes)
     {
         SourceImportData => {
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[20],
-                ImportDataRow => q{},
+                ImportDataRow => [],
                 UserID        => 1,
                 Silent        => 1
             },
@@ -2279,38 +2325,54 @@ my @ImportDataTests = (
         SourceImportData => {
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[20],
-                ImportDataRow => {},
+                ImportDataRow => q{},
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 6 no existing template id is given (check return false)
+    # 6 import data row must be an array reference (check return false)
+    {
+        SourceImportData => {
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[20],
+                ImportDataRow => {},
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
+            },
+        },
+    },
+
+    # 7 no existing template id is given (check return false)
     {
         SourceImportData => {
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[-1] + 1,
                 ImportDataRow => ['Dummy'],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 7 no class id is given (check return false)
+    # 8 no class id is given (check return false)
     {
         SourceImportData => {
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[21],
                 ImportDataRow => ['Dummy'],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 8 invalid class id is given (check return false)
+    # 9 invalid class id is given (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2321,12 +2383,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[22],
                 ImportDataRow => ['Dummy'],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 9 mapping list is empty (check return false)
+    # 10 mapping list is empty (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2336,12 +2399,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => ['Dummy'],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 10 more than one identifier with the same name (check return false)
+    # 11 more than one identifier with the same name (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2361,12 +2425,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ '123', '321' ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 11 identifier is empty (check return false)
+    # 12 identifier is empty (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2382,12 +2447,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [q{}],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 12 identifier is undef (check return false)
+    # 13 identifier is undef (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2403,12 +2469,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [undef],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 13 both identifiers are empty (check return false)
+    # 14 both identifiers are empty (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2428,12 +2495,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ q{}, q{} ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 14 both identifiers are undef (check return false)
+    # 15 both identifiers are undef (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2453,12 +2521,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ undef, undef ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 15 one identifiers is empty, one is undef (check return false)
+    # 16 one identifiers is empty, one is undef (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2478,12 +2547,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ q{}, undef ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 16 one of the identifiers is empty (check return false)
+    # 17 one of the identifiers is empty (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2503,12 +2573,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ '123', q{} ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 17 one of the identifiers is undef (check return false)
+    # 18 one of the identifiers is undef (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2528,31 +2599,7 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ '123', undef ],
                 UserID        => 1,
-                Silent        => 1
-            },
-        },
-    },
-
-    # 18 one of the identifiers is empty (check return false)
-    {
-        SourceImportData => {
-            ObjectData => {
-                ClassID => $ConfigItemClassIDs[0],
-            },
-            MappingObjectData => [
-                {
-                    Key        => 'Number',
-                    Identifier => 1,
-                },
-                {
-                    Key        => 'Name',
-                    Identifier => 1,
-                },
-            ],
-            ImportDataSave => {
-                TemplateID    => $TemplateIDs[23],
-                ImportDataRow => [ q{}, '123' ],
-                UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
@@ -2576,8 +2623,35 @@ my @ImportDataTests = (
             ],
             ImportDataSave => {
                 TemplateID    => $TemplateIDs[23],
+                ImportDataRow => [ q{}, '123' ],
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
+            },
+        },
+    },
+
+    # 20 one of the identifiers is empty (check return false)
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID => $ConfigItemClassIDs[0],
+            },
+            MappingObjectData => [
+                {
+                    Key        => 'Number',
+                    Identifier => 1,
+                },
+                {
+                    Key        => 'Name',
+                    Identifier => 1,
+                },
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[23],
                 ImportDataRow => [ undef, '123' ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
@@ -2585,7 +2659,7 @@ my @ImportDataTests = (
 
     # TODO Add some identifier tests
 
-    # 20 empty name is given (check return false)
+    # 21 empty name is given (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2606,12 +2680,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[24],
                 ImportDataRow => [ q{}, 'Production', 'Operational' ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 21 invalid deployment state is given (check return false)
+    # 22 invalid deployment state is given (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2632,12 +2707,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[24],
                 ImportDataRow => [ 'UnitTest - Importtest 1', 'Dummy', 'Operational' ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 22 invalid incident state is given (check return false)
+    # 23 invalid incident state is given (check return false)
     {
         SourceImportData => {
             ObjectData => {
@@ -2658,12 +2734,13 @@ my @ImportDataTests = (
                 TemplateID    => $TemplateIDs[24],
                 ImportDataRow => [ 'UnitTest - Importtest 2', 'Production', 'Dummy' ],
                 UserID        => 1,
+                UsageContext  => 'Agent',
                 Silent        => 1
             },
         },
     },
 
-    # 23 all required values are given (a NEW config item must be created)
+    # 24 all required values are given (a NEW config item must be created)
     {
         SourceImportData => {
             ObjectData => {
@@ -2707,7 +2784,7 @@ my @ImportDataTests = (
                     'UnitTest - Importtest 3',
                     'Production',
                     'Operational',
-                    'UnitTest',
+                    $TestContact{Email},
                     '2008-06-05',
                     '2008-08-05 04:50:00',
                     'Test3',
@@ -2715,7 +2792,8 @@ my @ImportDataTests = (
                     'Test3 Text3 Test3',
                     "Test3\nTextArray3\nTest3",
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -2724,7 +2802,7 @@ my @ImportDataTests = (
                 Name                 => 'UnitTest - Importtest 3',
                 DeplState            => 'Production',
                 InciState            => 'Operational',
-                'Customer1::1'       => 'UnitTest',
+                'Customer1::1'       => $TestContactID,
                 'Date1::1'           => '2008-06-05',
                 'DateTime1::1'       => '2008-08-05 04:50:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test3},
@@ -2735,7 +2813,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 23 all required values are given (a second NEW config item must be created)
+    # 25 all required values are given (a second NEW config item must be created)
     {
         SourceImportData => {
             ObjectData => {
@@ -2779,7 +2857,7 @@ my @ImportDataTests = (
                     'UnitTest - Importtest 4',
                     'Production',
                     'Operational',
-                    'UnitTest',
+                    $TestUserLogin,
                     '2008-09-05',
                     '2008-12-05 04:50:00',
                     'Test4',
@@ -2787,7 +2865,8 @@ my @ImportDataTests = (
                     'Test4 Text4 Test4',
                     "Test4\nTextArray4\nTest4",
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -2796,7 +2875,7 @@ my @ImportDataTests = (
                 Name                 => 'UnitTest - Importtest 4',
                 DeplState            => 'Production',
                 InciState            => 'Operational',
-                'Customer1::1'       => 'UnitTest',
+                'Customer1::1'       => $TestContactID,
                 'Date1::1'           => '2008-09-05',
                 'DateTime1::1'       => '2008-12-05 04:50:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test4},
@@ -2807,7 +2886,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 24 all required values are given (a new version must be added to first test config item)
+    # 26 all required values are given (a new version must be added to first test config item)
     {
         SourceImportData => {
             ObjectData => {
@@ -2856,7 +2935,7 @@ my @ImportDataTests = (
                     'UnitTest - ConfigItem 1 Version 2',
                     'Pilot',
                     'Incident',
-                    'UnitTest',
+                    $TestUserLogin,
                     '2008-02-02',
                     '2008-02-02 03:59:00',
                     'Test2',
@@ -2864,7 +2943,8 @@ my @ImportDataTests = (
                     'Test Text UPDATE1 Test',
                     "Test\nText Array UPDATE1\nTest",
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -2873,7 +2953,7 @@ my @ImportDataTests = (
                 Name                 => 'UnitTest - ConfigItem 1 Version 2',
                 DeplState            => 'Pilot',
                 InciState            => 'Incident',
-                'Customer1::1'       => 'UnitTest',
+                'Customer1::1'       => $TestContactID,
                 'Date1::1'           => '2008-02-02',
                 'DateTime1::1'       => '2008-02-02 03:59:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test2},
@@ -2884,7 +2964,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 25 all required values are given (a new version must be added to first test config item again)
+    # 27 all required values are given (a new version must be added to first test config item again)
     {
         SourceImportData => {
             ObjectData => {
@@ -2933,7 +3013,7 @@ my @ImportDataTests = (
                     'UnitTest - ConfigItem 1 Version 3',
                     'Repair',
                     'Operational',
-                    'UnitTest',
+                    $TestUserLogin,
                     '2008-02-03',
                     '2008-02-03 03:59:00',
                     'Test3',
@@ -2941,7 +3021,8 @@ my @ImportDataTests = (
                     'Test Text UPDATE2 Test',
                     "Test\nText Array UPDATE2\nTest",
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -2950,7 +3031,7 @@ my @ImportDataTests = (
                 Name                 => 'UnitTest - ConfigItem 1 Version 3',
                 DeplState            => 'Repair',
                 InciState            => 'Operational',
-                'Customer1::1'       => 'UnitTest',
+                'Customer1::1'       => $TestContactID,
                 'Date1::1'           => '2008-02-03',
                 'DateTime1::1'       => '2008-02-03 03:59:00',
                 'GeneralCatalog1::1' => $GeneralCatalogListReverse{Test3},
@@ -2961,7 +3042,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 26 all required values are given (a new version must be added to third test config item)
+    # 28 all required values are given (a new version must be added to third test config item)
     {
         SourceImportData => {
             ObjectData => {
@@ -3054,7 +3135,8 @@ my @ImportDataTests = (
                     'Main2 (1) Main2Sub2 (1)',
                     'Main2 (1) Main2Sub2 (2)',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3090,7 +3172,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 27 all required values are given (special character checks)
+    # 29 all required values are given (special character checks)
     # In 'UnitTest - ConfigItem 3 Version 2' 16 Attributes were imported,
     # so there will be 8 lingering attributes.
     {
@@ -3153,7 +3235,8 @@ my @ImportDataTests = (
                     'Test Test',
                     "Test\nTest\tTest",
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3189,7 +3272,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 28 all required values are given (UTF-8 checks)
+    # 30 all required values are given (UTF-8 checks)
     # In 'UnitTest - ConfigItem 3 Version 2' 16 Attributes were imported,
     # so there will be 8 lingering attributes.
     {
@@ -3252,7 +3335,8 @@ my @ImportDataTests = (
                     'њ ё',
                     'Ѭ Ѧ',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3288,7 +3372,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 29 a simple import for testing the overriding behavior of empty values
+    # 31 a simple import for testing the overriding behavior of empty values
     {
         SourceImportData => {
             ObjectData => {
@@ -3321,7 +3405,8 @@ my @ImportDataTests = (
                     'Importtest 5 for behavior of empty values',
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3336,7 +3421,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 30 import an empty value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # 32 import an empty value for Text1, with EmptyFieldsLeaveTheOldValues turned on
     # no new version should be created
     {
         SourceImportData => {
@@ -3371,7 +3456,8 @@ my @ImportDataTests = (
                     q{},
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3386,7 +3472,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 31 import undef for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # 33 import undef for Text1, with EmptyFieldsLeaveTheOldValues turned on
     # no new version should be created
     {
         SourceImportData => {
@@ -3421,7 +3507,8 @@ my @ImportDataTests = (
                     undef,
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3436,7 +3523,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 32 import an empty value for Text1, with EmptyFieldsLeaveTheOldValues turned off
+    # 34 import an empty value for Text1, with EmptyFieldsLeaveTheOldValues turned off
     # a new version should be created (value of Text1 will be removed)
     {
         SourceImportData => {
@@ -3471,7 +3558,8 @@ my @ImportDataTests = (
                     q{},
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3485,7 +3573,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 33 import a single space value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # 35 import a single space value for Text1, with EmptyFieldsLeaveTheOldValues turned on
     # a new version should be created
     {
         SourceImportData => {
@@ -3520,7 +3608,8 @@ my @ImportDataTests = (
                     q{ },
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3535,7 +3624,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 34 import the string '0' value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # 36 import the string '0' value for Text1, with EmptyFieldsLeaveTheOldValues turned on
     # a new version should be created
     {
         SourceImportData => {
@@ -3570,7 +3659,8 @@ my @ImportDataTests = (
                     '0',
                     'Test1',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3585,7 +3675,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 35 import an empty value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned on
+    # 37 import an empty value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned on
     # no new version should be created
     {
         SourceImportData => {
@@ -3620,7 +3710,8 @@ my @ImportDataTests = (
                     q{},
                     q{},
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3635,7 +3726,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 36 import an invalid value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned on
+    # 38 import an invalid value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned on
     # the import should fail
     {
         SourceImportData => {
@@ -3670,13 +3761,14 @@ my @ImportDataTests = (
                     q{},
                     'non-existent general catalog entry',
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
     },
 
-    # 37 import an invalid value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned off
+    # 39 import an invalid value for GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned off
     # the import should fail
     {
         SourceImportData => {
@@ -3711,13 +3803,14 @@ my @ImportDataTests = (
                     q{},
                     'non-existent general catalog entry',
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
     },
 
-    # 38 import an empty value for DeplState, with EmptyFieldsLeaveTheOldValues turned on
+    # 40 import an empty value for DeplState, with EmptyFieldsLeaveTheOldValues turned on
     # no new version should be created
     {
         SourceImportData => {
@@ -3752,8 +3845,9 @@ my @ImportDataTests = (
                     q{},
                     q{},
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
         ReferenceImportData => {
@@ -3768,7 +3862,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 39 import an invalid value for DeplState, with EmptyFieldsLeaveTheOldValues turned on
+    # 41 import an invalid value for DeplState, with EmptyFieldsLeaveTheOldValues turned on
     # an error should be generated
     {
         SourceImportData => {
@@ -3803,13 +3897,14 @@ my @ImportDataTests = (
                     q{},
                     q{},
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
     },
 
-    # 40 import an empty value for InciState, with EmptyFieldsLeaveTheOldValues turned on
+    # 42 import an empty value for InciState, with EmptyFieldsLeaveTheOldValues turned on
     # no new version should be created
     {
         SourceImportData => {
@@ -3844,8 +3939,9 @@ my @ImportDataTests = (
                     q{},
                     q{},
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
         ReferenceImportData => {
@@ -3860,7 +3956,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 41 import an invalid value for InciState, with EmptyFieldsLeaveTheOldValues turned on
+    # 43 import an invalid value for InciState, with EmptyFieldsLeaveTheOldValues turned on
     # an error should be generated
     {
         SourceImportData => {
@@ -3895,13 +3991,14 @@ my @ImportDataTests = (
                     q{},
                     q{},
                 ],
-                UserID => 1,
-                Silent => 1
+                UserID        => 1,
+                UsageContext  => 'Agent',
+                Silent        => 1
             },
         },
     },
 
-    # 42 special test to check handling of empty fields (should be reused for further values - fill up test)
+    # 44 special test to check handling of empty fields (should be reused for further values - fill up test)
     #   e.g. attribut has countMax 10, import has avalue on 5th position (1 - 4 are empty),
     #   so the imported value has to be on first positon after save
     {
@@ -3973,7 +4070,8 @@ my @ImportDataTests = (
                     undef,
                     'Main2 (2)',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -3991,7 +4089,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 43 add version with same import and with EmptyFieldsLeaveTheOldValues turned on
+    # 45 add version with same import and with EmptyFieldsLeaveTheOldValues turned on
     #     - new values should be appended
     {
         SourceImportData => {
@@ -4062,7 +4160,8 @@ my @ImportDataTests = (
                     undef,
                     'Main2 (2)',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -4086,7 +4185,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 44 add another version with same import and with EmptyFieldsLeaveTheOldValues turned on
+    # 46 add another version with same import and with EmptyFieldsLeaveTheOldValues turned on
     #     - one value should be appended, other should be replaced
     {
         SourceImportData => {
@@ -4157,7 +4256,8 @@ my @ImportDataTests = (
                     undef,
                     'Main2 (2) - replaced?',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {
@@ -4184,7 +4284,7 @@ my @ImportDataTests = (
         },
     },
 
-    # 45 add another version with same import but with EmptyFieldsLeaveTheOldValues turned off
+    # 47 add another version with same import but with EmptyFieldsLeaveTheOldValues turned off
     #     - so empty values will replace old values - so there are "free" again
     #     - should look like first import (fill up does its work)
     {
@@ -4255,7 +4355,8 @@ my @ImportDataTests = (
                     undef,
                     'Main2 (2)',
                 ],
-                UserID => 1,
+                UserID        => 1,
+                UsageContext  => 'Agent',
             },
         },
         ReferenceImportData => {

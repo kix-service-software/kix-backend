@@ -18,6 +18,7 @@
 "Agent User";"Object";"/system/config/*{SysConfigOption.AccessLevel EQ confidential}";;;;;
 "Agent User";"Object";"/system/config/definitions/*{SysConfigOptionDefinition.AccessLevel EQ confidential}";;;;;
 "Agent User";"Resource";"/objectsearch";;"x";;;
+"Ticket Reader";"Resource";"/contacts";;"x";;;
 "Ticket Reader";"Resource";"/tickets";;"x";;;
 "Ticket Reader";"Resource";"/tickets/*/articles/*/flags";"x";"x";"x";"x";
 "Ticket Reader";"Resource";"/system/ticket/*";;;;;
@@ -162,6 +163,7 @@
 "Customer Manager";"Resource";"/system/objecticons";"x";"x";"x";;
 "Customer Manager";"Resource";"/virtualfs";;"x";;;
 "System Admin";"Resource";"/system";"x";"x";"x";"x";
+"System Admin";"Resource";"/cmdb";"x";"x";"x";"x";
 "System Admin";"Resource";"/auth";"x";;;;
 "System Admin";"Resource";"/session";"x";"x";"x";"x";
 "System Admin";"Resource";"/contacts";"x";"x";"x";"x";
@@ -212,7 +214,7 @@
 "Customer";"Resource";"/tickets";"x";"x";;;
 "Customer";"Resource";"/tickets/*";;"x";"x";;
 "Customer";"Object";"/tickets/*{Ticket.OrganisationID !IN $CurrentUser.Contact.OrganisationIDs}";;;;;
-"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}";;"x";;;
+"Customer";"Property";"/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,PendingTime]}";;"x";;;
 "Customer";"Resource";"/tickets/*/articles";"x";"x";;;
 "Customer";"Resource";"/tickets/*/articles/*";;"x";;;
 "Customer";"Object";"/tickets/*/articles/*{Article.CustomerVisible NE 1}";;;;;

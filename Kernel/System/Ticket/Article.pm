@@ -980,10 +980,11 @@ sub ArticleGetTicketID {
 
     # set cache
     $Self->_TicketCacheSet(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $TicketID,
+        TicketID => $TicketID,
+        Type     => $Self->{CacheType},
+        TTL      => $Self->{CacheTTL},
+        Key      => $CacheKey,
+        Value    => $TicketID,
     );
 
     # return
@@ -2095,22 +2096,21 @@ sub _ArticleGetId {
 
 update an article
 
-Note: Keys "Body", "Subject", "From", "To", "Cc", "Bcc", "ReplyTo", "CustomerVisible" and "SenderType" are implemented.
-
     my $Success = $TicketObject->ArticleUpdate(
-        ArticleID => 123,
-        Key       => 'Body',
-        Value     => 'New Body',
-        UserID    => 123,
-        TicketID  => 123,
-    );
-
-    my $Success = $TicketObject->ArticleUpdate(
-        ArticleID => 123,
-        Key       => 'CustomerVisible',
-        Value     => 1,
-        UserID    => 123,
-        TicketID  => 123,
+        ArticleID       => 123,
+        Body            => '...',           # optional
+        Subject         => '...',           # optional
+        From            => '...',           # optional
+        To              => '...',           # optional
+        Cc              => '...',           # optional
+        Bcc             => '...',           # optional
+        ReplyTo         => '...',           # optional
+        CustomerVisible => 0|1,             # optional
+        SenderType      => '...',           # optional
+        SenderTypeID    => '...',           # optional, Prio over SenderType
+        IncomingTime    => '...',           # optional
+        ContentType     => '...',           # optional
+        UserID          => 123,
     );
 
 Events:
@@ -2122,7 +2122,7 @@ sub ArticleUpdate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ArticleID UserID Key TicketID)) {
+    for (qw(ArticleID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -2132,60 +2132,96 @@ sub ArticleUpdate {
         }
     }
 
-    # check needed stuff
-    if ( !defined $Param{Value} ) {
+    # do not use given TicketID
+    delete( $Param{TicketID} );
+
+    # check for defined values of required database columns
+    for my $Key ( qw(Body IncomingTime SenderType SenderTypeID) ) {
+        if (
+            exists( $Param{ $Key } )
+            && !defined( $Param{ $Key } )
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Parameter '$Key' does not allow undefined values!",
+            );
+            return;
+        }
+    }
+
+    my %Article = $Self->ArticleGet(ArticleID => $Param{ArticleID});
+    if ( !%Article ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need Value!'
+            Message  => "No such article for ArticleID ($Param{ArticleID})!"
         );
         return;
     }
 
-    # lookup for SenderType
-    if ( $Param{Key} eq 'SenderType' ) {
-        $Param{Key}   = 'SenderTypeID';
-        $Param{Value} = $Self->ArticleSenderTypeLookup(
-            SenderType => $Param{Value},
+    # check if update is required
+    my $ChangeRequired;
+    KEY:
+    for my $Key ( qw(Subject Body From To Cc Bcc IncomingTime ReplyTo CustomerVisible SenderType SenderTypeID ContentType) ) {
+        next KEY if (
+            !exists( $Param{ $Key } )
+            || (
+                defined( $Article{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Article{ $Key } eq $Param{ $Key }
+            )
         );
+        $ChangeRequired = 1;
+        last KEY;
+    }
+
+    # merge
+    %Article = (
+        %Article,
+        %Param,
+    );
+
+    # lookup for SenderType
+    if ( defined $Param{SenderType} && !defined $Param{SenderTypeID} ) {
+        $Article{SenderTypeID} = $Self->ArticleSenderTypeLookup(
+            SenderType => $Param{SenderType},
+        );
+
+        if ( !$Article{SenderTypeID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Couldn't update article for ticket $Article{TicketID}. Can't find sender type with name \"$Param{SenderType}\"!",
+            );
+            return;
+        }
     }
 
     # prepare IncomingTime if given
-    if ( $Param{Key} eq 'IncomingTime') {
+    if ( defined $Param{IncomingTime} ) {
         my $IncomingSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-            String => $Param{Value},
+            String => $Param{IncomingTime},
         );
-        $Param{Value} = $IncomingSystemTime if $IncomingSystemTime;
+        $Article{IncomingTime} = $IncomingSystemTime if $IncomingSystemTime;
     }
-
-    # map
-    my %Map = (
-        Body            => 'a_body',
-        Subject         => 'a_subject',
-        From            => 'a_from',
-        ReplyTo         => 'a_reply_to',
-        To              => 'a_to',
-        Cc              => 'a_cc',
-        Bcc             => 'a_bcc',
-        CustomerVisible => 'customer_visible',
-        SenderTypeID    => 'article_sender_type_id',
-        IncomingTime    => 'incoming_time',
-        ContentType     => 'a_content_type',
-    );
 
     # db update
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE article SET $Map{$Param{Key}} = ?, "
+        SQL => "UPDATE article SET a_body = ?, a_subject = ?, a_from = ?, a_to = ?, a_cc = ?, a_bcc = ?, a_reply_to = ?, "
+            . "customer_visible = ?, article_sender_type_id = ?, incoming_time = ?, a_content_type = ?, "
             . "change_time = current_timestamp, change_by = ? WHERE id = ?",
-        Bind => [ \$Param{Value}, \$Param{UserID}, \$Param{ArticleID} ],
+        Bind => [
+            \$Article{Body}, \$Article{Subject}, \$Article{From}, \$Article{To}, \$Article{Cc}, \$Article{Bcc}, \$Article{ReplyTo},
+            \$Article{CustomerVisible}, \$Article{SenderTypeID}, \$Article{IncomingTime}, \$Article{ContentType}, \$Article{UserID},
+            \$Param{ArticleID}
+        ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
 
     # event
     $Self->EventHandler(
         Event => 'ArticleUpdate',
         Data  => {
-            TicketID  => $Param{TicketID},
+            TicketID  => $Article{TicketID},
             ArticleID => $Param{ArticleID},
         },
         UserID => $Param{UserID},
@@ -2196,7 +2232,7 @@ sub ArticleUpdate {
         Event     => 'UPDATE',
         Namespace => 'Ticket.Article',
         UserID    => $Param{UserID},
-        ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
+        ObjectID  => $Article{TicketID}.'::'.$Param{ArticleID},
     );
 
     return 1;
@@ -2772,6 +2808,7 @@ delete accounted time of article
 
     my $Success = $TicketObject->ArticleAccountedTimeDelete(
         ArticleID => $ArticleID,
+        UserID    => 1
     );
 
 =cut
@@ -2780,12 +2817,15 @@ sub ArticleAccountedTimeDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ArticleID!'
-        );
-        return;
+    for my $Needed (qw(ArticleID UserID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+
+            );
+            return;
+        }
     }
 
     # db query
@@ -2799,11 +2839,26 @@ sub ArticleAccountedTimeDelete {
         ArticleID => $Param{ArticleID}
     );
 
+    # update ticket data
+    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
+            . ' change_by = ?, accounted_time = ? WHERE id = ?',
+        Bind => [ \$Param{UserID}, \$AccountedTime, \$TicketID ],
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'Ticket.Article.AccountedTime',
         ObjectID  => $TicketID.'::'.$Param{ArticleID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Ticket',
+        ObjectID  => $TicketID,
     );
 
     return 1;
@@ -3335,8 +3390,8 @@ sub PrepareArticle {
     $Param{SenderType} = $Param{SenderType} || 'agent';
     $Param{Charset} = $Param{Charset} || 'utf-8';
     $Param{MimeType} = $Param{MimeType} || 'text/html';
-    $Param{HistoryType} = $Param{HistoryType} || 'AddNote';
-    $Param{HistoryComment} = $Param{HistoryComment} || 'Added during job execution.';
+    $Param{HistoryType} = $Param{HistoryType} || 'AddArticle';
+    $Param{HistoryComment} = $Param{HistoryComment} || '%%';
 
     # replace placeholders in non-richtext attributes
     for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {

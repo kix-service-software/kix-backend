@@ -311,16 +311,16 @@ $Self->True(
     'MacroExecute()',
 );
 $Self->True(
-    IsHashRefWithData($AutomationObject->{MacroResults}) || 0,
-    'MacroResults is hash ref',
+    IsHashRefWithData($AutomationObject->{MacroVariables}) || 0,
+    'MacroVariables is hash ref',
 );
 $Self->Is(
-    $AutomationObject->{MacroResults}->{Set_B},
+    $AutomationObject->{MacroVariables}->{Set_B},
     $FilterDoneCheck,
     "Result of 2nd action is correct (should be '$FilterDoneCheck')",
 );
 $Self->Is(
-    $AutomationObject->{MacroResults}->{Set_C},
+    $AutomationObject->{MacroVariables}->{Set_C},
     $ExecuteTestDate,
     "Result of 3nd action should be input value",
 );

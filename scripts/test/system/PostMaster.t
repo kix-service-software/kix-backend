@@ -370,7 +370,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
             }
 
-            if ( $File == 3 ) {
+            elsif ( $File == 3 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -389,11 +389,22 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     ArticleID => $ArticleIDs[0],
                     UserID    => 1,
                 );
-                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                    ArticleID    => $ArticleIDs[0],
-                    AttachmentID => 2,
-                    UserID       => 1,
-                );
+                my $FileIndex = 1;
+                my %Attachment;
+                for my $AttachmentID ( sort{ $a <=> $b }( keys( %Index ) ) ) {
+                    if ( $FileIndex < 2 ) {
+                        $FileIndex += 1;
+                    }
+                    else {
+                        %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                            ArticleID    => $ArticleIDs[0],
+                            AttachmentID => $AttachmentID,
+                            UserID       => 1,
+                        );
+
+                        last;
+                    }
+                }
                 $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                 $Self->Is(
                     $MD5,
@@ -403,7 +414,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
 
             }
 
-            if ( $File == 5 ) {
+            elsif ( $File == 5 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -470,7 +481,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 }
             }
 
-            if ( $File == 6 ) {
+            elsif ( $File == 6 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -489,20 +500,31 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     ArticleID => $ArticleIDs[0],
                     UserID    => 1,
                 );
-                my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-                    ArticleID    => $ArticleIDs[0],
-                    AttachmentID => 2,
-                    UserID       => 1,
-                );
+                my $FileIndex = 1;
+                my %Attachment;
+                for my $AttachmentID ( sort{ $a <=> $b }( keys( %Index ) ) ) {
+                    if ( $FileIndex < 2 ) {
+                        $FileIndex += 1;
+                    }
+                    else {
+                        %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+                            ArticleID    => $ArticleIDs[0],
+                            AttachmentID => $AttachmentID,
+                            UserID       => 1,
+                        );
+
+                        last;
+                    }
+                }
                 $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $Attachment{Content} ) || '';
                 $Self->Is(
                     $MD5,
-                    '0596f2939525c6bd50fc2b649e40fbb6',
+                    '5ee767f3b68f24a9213e0bef82dc53e5',
                     $NamePrefix . ' md5 attachment check',
                 );
 
             }
-            if ( $File == 11 ) {
+            elsif ( $File == 11 ) {
 
                 # check body
                 my %Article = $Kernel::OM->Get('Ticket')->ArticleGet(
@@ -1272,6 +1294,77 @@ for my $Test ( sort keys %OwnerResponsibleTests ) {
             $Test . ' Check Field - ' . $Field,
         );
     }
+}
+
+## Tests for KIX2018-11925, check that failing PreFilterModules do not break execution
+@Tests = (
+    {
+        Name     => 'Failing PreFilterModule without FollowUp',
+        Email    => 'From: Sender <sender@example.com>
+To: Some Name <recipient@example.com>
+Envelope-To: Some EnvelopeTo Name <envelopeto@example.com>
+Subject: some subject
+
+Some Content in Body
+',
+        FollowUpReturnValue => undef
+    },
+    {
+        Name     => 'Failing PreFilterModule with FollowUp',
+        Email    => 'From: Sender <sender@example.com>
+To: Some Name <recipient@example.com>
+Envelope-To: Some EnvelopeTo Name <envelopeto@example.com>
+Subject: some subject
+
+Some Content in Body
+',
+        FollowUpReturnValue => 1
+    },
+);
+for my $Test (@Tests) {
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
+        Value => {
+            Module      => 'scripts::test::system::PostMaster::Filter::UnitTest',
+            Set         => {
+                'X-KIX-Ignore' => 'yes'
+            },
+            ReturnValue => undef
+        },
+    );
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::CheckFollowUpModule###' . $Test->{Name},
+        Value => {
+            Module      => 'scripts::test::system::FollowUpCheck::Filter::UnitTest',
+            ReturnValue => $Test->{FollowUpReturnValue}
+        },
+    );
+
+    my @Return;
+    {
+        my $PostMasterObject = Kernel::System::PostMaster->new(
+            Email => \$Test->{Email},
+        );
+
+        @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
+    }
+
+    $Self->Is(
+        $Return[0] || 0,
+        5,
+        "KIX2018-11925 Run() - Ignore",
+    );
+
+    # remove filter
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::PreFilterModule###' . $Test->{Name},
+        Value => undef,
+    );
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::CheckFollowUpModule###' . $Test->{Name},
+        Value => undef,
+    );
 }
 
 # rollback transaction on database

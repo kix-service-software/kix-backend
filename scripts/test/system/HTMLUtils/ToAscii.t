@@ -34,8 +34,7 @@ my @Tests = (
         Result => 'Some Text
 [1]Some URL
 
-[1] http://example.com
-',
+[1] http://example.com',
         Name => 'ToAscii - simple'
     },
     {
@@ -73,25 +72,29 @@ More Text',
 <div>--Shawn</div>
 <div>&nbsp;</div>',
         Result => 'Martin,
- ' . chr(160) . '
- I am lost. Martin says that...
- ' . chr(160) . '
- --Shawn
- ' . chr(160) . '
+
+' . chr(160) . '
+
+I am lost. Martin says that...
+
+' . chr(160) . '
+
+--Shawn
+
+' . chr(160) . '
 ',
         Name => 'ToAscii - simple'
     },
     {
         Input =>
             '<ul><li>a</li><li>b</li><li>c</li></ul><ol><li>one</li><li>two</li><li>three</li></ol>',
-        Result => '
- - a
+        Result => ' - a
  - b
  - c
 
- - one
- - two
- - three
+1. one
+2. two
+3. three
 
 ',
         Name => 'ToAscii - simple'
@@ -105,8 +108,7 @@ test<br />
 test<br />
 </p>
 <ul><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li></ul></body></html>',
-        Result => '
-test
+        Result => 'test
 test
 test
 test
@@ -123,12 +125,12 @@ test
     },
     {
         Input  => "<pre>Some Text\n\nWith new Lines</pre>",
-        Result => "\nSome Text\n\nWith new Lines\n\n",
+        Result => "Some Text\n\nWith new Lines",
         Name   => 'ToAscii - <pre>'
     },
     {
         Input  => "<code>Some Text\n\nWith new Lines  </code><br />Some Other Text",
-        Result => "\nSome Text\n\nWith new Lines  \n\nSome Other Text",
+        Result => "Some Text\n\nWith new Lines  \nSome Other Text",
         Name   => 'ToAscii - <code>'
     },
     {
@@ -140,7 +142,7 @@ test
     {
         Input =>
             "<pre><a class=\"moz-txt-link-freetext\"\rhref=\"mailto:html\@example.com\">mailto:html\@example.com</a></pre>",
-        Result => "\n[1]mailto:html\@example.com\n\n\n\n[1] mailto:html\@example.com\n",
+        Result => "[1]mailto:html\@example.com\n\n[1] mailto:html\@example.com",
         Name   => 'ToAscii - <a class ... href ..>'
     },
     {
@@ -209,12 +211,12 @@ Fifth Line',
     },
     {
         Input  => '&#55357;&#56833;',
-        Result => '��',
+        Result => '😁',
         Name   => 'Incorrectly encoded GRINNING FACE WITH SMILING EYES (decimal)'
     },
     {
         Input  => '&#xD83D;&#xDE01;',
-        Result => '��',
+        Result => '😁',
         Name   => 'Invalid encoded GRINNING FACE WITH SMILING EYES (hex)'
     },
     {

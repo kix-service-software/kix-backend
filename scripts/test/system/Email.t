@@ -156,9 +156,11 @@ for my $Encoding ( '', qw(base64 quoted-printable 8bit) ) {
             Objects => ['Email']
         );
 
-        my ( $Header, $Body ) = $Kernel::OM->Get('Email')->Send(
+        my $Send = $Kernel::OM->Get('Email')->Send(
             %{ $Test->{Data} },
         );
+        my $Header = $Send->{HeadRef};
+        my $Body   = $Send->{BodyRef};
 
         # start MIME::Tools workaround
         ${$Body} =~ s/\n/\r/g;

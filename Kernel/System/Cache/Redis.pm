@@ -270,6 +270,9 @@ sub SetSemaphore {
         Key => $Param{Key} // $Param{ID}
     );
 
+    # reset stop reconnect flag to prevent endless loop
+    $Self->{StopReconnect} = 0;
+
     return $Self->_RedisCall('set', $PreparedKey, $Param{Value}, 'nx', 'px', $Param{Timeout});
 }
 
@@ -290,6 +293,9 @@ sub ClearSemaphore {
         %Param,
         Key => $Param{Key} // $Param{ID}
     );
+
+    # reset stop reconnect flag to prevent endless loop
+    $Self->{StopReconnect} = 0;
 
     my $Value = $Self->_RedisCall('get', $PreparedKey);
     return if ( $Value != $Param{Value} );
@@ -385,12 +391,12 @@ sub _RedisCall {
         return;
     }
 
+    return if $Self->{StopReconnect};
+
     my $MaxTries = $Self->{Config}->{'max_tries'} || 3;
     my $WaitBetweenTries = $Self->{Config}->{'wait_between_tries'} || 100;
     my $Result;
     my $Reconnect;
-
-    return if $Self->{StopReconnect};
 
     TRYLOOP:
     eval {

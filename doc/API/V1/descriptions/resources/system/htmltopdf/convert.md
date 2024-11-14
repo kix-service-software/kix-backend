@@ -24,6 +24,9 @@ This ressources don't support default includes, expands, limits. Only specific q
 |```<Current_Time>```| Returns the current date |
 |```<Current_User>```| Returns the full name of the trigger of the print job. |
 |```<Count>```|Returns the current count. (Basically used for article numbering)|
+|```<TIME_YYYYMMDD_hhmm>```| Returns the current time in the format ```YYYYMMDD_hhmm```|
+|```<TIME_YYYYMMDD>```| Returns the current time in the format ```YYYYMMDD```|
+|```<TIME_YYYYMMDDhhmm>```| Returns the current time in the format ```YYYYMMDDhhmm``` |
 |```<TIME_YYMMDD_hhmm>```| Returns the current time in the format ```YYYYMMDD_hhmm```|
 |```<TIME_YYMMDD>```| Returns the current time in the format ```YYYYMMDD```|
 |```<TIME_YYMMDDhhmm>```| Returns the current time in the format ```YYYYMMDDhhmm``` |

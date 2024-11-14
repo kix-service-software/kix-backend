@@ -29,71 +29,72 @@ $Helper->BeginWork();
 
 $Helper->UseTmpArticleDir();
 
-for my $Backend (qw(DB FS)) {
+my $Location = $ConfigObject->Get('Home')
+    . "/scripts/test/system/sample/PostMaster/UTF8Filename.box";
 
-    $ConfigObject->Set(
-        Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+my $ContentRef = $MainObject->FileRead(
+    Location => $Location,
+    Mode     => 'binmode',
+    Result   => 'ARRAY',
+);
+
+my $TicketID;
+{
+    my $PostMasterObject = Kernel::System::PostMaster->new(
+        Email => $ContentRef,
     );
 
-    my $Location = $ConfigObject->Get('Home')
-        . "/scripts/test/system/sample/PostMaster/UTF8Filename.box";
+    my @Return = $PostMasterObject->Run();
+    @Return = @{ $Return[0] || [] };
 
-    my $ContentRef = $MainObject->FileRead(
-        Location => $Location,
-        Mode     => 'binmode',
-        Result   => 'ARRAY',
-    );
-
-    my $TicketID;
-    {
-        my $PostMasterObject = Kernel::System::PostMaster->new(
-            Email => $ContentRef,
-        );
-
-        my @Return = $PostMasterObject->Run();
-        @Return = @{ $Return[0] || [] };
-
-        $TicketID = $Return[1];
-    }
-
-    $Self->True(
-        $TicketID,
-        "$Backend - Ticket created",
-    );
-
-    my @ArticleIDs = $TicketObject->ArticleIndex( TicketID => $TicketID );
-    $Self->True(
-        $ArticleIDs[0],
-        "$Backend - Article created",
-    );
-
-    my %Attachments = $TicketObject->ArticleAttachmentIndex(
-        ArticleID => $ArticleIDs[0],
-        UserID    => 1,
-    );
-
-    $Self->IsDeeply(
-        $Attachments{1},
-        {
-            ContentAlternative => '',
-            ContentID          => '',
-            Filesize           => '132 Bytes',
-            ContentType        => 'application/pdf; name="=?UTF-8?Q?Documentacio=CC=81n=2Epdf?="',
-            Filename           => 'Documentación.pdf',
-            FilesizeRaw        => '132',
-            Disposition        => 'attachment'
-        },
-        "$Backend - Attachment filename",
-    );
+    $TicketID = $Return[1];
 }
+
+$Self->True(
+    $TicketID,
+    "Ticket created",
+);
+
+my @ArticleIDs = $TicketObject->ArticleIndex( TicketID => $TicketID );
+$Self->True(
+    $ArticleIDs[0],
+    "Article created",
+);
+
+my %Attachments = $TicketObject->ArticleAttachmentIndex(
+    ArticleID                  => $ArticleIDs[0],
+    UserID                     => 1,
+    StripPlainBodyAsAttachment => 2,
+);
+
+my $AttachmentID;
+for my $AttachmentsKey ( keys( %Attachments ) ) {
+    if ( $Attachments{ $AttachmentsKey }->{Filename} eq 'Documentación.pdf' ) {
+        $AttachmentID = $AttachmentsKey;
+
+        last;
+    }
+}
+
+$Self->IsDeeply(
+    $Attachments{ $AttachmentID },
+    {
+        ContentAlternative => '',
+        ContentID          => '',
+        Filesize           => '132 Bytes',
+        ContentType        => 'application/pdf; name="=?UTF-8?Q?Documentacio=CC=81n=2Epdf?="',
+        Filename           => 'Documentación.pdf',
+        FilesizeRaw        => '132',
+        Disposition        => 'attachment',
+        ID                 => $AttachmentID
+    },
+    "Attachment filename",
+);
 
 # rollback transaction on database
 $Helper->Rollback();
 
 1;
-
-
 
 =back
 

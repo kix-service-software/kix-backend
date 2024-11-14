@@ -60,99 +60,83 @@ $Self->True(
     'ArticleCreate()',
 );
 
-# article attachment checks
-for my $Backend (qw(DB FS)) {
-
-    # make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-    $Kernel::OM->Get('Config')->Set(
-        Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+for my $File (
+    qw(Ticket-Article-Test1.xls Ticket-Article-Test1.txt Ticket-Article-Test1.doc
+    Ticket-Article-Test1.png Ticket-Article-Test1.pdf Ticket-Article-Test-utf8-1.txt Ticket-Article-Test-utf8-1.bin)
+    )
+{
+    my $Location = $Kernel::OM->Get('Config')->Get('Home')
+        . "/scripts/test/system/sample/Ticket/$File";
+    my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
+        Location => $Location,
+        Mode     => 'binmode',
     );
 
-    $Self->True(
-        $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
-        "TicketObject loaded the correct backend",
-    );
-
-    for my $File (
-        qw(Ticket-Article-Test1.xls Ticket-Article-Test1.txt Ticket-Article-Test1.doc
-        Ticket-Article-Test1.png Ticket-Article-Test1.pdf Ticket-Article-Test-utf8-1.txt Ticket-Article-Test-utf8-1.bin)
+    for my $FileName (
+        'SimpleFile',
+        'ÄÖÜカスタマ-',          # Unicode NFC
+        'Второй_файл',    # Unicode NFD
         )
     {
-        my $Location = $Kernel::OM->Get('Config')->Get('Home')
-            . "/scripts/test/system/sample/Ticket/$File";
-        my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
-            Location => $Location,
-            Mode     => 'binmode',
+        my $Content                = ${$ContentRef};
+        my $FileNew                = $FileName . $File;
+        my $MD5Orig                = $Kernel::OM->Get('Main')->MD5sum( String => $Content );
+        my $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+            Content     => $Content,
+            Filename    => $FileNew,
+            ContentType => 'image/png',
+            ArticleID   => $ArticleID,
+            UserID      => 1,
+        );
+        $Self->True(
+            $ArticleWriteAttachment,
+            "ArticleWriteAttachment() - $FileNew",
         );
 
-        for my $FileName (
-            'SimpleFile',
-            'ÄÖÜカスタマ-',          # Unicode NFC
-            'Второй_файл',    # Unicode NFD
-            )
-        {
-            my $Content                = ${$ContentRef};
-            my $FileNew                = $FileName . $File;
-            my $MD5Orig                = $Kernel::OM->Get('Main')->MD5sum( String => $Content );
-            my $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
-                Content     => $Content,
-                Filename    => $FileNew,
-                ContentType => 'image/png',
-                ArticleID   => $ArticleID,
-                UserID      => 1,
-            );
-            $Self->True(
-                $ArticleWriteAttachment,
-                "$Backend ArticleWriteAttachment() - $FileNew",
-            );
+        my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+            ArticleID => $ArticleID,
+            UserID    => 1,
+        );
 
-            my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-                ArticleID => $ArticleID,
-                UserID    => 1,
-            );
+        my $TargetFilename = $FileName . $File;
+        # Mac OS (HFS+) will store all filenames as NFD internally.
+        if ( $^O eq 'darwin' ) {
+            $TargetFilename = Unicode::Normalize::NFD($TargetFilename);
+        }
 
-            my $TargetFilename = $FileName . $File;
-
-            # Mac OS (HFS+) will store all filenames as NFD internally.
-            if ( $^O eq 'darwin' && $Backend eq 'FS' ) {
-                $TargetFilename = Unicode::Normalize::NFD($TargetFilename);
-            }
-
+        for my $AttachmentID ( sort( keys( %AttachmentIndex ) ) ) {
             $Self->Is(
-                $AttachmentIndex{1}->{Filename},
+                $AttachmentIndex{ $AttachmentID }->{Filename},
                 $TargetFilename,
-                "$Backend ArticleAttachmentIndex() Filename - $FileNew"
+                "ArticleAttachmentIndex() Filename - $FileNew"
             );
 
             my %Data = $Kernel::OM->Get('Ticket')->ArticleAttachment(
                 ArticleID    => $ArticleID,
-                AttachmentID => 1,
+                AttachmentID => $AttachmentID,
                 UserID       => 1,
             );
             $Self->True(
                 $Data{Content},
-                "$Backend ArticleAttachment() Content - $FileNew",
+                "ArticleAttachment() Content - $FileNew",
             );
             $Self->True(
                 $Data{ContentType},
-                "$Backend ArticleAttachment() ContentType - $FileNew",
+                "ArticleAttachment() ContentType - $FileNew",
             );
             $Self->True(
                 $Data{Content} eq $Content,
-                "$Backend ArticleWriteAttachment() / ArticleAttachment() - $FileNew",
+                "ArticleWriteAttachment() / ArticleAttachment() - $FileNew",
             );
             $Self->True(
                 $Data{ContentType} eq 'image/png',
-                "$Backend ArticleWriteAttachment() / ArticleAttachment() - $File",
+                "ArticleWriteAttachment() / ArticleAttachment() - $File",
             );
             my $MD5New = $Kernel::OM->Get('Main')->MD5sum( String => $Data{Content} );
             $Self->Is(
                 $MD5Orig || '1',
                 $MD5New  || '2',
-                "$Backend MD5 - $FileNew",
+                "MD5 - $FileNew",
             );
             my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
                 ArticleID => $ArticleID,
@@ -160,7 +144,7 @@ for my $Backend (qw(DB FS)) {
             );
             $Self->True(
                 $Delete,
-                "$Backend ArticleDeleteAttachment() - $FileNew",
+                "ArticleDeleteAttachment() - $FileNew",
             );
 
             %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
@@ -171,132 +155,114 @@ for my $Backend (qw(DB FS)) {
             $Self->IsDeeply(
                 \%AttachmentIndex,
                 {},
-                "$Backend ArticleAttachmentIndex() after delete - $FileNew"
+                "ArticleAttachmentIndex() after delete - $FileNew"
             );
         }
     }
 }
 
 # filename collision checks
-for my $Backend (qw(DB FS)) {
+# Store file 2 times
+my $FileName               = "[Terminology Guide äöß].pdf";
+my $Content                = '123';
+my $FileNew                = $FileName;
+my $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+    Content     => $Content,
+    Filename    => $FileNew,
+    ContentType => 'image/png',
+    ArticleID   => $ArticleID,
+    UserID      => 1,
+);
+$Self->True(
+    $ArticleWriteAttachment,
+    "ArticleWriteAttachment() - collision check created $FileNew",
+);
 
-    # Make sure that the TicketObject gets recreated for each loop.
-    $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+$ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+    Content     => $Content,
+    Filename    => $FileNew,
+    ContentType => 'image/png',
+    ArticleID   => $ArticleID,
+    UserID      => 1,
+);
+$Self->True(
+    $ArticleWriteAttachment,
+    "ArticleWriteAttachment() - collision check created $FileNew second time",
+);
 
-    $Kernel::OM->Get('Config')->Set(
-        Key   => 'Ticket::StorageModule',
-        Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
-    );
+my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
 
-    $Self->True(
-        $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
-        "TicketObject loaded the correct backend",
-    );
+# cleanup filename like article storage
+my $TargetFilename = '[Terminology Guide äöß]';
+$TargetFilename =~ s/ /_/g;
+$TargetFilename =~ s/^\.//g;
+$TargetFilename = $Kernel::OM->Get('Main')->FilenameCleanUp(
+    Filename => $TargetFilename,
+    Type     => 'Local',
+);
 
-    # Store file 2 times
-    my $FileName               = "[Terminology Guide äöß].pdf";
-    my $Content                = '123';
-    my $FileNew                = $FileName;
-    my $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
-        Content     => $Content,
-        Filename    => $FileNew,
-        ContentType => 'image/png',
-        ArticleID   => $ArticleID,
-        UserID      => 1,
-    );
-    $Self->True(
-        $ArticleWriteAttachment,
-        "$Backend ArticleWriteAttachment() - collision check created $FileNew",
-    );
+$Self->Is(
+    scalar keys %AttachmentIndex,
+    2,
+    "ArticleWriteAttachment() - collision check number of attachments",
+);
 
-    $ArticleWriteAttachment = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
-        Content     => $Content,
-        Filename    => $FileNew,
-        ContentType => 'image/png',
-        ArticleID   => $ArticleID,
-        UserID      => 1,
-    );
-    $Self->True(
-        $ArticleWriteAttachment,
-        "$Backend ArticleWriteAttachment() - collision check created $FileNew second time",
-    );
+my ($Entry1) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename.pdf" } keys %AttachmentIndex;
+my ($Entry2) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename-1.pdf" } keys %AttachmentIndex;
 
-    my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-        ArticleID => $ArticleID,
-        UserID    => 1,
-    );
+$Self->IsDeeply(
+    $AttachmentIndex{$Entry1},
+    {
+        'ID'                 => $Entry1,
+        'ContentAlternative' => '',
+        'ContentID'          => '',
+        'ContentType'        => 'image/png',
+        'Filename'           => "$TargetFilename.pdf",
+        'Filesize'           => '3 Bytes',
+        'FilesizeRaw'        => '3',
+        'Disposition'        => 'attachment',
+    },
+    "ArticleAttachmentIndex - collision check entry 1",
+);
 
-    my $TargetFilename = '[Terminology Guide äöß]';
+$Self->IsDeeply(
+    $AttachmentIndex{$Entry2},
+    {
+        'ID'                 => $Entry2,
+        'ContentAlternative' => '',
+        'ContentID'          => '',
+        'ContentType'        => 'image/png',
+        'Filename'           => "$TargetFilename-1.pdf",
+        'Filesize'           => '3 Bytes',
+        'FilesizeRaw'        => '3',
+        'Disposition'        => 'attachment',
+    },
+    "ArticleAttachmentIndex - collision check entry 2",
+);
 
-    if ( $Backend eq 'FS' ) {
+my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
 
-        $TargetFilename = '_Terminology_Guide_äöß_';
+$Self->True(
+    $Delete,
+    "ArticleDeleteAttachment()",
+);
 
-        # Mac OS (HFS+) will store all filenames as NFD internally.
-        if ( $^O eq 'darwin' ) {
-            $TargetFilename = Unicode::Normalize::NFD($TargetFilename);
-        }
-    }
+%AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+    ArticleID => $ArticleID,
+    UserID    => 1,
+);
 
-    $Self->Is(
-        scalar keys %AttachmentIndex,
-        2,
-        "$Backend ArticleWriteAttachment() - collision check number of attachments",
-    );
-
-    my ($Entry1) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename.pdf" } keys %AttachmentIndex;
-    my ($Entry2) = grep { $AttachmentIndex{$_}->{Filename} eq "$TargetFilename-1.pdf" }
-        keys %AttachmentIndex;
-
-    $Self->IsDeeply(
-        $AttachmentIndex{$Entry1},
-        {
-            'ContentAlternative' => '',
-            'ContentID'          => '',
-            'ContentType'        => 'image/png',
-            'Filename'           => "$TargetFilename.pdf",
-            'Filesize'           => '3 Bytes',
-            'FilesizeRaw'        => '3',
-            'Disposition'        => 'attachment',
-        },
-        "$Backend ArticleAttachmentIndex - collision check entry 1",
-    );
-
-    $Self->IsDeeply(
-        $AttachmentIndex{$Entry2},
-        {
-            'ContentAlternative' => '',
-            'ContentID'          => '',
-            'ContentType'        => 'image/png',
-            'Filename'           => "$TargetFilename-1.pdf",
-            'Filesize'           => '3 Bytes',
-            'FilesizeRaw'        => '3',
-            'Disposition'        => 'attachment',
-        },
-        "$Backend ArticleAttachmentIndex - collision check entry 2",
-    );
-
-    my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
-        ArticleID => $ArticleID,
-        UserID    => 1,
-    );
-
-    $Self->True(
-        $Delete,
-        "$Backend ArticleDeleteAttachment()",
-    );
-
-    %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-        ArticleID => $ArticleID,
-        UserID    => 1,
-    );
-
-    $Self->IsDeeply(
-        \%AttachmentIndex,
-        {},
-        "$Backend ArticleAttachmentIndex() after delete",
-    );
-}
+$Self->IsDeeply(
+    \%AttachmentIndex,
+    {},
+    "ArticleAttachmentIndex() after delete",
+);
 
 # rollback transaction on database
 $Helper->Rollback();

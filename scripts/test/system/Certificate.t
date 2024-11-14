@@ -31,11 +31,17 @@ for my $Method (
     );
 }
 
+# REMINDER:
+# If there are problems with the certificates, they may have expired.
+# Currently, they run until 2029 and 2034.
+# Furthermore, these are self-signed certificates.
+
 # begin transaction on database
 $Helper->BeginWork();
 
 my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
 my @Certificates = _ReadCertificates();
+my @Emails       = _ReadEmails();
 
 my @NegativTests = (
     # CERTIFICATECREATE
@@ -163,7 +169,7 @@ for my $Test ( @NegativTests ) {
 
 # Certificate: Create / Get / Exists
 my @CertificateIDs;
-my @Tests = (
+my @TestsCGE = (
     {
         Function => 'CertificateCreate',
         Data     => {
@@ -499,8 +505,7 @@ END
             'Fingerprint' => 'da:39:a3:ee:5e:6b:4b:0d:32:55:bf:ef:95:60:18:90:af:d8:07:09',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
-            'Type'        => 'Cert',
-            'Verify'      => 'OK'
+            'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CSR | application/pkcs10 / Certificate'
     },
@@ -519,7 +524,6 @@ END
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
             'Type'        => 'Cert',
-            'Verify'      => 'OK',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ3J6Q0NBWmNDQVFBd2FqRUxN
 QWtHQTFVRUJoTUNSRVV4RURBT0JnTlZCQWNNQjBWNFlXMXdiR1V4RURBTwpCZ05WQkFvTUIwVjRZ
@@ -671,11 +675,7 @@ END
     },
 );
 
-$Kernel::OM->ObjectsDiscard(
-    Objects => ['ObjectSearch'],
-);
-
-for my $Test ( @Tests ) {
+for my $Test ( @TestsCGE ) {
     my $Function = $Test->{Function};
 
     my $Data = $Test;
@@ -752,6 +752,490 @@ for my $Test ( @Tests ) {
 
     $Kernel::OM->ObjectsDiscard(
         Objects => ['Certificate'],
+    );
+}
+
+# Certificate: Sign / Encrypt / Verify / Decrypt
+my $IgnoreEmailPattern = $Kernel::OM->Get('Config')->Get('IgnoreEmailAddressesAsRecipients');
+my @TestsSE = (
+    {
+        Functions => [ 'Sign' ],
+        Data      => {
+            To       => 'friend@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => 'Certificate: Sign / no From / no sign'
+    },
+    {
+        Functions => [ 'Sign' ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'friend@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1
+        },
+        Expected => [
+            []
+        ],
+        Name     => 'Certificate: Sign / no sign'
+    },
+    {
+        Functions => [ 'Sign' ],
+        Data      => {
+            From     => 'example@unittest.org',
+            To       => 'friend@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1
+        },
+        Expected => [
+            [
+                {
+                    'Key'   => 'SMIMESigned',
+                    'Value' => 1
+                }
+            ]
+        ],
+        Name     => 'Certificate: Sign / no sign'
+    },
+    {
+        Functions => [ 'Encrypt' ],
+        Data      => {
+            From     => 'me@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 1,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            undef
+        ],
+        Name     => 'Certificate: Encrypt / encrypt and send / no to / no encrypted'
+    },
+    {
+        Functions => [ 'Encrypt' ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'friend@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 1,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                },
+                {
+                    'Key' => 'SMIMEEncryptedError',
+                    'Value' => 'Could not be sent, because no certificate found!'
+                }
+            ]
+        ],
+        Name     => 'Certificate: Encrypt / encrypt and send / no encrypted'
+    },
+    {
+        Functions => [ 'Encrypt' ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'example@unittest.org',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 1,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [
+                {
+                    'Key'   => 'SMIMEEncrypted',
+                    'Value' => 1
+                }
+            ]
+        ],
+        Name     => 'Certificate: Encrypt / encrypt and send / Encrypted'
+    },
+    {
+        Functions => [ 'Encrypt' ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'friend@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 2,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                },
+                {
+                    'Key' => 'SMIMEEncryptedError',
+                    'Value' => 'No certificate found!'
+                }
+            ]
+        ],
+        Name     => 'Certificate: Encrypt / encrypt if possible / no encrypted'
+    },
+    {
+        Functions => [ 'Encrypt' ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'example@unittest.org',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 2,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                }
+            ]
+        ],
+        Name     => 'Certificate: Encrypt / encrypt if possible / no encrypted'
+    },
+    {
+        Functions => [
+            'Sign',
+            'Encrypt'
+        ],
+        Data      => {
+            From     => 'me@example.com',
+            To       => 'me@example.com',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 2,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [],
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                },
+                {
+                    'Key' => 'SMIMEEncryptedError',
+                    'Value' => 'No certificate found!'
+                }
+            ]
+        ],
+        Name     => 'Certificate: Sign + Encrypt / encrypt if possible / no encrypted / no sign'
+    },
+    {
+        Functions => [
+            'Sign',
+            'Encrypt'
+        ],
+        Data      => {
+            From     => 'example@unittest.org',
+            To       => 'example@unittest.org',
+            Subject  => 'UnitTest Sign!',
+            MimeType => 'text/plain',
+            Charset  => 'utf-8',
+            Body     => 'Some nice text',
+            Silent   => 1,
+            Encrypt  => 2,
+            IgnoreEmailPattern => $IgnoreEmailPattern
+        },
+        Expected => [
+            [
+                {
+                    'Key' => 'SMIMESigned',
+                    'Value' => 1
+                }
+            ],
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                }
+            ]
+        ],
+        Name     => 'Certificate: Sign + Encrypt / encrypt if possible / encrypted / sign'
+    }
+);
+
+for my $Test ( @TestsSE ) {
+
+    my %Header;
+    # do some encode
+    ATTRIBUTE:
+    for my $Attribute (qw(From To Cc Subject)) {
+        next ATTRIBUTE if !$Test->{Data}->{$Attribute};
+        $Header{$Attribute} = $Kernel::OM->Get('Email')->_EncodeMIMEWords(
+            Field   => $Attribute,
+            Line    => $Header{$Attribute},
+            Charset => $Test->{Data}->{Charset},
+        );
+    }
+
+    $Header{'X-Mailer'}     = "UnitTest Mail Service";
+    $Header{'X-Powered-By'} = 'KIX (https://www.kixdesk.com/)';
+    $Header{Type}           = $Test->{Data}->{MimeType} || 'text/plain';
+    $Header{Encoding}       = 'quoted-printable';
+    $Header{'Message-ID'}   = $Kernel::OM->Get('Email')->_MessageIDCreate();
+
+    # add date header
+    $Header{Date} = 'Date: ' . $Kernel::OM->Get('Time')->MailTimeStamp();
+
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Test->{Data}->{Body} );
+    my $Entity = MIME::Entity->build(
+        %Header,
+        Data => $Test->{Data}->{Body}
+    );
+
+    my $Index = 0;
+    for my $Function ( @{ $Test->{Functions} } ) {
+        my %Result = $Kernel::OM->Get('Certificate')->$Function(
+            %{$Test->{Data}},
+            Entity => $Entity
+        );
+        $Self->IsDeeply(
+            $Result{Flags},
+            $Test->{Expected}->[$Index],
+            $Test->{Name}
+        );
+        $Index++;
+    }
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Certificate'],
+    );
+}
+
+# Certificate: Verify / Decrypt
+# NOTE: the certificates are only self signed
+my @TestsVD = (
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Verify / $Emails[0]->{Filename} / no Content / no verify" ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[0]},
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Verify / $Emails[0]->{Filename} / no Type / no verify" ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[0]},
+            Type   => 'Test',
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Verify / $Emails[0]->{Filename} / invalid Type / no verify" ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[0]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Verify / $Emails[0]->{Filename} / verified" ]
+    },
+    {
+        Functions => [ 'Decrypt' ],
+        Data      => {
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Decrypt / $Emails[1]->{Filename} / no Content / no decrypted" ]
+    },
+    {
+        Functions => [ 'Decrypt' ],
+        Data      => {
+            %{$Emails[1]},
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Decrypt / $Emails[1]->{Filename} / no Type / no decrypted" ]
+    },
+    {
+        Functions => [ 'Decrypt' ],
+        Data      => {
+            %{$Emails[1]},
+            Type   => 'Test',
+            Silent => 1
+        },
+        Expected => [
+            undef
+        ],
+        Name     => [ "Certificate: Decrypt / $Emails[1]->{Filename} / invalid Type / no decrypted" ]
+    },
+    {
+        Functions => [ 'Decrypt' ],
+        Data      => {
+            %{$Emails[1]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Key'   => 'SMIMEEncrypted',
+                    'Value' => 1
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Decrypt / $Emails[1]->{Filename} / encrypted" ]
+    },
+    {
+        Functions => [
+            'Decrypt',
+            'Verify'
+        ],
+        Data      => {
+            %{$Emails[0]},
+            Type => 'Email'
+        },
+        Expected => [
+            1,
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name => [
+            "Certificate: Decrypt + Verify / $Emails[0]->{Filename} / decryption / not encrypted",
+            "Certificate: Decrypt + Verify / $Emails[0]->{Filename} / verification / verified"
+        ]
+    },
+    {
+        Functions => [
+            'Decrypt',
+            'Verify'
+        ],
+        Data      => {
+            %{$Emails[1]},
+            Type => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Key' => 'SMIMEEncrypted',
+                    'Value' => 1
+                }
+            ],
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name => [
+            "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / decryption / decrypted",
+            "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / verification / verified"
+        ]
+    }
+);
+
+for my $Test ( @TestsVD ) {
+    my $Content = $Test->{Data}->{Content};
+    my $Index = 0;
+
+    for my $Function ( @{ $Test->{Functions} } ) {
+        my $Result = $Kernel::OM->Get('Certificate')->$Function(
+            %{$Test->{Data}},
+            Content => $Content
+        );
+
+        if ( IsArrayRef($Test->{Expected}->[$Index]) ) {
+            $Self->IsDeeply(
+                $Result->{Flags},
+                $Test->{Expected}->[$Index],
+                $Test->{Name}->[$Index]
+            );
+            $Content = $Result->{Content};
+        }
+        else {
+            $Self->Is(
+                $Result,
+                $Test->{Expected}->[$Index],
+                $Test->{Name}->[$Index]
+            );
+        }
+        $Index++;
+    }
+
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Certificate']
     );
 }
 
@@ -853,10 +1337,6 @@ my @DeleteTests = (
     },
 );
 
-$Kernel::OM->ObjectsDiscard(
-    Objects => ['ObjectSearch'],
-);
-
 for my $Test ( @DeleteTests ) {
     my $Function = $Test->{Function};
 
@@ -956,7 +1436,7 @@ sub _ReadCertificates {
 
     for my $File ( @Files ) {
         my $Content = $Kernel::OM->Get('Main')->FileRead(
-            Directory => $HomeDir . '/scripts/test/system/sample/Certificate',
+            Directory => $HomeDir . '/scripts/test/system/sample/Certificate/Certificates',
             Filename  => $File->{Filename},
             Mode      => 'binmode'
         );
@@ -973,6 +1453,56 @@ sub _ReadCertificates {
                 Filesize    => $File->{Filesize},
                 ContentType => $File->{ContentType},
                 Content     => MIME::Base64::encode_base64( ${$Content} )
+            }
+        )
+    }
+
+    return @List;
+}
+
+sub _ReadEmails {
+    my ( %Param ) = @_;
+
+    my @List;
+    my @Files = (
+        {
+            Filename    => 'UnitTest_Signed.box',
+            Filesize    => 4_279,
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Signed.box / Email'
+        },
+        {
+            Filename    => 'UnitTest_Encrypted_Signed.box',
+            Filesize    => 6_778,
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Encrypted_Signed.box / Email'
+        }
+    );
+
+    for my $File ( @Files ) {
+        my $Content = $Kernel::OM->Get('Main')->FileRead(
+            Directory => $HomeDir . '/scripts/test/system/sample/Certificate/Emails',
+            Filename  => $File->{Filename},
+            Mode      => 'binmode'
+        );
+
+        $Self->True(
+            $Content,
+            $File->{Name} . ' / Exists'
+        );
+
+        my @Email = split( /\n/sm, ${ $Content } );
+        for my $Line (@Email) {
+            $Line .= "\n";
+        }
+
+        push (
+            @List,
+            {
+                Filename    => $File->{Filename},
+                Filesize    => $File->{Filesize},
+                ContentType => $File->{ContentType},
+                Content     => \@Email
             }
         )
     }

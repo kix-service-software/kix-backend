@@ -72,6 +72,9 @@ sub LoadPreferences {
         $Self->{'DB::Connect'} = 'SET DATEFORMAT ymd';
     }
 
+    # set handling of null values for ascending order
+    $Self->{'DB::OrderByNull'} = 'FIRST';
+
     return 1;
 }
 

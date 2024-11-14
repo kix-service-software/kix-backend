@@ -224,19 +224,33 @@
             <Option Location="Kernel/System/ITSMConfigItem/Number/*.pm" SelectedID="Kernel::System::ITSMConfigItem::Number::AutoIncrement"></Option>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CINameRegex" Required="0" Valid="0">
-        <Description Translatable="1">Defines regular expressions individually for each ConfigItem class to check the ConfigItem name and to show corresponding error messages.</Description>
+
+    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::Number::ClassPrefixes" Required="0" Valid="1">
+        <Description Translatable="1">Configuration for configuration item number generator module "ClassPrefixes". Module generates incremental numbers with pattern &lt;SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is given, the class id is used.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Computer::CINameRegex">^ABC.*</Item>
-                <Item Key="Computer::CINameRegexErrorMessage">A computer name must start with ABC!</Item>
-                <Item Key="Hardware::CINameRegex">.*\d\d$</Item>
-                <Item Key="Hardware::CINameRegexErrorMessage">A hardware name must end with two digits!</Item>
+                <Item Key="CounterLength">4</Item>
+                <Item Key="DefaultPrefix"></Item>
+                <Item Key="IncludeSystemID">1</Item>
+                <Item Key="Prefixes">
+                    <Hash>
+                        <Item Key="Building">BLD</Item>
+                        <Item Key="Computer">CM</Item>
+                        <Item Key="Hardware">HW</Item>
+                        <Item Key="Location">LOC</Item>
+                        <Item Key="Network">NW</Item>
+                        <Item Key="Room">RM</Item>
+                        <Item Key="Service">SRV</Item>
+                        <Item Key="Software">SW</Item>
+                    </Hash>
+                </Item>
+                <Item Key="Separator"></Item>
             </Hash>
         </Setting>
     </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="LinkObject::DefaultSubObject###ITSMConfigItem" Required="1" Valid="1">
         <Description Translatable="1">Defines the default subobject of the class 'ITSMConfigItem'.</Description>
         <Group>ITSM</Group>
@@ -317,14 +331,6 @@
                 <Item Key="global">global</Item>
                 <Item Key="class">class</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::CustomModules###030-CustomModule" Required="0" Valid="1">
-        <Description Translatable="1">Overloads (redefines) existing functions in Kernel::System::ITSMConfigItem. Used to easily add customizations.</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::ITSMConfigItem</SubGroup>
-        <Setting>
-            <String Regex="">Kernel::System::PreEventHandler</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="AssignedConfigItemsMapping" Required="1" Valid="1">

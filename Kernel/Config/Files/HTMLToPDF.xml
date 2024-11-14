@@ -8,8 +8,6 @@
             <Hash>
                 <Item Key="Parameter">
                     <Array>
-                        <Item>-s</Item>
-                        <Item>A4</Item>
                         <Item>--images</Item>
                         <Item>--enable-internal-links</Item>
                         <Item>--enable-local-file-access</Item>
@@ -129,6 +127,16 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::HTMLToPDF::Render::Table</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="HTMLToPDF::Render::Module###List" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the render module that should be used to build special sections.</Description>
+        <Group>PDFConvert</Group>
+        <SubGroup>Core::HTMLToPDF::Render</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::HTMLToPDF::Render::List</Item>
             </Hash>
         </Setting>
     </ConfigItem>

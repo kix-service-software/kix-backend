@@ -89,6 +89,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # set fixed time to have predetermined verifiable results
 my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
     String => '2014-01-01 12:00:00',
@@ -165,10 +184,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id = 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -179,10 +199,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id <> 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -193,10 +214,11 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id IN (1)'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -207,10 +229,11 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id NOT IN (1)'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -221,10 +244,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id < 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -235,10 +259,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id > 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -249,10 +274,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id <= 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -263,10 +289,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Join'       => [],
+            'Where'      => [
                 'st.user_id >= 1'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -277,12 +304,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login = \'Test\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -293,12 +321,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login != \'Test\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -309,12 +338,13 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login IN (\'Test\')'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -325,12 +355,13 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login NOT IN (\'Test\')'
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -341,12 +372,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login LIKE \'Test%\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -356,13 +388,14 @@ my @SearchTests = (
             Operator => 'ENDSWITH',
             Value    => 'Test'
         },
-        Expected     => {
+        Expected         => {
             'Join' => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login LIKE \'%Test\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -373,12 +406,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login LIKE \'%Test%\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -389,12 +423,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id'
             ],
-            'Where' => [
+            'Where'      => [
                 'tou.login LIKE \'Test\''
-            ]
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -405,13 +440,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) = \'test\' OR LOWER(touc.firstname) = \'test\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) = \'test\' OR LOWER(touc.firstname) = \'test\')' : '(touc.lastname = \'test\' OR touc.firstname = \'test\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -422,13 +458,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) != \'test\' OR LOWER(touc.firstname) != \'test\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) != \'test\' OR LOWER(touc.firstname) != \'test\')' : '(touc.lastname != \'test\' OR touc.firstname != \'test\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -439,13 +476,14 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) IN (\'test\') OR LOWER(touc.firstname) IN (\'test\'))'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) IN (\'test\') OR LOWER(touc.firstname) IN (\'test\'))' : '(touc.lastname IN (\'test\') OR touc.firstname IN (\'test\'))'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -456,13 +494,14 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) NOT IN (\'test\') OR LOWER(touc.firstname) NOT IN (\'test\'))'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) NOT IN (\'test\') OR LOWER(touc.firstname) NOT IN (\'test\'))' : '(touc.lastname NOT IN (\'test\') OR touc.firstname NOT IN (\'test\'))'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -473,13 +512,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) LIKE \'test%\' OR LOWER(touc.firstname) LIKE \'test%\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'test%\' OR LOWER(touc.firstname) LIKE \'test%\')' : '(touc.lastname LIKE \'test%\' OR touc.firstname LIKE \'test%\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -490,13 +530,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) LIKE \'%test\' OR LOWER(touc.firstname) LIKE \'%test\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'%test\' OR LOWER(touc.firstname) LIKE \'%test\')' : '(touc.lastname LIKE \'%test\' OR touc.firstname LIKE \'%test\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -507,13 +548,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) LIKE \'%test%\' OR LOWER(touc.firstname) LIKE \'%test%\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'%test%\' OR LOWER(touc.firstname) LIKE \'%test%\')' : '(touc.lastname LIKE \'%test%\' OR touc.firstname LIKE \'%test%\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -524,270 +566,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tou ON tou.id = st.user_id',
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
-            'Where' => [
-                '(LOWER(touc.lastname) LIKE \'test\' OR LOWER(touc.firstname) LIKE \'test\')'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator EQ",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'EQ',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id = 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator NE",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'NE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id <> 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator IN",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'IN',
-            Value    => ['1']
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id IN (1)'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator !IN",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => '!IN',
-            Value    => ['1']
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id NOT IN (1)'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator LT",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'LT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id < 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator GT",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id > 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator LTE",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'LTE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id <= 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleID / Operator GTE",
-        Search       => {
-            Field    => 'ResponsibleID',
-            Operator => 'GTE',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join'  => [],
-            'Where' => [
-                'st.responsible_user_id >= 1'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator EQ",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'EQ',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(touc.lastname) LIKE \'test\' OR LOWER(touc.firstname) LIKE \'test\')' : '(touc.lastname LIKE \'test\' OR touc.firstname LIKE \'test\')'
             ],
-            'Where' => [
-                'tru.login = \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator NE",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'NE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login != \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator IN",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator !IN",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => '!IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login NOT IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator STARTSWITH",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login LIKE \'Test%\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator ENDSWITH",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login LIKE \'%Test\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator CONTAINS",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login LIKE \'%Test%\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field Responsible / Operator LIKE",
-        Search       => {
-            Field    => 'Responsible',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
-            ],
-            'Where' => [
-                'tru.login LIKE \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleName / Operator EQ",
-        Search       => {
-            Field    => 'ResponsibleName',
-            Operator => 'EQ',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
-                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
-            ],
-            'Where' => [
-                '(LOWER(truc.lastname) = \'test\' OR LOWER(truc.firstname) = \'test\')'
-            ]
+            'IsRelative' => undef
         }
     },
     {
@@ -798,64 +584,14 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
                 'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
-            'Where' => [
+            'Where'      => [
                 '(toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\')'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleName / Operator NE",
-        Search       => {
-            Field    => 'ResponsibleName',
-            Operator => 'NE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
-                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
-            'Where' => [
-                '(LOWER(truc.lastname) != \'test\' OR LOWER(truc.firstname) != \'test\')'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleName / Operator IN",
-        Search       => {
-            Field    => 'ResponsibleName',
-            Operator => 'IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
-                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
-            ],
-            'Where' => [
-                '(LOWER(truc.lastname) IN (\'test\') OR LOWER(truc.firstname) IN (\'test\'))'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleName / Operator !IN",
-        Search       => {
-            Field    => 'ResponsibleName',
-            Operator => '!IN',
-            Value    => ['Test']
-        },
-        Expected     => {
-             'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
-                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
-            ],
-            'Where' => [
-                '(LOWER(truc.lastname) NOT IN (\'test\') OR LOWER(truc.firstname) NOT IN (\'test\'))'
-            ]
+            'IsRelative' => 1
         }
     },
     {
@@ -866,30 +602,14 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
                 'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
-            'Where' => [
+            'Where'      => [
                 '(toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => "Search: valid search / Field ResponsibleName / Operator STARTSWITH",
-        Search       => {
-            Field    => 'ResponsibleName',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
-                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
-            'Where' => [
-                '(LOWER(truc.lastname) LIKE \'test%\' OR LOWER(truc.firstname) LIKE \'test%\')'
-            ]
+            'IsRelative' => 1
         }
     },
     {
@@ -900,13 +620,360 @@ my @SearchTests = (
             Value    => ['0','1']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
                 'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
-            'Where' => [
+            'Where'      => [
                 '((toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL) OR (toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\'))'
-            ]
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator EQ",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'      => [],
+            'Where'     => [
+                'st.responsible_user_id = 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator NE",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'NE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id <> 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator IN",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'IN',
+            Value    => ['1']
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id IN (1)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator !IN",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => '!IN',
+            Value    => ['1']
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id NOT IN (1)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator LT",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'LT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id < 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator GT",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id > 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator LTE",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'LTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id <= 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleID / Operator GTE",
+        Search       => {
+            Field    => 'ResponsibleID',
+            Operator => 'GTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [],
+            'Where'      => [
+                'st.responsible_user_id >= 1'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator EQ",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login = \'Test\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator NE",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login != \'Test\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator IN",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login IN (\'Test\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator !IN",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login NOT IN (\'Test\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator STARTSWITH",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login LIKE \'Test%\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator ENDSWITH",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login LIKE \'%Test\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator CONTAINS",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login LIKE \'%Test%\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Responsible / Operator LIKE",
+        Search       => {
+            Field    => 'Responsible',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
+            ],
+            'Where'      => [
+                'tru.login LIKE \'Test\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator EQ",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) = \'test\' OR LOWER(truc.firstname) = \'test\')' : '(truc.lastname = \'test\' OR truc.firstname = \'test\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator NE",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) != \'test\' OR LOWER(truc.firstname) != \'test\')' : '(truc.lastname != \'test\' OR truc.firstname != \'test\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator IN",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) IN (\'test\') OR LOWER(truc.firstname) IN (\'test\'))' : '(truc.lastname IN (\'test\') OR truc.firstname IN (\'test\'))'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator !IN",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+             'Join'      => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) NOT IN (\'test\') OR LOWER(truc.firstname) NOT IN (\'test\'))' : '(truc.lastname NOT IN (\'test\') OR truc.firstname NOT IN (\'test\'))'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleName / Operator STARTSWITH",
+        Search       => {
+            Field    => 'ResponsibleName',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join'       => [
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id',
+                'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
+            ],
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'test%\' OR LOWER(truc.firstname) LIKE \'test%\')' : '(truc.lastname LIKE \'test%\' OR truc.firstname LIKE \'test%\')'
+            ],
+            'IsRelative' => undef
         }
     },
     {
@@ -917,30 +984,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tru ON tru.id = st.responsible_user_id',
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
-            'Where' => [
-                '(LOWER(truc.lastname) LIKE \'%test\' OR LOWER(truc.firstname) LIKE \'%test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 1',
-        Search       => {
-            Field    => 'ResponsibleOutOfOffice',
-            Operator => 'EQ',
-            Value    => '1'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'%test\' OR LOWER(truc.firstname) LIKE \'%test\')' : '(truc.lastname LIKE \'%test\' OR truc.firstname LIKE \'%test\')'
             ],
-            'Where' => [
-                '(trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\')'
-            ]
+            'IsRelative' => undef
         }
     },
     {
@@ -951,30 +1002,14 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tru ON tru.id = st.responsible_user_id',
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
-            'Where' => [
-                '(LOWER(truc.lastname) LIKE \'%test%\' OR LOWER(truc.firstname) LIKE \'%test%\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 0',
-        Search       => {
-            Field    => 'ResponsibleOutOfOffice',
-            Operator => 'EQ',
-            Value    => '0'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'%test%\' OR LOWER(truc.firstname) LIKE \'%test%\')' : '(truc.lastname LIKE \'%test%\' OR truc.firstname LIKE \'%test%\')'
             ],
-            'Where' => [
-                '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
-            ]
+            'IsRelative' => undef
         }
     },
     {
@@ -985,13 +1020,50 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'INNER JOIN users tru ON tru.id = st.responsible_user_id',
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
-            'Where' => [
-                '(LOWER(truc.lastname) LIKE \'test\' OR LOWER(truc.firstname) LIKE \'test\')'
-            ]
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(truc.lastname) LIKE \'test\' OR LOWER(truc.firstname) LIKE \'test\')' : '(truc.lastname LIKE \'test\' OR truc.firstname LIKE \'test\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'ResponsibleOutOfOffice',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where'      => [
+                '(trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\')'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ResponsibleOutOfOffice / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'ResponsibleOutOfOffice',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+            ],
+            'Where'      => [
+                '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
+            ],
+            'IsRelative' => 1
         }
     },
     {
@@ -1002,13 +1074,14 @@ my @SearchTests = (
             Value    => ['0','1']
         },
         Expected     => {
-            'Join' => [
+            'Join'       => [
                 'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
                 'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
-            'Where' => [
+            'Where'      => [
                 '((trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL) OR (trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\'))'
-            ]
+            ],
+            'IsRelative' => 1
         }
     }
 );
@@ -1555,7 +1628,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => $CaseSensitive ? [$TicketID2] : [$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => "Search: Field Owner / Operator ENDSWITH / Value \$UserLogin2",
@@ -1945,7 +2018,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID2]
+        Expected => $CaseSensitive ? [$TicketID2] : [$TicketID1,$TicketID2,$TicketID3]
     },
     {
         Name     => "Search: Field Responsible / Operator ENDSWITH / Value \$UserLogin2",
@@ -2261,7 +2334,7 @@ my @IntegrationSortTests = (
                 Field => 'Owner'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Owner / Direction ascending',
@@ -2271,7 +2344,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Owner / Direction descending',
@@ -2281,7 +2354,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field OwnerName',
@@ -2290,7 +2363,7 @@ my @IntegrationSortTests = (
                 Field => 'OwnerName'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction ascending',
@@ -2300,7 +2373,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field OwnerName / Direction descending',
@@ -2310,7 +2383,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleID',
@@ -2348,7 +2421,7 @@ my @IntegrationSortTests = (
                 Field => 'Responsible'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Responsible / Direction ascending',
@@ -2358,7 +2431,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field Responsible / Direction descending',
@@ -2368,7 +2441,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     },
     {
         Name     => 'Sort: Field ResponsibleName',
@@ -2377,7 +2450,7 @@ my @IntegrationSortTests = (
                 Field => 'ResponsibleName'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction ascending',
@@ -2387,7 +2460,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TicketID1, $TicketID2, $TicketID3]
+        Expected => $CaseSensitive ? [$TicketID1,$TicketID2,$TicketID3] : [$TicketID3,$TicketID1,$TicketID2]
     },
     {
         Name     => 'Sort: Field ResponsibleName / Direction descending',
@@ -2397,7 +2470,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TicketID3, $TicketID2, $TicketID1]
+        Expected => $CaseSensitive ? [$TicketID3,$TicketID2,$TicketID1] : [$TicketID2,$TicketID1,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

@@ -21,28 +21,6 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $TextContent = $Kernel::OM->Get('Main')->FileRead(
-    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.txt',
-    Mode     => 'binmode'
-);
-$Self->True(
-    $TextContent,
-    'load test.txt',
-);
-my $TestPNGBase64 = ${$TextContent};
-my $PNGContent = $Kernel::OM->Get('Main')->FileRead(
-    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.png',
-    Mode     => 'binmode'
-);
-$Self->True(
-    $PNGContent,
-    'load test.png',
-);
-my $TestPNGBin = ${$PNGContent};
-my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
-    Data => $TestPNGBin
-);
-
 my $NameRandom  = $Helper->GetRandomID();
 my %MacroActions = (
     'test-macroaction-' . $NameRandom . '-1' => {
@@ -506,6 +484,123 @@ END
         Expected => {
             Result => '1
 3',
+        }
+    },
+    {
+        Name => 'jq filter with trailing whitespace',
+        MacroResults => {
+            Variable1 => '[
+  {
+    "id": "AEBVCP",
+    "value": "pending",
+    "input": "ChecklistState",
+    "description": null,
+    "title": "Subtask \"AEBVCP\""
+  },
+  {
+    "description": null,
+    "title": "Subtask \"CMS\"",
+    "input": "ChecklistState",
+    "value": "pending",
+    "id": "CMS"
+  },
+  {
+    "value": "pending",
+    "id": "CRM",
+    "description": null,
+    "title": "Subtask \"CRM\"",
+    "input": "ChecklistState"
+  },
+  {
+    "id": "Cognos_Controller",
+    "value": "pending",
+    "input": "ChecklistState",
+    "title": "Subtask \"Cognos_Controller\"",
+    "description": null
+  }
+]'
+        },
+        Data => {
+            Result => '${Variable1|jq([.[] :: select(.id=="CRM").value="OK"]) }',
+        },
+        Expected => {
+            Result => '[
+  {
+    "id": "AEBVCP",
+    "value": "pending",
+    "input": "ChecklistState",
+    "description": null,
+    "title": "Subtask \"AEBVCP\""
+  },
+  {
+    "description": null,
+    "title": "Subtask \"CMS\"",
+    "input": "ChecklistState",
+    "value": "pending",
+    "id": "CMS"
+  },
+  {
+    "value": "OK",
+    "id": "CRM",
+    "description": null,
+    "title": "Subtask \"CRM\"",
+    "input": "ChecklistState"
+  },
+  {
+    "id": "Cognos_Controller",
+    "value": "pending",
+    "input": "ChecklistState",
+    "title": "Subtask \"Cognos_Controller\"",
+    "description": null
+  }
+]',
+        }
+    },
+    {
+        Name => 'jq filter building json structure',
+        MacroResults => {
+            Variable1 => [
+                {
+                    type      => 'person',
+                    firstname => 'Max',
+                    lastname  => 'Mustermann',
+                    street    => 'Musterstrasse 11',
+                    zip       => '0815',
+                    city      => 'Musterstadt'
+                },
+                {
+                    type   => 'building',
+                    name   => 'Musterhaus',
+                    street => 'Musterstrasse 12',
+                    zip    => '0815',
+                    city   => 'Musterstadt'
+                },
+                {
+                    type      => 'person',
+                    firstname => 'Heike',
+                    lastname  => 'Musterfrau',
+                    street    => 'Musterstrasse 13',
+                    zip       => '0815',
+                    city      => 'Musterstadt'
+                }
+            ]
+        },
+        Data => {
+            Result => '${Variable1|JSON|jq(map(. :: select(.type=="person")) :: map({id: "0", name:(.firstname+" "+.lastname), address:(.street+", "+.zip+" "+.city)}))}',
+        },
+        Expected => {
+            Result => '[
+  {
+    "id": "0",
+    "name": "Max Mustermann",
+    "address": "Musterstrasse 11, 0815 Musterstadt"
+  },
+  {
+    "id": "0",
+    "name": "Heike Musterfrau",
+    "address": "Musterstrasse 13, 0815 Musterstadt"
+  }
+]',
         }
     },
     {

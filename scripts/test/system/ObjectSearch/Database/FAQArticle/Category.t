@@ -56,6 +56,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -606,7 +609,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID3]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => "Search: Field Category / Operator ENDSWITH / Value \$Category2",
@@ -684,7 +687,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2]
+        Expected => $CaseSensitive ? [$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     }
 );
 
@@ -713,7 +716,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CategoryID / Direction ascending',
@@ -724,7 +727,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CategoryID / Direction descending',
@@ -735,7 +738,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Category',
@@ -745,7 +748,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Category / Direction ascending',
@@ -756,7 +759,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2]
+        Expected => $CaseSensitive ? [$FAQArticleID1,$FAQArticleID3,$FAQArticleID2] : [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Category / Direction descending',
@@ -767,7 +770,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1]
+        Expected => $CaseSensitive ? [$FAQArticleID2,$FAQArticleID3,$FAQArticleID1] : [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

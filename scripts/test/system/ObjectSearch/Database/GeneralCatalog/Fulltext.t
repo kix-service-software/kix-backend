@@ -50,11 +50,20 @@ $Self->IsDeeply(
 );
 
 # Quoting ESCAPE character backslash
-my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
 my $Escape = "\\";
 if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -118,7 +127,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(gc.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(gc.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(gc.name LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR gc.general_catalog_class LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

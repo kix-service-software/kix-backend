@@ -79,6 +79,10 @@ sub LoadPreferences {
 
     # init sql setting on db connect
     $Self->{'DB::Connect'} = "SET standard_conforming_strings TO ON;\n SET NAMES 'utf8';";
+
+    # set handling of null values for ascending order
+    $Self->{'DB::OrderByNull'} = 'LAST';
+
     return 1;
 }
 
@@ -472,6 +476,9 @@ sub TableAlter {
 
             # remove possible default
             push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP DEFAULT";
+
+            # remove required
+            push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP NOT NULL";
 
             # investigate the default value
             my $Default = '';

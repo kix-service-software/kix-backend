@@ -296,16 +296,16 @@ for my $Test ( @Tests ) {
 
     if ( ref( $Test->{Result} ) ) {
         $Self->IsDeeply(
-            $Kernel::OM->Get('Automation')->{MacroResults}->{Object}->{Object},
+            $Kernel::OM->Get('Automation')->{MacroVariables}->{Object}->{Object},
             $Test->{Result},
-            $Test->{Name} . ': MacroExecute - macro result "Object.Object" of check macro',
+            $Test->{Name} . ': MacroExecute - macro variable "Object.Object" of check macro',
         );
     }
     else {
         $Self->Is(
-            $Kernel::OM->Get('Automation')->{MacroResults}->{Object}->{Object},
+            $Kernel::OM->Get('Automation')->{MacroVariables}->{Object}->{Object},
             $Test->{Result},
-            $Test->{Name} . ': MacroExecute - macro result "Object.Object" of check macro',
+            $Test->{Name} . ': MacroExecute - macro variable "Object.Object" of check macro',
         );
     }
 

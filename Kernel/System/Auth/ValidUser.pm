@@ -14,7 +14,6 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
-    'Config',
     'Log',
 );
 
@@ -33,21 +32,22 @@ sub new {
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{User} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need User!"
-        );
-        return;
-    }
-
     # get params
     my @Addresses = ( $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!' );
-    if ( IsArrayRefWithData($Param{RemoteAddresses}) ) {
+    if ( IsArrayRefWithData( $Param{RemoteAddresses} ) ) {
         @Addresses = @{ $Param{RemoteAddresses} };
     }
     my $AddrString = join(',', @Addresses);
+
+    # just a note
+    if ( !$Param{User} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => "[Auth::ValidUser] No User given. "
+                . "(REMOTE_ADDR: '$AddrString', Backend: '$Self->{Config}->{Name}')",
+        );
+        return;
+    }
 
     # check client IP whitelist if available
     if ( IsHashRefWithData($Self->{Config}->{Config}) && IsArrayRefWithData($Self->{Config}->{Config}->{RelevantClientIPs}) ) {
@@ -67,9 +67,9 @@ sub Auth {
         if ( !$Allowed ) {
             if ( $Self->{Debug} ) {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
-                    Message =>
-                        "Client IP does not match RelevantClientIPs config !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
+                    Priority => 'debug',
+                    Message  => "[Auth::ValidUser] Client IP does not match RelevantClientIPs config. "
+                        . "(REMOTE_ADDR: '$AddrString', Backend: '$Self->{Config}->{Name}')",
                 );
             }
             return;
@@ -90,9 +90,9 @@ sub Auth {
         if ( !$Allowed ) {
             if ( $Self->{Debug} ) {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
-                    Message =>
-                        "User: $Param{User} does not match RelevantUsers config !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
+                    Priority => 'debug',
+                    Message  => "[Auth::ValidUser] User '$Param{User}' does not match RelevantUsers config. "
+                        . "(REMOTE_ADDR: '$AddrString', Backend: '$Self->{Config}->{Name}')",
                 );
             }
             return;
@@ -103,12 +103,12 @@ sub Auth {
         User => $Param{User},
     );
 
-    # return on no user
+    # return on no valid user
     if ( !IsHashRefWithData(\%UserData) || $UserData{ValidID} != 1 ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message =>
-                "User: No $Param{User} !(REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
+            Message  => "[Auth::ValidUser] User '$Param{User}' is not a valid user. "
+                . "(REMOTE_ADDR: '$AddrString', Backend: '$Self->{Config}->{Name}')",
         );
         return;
     }
@@ -116,7 +116,8 @@ sub Auth {
     # log
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
-        Message  => "User: $Param{User} authentication ok (REMOTE_ADDR: $AddrString, Backend: \"$Self->{Config}->{Name}\").",
+        Message  => "[Auth::ValidUser] User '$Param{User}' authentication ok. "
+            . "(REMOTE_ADDR: '$AddrString', Backend: '$Self->{Config}->{Name}')",
     );
 
     return $Param{User};

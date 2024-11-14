@@ -56,175 +56,71 @@ sub GetAuthMethod {
 sub Auth {
     my ( $Self, %Param ) = @_;
 
-    # do nothing if we have no relevant data for us
-    return if !$Param{User};
-
     # get params
     my $User       = $Param{User}      || '';
     my $Pw         = $Param{Pw}        || '';
     my $RemoteAddr = $ENV{REMOTE_ADDR} || 'Got no REMOTE_ADDR env!';
     my $UserID     = '';
     my $GetPw      = '';
-    my $Method;
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # sql query
-    my $SQL = "SELECT $Self->{UserTableUserPW}, $Self->{UserTableUserID}, $Self->{UserTableUser} "
-        . " FROM "
-        . " $Self->{UserTable} "
-        . " WHERE "
-        . " valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) AND "
-        . " $Self->{UserTableUser} = '" . $DBObject->Quote($User) . "'";
-    $DBObject->Prepare( SQL => $SQL );
-
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $GetPw  = $Row[0];
-        $UserID = $Row[1];
-        $User   = $Row[2];
-    }
-
-    # get needed objects
-    my $EncodeObject = $Kernel::OM->Get('Encode');
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # crypt given pw
-    my $CryptedPw = '';
-    my $Salt      = $GetPw;
-    if (
-        $ConfigObject->Get('AuthModule::DB::CryptType')
-        && $ConfigObject->Get('AuthModule::DB::CryptType') eq 'plain'
-        )
-    {
-        $CryptedPw = $Pw;
-        $Method    = 'plain';
-    }
-
-    # md5, bcrypt or sha pw
-    elsif ( $GetPw !~ /^.{13}$/ ) {
-
-        # md5 pw
-        if ( $GetPw =~ m{\A \$.+? \$.+? \$.* \z}xms ) {
-
-            # strip Salt
-            $Salt =~ s/^(\$.+?\$)(.+?)\$.*$/$2/;
-            my $Magic = $1;
-
-            # encode output, needed by unix_md5_crypt() only non utf8 signs
-            $EncodeObject->EncodeOutput( \$Pw );
-            $EncodeObject->EncodeOutput( \$Salt );
-
-            if ( $Magic eq '$apr1$' ) {
-                $CryptedPw = apache_md5_crypt( $Pw, $Salt );
-                $Method = 'apache_md5_crypt';
-            }
-            else {
-                $CryptedPw = unix_md5_crypt( $Pw, $Salt );
-                $Method = 'unix_md5_crypt';
-            }
-
-        }
-
-        # sha256 pw
-        elsif ( $GetPw =~ m{\A .{64} \z}xms ) {
-
-            my $SHAObject = Digest::SHA->new('sha256');
-
-            # encode output, needed by sha256_hex() only non utf8 signs
-            $EncodeObject->EncodeOutput( \$Pw );
-
-            $SHAObject->add($Pw);
-            $CryptedPw = $SHAObject->hexdigest();
-            $Method    = 'sha256';
-        }
-
-        elsif ( $GetPw =~ m{^BCRYPT:} ) {
-
-            # require module, log errors if module was not found
-            if ( !$Kernel::OM->Get('Main')->Require('Crypt::Eksblowfish::Bcrypt') )
-            {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message =>
-                        "User: '$User' tried to authenticate with bcrypt but 'Crypt::Eksblowfish::Bcrypt' is not installed!",
-                );
-                return;
-            }
-
-            # get salt and cost from stored PW string
-            my ( $Cost, $Salt, $Base64Hash ) = $GetPw =~ m{^BCRYPT:(\d+):(.{16}):(.*)$}xms;
-
-            # remove UTF8 flag, required by Crypt::Eksblowfish::Bcrypt
-            $EncodeObject->EncodeOutput( \$Pw );
-
-            # calculate password hash with the same cost and hash settings
-            my $Octets = Crypt::Eksblowfish::Bcrypt::bcrypt_hash(
-                {
-                    key_nul => 1,
-                    cost    => $Cost,
-                    salt    => $Salt,
-                },
-                $Pw
-            );
-
-            $CryptedPw = "BCRYPT:$Cost:$Salt:" . Crypt::Eksblowfish::Bcrypt::en_base64($Octets);
-            $Method    = 'bcrypt';
-        }
-
-        # fallback: sha1 pw
-        else {
-
-            my $SHAObject = Digest::SHA->new('sha1');
-
-            # encode output, needed by sha1_hex() only non utf8 signs
-            $EncodeObject->EncodeOutput( \$Pw );
-
-            $SHAObject->add($Pw);
-            $CryptedPw = $SHAObject->hexdigest();
-            $Method    = 'sha1';
-        }
-    }
-
-    # crypt pw
-    else {
-
-        # strip Salt only for (Extended) DES, not for any of Modular crypt's
-        if ( $Salt !~ /^\$\d\$/ ) {
-            $Salt =~ s/^(..).*/$1/;
-        }
-
-        # encode output, needed by crypt() only non utf8 signs
-        $EncodeObject->EncodeOutput( \$Pw );
-        $EncodeObject->EncodeOutput( \$Salt );
-        $CryptedPw = crypt( $Pw, $Salt );
-        $Method = 'crypt';
-    }
-
-    # just in case for debug!
-    if ( $Self->{Debug} > 0 ) {
+    # just a note
+    if ( !$User ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message =>
-                "User: '$User' tried to authenticate with Pw: '$Pw' ($UserID/$Method/$CryptedPw/$GetPw/$Salt/$RemoteAddr)",
+            Message  => "[Auth::DB] No User given! "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
+        return;
     }
 
     # just a note
     if ( !$Pw ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User without Pw!!! (REMOTE_ADDR: $RemoteAddr)",
+            Message  => "[Auth::DB] User '$User' authentication without Pw! "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         return;
     }
 
-    # login note
-    elsif ( ( ($GetPw) && ($User) && ($UserID) ) && $CryptedPw eq $GetPw ) {
+    # get crypted password from database
+    my $SQL = "SELECT $Self->{UserTableUserPW}, $Self->{UserTableUserID}, $Self->{UserTableUser} "
+        . " FROM "
+        . " $Self->{UserTable} "
+        . " WHERE "
+        . " valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) AND "
+        . " $Self->{UserTableUser} = '" . $Kernel::OM->Get('DB')->Quote($User) . "'";
+    $Kernel::OM->Get('DB')->Prepare( SQL => $SQL );
 
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $GetPw  = $Row[0];
+        $UserID = $Row[1];
+        $User   = $Row[2];
+    }
+
+    # encode output, needed by sha256_hex() only non utf8 signs
+    $Kernel::OM->Get('Encode')->EncodeOutput( \$Pw );
+
+    # crypt given password with sha 256
+    my $SHAObject = Digest::SHA->new('sha256');
+    $SHAObject->add($Pw);
+    my $CryptedPw = $SHAObject->hexdigest();
+
+    # just in case for debug!
+    if ( $Self->{Debug} > 0 ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "[Auth::DB] User '$User' tried to authenticate. "
+                . "(Data: '$UserID'/'$CryptedPw'/'$GetPw', REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
+        );
+    }
+
+    # compare password
+    if ( ( ($GetPw) && ($User) && ($UserID) ) && $CryptedPw eq $GetPw ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User authentication ok (Method: $Method, REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\").",
+            Message  => "[Auth::DB] User '$User' authentication ok. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
         return $User;
     }
@@ -233,8 +129,8 @@ sub Auth {
     elsif ( ($UserID) && ($GetPw) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message =>
-                "User: $User authentication with wrong Pw!!! (Method: $Method, REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")"
+            Message  => "[Auth::DB] User '$User' authentication with wrong Pw. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')"
         );
         return;
     }
@@ -243,7 +139,8 @@ sub Auth {
     else {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
-            Message  => "User: $User doesn't exist or is invalid!!! (REMOTE_ADDR: $RemoteAddr, Backend: \"$Self->{Config}->{Name}\")"
+            Message  => "[Auth::DB] User '$User' doesn't exist or is invalid. "
+                . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')"
         );
         return;
     }

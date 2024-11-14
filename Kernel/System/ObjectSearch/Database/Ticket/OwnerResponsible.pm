@@ -197,6 +197,7 @@ sub Search {
 
     # prepare condition
     my $Condition;
+    my $IsRelative;
     # special handling for out of office attributes
     if (
         $Param{Search}->{Field} eq 'OwnerOutOfOffice'
@@ -274,6 +275,9 @@ sub Search {
         else {
             $Condition = $Conditions[0];
         }
+
+        # this kind of search is always relative
+        $IsRelative = 1;
     }
     # default handling
     else {
@@ -290,8 +294,9 @@ sub Search {
 
     # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Join       => \@SQLJoin,
+        Where      => [ $Condition ],
+        IsRelative => $IsRelative
     };
 }
 

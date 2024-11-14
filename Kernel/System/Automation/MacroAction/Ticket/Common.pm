@@ -18,11 +18,6 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Automation::MacroAction::Common);
 
 our @ObjectDependencies = (
-    'Config',
-    'Encode',
-    'Main',
-    'Queue',
-    'TemplateGenerator',
     'Ticket',
     'Log',
 );
@@ -41,23 +36,37 @@ Example:
 
 =cut
 
-sub _ConvertScalar2ArrayRef {
+sub _CheckParams {
     my ( $Self, %Param ) = @_;
 
-    # FIXME: check if correct
-    # BPMX-capeIT
-    #    my @Data = split /,/, $Param{Data};
-    my @Data = split( '/,/,', $Param{Data} );
+    return if !$Self->SUPER::_CheckParams(%Param);
 
-    # EO BPMX-capeIT
+    return 1 if ($Param{NoTicketIDCheckNeeded});
 
-    # remove any possible heading and tailing white spaces
-    for my $Item (@Data) {
-        $Item =~ s{\A\s+}{};
-        $Item =~ s{\s+\z}{};
+    # check needed stuff
+    if ( !$Param{TicketID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "_CheckParams: Need TicketID!",
+        );
+        return;
     }
 
-    return \@Data;
+    my $TicketNumber = $Kernel::OM->Get('Ticket')->TicketNumberLookup(
+        TicketID => $Param{TicketID},
+        UserID   => 1,
+        Silent   => 1
+    );
+
+    if (!$TicketNumber) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "_CheckParams: No ticket found with ID '$Param{TicketID}'!",
+        );
+        return;
+    }
+
+    return 1;
 }
 
 sub _ReplaceValuePlaceholder {

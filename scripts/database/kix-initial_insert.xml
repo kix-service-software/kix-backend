@@ -1013,6 +1013,15 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="ticket_history_type">
+        <Data Key="id" Type="AutoIncrement">38</Data>
+        <Data Key="name" Type="Quote">AddArticle</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- channel -->
     <Insert Table="channel">
@@ -1652,7 +1661,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[New Ticket: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket for team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket for team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">2</Data>
@@ -1660,7 +1669,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">3</Data>
@@ -1668,7 +1677,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received:[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A follow up message has been received: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; wrote:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">4</Data>
@@ -1676,7 +1685,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Unlock: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Lock timeout has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Lock timeout has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">5</Data>
@@ -1684,7 +1693,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Owner assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">6</Data>
@@ -1692,7 +1701,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Responsible assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket responsible: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket responsible: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">7</Data>
@@ -1700,7 +1709,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Update: <KIX_LAST_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>A new article has been added: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; wrote:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>A new article has been added: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; wrote:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">8</Data>
@@ -1708,7 +1717,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket assigned to team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket assigned to team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; wrote:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">9</Data>
@@ -1716,7 +1725,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Reminder: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">10</Data>
@@ -1724,7 +1733,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Reminder: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Reminder time has been reached: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">11</Data>
@@ -1742,7 +1751,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Neues Ticket: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Neues Ticket f&uuml;r Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Neues Ticket f&uuml;r Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">15</Data>
@@ -1750,7 +1759,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">16</Data>
@@ -1758,7 +1767,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_ARTICLE_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Eine Folgenachricht wurde empfangen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_ARTICLE_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_ARTICLE_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">17</Data>
@@ -1766,7 +1775,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Entsperrung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Entsperrzeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Entsperrzeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">18</Data>
@@ -1774,7 +1783,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Bearbeiter zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">19</Data>
@@ -1782,7 +1791,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Verantwortlicher zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Verantwortung f&uuml;r dieses Tickets &uuml;bertragen: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Verantwortung f&uuml;r dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">20</Data>
@@ -1790,7 +1799,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Aktualisierung: <KIX_LAST_Subject_64>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ein neuer Artikel wurde angelegt: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>&lt;KIX_TICKET_Title&gt;</p><br/><br/><p>&nbsp;</p><br/><br/><hr /><br/><p>&lt;KIX_AGENT_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_AGENT_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">21</Data>
@@ -1798,7 +1807,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket zugeordnet zu Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Ticket zugeordnet zu Team &lt;KIX_TICKET_Queue&gt;.</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p><br/><br/><hr /><br/><p>&lt;KIX_CUSTOMER_From&gt; schrieb:</p><br/><br/><p>&lt;KIX_CUSTOMER_Body&gt;</p><br/><br/><hr /><br/><p>&nbsp;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">22</Data>
@@ -1806,7 +1815,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Erinnerung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">23</Data>
@@ -1814,7 +1823,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Erinnerung: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: [&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Erinnerungszeitpunkt wurde erreicht: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">24</Data>
@@ -5379,6 +5388,113 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">9</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Duration in State and Team</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists of tickets with their durations in specified states and teams.</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+    "DataSource": {
+        "SQL": {
+            "any": "base64(U0VMRUNUIAogICAgdC50biBBUyAiVGlja2V0TnVtYmVyIiwKICAgIHRvcmcubmFtZSBBUyAiT3JnYW5pc2F0aW9uIiwKICAgIHQudGl0bGUgQVMgIlRpdGxlIiwKICAgIHRzLm5hbWUgQVMgIkN1cnJlbnRTdGF0ZSIsCiAgICB0cS5uYW1lIEFTICJDdXJyZW50VGVhbSIsCiAgICB0LmlkIEFTICJTdGF0ZUR1cmF0aW9uTmV3IiwKICAgIHQuaWQgQVMgIlN0YXRlQ291bnROZXciLAogICAgdC5pZCBBUyAiU3RhdGVEdXJhdGlvbk9wZW4iLAogICAgdC5pZCBBUyAiU3RhdGVDb3VudE9wZW4iLAogICAgdC5pZCBBUyAiU3RhdGVEdXJhdGlvblBlbmRpbmdSZW1pbmRlciIsCiAgICB0LmlkIEFTICJTdGF0ZUNvdW50UGVuZGluZ1JlbWluZGVyIiwKICAgIHQuaWQgQVMgIlRlYW1EdXJhdGlvblNlcnZpY2VEZXNrIiwKICAgIHQuaWQgQVMgIlRlYW1Db3VudFNlcnZpY2VEZXNrIgoKRlJPTSB0aWNrZXQgQVMgdApMRUZUIEpPSU4gb3JnYW5pc2F0aW9uIEFTIHRvcmcgT04gdC5vcmdhbmlzYXRpb25faWQgPSB0b3JnLmlkCklOTkVSIEpPSU4gdGlja2V0X3N0YXRlIEFTIHRzIE9OIHQudGlja2V0X3N0YXRlX2lkID0gdHMuaWQKSU5ORVIgSk9JTiBxdWV1ZSBBUyB0cSBPTiB0LnF1ZXVlX2lkID0gdHEuaWQKICAgICAgICAgICAgICAKV0hFUkUgKCAnJHtQYXJhbWV0ZXJzLk9yZ2FuaXNhdGlvbklETGlzdD8wfScgPSAnMCcgT1IgdC5vcmdhbmlzYXRpb25faWQgSU4gKCR7UGFyYW1ldGVycy5PcmdhbmlzYXRpb25JRExpc3Q / MH0pICkKICBBTkQgKCAnJHtQYXJhbWV0ZXJzLlR5cGVJRExpc3Q / MH0nID0gJzAnIE9SIHQudHlwZV9pZCBJTiAoJHtQYXJhbWV0ZXJzLlR5cGVJRExpc3Q / MH0pICkKICBBTkQgKCAnJHtQYXJhbWV0ZXJzLlN0YXRlSURMaXN0PzB9JyA9ICcwJyBPUiB0LnRpY2tldF9zdGF0ZV9pZCBJTiAoJHtQYXJhbWV0ZXJzLlN0YXRlSURMaXN0PzB9KSApCgpPUkRFUiBCWSB0LnRuOw ==)"
+        },
+        "OutputHandler":[
+            {
+                "States":[
+                    "new ",
+                    "open",
+                    "pending reminder"
+                ],
+                "Columns":[
+                    "StateDurationNew",
+                    "StateDurationOpen",
+                    "StateDurationPendingReminder"
+                ],
+                "Name": "TicketStateDuration"
+            },
+            {
+                "Name": "TicketStateCount",
+                "States":[
+                    "new",
+                    "open",
+                    "pending reminder"
+                ],
+                "Columns":[
+                    "StateCountNew",
+                    "StateCountOpen",
+                    "StateCountPendingReminder"
+                ]
+            },
+            {
+                "Name":"TicketTeamDuration",
+                "RelevantStates":["open"],
+                "StopStates":["closed"],
+                "Columns":["TeamDurationServiceDesk"],
+                "Teams":["Service Desk"]
+            },
+            {
+                "Columns":["TeamCountServiceDesk"],
+                "Teams":["Service Desk"],
+                "Name":"TicketTeamCount"
+            }
+        ]
+    },
+    "OutputFormats":{
+        "CSV":{
+            "Separator":", ",
+            "Quote":"\"",
+            "IncludeColumnHeader":1
+        }
+    },
+    "Parameters":[
+        {
+            "References":"Organisation.ID",
+            "Multiple":1,
+            "Default":null,
+            "DataType":"NUMERIC",
+            "ReadOnly":0,
+            "Label":"Organisations",
+            "Required":0,
+            "Name":"OrganisationIDList",
+            "PossibleValues":null
+        },
+        {
+            "References":"TicketType.ID",
+            "DataType":"NUMERIC",
+            "Multiple":1,
+            "Default":null,
+            "Required":0,
+            "Label":"Ticket Types",
+            "PossibleValues":null,
+            "Name":"TypeIDList",
+            "Description":null,
+            "ReadOnly":0
+        },
+        {
+            "ReadOnly":0,
+            "Description":null,
+            "PossibleValues":null,
+            "Name":"StateIDList",
+            "Required":0,
+            "Label":"Ticket States",
+            "DataType":"NUMERIC",
+            "Default":null,
+            "Multiple":1,
+            "References":"TicketState.ID"
+        }
+    ]
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
 <!-- assign type to initial organisation -->
 <Insert Table="dynamic_field_value">
     <Data Key="id" Type="AutoIncrement">1</Data>
@@ -5607,6 +5723,16 @@ DefaultValue:
     <Data Key="role_id">3</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/objectsearch]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/contacts]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -7056,6 +7182,16 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">2</Data>
     <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/cmdb]]></Data>
+    <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">2</Data>
+    <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/auth]]></Data>
     <Data Key="value">1</Data>
     <Data Key="create_by">1</Data>
@@ -7556,7 +7692,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">13</Data>
     <Data Key="type_id">3</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/tickets/*{Ticket.[Age,Articles,Changed,ContactID,Created,CreateTimeUnix,DynamicFields,OrganisationID,PriorityID,QueueID,StateID,TypeID,TicketNumber,Title,PendingTime]}]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>

@@ -45,5 +45,17 @@
             </Option>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::QRCodeLookUp::CollectionClasses" Required="0" Valid="1">
+        <Description Translatable="1">Controls QR code resolution behavior of the app. If an asset of a class, given by a key within this hash is scanned, the app tries to load not the scanned asset itself, but multiple assets or a single asset linked with the scanned asset. If value "multi" is set, the app loads multiple linked assets. If no or an empty value is set, the app loads only a single linked asset. If more than one asset is linked, the app does not load any of them. The scanned asset MUST NOT be linked with more than one other asset. In other words: "multi" allows as a collection, whereas none/empty behaves like an alias.</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>QRCodeLookUp</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Hash>
+                <Item Key="ClassName">multi</Item>
+                <Item Key="AssetTag"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
 </kix_config>

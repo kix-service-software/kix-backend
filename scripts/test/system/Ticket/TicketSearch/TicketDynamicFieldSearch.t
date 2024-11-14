@@ -798,6 +798,7 @@ $Self->IsDeeply(
 @TicketResultSearch = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
     UserType   => 'Agent',
+    Result     => 'ARRAY',
     Limit      => 100,
     Search     => {
         AND => [

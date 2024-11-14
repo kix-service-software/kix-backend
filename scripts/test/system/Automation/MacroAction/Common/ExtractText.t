@@ -210,9 +210,9 @@ for my $Test ( @Tests ) {
     );
 
     $Self->IsDeeply(
-        $Kernel::OM->Get('Automation')->{MacroResults}->{ExtractedText},
+        $Kernel::OM->Get('Automation')->{variables}->{ExtractedText},
         $Test->{Result},
-        $Test->{Name} . ': MacroExecute - macro result "ExtractedText"',
+        $Test->{Name} . ': MacroExecute - macro variables "ExtractedText"',
     );
 
     if ( $Test->{FixedTimeSet} ) {
