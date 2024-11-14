@@ -94,6 +94,7 @@ This returns something like:
         'ID'         => 2,
         'Type'       => 'Ticket',
         'Name'       => 'Test'
+        'Scope'      => '...',
         'ExecOrder'  => [],
         'Comment'    => '...',
         'ValidID'    => '1',
@@ -126,7 +127,7 @@ sub MacroGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT id, name, type, exec_order, comments, valid_id, create_time, create_by, change_time, change_by FROM macro WHERE id = ?",
+        SQL   => "SELECT id, name, type, scope, exec_order, comments, valid_id, create_time, create_by, change_time, change_by FROM macro WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
 
@@ -138,13 +139,14 @@ sub MacroGet {
             ID         => $Row[0],
             Name       => $Row[1],
             Type       => $Row[2],
-            ExecOrder  => $Row[3],
-            Comment    => $Row[4],
-            ValidID    => $Row[5],
-            CreateTime => $Row[6],
-            CreateBy   => $Row[7],
-            ChangeTime => $Row[8],
-            ChangeBy   => $Row[9],
+            Scope      => $Row[3],
+            ExecOrder  => $Row[4],
+            Comment    => $Row[5],
+            ValidID    => $Row[6],
+            CreateTime => $Row[7],
+            CreateBy   => $Row[8],
+            ChangeTime => $Row[9],
+            ChangeBy   => $Row[10],
         );
 
         # prepare ExecOrder
@@ -179,6 +181,7 @@ adds a new macro
     my $ID = $AutomationObject->MacroAdd(
         Name       => 'test',
         Type       => 'Ticket',
+        Scope      => '...'                                    # optional
         Comment    => '...',                                   # optional
         ValidID    => 1,                                       # optional
         UserID     => 123,
@@ -202,7 +205,8 @@ sub MacroAdd {
 
     # set default value
     $Param{ValidID} //= 1;
-    $Param{Comment} ||= '';
+    $Param{Comment} //= '';
+    $Param{Scope}   //= '';
 
     # check if this is a duplicate after the change
     my $ID = $Self->MacroLookup(
@@ -223,10 +227,10 @@ sub MacroAdd {
 
     # insert
     return if !$DBObject->Do(
-        SQL => 'INSERT INTO macro (name, type, comments, valid_id, create_time, create_by, change_time, change_by) '
-             . 'VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+        SQL => 'INSERT INTO macro (name, type, scope, comments, valid_id, create_time, create_by, change_time, change_by) '
+             . 'VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
-            \$Param{Name}, \$Param{Type}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
+            \$Param{Name}, \$Param{Type}, \$Param{Scope}, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{UserID}
         ],
     );
 
@@ -266,6 +270,7 @@ updates a macro
         ID         => 123,
         Name       => 'test'                                    # optional
         Type       => 'Ticket',                                 # optional
+        Scope      => '...'                                     # optional
         ExecOrder  => [],                                       # optional
         Comment    => '...',                                    # optional
         ValidID    => 1,                                        # optional
@@ -315,13 +320,14 @@ sub MacroUpdate {
 
     # set default value
     $Param{Comment} //= $Data{Comment};
-    $Param{Type}    ||= $Data{Type};
+    $Param{Type}    //= $Data{Type};
+    $Param{Scope}   //= $Data{Scope};
     $Param{ValidID} //= $Data{ValidID};
 
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key ( qw(Type Name Comment ValidID) ) {
+    for my $Key ( qw(Type Name Scope Comment ValidID) ) {
 
         next KEY if defined $Param{$Key} && $Data{$Key} eq $Param{$Key};
 
@@ -344,9 +350,9 @@ sub MacroUpdate {
 
     # update Macro in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE macro SET type = ?, name = ?, exec_order = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
+        SQL => 'UPDATE macro SET type = ?, name = ?, scope = ?, exec_order = ?, comments = ?, valid_id = ?, change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Type}, \$Param{Name}, \$ExecOrder, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
+            \$Param{Type}, \$Param{Name}, \$Param{Scope}, \$ExecOrder, \$Param{Comment}, \$Param{ValidID}, \$Param{UserID}, \$Param{ID}
         ],
     );
 
@@ -372,6 +378,7 @@ returns a hash of all macros
     my %Macros = $AutomationObject->MacroList(
         Valid => 1          # optional
         Type  => 'Ticket'   # optional
+        Scope => '...'      # optional
     );
 
 the result looks like
@@ -391,7 +398,7 @@ sub MacroList {
     my $Valid = $Param{Valid} ? 1 : 0;
 
     # create cache key
-    my $CacheKey = 'MacroList::' . $Valid;
+    my $CacheKey = 'MacroList::' . $Valid . '::' . ($Param{Type}||'') . '::' . ($Param{Scope}||'');
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -400,15 +407,19 @@ sub MacroList {
     );
     return %{$Cache} if $Cache;
 
-    my $SQL = 'SELECT id, name FROM macro';
+    my $SQL = 'SELECT id, name FROM macro WHERE 1=1';
 
     my @Bind;
     if ( $Param{Valid} ) {
-        $SQL .= ' WHERE valid_id = 1'
+        $SQL .= ' AND valid_id = 1'
     }
     if ( $Param{Type} ) {
-        $SQL .= $Param{Valid} ? ' AND type = ?' : ' WHERE type = ?';
+        $SQL .= ' AND type = ?';
         push(@Bind, \$Param{Type});
+    }
+    if ( $Param{Scope} ) {
+        $SQL .= ' AND scope = ?';
+        push(@Bind, \$Param{Scope});
     }
 
     return if !$Kernel::OM->Get('DB')->Prepare(
@@ -581,10 +592,12 @@ sub MacroIsExecutable {
 executes a macro
 
     my $Success = $AutomationObject->MacroExecute(
-        ID            => 123,        # the ID of the macro
-        ObjectID      => 123,        # the ID of the object to execute the macro onto
-        Variables     => {...}       # optional, these will be available as macro variables
-        UserID        => 1
+        ID             => 123,        # the ID of the macro
+        ObjectID       => 123,        # the ID of the object to execute the macro onto
+        Variables      => {...}       # optional, these will be available as macro variables
+        AdditionalData => {...}       # optional, these will be available as macro variables
+        EventData      => {...}       # optional, these will be available as macro variables
+        UserID         => 1
     );
 
 =cut
@@ -613,7 +626,7 @@ sub MacroExecute {
     if ( $Self->{MacroID} ) {
         push @{$Self->{ParentMacroID}}, $Self->{MacroID};
     } else {
-        $Self->{MacroResults} = {
+        $Self->{MacroVariables} = {
             RootObjectID   => $Param{RootObjectID} || $Param{ObjectID},
             ObjectID       => $Param{ObjectID},
             EventData      => $Param{EventData} || {},
@@ -625,8 +638,8 @@ sub MacroExecute {
 
     # add variables
     if ( IsHashRefWithData($Param{Variables}) ) {
-        $Self->{MacroResults} = {
-            %{$Self->{MacroResults}||{}},
+        $Self->{MacroVariables} = {
+            %{$Self->{MacroVariables}||{}},
             %{$Param{Variables}},
         }
     }
@@ -635,11 +648,11 @@ sub MacroExecute {
     $Self->{ObjectID} = $Param{ObjectID};
     my $OrgObjectID;
     if (
-        $Self->{MacroResults}->{ObjectID} &&
-        "$Self->{MacroResults}->{ObjectID}" ne "$Param{ObjectID}"
+        $Self->{MacroVariables}->{ObjectID} &&
+        "$Self->{MacroVariables}->{ObjectID}" ne "$Param{ObjectID}"
     ) {
-        $OrgObjectID = $Self->{MacroResults}->{ObjectID};
-        $Self->{MacroResults}->{ObjectID} = $Param{ObjectID};
+        $OrgObjectID = $Self->{MacroVariables}->{ObjectID};
+        $Self->{MacroVariables}->{ObjectID} = $Param{ObjectID};
     }
 
     # keep root object id
@@ -704,11 +717,6 @@ sub MacroExecute {
         Type => $CacheType
     );
 
-    # init variable filter if necessary
-    if ( !IsHashRefWithData($Self->{VariableFilter}) ) {
-        $Self->_GetVariableFilter();
-    }
-
     my $Success = $BackendObject->Run(
         ObjectID  => $Param{ObjectID},
         ExecOrder => $Macro{ExecOrder},
@@ -726,7 +734,7 @@ sub MacroExecute {
 
     # reset id e.g. if we are a sub macro and now finished
     if ($OrgObjectID) {
-        $Self->{MacroResults}->{ObjectID} = $OrgObjectID;
+        $Self->{MacroVariables}->{ObjectID} = $OrgObjectID;
     }
 
     # remove IDs from log reference
@@ -1000,62 +1008,6 @@ sub _LoadMacroTypeBackend {
     }
 
     return $Self->{MacroTypeModules}->{$Param{Name}};
-}
-
-sub _GetVariableFilter {
-    my ( $Self, %Param ) = @_;
-
-    $Self->{VariableFilter} = {};
-    my $VariableFilter = $Kernel::OM->Get('Config')->Get('Automation::VariableFilter');
-
-    if (IsHashRefWithData($VariableFilter)) {
-        for my $Filter (sort keys %{$VariableFilter}) {
-            next if (!$Filter);
-
-            if (!$VariableFilter->{$Filter}) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "No module given for variable filter \"$Filter\"!"
-                );
-                next;
-            }
-            next if ( !$Kernel::OM->Get('Main')->Require($VariableFilter->{$Filter}) );
-
-            my $Module = $VariableFilter->{$Filter}->new( %{$Self} );
-            if ( !$Module ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to create instance of $VariableFilter->{$Filter}!"
-                );
-                return;
-            }
-
-            if ( !$Module->can('GetFilterHandler') ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Module \"$VariableFilter->{$Filter}\" cannot \"GetFilterHandler\"!"
-                );
-                next;
-            }
-
-            my %Handler = $Module->GetFilterHandler();
-
-            for my $HandlerName ( keys %Handler ) {
-                next if (!$HandlerName);
-                if (
-                    !$Handler{$HandlerName} ||
-                    ref $Handler{$HandlerName} ne 'CODE'
-                ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "$HandlerName is no function!"
-                    );
-                    next;
-                }
-                $Self->{VariableFilter}->{$HandlerName} = $Handler{$HandlerName};
-            }
-        }
-    }
 }
 
 =item MacroLogList()

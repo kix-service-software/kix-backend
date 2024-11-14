@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="macro">
+        <ColumnAdd Name="scope" Required="false" Size="50" Type="VARCHAR"/>
+        <IndexAdd Name="macro_scope">
+            <IndexColumn Name="scope"/>
+        </IndexAdd>
+    </TableAlter>
+
+</database>

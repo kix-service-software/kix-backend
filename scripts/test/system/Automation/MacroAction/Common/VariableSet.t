@@ -139,16 +139,16 @@ for my $Test ( @Tests ) {
 
     if ( ref( $Test->{Result} ) ) {
         $Self->IsDeeply(
-            $Kernel::OM->Get('Automation')->{MacroResults}->{Variable},
+            $Kernel::OM->Get('Automation')->{MacroVariables}->{Variable},
             $Test->{Result},
-            $Test->{Name} . ': MacroExecute - macro result "Variable" of check macro',
+            $Test->{Name} . ': MacroExecute - macro variables "Variable" of check macro',
         );
     }
     else {
         $Self->Is(
-            $Kernel::OM->Get('Automation')->{MacroResults}->{Variable},
+            $Kernel::OM->Get('Automation')->{MacroVariables}->{Variable},
             $Test->{Result},
-            $Test->{Name} . ': MacroExecute - macro result "Variable" of check macro',
+            $Test->{Name} . ': MacroExecute - macro variables "Variable" of check macro',
         );
     }
 
