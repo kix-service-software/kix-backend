@@ -198,12 +198,13 @@ sub ExecuteBasePermissionModules {
             %Param, 
             BasePermissionQueueIDs => $BasePermissionQueueIDs,
             TicketID               => $Param{Data}->{TicketID},
-            UserID                 => $Self->{Authorization}->{UserID}
+            UserID                 => $Self->{Authorization}->{UserID},
+            ReturnType             => 'APIFilter'
         );
-        next PERMISSION_MODULE if !IsHashRefWithData($Result);
+        next PERMISSION_MODULE if ( !IsHashRefWithData($Result) );
 
         $Filter->{Ticket}->{OR} //= [];
-        push @{$Filter->{Ticket}->{OR}}, $Result;
+        push( @{ $Filter->{Ticket}->{OR} }, $Result );
     }
 
     return $Filter;

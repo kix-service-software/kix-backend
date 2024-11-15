@@ -176,6 +176,8 @@ sub BasePermissionRelevantObjectIDList {
 
     return if !@QueueIDs;
 
+    @QueueIDs = sort( $Kernel::OM->Get('Main')->GetUnique( @QueueIDs ) );
+
     return \@QueueIDs;
 }
 
