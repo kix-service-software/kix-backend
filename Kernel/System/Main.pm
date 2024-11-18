@@ -1646,7 +1646,7 @@ sub ReplaceVariables {
         my $VariableFilterValueIndex = 0;
 
         # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([-a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xs ) {
+        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|((?:[^\{\}]+|\{(?-1)\})*))?\})(.*?)$/xs ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
@@ -1714,6 +1714,10 @@ sub ApplyVariableFilters {
     my $Value = $Param{Data};
 
     foreach my $Filter ( @Filters ) {
+        # cleanup leading and trailing spaces
+        $Filter =~ s/^\s+|\s+$//;
+
+        # skip empty filter
         next if !$Filter;
 
         if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
@@ -1817,7 +1821,7 @@ sub ApplyVariableFilters {
                     Priority => 'error',
                     Message  => "Unknown filter \"$Filter\"!"
                 );
-                return;
+                return $Value;
             }
 
             $Value = $Self->{VariableFilters}->{$Filter}->(
@@ -1892,6 +1896,15 @@ sub _LoadVariableFilterHandler {
             next;
         }
         $Self->{VariableFilters}->{$HandlerName} = $Handler{$HandlerName};
+
+        # TODO: better solution needed for filtername with mismatching name
+        # check filtername
+        if (
+            $HandlerName ne $Param{Name}
+            && lc( $HandlerName ) eq lc( $Param{Name} )
+        ) {
+            $Self->{VariableFilters}->{ $Param{Name} } = $Handler{ $HandlerName };
+        }
     }
 }
 

@@ -21,6 +21,28 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+my $TextContent = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.txt',
+    Mode     => 'binmode'
+);
+$Self->True(
+    $TextContent,
+    'load test.txt',
+);
+my $TestPNGBase64 = ${$TextContent};
+my $PNGContent = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Automation/MacroAction/test.png',
+    Mode     => 'binmode'
+);
+$Self->True(
+    $PNGContent,
+    'load test.png',
+);
+my $TestPNGBin = ${$PNGContent};
+my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
+    Data => $TestPNGBin
+);
+
 my $NameRandom  = $Helper->GetRandomID();
 my %MacroActions = (
     'test-macroaction-' . $NameRandom . '-1' => {
@@ -165,7 +187,7 @@ $Self->False(
 my @Tests = (
     {
         Name => 'simple',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'test1_value',
         },
         Data => {
@@ -177,7 +199,7 @@ my @Tests = (
     },
     {
         Name => 'simple as part of a string',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'test1_value',
         },
         Data => {
@@ -189,7 +211,7 @@ my @Tests = (
     },
     {
         Name => 'array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 1,2,3
             ]
@@ -203,7 +225,7 @@ my @Tests = (
     },
     {
         Name => 'hash',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => 'test2'
             }
@@ -217,7 +239,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -238,7 +260,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes in text',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -259,7 +281,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes direct assignment of structure',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -284,7 +306,7 @@ my @Tests = (
     },
     {
         Name => 'nested variables (2 levels)',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => {
                     Test3 => 'found!'
@@ -304,7 +326,7 @@ my @Tests = (
     },
     {
         Name => 'nested variables (4 levels)',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => {
                     Test3 => 'found!'
@@ -339,7 +361,7 @@ my @Tests = (
     },
     {
         Name => 'nested variable in filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => '2022-10-01 12:22:33',
             Variable2 => 3,
             Variable3 => 'TimeStamp'
@@ -353,7 +375,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => 'test123',
         },
         Data => {
@@ -373,7 +395,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter with binary content containing pipe characters',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => $TestPNGBase64,
         },
         Data => {
@@ -385,7 +407,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter with binary content containing pipe characters in json-text',
-        MacroResults => {
+        MacroVariables => {
             Article => {
                 Attachments => [
                     {
@@ -435,7 +457,7 @@ END
     },
     {
         Name => 'JSON filter in text',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => {
                 key => 'test123',
             }
@@ -455,7 +477,7 @@ END
     },
     {
         Name => 'JSON filter as object assignment',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => {
                 key => 'test123',
             }
@@ -471,7 +493,7 @@ END
     },
     {
         Name => 'jq filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => '[
                 { "Key": 1, "Value": 1111, "Flag": "a" },
                 { "Key": 2, "Value": 2222, "Flag": "b" },
@@ -488,7 +510,7 @@ END
     },
     {
         Name => 'jq filter with trailing whitespace',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => '[
   {
     "id": "AEBVCP",
@@ -558,7 +580,7 @@ END
     },
     {
         Name => 'jq filter building json structure',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => [
                 {
                     type      => 'person',
@@ -605,7 +627,7 @@ END
     },
     {
         Name => 'Combine variables as array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'Test1',
             Test2 => 'Test2',
         },
@@ -618,7 +640,7 @@ END
     },
     {
         Name => 'Combine variables containing arrays as array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 'Test1.1',
                 'Test1.2'
@@ -637,7 +659,7 @@ END
     },
     {
         Name => 'Multiple line data without leading or trailing content on line with variable',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'Variable: 1',
         },
         Data => {
@@ -653,25 +675,19 @@ Static: 2',
     },
 );
 
-# load additional filter
-$AutomationObject->_GetVariableFilter();
-
 my $TestCount = 0;
 foreach my $Test ( @Tests ) {
     $TestCount++;
 
-    $AutomationObject->{MacroResults} = $Test->{MacroResults};
-
-    my %Data = %{$Test->{Data}};
-
-    $AutomationObject->_ReplaceResultVariables(
-        Data => \%Data,
+    my $DataRef = $Kernel::OM->Get('Main')->ReplaceVariables(
+        Data      => $Test->{Data},
+        Variables => $Test->{MacroVariables}
     );
 
     $Self->IsDeeply(
-        \%Data,
+        $DataRef,
         $Test->{Expected},
-        '_ReplaceResultVariables() Test "'.$Test->{Name}.'"',
+        'Main::ReplaceVariables() Test "'.$Test->{Name}.'"',
     );
 }
 
