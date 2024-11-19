@@ -210,7 +210,7 @@ for my $Test ( @Tests ) {
     );
 
     $Self->IsDeeply(
-        $Kernel::OM->Get('Automation')->{variables}->{ExtractedText},
+        $Kernel::OM->Get('Automation')->{MacroVariables}->{ExtractedText},
         $Test->{Result},
         $Test->{Name} . ': MacroExecute - macro variables "ExtractedText"',
     );
