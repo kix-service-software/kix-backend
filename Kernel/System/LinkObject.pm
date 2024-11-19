@@ -1456,12 +1456,25 @@ sub LinkSearch {
                  .($Param{TargetObject}||'').'::'
                  .($Param{TargetKey}||'').'::'
                  .($Param{Type}||'').'::'
-                 .($Param{Limit}||'');
+                 .($Param{Limit}||'')
+                 .($Param{Object}||'')
+                 .($Param{ObjectID}||'');
+
     my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
     return $Cache if $Cache;
+
+    # lookup for source and target
+    if ( $Param{Object} && $Param{ObjectID} ) {
+        my $ObjectID = $Self->ObjectLookup(
+            Name   => $Param{Object},
+        );
+
+        push(@BindVars, ( \$ObjectID, \$Param{ObjectID}), \$ObjectID, \$Param{ObjectID} );
+        push(@SQLWhere, '((source_object_id = ? AND source_key = ?) OR (target_object_id = ? AND target_key = ?))');
+    }    
 
     # lookup type id
     if ( $Param{Type} ) {
