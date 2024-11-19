@@ -610,7 +610,10 @@ sub ArticleCreate {
         }
 
         # send agent notification on adding a note
-        elsif ( $Param{HistoryType} =~ /^AddNote$/i ) {
+        elsif (
+            $Param{HistoryType} =~ /^AddArticle$/i
+            || $Param{HistoryType} =~ /^AddNote$/i
+        ) {
 
             # trigger notification event
             $Self->EventHandler(
