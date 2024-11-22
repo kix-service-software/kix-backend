@@ -378,13 +378,18 @@ my @SortTests = (
         Attribute => 'CreateBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
+                'INNER JOIN users fcru ON fcru.id = f.created_by',
+                'LEFT OUTER JOIN contact fcruc ON fcruc.user_id = fcru.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fcruc.lastname)',
+                'LOWER(fcruc.firstname)',
+                'LOWER(fcru.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fcruc.lastname',
+                'fcruc.firstname',
+                'fcru.login'
             ]
         }
     },
@@ -393,28 +398,38 @@ my @SortTests = (
         Attribute => 'CreatedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
+                'INNER JOIN users fcru ON fcru.id = f.created_by',
+                'LEFT OUTER JOIN contact fcruc ON fcruc.user_id = fcru.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fcruc.lastname)',
+                'LOWER(fcruc.firstname)',
+                'LOWER(fcru.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fcruc.lastname',
+                'fcruc.firstname',
+                'fcru.login'
             ]
         }
     },
     {
-        Name      => 'Sort: Attribute "CreateBy"',
+        Name      => 'Sort: Attribute "ChangeBy"',
         Attribute => 'ChangeBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
+                'INNER JOIN users fchu ON fchu.id = f.changed_by',
+                'LEFT OUTER JOIN contact fchuc ON fchuc.user_id = fchu.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fchuc.lastname)',
+                'LOWER(fchuc.firstname)',
+                'LOWER(fchu.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fchuc.lastname',
+                'fchuc.firstname',
+                'fchu.login'
             ]
         }
     },
@@ -423,13 +438,18 @@ my @SortTests = (
         Attribute => 'LastChangedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
+                'INNER JOIN users fchu ON fchu.id = f.changed_by',
+                'LEFT OUTER JOIN contact fchuc ON fchuc.user_id = fchu.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fchuc.lastname)',
+                'LOWER(fchuc.firstname)',
+                'LOWER(fchu.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fchuc.lastname',
+                'fchuc.firstname',
+                'fchu.login'
             ]
         }
     }
@@ -835,7 +855,7 @@ my @IntegrationSortTests = (
                 Field => 'CreatedUserIDs'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreatedUserIDs / Direction ascending',
@@ -845,7 +865,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreatedUserIDs / Direction descending',
@@ -855,7 +875,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CreateBy',
@@ -893,7 +913,7 @@ my @IntegrationSortTests = (
                 Field => 'LastChangedUserIDs'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field LastChangedUserIDs / Direction ascending',
@@ -903,7 +923,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field LastChangedUserIDs / Direction descending',
@@ -913,7 +933,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
     },
     {
         Name     => 'Sort: Field ChangeBy',
