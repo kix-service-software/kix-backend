@@ -1646,7 +1646,7 @@ sub ReplaceVariables {
         my $VariableFilterValueIndex = 0;
 
         # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|((?:[^\{\}]+|\{(?-1)\})*))?\})(.*?)$/xs ) {
+        while ( $Param{Data} =~ /^(.*)(\$\{([-a-zA-Z0-9_.,: ]+)(?:\|((?:[^\{\}]+|\{(?-1)\})*))?\})(.*?)$/xs ) {
             my $Leading    = $1;
             my $Expression = $2;
             my $Variable   = $3;
