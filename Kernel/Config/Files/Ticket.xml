@@ -256,6 +256,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###100-ForceAssignedOrganisation" Required="0" Valid="1">
+        <Description Translatable="1">Set primary organisation of contact, when set organisation is not assigned to the contact.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::ForceAssignedOrganisation</Item>
+                <Item Key="Event">Ticket(Create|ContactUpdate|OrganisationUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###110-TicketIndexUpdate" Required="0" Valid="1">
         <Description Translatable="1">Updates the ticket index.</Description>
         <Group>Ticket</Group>
