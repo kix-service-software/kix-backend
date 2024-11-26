@@ -661,6 +661,7 @@ sub CreateArticle {
         UserID         => $Param{UserID},
         Loop           => 1,
         Attachment     => $Param{Attachments},
+        DoNotSendEmail => 1,
         %{$Param{SecurityOptions}},
     );
 

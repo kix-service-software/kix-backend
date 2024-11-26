@@ -6162,6 +6162,7 @@ sub ArticleCopy {
         HistoryType    => 'Misc',
         HistoryComment => "Copied article $Param{ArticleID} from "
             . "ticket $Article{TicketID} to ticket $Param{TicketID}",
+        DoNotSendEmail => 1
     );
     return 'CopyFailed' if !$CopyArticleID;
 
