@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2024-11-25 09:49+0000\n"
+"POT-Creation-Date: 2024-11-26 14:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4648,6 +4648,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Type"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Set primary organisation of contact, when set organisation is not assigned to the contact."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
