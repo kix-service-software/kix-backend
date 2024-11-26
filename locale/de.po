@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-25 09:49+0000\n"
+"POT-Creation-Date: 2024-11-26 14:58+0000\n"
 "PO-Revision-Date: 2024-10-09 11:50+0000\n"
 "Last-Translator: fkrahl <Frank.Krahl@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -5820,6 +5820,12 @@ msgstr "Titel setzen"
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Type"
 msgstr "Typ setzen"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Set primary organisation of contact, when set organisation is not assigned "
+"to the contact."
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
