@@ -305,6 +305,14 @@ sub ArticleCreate {
             )
         }
 
+        # get From by ticket queue
+        if (!$Param{From} && $Param{SenderType} eq 'system') {
+            $Param{From} = $Self->_GetFromByQueue(
+                %Param,
+                Ticket => \%OldTicketData
+            )
+        }
+
         # check needed stuff
         for my $Needed (qw(TicketID UserID From Body Charset MimeType)) {
             if ( !$Param{$Needed} ) {
@@ -653,11 +661,14 @@ sub ArticleCreate {
         }
     }
 
-    # send article through email channel if it was created by an agent
+    # send article through email channel if it was created by an agent or the system
     if (
         !$Param{DoNotSendEmail}
         && $Param{Channel} eq 'email'
-        && $Param{SenderType} eq 'agent'
+        && (
+            $Param{SenderType} eq 'agent'
+            || $Param{SenderType} eq 'system'
+        )
     ) {
 
         # prepare body and charset
@@ -3634,6 +3645,45 @@ sub _GetFromByUser {
     } else {
         $Realname .= $Address{RealName};
     }
+
+    if ($Realname =~ m/[äÄöÖüÜß]/) {
+        $Realname =~ s/ä/ae/g;
+        $Realname =~ s/Ä/Ae/g;
+        $Realname =~ s/ö/oe/g;
+        $Realname =~ s/Ö/Oe/g;
+        $Realname =~ s/ü/ue/g;
+        $Realname =~ s/Ü/Ue/g;
+        $Realname =~ s/ß/ss/g;
+    }
+
+    return "\"$Realname\" <$Address{Email}>";
+}
+
+sub _GetFromByQueue {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(UserID Ticket) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
+        QueueID => $Param{Ticket}->{QueueID},
+        UserID  => $Param{UserID}
+    );
+    if (!IsHashRefWithData(\%Address)) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Cannot prepare "From" value, could not load system address!'
+        );
+    }
+
+    my $Realname = $Address{RealName};
 
     if ($Realname =~ m/[äÄöÖüÜß]/) {
         $Realname =~ s/ä/ae/g;
