@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-27 09:09+0000\n"
-"PO-Revision-Date: 2024-10-09 11:50+0000\n"
-"Last-Translator: fkrahl <Frank.Krahl@kixdesk.com>\n"
+"PO-Revision-Date: 2024-11-27 10:51+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -433,7 +433,7 @@ msgstr "Besitzer abwesend – Ticket entsperren"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Pattern"
-msgstr ""
+msgstr "Pattern"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Node"
@@ -1513,7 +1513,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "References"
-msgstr ""
+msgstr "Verweise"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "ReplyTo"
@@ -1594,7 +1594,7 @@ msgstr "Dynamic Field Value"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Object ID"
-msgstr ""
+msgstr "Objekt ID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid "Sets a dynamic field value of a ticket."
@@ -1944,7 +1944,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateCount.pm
 msgid "States"
-msgstr ""
+msgstr "Status"
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateCount.pm
 msgid "The columns in the raw data containing the TicketID to resolve."
@@ -2789,7 +2789,7 @@ msgstr "Alternativ zu"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Article"
-msgstr ""
+msgstr "Artikel"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "AssetReference"
