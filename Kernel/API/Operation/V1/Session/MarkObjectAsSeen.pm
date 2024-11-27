@@ -147,30 +147,11 @@ sub _SetTicketsAsSeen {
     my ( $Self, %Param ) = @_;
 
     for my $TicketID (@{$Param{TicketIDs}}) {
-
-        # mark also all articles as seen
-        my @ArticleList = $Kernel::OM->Get('Ticket')->ArticleIndex(
-            TicketID => $TicketID
-        );
-        if (IsArrayRefWithData(\@ArticleList)) {
-            my $ArticleSuccess = $Self->_SetArticlesAsSeen(
-                ArticleIDs => \@ArticleList,
-                TicketID   => $TicketID
-            );
-            if (!$ArticleSuccess) {
-                return 0;
-            }
-        }
-
-        my $Success = $Kernel::OM->Get('Ticket')->TicketFlagSet(
+        my $Success = $Kernel::OM->Get('Ticket')->MarkAsSeen(
             TicketID => $TicketID,
-            Key      => 'Seen',
-            Value    => 1,
             UserID   => $Self->{Authorization}->{UserID}
         );
-        if (!$Success) {
-            return 0;
-        }
+        return 0 if !$Success;
     }
     return 1;
 }

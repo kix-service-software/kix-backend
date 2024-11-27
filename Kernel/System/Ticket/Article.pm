@@ -2408,6 +2408,39 @@ sub ArticleFlagSet {
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
     );
 
+    # check if we have to set the ticket Seen flag as well
+    if ( $Param{Key} eq 'Seen' ) {
+        my $ArticleCount = $Self->ArticleCount(
+            TicketID => $Param{TicketID},
+        );
+
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+                af.article_id = a.id AND article_key = ? AND af.create_by = ?',
+            Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+            Limit => 1,
+        );
+
+        my $SeenCount;
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $SeenCount = $Row[0];
+        }
+        if ( $SeenCount == $ArticleCount ) {
+            my $Result = $Self->TicketFlagSet(
+                TicketID => $Param{TicketID},
+                Key      => 'Seen',
+                Value    => 1,
+                UserID   => $Param{UserID}
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to set Seen flag for TicketID $Param{TicketID}!"
+                );
+            }
+        }
+    }
+
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     if ( !$Param{NoEvents} ) {

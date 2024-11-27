@@ -5294,6 +5294,23 @@ sub TicketFlagSet {
         Key  => 'TicketFlag::' . $Param{TicketID},
     );
 
+    # cleanup cache of TicketFlagExists
+    my $CacheKeyPattern = 'TicketFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Key} . '::';
+    my @CacheKeys = $Kernel::OM->Get('Cache')->GetKeysForType(
+        Type => $Self->{CacheType},
+    );
+    KEY:
+    for my $Key ( @CacheKeys ) {
+        # skip not relevant keys
+        next KEY if ( $Key !~ m/^\Q$CacheKeyPattern\E/ );
+
+        # delete cache
+        $Kernel::OM->Get('Cache')->Delete(
+            Type => $Self->{CacheType},
+            Key  => $Key,
+        );
+    }
+
     # event
     $Self->EventHandler(
         Event => 'TicketFlagSet',
@@ -5385,6 +5402,24 @@ sub TicketFlagDelete {
             Key  => 'TicketFlag::' . $Param{TicketID},
         );
 
+        # cleanup cache of TicketFlagExists
+        my $CacheKeyPatternPart1 = 'TicketFlagExists::' . $Param{TicketID} . '::';
+        my $CacheKeyPatternPart2 = '::' . $Param{Flag} . '::';
+        my @CacheKeys = $Kernel::OM->Get('Cache')->GetKeysForType(
+            Type => $Self->{CacheType},
+        );
+        KEY:
+        for my $Key ( @CacheKeys ) {
+            # skip not relevant keys
+            next KEY if ( $Key !~ m/^\Q$CacheKeyPatternPart1\E.+\Q$CacheKeyPatternPart2\E/ );
+
+            # delete cache
+            $Kernel::OM->Get('Cache')->Delete(
+                Type => $Self->{CacheType},
+                Key  => $Key,
+            );
+        }
+
         for my $Record (@AllTicketFlags) {
 
             $Self->EventHandler(
@@ -5415,6 +5450,23 @@ sub TicketFlagDelete {
             Type => $Self->{CacheType},
             Key  => 'TicketFlag::' . $Param{TicketID},
         );
+
+        # cleanup cache of TicketFlagExists
+        my $CacheKeyPattern = 'TicketFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Key} . '::';
+        my @CacheKeys = $Kernel::OM->Get('Cache')->GetKeysForType(
+            Type => $Self->{CacheType},
+        );
+        KEY:
+        for my $Key ( @CacheKeys ) {
+            # skip not relevant keys
+            next KEY if ( $Key !~ m/^\Q$CacheKeyPattern\E/ );
+
+            # delete cache
+            $Kernel::OM->Get('Cache')->Delete(
+                Type => $Self->{CacheType},
+                Key  => $Key,
+            );
+        }
 
         $Self->EventHandler(
             Event => 'TicketFlagDelete',
@@ -6714,6 +6766,58 @@ sub GetAssignedTicketsForObject {
     }
 
     return \@AssignedTicketIDs;
+}
+
+=item MarkAsSeen()
+
+mark all articles and ticket as seen by the given user
+
+    my $Success = $TicketObject->MarkAsSeen(
+        TicketID => 1,
+        UserID   => 1
+    );
+=cut
+
+sub MarkAsSeen {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(TicketID UserID)) {
+        if ( !defined( $Param{$Needed} ) ) {
+            $Kernel::OM->Get('Log')->Log( 
+                Priority => 'error', 
+                Message => "Need $Needed!" 
+            );
+            return;
+        }
+    }
+
+    # mark also all articles as seen
+    my @ArticleIDs = $Self->ArticleIndex(
+        TicketID => $Param{TicketID}
+    );
+    foreach my $ArticleID ( @ArticleIDs ) {
+        my $Success = $Self->ArticleFlagSet(
+            ArticleID => $ArticleID,
+            TicketID  => $Param{TicketID},
+            Key       => 'Seen',
+            Value     => 1,
+            UserID    => $Param{UserID},
+            # for performance reasons - ticket flag update will trigger notification
+            Silent    => 1,
+            NoEvents  => 1
+        );
+        return 0 if !$Success;
+    }
+
+    # ticket should be marked as seen when all articles of the ticket are marked as seen
+    # somehow there are cases that all article are already marked, but not the ticket. force mark as seen
+    return $Self->TicketFlagSet(
+        TicketID => $Param{TicketID},
+        Key      => 'Seen',
+        Value    => 1,
+        UserID   => $Param{UserID}
+    );
 }
 
 sub DESTROY {
