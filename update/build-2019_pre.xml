@@ -2,7 +2,6 @@
 <database Name="kix">
 
     <Insert Table="ticket_history_type">
-        <Data Key="id" Type="AutoIncrement">38</Data>
         <Data Key="name" Type="Quote">AddArticle</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
