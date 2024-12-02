@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2024-12-2 14:58+0000\n"
+"POT-Creation-Date: 2024-12-2 15:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2407,6 +2407,10 @@ msgid "Checklist"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Checks if the headers \"In-Reply-To\" or \"References\" of a follow-up message contain a Message-ID of an article visible in the self service portal on this ticket. If so, the email is visible in the self service portal."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checks if the sender of a follow-up message is contained in agent database, and if so sets sender type \"agent\"."
 msgstr ""
 
@@ -4400,10 +4404,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Ignore article with system sender type for new article feature (e. g. auto responses or email notifications)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Is executed when an article is created in the \"Email\" channel. Checks whether at least one email reference (References and InReplyTo) is a message-id of a customer visible article at the same ticket. If Yes: The visibility of the article in the SSP is automatically activated (regardless of the agent's setting). If No: The visibility selected by the agent is not changed."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
