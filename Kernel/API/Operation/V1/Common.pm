@@ -639,8 +639,8 @@ sub PrepareData {
             # check requirement
             if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
-                $Result->{Message} = "Required parameter $Parameter is missing or undefined!",
-                    last;
+                $Result->{Message} = "Required parameter $Parameter is missing or undefined!";
+                last;
             }
             elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref( $Parameters{$Parameter}->{RequiredIfNot} ) eq 'ARRAY' ) {
                 my $AltParameterHasValue = 0;
@@ -652,8 +652,8 @@ sub PrepareData {
                 }
                 if ( !exists( $Data{$Parameter} ) && !$AltParameterHasValue ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!",
-                        last;
+                    $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!";
+                    last;
                 }
             }
 
@@ -668,7 +668,7 @@ sub PrepareData {
                 }
                 if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter is missing!",
+                    $Result->{Message} = "Required parameter $Parameter is missing!";
                     last;
                 }
             }
@@ -703,7 +703,7 @@ sub PrepareData {
                 );
                 if ( !$Object )  {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Parameter $Parameter is not a valid JSON object!",
+                    $Result->{Message} = "Parameter $Parameter is not a valid JSON object!";
                     last;
                 }
                 $Self->_SetParameter(
@@ -726,31 +726,31 @@ sub PrepareData {
             # check if we have an optional parameter that needs a value
             if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists( $Data{$Parameter} ) && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
-                $Result->{Message} = "Optional parameter $Parameter is used without a value!",
-                    last;
+                $Result->{Message} = "Optional parameter $Parameter is used without a value!";
+                last;
             }
 
             # check valid values
             if ( exists( $Data{$Parameter} ) && exists( $Parameters{$Parameter}->{OneOf} ) && ref( $Parameters{$Parameter}->{OneOf} ) eq 'ARRAY' ) {
                 if ( !grep( /^$Data{$Parameter}$/g, @{ $Parameters{$Parameter}->{OneOf} } ) ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Parameter $Parameter is not one of '" . ( join( ',', @{ $Parameters{$Parameter}->{OneOf} } ) ) . "'!",
-                        last;
+                    $Result->{Message} = "Parameter $Parameter is not one of '" . ( join( ',', @{ $Parameters{$Parameter}->{OneOf} } ) ) . "'!";
+                    last;
                 }
             }
             if ( exists( $Data{$Parameter} ) && exists( $Parameters{$Parameter}->{Format} ) ) {
                 if ( $Data{$Parameter} !~ /$Parameters{$Parameter}->{Format}/g ) {
                     $Result->{Success} = 0;
-                    $Result->{Message} = "Parameter $Parameter has the wrong format!",
-                        last;
+                    $Result->{Message} = "Parameter $Parameter has the wrong format!";
+                    last;
                 }
             }
 
             # check if we have an optional parameter that needs a value
             if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists( $Data{$Parameter} ) && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
-                $Result->{Message} = "Optional parameter $Parameter is used without a value!",
-                    last;
+                $Result->{Message} = "Optional parameter $Parameter is used without a value!";
+                last;
             }
         }
     }
@@ -793,6 +793,8 @@ sub SuppressSubResourceInclude {
         $Self->_Debug( $Self->{LevelIndent}, "suppress including of sub-resource \"$SubResource\"" );
         $Self->{SuppressSubResourceIncludes}->{lc($SubResource)} = 1;
     }
+
+    return;
 }
 
 =item IncludeSubResourceIfProperty()
@@ -831,6 +833,8 @@ sub IncludeSubResourceIfProperty {
             AdditionalParameters => $Param{AdditionalParameters}
         };
     }
+
+    return;
 }
 
 =item AutoExpandProperty()
@@ -863,6 +867,8 @@ sub AutoExpandProperty {
     };
     # add property to expansions
     $Self->{Expand}->{$Param{Property}} = 1;
+
+    return;
 }
 
 =item PreventInclude()
@@ -894,6 +900,8 @@ sub PreventInclude {
         $Self->_Debug( $Self->{LevelIndent}, "preventing include \"$Include\"" );
         delete $Self->{Include}->{$Include};
     }
+
+    return;
 }
 
 =item AddCacheDependency()
@@ -942,6 +950,8 @@ sub AddCacheDependency {
         }
         $Self->{CacheDependencies}->{$Type} = 1;
     }
+
+    return;
 }
 
 =item AddCacheKeyExtension()
@@ -978,6 +988,8 @@ sub AddCacheKeyExtension {
         push( @{ $Self->{CacheKeyExtensions} }, $Extension );
         $Self->_Debug($Self->{LevelIndent}, "adding cache key extension \"$Extension\"");
     }
+
+    return;
 }
 
 =item SetDefaultSort()
@@ -1034,7 +1046,7 @@ sub SetTotalItemCount {
     $Self->{TotalItemCount} //= {};
 
     foreach my $Object ( keys %Param ) {
-        $Self->{TotalItemCount}->{$Object} = $Param{$Object},
+        $Self->{TotalItemCount}->{$Object} = $Param{$Object};
     }
 
     return 1;
@@ -1052,6 +1064,8 @@ sub HandleSearchInAPI {
     my ( $Self, %Param ) = @_;
 
     $Self->{HandleSearchInAPI} = 1;
+
+    return;
 }
 
 =item HandleSortInCORE()
@@ -1066,6 +1080,8 @@ sub HandleSortInCORE {
     my ( $Self, %Param ) = @_;
 
     $Self->{HandleSortInCORE} = 1;
+
+    return;
 }
 
 =item ApplyPaging()
@@ -2110,6 +2126,8 @@ sub _ApplyOffset {
             $Param{Data}->{$Object} = \@ResultArray;
         }
     }
+
+    return;
 }
 
 sub _ApplyLimit {
@@ -2139,6 +2157,8 @@ sub _ApplyLimit {
             $Param{Data}->{$Object} = \@LimitedArray;
         }
     }
+
+    return;
 }
 
 sub _ApplySort {
@@ -2236,6 +2256,8 @@ sub _ApplySort {
             $Param{Data}->{$Object} = \@SortedArray;
         }
     }
+
+    return;
 }
 
 sub _ApplyInclude {
@@ -2513,17 +2535,19 @@ sub _ExpandObject {
             for my $EmailSplit ( $Self->{EmailParserObject}->SplitAddressLine( Line => $Data->{ $Param{AttributeToExpand} } ) ) {
                 my $Email = $Self->{EmailParserObject}->GetEmailAddress( Email => $EmailSplit );
 
-                my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                    Email  => $Email,
-                    Silent => 1
-                );
-                if ( $ContactID ) {
-                    push @Array, $ContactID
+                if ( $Email ) {
+                    my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                        Email  => $Email,
+                        Silent => 1
+                    );
+                    if ( $ContactID ) {
+                        push @Array, $ContactID
+                    }
+                    else {
+                        push @UnresolvedContacts, { Index => $Counter, Value => $EmailSplit };
+                    }
+                    $Counter++;
                 }
-                else {
-                    push @UnresolvedContacts, { Index => $Counter, Value => $EmailSplit };
-                }
-                $Counter++;
             }
         }
     }
@@ -2579,7 +2603,7 @@ sub _ExpandObject {
             if ( !$SourceAttr ) {
                 $SourceAttr = $TargetAttr;
             }
-            $ExecData{$TargetAttr} = $Data->{$SourceAttr},
+            $ExecData{$TargetAttr} = $Data->{$SourceAttr};
         }
     }
     if ( $Self->{AutoExpandProperty}->{$Param{AttributeToExpand}}->{AdditionalParameters} ) {
@@ -2604,6 +2628,9 @@ sub _ExpandObject {
     my $ResultData = $Result->{Data}->{ ( ( keys %{ $Result->{Data} } )[0] ) };
 
     if ( $Param{ExpanderConfig}->{Type} eq 'EmailAddressList' && @UnresolvedContacts ) {
+        if ( ref( $ResultData ) ne 'ARRAY' ) {
+            $ResultData = [ $ResultData ];
+        }
         foreach my $UnresolvedContact ( @UnresolvedContacts ) {
             splice @{$ResultData}, $UnresolvedContact->{Index}, 0, $UnresolvedContact->{Value};
         }
@@ -2899,7 +2926,7 @@ sub _ExecPermissionChecks {
     $Self->{'_ExecPermissionChecksCache'}->{$UserID} //= {};
 
     my $Allowed = 1;
-    CHECK:
+    CHECKENTRY:
     foreach my $Check ( @{$Param{Checks}} ) {
         my $Result;
         if ( exists $Self->{'_ExecPermissionChecksCache'}->{$UserID}->{$Check->{Check}} ) {
@@ -2919,7 +2946,7 @@ sub _ExecPermissionChecks {
         }
         if ( !$Result->{Success} ) {
             $Allowed = 0;
-            last CHECK;
+            last CHECKENTRY;
         }
     }
 
@@ -3827,7 +3854,7 @@ sub _RunParallel {
     # create parallel instances
     my %Workers;
     foreach my $WorkerID ( 1..$NumWorkers ) {
-        $Workers{$WorkerID}, threads->create(
+        $Workers{$WorkerID} = threads->create(
             sub {
                 my ( $Self, %Param ) = @_;
 
@@ -3933,6 +3960,8 @@ sub _Debug {
     $Indent ||= '';
 
     printf STDERR "%f (%5i) %-15s %s%s: %s\n", Time::HiRes::time(), $$, "[API]", $Indent, $Self->{OperationConfig}->{Name}, "$Message";
+
+    return;
 }
 
 sub _PermissionDebug {
@@ -3943,6 +3972,8 @@ sub _PermissionDebug {
     $Indent ||= '';
 
     printf STDERR "%f (%5i) %-15s %s%s\n", Time::HiRes::time(), $$, "[Permission]", $Indent, $Message;
+
+    return;
 }
 
 =item _CheckCustomerAssignedObject()
