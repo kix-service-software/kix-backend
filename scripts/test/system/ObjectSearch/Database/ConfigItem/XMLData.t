@@ -90,13 +90,7 @@ END
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'CurrentVersion.Data.NotSearchable'},
-    {
-        IsSearchable => 0,
-        IsSortable   => 0,
-        Operators    => [],
-        Class        => [ $Class ],
-        ClassID      => [ $ClassID ]
-    },
+    undef,
     'GetSupportedAttributes provides expected data for not searchable attribute'
 );
 $Self->IsDeeply(
