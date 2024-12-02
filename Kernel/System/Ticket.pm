@@ -5404,7 +5404,7 @@ sub TicketFlagDelete {
 
         # cleanup cache of TicketFlagExists
         my $CacheKeyPatternPart1 = 'TicketFlagExists::' . $Param{TicketID} . '::';
-        my $CacheKeyPatternPart2 = '::' . $Param{Flag} . '::';
+        my $CacheKeyPatternPart2 = '::' . $Param{Key} . '::';
         my @CacheKeys = $Kernel::OM->Get('Cache')->GetKeysForType(
             Type => $Self->{CacheType},
         );
