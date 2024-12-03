@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-3 06:40+0000\n"
-"PO-Revision-Date: 2024-11-27 10:51+0000\n"
-"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
+"PO-Revision-Date: 2024-12-03 07:26+0000\n"
+"Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -251,7 +251,7 @@ msgstr "Abgelaufen"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Admin"
-msgstr ""
+msgstr "FAQ Admin"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "FAQ Editor"
@@ -1370,14 +1370,16 @@ msgstr "Wert"
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) A message id the new article is a reply to."
 msgstr ""
+"(Optional) Die Message-ID eines Artikels auf die der neue Artikel antwortet."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) Message ids of references of the new article."
-msgstr ""
+msgstr "(optional) Referenzierende Message-IDs des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) Prevent sending of the new article by the system."
 msgstr ""
+"(Optional) Unterbindet des Versand des Artikels als Email durch das System."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -1390,6 +1392,7 @@ msgstr ""
 msgid ""
 "(Optional) The email address an answer should be send to of the new article."
 msgstr ""
+"(Optional) Die E-Mail Adresse, an die eine Antwort gesendet werden soll."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -1415,7 +1418,7 @@ msgstr "(Optional) Die E-Mail Adressen der Empfänger des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) The message id of the new article."
-msgstr ""
+msgstr "(Optional) Die Message-ID des neuen Artikels."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid ""
@@ -2194,15 +2197,15 @@ msgstr "Anzahl offener Tickets nach Status"
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of open tickets by team"
-msgstr ""
+msgstr "Anzahl offener Tickets nach Team"
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of open tickets in teams by priority"
-msgstr ""
+msgstr "Anzahl offener Tickets in Teams nach Priorität"
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets closed within the last 7 days"
-msgstr ""
+msgstr "Anzahl geschlossener Tickets der letzten 7 Tage"
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of tickets created within the last 7 days"
