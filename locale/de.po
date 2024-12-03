@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-3 07:24+0000\n"
-"PO-Revision-Date: 2024-12-03 07:26+0000\n"
+"PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -6096,55 +6096,55 @@ msgstr "Gebäude"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::AttachmentAdd"
-msgstr ""
+msgstr "Anhang (%s) hinzugefügt"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::AttachmentDelete"
-msgstr ""
+msgstr "Anhang (%s) gelöscht"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ConfigItemCreate"
-msgstr ""
+msgstr "Neues ConfigItem (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ConfigItemDelete"
-msgstr ""
+msgstr "ConfigItem (ID=%s) gelöscht"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::DefinitionUpdate"
-msgstr ""
+msgstr "Definition des ConfigItem aktualisiert (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::DeploymentStateUpdate"
-msgstr ""
+msgstr "Verwendungsstatus geändert (neu=%s; alt=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::IncidentStateUpdate"
-msgstr ""
+msgstr "Vorfallsstatus geändert (neu=%s; alt=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::LinkAdd"
-msgstr ""
+msgstr "Link auf %s (Typ=%s) hinzugefügt"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::LinkDelete"
-msgstr ""
+msgstr "Link auf %s (Typ=%s) gelöscht"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::NameUpdate"
-msgstr ""
+msgstr "Name geändert (neu=%s; alt=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ValueUpdate"
-msgstr ""
+msgstr "Attribut %s von \"%s\" auf \"%s\" geändert"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::VersionCreate"
-msgstr ""
+msgstr "Neue Version erzeugt (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::VersionDelete"
-msgstr ""
+msgstr "Version %s gelöscht"
 
 #. manual entry from templates.pot.manual
 msgid "Cannot create or update item, because it already exists."
