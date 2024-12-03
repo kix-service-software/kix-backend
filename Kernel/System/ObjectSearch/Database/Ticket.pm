@@ -69,6 +69,15 @@ sub GetBaseDef {
 sub GetPermissionDef {
     my ( $Self, %Param ) = @_;
 
+    # check needed stuff
+    for my $Needed ( qw( UserID UserType ) ) {
+        if ( !$Param{ $Needed } ) {
+            return {
+                Where => [ '0=1' ]
+            };
+        }
+    }
+
     # init collection for permission search parts
     my @PermissionSearchParts = ();
 
