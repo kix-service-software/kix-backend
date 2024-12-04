@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="xml_storage">
+        <ColumnChange NameOld="xml_key" NameNew="xml_key" Required="true" TypeOld="VARCHAR" Type="BIGINT"/>
+    </TableAlter>
+
+</database>
