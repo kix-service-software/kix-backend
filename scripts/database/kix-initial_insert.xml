@@ -5495,6 +5495,37 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
 
+    <Insert Table="report_definition">
+        <Data Key="id" Type="AutoIncrement">10</Data>
+        <Data Key="name" Type="Quote" Translatable="1">Number of open tickets by statetype</Data>
+        <Data Key="comments" Type="Quote" Translatable="1">Lists open tickets by statetype.</Data>
+        <Data Key="is_periodic">1</Data>
+        <Data Key="max_reports">1</Data>
+        <Data Key="datasource" Type="Quote">GenericSQL</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="config" Type="Quote"><![CDATA[
+{
+  "DataSource": {
+    "SQL": {
+      "any": "base64(U0VMRUNUIHRzdC5uYW1lIGFzIG5hbWUsIENvdW50KCopIGFzIGNvdW50IEZST00gdGlja2V0IHQKSU5ORVIgSk9JTiB0aWNrZXRfc3RhdGUgdHMgT04gdC50aWNrZXRfc3RhdGVfaWQ9dHMuaWQKSU5ORVIgSk9JTiB0aWNrZXRfc3RhdGVfdHlwZSB0c3QgT04gdHMudHlwZV9pZD10c3QuaWQKV0hFUkUgdHN0Lm5hbWUgSU4gKCduZXcnLCAnb3BlbicsJ3BlbmRpbmcgcmVtaW5kZXInLCAncGVuZGluZyBhdXRvJykKR1JPVVAgQlkgdHN0LmlkCk9SREVSIEJZIHRzdC5uYW1lOw==)"
+    }
+  },
+  "OutputFormats": {
+      "CSV": {
+          "IncludeColumnHeader": 1,
+          "Quote": "\"",
+          "Separator": ",",
+          "TranslateColumnNames": 0
+      }
+  }
+}
+]]></Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
+
 <!-- assign type to initial organisation -->
 <Insert Table="dynamic_field_value">
     <Data Key="id" Type="AutoIncrement">1</Data>
