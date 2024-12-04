@@ -1,15 +1,3 @@
-msgid "Failed to connect to the given host. Please check your KIX Url."
-msgstr "Verbindung zu KIX-Server konnte nicht hergestellt werden. Bitte prüfen Sie die angegebene Adresse."
-
-msgid "Firstname ({0})"
-msgstr "Vorname ({0})"
-
-msgid "Lastname ({0})"
-msgstr "Name ({0})"
-
-msgid "Signature ({0})"
-msgstr "Unterschrift ({0})"
-
 msgid "work report (complete)"
 msgstr "Arbeitsbericht (vollständig)"
 
@@ -17,46 +5,31 @@ msgid "work report (customer)"
 msgstr "Arbeitsbericht (Kunde)"
 
 msgid "work report (declined)"
-msgstr "Arbeitsbericht (abgelehnt)"
+msgstr "Arbeitsbericht (Ablehnung)"
 
 msgid "KIX Field Agent User"
 msgstr "KIX Field Agent Nutzer"
 
 msgid "Time Accounting"
-msgstr "Zeitbuchungen"
+msgstr "Zeiterfassung"
 
 msgid "Working Notes"
 msgstr "Arbeitsnotizen"
 
-msgid "Signature"
-msgstr "Unterschrift"
+msgid "Time tracking stopped automatically."
+msgstr "Zeiterfassung autom. gestoppt"
 
-msgid "Risk Assumption"
-msgstr "Gefahrenübergang"
-
-msgid "Customer Visible"
-msgstr "Sichtbar für Kunde"
-
-msgid "Begin"
-msgstr "Beginn"
-
-msgid "End"
-msgstr "Ende"
+msgid "Task"
+msgstr "Aufgabe"
 
 msgid "Duration (hh:mm)"
-msgstr "Dauer (HH:mm)"
+msgstr "Dauer (hh:mm)"
 
-msgid "Note"
-msgstr "Notiz"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
+msgid "Work report"
+msgstr "Arbeitsbericht"
 
 msgid "Total"
-msgstr "Total"
+msgstr "Summe"
 
 msgid "Attached as: "
 msgstr "Angehangen als: "
@@ -64,26 +37,14 @@ msgstr "Angehangen als: "
 msgid "Signature ({0} {1}) - {2}"
 msgstr "Unterschrift ({0} {1}) - {2}"
 
-msgid "min"
-msgstr "min"
-
-msgid "h"
-msgstr "h"
-
 msgid "Required"
-msgstr "Erforderlich"
+msgstr "Pflicht"
 
 msgid "Abort"
 msgstr "Abbrechen"
 
 msgid "Remove"
-msgstr "Löschen"
-
-msgid "Ok"
-msgstr "OK"
-
-msgid "Yes"
-msgstr "Ja"
+msgstr "Entfernen"
 
 msgid "Save"
 msgstr "Sichern"
@@ -94,14 +55,23 @@ msgstr "Stopp"
 msgid "Confirm"
 msgstr "Bestätigen"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Search"
-msgstr "Suchen"
-
 msgid "Reload"
 msgstr "Neu Laden"
+
+msgid "Continue"
+msgstr "Fortsetzen"
+
+msgid "Enable Location Tracking"
+msgstr "Lokationsverfolgung aktivieren"
+
+msgid "Disable Location Tracking"
+msgstr "Lokationsverfolgung deaktivieren"
+
+msgid "Attachments are too large. Please remove some attachments."
+msgstr "Anhänge sind zu groß. Bitte entfernen Sie einige."
+
+msgid "Data usage"
+msgstr "Datennutzung"
 
 msgid "Error"
 msgstr "Fehler"
@@ -109,29 +79,17 @@ msgstr "Fehler"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Risk Assumption"
-msgstr "Gefahrenübergang"
+msgid "My Tickets"
+msgstr "Meine Tickets"
 
-msgid "Work report"
-msgstr "Arbeitsbericht"
+msgid "Other Tickets"
+msgstr "Tickets anderer"
 
 msgid "Preview"
 msgstr "Vorschau"
 
-msgid "Articles"
-msgstr "Artikel"
-
 msgid "CI"
-msgstr "Asset"
-
-msgid "Contact"
-msgstr "Kontakt"
-
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "FAQ"
-msgstr "FAQ"
+msgstr "Asset/Gerät"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -142,17 +100,92 @@ msgstr "Notiz Bearbeiten"
 msgid "All Tickets ({0})"
 msgstr "Alle Tickets ({0})"
 
+msgid "Other Tickets in Team"
+msgstr "Andere Teamtickets"
+
+msgid "All Assets ({0})"
+msgstr "Alle Geräte ({0})"
+
+msgid "Location usage"
+msgstr "Lokationsverwendung"
+
+msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background. You can always change this in the app's settings."
+msgstr "Diese App sammelt Standortdaten, um Ihren aktuellen Standort an Ihr Backoffice-Team zu melden. So kann das Backoffice die Agenten in die Nähe des Einsatzorts schicken. Dies gilt auch, wenn die App im Hintergrund läuft. Sie können dies jederzeit in den App-Einstellungen ändern."
+
+msgid "The app accesses images in the device's gallery or the camera in order to attach them to reports and to enable processing of the report. All images are sent to your KIX service system when the ticket is uploaded."
+msgstr "Die App greift auf Bilder aus der Galerie des Geräts oder der Kamera zu, um diese an Meldungen anzuhängen und die Bearbeitung der Meldung zu ermöglichen. Alle Bilder werden beim Hochladen des Tickets an Ihr KIX-Servicesystem gesendet."
+
+msgid "The app accesses files in the device's file system whenever you choose to select files, in order to attach them to reports and to enable processing of the report. All files are sent to your KIX service system when the ticket is uploaded."
+msgstr "Bei jeder Dateiauswahl greift die App auf Dateien im Dateisystem des Geräts zu, um diese an Berichte anzuhängen und die Bearbeitung des Berichts zu ermöglichen. Alle Dateien werden beim Hochladen des Tickets an Ihr KIX-Servicesystem gesendet."
+
+msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
+msgstr "Diese App sammelt Standortdaten, um Ihren aktuellen Standort an Ihr Backoffice-Team zu melden. So kann das Backoffice die Agenten in die Nähe des Einsatzortes schicken. Dies gilt auch, wenn die App im Hintergrund läuft."
+
+msgid "Files"
+msgstr "Dateien"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "The ticket is not in the correct state to initiate a download."
+msgstr "Das Ticket weist nicht den richtigen Status auf, um einen Download zu starten."
+
+msgid "The ticket with the number {0} is still checked out. Please finish this ticket first."
+msgstr "Das Ticket mit der Nummer {0} ist noch ausgecheckt. Bitte schließen Sie dieses Ticket zuerst ab."
+
+msgid "The ticket is still checked out. Please finish this ticket first."
+msgstr "Das Ticket ist noch ausgecheckt. Bitte schließen Sie dieses Ticket zuerst ab."
+
+msgid "Failed to update the ticket's state. Please try again later."
+msgstr "Der Ticketstatus konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut."
+
 msgid "general error"
 msgstr "Allgemeiner Fehler"
 
+msgid "Invalid authentication. Please check your login data."
+msgstr "Ungültige Authentifizierung. Bitte überprüfen Sie Ihre Anmeldedaten."
+
+msgid "Invalid session. Coulnd't verify your session."
+msgstr "Ungültige Sitzung. Ihre Sitzung konnte nicht verifiziert werden."
+
+msgid "Failed to connect to the given host. Please check your KIX Url."
+msgstr "Die Verbindung zum angegebenen Host konnte nicht hergestellt werden. Bitte überprüfen Sie Ihre KIX-URL."
+
 msgid "Missing internet connection."
-msgstr "Internetverbindung unterbrochen."
+msgstr "Keine Internetverbindung."
+
+msgid "Another time tracking is still running."
+msgstr "Eine weitere Zeiterfassung läuft noch."
+
+msgid "The start date has to be before the end date."
+msgstr "Das Startdatum muss vor dem Enddatum liegen."
+
+msgid "You need to enter a reason to decline the ticket."
+msgstr "Sie müssen einen Grund für die Ablehnung des Tickets angeben."
+
+msgid "The time tracking stopped because it exceeded the automatic stop duration."
+msgstr "Die Zeiterfassung wurde gestoppt, da die automatische Stoppdauer überschritten wurde."
+
+msgid "The requested ressource couldn't be found."
+msgstr "Die angeforderte Ressource konnte nicht gefunden werden."
+
+msgid "Something went wrong with the request to the server."
+msgstr "Bei der Anfrage an den Server ist ein Fehler aufgetreten."
+
+msgid "There was an error on the server. Please try again later."
+msgstr "Auf dem Server ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+
+msgid "The connection was lost. The ticket couldn't be changed."
+msgstr "Die Verbindung ist verloren gegangen. Das Ticket konnte nicht geändert werden."
+
+msgid "This function is only available in online mode"
+msgstr "Diese Funktion ist nur im Onlinemodus verfügbar"
 
 msgid "Ticket is overdued."
-msgstr "Ticketfälligkeit erreicht."
+msgstr "Das Ticket ist überfällig."
 
 msgid "Ticket is almost overdue."
-msgstr "Ticketfälligkeit fast erreicht."
+msgstr "Das Ticket ist fast fällig."
 
 msgid "Due date: "
 msgstr "Fälligkeitsdatum: "
@@ -160,11 +193,8 @@ msgstr "Fälligkeitsdatum: "
 msgid "Update tickets"
 msgstr "Tickets Aktualisieren"
 
-msgid "Tickets"
-msgstr "Tickets"
-
-msgid "Ticket"
-msgstr "Ticket"
+msgid "Update location"
+msgstr "Lokation aktualisieren"
 
 msgid "Declined tickets"
 msgstr "Abgelehnte Tickets"
@@ -172,32 +202,62 @@ msgstr "Abgelehnte Tickets"
 msgid "No tickets found"
 msgstr "Keine Tickets gefunden"
 
+msgid "Today"
+msgstr "Heute"
+
+msgid "Tomorrow"
+msgstr "Morgen"
+
+msgid "This Week"
+msgstr "Diese Woche"
+
+msgid "Next week"
+msgstr "Nächste Woche"
+
+msgid "Later"
+msgstr "Später"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Loading tickets"
+msgstr "Tickets laden"
+
+msgid "Please select a team first."
+msgstr "Bitte zunächst ein Team auswählen."
+
+msgid "assigned to:"
+msgstr "zugewiesen an:"
+
+msgid "unlocked tickets"
+msgstr "entsperrte Tickets"
+
+msgid "Shows tickets which can be pulled"
+msgstr "Zeigt Tickets die genommen werden können"
+
+msgid "Assigned to me"
+msgstr "Mir zugewiesen"
+
+msgid "Not assigned to me"
+msgstr "Nicht mir zugewiesen"
+
+msgid "Shows tickets which are assigned to you"
+msgstr "Zeigt Ihnen zugewiesene Tickets"
+
 msgid "Recent"
 msgstr "Kürzlich"
 
 msgid "Attachments ({0})"
 msgstr "Anhänge ({0})"
 
-msgid "KIX Login"
-msgstr "KIX Anmeldename"
-
-msgid "Username"
-msgstr "Nutzername"
-
-msgid "Password"
-msgstr "Passwort"
-
-msgid "KIX URL"
-msgstr "KIX URL"
+msgid "Date is missing"
+msgstr "Datum fehlt"
 
 msgid "KIX Customer Number"
 msgstr "KIX Kundennummer"
 
-msgid "Login"
-msgstr "Anmelden"
-
-msgid "Logout"
-msgstr "Abmelden"
+msgid "If you choose to remove any locally stored data, not yet uploaded information will be lost. The app will be reset to installation default."
+msgstr "Wenn Sie lokal gespeicherte Daten entfernen, gehen noch nicht hochgeladene Informationen verloren. Die App wird auf die Installationsstandardeinstellungen zurückgesetzt."
 
 msgid "Logged in as {0} ({1})"
 msgstr "Angemeldet als {0} ({1})"
@@ -205,11 +265,11 @@ msgstr "Angemeldet als {0} ({1})"
 msgid "Delete data"
 msgstr "Daten löschen"
 
+msgid "Deletes all locally stored ticket information and attachments"
+msgstr "Löscht alle lokal gespeicherten Ticketinformationen und Anhänge"
+
 msgid "General"
 msgstr "Allgemein"
-
-msgid "KIX"
-msgstr "KIX"
 
 msgid "About"
 msgstr "Über"
@@ -220,8 +280,20 @@ msgstr "Analytics"
 msgid "Automatic stop"
 msgstr "Automatisch Stoppen"
 
-msgid "Checklists"
-msgstr "Checklisten"
+msgid "Timetracking will be stopped autoamtically after {0} h"
+msgstr "Die Zeiterfassung wird nach {0} h automatisch gestoppt."
+
+msgid "Location tracking"
+msgstr "Lokationsverfolgung"
+
+msgid "Geolocation tracking service could not be started."
+msgstr "Der Geolokalisierungs-Trackingdienst konnte nicht gestartet werden."
+
+msgid "Geolocation tracking permissions not granted."
+msgstr "Berechtigungen zur Geolokalisierungsverfolgung nicht erteilt."
+
+msgid "Geolocation tracking permissions permantently denied."
+msgstr "Berechtigungen zur Geolokalisierungsverfolgung dauerhaft verweigert."
 
 msgid "completed"
 msgstr "vollständig"
@@ -229,62 +301,62 @@ msgstr "vollständig"
 msgid "{0} open items"
 msgstr "{0} offene Einträge"
 
-msgid "State"
-msgstr "Status"
+msgid "Form Data"
+msgstr "Formularangaben"
+
+msgid "Please select at most one item."
+msgstr "Bitte wählen Sie maximal einen Eintrag aus."
+
+msgid "Please select at most {0} items."
+msgstr "Bitte wählen Sie maximal {0} Einträge."
+
+msgid "Please select at least one item."
+msgstr "Bitte wählen Sie mind. einen Eintrag aus."
+
+msgid "Please select at least {0} items."
+msgstr "Bitte wählen Sie mind. {0} Einträge."
+
+msgid "Empty table"
+msgstr "Tabelle Leeren"
+
+msgid "See more data"
+msgstr "Mehr Daten Anzeigen"
+
+msgid "Add data"
+msgstr "Daten Hinzufügen"
 
 msgid "CI Class"
-msgstr "Asset Klasse"
+msgstr "Geräteklasse"
 
 msgid "Usage"
-msgstr "Nutzung"
+msgstr "Verwendung"
 
-msgid "Number"
-msgstr "Nummer"
+msgid "No assets found for this asset number."
+msgstr "Keine Geräte für diese Gerätenummer gefunden."
 
-msgid "Last changed"
-msgstr "Zuletzt geändert"
+msgid "Tap on search to find assets"
+msgstr "Auf Suche klicken um Geräte anzuzeigen"
 
 msgid "No work report"
 msgstr "Kein Arbeitsbericht"
 
-msgid "Agent"
-msgstr "Agent"
-
-msgid "Customer"
-msgstr "Kunde"
-
 msgid "Firstname ({0})"
 msgstr "Vorname ({0})"
 
-msgid "Closure code (required)"
-msgstr "Abschlusscode (Pflichtangabe)"
+msgid "Lastname ({0})"
+msgstr "Nachname ({0})"
 
-msgid "Name"
-msgstr "Name"
+msgid "Signature ({0})"
+msgstr "Unterschrift ({0})"
+
+msgid "Closure code (required)"
+msgstr "Abschlusscode (Pflicht)"
 
 msgid "Username"
 msgstr "Nutzername"
 
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Mobile"
-msgstr "Mobil"
-
-msgid "E-Mail"
-msgstr "E-Mail"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Comment"
-msgstr "Kommentar"
-
 msgid "KNR"
 msgstr "KNR"
-
-msgid "URL"
-msgstr "URL"
 
 msgid "Start time"
 msgstr "Startzeit"
@@ -293,28 +365,46 @@ msgid "Start date"
 msgstr "Startdatum"
 
 msgid "End time"
-msgstr "Endzeit"
+msgstr "Ende-Zeit"
 
 msgid "End date"
 msgstr "Enddatum"
 
-msgid "15 min"
-msgstr "15 min"
+msgid "Entry is not visible on the exernal work report."
+msgstr "Eintrag wird im externen Arbeitsbericht nicht angezeigt."
 
-msgid "Task"
-msgstr "Aufgabe"
+msgid "Entry is visible on the external work report."
+msgstr "Eintrag wird im externen Arbeitsbericht angezeigt."
+
+msgid "Work report"
+msgstr "Arbeitbericht"
+
+msgid "travel time"
+msgstr "An-/Abfahrt"
+
+msgid "processed as noted"
+msgstr "bearbeiten wie beschrieben"
+
+msgid "processed as specified"
+msgstr "bearbeiten wie angefordert"
+
+msgid "see checklists"
+msgstr "siehe Checklisten"
+
+msgid "see work notes"
+msgstr "siehe Notizen"
+
+msgid "Copy from Notes"
+msgstr "aus Notizen übernehmen"
+
+msgid "Note is not visble on the exernal work report."
+msgstr "Notiz ist nicht sichtbar im Arbeitsbericht (Kunde)."
+
+msgid "Note is visible on the external work report."
+msgstr "Notiz ist sichtbar im Arbeitsbericht (Kunde)."
 
 msgid "work report (customer)"
 msgstr "Arbeitsbericht (Kunde)"
-
-msgid "Attachments"
-msgstr "Anhänge"
-
-msgid "Attachment"
-msgstr "Anhang"
-
-msgid "Notes"
-msgstr "Notizen"
 
 msgid "Revert unsaved changes?"
 msgstr "Ungespeicherte Änderungen verwerfen?"
@@ -322,38 +412,11 @@ msgstr "Ungespeicherte Änderungen verwerfen?"
 msgid "More information"
 msgstr "Mehr Informationen"
 
-msgid "Pending time"
-msgstr "Wartezeit"
-
-msgid "Pending time"
-msgstr "Wartezeit"
-
-msgid "Queue"
-msgstr "Team"
-
-msgid "Owner"
-msgstr "Bearbeiter"
-
-msgid "Responsible"
-msgstr "Verantwortlicher"
-
-msgid "Created by"
-msgstr "Erstellt von"
-
-msgid "Created"
-msgstr "Erstellt"
-
-msgid "Changed by"
-msgstr "Geändert von"
-
-msgid "Priority"
-msgstr "Priorität"
-
-msgid "Type"
-msgstr "Typ"
-
 msgid "Offline available"
 msgstr "Offline Verfügbar"
+
+msgid "Ticket can be edited without internet connection"
+msgstr "Ticket kann ohne Internetverbindung bearbeitet werden."
 
 msgid "Start timetracking"
 msgstr "Start Zeiterfassung"
@@ -370,20 +433,23 @@ msgstr "Einträge"
 msgid "Item"
 msgstr "Eintrag"
 
-msgid "Articles"
-msgstr "Artikel"
+msgid "Add data"
+msgstr "Daten hinzufügen"
 
-msgid "Article"
-msgstr "Artikel"
+msgid "Form data entries"
+msgstr "Formularangaben"
 
-msgid "Checklists"
-msgstr "Checklisten"
+msgid "{0} Form data entries"
+msgstr "{0} Formularangaben"
 
-msgid "Checklist"
-msgstr "Checkliste"
+msgid "Form data entry"
+msgstr "Formularangabe"
 
-msgid "Notes"
-msgstr "Notizen"
+msgid "This ticket not available in offline mode."
+msgstr "Dieses Ticket ist nicht offline verfügbar."
+
+msgid "Please check out the ticket to make changes."
+msgstr "Bitte Ticket auschecken um Änderungen vorzunehmen."
 
 msgid "Time tracking"
 msgstr "Zeiterfassung"
@@ -400,116 +466,62 @@ msgstr "Bearbeitung Beenden"
 msgid "Checkout"
 msgstr "Annehmen"
 
+msgid "Pull Task"
+msgstr "Aufgabe übernehmen"
+
 msgid "Communication History"
-msgstr "Kommunikations-/Fallhistorie"
+msgstr "Kommunikationsverlauf"
 
-msgid "Time tracking stopped automatically."
-msgstr "Zeiterfassung automatisch angehalten."
-
-msgid "The ticket is not in the correct state to initiate a download."
-msgstr "Das Ticket ist auf Grund seines Status nicht herunterladbar."
-
-msgid "The ticket with the number {0} is still checked out. Please finish this ticket first."
-msgstr "Das Ticket mit der Nummer {0} ist noch heruntergeladen. Bitte beenden Sie dessen Bearbeitung zunächst."
-
-msgid "The ticket is still checked out. Please finish this ticket first."
-msgstr "Das Ticket ist noch heruntergeladen. Bitte beenden Sie die Bearbeitung zunächst."
-
-msgid "Failed to update the ticket's state. Please try again later."
-msgstr "Konnte Ticketstatus nicht aktualisieren. Bitte probieren Sie es später erneut."
-
-msgid "Invalid authentication. Please check your login data."
-msgstr "Ungültige Authentifizierung. Bitte prüfen Sie Ihre Anmeldedaten."
-
-msgid "Invalid session. Coulnd't verify your session."
-msgstr "Ungültige Sitzung. Verifizierung nicht möglich."
-
-msgid "Missing internet connection."
-msgstr "Internetverbindung nicht vorhanden."
-
-msgid "Another time tracking is still running."
-msgstr "Eine andere Zeiterfassung läuft bereits."
-
-msgid "The start date has to be before the end date."
-msgstr "Startdatum muss vor dem Endedatum liegen"
-
-msgid "You need to enter a reason to decline the ticket."
-msgstr "Zur Ablehnung eines Tickets geben Sie bitte eine Begründung ein."
-
-msgid "The time tracking stopped because it exceeded the automatic stop duration."
-msgstr "Die Zeiterfassung wurde autom. gestoppt, da die Maximaldauer überschritten wurde."
-
-msgid "Deletes all locally stored ticket information and attachments"
-msgstr "Löscht alle lokal gespeicherten Ticketinformationen und Anhänge."
-
-msgid "Timetracking will be stopped autoamtically after {0} h"
-msgstr "Zeiterfassung wird autom. nach {0}h gestoppt."
-
-msgid "Entry is not visible on the exernal work report."
-msgstr "Eintrag ist nicht sichtbar im Arbeitsbericht (Kunde)."
-
-msgid "Entry is visible on the external work report."
-msgstr "Eintrag ist sichtbar im Arbeitsbericht (Kunde)."
-
-msgid "Note is not visble on the exernal work report."
-msgstr "Notiz ist nicht sichtbar im Arbeitsbericht (Kunde)."
-
-msgid "Note is visible on the external work report."
-msgstr "Notiz ist sichtbar im Arbeitsbericht (Kunde)."
-
-msgid "Ticket can be edited without internet connection"
-msgstr "Ticket kann ohne Internetverbindung bearbeitet werden."
-
-msgid "The time tracking is active for another ticket and has to be stopped."
-msgstr "Die Zeiterfassung für ein anderes Ticket ist aktiv und muss zunächst beendet werden."
-
-msgid "The requested ressource couldn't be found."
-msgstr "Die angefragte Ressource konnte nicht gefunden werden."
-
-msgid "Something went wrong with the request to the server."
-msgstr "Fehler in Kommunikation mit Server."
-
-msgid "There was an error on the server. Please try again later."
-msgstr "Es ist ein Serverfehler aufgetreten. Bitte probieren Sie es später erneut."
-
-msgid "The connection was lost. The ticket couldn't be changed."
-msgstr "Die Verbindung ist abgebrochen. Das Ticket konnte nicht geändert werden."
-
-msgid "Tomorrow"
-msgstr "Morgen"
-
-msgid "Later"
-msgstr "Später"
-
-msgid "This Week"
-msgstr "Diese Woche"
-
-msgid "Next week"
-msgstr "Nächste Woche"
-
-msgid "Next Week"
-msgstr "Nächste Woche"
-
-msgid "NextWeek"
-msgstr "Nächste Woche"
+msgid "The time tracking is active for another ticket and has to be stopped. If you continue, this active time tracking will be stopped."
+msgstr "Die Zeiterfassung ist für ein anderes Ticket aktiv und muss gestoppt werden. Wenn Sie fortfahren, wird diese aktive Zeiterfassung beendet."
 
 msgid "New note"
 msgstr "Neue Notiz"
 
 msgid "Edit pending time"
-msgstr "Erinnerungszeit setzen"
+msgstr "Wartezeit bearbeiten"
 
 msgid "Edit plan time"
-msgstr "Zeitplanung bearbeiten"
+msgstr "Planzeiten bearbeiten"
+
+msgid "Click to change date"
+msgstr "Klicken für Datumsänderung"
+
+msgid "No date set"
+msgstr "Kein Datum gesetzt"
+
+msgid "Plan begin should be before plan end."
+msgstr "Planbeginn sollte vor Planende liegen."
+
+msgid "Plan end should be after plan begin."
+msgstr "Planende sollte nach Planbeginn liegen."
+
+msgid "Scanning for QR code."
+msgstr "QR Code scannen."
+
+msgid "No asset number found."
+msgstr "Keine Assetnummer gefunden."
 
 msgid "Record a new ticket"
 msgstr "Neues Ticket erfassen"
+
+msgid "signerTypeCustomer"
+msgstr "Unterschrift Kunde"
+
+msgid "typeTitle"
+msgstr "Titel"
+
+msgid "priorityTitle"
+msgstr "Priorität"
 
 msgid "Assigned to me"
 msgstr "mir zugeordnet"
 
 msgid "Delete ticket draft"
 msgstr "Tickentwurf löschen"
+
+msgid "Delete the local ticket draft"
+msgid "Lokalen Ticketentwurf löschen"
 
 msgid "The draft has been saved."
 msgstr "Entwurf wurde gesichert."
@@ -529,107 +541,12 @@ msgstr "Entwurf"
 msgid "Locally recorded"
 msgstr "lokal erfasst"
 
-msgid "Delete the local ticket draft"
-msgid "Lokalen Ticketentwurf löschen"
+msgid "Affected Assets"
+msgstr "Betroffene Geräte"
 
-msgid "If you choose to remove any locally stored data, not yet uploaded information will be lost. The app will be reset to installation default."
-msgstr "Wenn Sie lokal gespeicherte Daten entfernen, gehen noch nicht hochgeladene Informationen verloren. Die App wird auf den Installationsstandard zurückgesetzt."
+msgid "Ticket +"
+msgstr "Ticket +"
 
-msgid "The time tracking is active for another ticket and has to be stopped. If you continue, this active time tracking will be stopped."
-msgstr "Die Zeiterfassung ist für ein anderes Ticket aktiv und muss gestoppt werden. Wenn Sie fortfahren, wird diese aktive Zeiterfassung beendet."
+msgid "File size exceeded."
+msgstr "Dateigröße überschritten."
 
-msgid "travel time"
-msgstr "An-/Abfahrt"
-
-msgid "processed as noted"
-msgstr "bearbeiten wie beschrieben"
-
-msgid "processed as specified"
-msgstr "bearbeiten wie angefordert"
-
-msgid "see checklists"
-msgstr "siehe Checklisten"
-
-msgid "see work notes"
-msgstr "siehe Notizen"
-
-msgid "other Tickets"
-msgstr "andere Tickets"
-
-msgid "All Assets"
-msgstr "alle Assets"
-
-msgid "No assets found for this asset number."
-msgstr "keine Asstes gefunden für diese Asset Nummer"
-
-msgid "very low"
-msgstr "sehr niedrig"
-
-msgid "low"
-msgstr "niedrig"
-
-msgid "high"
-msgstr "hoch"
-
-msgid "very high"
-msgstr "sehr hoch"
-
-msgid "Analytics"
-msgstr "Analyse"
-
-msgid "This app collects location data to report it your current position to your back office team, enabling the back office to dispatch agents nearest to a place of action. This applies even when the app is running in background."
-msgstr "Diese App sammelt Standortdaten, um Ihrem Backoffice-Team Ihre aktuelle Position zu melden, damit das Backoffice Agenten in der Nähe eines Einsatzortes einsetzen kann. Dies gilt auch, wenn die App im Hintergrund läuft."
-
-msgid "Please select at most {0} items."
-msgstr "Bitte maximal {0} Einträge wählen."
-
-msgid "Please select at most one item."
-msgstr "Bitte maximal einen Eintrag wählen."
-
-msgid "Please select at least {0} items."
-msgstr "Bitte mindestens {0} Einträge wählen."
-
-msgid "Please select at least one item."
-msgstr "Bitte mindestens einen Eintrag wählen."
-
-msgid "Additional form data"
-msgstr "Zusätzliche Formulardaten"
-
-msgid "Form Data"
-msgstr "Formularangaben"
-
-msgid "Form data"
-msgstr "Formularangaben"
-
-msgid "Form data entries"
-msgstr "Formularangaben"
-
-msgid "{0} Form data entries"
-msgstr "{0} Formularangaben"
-
-msgid "Please select a team first."
-msgstr "Bitte zuerst ein Team wählen."
-
-msgid "assigned to"
-msgstr "zugeordnet zu"
-
-msgid "assigned to:"
-msgstr "zugeordnet zu:"
-
-msgid "assigned to: {0}"
-msgstr "zugeordnet zu: {0}"
-
-msgid "Other Tickets in Team"
-msgstr "Andere Tickets im Team"
-
-msgid "Other Tickets"
-msgstr "Andere Tickets"
-
-msgid "Not assigned to me"
-msgstr "nicht mir zugeordnet"
-
-msgid "Location tracking"
-msgstr "Standortverfolgung"
-
-msgid "Unlocked tickets"
-msgstr "entsperrte Tickets"
