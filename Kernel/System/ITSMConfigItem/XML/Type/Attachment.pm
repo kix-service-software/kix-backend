@@ -83,11 +83,11 @@ sub ValueLookup {
     # return empty string, when false value (undef, 0, empty string) is given
     return q{} if ( !$Param{Value} );
 
+    # return undef value, if given value is not a string
+    return if ( !IsString( $Param{Value} ) );
+
     # return given value, if given value is not a number
-    return $Param{Value} if (
-        !IsStringWithData( $Param{Value} )
-        || $Param{Value} =~ /\D/
-    );
+    return $Param{Value} if ( $Param{Value} =~ /\D/ );
 
     # get saved properties (attachment directory info)
     my %AttDirData = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetDirectory(
