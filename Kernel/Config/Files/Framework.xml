@@ -1100,6 +1100,7 @@
         <Setting>
             <Hash>
                 <Item Key="closed">open</Item>
+                <Item Key="new">new</Item>
                 <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
