@@ -341,6 +341,13 @@
             <String Regex="">
 {
   "Contact": {
+    "Service": {
+      "SectionGeneral::ServiceOwner": {
+        "SearchAttributes": [
+          "ID"
+        ]
+      }
+    },
     "Computer": {
       "SectionOwner::OwnerContact": {
         "SearchAttributes": [
