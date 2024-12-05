@@ -49,12 +49,16 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes(
-        UsageContext => $Param{Data}->{UserType}
-    );
-    my $MFAuthTypes  = $Kernel::OM->Get('Auth')->GetMFAuthTypes(
-        UsageContext => $Param{Data}->{UserType}
-    );
+    my $PreAuthTypes = [];
+    my $MFAuthTypes  = [];
+    if ( $Param{Data}->{UserType} ) {
+        $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes(
+            UsageContext => $Param{Data}->{UserType}
+        );
+        $MFAuthTypes  = $Kernel::OM->Get('Auth')->GetMFAuthTypes(
+            UsageContext => $Param{Data}->{UserType}
+        );
+    }
 
     return {
         'UserLogin' => {
