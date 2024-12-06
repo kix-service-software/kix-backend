@@ -1419,6 +1419,7 @@ sub RecalculateCurrentIncidentState {
 
     # get the incident state lists
     if ( !IsHashRefWithData($Self->{IncidentStateList}) ) {
+        TYPE:
         foreach my $Type ( qw(operational warning incident) ) {
             my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
                 Class       => 'ITSM::Core::IncidentState',
@@ -1426,6 +1427,16 @@ sub RecalculateCurrentIncidentState {
                     Functionality => $Type,
                 },
             );
+
+            # stop processing, when a functionality has no incident state assigned
+            if ( !IsHashRefWithData( $ItemList ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'No IncidentState with Functionality "' . $Type . '" found! IncidentStatePropagation not possible.',
+                );
+                return;
+            }
+            
             $Self->{IncidentStateList} //= {};
             %{$Self->{IncidentStateList}} = (
                 %{$Self->{IncidentStateList}},
