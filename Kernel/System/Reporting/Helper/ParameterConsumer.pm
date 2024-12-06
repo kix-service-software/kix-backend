@@ -45,7 +45,7 @@ sub _ReplaceParametersInString {
     return $Param{String} if !$Param{String} || !$Self->{Config};
 
     my %EmptyValuesForDataType = (
-        'STRING'   => '',
+        'STRING'   => '\'\'',
         'NUMERIC'  => 0,
         'DATE'     => '0001-01-01',
         'DATETIME' => '0001-01-01 00:00:00',
