@@ -643,9 +643,22 @@ if ( open( my $DATA, "<", "$Path/$File" ) ) {    ## no critic
         'XMLParse2XMLHash() - charset test - write an article attachment to storage',
     );
 
+    my %Attachments = $TicketObject->ArticleAttachmentIndex(
+        ArticleID                  => $ArticleID,
+        UserID                     => 1,
+        StripPlainBodyAsAttachment => 2,
+    );
+
+    my $AttachmentID;
+    for my $AttachmentsKey ( keys( %Attachments ) ) {
+        $AttachmentID = $AttachmentsKey;
+
+        last;
+    }
+
     my %Attachment = $TicketObject->ArticleAttachment(
         ArticleID    => $ArticleID,
-        AttachmentID => 1,
+        AttachmentID => $AttachmentID,
         UserID       => 1,
     );
 

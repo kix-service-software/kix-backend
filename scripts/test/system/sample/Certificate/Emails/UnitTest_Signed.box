@@ -1,0 +1,104 @@
+Subject: Unit Test Verify [Ticket#2024080217000021]
+Date: Fri, 2 Aug 2024 09:23:28 +0000
+From: "unittest" <example@unittest.org>
+To: "not assigned" <admin@localhost>
+Message-ID: <1722590607.326684.254778037@your-backend-host.example.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+ protocol="application/x-pkcs7-signature";
+ micalg="sha-256";
+ boundary="----B6AA86D4829F882CBB075927C18782B5"
+
+This is an S/MIME signed message
+
+------B6AA86D4829F882CBB075927C18782B5
+Content-Type: multipart/alternative; boundary="----------=_1722590608-337-0"
+
+This is a multi-part message in MIME format...
+------------=_1722590608-337-0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+     Unit Test Verify --=20
+Your Organization Name
+Your Org Street 123
+Your Org Registration Location Your Org. Registration Number
+Your Org. Director/s according to Registration=20=20
+
+------------=_1722590608-337-0
+Content-Type: text/html; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                <style>
+                        body {
+                font-family:Geneva,Helvetica,Arial,sans-serif; font-size: 12px;
+            }
+
+        </style>
+
+    </head>
+    <body>Unit Test Verify
+
+-- <br />
+Your Organization Name<br />
+Your Org Street 123<br />
+Your Org Registration Location Your Org. Registration Number<br />
+Your Org. Director/s according to Registration</body>
+</html>
+
+------------=_1722590608-337-0--
+
+------B6AA86D4829F882CBB075927C18782B5
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+MIIG8AYJKoZIhvcNAQcCoIIG4TCCBt0CAQExDzANBglghkgBZQMEAgEFADAL
+BgkqhkiG9w0BBwGgggP9MIID+TCCAuGgAwIBAgIUWgG1dmtcBAsgz/fgnpmK
+m1gLoPQwDQYJKoZIhvcNAQELBQAwgYsxCzAJBgNVBAYTAkRFMQ8wDQYDVQQI
+DAZTYXhvbnkxEDAOBgNVBAcMB0V4YW1wbGUxEDAOBgNVBAoMB0V4YW1wbGUx
+EDAOBgNVBAsMB0V4YW1wbGUxEDAOBgNVBAMMB0V4YW1wbGUxIzAhBgkqhkiG
+9w0BCQEWFGV4YW1wbGVAdW5pdHRlc3Qub3JnMB4XDTI0MDQyNTA4NDA0OFoX
+DTM0MDQyMzA4NDA0OFowgYsxCzAJBgNVBAYTAkRFMQ8wDQYDVQQIDAZTYXhv
+bnkxEDAOBgNVBAcMB0V4YW1wbGUxEDAOBgNVBAoMB0V4YW1wbGUxEDAOBgNV
+BAsMB0V4YW1wbGUxEDAOBgNVBAMMB0V4YW1wbGUxIzAhBgkqhkiG9w0BCQEW
+FGV4YW1wbGVAdW5pdHRlc3Qub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEAwetUmh0K4cGnF5peXIeqwkgrRI5kkc8zW7k6lB7lqlA/RYVX
+/jnBqmYD+tnEuoJ3BCycJgmD4YIO3KI3khi+lGsJCSsGsN6/kcE+RzFEQ+5S
+Z9O/QLklAJpNJGpcADkWvyz07TUCieu9Ywh2OKXtGm07OnsNxb9znssl/P/w
+BL+0/gtLV2fF/O7Yr/iiiBCsMCmPQUrnCqS4ek7VNkt7xqgs/IgLNW/CJcNU
+7Ld19Y6OYm/anNebCWdvIvYCWxy0u66BjDlxAgzVAPmwr0Bg2mupnVjuqsNE
+QrTPIaNQ3qPROUtF23IKsyMqbLPBe6TYlEDN+SlMO6YPImnAjfCEWwIDAQAB
+o1MwUTAdBgNVHQ4EFgQU9EiL7CU21Y2448t/yDzEILf8FecwHwYDVR0jBBgw
+FoAU9EiL7CU21Y2448t/yDzEILf8FecwDwYDVR0TAQH/BAUwAwEB/zANBgkq
+hkiG9w0BAQsFAAOCAQEAsOQ2Z5OkT6potzRUh7Dxe1QYiGlIueE742qfKRwu
+CMmPX4GuyRvcYyRZPqn7QUcGnXqVDXrmubVvDkJlvG4XUh/vS3XGKDWHdUUo
+FSPjyATL8/jXgXUzWuszka08HYz8D0A4DlebT6I8HLLfgKtg0MFJcFa/dboG
+WIYMpsXbzO8MgAj9zxrr/wNTgo3OSuKN1FlVGbEkf+nNoTLtjgeBu59X95HJ
+rXTDsuloWmctht8HT/hKjHhY83ysvUuqRZT6hDtxlRgQlObsa3HVO2vw0g3i
+RxvsQTiwYDqscfHycdowTukWAeAdrZoOclrGXcmRDsrn4GJDHShR4BR/h+Ah
+UDGCArcwggKzAgEBMIGkMIGLMQswCQYDVQQGEwJERTEPMA0GA1UECAwGU2F4
+b255MRAwDgYDVQQHDAdFeGFtcGxlMRAwDgYDVQQKDAdFeGFtcGxlMRAwDgYD
+VQQLDAdFeGFtcGxlMRAwDgYDVQQDDAdFeGFtcGxlMSMwIQYJKoZIhvcNAQkB
+FhRleGFtcGxlQHVuaXR0ZXN0Lm9yZwIUWgG1dmtcBAsgz/fgnpmKm1gLoPQw
+DQYJYIZIAWUDBAIBBQCggeQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAc
+BgkqhkiG9w0BCQUxDxcNMjQwODAyMDkyMzI4WjAvBgkqhkiG9w0BCQQxIgQg
+GRoUKdxFxjgVG33xxAuzLTwShHWYxLniL16dgSnmnv4weQYJKoZIhvcNAQkP
+MWwwajALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAK
+BggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYF
+Kw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAd0JEZ8X+
+PrJVit114Tx3Ab+jeSIS0mrvPsCTkGoxyRPOX2wZla35bzOZ4S5eKPWG46Gw
+r9mOKqzCrGxjmfRCCM7OlhWx/iyw4Fbri89R1UXEvSdTnw278bsa8XgV9Jpm
+kL8EDowhyRnODN60gxmO4NTrLF1BfsoEYI9ky8yLTbVZ2E+6/FIKpPwENAmY
+s/jmI+6IoJ7XqenniU2QMFh7v3U4oSqNiRExc6xYrLb02tkNc2wx6I2/d/yD
+1xB2HSanCYh9sBYGSGANsn1erJ20dkUo3uAu6vlLWHZnL1ludePBLwE1MgFD
+I8SrgeHNHVnh+F0gNRmoQ95+oxMlMZMk5A==
+
+------B6AA86D4829F882CBB075927C18782B5--
+

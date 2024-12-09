@@ -12,11 +12,6 @@ use utf8;
 
 use vars (qw($Self));
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $ContactObject = $Kernel::OM->Get('Contact');
-my $UserObject    = $Kernel::OM->Get('User');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -24,12 +19,12 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 # do not check mail addresses
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 # disable unique check
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'ContactEmailUniqueCheck',
     Value => 0,
 );
@@ -58,7 +53,7 @@ my $ContactsCreated = 0;
 for my $Contact (@Contacts) {
 
     # add assigned user
-    my $UserID = $UserObject->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => $Contact->{Name},
         ValidID      => 1,
         ChangeUserID => 1,
@@ -73,7 +68,7 @@ for my $Contact (@Contacts) {
         $Contact->{UserID} = $UserID;
 
         # add contact
-        my $ContactID = $ContactObject->ContactAdd(
+        my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
             AssignedUserID => $UserID,
             Firstname      => 'Firstname_' . $Contact->{Name},
             Lastname       => 'Lastname_' . $Contact->{Name},
@@ -98,9 +93,9 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         0,
         "ContactLookup: Not all test contacts created!"
     );
-} else {
-
-    my $Result = $ContactObject->ContactLookup(
+}
+else {
+    my $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         ID     => $Contacts[0]->{ID},
         Silent => 1
     );
@@ -110,7 +105,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with ID (first contact)'
     );
 
-    my $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         ID     => $Contacts[0]->{ID},
         Silent => 1,
         Valid  => 1 # first contact is invalid => should NOT be "found"
@@ -120,7 +115,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with ID and Valid (first contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         ID     => $Contacts[1]->{ID},
         Silent => 1
     );
@@ -130,7 +125,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with ID (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         ID     => $Contacts[1]->{ID},
         Silent => 1,
         Valid  => 1 # second contact is valid => should be "found"
@@ -141,7 +136,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with ID and Valid (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         ID     => $Contacts[2]->{ID},
         Silent => 1
     );
@@ -151,7 +146,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with ID (third contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserID => $Contacts[0]->{UserID},
         Silent => 1
     );
@@ -161,7 +156,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserID (first contact)'
     );
 
-    my $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserID => $Contacts[0]->{UserID},
         Silent => 1,
         Valid  => 1 # first contact is invalid => should NOT be "found"
@@ -171,7 +166,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserID and Valid (first contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserID => $Contacts[1]->{UserID},
         Silent => 1
     );
@@ -181,7 +176,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserID (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserID => $Contacts[1]->{UserID},
         Silent => 1,
         Valid  => 1 # second contact is valid => should be "found"
@@ -192,7 +187,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserID and Valid (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserID => $Contacts[2]->{UserID},
         Silent => 1
     );
@@ -202,7 +197,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserID (third contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserLogin => $Contacts[0]->{Name},
         Silent    => 1
     );
@@ -212,7 +207,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserLogin (first contact)'
     );
 
-    my $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserLogin => $Contacts[0]->{Name},
         Silent    => 1,
         Valid     => 1 # first contact is invalid => should NOT be "found"
@@ -222,7 +217,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserLogin and Valid (first contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserLogin => $Contacts[1]->{Name},
         Silent    => 1
     );
@@ -232,7 +227,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserLogin (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserLogin => $Contacts[1]->{Name},
         Silent    => 1,
         Valid     => 1 # second contact is valid => should be "found"
@@ -243,7 +238,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserLogin and Valid (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         UserLogin => $Contacts[2]->{Name},
         Silent    => 1
     );
@@ -253,7 +248,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with UserLogin (third contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         Email  => $Contacts[0]->{Email},
         Silent => 1
     );
@@ -263,7 +258,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with Email (first contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         Email  => $Contacts[1]->{Email},
         Silent => 1
     );
@@ -273,7 +268,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with Email (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         Email  => $Contacts[1]->{Email},
         Silent => 1,
         Valid  => 1  # ignore invalid (first) contact
@@ -284,7 +279,7 @@ if (!$ContactsCreated || $ContactsCreated != 3) {
         'ContactLookup: lookup with Email and Valid (second contact)'
     );
 
-    $Result = $ContactObject->ContactLookup(
+    $Result = $Kernel::OM->Get('Contact')->ContactLookup(
         Email  => $Contacts[2]->{Email},
         Silent => 1
     );

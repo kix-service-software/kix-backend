@@ -1731,7 +1731,7 @@ sub _FetchAttributes {
     my %Filters = (
         Hash        => '(\w{8})',
         Issuer      => 'issuer=\s*(.*)',
-        Fingerprint => '(?:SHA1\sFingerprint|\(stdin\))=(?:\s+|)(.*)',
+        Fingerprint => 'SHA1(?:\sFingerprint|\s*\(stdin\))=\s*(.*)',
         Serial      => 'serial=(.*)',
         Subject     => 'subject=\s*(.*)',
         StartDate   => 'notBefore=(.*)',
@@ -2425,15 +2425,14 @@ sub _CheckContentType {
     $Head->unfold();
     $Head->combine('Content-Type');
     my $ContentType = $Head->get('Content-Type');
-
     if ( !$ContentType ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Email has no ContentType!"
+                Priority => 'info',
+                Message  => 'E-mail has no ContentType, so "text/plain" is set!'
             );
         }
-        return;
+        return 'text/plain;charset=utf-8';
     }
 
     return $ContentType

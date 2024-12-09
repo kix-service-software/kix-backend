@@ -127,6 +127,7 @@ sub Run {
     my $Success = $Kernel::OM->Get('Automation')->MacroUpdate(
         ID        => $Param{Data}->{MacroID},
         Type      => $Macro->{Type} || $MacroData{Type},
+        Scope     => $Macro->{Scope} || $MacroData{Scope},
         Name      => $Macro->{Name} || $MacroData{Name},
         ExecOrder => exists $Macro->{ExecOrder} ? $Macro->{ExecOrder} : $MacroData{ExecOrder},
         Comment   => exists $Macro->{Comment} ? $Macro->{Comment} : $MacroData{Comment},

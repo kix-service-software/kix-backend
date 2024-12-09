@@ -49,8 +49,8 @@ input data validation, for example.
 
 Call this module directly without instantiating:
 
-    use Kernel::System::VariableCheck qw(:all);             # export all functions into the calling package
-    use Kernel::System::VariableCheck qw(IsHashRefWitData); # export just one function
+    use Kernel::System::VariableCheck qw(:all);              # export all functions into the calling package
+    use Kernel::System::VariableCheck qw(IsHashRefWithData); # export just one function
 
     if (IsHashRefWithData($HashRef)) {
         ...
@@ -358,7 +358,7 @@ sub DataIsDifferent {
 
     # check needed stuff
     for (qw(Data1 Data2)) {
-        return if ( !defined $Param{$_} );
+        return if ( !exists $Param{$_} );
     }
 
     # ''

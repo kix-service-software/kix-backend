@@ -69,6 +69,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -1249,7 +1252,7 @@ my @IntegrationSortTests = (
                 Field => 'CreateBy'
             }
         ],
-        Expected => ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3] : [$OrganisationID3,'1',$OrganisationID1,$OrganisationID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -1259,7 +1262,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3] : [$OrganisationID3,'1',$OrganisationID1,$OrganisationID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -1269,7 +1272,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$OrganisationID3,$OrganisationID2,$OrganisationID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$OrganisationID3,$OrganisationID2,$OrganisationID1,'1'] : [$OrganisationID2,$OrganisationID1,'1',$OrganisationID3]
     },
     {
         Name     => 'Sort: Field ChangeByID',
@@ -1307,7 +1310,7 @@ my @IntegrationSortTests = (
                 Field => 'ChangeBy'
             }
         ],
-        Expected => ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3] : [$OrganisationID3,'1',$OrganisationID1,$OrganisationID2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction ascending',
@@ -1317,7 +1320,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$OrganisationID1,$OrganisationID2,$OrganisationID3] : [$OrganisationID3,'1',$OrganisationID1,$OrganisationID2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction descending',
@@ -1327,7 +1330,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$OrganisationID3,$OrganisationID2,$OrganisationID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$OrganisationID3,$OrganisationID2,$OrganisationID1,'1'] : [$OrganisationID2,$OrganisationID1,'1',$OrganisationID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

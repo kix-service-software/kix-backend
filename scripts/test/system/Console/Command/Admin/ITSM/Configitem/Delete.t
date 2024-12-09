@@ -89,7 +89,6 @@ for ( 1 .. 10 ) {
 
     # create ConfigItem number
     my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-        Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
         ClassID => $GeneralCatalogItemID,
     );
 

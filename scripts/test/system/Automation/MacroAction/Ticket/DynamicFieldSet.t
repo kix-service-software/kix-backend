@@ -21,21 +21,26 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 my %Data = (
+    # possible value of both source DFs
     DFSelection_PossibleValues => {
         Key1 => "Value1",
         Key2 => "Value2",
         Key3 => "Value3"
     },
 
+    # name and values of source DF on ticket
+    DFSelectionSourceName    => 'DFSetSourceSelection',
     DFSelection_SourceValue  => ['Key1', 'Key2'],
-    DFSelection_ContactValue => ['Key1', 'Key3'],
 
+    # name and value of source DF on contact
+    DFSelectionContactSourceName => 'DFSetContactSelection',
+    DFSelection_ContactValue     => ['Key1', 'Key3'],
+
+    # target DFs on ticket
     DFSelectionTargetName => 'DFSetTargetSelection',
     DFTextTargetName      => 'DFSetTargetText',
 
-    DFSelectionSourceName        => 'DFSetSourceSelection',
-    DFSelectionContactSourceName => 'DFSetContactSelection',
-
+    # target DF on article
     DFTextTargetNameArticle => 'DFSetTargetTextArticle'
 );
 
@@ -80,7 +85,7 @@ if ($TicketID) {
                 Parameters => {
                     ObjectID           => $TicketID, # use ObjectID parameter for first execution
                     DynamicFieldName   => $Data{DFSelectionTargetName},
-                    DynamicFieldValue  => 'Key1',
+                    DynamicFieldValue  => 'Key1', # use first possible value for first execution
                     DynamicFieldAppend => 0
                 },
                 ValidID    => 1,
@@ -150,7 +155,7 @@ if ($TicketID) {
                         UserID => 1,
                         Parameters => {
                             DynamicFieldName   => $Data{DFSelectionTargetName},
-                            DynamicFieldValue  => 'Key2',
+                            DynamicFieldValue  => 'Key2', # use second possible value (result should not be first value anymore, even if the target object (ID) is not explicit given)
                             DynamicFieldAppend => 0
                         }
                     );
@@ -195,8 +200,8 @@ if ($TicketID) {
                         UserID => 1,
                         Parameters => {
                             DynamicFieldName   => $Data{DFSelectionTargetName},
-                            DynamicFieldValue  => 'Key3',
-                            DynamicFieldAppend => 1          # now append
+                            DynamicFieldValue  => 'Key3', # use third value, but ...
+                            DynamicFieldAppend => 1       # ... append now (result = Key2 and Key3)
                         }
                     );
                     $Success = $Kernel::OM->Get('Automation')->MacroExecute(
@@ -246,7 +251,7 @@ if ($TicketID) {
                         UserID => 1,
                         Parameters => {
                             DynamicFieldName   => $Data{DFSelectionTargetName},
-                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_Key>",
+                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_Key>", # use Key value of sourc DF of ticket => should fail, because string "Key1#Key2" is no valid possible value
                             DynamicFieldAppend => 0
                         }
                     );
@@ -271,15 +276,21 @@ if ($TicketID) {
                             IsArrayRefWithData($SelectionValue) ? 1 : 0,
                             'Check target selection DF (key placeholder)',
                         );
+                        # should still be old value
                         if (IsArrayRefWithData($SelectionValue)) {
                             $Self->Is(
                                 scalar(@{$SelectionValue}),
                                 2,
                                 'Check target selection DF (key placeholder)',
                             );
-                            $Self->IsDeeply(
-                                $SelectionValue,
-                                $Data{DFSelection_SourceValue},
+                            $Self->Is(
+                                $SelectionValue->[0],
+                                'Key2',
+                                'Check target selection DF (key placeholder)',
+                            );
+                            $Self->Is(
+                                $SelectionValue->[1],
+                                'Key3',
                                 'Check target selection DF (key placeholder)',
                             );
                         }
@@ -290,7 +301,7 @@ if ($TicketID) {
                         UserID => 1,
                         Parameters => {
                             DynamicFieldName   => $Data{DFSelectionTargetName},
-                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_ObjectValue>",
+                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_ObjectValue>", # should "copy" the value from source DF
                             DynamicFieldAppend => 0
                         }
                     );
@@ -328,13 +339,57 @@ if ($TicketID) {
                             );
                         }
                     }
+                    ###### by other dynamic field (with first object value placeholder)
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
+                        %MacroAction,
+                        UserID => 1,
+                        Parameters => {
+                            DynamicFieldName   => $Data{DFSelectionTargetName},
+                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_ObjectValue_0>", # should use first value from source DF
+                            DynamicFieldAppend => 0
+                        }
+                    );
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
+                        ID       => $MacroID,
+                        ObjectID => $TicketID,
+                        UserID   => 1,
+                    );
+                    $Self->True(
+                        $Success,
+                        'object value placeholder (MacroExecute)',
+                    );
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                        TicketID      => $TicketID,
+                        DynamicFields => 1,
+                        UserID        => 1,
+                        Silent        => 1
+                    );
+                    if (IsHashRefWithData(\%Ticket)) {
+                        my $SelectionValue = $Ticket{'DynamicField_'.$Data{DFSelectionTargetName}};
+                        $Self->True(
+                            IsArrayRefWithData($SelectionValue) ? 1 : 0,
+                            'Check target selection DF (fist object value placeholder)',
+                        );
+                        if (IsArrayRefWithData($SelectionValue)) {
+                            $Self->Is(
+                                scalar(@{$SelectionValue}),
+                                1,
+                                'Check target selection DF (fist object value placeholder)',
+                            );
+                            $Self->IsDeeply(
+                                $SelectionValue,
+                                [ $Data{DFSelection_SourceValue}->[0] ],
+                                'Check target selection DF (fist object value placeholder)',
+                            );
+                        }
+                    }
                     ###### by contact dynamic field (with key placeholder)
                     $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
                         Parameters => {
                             DynamicFieldName   => $Data{DFSelectionTargetName},
-                            DynamicFieldValue  => "<KIX_CONTACT_DynamicField_$Data{DFSelectionContactSourceName}_Key>",
+                            DynamicFieldValue  => "<KIX_CONTACT_DynamicField_$Data{DFSelectionContactSourceName}_Key>", # should fail, because key string is no possible value
                             DynamicFieldAppend => 0
                         }
                     );
@@ -357,18 +412,63 @@ if ($TicketID) {
                         my $SelectionValue = $Ticket{'DynamicField_'.$Data{DFSelectionTargetName}};
                         $Self->True(
                             IsArrayRefWithData($SelectionValue) ? 1 : 0,
-                            'Check target selection DF (child DF placeholder)',
+                            'Check target selection DF (contact DF placeholder (Key))',
+                        );
+                        # should still be old value
+                        if (IsArrayRefWithData($SelectionValue)) {
+                            $Self->Is(
+                                scalar(@{$SelectionValue}),
+                                1,
+                                'Check target selection DF (contact DF placeholder (Key))',
+                            );
+                            $Self->Is(
+                                $SelectionValue->[0],
+                                $Data{DFSelection_SourceValue}->[0],
+                                'Check target selection DF (contact DF placeholder (Key))',
+                            );
+                        }
+                    }
+                    ###### by contact dynamic field (with first object value placeholder)
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
+                        %MacroAction,
+                        UserID => 1,
+                        Parameters => {
+                            DynamicFieldName   => $Data{DFSelectionTargetName},
+                            DynamicFieldValue  => "<KIX_CONTACT_DynamicField_$Data{DFSelectionContactSourceName}_ObjectValue_0>", # result should be first value of contact source DF
+                            DynamicFieldAppend => 0
+                        }
+                    );
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
+                        ID       => $MacroID,
+                        ObjectID => $TicketID,
+                        UserID   => 1,
+                    );
+                    $Self->True(
+                        $Success,
+                        'contact DF placeholder (MacroExecute)',
+                    );
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                        TicketID      => $TicketID,
+                        DynamicFields => 1,
+                        UserID        => 1,
+                        Silent        => 1
+                    );
+                    if (IsHashRefWithData(\%Ticket)) {
+                        my $SelectionValue = $Ticket{'DynamicField_'.$Data{DFSelectionTargetName}};
+                        $Self->True(
+                            IsArrayRefWithData($SelectionValue) ? 1 : 0,
+                            'Check target selection DF (contact DF placeholder (ObjectValue_0))',
                         );
                         if (IsArrayRefWithData($SelectionValue)) {
                             $Self->Is(
                                 scalar(@{$SelectionValue}),
-                                2,
-                                'Check target selection DF (child DF placeholder)',
+                                1,
+                                'Check target selection DF (contact DF placeholder (ObjectValue_0))',
                             );
                             $Self->IsDeeply(
                                 $SelectionValue,
-                                $Data{DFSelection_ContactValue},
-                                'Check target selection DF (child DF placeholder)',
+                                [ $Data{DFSelection_ContactValue}->[0] ],
+                                'Check target selection DF (contact DF placeholder (ObjectValue_0))',
                             );
                         }
                     }
@@ -406,17 +506,61 @@ if ($TicketID) {
                         if (IsArrayRefWithData($TextValue)) {
                             $Self->Is(
                                 scalar(@{$TextValue}),
-                                2,
+                                1,
                                 'Check target text DF (key placeholder)',
+                            );
+                            $Self->Is(
+                                $TextValue->[0],
+                                'Key1#Key2',
+                                'Check target text DF (key placeholder)',
+                            );
+                        }
+                    }
+                    ###### for text DF by other dynamic field (object value placeholder)
+                    $Kernel::OM->Get('Automation')->MacroActionUpdate(
+                        %MacroAction,
+                        UserID => 1,
+                        Parameters => {
+                            DynamicFieldName   => $Data{DFTextTargetName},
+                            DynamicFieldValue  => "<KIX_TICKET_DynamicField_$Data{DFSelectionSourceName}_ObjectValue>",
+                            DynamicFieldAppend => 0
+                        }
+                    );
+                    $Success = $Kernel::OM->Get('Automation')->MacroExecute(
+                        ID       => $MacroID,
+                        ObjectID => $TicketID,
+                        UserID   => 1,
+                    );
+                    $Self->True(
+                        $Success,
+                        'text DF (MacroExecute) - object value placeholder',
+                    );
+                    %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                        TicketID      => $TicketID,
+                        DynamicFields => 1,
+                        UserID        => 1,
+                        Silent        => 1
+                    );
+                    if (IsHashRefWithData(\%Ticket)) {
+                        my $TextValue = $Ticket{'DynamicField_'.$Data{DFTextTargetName}};
+                        $Self->True(
+                            IsArrayRefWithData($TextValue) ? 1 : 0,
+                            'Check target text DF (object value placeholder)',
+                        );
+                        if (IsArrayRefWithData($TextValue)) {
+                            $Self->Is(
+                                scalar(@{$TextValue}),
+                                2,
+                                'Check target text DF (object value placeholder)',
                             );
                             $Self->IsDeeply(
                                 $TextValue,
                                 $Data{DFSelection_SourceValue},
-                                'Check target text DF (key placeholder)', # text DF has 2 values (the keys of the other DF)
+                                'Check target text DF (object value placeholder)',
                             );
                         }
                     }
-                    ###### for text DF by other dynamic field (only value placeholder)
+                    ###### for text DF by other dynamic field (additional check with value placeholder)
                     $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
@@ -460,7 +604,7 @@ if ($TicketID) {
                             );
                         }
                     }
-                    ###### for text DF by other dynamic field (value & key placeholder) # check if key placeholder is not alone, textual replacement should happen
+                    ###### for text DF by other dynamic field (value & key placeholder)
                     $Kernel::OM->Get('Automation')->MacroActionUpdate(
                         %MacroAction,
                         UserID => 1,
@@ -499,7 +643,7 @@ if ($TicketID) {
                             );
                             $Self->Is(
                                 $TextValue->[0],
-                                'Value1#Value2'.join('#',@{ $Data{DFSelection_SourceValue} }),
+                                'Value1#Value2Key1#Key2',
                                 'Check target text DF (value & key placeholder)'
                             );
                         }
@@ -507,7 +651,7 @@ if ($TicketID) {
 
                     ## article tests
                     if ($ArticleID) {
-                        ###### use ArticleID as ObjectID in parameters, but execute macro still with TicketID
+                        ###### use ArticleID as ObjectID in parameters, but execute macro still with TicketID => DF should be set on article (because target DF is for articles)
                         $Kernel::OM->Get('Automation')->MacroActionUpdate(
                             %MacroAction,
                             UserID => 1,

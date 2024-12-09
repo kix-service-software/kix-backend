@@ -76,10 +76,11 @@ sub Run {
 
         # check if this item already exists (i.e. some initial data)
         my $ID = $Self->Lookup(
-            Table        => 'organisation',
-            PrimaryKey   => 'id',
-            Item         => $Item,
-            RelevantAttr => [
+            Table          => 'organisation',
+            PrimaryKey     => 'id',
+            Item           => $Item,
+            SourceObjectID => $Item->{customer_id},
+            RelevantAttr   => [
                 'number'
             ]
         );

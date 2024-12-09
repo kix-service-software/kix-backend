@@ -110,16 +110,24 @@ sub AddTestToContainer {
 #####################################################TEST SUBROUTINES###################################################
 ########################################################################################################################
 sub NewTest {
-    my ($Self, $Name, $Status, $ContainerId) = @_;
-    return undef if (!$Name);
-    $Status //= 'unknown';
+    my ( $Self, $Name, $Status, $ContainerId, $File ) = @_;
+    return undef if ( !$Name );
+
+    $Status    //= 'unknown';
     my $TestId = Data::UUID->new->create_str();
+
     $Self->{Tests}->{$TestId} = {};
+
     $Self->AddTestProperty($TestId, 'name', $Name);
     $Self->AddTestProperty($TestId, 'status', $Status);
     $Self->AddTestProperty($TestId, 'uuid', $TestId);
+
     $Self->SetTestSeverityLevel($TestId, 'normal');
-    $Self->AddTestToContainer($TestId, $ContainerId) if ($ContainerId);;
+
+    $Self->SetTestFullName($TestId, $File) if ( $File );
+
+    $Self->AddTestToContainer($TestId, $ContainerId) if ( $ContainerId );
+
     return $TestId;
 }
 

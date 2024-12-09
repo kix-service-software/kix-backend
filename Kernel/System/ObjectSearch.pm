@@ -236,6 +236,15 @@ sub Search {
         }
         return;
     }
+    if ( $Param{UserID} !~ m/^[1-9][0-9]*$/ ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid UserID!",
+            );
+        }
+        return;
+    }
     if ( $Param{UserType} !~ m/^(?:Agent|Customer)$/ ) {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(

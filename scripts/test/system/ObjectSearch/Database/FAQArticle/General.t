@@ -65,6 +65,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -127,7 +143,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) = \'test\''
+                $CaseSensitive ? 'LOWER(f.f_subject) = \'test\'' : 'f.f_subject = \'test\''
             ]
         }
     },
@@ -140,7 +156,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(f.f_subject) != \'test\' OR f.f_subject IS NULL)'
+                $CaseSensitive ? '(LOWER(f.f_subject) != \'test\' OR f.f_subject IS NULL)' : '(f.f_subject != \'test\' OR f.f_subject IS NULL)'
             ]
         }
     },
@@ -153,7 +169,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_subject) IN (\'test\')' : 'f.f_subject IN (\'test\')'
             ]
         }
     },
@@ -166,7 +182,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_subject) NOT IN (\'test\')' : 'f.f_subject NOT IN (\'test\')'
             ]
         }
     },
@@ -179,7 +195,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(f.f_subject) LIKE \'test%\'' : 'f.f_subject LIKE \'test%\''
             ]
         }
     },
@@ -192,7 +208,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(f.f_subject) LIKE \'%test\'' : 'f.f_subject LIKE \'%test\''
             ]
         }
     },
@@ -205,7 +221,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(f.f_subject) LIKE \'%test%\'' : 'f.f_subject LIKE \'%test%\''
             ]
         }
     },
@@ -218,7 +234,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_subject) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(f.f_subject) LIKE \'test\'' : 'f.f_subject LIKE \'test\''
             ]
         }
     },
@@ -231,7 +247,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) = \'test\''
+                $CaseSensitive ? 'LOWER(f.f_number) = \'test\'' : 'f.f_number = \'test\''
             ]
         }
     },
@@ -244,7 +260,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(f.f_number) != \'test\' OR f.f_number IS NULL)'
+                $CaseSensitive ? '(LOWER(f.f_number) != \'test\' OR f.f_number IS NULL)' : '(f.f_number != \'test\' OR f.f_number IS NULL)'
             ]
         }
     },
@@ -257,7 +273,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_number) IN (\'test\')' : 'f.f_number IN (\'test\')'
             ]
         }
     },
@@ -270,7 +286,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_number) NOT IN (\'test\')' : 'f.f_number NOT IN (\'test\')'
             ]
         }
     },
@@ -283,7 +299,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(f.f_number) LIKE \'test%\'' : 'f.f_number LIKE \'test%\''
             ]
         }
     },
@@ -296,7 +312,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(f.f_number) LIKE \'%test\'' : 'f.f_number LIKE \'%test\''
             ]
         }
     },
@@ -309,7 +325,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(f.f_number) LIKE \'%test%\'' : 'f.f_number LIKE \'%test%\''
             ]
         }
     },
@@ -322,7 +338,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_number) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(f.f_number) LIKE \'test\'' : 'f.f_number LIKE \'test\''
             ]
         }
     },
@@ -335,7 +351,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) = \'test\''
+                $CaseSensitive ? 'LOWER(f.f_keywords) = \'test\'' : 'f.f_keywords = \'test\''
             ]
         }
     },
@@ -348,7 +364,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(f.f_keywords) != \'test\' OR f.f_keywords IS NULL)'
+                $CaseSensitive ? '(LOWER(f.f_keywords) != \'test\' OR f.f_keywords IS NULL)' : '(f.f_keywords != \'test\' OR f.f_keywords IS NULL)'
             ]
         }
     },
@@ -361,7 +377,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_keywords) IN (\'test\')' : 'f.f_keywords IN (\'test\')'
             ]
         }
     },
@@ -374,7 +390,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_keywords) NOT IN (\'test\')' : 'f.f_keywords NOT IN (\'test\')'
             ]
         }
     },
@@ -387,7 +403,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'test%\'' : 'f.f_keywords LIKE \'test%\''
             ]
         }
     },
@@ -400,7 +416,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'%test\'' : 'f.f_keywords LIKE \'%test\''
             ]
         }
     },
@@ -413,7 +429,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'%test%\'' : 'f.f_keywords LIKE \'%test%\''
             ]
         }
     },
@@ -426,7 +442,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.f_keywords) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'test\'' : 'f.f_keywords LIKE \'test\''
             ]
         }
     },
@@ -439,7 +455,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) = \'test\''
+                $CaseSensitive ? 'LOWER(f.language) = \'test\'' : 'f.language = \'test\''
             ]
         }
     },
@@ -452,7 +468,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(f.language) != \'test\' OR f.language IS NULL)'
+                $CaseSensitive ? '(LOWER(f.language) != \'test\' OR f.language IS NULL)' : '(f.language != \'test\' OR f.language IS NULL)'
             ]
         }
     },
@@ -465,7 +481,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.language) IN (\'test\')' : 'f.language IN (\'test\')'
             ]
         }
     },
@@ -478,7 +494,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.language) NOT IN (\'test\')' : 'f.language NOT IN (\'test\')'
             ]
         }
     },
@@ -491,7 +507,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(f.language) LIKE \'test%\'' : 'f.language LIKE \'test%\''
             ]
         }
     },
@@ -504,7 +520,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(f.language) LIKE \'%test\'' : 'f.language LIKE \'%test\''
             ]
         }
     },
@@ -517,7 +533,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(f.language) LIKE \'%test%\'' : 'f.language LIKE \'%test%\''
             ]
         }
     },
@@ -530,7 +546,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(f.language) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(f.language) LIKE \'test\'' : 'f.language LIKE \'test\''
             ]
         }
     }

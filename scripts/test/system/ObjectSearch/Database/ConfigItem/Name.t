@@ -50,6 +50,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -113,7 +132,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) = \'test\''
+                $CaseSensitive ? 'LOWER(ci.name) = \'test\'' : 'ci.name = \'test\''
             ]
         }
     },
@@ -127,7 +146,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) != \'test\''
+                $CaseSensitive ? 'LOWER(ci.name) != \'test\'' : 'ci.name != \'test\''
             ]
         }
     },
@@ -141,7 +160,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(ci.name) IN (\'test\')' : 'ci.name IN (\'test\')'
             ]
         }
     },
@@ -155,7 +174,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(ci.name) NOT IN (\'test\')' : 'ci.name NOT IN (\'test\')'
             ]
         }
     },
@@ -169,7 +188,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(ci.name) LIKE \'test%\'' : 'ci.name LIKE \'test%\''
             ]
         }
     },
@@ -183,7 +202,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(ci.name) LIKE \'%test\'' : 'ci.name LIKE \'%test\''
             ]
         }
     },
@@ -197,7 +216,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(ci.name) LIKE \'%test%\'' : 'ci.name LIKE \'%test%\''
             ]
         }
     },
@@ -211,7 +230,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'LOWER(ci.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(ci.name) LIKE \'test\'' : 'ci.name LIKE \'test\''
             ]
         }
     },
@@ -230,7 +249,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) = \'test\''
+                $CaseSensitive ? 'LOWER(civ.name) = \'test\'' : 'civ.name = \'test\''
             ]
         }
     },
@@ -249,7 +268,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) != \'test\''
+                $CaseSensitive ? 'LOWER(civ.name) != \'test\'' : 'civ.name != \'test\''
             ]
         }
     },
@@ -268,7 +287,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(civ.name) IN (\'test\')' : 'civ.name IN (\'test\')'
             ]
         }
     },
@@ -287,7 +306,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(civ.name) NOT IN (\'test\')' : 'civ.name NOT IN (\'test\')'
             ]
         }
     },
@@ -306,7 +325,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(civ.name) LIKE \'test%\'' : 'civ.name LIKE \'test%\''
             ]
         }
     },
@@ -325,7 +344,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(civ.name) LIKE \'%test\'' : 'civ.name LIKE \'%test\''
             ]
         }
     },
@@ -344,7 +363,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(civ.name) LIKE \'%test%\'' : 'civ.name LIKE \'%test%\''
             ]
         }
     },
@@ -363,7 +382,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id'
             ],
             'Where' => [
-                'LOWER(civ.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(civ.name) LIKE \'test\'' : 'civ.name LIKE \'test\''
             ]
         }
     }
@@ -892,7 +911,7 @@ my @IntegrationSortTests = (
                 Field => 'Name'
             }
         ],
-        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
     },
     {
         Name     => 'Sort: Field Name / Direction ascending',
@@ -902,7 +921,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID1, $ConfigItemID2, $ConfigItemID3] : [$ConfigItemID3, $ConfigItemID1, $ConfigItemID2]
     },
     {
         Name     => 'Sort: Field Name / Direction descending',
@@ -912,7 +931,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1]
+        Expected => $OrderByNull eq 'LAST' ? [$ConfigItemID3,$ConfigItemID2,$ConfigItemID1] : [$ConfigItemID2, $ConfigItemID1, $ConfigItemID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

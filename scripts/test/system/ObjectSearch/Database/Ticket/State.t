@@ -67,6 +67,12 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+my @ViewableStateIDs = $Kernel::OM->Get('State')->StateGetStatesByType(
+    Type   => 'Viewable',
+    Result => 'ID',
+);
+my $ViewableStateIDsString = join( ',', @ViewableStateIDs );
+
 # check Search
 my @SearchTests = (
     {
@@ -644,7 +650,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'st.ticket_state_id IN (1,2,3,5)'
+                'st.ticket_state_id IN (' . $ViewableStateIDsString . ')'
             ]
         }
     },
@@ -658,7 +664,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'st.ticket_state_id NOT IN (1,2,3,5)'
+                'st.ticket_state_id NOT IN (' . $ViewableStateIDsString . ')'
             ]
         }
     },
@@ -672,7 +678,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'st.ticket_state_id NOT IN (1,2,3,5)'
+                'st.ticket_state_id NOT IN (' . $ViewableStateIDsString . ')'
             ]
         }
     },
@@ -686,7 +692,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                'st.ticket_state_id IN (1,2,3,5)'
+                'st.ticket_state_id IN (' . $ViewableStateIDsString . ')'
             ]
         }
     },
@@ -700,7 +706,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [],
             'Where' => [
-                '(st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5))'
+                '(st.ticket_state_id IN (' . $ViewableStateIDsString . ') OR st.ticket_state_id NOT IN (' . $ViewableStateIDsString . '))'
             ]
         }
     },
@@ -717,7 +723,7 @@ my @SearchTests = (
                 'INNER JOIN ticket_state_type tst ON tst.id = ts.type_id'
             ],
             'Where' => [
-                '(st.ticket_state_id IN (1,2,3,5) OR st.ticket_state_id NOT IN (1,2,3,5) OR tst.name LIKE \'Test%\')'
+                '(st.ticket_state_id IN (' . $ViewableStateIDsString . ') OR st.ticket_state_id NOT IN (' . $ViewableStateIDsString . ') OR tst.name LIKE \'Test%\')'
             ]
         }
     }

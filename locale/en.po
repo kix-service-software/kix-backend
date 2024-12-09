@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-8-16 04:48+0000\n"
-"PO-Revision-Date: 2024-08-08 14:39+0000\n"
-"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
+"POT-Creation-Date: 2024-12-9 07:50+0000\n"
+"PO-Revision-Date: 2024-12-03 08:51+0000\n"
+"Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/en/>\n"
 "Language: en\n"
@@ -1141,10 +1141,6 @@ msgid "RegEx"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
-msgid "Text"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "The RegEx containing the capture groups."
 msgstr ""
 
@@ -1197,6 +1193,119 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Values"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"(Optional) The pending time in seconds. Will be added to the actual time "
+"when the macro action is executed. Used for pending states only."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Article Dynamic Fields"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Creates an ticket."
+msgstr "Creates a new ticket."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Lock"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Organisation"
+msgstr "Organisation"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Owner"
+msgstr "Owner"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Pending Time Difference"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Priority"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Responsible"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "State"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Team"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The ID of the new ticket."
+msgstr ""
+"Add the name of a variable if you want to use the result in further macro "
+"actions."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The ID or email of the contact of the new ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"The ID or login of the owner of the new ticket. Current user will be used if "
+"omitted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"The ID or login of the responsible of the new ticket. Root user (ID = 1) "
+"will be used if omitted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"The ID or number of the organisation of the new ticket. Primary organisation "
+"of contact will be used if omitted."
+msgstr ""
+"The ID or CNO of the organisation of the new ticket. Primary organisation of "
+"contact will be used if omitted."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The dynamic fields of the new ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The lock state of the new ticket."
+msgstr "The name of the lock state of the new ticket."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The name of the priority of the new ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The name of the state of the new ticket."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"The name of the team of the new ticket. If it is as sub-team, the full path-"
+"name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
+"NameOfTeamToBeSet\")."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid ""
+"The name of the type of the new ticket. Configured default will be used "
+"(Ticket::Type::Default) if omitted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "The title of the new ticket and subject of the first article."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/TicketCreate.pm
+msgid "Ticket Dynamic Fields"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/VariableSet.pm
@@ -1364,7 +1473,7 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Show in Customer Portal"
-msgstr "Show in Customer Portal"
+msgstr "Available in Customer Portal"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Subject"
@@ -1515,6 +1624,10 @@ msgstr "The ID or CNO of the organisation to be set."
 msgid "Sets the owner of a ticket."
 msgstr ""
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/OwnerSet.pm
+msgid "The ID or login of the agent to be set."
+msgstr ""
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/PrioritySet.pm
 msgid "Sets the priority of a ticket."
 msgstr ""
@@ -1525,10 +1638,6 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
 msgid "Sets the responsible of a ticket."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ResponsibleSet.pm
-msgid "The ID or login of the agent to be set."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/StateSet.pm
@@ -1573,123 +1682,6 @@ msgid ""
 "NameOfTeamToBeSet\")."
 msgstr ""
 
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"(Optional) The pending time in seconds. Will be added to the actual time "
-"when the macro action is executed. Used for pending states only."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Article Dynamic Fields"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Creates an ticket."
-msgstr "Creates a new ticket."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Lock"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Organisation"
-msgstr "Organisation"
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Owner"
-msgstr "Owner"
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Pending Time Difference"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Priority"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Responsible"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "State"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Team"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The ID of the new ticket."
-msgstr ""
-"Add the name of a variable if you want to use the result in further macro "
-"actions."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The ID or email of the contact of the new ticket."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"The ID or login of the owner of the new ticket. Current user will be used if "
-"omitted."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"The ID or login of the responsible of the new ticket. Root user (ID = 1) "
-"will be used if omitted."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"The ID or number of the organisation of the new ticket. Primary organisation "
-"of contact will be used if omitted."
-msgstr ""
-"The ID or CNO of the organisation of the new ticket. Primary organisation of "
-"contact will be used if omitted."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The dynamic fields of the new ticket."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The lock state of the new ticket."
-msgstr "The name of the lock state of the new ticket."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The name of the priority of the new ticket."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The name of the state of the new ticket."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"The name of the team of the new ticket. If it is as sub-team, the full path-"
-"name has to be used (separated by two colons - e.g. \"NameOfParentTeam::"
-"NameOfTeamToBeSet\")."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid ""
-"The name of the type of the new ticket. Configured default will be used "
-"(Ticket::Type::Default) if omitted."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "The title of the new ticket and subject of the first article."
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Ticket Dynamic Fields"
-msgstr ""
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TicketCreate.pm
-msgid "Title"
-msgstr ""
-
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/TitleSet.pm
 msgid "Sets the title of a ticket."
 msgstr ""
@@ -1715,15 +1707,15 @@ msgid "CIHistory::"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration.pm
-msgid "aborted"
-msgstr ""
-
-#. Perl Module: Kernel/System/Installation/Migration.pm
 msgid "aborting"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17.pm
 msgid "in progress"
+msgstr ""
+
+#. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
+msgid "aborted"
 msgstr ""
 
 #. Perl Module: Kernel/System/Installation/Migration/KIX17/Common.pm
@@ -1780,6 +1772,10 @@ msgid ""
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
+msgid "Text"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/Function/IfPluginAvailable.pm
 msgid "The name of the plugin to check for."
 msgstr ""
 
@@ -1804,6 +1800,73 @@ msgstr ""
 msgid "The names of the Dynamic Fields corresponding with the column config."
 msgstr ""
 
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateCount.pm
+msgid "Resolves the count a ticket was in a state."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateCount.pm
+msgid "States"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateCount.pm
+msgid "The names of the States corresponding with the column config."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketStateDuration.pm
+msgid "Resolves the duration of a ticket in a state."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "Columns"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "If count for a state is zero output as empty string."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "Output zero as empty string"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "Resolves the count a ticket was in a team."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "Teams"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid "The columns in the raw data containing the TicketID to resolve."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamCount.pm
+msgid ""
+"The names of the Teams corresponding with the column config. Special "
+"handling with \"<Current>\" and \"<Create>\""
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamDuration.pm
+msgid "Relevant states"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamDuration.pm
+msgid "Resolves the duration of a ticket in a team."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamDuration.pm
+msgid "Stop states"
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamDuration.pm
+msgid ""
+"The names of ticket states that are relevant for the duration calulation."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/TicketTeamDuration.pm
+msgid "The names of ticket states that stop the duration calulation."
+msgstr ""
+
 #. Perl Module: Kernel/System/Reporting/DataSource/GenericSQL/OutputHandler/Translate.pm
 msgid "Language"
 msgstr ""
@@ -1826,10 +1889,6 @@ msgstr ""
 msgid ""
 "A list (Array) of the columns to be contained in the order in which they "
 "should occur in the output result. If omitted all columns will be used."
-msgstr ""
-
-#. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
-msgid "Columns"
 msgstr ""
 
 #. Perl Module: Kernel/System/Reporting/OutputFormat/CSV.pm
@@ -1877,6 +1936,10 @@ msgstr ""
 #. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
 msgid ""
 "If given, this title overrides the one configured in the report definition."
+msgstr ""
+
+#. Perl Module: Kernel/System/Reporting/OutputFormat/Common.pm
+msgid "Title"
 msgstr ""
 
 #. Perl Module: Kernel/System/Ticket.pm
@@ -2015,6 +2078,14 @@ msgstr ""
 msgid "allows to create, edit, delete text modules"
 msgstr ""
 
+#. Perl Module: update/build-1991.pl
+msgid "Duration in State and Team"
+msgstr ""
+
+#. Perl Module: update/build-1991.pl
+msgid "Lists of tickets with their durations in specified states and teams."
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
 msgstr ""
@@ -2076,11 +2147,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
 msgid ""
-"Defines a generic expand available for all GET (including SEARCH) operations."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/Contact.xml
-msgid ""
 "Defines which attributes of the contact data hash should NOT be exported. "
 "Key = Attribute, Value = 1 if attribute should not be exported. If nothing "
 "is defined, every attribute will be exported"
@@ -2095,6 +2161,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Contact.xml
 msgid "Enable wildcard praefix for contact fulltext search."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/ObjectIcon.xml
+msgid ""
+"Defines a generic include available for all GET (including SEARCH) "
+"operations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Organisation.xml
@@ -2115,10 +2187,23 @@ msgstr ""
 msgid "Enable wildcard praefix for organisation search."
 msgstr ""
 
-#. SysConfig: Kernel/Config/Files/API/Role.xml
+#. SysConfig: Kernel/Config/Files/API/Queue.xml
 msgid ""
-"Defines a generic include available for all GET (including SEARCH) "
-"operations."
+"Defines a generic expand available for all GET (including SEARCH) operations."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Session.xml
+msgid ""
+"Defines which attributes of the user data hash should NOT be exported. Key = "
+"Attribute, Value = 1 if attribute should not be exported. If nothing is "
+"defined, every attribute will be exported"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API/Session.xml
+msgid ""
+"Defines which attributes of the user data hash should be exported. Key = "
+"Attribute, Value = 1 if attribute should be exported. If nothing is defined, "
+"every attribute will be exported"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API/Ticket.xml
@@ -2170,20 +2255,6 @@ msgstr "Team"
 msgid "Up"
 msgstr ""
 
-#. SysConfig: Kernel/Config/Files/API/User.xml
-msgid ""
-"Defines which attributes of the user data hash should NOT be exported. Key = "
-"Attribute, Value = 1 if attribute should not be exported. If nothing is "
-"defined, every attribute will be exported"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/API/User.xml
-msgid ""
-"Defines which attributes of the user data hash should be exported. Key = "
-"Attribute, Value = 1 if attribute should be exported. If nothing is defined, "
-"every attribute will be exported"
-msgstr ""
-
 #. SysConfig: Kernel/Config/Files/API/Validators.xml
 msgid "API module registration for the validator layer."
 msgstr ""
@@ -2229,7 +2300,19 @@ msgid "Registration of a execution plan type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a job type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
 msgid "Registration of a logging module for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a macro action type for automation."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Registration of a macro type for automation."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
@@ -2304,10 +2387,6 @@ msgid "Cache Time To Leave for FAQ items."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
-msgid "Comment"
-msgstr "Comment"
-
-#. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Decimal places of the voting result."
 msgstr ""
 
@@ -2329,10 +2408,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Definition of FAQ item free text field."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/FAQ.xml
-msgid "DynamicField object registration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
@@ -2620,6 +2695,14 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
+"Checks if the headers \"In-Reply-To\" or \"References\" of a follow-up "
+"message contain a Message-ID of an article visible in the self service "
+"portal on this ticket. If so, the email is visible in the self service "
+"portal."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
 "Checks if the sender of a follow-up message is contained in agent database, "
 "and if so sets sender type \"agent\"."
 msgstr ""
@@ -2655,6 +2738,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Christmas Eve"
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Comment"
+msgstr "Comment"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
@@ -3275,6 +3362,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "DynamicField backend registration."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "DynamicField object registration."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4246,6 +4337,22 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "TicketStateCount"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "TicketStateDuration"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "TicketTeamCount"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "TicketTeamDuration"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Translate"
 msgstr ""
 
@@ -4395,6 +4502,15 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
+"Configuration for configuration item number generator module \"ClassPrefixes"
+"\". Module generates incremental numbers with pattern &lt;SystemID"
+"+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, e.g. "
+"12CM0004, 12CM0005. When no class prefix and no default prefix is given, the "
+"class id is used."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ITSM.xml
+msgid ""
 "Defines for which object type in which configitem class in which configitem "
 "attributes will be searched with which object attributes values "
 "(SearchAttributes) or static values (SearchStatic). Configitem attributes "
@@ -4410,12 +4526,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Defines information shown for Organisation attributes."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid ""
-"Defines regular expressions individually for each ConfigItem class to check "
-"the ConfigItem name and to show corresponding error messages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4483,12 +4593,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid "Module registration for notification config item placeholders."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid ""
-"Overloads (redefines) existing functions in Kernel::System::ITSMConfigItem. "
-"Used to easily add customizations."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4632,6 +4736,19 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
 msgid ""
+"Controls QR code resolution behavior of the app. If an asset of a class, "
+"given by a key within this hash is scanned, the app tries to load not the "
+"scanned asset itself, but multiple assets or a single asset linked with the "
+"scanned asset. If value \"multi\" is set, the app loads multiple linked "
+"assets. If no or an empty value is set, the app loads only a single linked "
+"asset. If more than one asset is linked, the app does not load any of them. "
+"The scanned asset MUST NOT be linked with more than one other asset. In "
+"other words: \"multi\" allows as a collection, whereas none/empty behaves "
+"like an alias."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
 "Defines a list of Ticket Dynamic Fields which are available for editing in "
 "the KIXMobileApp. The lists consists of dynamic field names (e.g. "
 "'WorkOrder') or regular expressions matching dynamic field names (e.g. 'Work."
@@ -4735,6 +4852,10 @@ msgid ""
 "Activates the ticket archive system to have a faster system by moving some "
 "tickets out of the daily scope. To search for these tickets, the archive "
 "flag has to be enabled in the ticket search."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Added article."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5229,15 +5350,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Is executed when an article is created in the \"Email\" channel. Checks "
-"whether at least one email reference (References and InReplyTo) is a message-"
-"id of a customer visible article at the same ticket. If Yes: The visibility "
-"of the article in the SSP is automatically activated (regardless of the "
-"agent's setting). If No: The visibility selected by the agent is not changed."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Is executed when an article is created in the \"Email\" channel. Checks "
 "whether at least one of the recipient addresses (To, Cc or Bcc) is assigned "
 "to the ticket contact. If Yes: The visibility of the article in the SSP is "
 "automatically activated (regardless of the agent's setting). If No: The "
@@ -5409,18 +5521,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a job type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a macro action type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Registration of a macro type for automation."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Removed subscription for user \"%s\"."
 msgstr ""
 
@@ -5521,6 +5621,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Set Type"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Set primary organisation of contact, when set organisation is not assigned "
+"to the contact."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5709,10 +5815,6 @@ msgid ""
 "given."
 msgstr ""
 
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "note-report"
-msgstr ""
-
 #. Template: Page
 msgid "Page"
 msgstr ""
@@ -5775,55 +5877,55 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::AttachmentAdd"
-msgstr ""
+msgstr "Attachment (%s) added"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::AttachmentDelete"
-msgstr ""
+msgstr "Attachment (%s) deleted"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ConfigItemCreate"
-msgstr ""
+msgstr "New ConfigItem (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ConfigItemDelete"
-msgstr ""
+msgstr "ConfigItem (ID=%s) deleted"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::DefinitionUpdate"
-msgstr ""
+msgstr "ConfigItem definition updated (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::DeploymentStateUpdate"
-msgstr ""
+msgstr "Deployment state updated (new=%s; old=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::IncidentStateUpdate"
-msgstr ""
+msgstr "Incident state updated (new=%s; old=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::LinkAdd"
-msgstr ""
+msgstr "Link to %s (type=%s) added"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::LinkDelete"
-msgstr ""
+msgstr "Link to %s (type=%s) deleted"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::NameUpdate"
-msgstr ""
+msgstr "Name updated (new=%s; old=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::ValueUpdate"
-msgstr ""
+msgstr "Attribute %s updated from \"%s\" to \"%s\""
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::VersionCreate"
-msgstr ""
+msgstr "New version (ID=%s)"
 
 #. manual entry from templates.pot.manual
 msgid "CIHistory::VersionDelete"
-msgstr ""
+msgstr "Version %s deleted"
 
 #. manual entry from templates.pot.manual
 msgid "Cannot create or update item, because it already exists."

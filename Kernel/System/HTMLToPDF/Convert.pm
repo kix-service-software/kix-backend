@@ -48,10 +48,11 @@ sub Convert {
         return;
     }
 
+    my $IdentifierKey;
     if ( $Param{IdentifierType} ) {
         my $ObjectParams = $Self->{"Backend$Data{Object}"}->GetParams();
-
-        $Param{$ObjectParams->{$Param{IdentifierType}}} = $Param{IdentifierIDorNumber};
+        $IdentifierKey         = $ObjectParams->{$Param{IdentifierType}};
+        $Param{$IdentifierKey} = $Param{IdentifierIDorNumber};
     }
 
     my $Result = $Self->_CheckParams(
@@ -108,14 +109,21 @@ sub Convert {
             String => $Filename,
             UserID => $Param{UserID},
         );
+
         $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            %Param,
             Text     => $Replaced{Text},
+            Object   => $Data{Object},
+            ObjectID => $Param{$IdentifierKey},
             RichText => 1,
             UserID   => $Param{UserID},
             Data     => {}
-        )
+        );
     }
+
+    # discard needed objects
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Output::HTML::Layout'],
+    );
 
     for my $Key ( qw(Filters Allows Ignores) ) {
         next if !$Param{$Key};
@@ -146,15 +154,16 @@ sub Convert {
     for my $Key ( qw(Header Content Footer ) ) {
         $FileDatas{$Key} = $Self->Render(
             %Param,
-            Block     => $Data{Definition}->{$Key},
-            Filename  => $Filename . '_' . $Key,
-            Directory => $Directory,
-            Object    => $Data{Object},
-            Expands   => $Data{Definition}->{Expands},
-            Filters   => $Data{Definition}->{Filters},
-            Allows    => $Data{Definition}->{Allows},
-            Ignores   => $Data{Definition}->{Ignores},
-            IsContent => $Key eq 'Content' ? 1 : 0
+            Block        => $Data{Definition}->{$Key},
+            Filename     => $Filename . '_' . $Key,
+            Directory    => $Directory,
+            Object       => $Data{Object},
+            ObjectID     => $Param{$IdentifierKey},
+            Expands      => $Data{Definition}->{Expands},
+            Filters      => $Data{Definition}->{Filters},
+            Allows       => $Data{Definition}->{Allows},
+            Ignores      => $Data{Definition}->{Ignores},
+            IsContent    => $Key eq 'Content' ? 1 : 0
         );
     }
 
@@ -224,7 +233,48 @@ sub _Call {
     # prepare system call
     my @SystemCallArg = ( $Binary );
 
-    # add parameter to system call
+    # add page size parameter
+    if(
+        defined $Page{Format}
+        && $Page{Format}
+    ) {
+        push(
+            @SystemCallArg,
+            '-s',
+            $Page{Format}
+        );
+    }
+    elsif (
+        defined $Page{Height}
+        && defined $Page{Width}
+        && $Page{Height}
+        && $Page{Width}
+    ) {
+        push(
+            @SystemCallArg,
+            '--page-height',
+            $Page{Height},
+            '--page-width',
+            $Page{Width}
+        );
+    }
+    else {
+        push(
+            @SystemCallArg,
+            '-s',
+            'A4'
+        );
+    }
+
+    if ( $Page{Orientation} ) {
+        push(
+            @SystemCallArg,
+            '-O',
+            $Page{Orientation}
+        );
+    }
+
+    # add parameter of the system call from config
     if ( ref( $Config{Parameter} ) eq 'ARRAY' ) {
         push( @SystemCallArg, @{ $Config{Parameter} } );
     }
@@ -407,30 +457,38 @@ sub _ReplacePlaceholders {
             SystemTime => $Kernel::OM->Get('Time')->SystemTime()
         );
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDD_hhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . q{_}
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDD_hhmm>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDD_hhmm>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d_%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3],
+                $Time[2],
+                $Time[1]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDD_hhmm>/$TimeStamp/gsxm;
         }
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDD}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3];
-            $Result{Text} =~ s/<TIME_YYMMDD>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDD>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDD>/$TimeStamp/gsxm;
         }
 
-        if ( $Result{Text} =~ m{<TIME_YYMMDDhhmm}smx ) {
-            my $TimeStamp = $Time[5]
-                . $Time[4]
-                . $Time[3]
-                . $Time[2]
-                .$Time[1];
-            $Result{Text} =~ s/<TIME_YYMMDDhhmm>/$TimeStamp/gsxm;
+        if ( $Result{Text} =~ m{<TIME_YY(?:YY)?MMDDhhmm>}smx ) {
+            my $TimeStamp = sprintf(
+                '%d%02d%02d%02d%02d',
+                $Time[5],
+                $Time[4],
+                $Time[3],
+                $Time[2],
+                $Time[1]
+            );
+            $Result{Text} =~ s/<TIME_YY(?:YY)?MMDDhhmm>/$TimeStamp/gsxm;
         }
 
         $Result{Text} =~ s/<TIME_.*>//gsxm;

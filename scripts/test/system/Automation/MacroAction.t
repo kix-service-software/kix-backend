@@ -187,7 +187,7 @@ $Self->False(
 my @Tests = (
     {
         Name => 'simple',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'test1_value',
         },
         Data => {
@@ -199,7 +199,7 @@ my @Tests = (
     },
     {
         Name => 'simple as part of a string',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'test1_value',
         },
         Data => {
@@ -211,7 +211,7 @@ my @Tests = (
     },
     {
         Name => 'array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 1,2,3
             ]
@@ -225,7 +225,7 @@ my @Tests = (
     },
     {
         Name => 'hash',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => 'test2'
             }
@@ -239,7 +239,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -260,7 +260,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes in text',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -281,7 +281,7 @@ my @Tests = (
     },
     {
         Name => 'array of hashes with arrays of hashes direct assignment of structure',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 {},
                 {
@@ -306,7 +306,7 @@ my @Tests = (
     },
     {
         Name => 'nested variables (2 levels)',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => {
                     Test3 => 'found!'
@@ -326,7 +326,7 @@ my @Tests = (
     },
     {
         Name => 'nested variables (4 levels)',
-        MacroResults => {
+        MacroVariables => {
             Test1 => {
                 Test2 => {
                     Test3 => 'found!'
@@ -361,7 +361,7 @@ my @Tests = (
     },
     {
         Name => 'nested variable in filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => '2022-10-01 12:22:33',
             Variable2 => 3,
             Variable3 => 'TimeStamp'
@@ -375,7 +375,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => 'test123',
         },
         Data => {
@@ -395,7 +395,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter with binary content containing pipe characters',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => $TestPNGBase64,
         },
         Data => {
@@ -407,7 +407,7 @@ my @Tests = (
     },
     {
         Name => 'base64 filter with binary content containing pipe characters in json-text',
-        MacroResults => {
+        MacroVariables => {
             Article => {
                 Attachments => [
                     {
@@ -457,7 +457,7 @@ END
     },
     {
         Name => 'JSON filter in text',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => {
                 key => 'test123',
             }
@@ -477,7 +477,7 @@ END
     },
     {
         Name => 'JSON filter as object assignment',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => {
                 key => 'test123',
             }
@@ -493,7 +493,7 @@ END
     },
     {
         Name => 'jq filter',
-        MacroResults => {
+        MacroVariables => {
             Variable1 => '[
                 { "Key": 1, "Value": 1111, "Flag": "a" },
                 { "Key": 2, "Value": 2222, "Flag": "b" },
@@ -509,8 +509,125 @@ END
         }
     },
     {
+        Name => 'jq filter with trailing whitespace',
+        MacroVariables => {
+            Variable1 => '[
+  {
+    "id": "AEBVCP",
+    "value": "pending",
+    "input": "ChecklistState",
+    "description": null,
+    "title": "Subtask \"AEBVCP\""
+  },
+  {
+    "description": null,
+    "title": "Subtask \"CMS\"",
+    "input": "ChecklistState",
+    "value": "pending",
+    "id": "CMS"
+  },
+  {
+    "value": "pending",
+    "id": "CRM",
+    "description": null,
+    "title": "Subtask \"CRM\"",
+    "input": "ChecklistState"
+  },
+  {
+    "id": "Cognos_Controller",
+    "value": "pending",
+    "input": "ChecklistState",
+    "title": "Subtask \"Cognos_Controller\"",
+    "description": null
+  }
+]'
+        },
+        Data => {
+            Result => '${Variable1|jq([.[] :: select(.id=="CRM").value="OK"]) }',
+        },
+        Expected => {
+            Result => '[
+  {
+    "id": "AEBVCP",
+    "value": "pending",
+    "input": "ChecklistState",
+    "description": null,
+    "title": "Subtask \"AEBVCP\""
+  },
+  {
+    "description": null,
+    "title": "Subtask \"CMS\"",
+    "input": "ChecklistState",
+    "value": "pending",
+    "id": "CMS"
+  },
+  {
+    "value": "OK",
+    "id": "CRM",
+    "description": null,
+    "title": "Subtask \"CRM\"",
+    "input": "ChecklistState"
+  },
+  {
+    "id": "Cognos_Controller",
+    "value": "pending",
+    "input": "ChecklistState",
+    "title": "Subtask \"Cognos_Controller\"",
+    "description": null
+  }
+]',
+        }
+    },
+    {
+        Name => 'jq filter building json structure',
+        MacroVariables => {
+            Variable1 => [
+                {
+                    type      => 'person',
+                    firstname => 'Max',
+                    lastname  => 'Mustermann',
+                    street    => 'Musterstrasse 11',
+                    zip       => '0815',
+                    city      => 'Musterstadt'
+                },
+                {
+                    type   => 'building',
+                    name   => 'Musterhaus',
+                    street => 'Musterstrasse 12',
+                    zip    => '0815',
+                    city   => 'Musterstadt'
+                },
+                {
+                    type      => 'person',
+                    firstname => 'Heike',
+                    lastname  => 'Musterfrau',
+                    street    => 'Musterstrasse 13',
+                    zip       => '0815',
+                    city      => 'Musterstadt'
+                }
+            ]
+        },
+        Data => {
+            Result => '${Variable1|JSON|jq(map(. :: select(.type=="person")) :: map({id: "0", name:(.firstname+" "+.lastname), address:(.street+", "+.zip+" "+.city)}))}',
+        },
+        Expected => {
+            Result => '[
+  {
+    "id": "0",
+    "name": "Max Mustermann",
+    "address": "Musterstrasse 11, 0815 Musterstadt"
+  },
+  {
+    "id": "0",
+    "name": "Heike Musterfrau",
+    "address": "Musterstrasse 13, 0815 Musterstadt"
+  }
+]',
+        }
+    },
+    {
         Name => 'Combine variables as array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'Test1',
             Test2 => 'Test2',
         },
@@ -523,7 +640,7 @@ END
     },
     {
         Name => 'Combine variables containing arrays as array',
-        MacroResults => {
+        MacroVariables => {
             Test1 => [
                 'Test1.1',
                 'Test1.2'
@@ -542,7 +659,7 @@ END
     },
     {
         Name => 'Multiple line data without leading or trailing content on line with variable',
-        MacroResults => {
+        MacroVariables => {
             Test1 => 'Variable: 1',
         },
         Data => {
@@ -558,25 +675,19 @@ Static: 2',
     },
 );
 
-# load additional filter
-$AutomationObject->_GetVariableFilter();
-
 my $TestCount = 0;
 foreach my $Test ( @Tests ) {
     $TestCount++;
 
-    $AutomationObject->{MacroResults} = $Test->{MacroResults};
-
-    my %Data = %{$Test->{Data}};
-
-    $AutomationObject->_ReplaceResultVariables(
-        Data => \%Data,
+    my $DataRef = $Kernel::OM->Get('Main')->ReplaceVariables(
+        Data      => $Test->{Data},
+        Variables => $Test->{MacroVariables}
     );
 
     $Self->IsDeeply(
-        \%Data,
+        $DataRef,
         $Test->{Expected},
-        '_ReplaceResultVariables() Test "'.$Test->{Name}.'"',
+        'Main::ReplaceVariables() Test "'.$Test->{Name}.'"',
     );
 }
 

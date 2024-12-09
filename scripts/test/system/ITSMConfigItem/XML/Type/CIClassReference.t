@@ -81,7 +81,6 @@ $Self->True(
 my $ConfigItemName   = 'TestConfigItem.' . $Helper->GetRandomID();
 my $SerialNumber     = 'SerialNumber.' . $Helper->GetRandomID();
 my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemNumberCreate(
-    Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
     ClassID => $HardwareClassID,
 );
 my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(

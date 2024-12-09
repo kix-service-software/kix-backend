@@ -137,90 +137,84 @@ my @Tests = (
 $Helper->BeginWork();
 
 for my $Test (@Tests) {
+    my $Location = $ConfigObject->Get('Home')
+        . '/scripts/test/system/sample/PostMaster/' . $Test->{Name} . '.box';
 
-    for my $Backend (qw(DB FS)) {
+    my $ContentRef = $MainObject->FileRead(
+        Location => $Location,
+        Mode     => 'binmode',
+        Result   => 'ARRAY',
+    );
 
-        $ConfigObject->Set(
-            Key   => 'Ticket::StorageModule',
-            Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
+    my @Return;
+    my $TicketID;
+    {
+        my $PostMasterObject = Kernel::System::PostMaster->new(
+            Email => $ContentRef,
         );
 
-        my $Location = $ConfigObject->Get('Home')
-            . '/scripts/test/system/sample/PostMaster/' . $Test->{Name} . '.box';
+        @Return = $PostMasterObject->Run();
+        @Return = @{ $Return[0] || [] };
 
-        my $ContentRef = $MainObject->FileRead(
-            Location => $Location,
-            Mode     => 'binmode',
-            Result   => 'ARRAY',
-        );
+        $TicketID = $Return[1];
+    }
 
-        my @Return;
-        my $TicketID;
-        {
-            my $PostMasterObject = Kernel::System::PostMaster->new(
-                Email => $ContentRef,
-            );
+    $Self->Is(
+        $Return[0] || 0,
+        1,
+        "$Test->{Name} | Postmaster NewTicket",
+    );
 
-            @Return = $PostMasterObject->Run();
-            @Return = @{ $Return[0] || [] };
+    $Self->True(
+        $TicketID,
+        "$Test->{Name} | Ticket created $TicketID",
+    );
 
-            $TicketID = $Return[1];
-        }
+    my @ArticleIDs = $TicketObject->ArticleIndex( TicketID => $TicketID );
+    $Self->True(
+        $ArticleIDs[0],
+        "$Test->{Name} | Article created",
+    );
 
-        $Self->Is(
-            $Return[0] || 0,
-            1,
-            "$Test->{Name} | $Backend - Postmaster NewTicket",
-        );
+    my %AttachmentIndex = $TicketObject->ArticleAttachmentIndex(
+        ArticleID => $ArticleIDs[0],
+        UserID    => 1,
+    );
 
-        $Self->True(
-            $TicketID,
-            "$Test->{Name} | $Backend - Ticket created $TicketID",
-        );
+    my %AttachmentsLookup = map { $AttachmentIndex{$_}->{Filename} => $_ } sort keys %AttachmentIndex;
 
-        my @ArticleIDs = $TicketObject->ArticleIndex( TicketID => $TicketID );
-        $Self->True(
-            $ArticleIDs[0],
-            "$Test->{Name} | $Backend - Article created",
-        );
+    for my $AttachmentFilename ( sort keys %{ $Test->{ExpectedResults} } ) {
 
-        my %AttachmentIndex = $TicketObject->ArticleAttachmentIndex(
-            ArticleID => $ArticleIDs[0],
-            UserID    => 1,
-        );
+        my $AttachmentID = $AttachmentsLookup{$AttachmentFilename};
 
-        my %AttachmentsLookup = map { $AttachmentIndex{$_}->{Filename} => $_ } sort keys %AttachmentIndex;
+        # add attachment id to expected results
+        $Test->{ExpectedResults}->{$AttachmentFilename}->{ID} = $AttachmentID;
 
-        for my $AttachmentFilename ( sort keys %{ $Test->{ExpectedResults} } ) {
+        # delete zise attributes for easy compare
+        delete $AttachmentIndex{$AttachmentID}->{Filesize};
+        delete $AttachmentIndex{$AttachmentID}->{FilesizeRaw};
 
-            my $AttachmentID = $AttachmentsLookup{$AttachmentFilename};
-
-            # delete zise attributes for easy compare
-            delete $AttachmentIndex{$AttachmentID}->{Filesize};
-            delete $AttachmentIndex{$AttachmentID}->{FilesizeRaw};
-
-            $Self->IsDeeply(
-                $AttachmentIndex{$AttachmentID},
-                $Test->{ExpectedResults}->{$AttachmentFilename},
-                "$Test->{Name} | $Backend - Attachment",
-            );
-        }
-
-        # delete ticket
-        my $Success = $TicketObject->TicketDelete(
-            TicketID => $TicketID,
-            UserID   => 1,
-        );
-        $Self->True(
-            $Success,
-            "$Test->{Name} | Ticket deleted",
-        );
-
-        # new/clear ticket object
-        $Kernel::OM->ObjectsDiscard(
-            Objects => ['Ticket'],
+        $Self->IsDeeply(
+            $AttachmentIndex{$AttachmentID},
+            $Test->{ExpectedResults}->{$AttachmentFilename},
+            "$Test->{Name} | Attachment",
         );
     }
+
+    # delete ticket
+    my $Success = $TicketObject->TicketDelete(
+        TicketID => $TicketID,
+        UserID   => 1,
+    );
+    $Self->True(
+        $Success,
+        "$Test->{Name} | Ticket deleted",
+    );
+
+    # new/clear ticket object
+    $Kernel::OM->ObjectsDiscard(
+        Objects => ['Ticket'],
+    );
 }
 
 # rollback transaction on database

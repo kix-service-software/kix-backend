@@ -1,0 +1,68 @@
+# --
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-GPL3 for license information (GPL3). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
+# --
+
+
+[% RenderBlockStart("CSS") %]
+<style  type="text/css">
+    .[% Data.ID %] {
+[% IF Data.Break %]
+        margin-top: 0.6rem;
+[% IF Data.Style.Color %]
+        border-bottom: 1px solid [% Data.Style.Color | html %];
+[% ELSE %]
+        border-bottom: 1px solid #000;
+[% END %]
+[% END %]
+[% IF Data.Style.Height %]
+        height: [% Data.Style.Height | html %];
+[% END %]
+[% IF Data.Style.Width %]
+        width: [% Data.Style.Width | html %];
+[% END %]
+[% IF Data.Style.Float %]
+        float: [% Data.Style.Float | html %];
+[% ELSE %]
+        clear: both;
+[% END %]
+[% IF Data.Style.Size %]
+        font-size: [% Data.Style.Size | html %];
+[% END %]
+[% IF Data.Style.Color %]
+        color: [% Data.Style.Color | html %];
+[% END %]
+[% IF Data.Style.BGColor %]
+        background-color: [% Data.Style.BGColor | html %];
+[% END %]
+        margin: 0.1rem 0;
+    }
+    .[% Data.ID %].NoList {
+        list-style: none;
+        padding: 0;
+    }
+[% RenderBlockStart("StyleClass") %]
+    .[% Data.ID %][% Data.Selector %] {
+        [% Data.CSS %]
+    }
+[% RenderBlockEnd("StyleClass") %]
+</style>
+[% RenderBlockEnd("CSS") %]
+[% RenderBlockStart("HTML") %]
+[% IF !Data.Used %]
+<ul class="[% Data.ID %] [% Data.Class | html %]">
+[% ELSE %]
+<ol class="[% Data.ID %] [% Data.Class | html %]">
+[% END %]
+[% RenderBlockStart("Entry") %]
+    <li class="[% Data.Class | html %]">[% Data.Value %]</li>
+[% RenderBlockEnd("Entry") %]
+[% IF !Data.Used %]
+</ul>
+[% ELSE %]
+</ol>
+[% END %]
+[% RenderBlockEnd("HTML") %]

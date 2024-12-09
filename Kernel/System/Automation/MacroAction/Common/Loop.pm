@@ -92,8 +92,7 @@ sub Run {
 
     my $Values = $Self->_ReplaceValuePlaceholder(
         %Param,
-        Value => $Param{Config}->{Values},
-        HandleKeyLikeObjectValue => 1
+        Value => $Param{Config}->{Values}
     );
 
     my @ValueList;

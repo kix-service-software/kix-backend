@@ -282,39 +282,8 @@ my @FlagSearchTests = (
         Search => {
             AND => [
                 {
-                    Field => 'ArticleFlag',
-                    Value => [
-                        {
-                            Flag  => 'f1',
-                            Value => '42',
-                        },
-                        {
-                            Flag  => 'f2',
-                            Value => '42',
-                        },
-                    ],
-                    Operator => 'EQ',
-                },
-            ],
-        },
-        Expected => 1,
-        Name     => "Can find ticket when searching for two article flags",
-    },
-    {
-        Search => {
-            AND => [
-                {
-                    Field => 'ArticleFlag',
-                    Value => [
-                        {
-                            Flag  => 'f1',
-                            Value => '42',
-                        },
-                        {
-                            Flag  => 'f2',
-                            Value => '1',
-                        },
-                    ],
+                    Field    => 'ArticleFlag.Seen',
+                    Value    => '42',
                     Operator => 'EQ',
                 },
             ],
@@ -330,8 +299,7 @@ for my $Test (@FlagSearchTests) {
         Result     => 'COUNT',
         UserType   => 'Agent',
         UserID     => 1,
-#        TicketID => $TicketID,  ????
-        Search   => $Test->{Search},
+        Search     => $Test->{Search},
     );
 
     $Self->Is(

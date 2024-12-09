@@ -561,10 +561,13 @@ sub CategoryLookup {
 
     # check needed stuff
     if ( !$Param{Name} && !$Param{CategoryID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Got no Name or CategoryID!',
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Got no Name or CategoryID!',
+            );
+        }
+
         return;
     }
 
@@ -593,10 +596,13 @@ sub CategoryLookup {
 
     # check if data exists
     if ( !defined $ReturnData ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No $Key for $Value found!",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No $Key for $Value found!",
+            );
+        }
+
         return;
     }
 

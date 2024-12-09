@@ -339,36 +339,39 @@ sub _ArticleUpdate {
     }
 
     # update normal attributes
-    for my $Attribute (
+    # check if update is required
+    my $ChangeRequired;
+    KEY:
+    for my $Key (
         qw(
             Subject Body From To Cc Bcc
             IncomingTime ReplyTo CustomerVisible
             SenderType SenderTypeID ContentType
         )
     ) {
-        # skip undefined attribute
-        next if( !defined( $Article->{ $Attribute } ) );
-
-        # skip unchanged attribute
-        next if(
-            !DataIsDifferent(
-                Data1 => $Article->{ $Attribute },
-                Data2 => $Param{OldArticle}->{ $Attribute }
+        next KEY if (
+            !exists( $Article->{ $Key } )
+            || (
+                defined( $Article->{ $Key } )
+                && defined( $Param{OldArticle}->{ $Key } )
+                && $Param{OldArticle}->{ $Key } eq $Article->{ $Key }
             )
         );
+        $ChangeRequired = 1;
+        last KEY;
+    }
 
+    if ( $ChangeRequired ) {
         # update attribute
         my $Success = $Kernel::OM->Get('Ticket')->ArticleUpdate(
+            %{ $Article },
             ArticleID => $Param{ArticleID},
-            Key       => $Attribute,
-            Value     => $Article->{ $Attribute },
             UserID    => $Param{UserID},
-            TicketID  => $Param{TicketID},
         );
         if ( !$Success ) {
             return $Self->_Error(
                 Code    => 'Object.UnableToUpdate',
-                Message => "Unable to update article attribute $Attribute",
+                Message => "Unable to update article with ID $Param{ArticleID}",
             );
         }
     }

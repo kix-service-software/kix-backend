@@ -57,6 +57,9 @@ sub Run {
 
     my @MacroDataList;
 
+    # we don't do any core search filtering, inform the API to do it for us, based on the given search
+    $Self->HandleSearchInAPI();
+
     my %MacroList = $Kernel::OM->Get('Automation')->MacroList(
         Valid => 0,
     );
