@@ -1754,11 +1754,11 @@ sub ApplyVariableFilters {
                 if ( IsStringWithData( $Value ) ) {
                     $JqExpression =~ s/\s+::\s+/|/g;
                     $JqExpression =~ s/&quot;/"/g;
-                    $Value = `echo '$Value' | jq -r '$JqExpression'`;
-                    chomp $Value;
 
-                    # special characters must be re-encoded because the result is decoded twice after the system call
-                    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
+                    $Value = $Kernel::OM->Get('JSON')->Jq(
+                        Data   => $Value,
+                        Filter => $JqExpression,
+                    );
                 }
                 else {
                     $Kernel::OM->Get('Log')->Log(
