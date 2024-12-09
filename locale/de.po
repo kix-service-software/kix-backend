@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-9 07:50+0000\n"
-"PO-Revision-Date: 2024-12-03 08:51+0000\n"
-"Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
+"PO-Revision-Date: 2024-12-09 14:51+0000\n"
+"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -2227,11 +2227,11 @@ msgstr ""
 
 #. Perl Module: update/build-1991.pl
 msgid "Duration in State and Team"
-msgstr ""
+msgstr "Verweildauer in Status und Team"
 
 #. Perl Module: update/build-1991.pl
 msgid "Lists of tickets with their durations in specified states and teams."
-msgstr ""
+msgstr "Liste von Tickets mit deren Verweildauer in spez. Status und Teams."
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid "API module registration for the operation layer."
