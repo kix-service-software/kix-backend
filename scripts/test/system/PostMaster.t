@@ -564,6 +564,14 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 Key   => 'PostmasterFollowUpState',
                 Value => 'new'
             );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpStateClosed',
+                Value => 'open'
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TicketStateWorkflow::PostmasterFollowUpState',
+                Value => {}
+            );
             {
                 my $PostMasterObject = Kernel::System::PostMaster->new(
                     Email => \@Content,
@@ -724,6 +732,14 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 Key   => 'PostmasterFollowUpState',
                 Value => 'open'
             );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpStateClosed',
+                Value => 'new'
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TicketStateWorkflow::PostmasterFollowUpState',
+                Value => {}
+            );
 
             # send follow up #5
             @Content = ();
@@ -833,7 +849,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             );
             $Self->Is(
                 $Ticket{State} || 0,
-                'open',
+                'new',
                 $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpStateClosed check',
             );
 
