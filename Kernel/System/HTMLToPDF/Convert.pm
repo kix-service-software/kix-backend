@@ -111,12 +111,12 @@ sub Convert {
         );
 
         $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            Text     => $Replaced{Text},
-            Object   => $Data{Object},
-            ObjectID => $Param{$IdentifierKey},
-            RichText => 1,
-            UserID   => $Param{UserID},
-            Data     => {}
+            Text       => $Replaced{Text},
+            ObjectType => $Data{Object},
+            ObjectID   => $Param{$IdentifierKey},
+            RichText   => 1,
+            UserID     => $Param{UserID},
+            Data       => {}
         );
     }
 
