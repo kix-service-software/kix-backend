@@ -370,7 +370,18 @@ our %FieldTypeMigration = (
             ]
         }
     },
-    'Table' => {}, # no changes needed for Table
+    'Table' => {
+        ConfigChange => {
+            Add => {
+                RowsInit => 1,
+                RowsMin  => 1,
+                RowsMax  => 1,
+            },
+            Remove => [
+                'Rows',
+            ]
+        }
+    },
     'Text' => {
         Type         => 'Text',
         ConfigChange => {
@@ -748,6 +759,18 @@ sub Run {
                     # init regular expression list, if missing
                     if ( !defined( $Config->{RegExList} ) ) {
                         $Config->{RegExList} = [];
+                    }
+                }
+
+                # special handling for Table
+                if ( $FieldTypeSrc eq 'Table' ) {
+                    # migrate Rows
+                    if ( ref( $Config->{Rows} ) eq 'HASH' ) {
+                        for my $Attribute ( qw(Init Min Max) ) {
+                            if ( defined( $Config->{Rows}->{ $Attribute } ) ) {
+                                $Config->{ 'Rows' . $Attribute } = $Config->{Rows}->{ $Attribute };
+                            }
+                        }
                     }
                 }
 
