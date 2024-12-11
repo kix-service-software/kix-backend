@@ -281,10 +281,9 @@ sub _AssignOrganisation {
             Search => {
                 AND => [
                     {
-                        Field => 'Name',
-                        Type  => 'EQ',
-                        Type  => 'STRING',
-                        Value => $Param{Ticket}->{customer_id}
+                        Field    => 'Name',
+                        Operator => 'EQ',
+                        Value    => $Param{Ticket}->{customer_id}
                     }
                 ]
             },

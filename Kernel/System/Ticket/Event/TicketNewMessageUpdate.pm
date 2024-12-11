@@ -125,7 +125,6 @@ sub Run {
             $TicketObject->TicketFlagDelete(
                 TicketID => $Param{Data}->{TicketID},
                 Key      => 'Seen',
-                AllUsers => 1,
                 UserID   => $Param{Data}->{UserID},
             );
         }

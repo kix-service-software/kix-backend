@@ -476,6 +476,52 @@ sub Run {
         }
     }
 
+    # CustomerVisible: check if InReplyTo or References contain a MessageID visible to the ticket contact
+    if (
+        !$GetParam{CustomerVisible}
+        && $Kernel::OM->Get('Config')->Get('PostMaster::FollowUp::CheckReferences')
+        && (
+            $GetParam{'In-Reply-To'}
+            || $GetParam{'References'}
+        )
+    ) {
+        # get possible references
+        my @ReferencesAll;
+        my $ReferencesString = $GetParam{'References'};
+        if ( $ReferencesString ) {
+            push( @ReferencesAll, ( $ReferencesString =~ /(<[^>]+>)/g ) );
+        }
+
+        # get in reply to id
+        my $InReplyToString = $GetParam{'In-Reply-To'};
+        if ( $InReplyToString ) {
+            chomp( $InReplyToString );
+            $InReplyToString =~ s/.*?(<[^>]+>).*/$1/;
+            push( @ReferencesAll, $InReplyToString );
+        }
+
+        # check references
+        if ( @ReferencesAll ) {
+            # get unique references
+            my @References = $Kernel::OM->Get('Main')->GetUnique(@ReferencesAll);
+
+            # get reference article with filter for channel 'email', visible for customer and relevant message id
+            my @ReferenceArticles = $Kernel::OM->Get('Ticket')->ArticleGet(
+                TicketID        => $Param{TicketID},
+                Channel         => [ 'email' ],
+                CustomerVisible => 1,
+                MessageID       => \@References,
+                DynamicFields   => 0,
+                UserID          => 1,
+            );
+
+            # check if reference article exists
+            if ( @ReferenceArticles ) {
+                $GetParam{CustomerVisible} = 1;
+            }
+        }
+    }
+
     # CustomerVisible: check if from is known contact AND has the same organisation as ticket
     if (
         !$GetParam{CustomerVisible}
