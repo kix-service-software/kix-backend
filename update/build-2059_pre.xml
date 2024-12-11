@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
 
+    <IndexDrop Name="xml_storage_key_type"/>
+
     <TableAlter Name="xml_storage">
         <ColumnChange NameOld="xml_key" NameNew="xml_key" Required="true" TypeOld="VARCHAR" Type="BIGINT"/>
     </TableAlter>
+
+    <IndexCreate Name="xml_storage_key_type">
+        <IndexColumn Name="xml_key"/>
+        <IndexColumn Name="xml_type" Size="10"/>
+    </Index>
 
 </database>
