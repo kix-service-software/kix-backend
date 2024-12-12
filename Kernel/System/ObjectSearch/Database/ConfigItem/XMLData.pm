@@ -129,15 +129,6 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
-        my $BigIntCast  = 'BIGINT';
-        my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
-        if (
-            ref( $CastMapping ) eq 'HASH'
-            && $CastMapping->{BIGINT}
-        ) {
-            $BigIntCast = $CastMapping->{BIGINT};
-        }
-
         my $SupportedAttributes = $Self->GetSupportedAttributes();
         my @XMLType     = map{"ITSM::ConfigItem::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
 
@@ -155,7 +146,7 @@ sub Search {
         # add join for xml storage
         push(
             @SQLJoin,
-            "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS $BigIntCast) = $XMLStorageJoinColumn AND $JoinRestriction AND $JoinXMLType"
+            "LEFT OUTER JOIN xml_storage $TableAlias ON $TableAlias.xml_key = $XMLStorageJoinColumn AND $JoinRestriction AND $JoinXMLType"
         );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;

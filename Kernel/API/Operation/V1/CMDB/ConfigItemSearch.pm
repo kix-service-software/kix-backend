@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 use base qw(
     Kernel::API::Operation::V1::CMDB::Common
@@ -97,6 +98,10 @@ sub Run {
         );
     }
 
+    $Self->_Debug($Self->{LevelIndent}, "search items...");
+
+    my $StartTime = Time::HiRes::time();
+
     my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
         Result     => 'ARRAY',
         Search     => $Self->{Search}->{ConfigItem}      || {},
@@ -106,6 +111,8 @@ sub Run {
         UserID     => $Self->{Authorization}->{UserID},
         ObjectType => 'ConfigItem'
     );
+
+    $Self->_Debug($Self->{LevelIndent}, sprintf("search items took %i ms", TimeDiff($StartTime)));
 
     # get already prepared CI data from ConfigItemGet operation
     if ( @ConfigItemList ) {
