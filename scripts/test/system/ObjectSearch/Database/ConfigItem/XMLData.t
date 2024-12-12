@@ -90,13 +90,7 @@ END
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'CurrentVersion.Data.NotSearchable'},
-    {
-        IsSearchable => 0,
-        IsSortable   => 0,
-        Operators    => [],
-        Class        => [ $Class ],
-        ClassID      => [ $ClassID ]
-    },
+    undef,
     'GetSupportedAttributes provides expected data for not searchable attribute'
 );
 $Self->IsDeeply(
@@ -134,6 +128,29 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
         'Kernel::System::DB::' . $DatabaseType,
         'DatabaseType ' . $DatabaseType . ' / Backend'
     );
+
+    my $BigIntCast  = 'BIGINT';
+    my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
+    if (
+        ref( $CastMapping ) eq 'HASH'
+        && $CastMapping->{BIGINT}
+    ) {
+        $BigIntCast = $CastMapping->{BIGINT};
+    }
+    if ( $DatabaseType eq 'mysql' ) {
+        $Self->Is(
+            $BigIntCast,
+            'UNSIGNED',
+            'DatabaseType ' . $DatabaseType . ' / BigIntCast'
+        );
+    }
+    else {
+        $Self->Is(
+            $BigIntCast,
+            'BIGINT',
+            'DatabaseType ' . $DatabaseType . ' / BigIntCast'
+        );
+    }
 
     my $QuoteSingle   = '';
     my $DBQuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
@@ -217,7 +234,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'Test\''
@@ -233,7 +250,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
@@ -249,7 +266,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
@@ -265,7 +282,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value != \'\''
@@ -281,7 +298,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value IN (\'Test\')'
@@ -297,7 +314,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value NOT IN (\'Test\')'
@@ -313,7 +330,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'Test\''
@@ -329,7 +346,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'Test\''
@@ -345,7 +362,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'Test\''
@@ -361,7 +378,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'Test\''
@@ -377,7 +394,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'Test%\''
@@ -393,7 +410,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'%Test\''
@@ -409,7 +426,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'%Test%\''
@@ -425,7 +442,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             },
             Expected     => {
                 'Join'  => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'Test\''
@@ -445,7 +462,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'Test\''
@@ -465,7 +482,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
@@ -485,7 +502,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'Test\' OR xst_left0.xml_content_value IS NULL)'
@@ -505,7 +522,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value != \'\''
@@ -525,7 +542,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value IN (\'Test\')'
@@ -545,7 +562,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value NOT IN (\'Test\')'
@@ -565,7 +582,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'Test\''
@@ -585,7 +602,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'Test\''
@@ -605,7 +622,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'Test\''
@@ -625,7 +642,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'Test\''
@@ -645,7 +662,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'Test%\''
@@ -665,7 +682,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'%Test\''
@@ -685,7 +702,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'%Test%\''
@@ -705,7 +722,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'Test\''

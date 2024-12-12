@@ -209,7 +209,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'2024-02-09 08:15:00\''
@@ -226,7 +226,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'2024-02-10 08:00:00\''
@@ -243,7 +243,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'2024-02-09 08:15:00\' OR xst_left0.xml_content_value IS NULL)'
@@ -260,7 +260,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'2024-02-10 08:00:00\' OR xst_left0.xml_content_value IS NULL)'
@@ -278,7 +278,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'2024-02-09 08:15:00\''
@@ -296,7 +296,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'2024-02-10 08:00:00\''
@@ -313,7 +313,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'2024-02-09 08:15:00\''
@@ -330,7 +330,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'2024-02-10 08:00:00\''
@@ -347,7 +347,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'2024-02-09 08:15:00\''
@@ -364,7 +364,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'2024-02-10 08:00:00\''
@@ -381,7 +381,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => undef,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'2024-02-09 08:15:00\''
@@ -398,7 +398,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             Expected     => {
                 'IsRelative' => 1,
                 'Join' => [
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'2024-02-10 08:00:00\''
@@ -420,7 +420,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'2024-02-09 08:15:00\''
@@ -442,7 +442,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value = \'2024-02-10 08:00:00\''
@@ -463,7 +463,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'2024-02-09 08:15:00\' OR xst_left0.xml_content_value IS NULL)'
@@ -485,7 +485,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     '(xst_left0.xml_content_value != \'2024-02-10 08:00:00\' OR xst_left0.xml_content_value IS NULL)'
@@ -506,7 +506,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'2024-02-09 08:15:00\''
@@ -527,7 +527,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value < \'2024-02-10 08:00:00\''
@@ -548,7 +548,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'2024-02-09 08:15:00\''
@@ -569,7 +569,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value <= \'2024-02-10 08:00:00\''
@@ -590,7 +590,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'2024-02-09 08:15:00\''
@@ -612,7 +612,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value > \'2024-02-10 08:00:00\''
@@ -633,7 +633,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => undef,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'2024-02-09 08:15:00\''
@@ -654,7 +654,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 'IsRelative' => 1,
                 'Join' => [
                     'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\''
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'DateTime' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value >= \'2024-02-10 08:00:00\''

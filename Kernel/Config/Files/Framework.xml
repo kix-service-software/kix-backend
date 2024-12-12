@@ -1100,9 +1100,21 @@
         <Setting>
             <Hash>
                 <Item Key="closed">open</Item>
+                <Item Key="new">new</Item>
                 <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckReferences" Required="0" Valid="1">
+        <Description Translatable="1">Checks if the headers "In-Reply-To" or "References" of a follow-up message contain a Message-ID of an article visible in the self service portal on this ticket. If so, the email is visible in the self service portal.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0">No</Item>
+                <Item Key="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckFromOrganisation" Required="0" Valid="1">

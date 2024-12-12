@@ -305,6 +305,14 @@ sub ArticleCreate {
             )
         }
 
+        # get From by ticket queue
+        if (!$Param{From} && $Param{SenderType} eq 'system') {
+            $Param{From} = $Self->_GetFromByQueue(
+                %Param,
+                Ticket => \%OldTicketData
+            )
+        }
+
         # check needed stuff
         for my $Needed (qw(TicketID UserID From Body Charset MimeType)) {
             if ( !$Param{$Needed} ) {
@@ -610,7 +618,10 @@ sub ArticleCreate {
         }
 
         # send agent notification on adding a note
-        elsif ( $Param{HistoryType} =~ /^AddNote$/i ) {
+        elsif (
+            $Param{HistoryType} =~ /^AddArticle$/i
+            || $Param{HistoryType} =~ /^AddNote$/i
+        ) {
 
             # trigger notification event
             $Self->EventHandler(
@@ -650,11 +661,14 @@ sub ArticleCreate {
         }
     }
 
-    # send article through email channel if it was created by an agent
+    # send article through email channel if it was created by an agent or the system
     if (
         !$Param{DoNotSendEmail}
         && $Param{Channel} eq 'email'
-        && $Param{SenderType} eq 'agent'
+        && (
+            $Param{SenderType} eq 'agent'
+            || $Param{SenderType} eq 'system'
+        )
     ) {
 
         # prepare body and charset
@@ -2405,6 +2419,39 @@ sub ArticleFlagSet {
         Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
     );
 
+    # check if we have to set the ticket Seen flag as well
+    if ( $Param{Key} eq 'Seen' ) {
+        my $ArticleCount = $Self->ArticleCount(
+            TicketID => $Param{TicketID},
+        );
+
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+                af.article_id = a.id AND article_key = ? AND af.create_by = ?',
+            Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+            Limit => 1,
+        );
+
+        my $SeenCount;
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $SeenCount = $Row[0];
+        }
+        if ( $SeenCount == $ArticleCount ) {
+            my $Result = $Self->TicketFlagSet(
+                TicketID => $Param{TicketID},
+                Key      => 'Seen',
+                Value    => 1,
+                UserID   => $Param{UserID}
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to set Seen flag for TicketID $Param{TicketID}!"
+                );
+            }
+        }
+    }
+
     $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     if ( !$Param{NoEvents} ) {
@@ -3598,6 +3645,45 @@ sub _GetFromByUser {
     } else {
         $Realname .= $Address{RealName};
     }
+
+    if ($Realname =~ m/[äÄöÖüÜß]/) {
+        $Realname =~ s/ä/ae/g;
+        $Realname =~ s/Ä/Ae/g;
+        $Realname =~ s/ö/oe/g;
+        $Realname =~ s/Ö/Oe/g;
+        $Realname =~ s/ü/ue/g;
+        $Realname =~ s/Ü/Ue/g;
+        $Realname =~ s/ß/ss/g;
+    }
+
+    return "\"$Realname\" <$Address{Email}>";
+}
+
+sub _GetFromByQueue {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(UserID Ticket) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my %Address = $Kernel::OM->Get('Queue')->GetSystemAddress(
+        QueueID => $Param{Ticket}->{QueueID},
+        UserID  => $Param{UserID}
+    );
+    if (!IsHashRefWithData(\%Address)) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Cannot prepare "From" value, could not load system address!'
+        );
+    }
+
+    my $Realname = $Address{RealName};
 
     if ($Realname =~ m/[äÄöÖüÜß]/) {
         $Realname =~ s/ä/ae/g;

@@ -129,8 +129,25 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
+        my $SupportedAttributes = $Self->GetSupportedAttributes();
+        my @XMLType     = map{"ITSM::ConfigItem::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
+
+        if ( $Param{Flags}->{PreviousVersionSearch} ) {
+            my @XMLTypeArchiv = map{"ITSM::ConfigItem::Archiv::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
+            push( @XMLType, @XMLTypeArchiv);
+        }
+
+        my $JoinXMLType = $Self->_GetCondition(
+            Column   => "$TableAlias.xml_type",
+            Operator => 'IN',
+            Value    => \@XMLType
+        );
+
         # add join for xml storage
-        push( @SQLJoin, "LEFT OUTER JOIN xml_storage $TableAlias ON $TableAlias.xml_key = $XMLStorageJoinColumn AND $JoinRestriction" );
+        push(
+            @SQLJoin,
+            "LEFT OUTER JOIN xml_storage $TableAlias ON $TableAlias.xml_key = $XMLStorageJoinColumn AND $JoinRestriction AND $JoinXMLType"
+        );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;
     }
@@ -164,34 +181,34 @@ sub _XMLAttributeGet {
     for my $Attr ( @{$Param{DefinitionRef}} ) {
         my $Key = $Param{Key} . ".$Attr->{Key}";
 
-        if ( defined( $Param{AttributesRef}->{ $Key } ) ) {
-            push( @{ $Param{AttributesRef}->{ $Key }->{Class} }, $Param{Class} );
-            push( @{ $Param{AttributesRef}->{ $Key }->{ClassID} }, $Param{ClassID} );
-        }
-        else {
-            my $ValueType = undef;
-            my $Operators = [];
-            if (
-                $Attr->{Input}->{Type} eq 'Date'
-                || $Attr->{Input}->{Type} eq 'DateTime'
-            ) {
-                $ValueType = uc($Attr->{Input}->{Type});
-                if ( $Attr->{Searchable} ) {
-                    $Operators = ['EQ','NE','LT','LTE','GT','GTE']
+        if (  $Attr->{Searchable} ) {
+            if ( defined( $Param{AttributesRef}->{ $Key } ) ) {
+                push( @{ $Param{AttributesRef}->{ $Key }->{Class} }, $Param{Class} );
+                push( @{ $Param{AttributesRef}->{ $Key }->{ClassID} }, $Param{ClassID} );
+            }
+            else {
+                my $ValueType = undef;
+                my $Operators;
+                if (
+                    $Attr->{Input}->{Type} eq 'Date'
+                    || $Attr->{Input}->{Type} eq 'DateTime'
+                ) {
+                    $ValueType = uc( $Attr->{Input}->{Type} );
+                    $Operators = ['EQ','NE','LT','LTE','GT','GTE'];
                 }
-            }
-            elsif ( $Attr->{Searchable} ) {
-                $Operators = ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'];
-            }
+                else {
+                    $Operators = ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'];
+                }
 
-            $Param{AttributesRef}->{$Key} = {
-                IsSearchable => $Attr->{Searchable} || 0,
-                IsSortable   => 0,
-                Class        => [ $Param{Class} ],
-                ClassID      => [ $Param{ClassID} ],
-                Operators    => $Operators,
-                ValueType    => $ValueType
-            };
+                $Param{AttributesRef}->{ $Key } = {
+                    IsSearchable => 1,
+                    IsSortable   => 0,
+                    Class        => [ $Param{Class} ],
+                    ClassID      => [ $Param{ClassID} ],
+                    Operators    => $Operators,
+                    ValueType    => $ValueType
+                };
+            }
         }
 
         if ( IsArrayRefWithData( $Attr->{Sub} ) ) {

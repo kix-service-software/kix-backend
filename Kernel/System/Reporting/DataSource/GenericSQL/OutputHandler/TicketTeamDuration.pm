@@ -277,20 +277,24 @@ sub _PrepareTicketTeamDurations {
             || !$QueueID
             || !$StateID
         ) {
+            # init values
+            $QueueID      = $Entry->{QueueID};
+            $StateID      = $Entry->{StateID};
+            $CreateTeam   = 1;
+            $TeamDuration = 0;
+
             # special handling when ticket is created in a stop state
             if (
                 ref( $Param{StopStates} ) eq 'ARRAY'
-                && grep( { $Self->{StateLookup}->{$_} && $Self->{StateLookup}->{$_} eq $Entry->{StateID} } @{ $Param{StopStates} } )
+                && grep( { $Self->{StateLookup}->{$_} && $Self->{StateLookup}->{$_} eq $StateID } @{ $Param{StopStates} } )
             ) {
+                $Stopped = 1;
+
                 last ENTRY;
             }
 
-            # init values
+            # init values for calculations
             $StartTimeStamp = $Entry->{CreateTime};
-            $QueueID        = $Entry->{QueueID};
-            $StateID        = $Entry->{StateID};
-            $CreateTeam     = 1;
-            $TeamDuration   = 0;
             $Stopped        = 0;
         }
         # handle state changes

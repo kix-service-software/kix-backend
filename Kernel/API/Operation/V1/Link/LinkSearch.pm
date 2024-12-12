@@ -61,7 +61,7 @@ sub Run {
     if ( IsArrayRefWithData($Self->{Search}->{Link}->{AND}) ) {
         foreach my $SearchItem ( @{$Self->{Search}->{Link}->{AND}} ) {
             # ignore everything that we don't support in the core DB search (the rest will be done in the generic API Searching)
-            next if ($SearchItem->{Field} !~ /^(SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
+            next if ($SearchItem->{Field} !~ /^(Object|ObjectID|SourceObject|SourceKey|TargetObject|TargetKey|Type)$/g);
             next if ($SearchItem->{Operator} ne 'EQ');
 
             $SearchParam{$SearchItem->{Field}} = $SearchItem->{Value};
