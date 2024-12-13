@@ -10,7 +10,7 @@
     <IndexCreate Name="xml_storage_key_type">
         <IndexColumn Name="xml_key"/>
         <IndexColumn Name="xml_type" Size="10"/>
-    </Index>
+    </IndexCreate>
 
     <Insert Table="report_definition">
         <Data Key="name" Type="Quote" Translatable="1">Number of open tickets by statetype</Data>
