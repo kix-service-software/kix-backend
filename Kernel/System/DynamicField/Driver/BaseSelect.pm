@@ -298,6 +298,8 @@ sub DisplayValueRender {
         $Value = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Value};
     }
 
+    my $NotTranslatedValue = $Value;
+
     # check is needed to translate values
     if ( $Param{DynamicFieldConfig}->{Config}->{TranslatableValues} ) {
 
@@ -315,6 +317,11 @@ sub DisplayValueRender {
             Max  => $Param{ValueMaxChars} || q{},
         );
 
+        $NotTranslatedValue = $Param{LayoutObject}->Ascii2Html(
+            Text => $NotTranslatedValue,
+            Max  => $Param{ValueMaxChars} || q{},
+        );
+
         $Title = $Param{LayoutObject}->Ascii2Html(
             Text => $Title,
             Max  => $Param{TitleMaxChars} || q{},
@@ -323,6 +330,9 @@ sub DisplayValueRender {
     else {
         if ( $Param{ValueMaxChars} && length($Value) > $Param{ValueMaxChars} ) {
             $Value = substr( $Value, 0, $Param{ValueMaxChars} ) . '...';
+        }
+        if ( $Param{ValueMaxChars} && length($NotTranslatedValue) > $Param{ValueMaxChars} ) {
+            $NotTranslatedValue = substr( $NotTranslatedValue, 0, $Param{ValueMaxChars} ) . '...';
         }
         if ( $Param{TitleMaxChars} && length($Title) > $Param{TitleMaxChars} ) {
             $Title = substr( $Title, 0, $Param{TitleMaxChars} ) . '...';
@@ -338,6 +348,7 @@ sub DisplayValueRender {
         Title       => $Title,
         Link        => $Link,
         LinkPreview => $LinkPreview,
+        NotTranslatedValue => $NotTranslatedValue
     };
 
     return $Data;

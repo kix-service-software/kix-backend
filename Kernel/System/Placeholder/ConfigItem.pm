@@ -82,38 +82,60 @@ sub _Replace {
         }
     }
 
-    if ( IsHashRefWithData($ConfigItem) || IsHashRefWithData($Version) ) {
+    my $LanguageObject;
+    if ($Param{Language}) {
+        $LanguageObject = Kernel::Language->new(
+            UserLanguage => $Param{Language}
+        );
+    }
+
+    if ( IsHashRefWithData($ConfigItem) ) {
+        # clone it, do not change original
+        $ConfigItem = $Kernel::OM->Get('Storable')->Clone(Data => $ConfigItem);
+
         $ConfigItem->{ID} = $ConfigItem->{ConfigItemID};
 
-        my $LanguageObject;
-        if ($Param{Language}) {
-            $LanguageObject = Kernel::Language->new(
-                UserLanguage => $Param{Language}
+        for my $Field ( keys %{$ConfigItem} ) {
+            next if !defined $ConfigItem->{$Field};
+            $ConfigItem->{$Field.'!'} = $ConfigItem->{$Field};      # store the original value with a trailing "!"
+        }
+
+        if ($LanguageObject) {
+            $ConfigItem->{CreateTime} = $LanguageObject->FormatTimeString(
+                $ConfigItem->{CreateTime}, 'DateFormat', 'NoSeconds'
             );
-            if ($LanguageObject) {
-                $ConfigItem->{CreateTime} = $LanguageObject->FormatTimeString(
-                    $ConfigItem->{CreateTime}, 'DateFormat', 'NoSeconds'
-                );
-                $ConfigItem->{ChangeTime} = $LanguageObject->FormatTimeString(
-                    $ConfigItem->{ChangeTime}, 'DateFormat', 'NoSeconds'
-                );
-            }
+            $ConfigItem->{ChangeTime} = $LanguageObject->FormatTimeString(
+                $ConfigItem->{ChangeTime}, 'DateFormat', 'NoSeconds'
+            );
         }
-
-        # prepare version if needed else set it empty
-        if (IsHashRefWithData($Version)) {
-            my $TopLevelAttributes = $Self->_GetTopLevelAttributes(Version => $Version) || [];
-            my $CheckList = join('|',@{$TopLevelAttributes});
-            if ($CheckList && $Param{Text} =~ m/$Tag(?:$CheckList)/) {
-                $Self->_PrepareVersion(LanguageObject => $LanguageObject, Version => $Version);
-            } else {
-                $Version = {};
-            }
-        }
-
-        # replace it
-        $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Version }, %{ $ConfigItem } );
     }
+
+    # prepare version if needed else set it empty
+    if ( IsHashRefWithData($Version) ) {
+        # clone it, do not change original
+        $Version = $Kernel::OM->Get('Storable')->Clone(Data => $Version);
+
+        my $TopLevelAttributes = $Self->_GetTopLevelAttributes(Version => $Version) || [];
+        my $CheckList = join('|',@{$TopLevelAttributes});
+        if ($CheckList && $Param{Text} =~ m/$Tag(?:$CheckList)/) {
+            $Self->_PrepareVersion(LanguageObject => $LanguageObject, Version => $Version);
+        } else {
+            $Version = {};
+        }
+
+        # return if "object value" is wanted
+        if ($Param{Text} =~ m/^$Tag((?:\w|^>)+)(ObjectValue|(?<!Value|Values|Key|Keys|\d|_)!)$Self->{End}$/) {
+            my $Key = $1;
+            if ($Key !~ m/_$/) {
+                $Key .= '_';
+            }
+            $Key .= 'ObjectValueArray';
+            return $Version->{$Key};
+        }
+    }
+
+    # replace it
+    $Param{Text} = $Self->_HashGlobalReplace( $Param{Text}, $Tag, %{ $Version }, %{ $ConfigItem } );
 
     # cleanup
     $Param{Text} =~ s/$Tag.+?$Self->{End}/$Param{ReplaceNotFound}/gi;
@@ -181,6 +203,7 @@ sub _PrepareData {
         my $Attribute = $Param{Parent} . $Item->{Key};
         my @Keys;
         my @Values;
+        my @NotTranslatedValues;
 
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
@@ -196,6 +219,12 @@ sub _PrepareData {
                     Item  => $Item,
                     Value => $Value
                 );
+
+                my $NotTranslatedValue = $Self->_GetDisplayValue(
+                    Item  => $Item,
+                    Value => $Value
+                );
+
                 if (defined $PreparedValue) {
                     $Value = $PreparedValue;
                 }
@@ -205,7 +234,11 @@ sub _PrepareData {
 
                 $Param{Version}->{$AttributeCounter . '_Value'} = $Value;
                 $Param{Version}->{$AttributeCounter} = $Value;
+                $Param{Version}->{$AttributeCounter . '_Value!'} = $NotTranslatedValue // $Param{Version}->{$AttributeCounter . '_Key'};
+                $Param{Version}->{$AttributeCounter . '!'} = $NotTranslatedValue // $Param{Version}->{$AttributeCounter . '_Key'};
+
                 push(@Values, $Value);
+                push(@NotTranslatedValues, $NotTranslatedValue // $Param{Version}->{$AttributeCounter . '_Key'});
             }
 
             next COUNTER if !$Item->{Sub};
@@ -224,8 +257,14 @@ sub _PrepareData {
             $Param{Version}->{$Attribute} = join(', ', @Values);
             $Param{Version}->{$Attribute . '_Values'} = $Param{Version}->{$Attribute};
         }
-        if (scalar@Keys) {
+        if (scalar(@NotTranslatedValues)) {
+            $Param{Version}->{$Attribute . '_Values!'} = join(', ', @NotTranslatedValues);
+        }
+        if (scalar(@Keys)) {
             $Param{Version}->{$Attribute . '_Keys'} = join(', ', @Keys);
+            $Param{Version}->{$Attribute . '!'} = join(',', @Keys);
+            $Param{Version}->{$Attribute . '_ObjectValue'} = join(',', @Keys);
+            $Param{Version}->{$Attribute . '_ObjectValueArray'} = \@Keys;
         }
     }
 }
