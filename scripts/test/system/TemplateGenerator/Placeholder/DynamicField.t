@@ -98,6 +98,67 @@ for my $Field ( sort keys %DFFields ) {
             Expection => $Expection{Short},
         }
     );
+    if ($Expection{'Value!'}) {
+        push(
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "_Value!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "_Value!>",
+                Expection => $Expection{'Value!'},
+            }
+        );
+    }
+    if ($Expection{'HTML!'}) {
+        push(
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "_HTML!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "_HTML!>",
+                Expection => $Expection{'HTML!'},
+            }
+        );
+    }
+    if ($Expection{'Short!'}) {
+        push(
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "_Short!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "_Short!>",
+                Expection => $Expection{'Short!'},
+            }
+        );
+    }
+    if ($Expection{'Key!'}) {
+        push(
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "_Key!>",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "_Key!>",
+                Expection => $Expection{'Key!'},
+            }
+        );
+    }
+    if ($Expection{'! with text'}) {
+        push(
+            @UnitTests,
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "!> with text",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "!> with text",
+                Expection => $Expection{'! with text'} . ' with text',
+            },
+            {
+                TestName  => "Placeholder: <KIX_TICKET_DynamicField_" . $Field . "_ObjectValue> with text",
+                TicketID  => $TicketID,
+                Test      => "<KIX_TICKET_DynamicField_" . $Field . "_ObjectValue> with text",
+                Expection => $Expection{'! with text'} . ' with text',
+            }
+        );
+    }
 
     if (
         $Expection{All}
@@ -140,6 +201,7 @@ for my $Field ( sort keys %DFFields ) {
                 }
             )
         }
+        # simple ! should also return object value
         push (
             @UnitTests,
             {
@@ -374,7 +436,12 @@ END
                     ],
                     0     => 'customer',
                     1     => 'service provider'
-                }
+                },
+                '! with text' => 'customer,service provider',
+                'Value!'      => 'customer, service provider',
+                'Key!'        => 'customer, service provider',
+                'HTML!'       => 'customer, service provider',
+                'Short!'      => 'customer, service provider',
             }
         },
         {

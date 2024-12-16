@@ -249,6 +249,7 @@ sub DisplayValueRender {
         Title       => $Title,
         Link        => $Link,
         LinkPreview => $LinkPreview,
+        NotTranslatedValue => join( $Separator, @Values )
     };
 
     return $Data;

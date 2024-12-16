@@ -634,7 +634,7 @@ sub _Replace {
             next ATTRIBUTE if $Attribute =~ m{ \A DynamicField_ }xms;
             next ATTRIBUTE if $Attribute =~ /^.*?!$/g;
             next ATTRIBUTE if !$Ticket{$Attribute};
-            
+
             if ( $Ticket{$Attribute} =~ m{\A(\d\d\d\d)-(\d\d)-(\d\d)\s(\d\d):(\d\d):(\d\d)\z}xi ) {
                 $Ticket{$Attribute} = $LanguageObject->FormatTimeString(
                     $Ticket{$Attribute},
@@ -657,10 +657,6 @@ sub _Replace {
             );
         }
     }
-
-    # do not handle DF object value as text (prevent string handling)
-    # TODO: ... but do it elsewhere
-    my $KeepValueAsIs = $Param{Text} =~ m/^<KIX_(?:\w|^>)+_DynamicField_(?:\w+?)_ObjectValue>$/ ? 1 : 0;
 
     # get and execute placeholder modules
     my $PlaceholderModules = $Kernel::OM->Get('Config')->Get('Placeholder::Module');

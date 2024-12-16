@@ -333,9 +333,9 @@ sub _ReplaceDynamicFieldPlaceholder {
         my %DynamicFields;
         my %DynamicFieldsObject;
 
-        # For systems with many Dynamic fields we do not want to load them all unless needed
-        # Find what Dynamic Field Values are requested
-        while ( $Param{Text} =~ m/$Param{Tag}(\S+?)(!|_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?|_Object_\d+.+?)?$Self->{End}/gixms ) {
+        # for systems with many Dynamic fields we do not want to load them all unless needed
+        # find which Dynamic Field Values are requested
+        while ( $Param{Text} =~ m/$Param{Tag}(\S+?)((_Value|_Key|_HTML|_Short|_ObjectValue(_\d+)?|_Object_\d+.+?)?!?)$Self->{End}/gixms ) {
                 my $DFName = $1;
                 my $Type = $2;
                 $DynamicFields{$DFName} = 1;
@@ -372,20 +372,19 @@ sub _ReplaceDynamicFieldPlaceholder {
             );
 
             # return object value if text is just "ObjectValue" or "!" placeholder (no surrounding text)
-            my $ReturnObjectValue;
-            if ($Param{Text} =~ m/^$Param{Tag}(\S+?)(ObjectValue|!)$Self->{End}$/gixms) {
+            my $KeepValueAsIs;
+            if ($Param{Text} =~ m/^$Param{Tag}(?:\w|^>)+(ObjectValue|(?<!Value|Short|HTML|Key)!)$Self->{End}$/) {
 
                 # but not (now) if _Object_ is included => handle sub object value
                 if ($Param{Text} !~ m/_Object_/) {
                     return $DisplayObjectValueStrg;
                 }
-
-                $ReturnObjectValue = 1;
+                $KeepValueAsIs = 1;
             }
 
             if (
                 IsArrayRefWithData($DisplayObjectValueStrg)
-                && !$ReturnObjectValue
+                && !$KeepValueAsIs
             ) {
                 my $Index = 0;
                 for my $ObjectValue (@{$DisplayObjectValueStrg}) {
@@ -408,6 +407,8 @@ sub _ReplaceDynamicFieldPlaceholder {
                     = $DisplayValueStrg->{Value};
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} }
                     = $DisplayValueStrg->{Value};
+                $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Value!' }
+                    = $DisplayValueStrg->{NotTranslatedValue} // $DisplayValueStrg->{Value};
             }
 
             # get the display keys for each dynamic field
@@ -423,6 +424,8 @@ sub _ReplaceDynamicFieldPlaceholder {
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' }
                     = $DisplayValueStrg->{Value};
             }
+            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key!' } = IsHashRefWithData($DisplayKeyStrg) && $DisplayKeyStrg->{NotTranslatedValue} ?
+                $DisplayKeyStrg->{NotTranslatedValue} : $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Key' };
 
             # get the html display values for each dynamic field
             my $HTMLDisplayValueStrg = $Self->{DynamicFieldBackendObject}->HTMLDisplayValueRender(
@@ -436,6 +439,8 @@ sub _ReplaceDynamicFieldPlaceholder {
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' }
                     = $DisplayValueStrg->{Value};
             }
+            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML!' } = IsHashRefWithData($HTMLDisplayValueStrg) && $HTMLDisplayValueStrg->{NotTranslatedValue} ?
+                $HTMLDisplayValueStrg->{NotTranslatedValue} : $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_HTML' };
 
             # get the short display values for each dynamic field
             my $ShortDisplayValueStrg = $Self->{DynamicFieldBackendObject}->ShortDisplayValueRender(
@@ -449,6 +454,8 @@ sub _ReplaceDynamicFieldPlaceholder {
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }
                     = $DisplayValueStrg->{Value};
             }
+            $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short!' } = IsHashRefWithData($ShortDisplayValueStrg) && $ShortDisplayValueStrg->{NotTranslatedValue} ?
+                $ShortDisplayValueStrg->{NotTranslatedValue} : $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' };
 
             # prepare object values if needed
             if ( IsArrayRefWithData( $DynamicFieldsObject{ $DynamicFieldConfig->{Name} } ) ) {
@@ -458,15 +465,20 @@ sub _ReplaceDynamicFieldPlaceholder {
                         Value              => $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
                         Placeholder        => $ObjectPlaceholder,
                         UserID             => $Param{UserID},
-                        Language           => $Param{Language},
-                        KeepValueAsIs      => $Param{KeepValueAsIs}
+                        Language           => $Param{Language}
                     );
-                    if ( $ObjectValueStrg ) {
-                        $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . $ObjectPlaceholder } = $ObjectValueStrg;
-                    }
 
                     # return value - no text replacement
-                    return $ObjectValueStrg if ($ReturnObjectValue);
+                    return $ObjectValueStrg if ($KeepValueAsIs);
+
+                    if ( $ObjectValueStrg ) {
+                        # use as text if "object values" was not wanted
+                        # happens because created "sub" placeholder does not know about surrounding text
+                        if (!$KeepValueAsIs && IsArrayRef($ObjectValueStrg)) {
+                            $ObjectValueStrg = join(q{,},@{$ObjectValueStrg});
+                        }
+                        $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . $ObjectPlaceholder } = $ObjectValueStrg;
+                    }
                 }
             }
         }
