@@ -969,6 +969,11 @@ sub ContactUpdate {
         last KEY;
     }
 
+    my $OldAssignedUserID;
+    if ($Contact{AssignedUserID} && $Contact{AssignedUserID} != $Param{AssignedUserID}) {
+        $OldAssignedUserID = $Contact{AssignedUserID};
+    }
+
     my @DeleteOrgIDs;
     my @InsertOrgIDs;
     for my $OrgID (@{$Contact{OrganisationIDs}}) {
@@ -1068,6 +1073,22 @@ sub ContactUpdate {
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
     );
+
+    # push client callback event for assigned user (contact include)
+    if ($Param{AssignedUserID}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $Param{AssignedUserID}
+        );
+    }
+    if ($OldAssignedUserID) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $OldAssignedUserID
+        );
+    }
 
     return 1;
 }

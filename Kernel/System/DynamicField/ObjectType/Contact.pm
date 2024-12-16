@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -125,8 +125,21 @@ sub PostValueSet {
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
         Namespace => 'Contact',
-        ObjectID  => $Param{ObjectID},
+        ObjectID  => $Param{ObjectID}
     );
+
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        ID => $Param{ObjectID}
+    );
+
+    # push client callback event for user (contact include)
+    if (%Contact && $Contact{AssignedUserID}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $Contact{AssignedUserID}
+        );
+    }
 
     return 1;
 }
