@@ -143,7 +143,10 @@ sub ArticleDelete {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Article{TicketID}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(

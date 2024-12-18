@@ -493,7 +493,10 @@ sub ArticleCreate {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID},
+    );
 
     # add history row
     $Self->HistoryAdd(
@@ -911,13 +914,12 @@ sub ArticleGetContentPath {
         $Param{TicketID} = $TicketID;
     }
 
-    # check key
+    # prepare cache key
     my $CacheKey = 'ArticleGetContentPath::' . $Param{ArticleID};
 
     # check cache
     my $Cache = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return $Cache if $Cache;
@@ -939,8 +941,6 @@ sub ArticleGetContentPath {
     # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => $Result,
     );
@@ -971,13 +971,12 @@ sub ArticleGetTicketID {
         return;
     }
 
-    # check key
+    # prepare cache key
     my $CacheKey = 'ArticleGetTicketID::' . $Param{ArticleID};
 
     # check cache
     my $Cache = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        Key => $CacheKey,
     );
     return $Cache if $Cache;
 
@@ -994,11 +993,8 @@ sub ArticleGetTicketID {
 
     # set cache
     $Self->_TicketCacheSet(
-        TicketID => $TicketID,
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
-        Key      => $CacheKey,
-        Value    => $TicketID,
+        Key   => $CacheKey,
+        Value => $TicketID,
     );
 
     # return
@@ -1307,12 +1303,13 @@ sub ArticleIndex {
 
     my $UseCache = $CacheableSenderTypes{ $Param{SenderType} || 'ALL' };
 
-    my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
+    # prepare cache key
+    my $CacheKey = 'ArticleIndex::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
 
+    # check cache
     if ($UseCache) {
         my $Cached = $Self->_TicketCacheGet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
             Key      => $CacheKey,
         );
 
@@ -1354,11 +1351,10 @@ sub ArticleIndex {
         push @Index, $Row[0];
     }
 
+    # set cache
     if ($UseCache) {
         $Self->_TicketCacheSet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
-            TTL      => $Self->{CacheTTL},
             Key      => $CacheKey,
             Value    => \@Index,
         );
@@ -2229,7 +2225,10 @@ sub ArticleUpdate {
         ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Article{TicketID},
+    );
 
     # event
     $Self->EventHandler(
@@ -2452,7 +2451,43 @@ sub ArticleFlagSet {
         }
     }
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    # check if we have to set the ticket Seen flag as well
+    if ( $Param{Key} eq 'Seen' ) {
+        my $ArticleCount = $Self->ArticleCount(
+            TicketID => $Param{TicketID},
+        );
+
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+                af.article_id = a.id AND article_key = ? AND af.create_by = ?',
+            Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+            Limit => 1,
+        );
+
+        my $SeenCount;
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $SeenCount = $Row[0];
+        }
+        if ( $SeenCount == $ArticleCount ) {
+            my $Result = $Self->TicketFlagSet(
+                TicketID => $Param{TicketID},
+                Key      => 'Seen',
+                Value    => 1,
+                UserID   => $Param{UserID}
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to set Seen flag for TicketID $Param{TicketID}!"
+                );
+            }
+        }
+    }
+
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     if ( !$Param{NoEvents} ) {
         $Self->EventHandler(
@@ -2565,7 +2600,10 @@ sub ArticleFlagDelete {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $TicketID );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $TicketID
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -2604,11 +2642,12 @@ sub ArticleFlagGet {
         }
     }
 
-    my $CacheKey = 'ArticleFlagGet::' . $Param{TicketID} . '::' . $Param{ArticleID} . '::' . $Param{UserID};
+    # prepare cache key
+    my $CacheKey = 'ArticleFlagGet::' . $Param{ArticleID} . '::' . $Param{UserID};
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return %{$Cached} if ref $Cached eq 'HASH';
@@ -2651,10 +2690,9 @@ sub ArticleFlagGet {
         }
     }
 
+    # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => \%Flag,
     );
@@ -2770,11 +2808,12 @@ sub ArticleFlagsOfTicketGet {
         }
     }
 
-    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{TicketID} . '::' . $Param{UserID};
+    # prepare cache key
+    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{UserID};
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return %{$Cached} if ref $Cached eq 'HASH';
@@ -2798,10 +2837,9 @@ sub ArticleFlagsOfTicketGet {
         $Flag{ $Row[0] }->{ $Row[1] } = $Row[2];
     }
 
+    # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => \%Flag,
     );
