@@ -220,7 +220,9 @@ sub PostValueSet {
     );
 
     # clear ticket cache
-    $TicketObject->_TicketCacheClear( TicketID => $Article{TicketID} );
+    $TicketObject->_TicketCacheClear(
+        TicketID => $Article{TicketID}
+    );
 
     # trigger event
     $TicketObject->EventHandler(

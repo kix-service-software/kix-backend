@@ -100,7 +100,10 @@ sub WatcherAdd {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    $TicketObject->_TicketCacheClear( TicketID => $Param{ObjectID} );
+    # clear ticket cache
+    $TicketObject->_TicketCacheClear(
+        TicketID => $Param{ObjectID}
+    );
 
     # add history
     $TicketObject->HistoryAdd(
@@ -164,7 +167,10 @@ sub WatcherDelete {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    $TicketObject->_TicketCacheClear( TicketID => $Param{ObjectID} );
+    # clear ticket cache
+    $TicketObject->_TicketCacheClear(
+        TicketID => $Param{ObjectID}
+    );
 
     $TicketObject->HistoryAdd(
         TicketID     => $Param{ObjectID},
