@@ -449,7 +449,10 @@ sub _MigrateArticles {
 
             # fix faulty email adresses - remove trailing comma
             foreach my $Attr ( qw(a_from a_to a_cc a_bcc) ) {
-                if ( $Item->{$Attr} =~ /^(.*?),$/gmx ) {
+                if (
+                    $Item->{$Attr}
+                    && $Item->{$Attr} =~ /^(.*?),$/gmx
+                ) {
                     $Item->{$Attr} = $1;
                 }
             }
