@@ -36,3 +36,14 @@ Feature: POST request to the /tickets/:TicketID/articles resource
     Then the response code is 204
     And the response has no content
 
+
+
+
+
+
+
+
+
+
+
+

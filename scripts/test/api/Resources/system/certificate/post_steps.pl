@@ -31,7 +31,7 @@ require '_StepsLib.pl';
 Given qr/a certificate$/, sub {
 
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/system/certificate',
+      URL     => S->{API_URL}.'/system/certificates',
       Token   => S->{Token},
       Content => {
 		  Certificate => {
@@ -51,7 +51,7 @@ Given qr/a certificate$/, sub {
 When qr/I create a certificate$/, sub {
 
    ( S->{Response}, S->{ResponseContent} ) = _Post(
-      URL     => S->{API_URL}.'/system/certificate',
+      URL     => S->{API_URL}.'/system/certificates',
       Token   => S->{Token},
 	   Content => {
 		   Certificate => {
@@ -71,7 +71,7 @@ When qr/I create a certificate$/, sub {
 When qr/I create a second certificate$/, sub {
 
 	( S->{Response}, S->{ResponseContent} ) = _Post(
-		URL     => S->{API_URL}.'/system/certificate',
+		URL     => S->{API_URL}.'/system/certificates',
 		Token   => S->{Token},
 		Content => {
 			Certificate => {
@@ -91,7 +91,7 @@ When qr/I create a second certificate$/, sub {
 When qr/I create a private certificate$/, sub {
 
 	( S->{Response}, S->{ResponseContent} ) = _Post(
-		URL     => S->{API_URL}.'/system/certificate',
+		URL     => S->{API_URL}.'/system/certificates',
 		Token   => S->{Token},
 		Content => {
 			Certificate => {

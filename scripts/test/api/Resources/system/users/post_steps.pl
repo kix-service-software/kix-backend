@@ -34,14 +34,13 @@ Given qr/a user$/, sub {
       Token   => S->{Token},
       Content => {
         User => {
-            UserEmail => "john.doe1".rand()."\@example.com",
-            UserFirstname => "John",
-            UserLastname => "Doe",
             UserLogin => "jdoe".rand(),
             UserPw => "secret1".rand(),
-            UserTitle => "DR.",
             IsAgent => 1,
             IsCustomer => 0,
+            RoleIDs => [
+                3,5,8
+            ],
             ValidID => 1
         }
       }
@@ -49,35 +48,20 @@ Given qr/a user$/, sub {
 };
 
 Given qr/(\d+) of users$/, sub {
-    my $UserEmail;
     my $UserLogin;
-    my $UserLastname;
-    my $UserFirstname;
 
     for ($i=0;$i<$1;$i++){
         if ( $i == 2 ) {
-            $UserEmail = 'test_for_filter.doe2@test.org';
             $UserLogin = 'jdoe_test_for_filter';
-            $UserFirstname = 'John';
-            $UserLastname = 'Doe';
         }
         elsif ( $i == 3 ) {
-            $UserEmail = 'Max.Mustermann@test.org';
             $UserLogin = 'mmamu';
-            $UserFirstname = 'Max';
-            $UserLastname = 'Mustermann';
         }
         elsif ( $i == 4 ) {
-            $UserEmail = 'Frank.Zander@test.org';
             $UserLogin = 'fzander';
-            $UserFirstname = 'Frank';
-            $UserLastname = 'Zander';
         }
         elsif ( $i == 5 ) {
-            $UserEmail = 'Max.Müller@test.org';
             $UserLogin = 'mmamu';
-            $UserFirstname = 'Max';
-            $UserLastname = 'Müller';
         }
         else {
             $UserEmail = "john.doe1".rand()."\@example.com";
@@ -89,14 +73,13 @@ Given qr/(\d+) of users$/, sub {
             Token   => S->{Token},
             Content => {
                 User => {
-                    UserEmail => $UserEmail,
-                    UserFirstname => $UserFirstname,
-                    UserLastname => $UserLastname,
                     UserLogin => $UserLogin,
                     UserPw => "secret1".rand(),
-                    UserTitle => "DR.",
                     IsAgent => 1,
                     IsCustomer => 0,
+                    RoleIDs => [
+                        3,5,8
+                    ],
                     ValidID => 1
                 }
             }
@@ -110,14 +93,13 @@ When qr/added a user$/, sub {
       Token   => S->{Token},
       Content => {
         User => {
-            UserEmail => "john.doe2".rand()."\@example.com",
-            UserFirstname => "John",
-            UserLastname => "Doe",
             UserLogin => "jdoe".rand(),
             UserPw => "secret2".rand(),
-            UserTitle => "DR.",
             IsAgent => 1,
             IsCustomer => 0,
+            RoleIDs => [
+                3
+            ],
             ValidID => 1
         }
       }

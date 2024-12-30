@@ -28,10 +28,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I query collection of certificate$/, sub {
+When qr/I query collection of certificates$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/certificate',
+      URL   => S->{API_URL}.'/system/certificates',
    );
 };
 

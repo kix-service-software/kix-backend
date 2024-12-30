@@ -31,6 +31,6 @@ require '_StepsLib.pl';
 When qr/I delete this certificate$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Delete(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/certificate/'.S->{ResponseContent}->{CertificateID},
+      URL   => S->{API_URL}.'/system/certificates/'.S->{ResponseContent}->{CertificateID},
    );
 };

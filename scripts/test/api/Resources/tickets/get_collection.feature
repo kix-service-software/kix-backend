@@ -13,7 +13,6 @@ Feature: GET request to the /tickets resource
     When delete all this tickets
     Then the response code is 204
     And the response has no content
-    When I query the collection of tickets
 
   Scenario: get the list of existing tickets with filter
     Given 4 of tickets 
@@ -25,7 +24,6 @@ Feature: GET request to the /tickets resource
     When delete all this tickets
     Then the response code is 204
     And the response has no content
-    When I query the collection of tickets
 
   Scenario: get the list of existing tickets with filter contain
     Given 8 of tickets
@@ -37,7 +35,6 @@ Feature: GET request to the /tickets resource
     When delete all this tickets
     Then the response code is 204
     And the response has no content
-    When I query the collection of tickets
     
   Scenario: get the list of existing tickets with limit
     Given 8 of tickets
@@ -46,18 +43,47 @@ Feature: GET request to the /tickets resource
     And the response contains 4 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204
-    And the response has no content  
-    When I query the collection of tickets
+    And the response has no content
     
   Scenario: get the list of existing tickets with sorted
     Given 8 of tickets
     When I query the collection of tickets with sorted by "Ticket.-Title:textual" 
     Then the response code is 200
+#    Then the response content is
     And the response contains 8 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204
-    And the response has no content       
-    When I query the collection of tickets
+    And the response has no content
+
+  Scenario: get the list of existing tickets with offset
+    Given 8 of tickets
+    When I query the collection of tickets with offset 4
+    Then the response code is 200
+    And the response now contains 8 items of type "Ticket"
+#    Then the response content
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: get the list of existing tickets with limit and offset
+    Given 8 of tickets
+    When I query the collection of tickets with limit 26 and offset 2
+    Then the response code is 200
+#    Then the response content
+    And the response now contains 0 items of type "Ticket"
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
+
+  Scenario: get the list of existing tickets with sorted, limit and offset
+    Given 8 of tickets
+    When I query the collection of tickets with sorted by "Ticket.-Title:textual" limit 38 and offset 1
+    Then the response code is 200
+#    Then the response content
+    And the response now contains 5 items of type "Ticket"
+    When delete all this tickets
+    Then the response code is 204
+    And the response has no content
 
   Scenario: get the list of existing tickets with multiplesort (prio and queue)
     Given 20 of tickets
@@ -85,7 +111,7 @@ Feature: GET request to the /tickets resource
     When delete all this tickets
     Then the response code is 204
     And the response has no content
-    
+
 
     
     

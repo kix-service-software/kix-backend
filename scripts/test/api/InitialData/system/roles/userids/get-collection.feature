@@ -8,4 +8,8 @@ Feature: GET request to the /system/roles/:RoleID/userids resource
   Scenario: get the list of assigned roles
     When I get the list of assigned users of RoleID 1
     Then the response code is 200
-#    And the response object is RoleUserIDCollectionResponse
+    And the response contains the following rolesuserids items type of UserIDs
+      | UserIDs |
+      | 1       |
+
+
