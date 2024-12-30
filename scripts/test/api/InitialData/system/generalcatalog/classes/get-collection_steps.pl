@@ -28,7 +28,7 @@ require '_StepsLib.pl';
 
 # feature specific steps
 
-When qr/I query the collection of generalcatalog class$/, sub {
+When qr/I query the collection of generalcatalog classes$/, sub {
    my $Object = "GeneralCatalogClass";
    my $Index = 0;
 

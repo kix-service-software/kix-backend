@@ -37,7 +37,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles
     When I query the collection of roles
     Then the response code is 200
-    And the response contains 20 items of type "Role"
+    And the response contains 19 items of type "Role"
     And the response contains the following items of type Role
       | Name                         | Comment                                                                                                                                                                      | ValidID |
       | Agent User                   | allows to login in both frontend- and backend application but does not grant any further permissions                                                                         | 1       |

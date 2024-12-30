@@ -29,8 +29,8 @@
      When I query the collection of console with filter command "Console::Command::Admin::Article::StorageSwitch"
      Then the response code is 200
      And the response contains the following items type of ConsoleCommand
-       | Command                                         | Description                                                           |
-       | Console::Command::Admin::Article::StorageSwitch | Migrate article files from one storage backend to another on the fly. |
+       | Command                                         | Description                                                                            |
+       | Console::Command::Admin::Article::StorageSwitch | Migrate article attachment metadata files to DB. Leave attachment content files in FS. |
 
    Scenario: get the list of existing console command filter
      When I query the collection of console with filter command "Console::Command::Admin::Contact::Add"

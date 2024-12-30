@@ -135,3 +135,13 @@ Then qr/the response contains the following items Class (.*?) of type GeneralCat
         $Index++
     }
 };
+
+When qr/I query the collection of generalcatalog items "(.*?)"$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token  => S->{Token},
+        URL    => S->{API_URL} . '/system/generalcatalog',
+        Filter => '{  "GeneralCatalogItem":{ "AND":[  {"Field":"Class","Operator":"EQ","Type":"STRING","Value":"'.$1.'" }]}}',
+        Sort   => 'GeneralCatalogItem.Name:textual'
+    );
+};
+

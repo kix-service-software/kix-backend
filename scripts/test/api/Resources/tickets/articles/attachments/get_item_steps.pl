@@ -31,7 +31,7 @@ require '_StepsLib.pl';
 When qr/I get the attachment item\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles/'.S->{ArticleID}.'/attachments/'.S->{ResponseContent}->{AttachmentID},
+      URL   => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles/'.S->{ArticleID}.'/attachments',
    );
 };
 

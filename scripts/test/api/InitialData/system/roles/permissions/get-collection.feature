@@ -21,11 +21,12 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 2
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 8 items of type "Permission"
+    And the response contains 9 items of type "Permission"
     And the response contains the following items of type Permission
       | Target         | Value | TypeID |
       | /auth          | 1     | 1      |
-      | /certificate   | 11    | 1      |
+      | /certificates  | 11    | 1      |
+      | /cmdb          | 15    | 1      |
       | /contacts      | 15    | 1      |
       | /organisations | 6     | 1      |
       | /session       | 15    | 1      |
@@ -64,38 +65,39 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 4
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 29 items of type "Permission"
+    And the response contains 30 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                       | Value | TypeID |
-      | /links                                                       | 2     | 1      |
-      | /reporting                                                   | 2     | 1      |
-      | /reporting/reportdefinitions                                 | 2     | 1      |
-      | /reporting/reportdefinitions/*                               | 0     | 1      |
-      | /reporting/reportdefinitions/3                               | 2     | 1      |
-      | /reporting/reportdefinitions/4                               | 2     | 1      |
-      | /reporting/reportdefinitions/5                               | 2     | 1      |
-      | /reporting/reportdefinitions/6                               | 2     | 1      |
-      | /reporting/reportdefinitions/7                               | 2     | 1      |
-      | /reporting/reportdefinitions/8                               | 2     | 1      |
-      | /reporting/reports                                           | 2     | 1      |
-      | /reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}  | 0     | 2      |
-      | /system/communication                                        | 2     | 1      |
-      | /system/communication/*                                      | 0     | 1      |
-      | /system/communication/channels                               | 2     | 1      |
-      | /system/communication/sendertypes                            | 2     | 1      |
-      | /system/communication/systemaddresses                        | 2     | 1      |
-      | /system/htmltopdf                                            | 2     | 1      |
-      | /system/htmltopdf/convert                                    | 2     | 1      |
-      | /system/ticket/*                                             | 0     | 1      |
-      | /system/ticket                                               | 2     | 1      |
-      | /system/ticket/locks                                         | 2     | 1      |
-      | /system/ticket/priorities                                    | 2     | 1      |
-      | /system/ticket/queues                                        | 2     | 1      |
-      | /system/ticket/states                                        | 2     | 1      |
-      | /system/ticket/types                                         | 2     | 1      |
-      | /tickets                                                     | 2     | 1      |
-      | /tickets/*/articles/*/flags                                  | 15    | 1      |
-      | *                                                            | 2     | 4      |
+      | Target                                                      | Value | TypeID |
+      | /contacts                                                   | 2     | 1      |
+      | /links                                                      | 2     | 1      |
+      | /reporting                                                  | 2     | 1      |
+      | /reporting/reportdefinitions                                | 2     | 1      |
+      | /reporting/reportdefinitions/*                              | 0     | 1      |
+      | /reporting/reportdefinitions/3                              | 2     | 1      |
+      | /reporting/reportdefinitions/4                              | 2     | 1      |
+      | /reporting/reportdefinitions/5                              | 2     | 1      |
+      | /reporting/reportdefinitions/6                              | 2     | 1      |
+      | /reporting/reportdefinitions/7                              | 2     | 1      |
+      | /reporting/reportdefinitions/8                              | 2     | 1      |
+      | /reporting/reports                                          | 2     | 1      |
+      | /reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]} | 0     | 2      |
+      | /system/communication                                       | 2     | 1      |
+      | /system/communication/*                                     | 0     | 1      |
+      | /system/communication/channels                              | 2     | 1      |
+      | /system/communication/sendertypes                           | 2     | 1      |
+      | /system/communication/systemaddresses                       | 2     | 1      |
+      | /system/htmltopdf                                           | 2     | 1      |
+      | /system/htmltopdf/convert                                   | 2     | 1      |
+      | /system/ticket/*                                            | 0     | 1      |
+      | /system/ticket                                              | 2     | 1      |
+      | /system/ticket/locks                                        | 2     | 1      |
+      | /system/ticket/priorities                                   | 2     | 1      |
+      | /system/ticket/queues                                       | 2     | 1      |
+      | /system/ticket/states                                       | 2     | 1      |
+      | /system/ticket/types                                        | 2     | 1      |
+      | /tickets                                                    | 2     | 1      |
+      | /tickets/*/articles/*/flags                                 | 15    | 1      |
+      | *                                                           | 2     | 4      |
 
   Scenario: get the list of existing permissions of Ticket Agent
     When I query the collection of permissions with roleid 5
@@ -341,7 +343,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/roles | 6     | 1      |
 
   Scenario: get the list of existing permissions of Ticket Agent (Servicedesk)
-    When I query the collection of permissions with roleid 17
+    When I query the collection of permissions with roleid 16
     Then the response code is 200
     And the response contains 5 items of type "Permission"
     And the response contains the following items of type Permission
@@ -349,49 +351,50 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | 1                                   | 15    | 4      |
       | 2                                   | 15    | 4      |
       | /system/ticket/queues/1             | 2     | 1      |
-      | /system/ticket/queues/2             | 2     | 1      |      
+      | /system/ticket/queues/2             | 2     | 1      |
       | /tickets/*{Ticket.QueueID IN [1,2]} | 15    | 2      |
 
   Scenario: get the list of existing permissions of Ticket Agent Base Permission
-    When I query the collection of permissions with roleid 18
+    When I query the collection of permissions with roleid 17
     Then the response code is 200
-    And the response contains 31 items of type "Permission"
+    And the response contains 32 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target                                                       | Value | TypeID |
-      | /contacts                                                    | 2     | 1      |
-      | /links                                                       | 15    | 1      |
-      | /organisations                                               | 2     | 1      |
-      | /reporting                                                   | 2     | 1      |
-      | /reporting/reportdefinitions                                 | 2     | 1      |
-      | /reporting/reportdefinitions/*                               | 0     | 1      |
-      | /reporting/reportdefinitions/3                               | 2     | 1      |
-      | /reporting/reportdefinitions/4                               | 2     | 1      |
-      | /reporting/reportdefinitions/5                               | 2     | 1      |
-      | /reporting/reportdefinitions/6                               | 2     | 1      |
-      | /reporting/reportdefinitions/7                               | 2     | 1      |
-      | /reporting/reportdefinitions/8                               | 2     | 1      |
-      | /reporting/reports                                           | 2     | 1      |
-      | /reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}  | 0     | 2      |
-      | /system/communication                                        | 2     | 1      |
-      | /system/communication/*                                      | 0     | 1      |
-      | /system/communication/channels                               | 2     | 1      |
-      | /system/communication/sendertypes                            | 2     | 1      |
-      | /system/communication/systemaddresses                        | 2     | 1      |
-      | /system/htmltopdf                                            | 2     | 1      |
-      | /system/htmltopdf/convert                                    | 2     | 1      |
-      | /system/textmodules                                          | 2     | 1      |
-      | /system/ticket/*                                             | 0     | 1      |
-      | /system/ticket                                               | 2     | 1      |
-      | /system/ticket/locks                                         | 2     | 1      |
-      | /system/ticket/priorities                                    | 2     | 1      |
-      | /system/ticket/queues                                        | 2     | 1      |
-      | /system/ticket/states                                        | 2     | 1      |
-      | /system/ticket/types                                         | 2     | 1      |
-      | /tickets                                                     | 15    | 1      |
-      | *                                                            | 0     | 4      |
+      | Target                                                      | Value | TypeID |
+      | /contacts                                                   | 2     | 1      |
+      | /links                                                      | 15    | 1      |
+      | /organisations                                              | 2     | 1      |
+      | /reporting                                                  | 2     | 1      |
+      | /reporting/reportdefinitions                                | 2     | 1      |
+      | /reporting/reportdefinitions/*                              | 0     | 1      |
+      | /reporting/reportdefinitions/3                              | 2     | 1      |
+      | /reporting/reportdefinitions/4                              | 2     | 1      |
+      | /reporting/reportdefinitions/5                              | 2     | 1      |
+      | /reporting/reportdefinitions/6                              | 2     | 1      |
+      | /reporting/reportdefinitions/7                              | 2     | 1      |
+      | /reporting/reportdefinitions/8                              | 2     | 1      |
+      | /reporting/reports                                          | 2     | 1      |
+      | /reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]} | 0     | 2      |
+      | /system/communication                                       | 2     | 1      |
+      | /system/communication/*                                     | 0     | 1      |
+      | /system/communication/channels                              | 2     | 1      |
+      | /system/communication/sendertypes                           | 2     | 1      |
+      | /system/communication/systemaddresses                       | 2     | 1      |
+      | /system/htmltopdf                                           | 2     | 1      |
+      | /system/htmltopdf/convert                                   | 2     | 1      |
+      | /system/textmodules                                         | 2     | 1      |
+      | /system/ticket/*                                            | 0     | 1      |
+      | /system/ticket                                              | 2     | 1      |
+      | /system/ticket/locks                                        | 2     | 1      |
+      | /system/ticket/priorities                                   | 2     | 1      |
+      | /system/ticket/queues                                       | 2     | 1      |
+      | /system/ticket/states                                       | 2     | 1      |
+      | /system/ticket/types                                        | 2     | 1      |
+      | /tickets                                                    | 15    | 1      |
+      | /virtualfs                                                  | 2     | 1      |
+      | *                                                           | 0     | 4      |
 
   Scenario: get the list of existing permissions of Textmodule Admin
-    When I query the collection of permissions with roleid 19
+    When I query the collection of permissions with roleid 18
     Then the response code is 200
     And the response contains 1 items of type "Permission"
     And the response contains the following items of type Permission
@@ -399,13 +402,16 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /system/textmodules | 15    | 1      |
 
   Scenario: get the list of existing permissions of FAQ Admin
-    When I query the collection of permissions with roleid 20
+    When I query the collection of permissions with roleid 19
     Then the response code is 200
     And the response contains 2 items of type "Permission"
     And the response contains the following items of type Permission
       | Target              | Value | TypeID |
       | /system/faq         | 15    | 1      |
       | /system/objecticons | 15    | 1      |
+
+
+
 
 
 

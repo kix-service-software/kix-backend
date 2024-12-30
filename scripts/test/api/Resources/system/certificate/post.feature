@@ -1,4 +1,4 @@
-Feature: POST request to the /system/certificate resource
+Feature: POST request to the /system/certificates resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__

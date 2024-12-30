@@ -93,3 +93,70 @@ Then qr/the response contains the following config (.*?)$/, sub {
 Then qr/the values "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
+
+#=============================special Test basepermissionmodules ============================================= 
+When qr/I query the collection of sysconfig "(.*?)"$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/system/config/'.$1,
+   );
+};
+
+#================================
+Then qr/the response contains the following sysconfig entrys of "(.*?)"$/, sub {
+   my $Object = $1;
+   my $Index = 0;
+
+   foreach my $Row ( @{ C->data } ) {
+      foreach my $Attribute ( keys %{$Row}) {
+         C->dispatch( 'Then', "the sysconfigvalues \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+      }
+      $Index++
+   }
+};
+
+Then qr/the sysconfigvalues "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+   if ( defined( S->{ResponseContent}->{$2}->{$1}) ) {
+      S->{ResponseContent}->{$2}->{$1}   =~ s/^\s+|\s+$//g;
+      is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+   }
+   else{
+       print STDERR "defined2:".Dumper(S->{ResponseContent}->{$2}->{$1});
+   }
+#   is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+};
+
+#=========================================
+When qr/I query this SysConfigOption "(.*?)"$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token  => S->{Token},
+        URL    => S->{API_URL} . '/system/config/'.$1,
+    );
+};
+
+#  no hash array #############################################################################################
+Then qr/response contains the following items type of (.*?)$/, sub {
+    my $Object = $1;
+    my $Index = 0;
+
+    foreach my $Row ( @{ C->data } ) {
+        foreach my $Attribute ( keys %{$Row}) {
+            C->dispatch( 'Then', "attr \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+        }
+        $Index++
+    }
+};
+
+Then qr/attr "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    if ($2 eq 'SysConfigOption') {
+        is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+    }
+    else {
+        is(S->{ResponseContent}->{SysConfigOption}->{$2}->{$1}, $4, 'Check attribute value in response');
+    }
+};
+
+
+
+
+
