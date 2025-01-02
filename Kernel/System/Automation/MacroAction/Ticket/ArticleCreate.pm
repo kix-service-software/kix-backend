@@ -175,6 +175,11 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Dynamic Fields'),
         Description => Kernel::Language::Translatable('The dynamic fields of the new article.'),
         Required    => 0,
+        Placeholder => {
+            ValueType => 'KeyValueListValues',
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     # FIXME: add if necessary
@@ -218,8 +223,6 @@ sub Run {
 
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
-
-    %Param = $Self->_PrepareEventData(%Param);
 
     my %ArticleData = $Kernel::OM->Get('Ticket')->PrepareArticle(
         %{ $Param{Config} },
@@ -289,11 +292,10 @@ sub _SetArticleDynamicFields {
     my ( $Self, %Param ) = @_;
 
     # set dynamic fields
-    if ( $Param{NewArticleID} && IsArrayRefWithData( $Param{Config}->{ArticleDynamicFieldList} ) ) {
-
-        my $TemplateGeneratorObject   = $Kernel::OM->Get('TemplateGenerator');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
+    if (
+        $Param{NewArticleID}
+        && IsArrayRefWithData( $Param{Config}->{ArticleDynamicFieldList} )
+    ) {
         # get the dynamic fields
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             Valid      => 1,
@@ -313,41 +315,37 @@ sub _SetArticleDynamicFields {
         DYNAMICFIELD:
         foreach my $DynamicField (@{$Param{Config}->{ArticleDynamicFieldList}}) {
             next if (
-                !IsArrayRefWithData($DynamicField)
-                    || !$DynamicField->[0]
-                    || !IsHashRefWithData($DynamicFieldLookup{$DynamicField->[0]})
+                !IsArrayRefWithData( $DynamicField )
+                || !$DynamicField->[0]
+                || !$DynamicField->[1]
+                || !IsHashRefWithData( $DynamicFieldLookup{ $DynamicField->[0] } )
             );
 
-            my $ReplacedValue = $Self->_ReplaceValuePlaceholder(
-                %Param,
-                Value => $DynamicField->[1]
-            );
+            my @ExistingValuesForGivenDF = $Values{ $DynamicField->[0] } ? @{ $Values{ $DynamicField->[0] } } : ();
 
-            next if (!$ReplacedValue);
-
-            my @ExistingValuesForGivenDF = $Values{$DynamicField->[0]} ? @{$Values{$DynamicField->[0]}} : ();
-
-            if (IsArrayRefWithData($ReplacedValue)) {
-                push(@ExistingValuesForGivenDF, @{$ReplacedValue});
+            if (IsArrayRefWithData( $DynamicField->[1] )) {
+                push( @ExistingValuesForGivenDF, @{ $DynamicField->[1] } );
             }
             else {
-                push(@ExistingValuesForGivenDF, ($ReplacedValue));
+                push( @ExistingValuesForGivenDF, ( $DynamicField->[1] ) );
             }
 
-            @ExistingValuesForGivenDF = $Kernel::OM->Get('Main')->GetUnique(@ExistingValuesForGivenDF);
+            @ExistingValuesForGivenDF = $Kernel::OM->Get('Main')->GetUnique( @ExistingValuesForGivenDF );
 
-            $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
+            $Values{ $DynamicField->[0] } = \@ExistingValuesForGivenDF;
         }
 
-        for my $v (keys %Values) {
-            $DynamicFieldBackendObject->ValueSet(
-                DynamicFieldConfig => $DynamicFieldLookup{$v},
+        for my $DynamicField (keys %Values) {
+            $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                DynamicFieldConfig => $DynamicFieldLookup{ $DynamicField },
                 ObjectID           => $Param{NewArticleID},
-                Value              => $Values{$v},
+                Value              => $Values{ $DynamicField },
                 UserID             => $Param{UserID},
             );
         }
     }
+
+    return 1;
 }
 
 1;

@@ -53,6 +53,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Lock'),
         Description => Kernel::Language::Translatable('The lock state to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -81,7 +85,7 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,14 +93,9 @@ sub Run {
         return;
     }
 
-    my $Lock = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{Lock}
-    );
-
     # set the new lock
     my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
-        Lock => $Lock,
+        Lock => $Param{Config}->{Lock},
     );
 
     if ( !$LockID ) {
@@ -113,7 +112,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketLockSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketLockSet(
         TicketID => $Param{TicketID},
         LockID   => $LockID,
         UserID   => $Param{UserID},

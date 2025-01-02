@@ -51,6 +51,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('ObjectID'),
         Description => Kernel::Language::Translatable('The ID of the object to run the macro for.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'MacroID',
@@ -83,13 +87,6 @@ sub Run {
 
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
-
-    if ( $Param{Config}->{ObjectID} ) {
-        $Param{Config}->{ObjectID} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{ObjectID} || ''
-        );
-    }
 
     # FIXME: use given instance
     my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');

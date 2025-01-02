@@ -51,18 +51,30 @@ sub Describe {
         Label       => Kernel::Language::Translatable( 'State'),
         Description => Kernel::Language::Translatable( 'The name of the state to be set.'),
         Required => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'PendingTimeDiff',
         Label       => Kernel::Language::Translatable( 'Pending Time Difference'),
         Description => Kernel::Language::Translatable( '(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.'),
         Required => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'PendingDateTime',
         Label       => Kernel::Language::Translatable( 'Pending Date Time'),
         Description => Kernel::Language::Translatable( '(Optional) The pending time in format YYYY-MM-DD hh:mm:ss. This timestamp will be set as pending time. Setting "Pending Time Difference" will overwrite this parameter. Used for pending states only.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'TargetTime',
@@ -99,21 +111,18 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet( TicketID => $Param{TicketID} );
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+        TicketID => $Param{TicketID}
+    );
 
     if ( !%Ticket ) {
         return;
     }
 
-    my $State = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{State}
-    );
-
     # set the new state
-    my %State = $Kernel::OM->Get('State')->StateGet( Name => $State );
+    my %State = $Kernel::OM->Get('State')->StateGet(
+        Name => $Param{Config}->{State}
+    );
 
     if ( !%State || !$State{ID} ) {
         $Kernel::OM->Get('Automation')->LogError(
@@ -129,7 +138,7 @@ sub Run {
 
     # do nothing if the desired state is already set
     if ( $State{ID} ne $Ticket{StateID} ) {
-        $Success = $TicketObject->TicketStateSet(
+        $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
             TicketID => $Param{TicketID},
             StateID  => $State{ID},
             UserID   => $Param{UserID}
@@ -148,18 +157,6 @@ sub Run {
 
     # set pending time
     if ( $State{TypeName} =~ m{\A pending}msxi ) {
-        $Param{Config}->{PendingTimeDiff} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{PendingTimeDiff}
-        );
-        $Param{Config}->{PendingDateTime} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{PendingDateTime}
-        );
-
-        # get time object
-        my $TimeObject = $Kernel::OM->Get('Kernel::System::Time');
-
         my $PendingTime;
         if ( defined $Param{Config}->{PendingTimeDiff} ) {
             # prepare system call
@@ -180,13 +177,13 @@ sub Run {
             }
 
             # get current time
-            my $PendingSystemTime = $TimeObject->SystemTime();
+            my $PendingSystemTime = $Kernel::OM->Get('Time')->SystemTime();
 
             # add PendingTimeDiff
             $PendingSystemTime += $PendingTimeDiffResult;
 
             # convert pending time to time stamp
-            $PendingTime = $TimeObject->SystemTime2TimeStamp( SystemTime => $PendingSystemTime );
+            $PendingTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp( SystemTime => $PendingSystemTime );
 
         } elsif ( $Param{Config}->{PendingDateTime} ) {
             $PendingTime = $Param{Config}->{PendingDateTime};
@@ -231,15 +228,15 @@ sub Run {
                 }
 
                 # get date parts
-                my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-                    SystemTime => $TimeObject->TimeStamp2SystemTime(
+                my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+                    SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                         String => $PendingTime,
                     )
                 );
 
                 # get BOB
-                my $PendingTimeUnix = $TimeObject->DestinationTime(
-                    StartTime => $TimeObject->TimeStamp2SystemTime(
+                my $PendingTimeUnix = $Kernel::OM->Get('Time')->DestinationTime(
+                    StartTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                         String => "$Year-$Month-$Day 00:00:00",
                     ),
                     Time     => 2,   # at least 2 seconds needed, is substracted after next line
@@ -247,7 +244,7 @@ sub Run {
                 ) - 2;
 
                 # get BOB date time string
-                $PendingTime = $TimeObject->SystemTime2TimeStamp(
+                $PendingTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                     SystemTime => $PendingTimeUnix
                 );
 
@@ -255,25 +252,25 @@ sub Run {
                 if ( $Param{Config}->{TargetTime} eq 'EOB' ) {
 
                     # get date parts of BOB
-                    my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $TimeObject->SystemTime2Date(
-                        SystemTime => $TimeObject->TimeStamp2SystemTime(
+                    my ( $Sec, $Min, $Hour, $Day, $Month, $Year, $WeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
+                        SystemTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => $PendingTime,
                         )
                     );
 
                     # get working time of relevant day (seconds)
-                    my $WorkingTime = $TimeObject->WorkingTime(
-                        StartTime => $TimeObject->TimeStamp2SystemTime(
+                    my $WorkingTime = $Kernel::OM->Get('Time')->WorkingTime(
+                        StartTime => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => "$Year-$Month-$Day 00:00:01",
                         ),
-                        StopTime  => $TimeObject->TimeStamp2SystemTime(
+                        StopTime  => $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                             String => "$Year-$Month-$Day 23:59:59",
                         ),
                         Calendar  => $Calendar
                     );
 
                     # get EOB date time string (= BOB + working time for this day)
-                    $PendingTime = $TimeObject->SystemTime2TimeStamp(
+                    $PendingTime = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
                         SystemTime => $PendingTimeUnix + $WorkingTime
                     );
                 }

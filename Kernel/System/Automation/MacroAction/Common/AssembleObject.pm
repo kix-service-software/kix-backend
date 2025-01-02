@@ -57,6 +57,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Definition'),
         Description => Kernel::Language::Translatable('The definition (structure/content) of the object, i.e. the YAML string or the JSON. You can use variables and placeholders. IMPORTANT: due to the possible use of placeholders and variables, the definition can only be validated when this action gets executed. In case of an error you will find detailed information in the job log and the kix log.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     $Self->AddResult(
@@ -89,11 +93,6 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $Definition = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{Definition}
-    );
-
     # create new instance of helper module
     my $Module = $Kernel::OM->GetModuleFor('Automation::Helper::Object');
     if ( !$Kernel::OM->Get('Main')->Require($Module) ) {
@@ -116,7 +115,7 @@ sub Run {
     }
 
     $Object->SetType($Param{Config}->{Type});
-    $Object->SetDefinition($Definition);
+    $Object->SetDefinition($Param{Config}->{Definition});
 
     # return the object
     $Self->SetResult(Name => 'Object', Value => $Object);

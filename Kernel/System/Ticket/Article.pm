@@ -3736,6 +3736,20 @@ sub _GetFromByQueue {
     return "\"$Realname\" <$Address{Email}>";
 }
 
+sub _ConvertScalar2ArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    my @Data = split( /,/, $Param{Data} );
+
+    # remove any possible heading and tailing white spaces
+    for my $Item (@Data) {
+        $Item =~ s{\A\s+}{};
+        $Item =~ s{\s+\z}{};
+    }
+
+    return \@Data;
+}
+
 1;
 
 =back
