@@ -94,30 +94,6 @@ sub Run {
         return if !%Ticket;
 
         $Param{Ticket} = \%Ticket;
-
-        $Self->{ViewableStates} = {
-            reverse $Kernel::OM->Get('State')->StateGetStatesByType(
-                Type   => 'Viewable',
-                Result => 'HASH',
-            )
-        };
-
-        if ( !$Self->{ViewableStates}->{$Ticket{State}} ) {
-            # delete all user counters for this object for the ticket owner and leave
-            $Kernel::OM->Get('User')->DeleteUserCounterObject(
-                Category => 'Ticket',
-                ObjectID => $Param{Data}->{TicketID},
-                UserID   => $Ticket{OwnerID}
-            );
-
-            if ( $Param{Event} eq 'TicketUnsubscribe' ) {
-                # delete the watcher counter
-                $Self->HandleTicketUnsubscribe(
-                    %Param
-                );
-            }
-            return 1;
-        }
     }
 
     # handle ticket events to update ticket counters:
