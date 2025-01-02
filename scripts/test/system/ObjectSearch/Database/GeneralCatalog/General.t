@@ -60,6 +60,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -122,7 +138,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) = \'test\''
+                $CaseSensitive ? 'LOWER(gc.name) = \'test\'' : 'gc.name = \'test\''
             ]
         }
     },
@@ -135,7 +151,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) = \'\''
+                $CaseSensitive ? 'LOWER(gc.name) = \'\'' : 'gc.name = \'\''
             ]
         }
     },
@@ -148,7 +164,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) != \'test\''
+                $CaseSensitive ? 'LOWER(gc.name) != \'test\'' : 'gc.name != \'test\''
             ]
         }
     },
@@ -161,7 +177,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) != \'\''
+                $CaseSensitive ? 'LOWER(gc.name) != \'\'' : 'gc.name != \'\''
             ]
         }
     },
@@ -174,7 +190,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.name) IN (\'test\')' : 'gc.name IN (\'test\')'
             ]
         }
     },
@@ -187,7 +203,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.name) NOT IN (\'test\')' : 'gc.name NOT IN (\'test\')'
             ]
         }
     },
@@ -200,7 +216,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(gc.name) LIKE \'test%\'' : 'gc.name LIKE \'test%\''
             ]
         }
     },
@@ -213,7 +229,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(gc.name) LIKE \'%test\'' : 'gc.name LIKE \'%test\''
             ]
         }
     },
@@ -226,7 +242,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(gc.name) LIKE \'%test%\'' : 'gc.name LIKE \'%test%\''
             ]
         }
     },
@@ -239,7 +255,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(gc.name) LIKE \'test\'' : 'gc.name LIKE \'test\''
             ]
         }
     },
@@ -252,7 +268,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) = \'test\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) = \'test\'' : 'gc.general_catalog_class = \'test\''
             ]
         }
     },
@@ -265,7 +281,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) = \'\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) = \'\'' : 'gc.general_catalog_class = \'\''
             ]
         }
     },
@@ -278,7 +294,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) != \'test\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) != \'test\'' : 'gc.general_catalog_class != \'test\''
             ]
         }
     },
@@ -291,7 +307,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) != \'\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) != \'\'' : 'gc.general_catalog_class != \'\''
             ]
         }
     },
@@ -304,7 +320,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) IN (\'test\')' : 'gc.general_catalog_class IN (\'test\')'
             ]
         }
     },
@@ -317,7 +333,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) NOT IN (\'test\')' : 'gc.general_catalog_class NOT IN (\'test\')'
             ]
         }
     },
@@ -330,7 +346,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) LIKE \'test%\'' : 'gc.general_catalog_class LIKE \'test%\''
             ]
         }
     },
@@ -343,7 +359,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) LIKE \'%test\'' : 'gc.general_catalog_class LIKE \'%test\''
             ]
         }
     },
@@ -356,7 +372,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) LIKE \'%test%\'' : 'gc.general_catalog_class LIKE \'%test%\''
             ]
         }
     },
@@ -369,7 +385,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.general_catalog_class) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(gc.general_catalog_class) LIKE \'test\'' : 'gc.general_catalog_class LIKE \'test\''
             ]
         }
     },
@@ -382,7 +398,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) = \'test\''
+                $CaseSensitive ? 'LOWER(gc.comments) = \'test\'' : 'gc.comments = \'test\''
             ]
         }
     },
@@ -395,7 +411,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(gc.comments) = \'\' OR gc.comments IS NULL)'
+                $CaseSensitive ? '(LOWER(gc.comments) = \'\' OR gc.comments IS NULL)' : '(gc.comments = \'\' OR gc.comments IS NULL)'
             ]
         }
     },
@@ -408,7 +424,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(gc.comments) != \'test\' OR gc.comments IS NULL)'
+                $CaseSensitive ? '(LOWER(gc.comments) != \'test\' OR gc.comments IS NULL)' : '(gc.comments != \'test\' OR gc.comments IS NULL)'
             ]
         }
     },
@@ -421,7 +437,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) != \'\''
+                $CaseSensitive ? 'LOWER(gc.comments) != \'\'' : 'gc.comments != \'\''
             ]
         }
     },
@@ -434,7 +450,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.comments) IN (\'test\')' : 'gc.comments IN (\'test\')'
             ]
         }
     },
@@ -447,7 +463,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gc.comments) NOT IN (\'test\')' : 'gc.comments NOT IN (\'test\')'
             ]
         }
     },
@@ -460,7 +476,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(gc.comments) LIKE \'test%\'' : 'gc.comments LIKE \'test%\''
             ]
         }
     },
@@ -473,7 +489,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(gc.comments) LIKE \'%test\'' : 'gc.comments LIKE \'%test\''
             ]
         }
     },
@@ -486,7 +502,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(gc.comments) LIKE \'%test%\'' : 'gc.comments LIKE \'%test%\''
             ]
         }
     },
@@ -499,7 +515,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(gc.comments) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(gc.comments) LIKE \'test\'' : 'gc.comments LIKE \'test\''
             ]
         }
     }

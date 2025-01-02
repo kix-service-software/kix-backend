@@ -36,10 +36,7 @@ sub Run {
     my $IDKey = $Param{IDKey};
     my $Css   = q{};
 
-    if (
-        $Block->{ID}
-        && !$Self->{CSSIDs}->{$Block->{ID}}
-    ) {
+    if ( $Block->{ID} ) {
         $LayoutObject->Block(
             Name => 'CSS',
             Data => $Block
@@ -62,7 +59,12 @@ sub Run {
         $Css = $LayoutObject->Output(
             TemplateFile => 'HTMLToPDF/Table',
         );
-        $Self->{CSSIDs}->{$Block->{ID}} = 1;
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'notice',
+            Message  => 'PDF Convert: Can\'t set CSS for block type "Table", because no given ID.'
+        );
     }
 
     $LayoutObject->Block(
@@ -74,12 +76,13 @@ sub Run {
 
     if ( $Block->{SubType} eq 'Custom' ) {
         $Self->_TableCustom(
-            Block   => $Block,
-            Data    => $Param{Data},
-            Object  => $Param{Object},
-            $IDKey  => $Param{$IDKey},
-            IDKey   => $IDKey,
-            UserID  => $Param{UserID}
+            Block        => $Block,
+            Data         => $Param{Data},
+            Object       => $Param{Object},
+            ObjectID     => $Param{ObjectID},
+            MainObject   => $Param{MainObject},
+            MainObjectID => $Param{MainObjectID},
+            UserID       => $Param{UserID}
         );
     }
     elsif ( $Block->{SubType} eq 'DataSet' ) {
@@ -122,7 +125,6 @@ sub _TableCustom {
     my $LayoutObject  = $Kernel::OM->Get('Output::HTML::Layout');
 
     my $Block = $Param{Block};
-    my $IDKey = $Param{IDKey};
 
     my @AddClass;
     my @Columns;
@@ -142,26 +144,19 @@ sub _TableCustom {
         );
         for my $Cell ( keys @Columns ) {
             my %Entry = $Self->ReplacePlaceholders(
-                String    => $Row->[$Cell],
-                Datas     => $Param{Data},
-                Object    => $Param{Object},
-                Translate => $Block->{Translate},
-                ReplaceAs => $Block->{ReplaceAs} // q{-}
-            );
-
-            my $Value = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-                Text            => $Entry{Text},
-                ObjectType      => $Param{Object},
-                ObjectID        => $Param{$IDKey},
-                Data            => {},
-                UserID          => $Param{UserID},
-                RichText        => 1,
-                Translate       => $Block->{Translate},
-                ReplaceNotFound => $Block->{ReplaceAs} // q{-}
+                String       => $Row->[$Cell],
+                Datas        => $Param{Data},
+                Translate    => $Block->{Translate},
+                Object       => $Param{Object},
+                ObjectID     => $Param{ObjectID},
+                MainObject   => $Param{MainObject},
+                MainObjectID => $Param{MainObjectID},
+                UserID       => $Param{UserID},
+                ReplaceAs    => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Block->{Translate} ) {
-                $Value = $LayoutObject->{LanguageObject}->Translate($Value);
+                $Entry{Text} = $LayoutObject->{LanguageObject}->Translate($Entry{Text});
             }
 
             my $Classes = $AddClass[$Cell];
@@ -173,7 +168,7 @@ sub _TableCustom {
             $LayoutObject->Block(
                 Name => 'BodyCol',
                 Data => {
-                    Value => $Value,
+                    Value => $Entry{Text},
                     Class => $Classes
                 }
             );
@@ -294,11 +289,15 @@ sub _RenderHeader {
         for my $Column ( @{$Block->{Columns}} ) {
             next if !$Column && $Param{SubType} ne 'Custom';
             my %Entry = $Self->ReplacePlaceholders(
-                String    => $Column,
-                Datas     => $Param{Datas},
-                Object    => $Param{Object},
-                Translate => $Block->{Translate},
-                ReplaceAs => $Block->{ReplaceAs} // q{-}
+                String       => $Column,
+                Datas        => $Param{Datas},
+                Object       => $Param{Object},
+                ObjectID     => $Param{ObjectID},
+                MainObject   => $Param{MainObject},
+                MainObjectID => $Param{MainObjectID},
+                Translate    => $Block->{Translate},
+                UserID       => $Param{UserID},
+                ReplaceAs    => $Block->{ReplaceAs} // q{-}
             );
 
             if ( $Param{SubType} ne 'Custom' ) {

@@ -80,6 +80,24 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
 
 # check Search
 my @SearchTests = (
@@ -495,7 +513,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email) = \'unit.test@unittest.com\'' : 'c.email = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -508,7 +526,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email) != \'unit.test@unittest.com\' OR c.email IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email) != \'unit.test@unittest.com\' OR c.email IS NULL)' : '(c.email != \'unit.test@unittest.com\' OR c.email IS NULL)'
             ]
         }
     },
@@ -521,7 +539,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email) IN (\'unit.test@unittest.com\')' : 'c.email IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -535,7 +553,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email) NOT IN (\'unit.test@unittest.com\')' : 'c.email NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -548,7 +566,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email) LIKE \'unit.test%\'' : 'c.email LIKE \'unit.test%\''
             ]
         }
     },
@@ -561,7 +579,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email) LIKE \'%unittest.com\'' : 'c.email LIKE \'%unittest.com\''
             ]
         }
     },
@@ -574,7 +592,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email) LIKE \'%test@unit%\'' : 'c.email LIKE \'%test@unit%\''
             ]
         }
     },
@@ -587,7 +605,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email) LIKE \'%unit%\'' : 'c.email LIKE \'%unit%\''
             ]
         }
     },
@@ -600,7 +618,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email1) = \'unit.test@unittest.com\'' : 'c.email1 = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -613,7 +631,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email1) != \'unit.test@unittest.com\' OR c.email1 IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email1) != \'unit.test@unittest.com\' OR c.email1 IS NULL)' : '(c.email1 != \'unit.test@unittest.com\' OR c.email1 IS NULL)'
             ]
         }
     },
@@ -626,7 +644,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email1) IN (\'unit.test@unittest.com\')' : 'c.email1 IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -640,7 +658,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email1) NOT IN (\'unit.test@unittest.com\')' : 'c.email1 NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -653,7 +671,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email1) LIKE \'unit.test%\'' : 'c.email1 LIKE \'unit.test%\''
             ]
         }
     },
@@ -666,7 +684,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email1) LIKE \'%unittest.com\'' : 'c.email1 LIKE \'%unittest.com\''
             ]
         }
     },
@@ -679,7 +697,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email1) LIKE \'%test@unit%\'' : 'c.email1 LIKE \'%test@unit%\''
             ]
         }
     },
@@ -692,7 +710,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email1) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email1) LIKE \'%unit%\'' : 'c.email1 LIKE \'%unit%\''
             ]
         }
     },
@@ -705,7 +723,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email2) = \'unit.test@unittest.com\'' : 'c.email2 = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -718,7 +736,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email2) != \'unit.test@unittest.com\' OR c.email2 IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email2) != \'unit.test@unittest.com\' OR c.email2 IS NULL)' : '(c.email2 != \'unit.test@unittest.com\' OR c.email2 IS NULL)'
             ]
         }
     },
@@ -731,7 +749,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email2) IN (\'unit.test@unittest.com\')' : 'c.email2 IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -745,7 +763,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email2) NOT IN (\'unit.test@unittest.com\')' : 'c.email2 NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -758,7 +776,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email2) LIKE \'unit.test%\'' : 'c.email2 LIKE \'unit.test%\''
             ]
         }
     },
@@ -771,7 +789,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email2) LIKE \'%unittest.com\'' : 'c.email2 LIKE \'%unittest.com\''
             ]
         }
     },
@@ -784,7 +802,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email2) LIKE \'%test@unit%\'' : 'c.email2 LIKE \'%test@unit%\''
             ]
         }
     },
@@ -797,7 +815,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email2) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email2) LIKE \'%unit%\'' : 'c.email2 LIKE \'%unit%\''
             ]
         }
     },
@@ -810,7 +828,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email3) = \'unit.test@unittest.com\'' : 'c.email3 = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -823,7 +841,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email3) != \'unit.test@unittest.com\' OR c.email3 IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email3) != \'unit.test@unittest.com\' OR c.email3 IS NULL)' : '(c.email3 != \'unit.test@unittest.com\' OR c.email3 IS NULL)'
             ]
         }
     },
@@ -836,7 +854,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email3) IN (\'unit.test@unittest.com\')' : 'c.email3 IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -850,7 +868,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email3) NOT IN (\'unit.test@unittest.com\')' : 'c.email3 NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -863,7 +881,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email3) LIKE \'unit.test%\'' : 'c.email3 LIKE \'unit.test%\''
             ]
         }
     },
@@ -876,7 +894,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email3) LIKE \'%unittest.com\'' : 'c.email3 LIKE \'%unittest.com\''
             ]
         }
     },
@@ -889,7 +907,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email3) LIKE \'%test@unit%\'' : 'c.email3 LIKE \'%test@unit%\''
             ]
         }
     },
@@ -902,7 +920,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email3) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email3) LIKE \'%unit%\'' : 'c.email3 LIKE \'%unit%\''
             ]
         }
     },
@@ -915,7 +933,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email4) = \'unit.test@unittest.com\'' : 'c.email4 = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -928,7 +946,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email4) != \'unit.test@unittest.com\' OR c.email4 IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email4) != \'unit.test@unittest.com\' OR c.email4 IS NULL)' : '(c.email4 != \'unit.test@unittest.com\' OR c.email4 IS NULL)'
             ]
         }
     },
@@ -941,7 +959,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email4) IN (\'unit.test@unittest.com\')' : 'c.email4 IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -955,7 +973,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email4) NOT IN (\'unit.test@unittest.com\')' : 'c.email4 NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -968,7 +986,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email4) LIKE \'unit.test%\'' : 'c.email4 LIKE \'unit.test%\''
             ]
         }
     },
@@ -981,7 +999,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email4) LIKE \'%unittest.com\'' : 'c.email4 LIKE \'%unittest.com\''
             ]
         }
     },
@@ -994,7 +1012,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email4) LIKE \'%test@unit%\'' : 'c.email4 LIKE \'%test@unit%\''
             ]
         }
     },
@@ -1007,7 +1025,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email4) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email4) LIKE \'%unit%\'' : 'c.email4 LIKE \'%unit%\''
             ]
         }
     },
@@ -1020,7 +1038,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) = \'unit.test@unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email5) = \'unit.test@unittest.com\'' : 'c.email5 = \'unit.test@unittest.com\''
             ]
         }
     },
@@ -1033,7 +1051,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(c.email5) != \'unit.test@unittest.com\' OR c.email5 IS NULL)'
+                $CaseSensitive ? '(LOWER(c.email5) != \'unit.test@unittest.com\' OR c.email5 IS NULL)' : '(c.email5 != \'unit.test@unittest.com\' OR c.email5 IS NULL)'
             ]
         }
     },
@@ -1046,7 +1064,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email5) IN (\'unit.test@unittest.com\')' : 'c.email5 IN (\'unit.test@unittest.com\')'
             ]
 
         }
@@ -1060,7 +1078,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) NOT IN (\'unit.test@unittest.com\')'
+                $CaseSensitive ? 'LOWER(c.email5) NOT IN (\'unit.test@unittest.com\')' : 'c.email5 NOT IN (\'unit.test@unittest.com\')'
             ]
         }
     },
@@ -1073,7 +1091,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) LIKE \'unit.test%\''
+                $CaseSensitive ? 'LOWER(c.email5) LIKE \'unit.test%\'' : 'c.email5 LIKE \'unit.test%\''
             ]
         }
     },
@@ -1086,7 +1104,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) LIKE \'%unittest.com\''
+                $CaseSensitive ? 'LOWER(c.email5) LIKE \'%unittest.com\'' : 'c.email5 LIKE \'%unittest.com\''
             ]
         }
     },
@@ -1099,7 +1117,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) LIKE \'%test@unit%\''
+                $CaseSensitive ? 'LOWER(c.email5) LIKE \'%test@unit%\'' : 'c.email5 LIKE \'%test@unit%\''
             ]
         }
     },
@@ -1112,7 +1130,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(c.email5) LIKE \'%unit%\''
+                $CaseSensitive ? 'LOWER(c.email5) LIKE \'%unit%\'' : 'c.email5 LIKE \'%unit%\''
             ]
         }
     }
@@ -2134,7 +2152,7 @@ my @IntegrationSortTests = (
                 Field => 'Email1'
             }
         ],
-        Expected => [$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2],'1'] : ['1',$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2]]
     },
     {
         Name     => 'Sort: Field Email1 / Direction ascending',
@@ -2144,7 +2162,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2],'1'] : ['1',$ContactIDs[4],$ContactIDs[0],$ContactIDs[3],$ContactIDs[1],$ContactIDs[2]]
     },
     {
         Name     => 'Sort: Field Email1 / Direction descending',
@@ -2154,7 +2172,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactIDs[2],$ContactIDs[1],$ContactIDs[3],$ContactIDs[0],$ContactIDs[4]]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactIDs[2],$ContactIDs[1],$ContactIDs[3],$ContactIDs[0],$ContactIDs[4]] : [$ContactIDs[2],$ContactIDs[1],$ContactIDs[3],$ContactIDs[0],$ContactIDs[4],'1']
     },
     {
         Name     => 'Sort: Field Email2',
@@ -2163,7 +2181,7 @@ my @IntegrationSortTests = (
                 Field => 'Email2'
             }
         ],
-        Expected => [$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],'1'] : ['1',$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0]]
     },
     {
         Name     => 'Sort: Field Email2 / Direction ascending',
@@ -2173,7 +2191,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],'1'] : ['1',$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0]]
     },
     {
         Name     => 'Sort: Field Email2 / Direction descending',
@@ -2183,7 +2201,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3]]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3]] : [$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3],'1']
     },
     {
         Name     => 'Sort: Field Email3',
@@ -2192,7 +2210,7 @@ my @IntegrationSortTests = (
                 Field => 'Email3'
             }
         ],
-        Expected => [$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3],'1'] : ['1',$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3]]
     },
     {
         Name     => 'Sort: Field Email3 / Direction ascending',
@@ -2202,7 +2220,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3],'1'] : ['1',$ContactIDs[0],$ContactIDs[1],$ContactIDs[4],$ContactIDs[2],$ContactIDs[3]]
     },
     {
         Name     => 'Sort: Field Email3 / Direction descending',
@@ -2212,7 +2230,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactIDs[3],$ContactIDs[2],$ContactIDs[4],$ContactIDs[1],$ContactIDs[0]]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactIDs[3],$ContactIDs[2],$ContactIDs[4],$ContactIDs[1],$ContactIDs[0]] : [$ContactIDs[3],$ContactIDs[2],$ContactIDs[4],$ContactIDs[1],$ContactIDs[0],'1']
     },
     {
         Name     => 'Sort: Field Email4',
@@ -2221,7 +2239,7 @@ my @IntegrationSortTests = (
                 Field => 'Email4'
             }
         ],
-        Expected => [$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3],'1'] : ['1',$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3]]
     },
     {
         Name     => 'Sort: Field Email4 / Direction ascending',
@@ -2231,7 +2249,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3],'1'] : ['1',$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],$ContactIDs[4],$ContactIDs[3]]
     },
     {
         Name     => 'Sort: Field Email4 / Direction descending',
@@ -2241,7 +2259,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0]]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0]] : [$ContactIDs[3],$ContactIDs[4],$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],'1']
     },
     {
         Name     => 'Sort: Field Email5',
@@ -2250,7 +2268,7 @@ my @IntegrationSortTests = (
                 Field => 'Email5'
             }
         ],
-        Expected => [$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],'1'] : ['1',$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1]]
     },
     {
         Name     => 'Sort: Field Email5 / Direction ascending',
@@ -2260,7 +2278,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1],'1'] : ['1',$ContactIDs[4],$ContactIDs[3],$ContactIDs[0],$ContactIDs[2],$ContactIDs[1]]
     },
     {
         Name     => 'Sort: Field Email5 / Direction descending',
@@ -2270,7 +2288,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],$ContactIDs[3],$ContactIDs[4]]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],$ContactIDs[3],$ContactIDs[4]] : [$ContactIDs[1],$ContactIDs[2],$ContactIDs[0],$ContactIDs[3],$ContactIDs[4],'1']
     }
 );
 for my $Test ( @IntegrationSortTests ) {

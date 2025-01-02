@@ -70,7 +70,6 @@ my $ConfigItemObject = $Kernel::OM->Get('ITSMConfigItem');
 
 # create ConfigItem number
 my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-    Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
     ClassID => $HardwareConfigItemID,
 );
 

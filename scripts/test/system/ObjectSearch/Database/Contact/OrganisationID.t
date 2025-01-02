@@ -83,6 +83,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -345,7 +361,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) = \'test\''
+                $CaseSensitive ? 'LOWER(o.name) = \'test\'' : 'o.name = \'test\''
             ]
         }
     },
@@ -362,7 +378,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) != \'test\''
+                $CaseSensitive ? 'LOWER(o.name) != \'test\'' : 'o.name != \'test\''
             ]
         }
     },
@@ -379,7 +395,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.name) IN (\'test\')' : 'o.name IN (\'test\')'
             ]
         }
     },
@@ -396,7 +412,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.name) NOT IN (\'test\')' : 'o.name NOT IN (\'test\')'
             ]
         }
     },
@@ -413,7 +429,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'test%\'' : 'o.name LIKE \'test%\''
             ]
         }
     },
@@ -430,7 +446,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'%test\'' : 'o.name LIKE \'%test\''
             ]
         }
     },
@@ -447,7 +463,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'%test%\'' : 'o.name LIKE \'%test%\''
             ]
         }
     },
@@ -464,7 +480,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'test\'' : 'o.name LIKE \'test\''
             ]
         }
     },
@@ -481,7 +497,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) = \'test\''
+                $CaseSensitive ? 'LOWER(o.number) = \'test\'' : 'o.number = \'test\''
             ]
         }
     },
@@ -498,7 +514,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) != \'test\''
+                $CaseSensitive ? 'LOWER(o.number) != \'test\'' : 'o.number != \'test\''
             ]
         }
     },
@@ -515,7 +531,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.number) IN (\'test\')' : 'o.number IN (\'test\')'
             ]
         }
     },
@@ -532,7 +548,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.number) NOT IN (\'test\')' : 'o.number NOT IN (\'test\')'
             ]
         }
     },
@@ -549,7 +565,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'test%\'' : 'o.number LIKE \'test%\''
             ]
         }
     },
@@ -566,7 +582,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'%test\'' : 'o.number LIKE \'%test\''
             ]
         }
     },
@@ -583,7 +599,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'%test%\'' : 'o.number LIKE \'%test%\''
             ]
         }
     },
@@ -600,7 +616,7 @@ my @SearchTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
-                'LOWER(o.number) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'test\'' : 'o.number LIKE \'test\''
             ]
         }
     },
@@ -618,7 +634,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) = \'test\''
+                $CaseSensitive ? 'LOWER(po.name) = \'test\'' : 'po.name = \'test\''
             ]
         }
     },
@@ -636,7 +652,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) != \'test\''
+                $CaseSensitive ? 'LOWER(po.name) != \'test\'' : 'po.name != \'test\''
             ]
         }
     },
@@ -654,7 +670,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(po.name) IN (\'test\')' : 'po.name IN (\'test\')'
             ]
         }
     },
@@ -672,7 +688,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(po.name) NOT IN (\'test\')' : 'po.name NOT IN (\'test\')'
             ]
         }
     },
@@ -690,7 +706,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(po.name) LIKE \'test%\'' : 'po.name LIKE \'test%\''
             ]
         }
     },
@@ -708,7 +724,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(po.name) LIKE \'%test\'' : 'po.name LIKE \'%test\''
             ]
 
         }
@@ -727,7 +743,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(po.name) LIKE \'%test%\'' : 'po.name LIKE \'%test%\''
             ]
         }
     },
@@ -745,7 +761,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(po.name) LIKE \'test\'' : 'po.name LIKE \'test\''
             ]
         }
     },
@@ -763,7 +779,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) = \'test\''
+                $CaseSensitive ? 'LOWER(po.number) = \'test\'' : 'po.number = \'test\''
             ]
         }
     },
@@ -781,7 +797,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) != \'test\''
+                $CaseSensitive ? 'LOWER(po.number) != \'test\'' : 'po.number != \'test\''
             ]
         }
     },
@@ -799,7 +815,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(po.number) IN (\'test\')' : 'po.number IN (\'test\')'
             ]
         }
     },
@@ -817,7 +833,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(po.number) NOT IN (\'test\')' : 'po.number NOT IN (\'test\')'
             ]
         }
     },
@@ -835,7 +851,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(po.number) LIKE \'test%\'' : 'po.number LIKE \'test%\''
             ]
         }
     },
@@ -853,7 +869,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(po.number) LIKE \'%test\'' : 'po.number LIKE \'%test\''
             ]
         }
     },
@@ -871,7 +887,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(po.number) LIKE \'%test%\'' : 'po.number LIKE \'%test%\''
             ]
         }
     },
@@ -889,7 +905,7 @@ my @SearchTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                'LOWER(po.number) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(po.number) LIKE \'test\'' : 'po.number LIKE \'test\''
             ]
         }
     }

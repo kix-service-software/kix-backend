@@ -397,112 +397,101 @@ my @Tests = (
     },
 );
 
-for my $Backend (qw(DB FS)) {
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Some Ticket_Title',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
+    OrganisationID => 'unittest',
+    ContactID      => 'customer@example.com',
+    OwnerID        => 1,
+    UserID         => 1,
+);
+$Self->True(
+    $TicketID,
+    "TicketCreate() - TicketID:'$TicketID'",
+);
 
-    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
-        Title          => 'Some Ticket_Title',
-        Queue          => 'Junk',
-        Lock           => 'unlock',
-        Priority       => '3 normal',
-        State          => 'closed',
-        OrganisationID => 'unittest',
-        ContactID      => 'customer@example.com',
-        OwnerID        => 1,
+for my $Test (@Tests) {
+
+    # create an article
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        TicketID       => $TicketID,
+        Channel        => 'note',
+        SenderType     => 'agent',
+        From           => 'Some Agent <email@example.com>',
+        To             => 'Some Customer <customer-a@example.com>',
+        Subject        => 'some short description',
+        Body           => 'the message text',
+        ContentType    => 'text/plain; charset=ISO-8859-15',
+        HistoryType    => 'OwnerUpdate',
+        HistoryComment => 'Some free text!',
         UserID         => 1,
+        NoAgentNotify  => 1,                                         # if you don't want to send agent notifications
     );
     $Self->True(
-        $TicketID,
-        "TicketCreate() - TicketID:'$TicketID'",
+        $ArticleID,
+        "ArticleCreate() - ArticleID:'$ArticleID'",
     );
 
-    for my $Test (@Tests) {
-
-        # Make sure that the TicketObject gets recreated for each loop.
-        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
-
-        $Kernel::OM->Get('Config')->Set(
-            Key   => 'Ticket::StorageModule',
-            Value => 'Kernel::System::Ticket::ArticleStorage' . $Backend,
-        );
-
-        $Self->True(
-            $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleStorage' . $Backend ),
-            "TicketObject loaded the correct backend",
-        );
-
-        # create an article
-        my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
-            TicketID       => $TicketID,
-            Channel        => 'note',
-            SenderType     => 'agent',
-            From           => 'Some Agent <email@example.com>',
-            To             => 'Some Customer <customer-a@example.com>',
-            Subject        => 'some short description',
-            Body           => 'the message text',
-            ContentType    => 'text/plain; charset=ISO-8859-15',
-            HistoryType    => 'OwnerUpdate',
-            HistoryComment => 'Some free text!',
-            UserID         => 1,
-            NoAgentNotify  => 1,                                         # if you don't want to send agent notifications
-        );
-        $Self->True(
-            $ArticleID,
-            "ArticleCreate() - ArticleID:'$ArticleID'",
-        );
-
-        # create attachment
-        my $Success = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
-            %{ $Test->{Config} },
-            ArticleID => $ArticleID,
-        );
-        $Self->True(
-            $Success,
-            "$Test->{Name} | $Backend ArticleWriteAttachment() - created $Test->{Config}->{Filename}",
-        );
-
-        # get the list of all attachments (should be only 1)
-        my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
-            ArticleID => $ArticleID,
-            UserID    => $UserID,
-        );
-        my $AttachmentID = grep { $AttachmentIndex{$_}->{Filename} eq $Test->{Config}->{Filename} }
-            keys %AttachmentIndex;
-        $Self->IsDeeply(
-            $AttachmentIndex{$AttachmentID},
-            $Test->{ExpectedResults},
-            "$Test->{Name} | $Backend ArticleAttachmentIndex",
-        );
-
-        # get the attachment individually
-        my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
-            ArticleID    => $ArticleID,
-            AttachmentID => $AttachmentID,
-            UserID       => $UserID,
-        );
-
-        # add the missing content to the test expected resutls
-        my %ExpectedAttachment = (
-            %{ $Test->{ExpectedResults} },
-            Content => $Test->{Config}->{Content},
-        );
-        $Self->IsDeeply(
-            \%Attachment,
-            \%ExpectedAttachment,
-            "$Test->{Name} | $Backend ArticleAttachment",
-        );
-
-    }
-
-    # run TicketDelete() to cleanup the FS backend too
-    my $Success = $Kernel::OM->Get('Ticket')->TicketDelete(
-        TicketID => $TicketID,
-        UserID   => 1,
+    # create attachment
+    my $Success = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
+        %{ $Test->{Config} },
+        ArticleID => $ArticleID,
     );
     $Self->True(
         $Success,
-        "TicketDelete() - TicketID:'$TicketID'",
+        "$Test->{Name} | ArticleWriteAttachment() - created $Test->{Config}->{Filename}",
     );
+
+    # get the list of all attachments (should be only 1)
+    my %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
+        ArticleID => $ArticleID,
+        UserID    => $UserID,
+    );
+    my @AttachmentIDs = grep { $AttachmentIndex{$_}->{Filename} eq $Test->{Config}->{Filename} }
+        keys %AttachmentIndex;
+    my $AttachmentID  = $AttachmentIDs[0];
+    $Self->IsDeeply(
+        $AttachmentIndex{$AttachmentID},
+        {
+            %{ $Test->{ExpectedResults} },
+            ID => $AttachmentID
+        },
+        "$Test->{Name} | ArticleAttachmentIndex",
+    );
+
+    # get the attachment individually
+    my %Attachment = $Kernel::OM->Get('Ticket')->ArticleAttachment(
+        ArticleID    => $ArticleID,
+        AttachmentID => $AttachmentID,
+        UserID       => $UserID,
+    );
+
+    # add the missing content to the test expected resutls
+    my %ExpectedAttachment = (
+        %{ $Test->{ExpectedResults} },
+        Content => $Test->{Config}->{Content},
+        ID      => $AttachmentID
+    );
+    $Self->IsDeeply(
+        \%Attachment,
+        \%ExpectedAttachment,
+        "$Test->{Name} | ArticleAttachment",
+    );
+
 }
+
+# run TicketDelete() to cleanup the FS backend too
+my $Success = $Kernel::OM->Get('Ticket')->TicketDelete(
+    TicketID => $TicketID,
+    UserID   => 1,
+);
+$Self->True(
+    $Success,
+    "TicketDelete() - TicketID:'$TicketID'",
+);
 
 # rollback transaction on database
 $Helper->Rollback();

@@ -15,6 +15,8 @@ use base qw(
     Kernel::System::ObjectSearch::Database::CommonAttribute
 );
 
+use Kernel::System::VariableCheck qw(:all);
+
 our $ObjectManagerDisabled = 1;
 
 =head1 NAME
@@ -43,6 +45,12 @@ sub GetSupportedAttributes {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        MyQueues => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ'],
+            ValueType    => 'NUMERIC'
         }
     };
 }
@@ -55,12 +63,16 @@ sub Search {
 
     # init mapping
     my %AttributeMapping = (
-        QueueID => {
+        QueueID  => {
             Column    => 'st.queue_id',
             ValueType => 'NUMERIC'
         },
-        Queue   => {
+        Queue    => {
             Column    => 'tq.name'
+        },
+        MyQueues => {
+            Column    => 'st.queue_id',
+            ValueType => 'NUMERIC'
         }
     );
 
@@ -74,14 +86,81 @@ sub Search {
         }
     }
 
+
     # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
-    );
+    my $Condition;
+    # special handling for 'MyQueues'
+    if ( $Param{Search}->{Field} eq 'MyQueues' ) {
+        # get user preferences
+        my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
+            UserID => $Param{UserID},
+        );
+
+        # prepare condition values
+        my $ConditionValues = [];
+        if ( defined( $UserPreferences{MyQueues} ) ) {
+            $ConditionValues = $UserPreferences{MyQueues};
+        }
+
+        # prepare search values
+        my $SearchValues = [];
+        if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
+            push( @{ $SearchValues }, $Param{Search}->{Value} );
+        }
+        else {
+            $SearchValues =  $Param{Search}->{Value};
+        }
+
+        # prepare conditions for search values
+        my @Conditions;
+        for my $SearchValue ( @{ $SearchValues } ) {
+            # prepare condition for true value
+            if ( $SearchValue ) {
+                my $SearchCondition = $Self->_GetCondition(
+                    Operator  => 'IN',
+                    Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+                    ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+                    Value     => $ConditionValues,
+                    Silent    => $Param{Silent}
+                );
+                return if ( !$SearchCondition );
+
+                # add special condition
+                push( @Conditions, $SearchCondition );
+            }
+            # prepare condition for false value
+            else {
+                my $SearchCondition = $Self->_GetCondition(
+                    Operator  => '!IN',
+                    Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+                    ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+                    Value     => $ConditionValues,
+                    Silent    => $Param{Silent}
+                );
+                return if ( !$SearchCondition );
+
+                # add special condition
+                push( @Conditions, $SearchCondition );
+            }
+        }
+
+        if ( scalar( @Conditions ) > 1 ) {
+            $Condition = '(' . join( ' OR ', @Conditions ) . ')';
+        }
+        else {
+            $Condition = $Conditions[0];
+        }
+    }
+    # default handling
+    else {
+        $Condition = $Self->_GetCondition(
+            Operator  => $Param{Search}->{Operator},
+            Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
+            ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+            Value     => $Param{Search}->{Value},
+            Silent    => $Param{Silent}
+        );
+    }
     return if ( !$Condition );
 
     # return search def

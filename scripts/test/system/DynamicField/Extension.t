@@ -127,8 +127,8 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Text###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyText',
-        Behaviors => {
+        Module     => 'scripts::test::system::sample::DynamicField::Driver::DummyText',
+        Properties => {
             Dummy1 => 1,
         },
     },
@@ -136,8 +136,8 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::TextArea###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyTextArea',
-        Behaviors => {
+        Module     => 'scripts::test::system::sample::DynamicField::Driver::DummyTextArea',
+        Properties => {
             Dummy1 => 1,
         },
     },
@@ -145,9 +145,8 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Multiselect###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyMultiselect',
-        Behaviors => {
-            Dummy1 => 0,
+        Module     => 'scripts::test::system::sample::DynamicField::Driver::DummyMultiselect',
+        Properties => {
             Dummy2 => 1,
         },
     },
@@ -155,10 +154,8 @@ $ConfigObject->Set(
 $ConfigObject->Set(
     Key   => 'DynamicFields::Extension::Driver::Date###100-DFDummy',
     Value => {
-        Module    => 'scripts::test::system::sample::DynamicField::Driver::DummyDate',
-        Behaviors => {
-            Dummy1 => 0,
-            Dummy2 => 0,
+        Module     => 'scripts::test::system::sample::DynamicField::Driver::DummyDate',
+        Properties => {
         },
     },
 );

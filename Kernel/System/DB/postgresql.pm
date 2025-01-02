@@ -79,6 +79,10 @@ sub LoadPreferences {
 
     # init sql setting on db connect
     $Self->{'DB::Connect'} = "SET standard_conforming_strings TO ON;\n SET NAMES 'utf8';";
+
+    # set handling of null values for ascending order
+    $Self->{'DB::OrderByNull'} = 'LAST';
+
     return 1;
 }
 

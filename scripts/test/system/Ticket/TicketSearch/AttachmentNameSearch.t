@@ -24,12 +24,6 @@ $Helper->BeginWork();
 
 $Helper->UseTmpArticleDir();
 
-# initially set article storage to DB, so that subsequent FS tests succeed.
-$Kernel::OM->Get('Config')->Set(
-    Key   => 'Ticket::StorageModule',
-    Value => "Kernel::System::Ticket::ArticleStorageDB",
-);
-
 my $UserID = 1;
 
 # get a random id
@@ -193,8 +187,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0], $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0], $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName nonexisting',
@@ -205,8 +198,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [],
     },
     {
         Name   => 'AttachmentName Ticket1 Article1',
@@ -222,8 +214,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0] ],
     },
     {
         Name   => 'AttachmentName Ticket1 Article2',
@@ -239,8 +230,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0] ],
     },
     {
         Name   => 'AttachmentName Ticket2 Article1',
@@ -256,8 +246,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName Ticket2 Article2',
@@ -273,8 +262,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName Ticket2 Article3',
@@ -290,8 +278,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName Title Ticket 1',
@@ -307,8 +294,7 @@ my @Tests = (
                 Operator => 'EQ',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0] ],
     },
     {
         Name   => 'AttachmentName Title (Like) Ticket 1',
@@ -324,8 +310,7 @@ my @Tests = (
                 Operator => 'LIKE',
             },
         ],
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0] ],
     },
     {
         Name   => 'AttachmentName (AsCustomer)',
@@ -337,8 +322,7 @@ my @Tests = (
             },
         ],
         UserType                        => 'Customer',
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[0], $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[0], $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName (AsCustomer) Ticket2 Article2',
@@ -355,8 +339,7 @@ my @Tests = (
             },
         ],
         UserType                        => 'Customer',
-        ExpectedResultsArticleStorageDB => [ $TicketIDs[1] ],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [ $TicketIDs[1] ],
     },
     {
         Name   => 'AttachmentName (AsCustomer) Ticket2 Article3',
@@ -373,8 +356,7 @@ my @Tests = (
             },
         ],
         UserType                        => 'Customer',
-        ExpectedResultsArticleStorageDB => [],
-        ExpectedResultsArticleStorageFS => [],
+        ExpectedResults => [],
     },
 );
 
@@ -383,69 +365,53 @@ for my $Module (qw(StaticDB RuntimeDB)) {
 
     for my $Test (@Tests) {
 
-        # attachment name is not considering for searches using ArticleSotrageFS
-        for my $StorageBackend (qw(ArticleStorageDB ArticleStorageFS)) {
+        # Make sure that the TicketObject gets recreated for each loop.
+        $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
 
-            # Make sure that the TicketObject gets recreated for each loop.
-            $Kernel::OM->ObjectsDiscard( Objects => ['Ticket'] );
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'Ticket::SearchIndexModule',
+            Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
+        );
 
-            # For the search it is enough to change the config, the TicketObject does not
-            # have to be recreated to use the different base class
-            $Kernel::OM->Get('Config')->Set(
-                Key   => 'Ticket::StorageModule',
-                Value => "Kernel::System::Ticket::$StorageBackend",
-            );
+        $Self->True(
+            $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module ),
+            "$Module - TicketObject loaded the correct ArticleSearchIndex",
+        );
 
-            $Kernel::OM->Get('Config')->Set(
-                Key   => 'Ticket::SearchIndexModule',
-                Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module,
-            );
+        # prepare search
+        my @SearchData = (
+            {
+                Field    => 'TicketID',
+                Value    => [@TicketIDs],
+                Operator => 'IN',
+            }
+        );
+        push( @SearchData, @{ $Test->{Search} } );
 
-            $Self->True(
-                $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::' . $StorageBackend ),
-                "$Module - $StorageBackend - TicketObject loaded the correct StorageModule",
-            );
-
-            $Self->True(
-                $Kernel::OM->Get('Ticket')->isa( 'Kernel::System::Ticket::ArticleSearchIndex::' . $Module ),
-                "$Module - $StorageBackend - TicketObject loaded the correct ArticleSearchIndex",
-            );
-
-            # prepare search
-            my @SearchData = (
+        my @FoundTicketIDs =  $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            Limit      => 2,
+            Search     => {
+                AND => \@SearchData,
+            },
+            Sort       => [
                 {
-                    Field    => 'TicketID',
-                    Value    => [@TicketIDs],
-                    Operator => 'IN',
+                    Field     => 'Age',
+                    Direction => 'descending',
                 }
-            );
-            push( @SearchData, @{ $Test->{Search} } );
+            ],
+            UserType   => $Test->{UserType},
+            UserID     => 1,
+        );
 
-            my @FoundTicketIDs =  $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'Ticket',
-                Result     => 'ARRAY',
-                Limit      => 2,
-                Search     => {
-                    AND => \@SearchData,
-                },
-                Sort       => [
-                    {
-                        Field     => 'Age',
-                        Direction => 'descending',
-                    }
-                ],
-                UserType   => $Test->{UserType},
-                UserID     => 1,
-            );
+        @FoundTicketIDs = sort @FoundTicketIDs;
 
-            @FoundTicketIDs = sort @FoundTicketIDs;
-
-            $Self->IsDeeply(
-                \@FoundTicketIDs,
-                $Test->{"ExpectedResults$StorageBackend"},
-                "$Module - $Test->{Name} $StorageBackend TicketSearch() -"
-            );
-        }
+        $Self->IsDeeply(
+            \@FoundTicketIDs,
+            $Test->{"ExpectedResults"},
+            "$Module - $Test->{Name} - TicketSearch()"
+        );
     }
 }
 

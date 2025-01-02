@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -90,20 +90,13 @@ perform DynamicFieldConfigUpdate Operation. This will return the updated Dynamic
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # isolate DynamicFieldConfig parameter
-    my $DynamicFieldConfig = $Param{Data}->{DynamicFieldConfig};
-
-    # remove leading and trailing spaces
-    for my $Attribute ( sort keys %{$DynamicFieldConfig} ) {
-        if ( ref $Attribute ne 'HASH' && ref $Attribute ne 'ARRAY' ) {
-
-            #remove leading spaces
-            $DynamicFieldConfig->{$Attribute} =~ s{\A\s+}{};
-
-            #remove trailing spaces
-            $DynamicFieldConfig->{$Attribute} =~ s{\s+\z}{};
+    # isolate and trim DynamicFieldConfig parameter
+    my $DynamicFieldConfig = $Self->_Trim(
+        Data   => $Param{Data}->{DynamicFieldConfig},
+        Ignore => {
+            ItemSeparator => 1
         }
-    }
+    );
 
     # check if DynamicField exists
     my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(

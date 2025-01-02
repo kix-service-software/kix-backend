@@ -453,15 +453,19 @@ sub _TicketUpdate {
         # set values to empty if they are not defined
         $TicketData{ContactID}      = $TicketData{ContactID} || '';
         $TicketData{OrganisationID} = $TicketData{OrganisationID} || '';
-        $Ticket->{ContactID}        = $Ticket->{ContactID} || '';
-        $Ticket->{OrganisationID}   = $Ticket->{OrganisationID} || '';
 
         my $Success;
         if (
-            $Ticket->{ContactID} ne $TicketData{ContactID}
-            || $Ticket->{OrganisationID} ne $TicketData{OrganisationID}
+            (
+                defined( $Ticket->{ContactID} )
+                && $Ticket->{ContactID} ne $TicketData{ContactID}
             )
-        {
+            || (
+                defined( $Ticket->{OrganisationID} )
+                && $Ticket->{OrganisationID} ne $TicketData{OrganisationID}
+            )
+        ) {
+
             $Success = $TicketObject->TicketCustomerSet(
                 OrganisationID => $Ticket->{OrganisationID},
                 ContactID      => $Ticket->{ContactID},

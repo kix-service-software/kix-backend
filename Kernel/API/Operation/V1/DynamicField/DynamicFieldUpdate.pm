@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -102,7 +102,10 @@ sub Run {
 
     # isolate and trim DynamicField parameter
     my $DynamicField = $Self->_Trim(
-        Data => $Param{Data}->{DynamicField}
+        Data   => $Param{Data}->{DynamicField},
+        Ignore => {
+            ItemSeparator => 1
+        }
     );
 
     # check attribute values

@@ -85,6 +85,22 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check Search
 my @SearchTests = (
     {
@@ -147,7 +163,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) = \'test\''
+                $CaseSensitive ? 'LOWER(o.name) = \'test\'' : 'o.name = \'test\''
             ]
         }
     },
@@ -160,7 +176,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) = \'\''
+                $CaseSensitive ? 'LOWER(o.name) = \'\'' : 'o.name = \'\''
             ]
         }
     },
@@ -173,7 +189,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) != \'test\''
+                $CaseSensitive ? 'LOWER(o.name) != \'test\'' : 'o.name != \'test\''
             ]
         }
     },
@@ -186,7 +202,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) != \'\''
+                $CaseSensitive ? 'LOWER(o.name) != \'\'' : 'o.name != \'\''
             ]
         }
     },
@@ -199,7 +215,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.name) IN (\'test\')' : 'o.name IN (\'test\')'
             ]
         }
     },
@@ -212,7 +228,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.name) NOT IN (\'test\')' : 'o.name NOT IN (\'test\')'
             ]
         }
     },
@@ -225,7 +241,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'test%\'' : 'o.name LIKE \'test%\''
             ]
         }
     },
@@ -238,7 +254,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'%test\'' : 'o.name LIKE \'%test\''
             ]
         }
     },
@@ -251,7 +267,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'%test%\'' : 'o.name LIKE \'%test%\''
             ]
         }
     },
@@ -264,7 +280,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.name) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.name) LIKE \'test\'' : 'o.name LIKE \'test\''
             ]
         }
     },
@@ -277,7 +293,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) = \'test\''
+                $CaseSensitive ? 'LOWER(o.number) = \'test\'' : 'o.number = \'test\''
             ]
         }
     },
@@ -290,7 +306,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) = \'\''
+                $CaseSensitive ? 'LOWER(o.number) = \'\'' : 'o.number = \'\''
             ]
         }
     },
@@ -303,7 +319,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) != \'test\''
+                $CaseSensitive ? 'LOWER(o.number) != \'test\'' : 'o.number != \'test\''
             ]
         }
     },
@@ -316,7 +332,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) != \'\''
+                $CaseSensitive ? 'LOWER(o.number) != \'\'' : 'o.number != \'\''
             ]
         }
     },
@@ -329,7 +345,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.number) IN (\'test\')' : 'o.number IN (\'test\')'
             ]
         }
     },
@@ -342,7 +358,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.number) NOT IN (\'test\')' : 'o.number NOT IN (\'test\')'
             ]
         }
     },
@@ -355,7 +371,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'test%\'' : 'o.number LIKE \'test%\''
             ]
         }
     },
@@ -368,7 +384,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'%test\'' : 'o.number LIKE \'%test\''
             ]
         }
     },
@@ -381,7 +397,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'%test%\'' : 'o.number LIKE \'%test%\''
             ]
         }
     },
@@ -394,7 +410,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.number) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.number) LIKE \'test\'' : 'o.number LIKE \'test\''
             ]
         }
     },
@@ -407,7 +423,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) = \'test\''
+                $CaseSensitive ? 'LOWER(o.street) = \'test\'' : 'o.street = \'test\''
             ]
         }
     },
@@ -420,7 +436,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.street) = \'\' OR o.street IS NULL)'
+                $CaseSensitive ? '(LOWER(o.street) = \'\' OR o.street IS NULL)' : '(o.street = \'\' OR o.street IS NULL)'
             ]
         }
     },
@@ -433,7 +449,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.street) != \'test\' OR o.street IS NULL)'
+                $CaseSensitive ? '(LOWER(o.street) != \'test\' OR o.street IS NULL)' : '(o.street != \'test\' OR o.street IS NULL)'
             ]
         }
     },
@@ -446,7 +462,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) != \'\''
+                $CaseSensitive ? 'LOWER(o.street) != \'\'' : 'o.street != \'\''
             ]
         }
     },
@@ -459,7 +475,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.street) IN (\'test\')' : 'o.street IN (\'test\')'
             ]
         }
     },
@@ -472,7 +488,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.street) NOT IN (\'test\')' : 'o.street NOT IN (\'test\')'
             ]
         }
     },
@@ -485,7 +501,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.street) LIKE \'test%\'' : 'o.street LIKE \'test%\''
             ]
         }
     },
@@ -498,7 +514,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.street) LIKE \'%test\'' : 'o.street LIKE \'%test\''
             ]
         }
     },
@@ -511,7 +527,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.street) LIKE \'%test%\'' : 'o.street LIKE \'%test%\''
             ]
         }
     },
@@ -524,7 +540,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.street) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.street) LIKE \'test\'' : 'o.street LIKE \'test\''
             ]
         }
     },
@@ -537,7 +553,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) = \'test\''
+                $CaseSensitive ? 'LOWER(o.city) = \'test\'' : 'o.city = \'test\''
             ]
         }
     },
@@ -550,7 +566,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.city) = \'\' OR o.city IS NULL)'
+                $CaseSensitive ? '(LOWER(o.city) = \'\' OR o.city IS NULL)' : '(o.city = \'\' OR o.city IS NULL)'
             ]
         }
     },
@@ -563,7 +579,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.city) != \'test\' OR o.city IS NULL)'
+                $CaseSensitive ? '(LOWER(o.city) != \'test\' OR o.city IS NULL)' : '(o.city != \'test\' OR o.city IS NULL)'
             ]
         }
     },
@@ -576,7 +592,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) != \'\''
+                $CaseSensitive ? 'LOWER(o.city) != \'\'' : 'o.city != \'\''
             ]
         }
     },
@@ -589,7 +605,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.city) IN (\'test\')' : 'o.city IN (\'test\')'
             ]
         }
     },
@@ -602,7 +618,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.city) NOT IN (\'test\')' : 'o.city NOT IN (\'test\')'
             ]
         }
     },
@@ -615,7 +631,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.city) LIKE \'test%\'' : 'o.city LIKE \'test%\''
             ]
         }
     },
@@ -628,7 +644,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.city) LIKE \'%test\'' : 'o.city LIKE \'%test\''
             ]
         }
     },
@@ -641,7 +657,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.city) LIKE \'%test%\'' : 'o.city LIKE \'%test%\''
             ]
         }
     },
@@ -654,7 +670,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.city) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.city) LIKE \'test\'' : 'o.city LIKE \'test\''
             ]
         }
     },
@@ -667,7 +683,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) = \'test\''
+                $CaseSensitive ? 'LOWER(o.zip) = \'test\'' : 'o.zip = \'test\''
             ]
         }
     },
@@ -680,7 +696,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.zip) = \'\' OR o.zip IS NULL)'
+                $CaseSensitive ? '(LOWER(o.zip) = \'\' OR o.zip IS NULL)' : '(o.zip = \'\' OR o.zip IS NULL)'
             ]
         }
     },
@@ -693,7 +709,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.zip) != \'test\' OR o.zip IS NULL)'
+                $CaseSensitive ? '(LOWER(o.zip) != \'test\' OR o.zip IS NULL)' : '(o.zip != \'test\' OR o.zip IS NULL)'
             ]
         }
     },
@@ -706,7 +722,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) != \'\''
+                $CaseSensitive ? 'LOWER(o.zip) != \'\'' : 'o.zip != \'\''
             ]
         }
     },
@@ -719,7 +735,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.zip) IN (\'test\')' : 'o.zip IN (\'test\')'
             ]
         }
     },
@@ -732,7 +748,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.zip) NOT IN (\'test\')' : 'o.zip NOT IN (\'test\')'
             ]
         }
     },
@@ -745,7 +761,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.zip) LIKE \'test%\'' : 'o.zip LIKE \'test%\''
             ]
         }
     },
@@ -758,7 +774,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.zip) LIKE \'%test\'' : 'o.zip LIKE \'%test\''
             ]
         }
     },
@@ -771,7 +787,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.zip) LIKE \'%test%\'' : 'o.zip LIKE \'%test%\''
             ]
         }
     },
@@ -784,7 +800,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.zip) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.zip) LIKE \'test\'' : 'o.zip LIKE \'test\''
             ]
         }
     },
@@ -797,7 +813,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) = \'test\''
+                $CaseSensitive ? 'LOWER(o.country) = \'test\'' : 'o.country = \'test\''
             ]
         }
     },
@@ -810,7 +826,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.country) = \'\' OR o.country IS NULL)'
+                $CaseSensitive ? '(LOWER(o.country) = \'\' OR o.country IS NULL)' : '(o.country = \'\' OR o.country IS NULL)'
             ]
         }
     },
@@ -823,7 +839,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.country) != \'test\' OR o.country IS NULL)'
+                $CaseSensitive ? '(LOWER(o.country) != \'test\' OR o.country IS NULL)' : '(o.country != \'test\' OR o.country IS NULL)'
             ]
         }
     },
@@ -836,7 +852,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) != \'\''
+                $CaseSensitive ? 'LOWER(o.country) != \'\'' : 'o.country != \'\''
             ]
         }
     },
@@ -849,7 +865,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.country) IN (\'test\')' : 'o.country IN (\'test\')'
             ]
         }
     },
@@ -862,7 +878,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.country) NOT IN (\'test\')' : 'o.country NOT IN (\'test\')'
             ]
         }
     },
@@ -875,7 +891,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.country) LIKE \'test%\'' : 'o.country LIKE \'test%\''
             ]
         }
     },
@@ -888,7 +904,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.country) LIKE \'%test\'' : 'o.country LIKE \'%test\''
             ]
         }
     },
@@ -901,7 +917,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.country) LIKE \'%test%\'' : 'o.country LIKE \'%test%\''
             ]
         }
     },
@@ -914,7 +930,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.country) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.country) LIKE \'test\'' : 'o.country LIKE \'test\''
             ]
         }
     },
@@ -927,7 +943,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) = \'test\''
+                $CaseSensitive ? 'LOWER(o.url) = \'test\'' : 'o.url = \'test\''
             ]
         }
     },
@@ -940,7 +956,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.url) = \'\' OR o.url IS NULL)'
+                $CaseSensitive ? '(LOWER(o.url) = \'\' OR o.url IS NULL)' : '(o.url = \'\' OR o.url IS NULL)'
             ]
         }
     },
@@ -953,7 +969,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.url) != \'test\' OR o.url IS NULL)'
+                $CaseSensitive ? '(LOWER(o.url) != \'test\' OR o.url IS NULL)' : '(o.url != \'test\' OR o.url IS NULL)'
             ]
         }
     },
@@ -966,7 +982,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) != \'\''
+                $CaseSensitive ? 'LOWER(o.url) != \'\'' : 'o.url != \'\''
             ]
         }
     },
@@ -979,7 +995,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.url) IN (\'test\')' : 'o.url IN (\'test\')'
             ]
         }
     },
@@ -992,7 +1008,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.url) NOT IN (\'test\')' : 'o.url NOT IN (\'test\')'
             ]
         }
     },
@@ -1005,7 +1021,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.url) LIKE \'test%\'' : 'o.url LIKE \'test%\''
             ]
         }
     },
@@ -1018,7 +1034,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.url) LIKE \'%test\'' : 'o.url LIKE \'%test\''
             ]
         }
     },
@@ -1031,7 +1047,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.url) LIKE \'%test%\'' : 'o.url LIKE \'%test%\''
             ]
         }
     },
@@ -1044,7 +1060,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.url) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.url) LIKE \'test\'' : 'o.url LIKE \'test\''
             ]
         }
     },
@@ -1057,7 +1073,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) = \'test\''
+                $CaseSensitive ? 'LOWER(o.comments) = \'test\'' : 'o.comments = \'test\''
             ]
         }
     },
@@ -1070,7 +1086,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.comments) = \'\' OR o.comments IS NULL)'
+                $CaseSensitive ? '(LOWER(o.comments) = \'\' OR o.comments IS NULL)' : '(o.comments = \'\' OR o.comments IS NULL)'
             ]
         }
     },
@@ -1083,7 +1099,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                '(LOWER(o.comments) != \'test\' OR o.comments IS NULL)'
+                $CaseSensitive ? '(LOWER(o.comments) != \'test\' OR o.comments IS NULL)' : '(o.comments != \'test\' OR o.comments IS NULL)'
             ]
         }
     },
@@ -1096,7 +1112,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) != \'\''
+                $CaseSensitive ? 'LOWER(o.comments) != \'\'' : 'o.comments != \'\''
             ]
         }
     },
@@ -1109,7 +1125,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.comments) IN (\'test\')' : 'o.comments IN (\'test\')'
             ]
         }
     },
@@ -1122,7 +1138,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(o.comments) NOT IN (\'test\')' : 'o.comments NOT IN (\'test\')'
             ]
         }
     },
@@ -1135,7 +1151,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(o.comments) LIKE \'test%\'' : 'o.comments LIKE \'test%\''
             ]
         }
     },
@@ -1148,7 +1164,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(o.comments) LIKE \'%test\'' : 'o.comments LIKE \'%test\''
             ]
         }
     },
@@ -1161,7 +1177,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(o.comments) LIKE \'%test%\'' : 'o.comments LIKE \'%test%\''
             ]
         }
     },
@@ -1174,7 +1190,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'LOWER(o.comments) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(o.comments) LIKE \'test\'' : 'o.comments LIKE \'test\''
             ]
         }
     }

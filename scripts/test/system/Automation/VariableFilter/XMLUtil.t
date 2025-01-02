@@ -361,11 +361,11 @@ $Self->True(
     'MacroExecute()',
 );
 $Self->True(
-    IsHashRefWithData($AutomationObject->{MacroResults}) || 0,
-    'MacroResults is hash ref',
+    IsHashRefWithData($AutomationObject->{MacroVariables}) || 0,
+    'MacroVariables is hash ref',
 );
 $Self->IsDeeply(
-    $AutomationObject->{MacroResults}->{Set_B},
+    $AutomationObject->{MacroVariables}->{Set_B},
     {
         'h_p' => {
             'content' => 'Test',
@@ -375,7 +375,7 @@ $Self->IsDeeply(
     'Result of 2nd action',
 );
 $Self->IsDeeply(
-    $AutomationObject->{MacroResults}->{Set_C},
+    $AutomationObject->{MacroVariables}->{Set_C},
     '<root><h:p xmlns:h="http://www.w3.org/TR/html4/">Test</h:p></root>',
     "Result of 3nd action",
 );

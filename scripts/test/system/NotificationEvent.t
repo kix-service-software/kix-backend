@@ -711,20 +711,20 @@ for my $Test (@Tests) {
 
     # verify NotificationEvent
     $Self->Is(
-        1,
         IsHashRefWithData( \%NotificationEvent ),
+        1,
         "$Test->{Name} - NotificationEventGet() - Right structure",
     );
 
     $Self->Is(
-        $NotificationID,
         $NotificationEvent{ID},
+        $NotificationID,
         "$Test->{Name} - NotificationEventGet() - ID",
     );
 
     $Self->Is(
-        $Test->{Add}->{Name},
         $NotificationEvent{Name},
+        $Test->{Add}->{Name},
         "$Test->{Name} - NotificationEventGet() - Name",
     );
 
@@ -735,26 +735,26 @@ for my $Test (@Tests) {
     }
 
     $Self->Is(
-        $Test->{Add}->{Comment},
         $NotificationEvent{Comment},
+        $Test->{Add}->{Comment},
         "$Test->{Name} - NotificationEventGet() - Comment",
     );
 
     $Self->Is(
-        $Test->{Add}->{ValidID},
         $NotificationEvent{ValidID},
+        $Test->{Add}->{ValidID},
         "$Test->{Name} - NotificationEventGet() - ValidID",
     );
 
     $Self->IsDeeply(
-        $Test->{Add}->{Data},
         $NotificationEvent{Data},
+        $Test->{Add}->{Data},
         "$Test->{Name} - NotificationEventGet() - Data",
     );
 
     $Self->IsDeeply(
-        $Test->{Add}->{Message},
         $NotificationEvent{Message},
+        $Test->{Add}->{Message},
         "$Test->{Name} - NotificationEventGet() - Message",
     );
 
@@ -769,14 +769,14 @@ for my $Test (@Tests) {
     );
 
     $Self->Is(
-        $UserID,
         $NotificationEvent{ChangeBy},
+        $UserID,
         "$Test->{Name} - NotificationEventGet() - ChangeBy",
     );
 
     $Self->Is(
-        $UserID,
         $NotificationEvent{CreateBy},
+        $UserID,
         "$Test->{Name} - NotificationEventGet() - CreateBy",
     );
 
@@ -826,20 +826,20 @@ for my $Test (@Tests) {
 
     # verify NotificationEvent
     $Self->Is(
-        1,
         IsHashRefWithData( \%NotificationEvent ),
+        1,
         "$Test->{Name} - NotificationEventGet() - Right structure",
     );
 
     $Self->Is(
-        $NotificationID,
         $NotificationEvent{ID},
+        $NotificationID,
         "$Test->{Name} - NotificationEventGet() - ID",
     );
 
     $Self->Is(
-        $Test->{Update}->{Name},
         $NotificationEvent{Name},
+        $Test->{Update}->{Name},
         "$Test->{Name} - NotificationEventGet() - Name",
     );
 
@@ -850,26 +850,26 @@ for my $Test (@Tests) {
     }
 
     $Self->Is(
-        $Test->{Update}->{Comment},
         $NotificationEvent{Comment},
+        $Test->{Update}->{Comment},
         "$Test->{Name} - NotificationEventGet() - Comment",
     );
 
     $Self->Is(
-        $Test->{Update}->{ValidID},
         $NotificationEvent{ValidID},
+        $Test->{Update}->{ValidID},
         "$Test->{Name} - NotificationEventGet() - ValidID",
     );
 
     $Self->IsDeeply(
-        $Test->{Update}->{Data},
         $NotificationEvent{Data},
+        $Test->{Update}->{Data},
         "$Test->{Name} - NotificationEventGet() - Data",
     );
 
     $Self->IsDeeply(
-        $Test->{Update}->{Message},
         $NotificationEvent{Message},
+        $Test->{Update}->{Message},
         "$Test->{Name} - NotificationEventGet() - Message",
     );
 
@@ -884,14 +884,14 @@ for my $Test (@Tests) {
     );
 
     $Self->Is(
-        $UserID,
         $NotificationEvent{ChangeBy},
+        $UserID,
         "$Test->{Name} - NotificationEventGet() - ChangeBy",
     );
 
     $Self->Is(
-        $UserID,
         $NotificationEvent{CreateBy},
+        $UserID,
         "$Test->{Name} - NotificationEventGet() - CreateBy",
     );
 
@@ -906,8 +906,8 @@ for my $NotificationType ( sort keys %NotificationIDs ) {
 
 # verify IDs
 $Self->Is(
-    1,
     IsArrayRefWithData( \@AddedNotifications ),
+    1,
     "Added Notification IDs- Right structure",
 );
 
@@ -915,14 +915,14 @@ my @IDs = sort $NotificationEventObject->NotificationEventCheck( Event => 'AnEve
 
 # verify NotificationEventCheck
 $Self->Is(
-    1,
     IsArrayRefWithData( \@IDs ),
+    1,
     "NotificationEventCheck() - Right structure",
 );
 
 $Self->IsDeeply(
-    \@AddedNotifications,
     \@IDs,
+    \@AddedNotifications,
     "NotificationEventCheck()",
 );
 
@@ -930,8 +930,8 @@ $Self->IsDeeply(
 my %NotificationList = $NotificationEventObject->NotificationList( Type => 'Ticket' );
 for my $NotificationID ( sort keys %NotificationIDs ) {
     $Self->Is(
-        $NotificationIDs{Ticket}->{$NotificationID},
         $NotificationList{$NotificationID},
+        $NotificationIDs{Ticket}->{$NotificationID},
         "NotificationList() from DB with type 'Ticket' found NotificationEvent $NotificationID",
     );
 }
@@ -949,8 +949,8 @@ $Kernel::OM->Get('Cache')->CleanUp(
 
 for my $NotificationID ( sort keys %NotificationIDs ) {
     $Self->Is(
-        $NotificationIDs{Ticket}->{$NotificationID},
         $NotificationList{$NotificationID}->{Name},
+        $NotificationIDs{Ticket}->{$NotificationID},
         "NotificationList() from DB with type 'Ticket' in details mode found NotificationEvent $NotificationID",
     );
 }
@@ -978,8 +978,8 @@ for my $NotificationID ( sort keys %NotificationIDs ) {
     }
 
     $Self->Is(
-        $NotificationIDs{$NotificationType}->{$NotificationID},
         $NotificationList{$NotificationID}->{Name},
+        $NotificationIDs{$NotificationType}->{$NotificationID},
         "NotificationList() from DB with type 'Ticket' in details mode and all types found NotificationEvent $NotificationID",
     );
 }
@@ -997,8 +997,8 @@ $Kernel::OM->Get('Cache')->CleanUp(
 
 for my $NotificationID ( sort keys %NotificationIDs ) {
     $Self->Is(
-        $NotificationIDs{Ticket}->{$NotificationID},
         $NotificationList{$NotificationID}->{Name},
+        $NotificationIDs{Ticket}->{$NotificationID},
         "NotificationList() from DB with type 'Ticket' in details mode found NotificationEvent $NotificationID",
     );
 }
@@ -1011,8 +1011,8 @@ for my $NotificationType ( sort keys %NotificationIDs ) {
     for my $NotificationID ( sort keys %{ $NotificationIDs{$NotificationType} } ) {
 
         $Self->Is(
-            $NotificationIDs{$NotificationType}->{$NotificationID},
             $NotificationList{$NotificationID},
+            $NotificationIDs{$NotificationType}->{$NotificationID},
             "NotificationList() from DB found NotificationEvent $NotificationID",
         );
 

@@ -37,6 +37,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data before creation of test field'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # begin transaction on database
 $Helper->BeginWork();
 
@@ -71,6 +74,9 @@ $Self->IsDeeply(
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -137,7 +143,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text = \'Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) = \'test\'' : 'dfv_left0.value_text = \'test\''
             ]
         }
     },
@@ -153,7 +159,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                $CaseSensitive ? '(LOWER(dfv_left0.value_text) = \'\' OR dfv_left0.value_text IS NULL)' : '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
             ]
         }
     },
@@ -169,7 +175,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                '(dfv_left0.value_text != \'Test\' OR dfv_left0.value_text IS NULL)'
+                $CaseSensitive ? '(LOWER(dfv_left0.value_text) != \'test\' OR dfv_left0.value_text IS NULL)' : '(dfv_left0.value_text != \'test\' OR dfv_left0.value_text IS NULL)'
             ]
         }
     },
@@ -185,7 +191,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text != \'\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) != \'\'' : 'dfv_left0.value_text != \'\''
             ]
         }
     },
@@ -194,14 +200,14 @@ my @SearchTests = (
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => 'IN',
-            Value    => 'Test'
+            Value    => ['Test']
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text IN (\'Test\')'
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) IN (\'test\')' : 'dfv_left0.value_text IN (\'test\')'
             ]
         }
     },
@@ -210,14 +216,14 @@ my @SearchTests = (
         Search       => {
             Field    => 'DynamicField_UnitTest',
             Operator => '!IN',
-            Value    => 'Test'
+            Value    => ['Test']
         },
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text NOT IN (\'Test\')'
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) NOT IN (\'test\')' : 'dfv_left0.value_text NOT IN (\'test\')'
             ]
         }
     },
@@ -233,7 +239,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'Test%\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'test%\'' : 'dfv_left0.value_text LIKE \'test%\''
             ]
         }
     },
@@ -249,7 +255,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'%Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'%test\'' : 'dfv_left0.value_text LIKE \'%test\''
             ]
         }
     },
@@ -265,7 +271,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'%Test%\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'%test%\'' : 'dfv_left0.value_text LIKE \'%test%\''
             ]
         }
     },
@@ -281,7 +287,7 @@ my @SearchTests = (
                 'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where' => [
-                'dfv_left0.value_text LIKE \'Test\''
+                $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'test\'' : 'dfv_left0.value_text LIKE \'test\''
             ]
         }
     }
@@ -434,6 +440,19 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EQ',
+                    Value    => 'test2'
+                }
+            ]
+        },
+        Expected => [$ContactID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value empty string',
         Search   => {
             'AND' => [
@@ -454,6 +473,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'NE',
                     Value    => 'Test2'
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator NE / Value test2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'NE',
+                    Value    => 'test2'
                 }
             ]
         },
@@ -486,6 +518,19 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator STARTSWITH / Value tTest',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'STARTSWITH',
+                    Value    => 'test'
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value t2',
         Search   => {
             'AND' => [
@@ -493,6 +538,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'ENDSWITH',
                     Value    => 't2'
+                }
+            ]
+        },
+        Expected => [$ContactID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator ENDSWITH / Value T2',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'ENDSWITH',
+                    Value    => 'T2'
                 }
             ]
         },
@@ -512,6 +570,19 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID2]
     },
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator CONTAINS / Value EST',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'CONTAINS',
+                    Value    => 'EST'
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator LIKE / Value Test*',
         Search   => {
             'AND' => [
@@ -519,6 +590,19 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'LIKE',
                     Value    => 'Test*'
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator LIKE / Value test*',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'LIKE',
+                    Value    => 'test*'
                 }
             ]
         },
@@ -549,7 +633,7 @@ my @IntegrationSortTests = (
                 Field => 'DynamicField_UnitTest'
             }
         ],
-        Expected => [$ContactID1, $ContactID2, 1,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,1,$ContactID3] : [1,$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction ascending',
@@ -559,7 +643,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1, $ContactID2, 1,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,1,$ContactID3] : [1,$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field DynamicField_UnitTest / Direction descending',
@@ -569,7 +653,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [1,$ContactID3, $ContactID2, $ContactID1]
+        Expected => $OrderByNull eq 'LAST' ? [1,$ContactID3,$ContactID2,$ContactID1] : [$ContactID2,$ContactID1,1,$ContactID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

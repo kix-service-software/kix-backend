@@ -163,17 +163,17 @@ for my $Test ( @Tests ) {
         if ( ref( $Test->{Results} ) ) {
             for my $ResultKey ( sort( keys( %{ $Test->{Results} } ) ) ) {
                 $Self->Is(
-                    $Kernel::OM->Get('Automation')->{MacroResults}->{Report}->{Results}->[0]->{ $ResultKey },
+                    $Kernel::OM->Get('Automation')->{MacroVariables}->{Report}->{Results}->[0]->{ $ResultKey },
                     $Test->{Results}->{ $ResultKey },
-                    $Test->{Name} . ': MacroExecute - macro result "Report.Results.' . $ResultKey . '" of check macro',
+                    $Test->{Name} . ': MacroExecute - macro variable "Report.Results.' . $ResultKey . '" of check macro',
                 );
             }
         }
         else {
             $Self->Is(
-                $Kernel::OM->Get('Automation')->{MacroResults}->{Reports},
+                $Kernel::OM->Get('Automation')->{MacroVariables}->{Reports},
                 $Test->{Results},
-                $Test->{Name} . ': MacroExecute - macro result "Report" of check macro',
+                $Test->{Name} . ': MacroExecute - macro variable "Report" of check macro',
             );
         }
     }
@@ -289,17 +289,17 @@ for my $Test ( @Tests ) {
     if ( ref( $Test->{Results} ) ) {
             for my $ResultKey ( sort( keys( %{ $Test->{Results} } ) ) ) {
                 $Self->Is(
-                    $Kernel::OM->Get('Automation')->{MacroResults}->{Report}->{Results}->[0]->{ $ResultKey },
+                    $Kernel::OM->Get('Automation')->{MacroVariables}->{Report}->{Results}->[0]->{ $ResultKey },
                     $Test->{Results}->{ $ResultKey },
-                    $Test->{Name} . ': MacroExecute - macro result "Report.Results.' . $ResultKey . '" of check macro',
+                    $Test->{Name} . ': MacroExecute - macro variable "Report.Results.' . $ResultKey . '" of check macro',
                 );
             }
     }
     else {
         $Self->Is(
-            $Kernel::OM->Get('Automation')->{MacroResults}->{Report},
+            $Kernel::OM->Get('Automation')->{MacroVariables}->{Report},
             $Test->{Results},
-            $Test->{Name} . ': MacroExecute - macro result "Report" of check macro',
+            $Test->{Name} . ': MacroExecute - macro variable "Report" of check macro',
         );
     }
 

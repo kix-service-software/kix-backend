@@ -68,6 +68,9 @@ sub LoadPreferences {
     # init sql setting on db connect
     $Self->{'DB::Connect'} = "ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'";
 
+    # set handling of null values for ascending order
+    $Self->{'DB::OrderByNull'} = 'LAST';
+
     return 1;
 }
 

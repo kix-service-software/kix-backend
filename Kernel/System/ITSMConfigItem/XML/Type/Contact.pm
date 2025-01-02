@@ -165,6 +165,10 @@ sub ImportValuePrepare {
     my ( $Self, %Param ) = @_;
 
     return if !defined $Param{Value};
+
+    # return empty string unchanged
+    return '' if ( $Param{Value} eq '' );
+
     my $ID = '';
 
     # check if it is an email address and lookup contact...

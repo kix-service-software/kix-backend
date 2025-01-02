@@ -325,6 +325,12 @@ sub DisplayValueRender {
     # set item separator
     my $ItemSeparator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator} || ', ';
 
+    if ( $Param{HTMLOutput} ) {
+        $ItemSeparator = $Param{LayoutObject}->Ascii2Html(
+            Text => $ItemSeparator,
+        );
+    }
+
     my $Value = join( $ItemSeparator, @Values );
     my $Title = join( $ItemSeparator, @Titles );
 

@@ -14,11 +14,11 @@ use strict;
 use warnings;
 
 use Kernel::System::EventHandler;
+use Kernel::System::PreEventHandler;
 use Kernel::System::ITSMConfigItem::AttachmentStorage;
 use Kernel::System::ITSMConfigItem::Definition;
 use Kernel::System::ITSMConfigItem::History;
 use Kernel::System::ITSMConfigItem::Image;
-use Kernel::System::ITSMConfigItem::Number;
 use Kernel::System::ITSMConfigItem::Permission;
 use Kernel::System::ITSMConfigItem::Version;
 use Kernel::System::ITSMConfigItem::XML;
@@ -85,35 +85,31 @@ sub new {
         Kernel::System::ITSMConfigItem::Definition
         Kernel::System::ITSMConfigItem::History
         Kernel::System::ITSMConfigItem::Image
-        Kernel::System::ITSMConfigItem::Number
         Kernel::System::ITSMConfigItem::Permission
         Kernel::System::ITSMConfigItem::Version
         Kernel::System::ITSMConfigItem::XML
         Kernel::System::EventHandler
+        Kernel::System::PreEventHandler
     );
 
     # Dynamically find packages which are considered as super-classes for this
     # package. These packages may contain methods which overwrite functions
     # contained in @ISA as initially set, but not methods contained in this very
     # file, unless SUPER is used.
-    if (
-        !$Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules')
-        || ref( $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') ) ne 'HASH'
-    ) {
-        die "Got no ITSMConfigItem::CustomModules! Please check your SysConfig! Error occured";
-    }
-    my %CustomModules = %{ $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') };
-    for my $CustModKey ( sort( keys(%CustomModules) ) ) {
-        next if ( !$CustomModules{$CustModKey} );
-        if ( !$Kernel::OM->Get('Main')->Require( $CustomModules{$CustModKey} ) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Can't load ITSMConfigItem custom module "
-                    . $CustomModules{$CustModKey} . " ($@)!",
-            );
-        }
-        else {
-            unshift( @ISA, $CustomModules{$CustModKey} );
+    if ( ref( $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') ) eq 'HASH' ) {
+        my %CustomModules = %{ $Kernel::OM->Get('Config')->Get('ITSMConfigItem::CustomModules') };
+        for my $CustModKey ( sort( keys(%CustomModules) ) ) {
+            next if ( !$CustomModules{$CustModKey} );
+            if ( !$Kernel::OM->Get('Main')->Require( $CustomModules{$CustModKey} ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Can't load ITSMConfigItem custom module "
+                        . $CustomModules{$CustModKey} . " ($@)!",
+                );
+            }
+            else {
+                unshift( @ISA, $CustomModules{$CustModKey} );
+            }
         }
     }
 
@@ -130,6 +126,13 @@ sub new {
     $Self->EventHandlerInit(
         Config => 'ITSMConfigItem::EventModulePost',
     );
+
+    # load config item number generator
+    my $GeneratorModule = $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator')
+        || 'Kernel::System::ITSMConfigItem::Number::AutoIncrement';
+    if ( !$Kernel::OM->Get('Main')->RequireBaseClass($GeneratorModule) ) {
+        die "Can't load config item number generator backend module $GeneratorModule! $@";
+    }
 
     return $Self;
 }
@@ -516,7 +519,7 @@ sub ConfigItemAdd {
     if ( $Param{Number} ) {
 
         # find existing config item number
-        my $Exists = $Self->ConfigItemNumberLookup(
+        my $Exists = $Self->ConfigItemLookup(
             ConfigItemNumber => $Param{Number},
         );
 
@@ -531,10 +534,8 @@ sub ConfigItemAdd {
         }
     }
     else {
-
         # create config item number
         $Param{Number} = $Self->ConfigItemNumberCreate(
-            Type    => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::NumberGenerator'),
             ClassID => $Param{ClassID},
         );
     }
@@ -1113,6 +1114,16 @@ sub ConfigItemAttachmentExists {
     return 1;
 }
 
+=item ConfigItemCreateNumber()
+
+creates a new config item number
+
+    my $ConfigItemNumber = $ConfigItemObject->ConfigItemCreateNumber();
+
+=cut
+
+# use it from Kernel/System/ITSMConfigItem/Number/*.pm
+
 =item ConfigItemLookup()
 
 This method does a lookup for a configitem. If a configitem id is given,
@@ -1586,7 +1597,7 @@ sub RecalculateCurrentIncidentState {
             my $VersionList = $Self->VersionList(
                 ConfigItemID => $ConfigItemID,
             );
-    
+
             my $VersionID = $VersionList->[-1];
             $CacheKey = 'VersionGet::VersionID::' . $VersionID . '::XMLData::';
             for my $XMLData (qw(0 1)) {
@@ -2078,45 +2089,86 @@ sub SetAttributeContentsByKey {
     # check required params...
     if (
         !$Param{KeyName}
-        ||
-        !length( $Param{NewContent} ) ||
-        ( !$Param{XMLData} ) ||
-        ( !$Param{XMLDefinition} ) ||
-        ( ref $Param{XMLData} ne 'HASH' ) ||
-        ( ref $Param{XMLDefinition} ne 'ARRAY' )
-        )
-    {
+        || !defined $Param{NewContent}
+        || ( !$Param{XMLData} )
+        || ( !$Param{XMLDefinition} )
+        || ( ref $Param{XMLData} ne 'HASH' )
+        || ( ref $Param{XMLDefinition} ne 'ARRAY' )
+    ) {
         return 0;
     }
 
+    my $NewContent = $Param{NewContent};
+    if ( !IsArrayRef($Param{NewContent}) ) {
+        $NewContent = [ $Param{NewContent} ];
+    }
+
+    # Needs for the check if that the root has any content
+    my $HasContent = 0;
     ITEM:
     for my $Item ( @{ $Param{XMLDefinition} } ) {
 
         COUNTER:
         for my $Counter ( 1 .. $Item->{CountMax} ) {
 
+            # Needs for the check if that the item (current position) has any content
+            my $CounterContent = 0;
             # get the value...
             if ( $Item->{Key} eq $Param{KeyName} ) {
-                $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $Param{NewContent};
+                $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} = $NewContent->[$Counter-1] || undef;
+                if ( $NewContent->[$Counter-1] ) {
+                    $CounterContent = 1;
+                }
+            }
+            elsif ( $Param{XMLData}->{ $Item->{Key} }->[$Counter]->{Content} ) {
+                $CounterContent = 1;
             }
 
-            next COUNTER if !$Item->{Sub};
+            if ( $Item->{Sub} ) {
+                # make sure it's a hash ref
+                $Param{XMLData}->{ $Item->{Key} }->[$Counter] //= {};
 
-            # make sure it's a hash ref
-            $Param{XMLData}->{ $Item->{Key} }->[$Counter] //= {};
+                # recurse if subsection available...
+                my $SubResult = $Self->SetAttributeContentsByKey(
+                    KeyName       => $Param{KeyName},
+                    NewContent    => $NewContent,
+                    XMLDefinition => $Item->{Sub},
+                    XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
+                );
 
-            #recurse if subsection available...
-            my $SubResult = $Self->SetAttributeContentsByKey(
-                KeyName       => $Param{KeyName},
-                NewContent    => $Param{NewContent},
-                XMLDefinition => $Item->{Sub},
-                XMLData       => $Param{XMLData}->{ $Item->{Key} }->[$Counter],
-            );
+                # checks if the item (current position) and his sub element has a content
+                # if not, the item (current position) will be removed.
+                # Has the sub element some content than the current item will be held.
+                if (
+                    !$SubResult
+                    && !$CounterContent
+                ) {
+                    delete $Param{XMLData}->{ $Item->{Key} }->[$Counter];
+                }
+                elsif (
+                    $SubResult
+                    && !$CounterContent
+                ) {
+                    $CounterContent = 1;
+                }
+            }
+            # if the item (current position) has no sub element and content, then it will be removed.
+            elsif ( !$CounterContent ) {
+                delete $Param{XMLData}->{ $Item->{Key} }->[$Counter];
+            }
+
+            # Sets the root content as true if one of the items has any content.
+            if (
+                !$HasContent
+                && $CounterContent
+            ) {
+                $HasContent = 1;
+            }
 
         }
     }
 
-    return 0;
+    return $HasContent;
 }
 
 =item VersionCount()

@@ -737,16 +737,20 @@ sub MacroActionExecute {
         $BackendObject->{$CommonParam} = $Self->{$CommonParam};
     }
 
+    # init MacroResults if not already done
+    $Self->{MacroResults} //= {};
+
     # fallback if not already known
-    $Self->{MacroResults} //= {
+    $Self->{MacroVariables} //= {
         RootObjectID => $Self->{RootObjectID},
         ObjectID     => $Param{ObjectID},
         EventData    => $Self->{EventData}
     };
 
     # we need the result variables and macro results for the assignments
-    $BackendObject->{MacroResults} = $Self->{MacroResults};
+    $BackendObject->{MacroVariables}  = $Self->{MacroVariables};
     $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
+    $BackendObject->{MacroResults}    = $Self->{MacroResults};
 
     # add root object id
     $BackendObject->{RootObjectID} = $Self->{RootObjectID};
@@ -765,19 +769,20 @@ sub MacroActionExecute {
             Config => \%Parameters
         );
 
-        # replace result variables
-        if (IsHashRefWithData($Self->{MacroResults})) {
-            $Self->_ReplaceResultVariables(
-                Data   => \%Parameters,
-                UserID => $Param{UserID}
+        # replace variables
+        if (IsHashRefWithData($Self->{MacroVariables})) {
+            $Kernel::OM->Get('Main')->ReplaceVariables(
+                Data      => \%Parameters,
+                Variables => $Self->{MacroVariables},
+                UserID    => $Param{UserID}
             );
         }
 
         my $Success = $BackendObject->Run(
             %Param,
-            MacroType         => $Macro{Type},
-            Config            => \%Parameters,
-            ConfigRaw         => \%{$MacroAction{Parameters} || {}},
+            MacroType => $Macro{Type},
+            Config    => \%Parameters,
+            ConfigRaw => \%{$MacroAction{Parameters} || {}},
         );
 
         if ( !$Success ) {
@@ -1071,7 +1076,7 @@ sub _LoadMacroActionTypeBackend {
         if ( !$Kernel::OM->Get('Main')->Require($Backend) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Unable to require $Backend!"
+                Message  => "Unable to require $Backend (MacroAction: $Param{Name})!"
             );
             return;
         }
@@ -1093,216 +1098,6 @@ sub _LoadMacroActionTypeBackend {
     }
 
     return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}};
-}
-
-# recursively replace result variables
-sub _ReplaceResultVariables {
-    my ( $Self, %Param ) = @_;
-
-    return if !defined $Param{Data};
-
-    if ( IsHashRefWithData($Param{Data}) ) {
-        foreach my $Key ( sort keys %{$Param{Data}} ) {
-            $Param{Data}->{$Key} = $Self->_ReplaceResultVariables(
-                Data   => $Param{Data}->{$Key},
-                UserID => $Param{UserID}
-            );
-        }
-    }
-    elsif ( IsArrayRefWithData($Param{Data}) ) {
-        foreach my $Item ( @{$Param{Data}} ) {
-            $Item = $Self->_ReplaceResultVariables(
-                Data   => $Item,
-                UserID => $Param{UserID}
-            );
-        }
-    }
-    else {
-        # init index for temp variables
-        my $VariableFilterValueIndex = 0;
-
-        # let leading be greedy - start with innermost variable
-        while ( $Param{Data} =~ /^(.*)(\$\{([a-zA-Z0-9_.,: ]+)(?:\|(.*?))?\})(.*?)$/xs ) {
-            my $Leading    = $1;
-            my $Expression = $2;
-            my $Variable   = $3;
-            my $Filter     = $4;
-            my $Trailing   = $5;
-
-            my $Value = $Kernel::OM->Get('Main')->ResolveValueByKey(
-                Key  => $Variable,
-                Data => $Self->{MacroResults},
-            );
-
-            if ( $Filter ) {
-                $Value = $Self->_ExecuteVariableFilters(
-                    Data   => $Value,
-                    Filter => $Filter,
-                    UserID => $Param{UserID}
-                );
-            }
-
-            # variable is part of a string, we have to do a string replace
-            if ( $Leading || $Trailing ) {
-                # value is a data structure, replace with temp variable
-                if ( ref( $Value ) ) {
-                    # increment index
-                    $VariableFilterValueIndex += 1;
-
-                    # store value in MacroResults
-                    $Self->{MacroResults}->{VariableFilterValue}->{ $VariableFilterValueIndex } = $Value;
-
-                    # replace current variable with variable filter value
-                    $Param{Data} =~ s/\Q$Expression\E/<VariableFilterValue$VariableFilterValueIndex>/gxs;
-                }
-                # replace value as string
-                else {
-                    $Param{Data} =~ s/\Q$Expression\E/$Value/gxs;
-                }
-            }
-            else {
-                # variable is an assignment, we can replace it with the actual value (i.e. Object)
-                $Param{Data} = $Value;
-            }
-        }
-
-        # remove temp variables from MacroResult
-        delete( $Self->{MacroResults}->{VariableFilterValue} );
-    }
-
-    return $Param{Data};
-}
-
-sub _ExecuteVariableFilters {
-    my ( $Self, %Param ) = @_;
-
-    return $Param{Data} if !$Param{Filter};
-
-    my @Filters = split(/\|/, $Param{Filter});
-
-    my $Value = $Param{Data};
-
-    foreach my $Filter ( @Filters ) {
-        next if !$Filter;
-
-        if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
-            if ( defined( $Value ) ) {
-                $Value = $Kernel::OM->Get('JSON')->Encode(
-                    Data => $Value
-                );
-                $Value =~ s/^"//;
-                $Value =~ s/"$//;
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need defined data!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^FromJSON$/i ) {
-            if ( IsStringWithData( $Value ) ) {
-                $Value = $Kernel::OM->Get('JSON')->Decode(
-                    Data => $Value
-                );
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need string with data!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^jq\((.*)\)$/i ) {
-            my $JqExpression = $1;
-            if ( $JqExpression ) {
-                if ( IsStringWithData( $Value ) ) {
-                    $JqExpression =~ s/\s+::\s+/|/g;
-                    $JqExpression =~ s/&quot;/"/g;
-                    $Value = `echo '$Value' | jq -r '$JqExpression'`;
-                    chomp $Value;
-
-                    # special characters must be re-encoded because the result is decoded twice after the system call
-                    $Kernel::OM->Get('Encode')->EncodeInput( \$Value );
-                }
-                else {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "\"$Filter\" need string with data!"
-                    );
-                }
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" has no jq expression!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^(?:base64|ToBase64)$/i ) {
-            if ( defined( $Value ) ) {
-                $Value = MIME::Base64::encode_base64($Value);
-                $Value =~ s/\n//g;
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need defined data!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^FromBase64$/i ) {
-            if ( IsStringWithData( $Value ) ) {
-                $Value = MIME::Base64::decode_base64($Value);
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need string with data!"
-                );
-            }
-        }
-        elsif (IsHashRefWithData($Self->{VariableFilter})) {
-            $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
-            my $Parameter = $+{parameter};
-
-            # check for stored variable filter value
-            if ( $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
-                my $VariableFilterValueIndex = $1;
-                $Parameter = $Kernel::OM->Get('Main')->ResolveValueByKey(
-                    Key  => $VariableFilterValueIndex,
-                    Data => $Self->{MacroResults}->{VariableFilterValue},
-                );
-            }
-
-            my $Handler;
-            for my $HandlerName ( %{$Self->{VariableFilter}} ) {
-                if (lc($HandlerName) eq lc($Filter)) {
-                    $Handler = $Self->{VariableFilter}->{$HandlerName};
-                    last;
-                }
-            }
-            if ($Handler && ref $Handler eq 'CODE') {
-                $Value = $Handler->(
-                    $Self,
-                    Value     => $Value,
-                    Parameter => $Parameter
-                )
-            } else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown filter \"$Filter\"!"
-                );
-            }
-        } else {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unknown filter \"$Filter\"!"
-            );
-        }
-    }
-
-    return $Value;
 }
 
 1;

@@ -208,7 +208,7 @@ $OrganisationSearch = $Kernel::OM->Get('ObjectSearch')->Search(
         AND => [
             {
                 Field => 'Fulltext',
-                Operator => 'STARTSWITH',
+                Operator => 'LIKE',
                 Type     => 'STRING',
                 Value    => 'Example'
             }
@@ -230,7 +230,7 @@ $OrganisationSearch = $Kernel::OM->Get('ObjectSearch')->Search(
         AND => [
             {
                 Field => 'Fulltext',
-                Operator => 'STARTSWITH',
+                Operator => 'LIKE',
                 Type     => 'STRING',
                 Value    => 'Foo-123FALSE-Example'
             }

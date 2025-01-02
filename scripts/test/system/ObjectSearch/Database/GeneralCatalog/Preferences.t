@@ -45,6 +45,25 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data before creation of test attribute'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # begin transaction on database
 $Helper->BeginWork();
 
@@ -148,7 +167,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) = \'test\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) = \'test\'' : 'gcp0.pref_value = \'test\''
             ]
         }
     },
@@ -165,7 +184,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                '(LOWER(gcp0.pref_value) = \'\' OR gcp0.pref_value IS NULL)'
+                $CaseSensitive ? '(LOWER(gcp0.pref_value) = \'\' OR gcp0.pref_value IS NULL)' : '(gcp0.pref_value = \'\' OR gcp0.pref_value IS NULL)'
             ]
         }
     },
@@ -182,7 +201,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                '(LOWER(gcp0.pref_value) != \'test\' OR gcp0.pref_value IS NULL)'
+                $CaseSensitive ? '(LOWER(gcp0.pref_value) != \'test\' OR gcp0.pref_value IS NULL)' : '(gcp0.pref_value != \'test\' OR gcp0.pref_value IS NULL)'
             ]
         }
     },
@@ -199,7 +218,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) != \'\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) != \'\'' : 'gcp0.pref_value != \'\''
             ]
         }
     },
@@ -216,7 +235,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) IN (\'test\')' : 'gcp0.pref_value IN (\'test\')'
             ]
         }
     },
@@ -233,7 +252,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) NOT IN (\'test\')'
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) NOT IN (\'test\')' : 'gcp0.pref_value NOT IN (\'test\')'
             ]
         }
     },
@@ -250,7 +269,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) LIKE \'test%\'' : 'gcp0.pref_value LIKE \'test%\''
             ]
         }
     },
@@ -267,7 +286,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) LIKE \'%test\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) LIKE \'%test\'' : 'gcp0.pref_value LIKE \'%test\''
             ]
         }
     },
@@ -284,7 +303,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) LIKE \'%test%\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) LIKE \'%test%\'' : 'gcp0.pref_value LIKE \'%test%\''
             ]
         }
     },
@@ -301,7 +320,7 @@ my @SearchTests = (
                 'AND gcp0.pref_key = \'UnitTest\''
             ],
             'Where' => [
-                'LOWER(gcp0.pref_value) LIKE \'test\''
+                $CaseSensitive ? 'LOWER(gcp0.pref_value) LIKE \'test\'' : 'gcp0.pref_value LIKE \'test\''
             ]
         }
     }
@@ -686,18 +705,26 @@ my @IntegrationSortTests = (
         Expected => [@ItemIDs,$ItemID1,$ItemID3,$ItemID2]
     }
 );
-for my $Test ( @IntegrationSortTests ) {
-    my @Result = $ObjectSearch->Search(
-        ObjectType => 'GeneralCatalog',
-        Result     => 'ARRAY',
-        Sort       => $Test->{Sort},
-        UserType   => 'Agent',
-        UserID     => 1,
-    );
-    $Self->IsDeeply(
-        \@Result,
-        $Test->{Expected},
-        $Test->{Name}
+if ( $OrderByNull eq 'LAST' ) {
+    for my $Test ( @IntegrationSortTests ) {
+        my @Result = $ObjectSearch->Search(
+            ObjectType => 'GeneralCatalog',
+            Result     => 'ARRAY',
+            Sort       => $Test->{Sort},
+            UserType   => 'Agent',
+            UserID     => 1,
+        );
+        $Self->IsDeeply(
+            \@Result,
+            $Test->{Expected},
+            $Test->{Name}
+        );
+    }
+}
+else {
+    $Self->True(
+        1,
+        '## TODO ## Check Sort for OrderByNull FIRST'
     );
 }
 

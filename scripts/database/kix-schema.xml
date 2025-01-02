@@ -2573,6 +2573,7 @@
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="type" Required="true" Size="50" Type="VARCHAR"/>
+    <Column Name="scope" Required="false" Size="50" Type="VARCHAR"/>
     <Column Name="exec_order" Required="false" Size="10000" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
@@ -2582,6 +2583,9 @@
     <Column Name="change_by" Required="true" Type="INTEGER"/>
     <Index Name="macro_name">
         <IndexColumn Name="name"/>
+    </Index>
+    <Index Name="macro_scope">
+        <IndexColumn Name="scope"/>
     </Index>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>

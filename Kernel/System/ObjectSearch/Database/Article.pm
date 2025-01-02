@@ -55,7 +55,7 @@ sub GetBaseDef {
     return {
         Select  => ['a.id', 'a.incoming_time'],
         From    => [ 'article a'],
-        OrderBy => ['a.incoming_time ASC']
+        OrderBy => ['a.incoming_time ASC,a.id ASC']
     };
 }
 

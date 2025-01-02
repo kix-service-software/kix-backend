@@ -69,6 +69,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check Search
 my @SearchTests = (
     {
@@ -747,7 +750,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -758,7 +761,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -769,7 +772,7 @@ my @IntegrationSortTests = (
             }
         ],
         Language => 'en',
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1] : [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

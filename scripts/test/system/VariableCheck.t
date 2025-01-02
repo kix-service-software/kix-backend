@@ -212,6 +212,8 @@ $RunTests->( 'IsStringWithData', $TestVariables, $ExpectedTestResults );
 # DataIsDifferent tests
 #
 
+my $Undef = undef;
+
 my %Hash1 = (
     key1 => '1',
     key2 => '2',
@@ -244,7 +246,7 @@ my $Scalar2 = {
 };
 
 my $Count = 0;
-for my $Value1 ( \%Hash1, \%Hash2, \@List1, \@List2, \$Scalar1, \$Scalar2 ) {
+for my $Value1 ( \%Hash1, \%Hash2, \@List1, \@List2, \$Scalar1, \$Scalar2, $Undef ) {
     $Count++;
     $Self->Is(
         scalar DataIsDifferent(
@@ -256,11 +258,11 @@ for my $Value1 ( \%Hash1, \%Hash2, \@List1, \@List2, \$Scalar1, \$Scalar2 ) {
     );
 
     my $Count2 = 0;
-    VALUE2: for my $Value2 ( \%Hash1, \%Hash2, \@List1, \@List2, \$Scalar1, \$Scalar2 ) {
-        if ( $Value2 == $Value1 ) {
+    VALUE2: for my $Value2 ( \%Hash1, \%Hash2, \@List1, \@List2, \$Scalar1, \$Scalar2, $Undef ) {
+        $Count2++;
+        if ( $Count == $Count2 ) {
             next VALUE2;
         }
-        $Count2++;
 
         $Self->Is(
             scalar DataIsDifferent(

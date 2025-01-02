@@ -50,11 +50,20 @@ $Self->IsDeeply(
 );
 
 # Quoting ESCAPE character backslash
-my $QuoteBack = $Kernel::OM->Get('DB')->{'DB::QuoteBack'};
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
 my $Escape = "\\";
 if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 my @SearchTests = (
@@ -123,7 +132,7 @@ my @SearchTests = (
                 'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
             ],
             'Where' => [
-                '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(c.firstname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(c.firstname LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.lastname LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email1 LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email2 LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email3 LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email4 LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.email5 LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.title LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.phone LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.fax LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.mobile LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.street LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.city LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.zip LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR c.country LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR u0.login LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o0.number LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR o0.name LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

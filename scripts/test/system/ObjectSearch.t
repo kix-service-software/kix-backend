@@ -62,6 +62,15 @@ my @SearchTests = (
         ResultDefined => ''
     },
     {
+        Name          => 'ObjectSearch > Search: Invalid UserID',
+        Parameter     => {
+            ObjectType => 'Ticket',
+            UserID     => $Helper->GetRandomID(),
+            Silent     => 1
+        },
+        ResultDefined => ''
+    },
+    {
         Name          => 'ObjectSearch > Search: Invalid Result',
         Parameter     => {
             ObjectType => 'Ticket',

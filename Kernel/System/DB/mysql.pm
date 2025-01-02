@@ -89,6 +89,9 @@ sub LoadPreferences {
         'BIGINT' => 'UNSIGNED'
     };
 
+    # set handling of null values for ascending order
+    $Self->{'DB::OrderByNull'} = 'FIRST';
+
     return 1;
 }
 

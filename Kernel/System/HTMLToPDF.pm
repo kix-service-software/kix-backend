@@ -15,6 +15,7 @@ use vars qw(@ISA);
 
 use Kernel::System::HTMLToPDF::Convert;
 use Kernel::System::HTMLToPDF::Render;
+use IO::Compress::Zip qw(:all);
 
 our @ObjectDependencies = (
     "Config",
@@ -97,6 +98,73 @@ sub new {
     return $Self;
 }
 
+sub Print {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (
+        qw(
+            UserID IdentifierType IdentifierIDorNumber
+        )
+    ) {
+        if ( !$Param{$Needed} ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Needed $Needed!"
+                );
+            }
+            return;
+        }
+    }
+
+    if (
+        !$Param{TemplateID}
+        && !$Param{TemplateName}
+    ) {
+        return (
+            Code    => 'Object.NotFound',
+            Message => "Cannot convert pdf. TemplateName and TemplateID not given.",
+        );
+    }
+
+    my %Template = $Self->TemplateExists(
+        %Param
+    );
+
+    if ( !%Template ) {
+        return (
+            Code    => 'Object.NotFound',
+            Message => "Cannot convert pdf. Template does not exist.",
+        );
+    }
+
+    my @IDOrNumbers = split(/,/smx, $Param{IdentifierIDorNumber});
+
+    my $Compress = $Param{Compress} || 0;
+    my @Files;
+    for my $Identifier ( @IDOrNumbers ) {
+        my %File = $Self->Convert(
+            %Template,
+            Filename             => $Param{Filename} || q{},
+            IdentifierType       => $Param{IdentifierType},
+            IdentifierIDorNumber => $Identifier,
+            Expands              => $Param{Expands} || q{},
+            Filters              => $Param{Filters} || q{},
+            Allows               => $Param{Allows}  || q{},
+            Ignores              => $Param{Ignores} || q{},
+            UserID               => $Param{UserID},
+        );
+
+        return %File if ( !$Compress );
+
+        push ( @Files, \%File );
+    }
+
+    return $Self->_Compress(
+        Files => \@Files
+    );
+}
+
 sub PossibleExpandsGet {
     my ($Self, %Param) = @_;
 
@@ -114,15 +182,23 @@ sub TemplateGet {
         !$Param{ID}
         && !$Param{Name}
     ) {
-        $LogObject->Log(
-            Priority => 'error',
-            Message  => 'No given ID or Name!'
-        );
+        if ( !$Param{Silent} ) {
+            $LogObject->Log(
+                Priority => 'error',
+                Message  => 'No given ID and Name!'
+            );
+        }
         return;
     }
+
+    my $Selection = 'id, name';
+    if ( !$Param{NoData} ) {
+        $Selection .= ', object, valid_id, definition, created, created_by, changed, changed_by';
+    }
+
     my @Bind;
-    my $SQL = <<'END';
-SELECT id, name, object, valid_id, definition, created, created_by, changed, changed_by
+    my $SQL = <<"END";
+SELECT $Selection
 FROM html_to_pdf
 WHERE
 END
@@ -145,19 +221,23 @@ END
     # fetch the result
     my %Data;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Data{Definition} = $JSONObject->Decode(
-            Data => $Row[4]
-        );
         $Data{ID}        = $Row[0];
         $Data{Name}      = $Row[1];
-        $Data{Object}    = $Row[2];
-        $Data{ValidID}   = $Row[3];
-        $Data{Created}   = $Row[5];
-        $Data{CreatedBy} = $Row[6];
-        $Data{Changed}   = $Row[7];
-        $Data{ChangedBy} = $Row[8];
-        $Data{IDKey}     = $Self->{"Backend$Row[2]"}->{IDKey}     || q{};
-        $Data{NumberKey} = $Self->{"Backend$Row[2]"}->{NumberKey} || q{};
+
+        if ( !$Param{NoData} ) {
+            $Data{Definition} = $JSONObject->Decode(
+                Data => $Row[4]
+            );
+
+            $Data{Object}    = $Row[2];
+            $Data{ValidID}   = $Row[3];
+            $Data{Created}   = $Row[5];
+            $Data{CreatedBy} = $Row[6];
+            $Data{Changed}   = $Row[7];
+            $Data{ChangedBy} = $Row[8];
+            $Data{IDKey}     = $Self->{"Backend$Row[2]"}->{IDKey}     || q{};
+            $Data{NumberKey} = $Self->{"Backend$Row[2]"}->{NumberKey} || q{};
+        }
     }
 
     return %Data;
@@ -308,6 +388,100 @@ END
     }
 
     return %List;
+}
+
+sub TemplateExists {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        !$Param{TemplateID}
+        && !$Param{TemplateName}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed TemplateID or TemplateName!"
+            );
+        }
+        return;
+    }
+
+    # get the template data
+    my %Template = $Self->TemplateGet(
+        ID     => $Param{TemplateID},
+        Name   => $Param{TemplateName},
+        NoData => 1
+    );
+
+    if (
+        !%Template
+        && $Param{FallbackTemplate}
+    ) {
+        %Template = $Self->TemplateGet(
+            Name   => $Param{FallbackTemplate},
+            NoData => 1
+        );
+    }
+
+    return %Template;
+}
+
+sub _Compress {
+    my ( $Self, %Param ) = @_;
+
+    if ( !IsArrayRefWithData($Param{Files}) ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed Files!"
+            );
+        }
+        return;
+    }
+
+    my $ZipObject;
+    my $ZipResult;
+    my %ZipFilename = $Self->_ReplacePlaceholders(
+        String => 'Ticketlist-<TIME_YYYYMMDDhhmm>.zip'
+    );
+
+    for my $File ( @{$Param{Files}} ) {
+        if ( !$ZipObject ) {
+            $ZipObject = new IO::Compress::Zip(
+                \$ZipResult,
+                BinModeIn => 1,
+                Name      => $File->{Filename},
+            );
+
+            if ( !$ZipObject ) {
+                return $Self->_Error(
+                    Code    => 'Operation.InternalError',
+                    Message => 'Unable to create Zip object.',
+                );
+            }
+
+            $ZipObject->print( $File->{Content} );
+            $ZipObject->flush();
+        }
+        else {
+            $ZipObject->newStream( Name => $File->{Filename} );
+            $ZipObject->print( $File->{Content} );
+            $ZipObject->flush();
+        }
+    }
+
+    if ($ZipObject) {
+        $ZipObject->close();
+    }
+
+    my %ZipFile = (
+        Content     => $ZipResult,
+        Filename    => $ZipFilename{Text},
+        ContentType => 'application/zip',
+        FilesizeRaw => 0 + length $ZipResult,
+    );
+
+    return %ZipFile;
 }
 
 1;

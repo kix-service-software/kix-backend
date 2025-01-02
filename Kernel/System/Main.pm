@@ -22,6 +22,7 @@ use List::Util qw();
 use Storable;
 use Fcntl qw(:flock);
 use Time::HiRes;
+use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -1604,9 +1605,308 @@ sub GetCombinedListKeepOrder {
     return $Param{Union} ? @Union : @Isect;
 }
 
+=item ReplaceVariables()
+
+recursively replace variables with values
+
+    my $Result = $MainObject->ReplaceVariables(
+        Data      => {...},
+        Variables => {...},
+    );
+
+returns: the "Data" parameter with replaced variables
+
+=cut
+
+sub ReplaceVariables {
+    my ( $Self, %Param ) = @_;
+
+    return if !defined $Param{Data};
+
+    $Param{Variables} //= {};
+
+    if ( IsHashRefWithData($Param{Data}) ) {
+        foreach my $Key ( sort keys %{$Param{Data}} ) {
+            $Param{Data}->{$Key} = $Self->ReplaceVariables(
+                Data      => $Param{Data}->{$Key},
+                Variables => $Param{Variables}
+            );
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Data}) ) {
+        foreach my $Item ( @{$Param{Data}} ) {
+            $Item = $Self->ReplaceVariables(
+                Data      => $Item,
+                Variables => $Param{Variables}
+            );
+        }
+    }
+    else {
+        # init index for temp variables
+        my $VariableFilterValueIndex = 0;
+
+        # let leading be greedy - start with innermost variable
+        while ( $Param{Data} =~ /^(.*)(\$\{([-a-zA-Z0-9_.,: ]+)(?:\|((?:[^\{\}]+|\{(?-1)\})*))?\})(.*?)$/xs ) {
+            my $Leading    = $1;
+            my $Expression = $2;
+            my $Variable   = $3;
+            my $Filter     = $4;
+            my $Trailing   = $5;
+
+            my $Value = $Self->ResolveValueByKey(
+                Key  => $Variable,
+                Data => $Param{Variables},
+            );
+
+            if ( $Filter ) {
+                $Value = $Self->ApplyVariableFilters(
+                    Data             => $Value,
+                    FilterExpression => $Filter,
+                );
+            }
+
+            # variable is part of a string, we have to do a string replace
+            if ( $Leading || $Trailing ) {
+                # value is a data structure, replace with temp variable
+                if ( ref( $Value ) ) {
+                    # increment index
+                    $VariableFilterValueIndex += 1;
+
+                    # store value in variables
+                    $Self->{VariableFilterValue}->{ $VariableFilterValueIndex } = $Value;
+
+                    # replace current variable with variable filter value
+                    $Param{Data} =~ s/\Q$Expression\E/<VariableFilterValue$VariableFilterValueIndex>/gxs;
+                }
+                # replace value as string
+                else {
+                    $Param{Data} =~ s/\Q$Expression\E/$Value/gxs;
+                }
+            }
+            else {
+                # variable is an assignment, we can replace it with the actual value (i.e. Object)
+                $Param{Data} = $Value;
+            }
+        }
+    }
+
+    return $Param{Data};
+}
+
+=item ApplyVariableFilters()
+
+apply the given variable filters to the data
+
+    my $Result = $MainObject->ApplyVariableFilters(
+        Data             => {...},
+        FilterExpression => {...},
+    );
+
+=cut
+
+sub ApplyVariableFilters {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Data} if !$Param{FilterExpression};
+
+    my @Filters = split(/\|/, $Param{FilterExpression});
+
+    my $Value = $Param{Data};
+
+    foreach my $Filter ( @Filters ) {
+        # cleanup leading and trailing spaces
+        $Filter =~ s/^\s+|\s+$//;
+
+        # skip empty filter
+        next if !$Filter;
+
+        if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
+            if ( defined( $Value ) ) {
+                $Value = $Kernel::OM->Get('JSON')->Encode(
+                    Data => $Value
+                );
+                $Value =~ s/^"//;
+                $Value =~ s/"$//;
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need defined data!"
+                );
+            }
+        }
+        elsif ( $Filter =~ /^FromJSON$/i ) {
+            if ( IsStringWithData( $Value ) ) {
+                $Value = $Kernel::OM->Get('JSON')->Decode(
+                    Data => $Value
+                );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need string with data!"
+                );
+            }
+        }
+        elsif ( $Filter =~ /^jq\((.*)\)$/i ) {
+            my $JqExpression = $1;
+            if ( $JqExpression ) {
+                if ( IsStringWithData( $Value ) ) {
+                    $JqExpression =~ s/\s+::\s+/|/g;
+                    $JqExpression =~ s/&quot;/"/g;
+
+                    $Value = $Kernel::OM->Get('JSON')->Jq(
+                        Data   => $Value,
+                        Filter => $JqExpression,
+                    );
+                }
+                else {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "\"$Filter\" need string with data!"
+                    );
+                }
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" has no jq expression!"
+                );
+            }
+        }
+        elsif ( $Filter =~ /^(?:base64|ToBase64)$/i ) {
+            if ( defined( $Value ) ) {
+                $Value = MIME::Base64::encode_base64($Value);
+                $Value =~ s/\n//g;
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need defined data!"
+                );
+            }
+        }
+        elsif ( $Filter =~ /^FromBase64$/i ) {
+            if ( IsStringWithData( $Value ) ) {
+                $Value = MIME::Base64::decode_base64($Value);
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$Filter\" need string with data!"
+                );
+            }
+        }
+        else {
+            $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
+            my $Parameter = $+{parameter};
+
+            # check for stored variable filter value
+            if ( $Parameter && $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
+                my $VariableFilterValueIndex = $1;
+                $Parameter = $Self->ResolveValueByKey(
+                    Key  => $VariableFilterValueIndex,
+                    Data => $Self->{VariableFilterValue},
+                );
+            }
+
+            if ( !$Self->{VariableFilters}->{$Filter} ) {
+                # try to load the filter handler
+                $Self->_LoadVariableFilterHandler(
+                    Name => $Filter
+                );
+            }
+            if ( !$Self->{VariableFilters}->{$Filter} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown filter \"$Filter\"!"
+                );
+                return $Value;
+            }
+
+            $Value = $Self->{VariableFilters}->{$Filter}->(
+                $Self,
+                Value     => $Value,
+                Parameter => $Parameter
+            )
+        }
+    }
+
+    return $Value;
+}
+
 =begin Internal:
 
 =cut
+
+sub _LoadVariableFilterHandler {
+    my ( $Self, %Param ) = @_;
+
+    $Self->{VariableFilters} //= {};
+
+    my $VariableFilters = $Kernel::OM->Get('Config')->Get('Automation::VariableFilter');
+    if ( !IsHashRefWithData($VariableFilters) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No variable filter handlers registered!"
+        );
+        next;
+    }
+
+    my $Name = (split('\.', $Param{Name}, 2))[0];
+
+    if (!$VariableFilters->{$Name}) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No filter handler for filter \"$Param{Name}\" registered!"
+        );
+        next;
+    }
+    return if !$Self->Require($VariableFilters->{$Name});
+
+    my $Module = $VariableFilters->{$Name}->new( %{$Self} );
+    if ( !$Module ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Unable to create instance of $VariableFilters->{Name}!"
+        );
+        return;
+    }
+
+    if ( !$Module->can('GetFilterHandler') ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Module \"$VariableFilters->{$Name}\" cannot \"GetFilterHandler\"!"
+        );
+        next;
+    }
+
+    my %Handler = $Module->GetFilterHandler();
+
+    for my $HandlerName ( keys %Handler ) {
+        next if (!$HandlerName);
+        if (
+            !$Handler{$HandlerName} ||
+            ref $Handler{$HandlerName} ne 'CODE'
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "$HandlerName is no function!"
+            );
+            next;
+        }
+        $Self->{VariableFilters}->{$HandlerName} = $Handler{$HandlerName};
+
+        # TODO: better solution needed for filtername with mismatching name
+        # check filtername
+        if (
+            $HandlerName ne $Param{Name}
+            && lc( $HandlerName ) eq lc( $Param{Name} )
+        ) {
+            $Self->{VariableFilters}->{ $Param{Name} } = $Handler{ $HandlerName };
+        }
+    }
+}
 
 sub _Dump {
     my ( $Self, $Data ) = @_;

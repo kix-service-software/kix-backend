@@ -187,9 +187,8 @@ sub _PrepareValue {
     if (defined $Param{Config}->{DynamicFieldValue}) {
         my $Value = $Self->_ReplaceValuePlaceholder(
             %Param,
-            Translate                => 1,
-            Value                    => $Param{Config}->{DynamicFieldValue},
-            HandleKeyLikeObjectValue => 1,
+            Translate => 1,
+            Value     => $Param{Config}->{DynamicFieldValue}
         );
         if (IsArrayRefWithData($Value)) {
             @NewValue = @{$Value};
