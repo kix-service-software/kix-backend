@@ -395,6 +395,7 @@ sub _ArticleUpdate {
             # decode attachment content from base64
             if ($Attachment->{Filename} !~ m/^(?:file-[12]|pasted[-]\d+[-]\d+[.].*)$/smx) {
                 $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
+                $Attachment->{Disposition} //= 'attachment';
             }
             # extract embedded images from file-2
             elsif (
