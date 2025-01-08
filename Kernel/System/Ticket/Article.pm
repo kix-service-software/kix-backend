@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -294,16 +294,16 @@ sub ArticleCreate {
         $Param{Body} = 'No body';
     }
 
+    # get From by agent preference
+    if (!$Param{From} && $Param{SenderType} eq 'agent') {
+        $Param{From} = $Self->_GetFromByUser(
+            %Param,
+            Ticket => \%OldTicketData
+        )
+    }
+
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
-
-        # get From by agent preference
-        if (!$Param{From} && $Param{SenderType} eq 'agent') {
-            $Param{From} = $Self->_GetFromByUser(
-                %Param,
-                Ticket => \%OldTicketData
-            )
-        }
 
         # get From by ticket queue
         if (!$Param{From} && $Param{SenderType} eq 'system') {
@@ -2425,7 +2425,7 @@ sub ArticleFlagSet {
         );
 
         $Kernel::OM->Get('DB')->Prepare(
-            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
                 af.article_id = a.id AND article_key = ? AND af.create_by = ?',
             Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
             Limit => 1,
@@ -2458,7 +2458,7 @@ sub ArticleFlagSet {
         );
 
         $Kernel::OM->Get('DB')->Prepare(
-            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
                 af.article_id = a.id AND article_key = ? AND af.create_by = ?',
             Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
             Limit => 1,
