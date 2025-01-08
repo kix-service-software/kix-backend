@@ -27,7 +27,6 @@ use Kernel::System::Ticket::ArticleStorage;
 use Kernel::System::Ticket::TicketIndex;
 use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
-use Kernel::System::EmailParser;
 
 use vars qw(@ISA);
 
@@ -536,7 +535,7 @@ sub TicketCreate {
                 Silent => 1
             );
             if ($FoundOrgNumber) {
-                $ExistingOrganisationID = $Param{OrganisationID}
+                $ExistingOrganisationID = $Param{OrganisationID};
             }
         }
         if (!$ExistingOrganisationID) {
@@ -545,86 +544,39 @@ sub TicketCreate {
                 Silent => 1
             );
             if ($FoundOrgID) {
-                $ExistingOrganisationID = $FoundOrgID
+                $ExistingOrganisationID = $FoundOrgID;
             }
         }
     }
 
     # create contact if necessary
-    if ($Param{ContactID} ) {
-        if ($Param{ContactID} !~ /^\d+$/) {
-            $Self->{ParserObject} = Kernel::System::EmailParser->new(
-                Mode => 'Standalone',
+    if ( $Param{ContactID } ) {
+        if ( $Param{ContactID} !~ /^\d+$/ ) {
+            my $ContactID = $Kernel::OM->Get('Contact')->GetOrCreateID(
+                Email                 => $Param{ContactID},
+                PrimaryOrganisationID => $ExistingOrganisationID,
+                UserID                => $Param{UserID},
             );
-            my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
-                Email => $Param{ContactID},
-            );
-            my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
-                Email => $Param{ContactID},
-            );
-
-            if (!$ContactEmail && !$ContactEmailRealname) {
+            if ( !$ContactID ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message => 'No Contact ID or valid Email provided.',
+                    Message  => 'Could not get Contact for email "' . $Param{ContactID} . '"!'
                 );
-                $Param{ContactID} = undef;
-            } else {
-                my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
-
-                # find valid contact
-                my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                    Email  => $ContactEmail,
-                    Silent => 1,
-                    Valid  => 1
-                );
-
-                # find invalid contact as fallback
-                if (!$ExistingContactID) {
-                    $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                        Email  => $ContactEmail,
-                        Silent => 1
-                    );
-                }
-
-                # create if none was found
-                if (!$ExistingContactID) {
-                    $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                        Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                        Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
-                        Email                 => $ContactEmail,
-                        PrimaryOrganisationID => $ExistingOrganisationID,
-                        ValidID               => 1,
-                        UserID                => $Param{UserID}
-                    );
-                } else {
-                    $Param{ContactID} = $ExistingContactID;
-                }
-
-                # set organisation if not given
-                # FIXME: remove this with KIX2018-6884
-                if ($Param{ContactID} && !$Param{OrganisationID}) {
-                    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                        ID => $Param{ContactID},
-                    );
-                    if (
-                        IsHashRefWithData(\%ContactData)
-                        && $ContactData{PrimaryOrganisationID}
-                    ) {
-                        $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
-                    }
-                }
             }
-        } else {
+            elsif ( $Param{ContactID} !~ /^\d+$/ ) {
+                $Param{ContactID} = $ContactID;
+            }
+        }
+        
+        if ( $Param{ContactID} =~ /^\d+$/ ) {
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 ID     => $Param{ContactID},
                 Silent => 1,
             );
-            if (IsHashRefWithData(\%ContactData)) {
-
+            if ( IsHashRefWithData( \%ContactData ) ) {
                 # set organisation if not given at all (also no unknown)
                 # FIXME: remove this with KIX2018-6884
-                if ($ContactData{PrimaryOrganisationID} && !$Param{OrganisationID}) {
+                if ( $ContactData{PrimaryOrganisationID} && !$Param{OrganisationID} ) {
                     $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
                 }
             } else {
