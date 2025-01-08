@@ -159,17 +159,7 @@ sub Run {
         }
     }
 
-    # get sender email
-    my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
-        Line => $GetParam{'X-KIX-From'} || $GetParam{From},
-    );
-    for my $Address (@EmailAddresses) {
-        $GetParam{SenderEmailAddress} = $Self->{ParserObject}->GetEmailAddress(
-            Email => $Address,
-        );
-    }
-
-    # get customer id if X-KIX-Organisation is given
+    # get organisation id if X-KIX-Organisation is given
     if ( $GetParam{'X-KIX-Organisation'} ) {
 
         # check if it is a valid Organisation
@@ -180,11 +170,6 @@ sub Run {
         if ($ID) {
             $GetParam{'X-KIX-Organisation'}  = $ID;
         }
-    }
-
-    # if there is still no customer user found, take the senders email address
-    if ( !$GetParam{'X-KIX-Contact'} ) {
-        $GetParam{'X-KIX-Contact'} = $GetParam{SenderEmailAddress} || '';
     }
 
     # get ticket owner
@@ -256,6 +241,47 @@ sub Run {
         $Opts{ResponsibleID} = $Param{InmailUserID};
     }
 
+    # handle contacts in sender email
+    my @EmailAddresses = $Self->{ParserObject}->SplitAddressLine(
+        Line => $GetParam{'X-KIX-From'} || $GetParam{From},
+    );
+    for my $Address ( @EmailAddresses ) {
+        my $ContactID = $Kernel::OM->Get('Contact')->GetOrCreateID(
+            ParserObject          => $Self->{ParserObject},
+            Email                 => $Address,
+            PrimaryOrganisationID => $GetParam{'X-KIX-Organisation'},
+            UserID                => $Param{InmailUserID},
+        );
+        if ( !$ContactID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Could not get Contact for email "' . $Address . '"!'
+            );
+        }
+        elsif ( !$Opts{ContactID} ) {
+            $Opts{ContactID} = $ContactID;
+        }
+    }
+
+    # get contact id if X-KIX-Contact is given
+    if ( $GetParam{'X-KIX-Contact'} ) {
+        my $ContactID = $Kernel::OM->Get('Contact')->GetOrCreateID(
+            ParserObject          => $Self->{ParserObject},
+            Email                 => $GetParam{'X-KIX-Contact'},
+            PrimaryOrganisationID => $GetParam{'X-KIX-Organisation'},
+            UserID                => $Param{InmailUserID},
+        );
+        if ( !$ContactID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Could not get Contact for email "' . $GetParam{'X-KIX-Contact'} . '"!'
+            );
+        }
+        else {
+            $Opts{ContactID} = $ContactID;
+        }
+    }
+
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
@@ -270,7 +296,6 @@ sub Run {
         State           => $State,
         TypeID          => $TypeID,
         OrganisationID  => $GetParam{'X-KIX-Organisation'},
-        ContactID       => $GetParam{'X-KIX-Contact'},
         OwnerID         => $GetParam{'X-KIX-OwnerID'} || $Param{InmailUserID},
         UserID          => $Param{InmailUserID},
         %Opts,
