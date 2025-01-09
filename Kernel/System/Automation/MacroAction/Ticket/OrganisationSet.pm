@@ -53,6 +53,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Organisation'),
         Description => Kernel::Language::Translatable('The ID or number of the organisation to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -81,7 +85,7 @@ sub Run {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,22 +93,17 @@ sub Run {
         return;
     }
 
-    my $Organisation = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{OrganisationNumberOrID}
-    );
-
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-        Number => $Organisation,
+        Number => $Param{Config}->{OrganisationNumberOrID},
         Silent => 1
     );
-    if ( !$OrganisationID && $Organisation =~ m/^\d+$/ ) {
+    if ( !$OrganisationID && $Param{Config}->{OrganisationNumberOrID} =~ m/^\d+$/ ) {
         my $OrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-            ID     => $Organisation,
+            ID     => $Param{Config}->{OrganisationNumberOrID},
             Silent => 1
         );
         if ($OrgNumber) {
-            $OrganisationID = $Organisation;
+            $OrganisationID = $Param{Config}->{OrganisationNumberOrID};
         }
     }
 
@@ -122,7 +121,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketCustomerSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketCustomerSet(
         TicketID       => $Param{TicketID},
         OrganisationID => $OrganisationID,
         UserID         => $Param{UserID}

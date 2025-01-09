@@ -53,6 +53,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Type'),
         Description => Kernel::Language::Translatable('The name of the type to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,9 +83,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,14 +91,9 @@ sub Run {
         return;
     }
 
-    my $Type = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{Type}
-    );
-
     # set the new type
     my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
-        Type => $Type,
+        Type => $Param{Config}->{Type},
     );
 
     if ( !$TypeID ) {
@@ -113,7 +110,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketTypeSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketTypeSet(
         TicketID => $Param{TicketID},
         TypeID   => $TypeID,
         UserID   => $Param{UserID},

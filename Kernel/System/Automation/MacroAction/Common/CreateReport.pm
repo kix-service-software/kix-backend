@@ -57,6 +57,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Parameters'),
         Description => Kernel::Language::Translatable('The parameters of the report as a HashRef.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'OutputFormats',
@@ -110,22 +114,6 @@ sub Run {
             UserID   => $Param{UserID}
         );
         return;
-    }
-
-    # replace placeholders - atm only for ticket
-    if ( IsHashRefWithData($Param{Config}->{Parameters}) ) {
-        foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
-            $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-                RichText  => 0,
-                Text      => $Param{Config}->{Parameters}->{$Parameter},
-                Data      => {},
-                UserID    => $Param{UserID},
-                Translate => 0,
-
-                # FIXME: as common action, object id could be not a ticket!
-                TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
-            );
-        }
     }
 
     # create Report

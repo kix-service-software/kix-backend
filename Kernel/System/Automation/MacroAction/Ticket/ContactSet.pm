@@ -53,6 +53,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Contact'),
         Description => Kernel::Language::Translatable('The ID or email (or Login of the corresponding user) of the contact to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,9 +83,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,23 +91,18 @@ sub Run {
         return;
     }
 
-    my $Contact = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{ContactEmailOrID}
-    );
-
     my $ContactID;
-    if ( $Contact =~ m/^\d+$/ ) {
+    if ( $Param{Config}->{ContactEmailOrID} =~ m/^\d+$/ ) {
         my $ContactMail = $Kernel::OM->Get('Contact')->ContactLookup(
-            ID     => $Contact,
+            ID     => $Param{Config}->{ContactEmailOrID},
             Silent => 1
         );
         if ($ContactMail) {
-            $ContactID = $Contact;
+            $ContactID = $Param{Config}->{ContactEmailOrID};
         }
     } else {
         $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-            Email  => $Contact,
+            Email  => $Param{Config}->{ContactEmailOrID},
             Silent => 1
         );
     }
@@ -113,7 +110,7 @@ sub Run {
     if ( !$ContactID ) {
         # try to find a contact with this user login
         my $UserID = $Kernel::OM->Get('User')->UserLookup(
-           UserLogin => $Contact,
+           UserLogin => $Param{Config}->{ContactEmailOrID},
            Silent    => 1,
         );
         if ( $UserID ) {
@@ -127,7 +124,7 @@ sub Run {
     if (!$ContactID) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "Couldn't update ticket $Param{TicketID} - no contact found with \"$Contact\" (\"$Param{Config}->{ContactEmailOrID}\")",
+            Message  => "Couldn't update ticket $Param{TicketID} - no contact found with \"$Param{Config}->{ContactEmailOrID}\"",
             UserID   => $Param{UserID}
         );
         return;
@@ -143,7 +140,7 @@ sub Run {
     );
     my $OrganisationID = $Contact{PrimaryOrganisationID};
 
-    my $Success = $TicketObject->TicketCustomerSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketCustomerSet(
         TicketID       => $Param{TicketID},
         OrganisationID => $OrganisationID,
         ContactID      => $ContactID,

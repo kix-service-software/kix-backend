@@ -68,17 +68,6 @@ Encode a perl data structure to a JSON string.
 sub Encode {
     my ( $Self, %Param ) = @_;
 
-    # check for needed data
-    if ( !defined $Param{Data} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need Data!',
-            );
-        }
-        return;
-    }
-
     # create json object
     my $JSONObject = JSON::MaybeXS->new();
 

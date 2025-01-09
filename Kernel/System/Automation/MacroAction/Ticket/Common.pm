@@ -69,14 +69,6 @@ sub _CheckParams {
     return 1;
 }
 
-sub _ReplaceValuePlaceholder {
-    my ( $Self, %Param ) = @_;
-
-    %Param = $Self->_PrepareEventData(%Param);
-
-    return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
-}
-
 sub _PrepareEventData {
     my ( $Self, %Param ) = @_;
 

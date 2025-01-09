@@ -51,6 +51,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Value'),
         Description => Kernel::Language::Translatable('The value to assign.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     $Self->AddResult(
@@ -82,13 +86,6 @@ sub Run {
 
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
-
-    foreach my $Key (keys %{$Param{Config}}) {
-        $Param{Config}->{$Key} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{$Key}
-        );
-    }
 
     # set the variable
     $Self->SetResult(Name => 'Variable', Value => $Param{Config}->{Value});

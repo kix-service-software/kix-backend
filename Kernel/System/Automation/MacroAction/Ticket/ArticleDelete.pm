@@ -51,6 +51,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('ArticleID'),
         Description => Kernel::Language::Translatable('(Required) ID of the article which should be deleted.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,16 +83,6 @@ sub Run {
 
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
-
-    # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(ArticleID) ) {
-        next if !defined $Param{Config}->{$Attribute};
-
-        $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{$Attribute}
-        );
-    }
 
     my %Article;
     if ($Param{Config}->{ArticleID} =~ /^\d+$/) {
