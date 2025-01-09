@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Text::ParseWords;
+use File::Basename;
 
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
@@ -23,11 +24,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::ClientRegistration
+Kernel::System::Autostart
 
 =head1 SYNOPSIS
 
-Add address book functions.
+All autostart functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -37,7 +38,7 @@ Add address book functions.
 
 =item new()
 
-create a Autostart object.
+create an Autostart object.
 
 =cut
 
@@ -66,16 +67,41 @@ Run autostart.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    print STDERR "executing autostart scripts...\n";
+
     my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
-    my @Files = $Kernel::OM->Get('Main')->DirectoryRead(
-        Directory => $Home.'/autostart',
-        Filter    => '*'
+    # add framework
+    my @Directories = (
+        $Home.'/autostart'
     );
+
+    # add plugin folders
+    my @Plugins = $Kernel::OM->Get('Installation')->PluginList(
+        Valid => 1,
+    );
+    foreach my $Plugin ( @Plugins ) {
+        my $Directory = $Plugin->{Directory}.'/autostart';
+        next if ! -e $Directory;
+
+        push @Directories, $Directory;
+    }
+
+    my @Files;
+    foreach my $Directory ( @Directories ) {
+        my @FilesInDir = $Kernel::OM->Get('Main')->DirectoryRead(
+            Directory => $Directory,
+            Filter    => '*'
+        );
+
+        push @Files, @FilesInDir;
+    }
 
     foreach my $File ( sort @Files ) {
 
         next if ($File =~ m/\.old$/); # ignore "old" files (dev environment, module-linker)
+
+        print STDERR "  executing ".(basename $File)."\n";
 
         my $Content = $Kernel::OM->Get('Main')->FileRead(
             Location => $File,
@@ -108,6 +134,8 @@ sub Run {
 
             # replace leading and trailing spaces
             $Line =~ s/(^\s+|\s+$)//g;
+
+            print STDERR "    executing command: $Line\n";
 
             my @Command = Text::ParseWords::quotewords('\s+', 0, $Line);
 

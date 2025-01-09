@@ -8883,8 +8883,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K18SSPDECommunity/Handbuch</Item>
-                <Item Key="en">https://docs.kixdesk.com/display/KIX18SelfServicePortalENCommunity/Manual</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8894,8 +8894,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1ACU/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18UserManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/anwender.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/anwender.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8905,8 +8905,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1AD/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18AdminManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/admin.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/admin.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
