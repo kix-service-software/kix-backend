@@ -1148,10 +1148,7 @@ Example:
 sub _ReplaceValuePlaceholder {
     my ( $Self, %Param ) = @_;
 
-    return $Param{Value} if (
-        !$Param{Value}
-        || $Param{Value} !~ m/(<|&lt;)KIX_/
-    );
+    return $Param{Value} if ( !$Param{Value} );
 
     my $Data = $Self->{EventData} || {};
     if ( IsHashRefWithData( $Param{Data} ) ) {
@@ -1290,6 +1287,11 @@ sub _ReplacePlaceholderHashRef {
 
 sub _ReplacePlaceholderString {
     my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if (
+        !$Param{Value}
+        || $Param{Value} !~ m/(<|&lt;)KIX_/
+    );
 
     $Param{Value} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         Text            => $Param{Value},
