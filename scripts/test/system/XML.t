@@ -215,7 +215,7 @@ $Self->True(
 );
 
 # enter the @XMLHash into the database, retrieve and delete it
-for my $Key ( 'Some\'Key', '123' ) {
+for my $Key ( 123, 5000000000 ) {
     my $XMLHashAdd = $XMLObject->XMLHashAdd(
         Type    => 'SomeType',
         Key     => $Key,
@@ -548,7 +548,7 @@ for my $Key (@Keys) {
         OldType => 'SomeType',
         OldKey  => $Key,
         NewType => 'SomeTypeNew',
-        NewKey  => $Key . 'New',
+        NewKey  => $Key + 10000,
     );
     $Self->True(
         $XMLHashMove,

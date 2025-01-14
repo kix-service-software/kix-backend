@@ -1491,8 +1491,16 @@ sub GetOrCreateID {
         return;
     }
 
-    # lookup existing contact
+    # lookup existing valid contact
     my $ContactID = $Self->ContactLookup(
+        Email  => $ContactEmail,
+        Silent => 1,
+        Valid  => 1
+    );
+    return $ContactID if ( $ContactID );
+
+    # lookup existing invalid contact
+    $ContactID = $Self->ContactLookup(
         Email  => $ContactEmail,
         Silent => 1
     );

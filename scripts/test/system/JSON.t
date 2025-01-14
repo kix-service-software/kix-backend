@@ -21,7 +21,7 @@ my $JSONObject = $Kernel::OM->Get('JSON');
 my @Tests = (
     {
         Input  => undef,
-        Result => undef,
+        Result => 'null',
         Name   => 'JSON - undef test',
         Silent => 1,
     },
