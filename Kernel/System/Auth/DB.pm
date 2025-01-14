@@ -41,6 +41,11 @@ sub new {
     $Self->{UserTableUserPW} = $Param{Config}->{Columns}->{Password} || 'pw';
     $Self->{UserTableUser} = $Param{Config}->{Columns}->{Login} || 'login';
 
+    $Self->{Lower} = '';
+    if ( $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive') ) {
+        $Self->{Lower} = 'LOWER';
+    }
+
     return $Self;
 }
 
@@ -84,13 +89,18 @@ sub Auth {
     }
 
     # get crypted password from database
+    my $UserLogin = lc($User);
     my $SQL = "SELECT $Self->{UserTableUserPW}, $Self->{UserTableUserID}, $Self->{UserTableUser} "
         . " FROM "
         . " $Self->{UserTable} "
         . " WHERE "
         . " valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} ) AND "
-        . " $Self->{UserTableUser} = '" . $Kernel::OM->Get('DB')->Quote($User) . "'";
-    $Kernel::OM->Get('DB')->Prepare( SQL => $SQL );
+        . " $Self->{Lower}($Self->{UserTableUser}) = ?";
+    $Kernel::OM->Get('DB')->Prepare(
+        SQL   => $SQL,
+        Bind  => [ \$UserLogin ],
+        Limit => 1,
+    );
 
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $GetPw  = $Row[0];

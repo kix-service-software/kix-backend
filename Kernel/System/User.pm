@@ -1155,9 +1155,11 @@ return 1 if another user with this login (username) already exists
 sub UserLoginExistsCheck {
     my ( $Self, %Param ) = @_;
 
+    my $UserLogin = lc $Param{UserLogin};
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{UserTableUser} = ?",
-        Bind => [ \$Param{UserLogin} ],
+        SQL => "SELECT $Self->{UserTableUserID} FROM $Self->{UserTable} WHERE $Self->{Lower}($Self->{UserTableUser}) = ?",
+        Bind => [ \$UserLogin ],
     );
 
     # fetch the result
