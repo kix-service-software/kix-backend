@@ -1356,25 +1356,25 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'DefinitionUpdate',
                     HistoryTypeID => 8,
-                    Comment       => 'Definition des ConfigItems aktualisiert (ID=' . $ConfigItemDefinitionIDs[0] . ')',
+                    Comment       => 'Definition des ConfigItem aktualisiert (ID=' . $ConfigItemDefinitionIDs[0] . ')',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'NameUpdate',
                     HistoryTypeID => 5,
-                    Comment       => 'UnitTest - HistoryTest%%',
+                    Comment       => 'Name geändert (neu=UnitTest; alt=)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Operational} . '; alt=)',
+                    Comment       => 'Vorfallsstatus geändert (neu=Operational; alt=)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Planned} . '; alt=)',
+                    Comment       => 'Verwendungsstatus geändert (neu=Planned; alt=)',
                     CreateBy      => 1,
                 },
                 {
@@ -1391,13 +1391,13 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Incident} . '; alt=' . $InciStateListReverse{Operational} . ')',
+                    Comment       => 'Vorfallsstatus geändert (neu=Incident; alt=Operational)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Maintenance} . '; alt=' . $DeplStateListReverse{Planned} . ')',
+                    Comment       => 'Verwendungsstatus geändert (neu=Maintenance; alt=Planned)',
                     CreateBy      => 1,
                 },
             ],

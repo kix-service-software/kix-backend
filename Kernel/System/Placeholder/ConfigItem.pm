@@ -78,6 +78,7 @@ sub _Replace {
         ) {
             $Version = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                 ConfigItemID => $ConfigItem->{ConfigItemID},
+                XMLDataGet   => 1,
             ) || {};
         }
     }
@@ -114,6 +115,37 @@ sub _Replace {
     if ( IsHashRefWithData($Version) ) {
         # clone it, do not change original
         $Version = $Kernel::OM->Get('Storable')->Clone(Data => $Version);
+
+        # handle CurrentVersion placeholder
+        my $CurrentVersionTag = $Tag . 'CurrentVersion_';
+        my @Attributes = $Param{Text} =~ m/\Q$CurrentVersionTag\E(.*?)$Self->{End}/g;
+        for my $Attribute (@Attributes) {
+            my $ReplaceString = '';
+
+            # handle xml attributes
+            if ($Attribute =~ m/Data_(.+)/) {
+                my $XMLKey = $1;
+                my $Values = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeValuesByKey(
+                    KeyName       => $XMLKey,
+                    XMLData       => $Version->{XMLData}->[1]->{Version}->[1],
+                    XMLDefinition => $Version->{XMLDefinition},
+                );
+
+                if ( IsArrayRefWithData($Values) ) {
+                    $ReplaceString = $Values->[0];
+                }
+            }
+            # handle version attributes
+            elsif (
+                $Attribute ne 'XMLData'
+                && $Attribute ne 'XMLDefinition'
+                && defined( $Version->{ $Attribute } )
+            ) {
+                $ReplaceString = $Version->{ $Attribute };
+            }
+
+            $Param{Text} =~ s/\Q$CurrentVersionTag$Attribute\E$Self->{End}/$ReplaceString/g;
+        }
 
         my $TopLevelAttributes = $Self->_GetTopLevelAttributes(Version => $Version) || [];
         my $CheckList = join('|',@{$TopLevelAttributes});

@@ -18,6 +18,13 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# set fixed time for test
+$Helper->FixedTimeSet(
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => '2014-01-01 14:00:00',
+    ),
+);
+
 # begin transaction on database
 $Helper->BeginWork();
 

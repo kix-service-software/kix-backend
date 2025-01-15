@@ -52,7 +52,11 @@ sub Describe {
         Name        => 'Team',
         Label       => Kernel::Language::Translatable('Team'),
         Description => Kernel::Language::Translatable('The name of the team to be set. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. "NameOfParentTeam::NameOfTeamToBeSet").'),
-        Required    => 1
+        Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,9 +83,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,24 +91,19 @@ sub Run {
         return;
     }
 
-    my $Team = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{Team}
-    );
-
     # set the new team
     my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
-        Queue => $Team,
+        Queue  => $Param{Config}->{Team},
         Silent => 1
     );
 
-    if (!$QueueID && $Team =~ m/^\d+$/) {
+    if (!$QueueID && $Param{Config}->{Team} =~ m/^\d+$/) {
         my $QueueName = $Kernel::OM->Get('Queue')->QueueLookup(
-            QueueID => $Team,
+            QueueID => $Param{Config}->{Team},
             Silent => 1
         );
         if ($QueueName) {
-            $QueueID = $Team;
+            $QueueID = $Param{Config}->{Team};
         }
     }
 
@@ -124,7 +121,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketQueueSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketQueueSet(
         TicketID => $Param{TicketID},
         QueueID  => $QueueID,
         UserID   => $Param{UserID},
