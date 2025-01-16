@@ -381,4 +381,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ObjectIconValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::ObjectIconValidator</Item>
+                <Item Key="Validates">Content</Item>
+                <Item Key="ConsiderOperationRegEx">ObjectIconCreate|ObjectIconUpdate</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

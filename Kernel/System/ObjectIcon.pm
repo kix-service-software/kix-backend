@@ -11,6 +11,9 @@ package Kernel::System::ObjectIcon;
 use strict;
 use warnings;
 
+use bytes;
+use MIME::Base64;
+
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
@@ -170,6 +173,8 @@ sub ObjectIconAdd {
         }
     }
 
+    return if !$Self->ObjectIconValidate( %Param );
+
     my $DBObject = $Kernel::OM->Get('DB');
 
     # do the db insert...
@@ -263,6 +268,8 @@ sub ObjectIconUpdate {
             return;
         }
     }
+
+    return if !$Self->ObjectIconValidate( %Param );
 
     # do the db insert...
     my $DBUpdate = $Kernel::OM->Get('DB')->Do(
@@ -439,6 +446,46 @@ sub ObjectIconDelete {
         Namespace => 'ObjectIcon',
         ObjectID  => $Param{ID},
     );
+
+    return 1;
+}
+
+sub ObjectIconValidate {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(Content) ) {
+        if ( !IsString( $Param{ $Needed } ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # check size
+    my $MaxAllowedSize = $Kernel::OM->Get('Config')->Get('ObjectIcon::MaxAllowedSize');
+    my $ContentSize = bytes::length( MIME::Base64::decode_base64( $Param{Content} ) );
+    if ( !$ContentSize ) {
+        $Kernel::OM->Get('Log')->Log( 
+            Priority => 'error', 
+            Message  => 'Content is empty!',
+            Silent   => $Param{Silent}
+        );
+
+        return;
+    }
+    elsif ( $ContentSize > $MaxAllowedSize ) {
+        $Kernel::OM->Get('Log')->Log( 
+            Priority => 'error', 
+            Message  => "Size exceeds maximum allowed size ($MaxAllowedSize bytes)!",
+            Silent   => $Param{Silent}
+        );
+
+        return;
+    }
 
     return 1;
 }
