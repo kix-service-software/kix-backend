@@ -453,13 +453,18 @@ sub InitProgress {
 
     if ( !IsHashRefWithData($MigrationState->{State}->{Progress}->{$Param{Type}}) ) {
         my %Progress = (
-            ElapsedTime => 0,
-            Current     => 0,
-            ItemCount   => $Param{ItemCount},
-            OK          => 0,
-            Error       => 0,
-            Ignored     => 0,
-            Status      => Kernel::Language::Translatable('pending'),
+            ElapsedTime   => 0,
+            Current       => 0,
+            ItemCount     => $Param{ItemCount},
+            OK            => 0,
+            Error         => 0,
+            Ignored       => 0,
+            Status        => Kernel::Language::Translatable('pending'),
+            ForecastCount => 0,
+            ForecastTime  => 0,
+            PreviousCount => 0,
+            PreviousTime  => 0,
+
         );
         $MigrationState->{State}->{Progress}->{$Param{Type}} = \%Progress;
     }
@@ -487,9 +492,19 @@ sub UpdateProgress {
     $Progress->{ElapsedTime} = Time::HiRes::time() - $Progress->{StartTime};
     $Progress->{Status}      = Kernel::Language::Translatable('in progress');
 
+    if ( ( $Progress->{ElapsedTime} - $Progress->{PreviousTime} ) > 30 ) {
+        # use previous count and time for forecast correction
+        $Progress->{ForecastCount} = $Progress->{PreviousCount};
+        $Progress->{ForecastTime}  = $Progress->{PreviousTime};
+
+        # update previous data
+        $Progress->{PreviousCount} = $Progress->{Current};
+        $Progress->{PreviousTime}  = $Progress->{ElapsedTime};
+    }
+
     if ( $Progress->{ElapsedTime} > 10 ) {
         # add forecast after 10 seconds
-        $Progress->{AvgPerMinute} = $Progress->{Current} / $Progress->{ElapsedTime} * 60;
+        $Progress->{AvgPerMinute} = ( $Progress->{Current} - $Progress->{ForecastCount} ) / ( $Progress->{ElapsedTime} - $Progress->{ForecastTime} ) * 60;
 
         my $TimeRemaining = ($Progress->{ItemCount} - $Progress->{Current}) / $Progress->{AvgPerMinute} * 60;
         my $RemainingHours = int($TimeRemaining / 3600);
