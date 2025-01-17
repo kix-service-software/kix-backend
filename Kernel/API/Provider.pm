@@ -395,7 +395,9 @@ sub Run {
         );
     }
 
-    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, TimeDiff($Self->{Metric}->{StartTime}));
+    if ( $Self->{Debug} ) {
+        $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, TimeDiff($Self->{Metric}->{StartTime}));
+    }
 
     return;
 }
