@@ -118,7 +118,11 @@ sub Run {
     $Object->SetDefinition($Param{Config}->{Definition});
 
     # return the object
-    $Self->SetResult(Name => 'Object', Value => $Object);
+    $Self->SetResult(
+        Name   => 'Object',
+        Value  => $Object,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

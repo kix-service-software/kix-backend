@@ -107,7 +107,11 @@ sub Run {
 
     foreach my $Value ( @ValueList ) {
         if ( $Param{Config}->{LoopVariable} ) {
-            $Self->SetResult(Name => $Param{Config}->{LoopVariable}, Value => $Value);
+            $Self->SetResult(
+                Name   => $Param{Config}->{LoopVariable},
+                Value  => $Value,
+                UserID => $Param{UserID}
+            );
         }
 
         my $Result = $AutomationObject->MacroExecute(

@@ -163,7 +163,11 @@ sub Run {
     }
 
     # return the report
-    $Self->SetResult(Name => 'Report', Value => \%Report);
+    $Self->SetResult(
+        Name   => 'Report',
+        Value  => \%Report,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }
