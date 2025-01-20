@@ -1362,7 +1362,7 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'NameUpdate',
                     HistoryTypeID => 5,
-                    Comment       => 'Name geändert (neu=UnitTest; alt=)',
+                    Comment       => 'Name geändert (neu=UnitTest - HistoryTest; alt=)',
                     CreateBy      => 1,
                 },
                 {
