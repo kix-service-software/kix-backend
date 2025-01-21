@@ -1857,8 +1857,8 @@ sub _FindChangedXMLValues {
     # do the check
     my %UpdateValues;
     for my $TagKey ( sort keys %UniqueTagKeys ) {
-        my $NewContent = eval '$NewXMLData' . $TagKey . '->{Content}' || '';      ## no critic
-        my $OldContent = eval '$OldXMLData->' . $TagKey . '->{Content}' || '';    ## no critic
+        my $NewContent = eval '$NewXMLData' . $TagKey . '->{Content}' // '';      ## no critic
+        my $OldContent = eval '$OldXMLData->' . $TagKey . '->{Content}' // '';    ## no critic
 
         if ( $NewContent ne $OldContent ) {
 

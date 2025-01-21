@@ -777,7 +777,7 @@ sub ConvertDataToExternal {
                 delete $ArrayItem->{TagKey};
 
                 # get content from entry
-                my $Content = delete $ArrayItem->{Content} || '';
+                my $Content = delete $ArrayItem->{Content} // '';
 
                 # check if we have a special handling method to prepare the value
                 if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('ExternalValuePrepare') ) {
