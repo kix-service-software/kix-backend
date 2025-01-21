@@ -217,7 +217,7 @@ sub _PrepareData {
         my $ItemKey = $DefItem->{Key};
 
         # don't look at details if we don't have any value for this
-        next if ( !$Data->{ $ItemKey } );
+        next if ( !defined( $Data->{ $ItemKey } ) );
 
         # ignore attribute if user is logged in as Customer and attribute should not be visible
         next if (

@@ -4377,6 +4377,52 @@ my @ImportDataTests = (
             },
         },
     },
+
+    # 48 import a zero value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # zero should be used as new value for Text1
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[0],
+                EmptyFieldsLeaveTheOldValues => '1',
+            },
+            MappingObjectData => [
+                {
+                    Key        => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Text1::1',
+                },
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[25],
+                ImportDataRow => [
+                    'UnitTest - Importtest 5',
+                    'Production',
+                    'Operational',
+                    '0',
+                ],
+                UserID        => 1,
+                UsageContext  => 'Agent',
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 6,
+            LastVersion   => {
+                Name                 => 'UnitTest - Importtest 5',
+                DeplState            => 'Production',
+                InciState            => 'Operational',
+                'Text1::1'           => '0',
+            },
+        },
+    },
 );
 
 # ------------------------------------------------------------ #
