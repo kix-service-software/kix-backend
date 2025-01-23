@@ -87,6 +87,9 @@ sub new {
         $Self->{$Needed} = $Param{$Needed};
     }
 
+    $Self->{Debug}           = $Kernel::OM->Get('Config')->Get('API::Debug');
+    $Self->{PermissionDebug} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
+
     $Self->{CallingOperationType} = $Param{CallingOperationType};
 
     # check operation
@@ -255,7 +258,9 @@ sub Run {
     # start the backend
     my $Result = $Self->{BackendObject}->RunOperation(%Param);
 
-    $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", TimeDiff($StartTime)));
+    if ( $Self->{Debug} ) {
+        $Self->_Debug($Self->{LevelIndent}, sprintf("execution took %i ms", TimeDiff($StartTime)));
+    }
 
     return $Result;
 }
@@ -320,7 +325,10 @@ sub _CheckPermission {
 
     my $StartTime = Time::HiRes::time();
 
-    $Self->_PermissionDebug($Self->{LevelIndent}, "permission check (Resource)");
+    if ( $Self->{PermissionDebug} ) {
+        $Self->_PermissionDebug($Self->{LevelIndent}, "permission check (Resource)");
+    }
+
     my $OldLevelIndent = $Self->{LevelIndent};
     $Self->{LevelIndent} .= '    ';
 
@@ -351,7 +359,9 @@ sub _CheckPermission {
 
     # return false if access is explicitly denied by token
     if ( !$Access ) {
-        $Self->_PermissionDebug($Self->{LevelIndent}, "RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
+        if ( $Self->{PermissionDebug} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, "RequestURI: $Self->{RequestURI}, requested permission: $RequestedPermission --> permission denied by token");
+        }
         $Self->{LevelIndent} = $OldLevelIndent;
         return;
     }
@@ -363,7 +373,6 @@ sub _CheckPermission {
     my $Granted = 0;
     my $AllowedPermission;
     my @GrantedResources;
-    my $PermissionDebug = $Kernel::OM->Get('Config')->Get('Permission::Debug');
 
     foreach my $Resource ( @Resources ) {
         $Kernel::OM->Get('User')->{LevelIndent} = $Self->{LevelIndent};
@@ -374,7 +383,7 @@ sub _CheckPermission {
                 RequestedPermission => $RequestedPermission
         );
 
-        if ( $PermissionDebug ) {
+        if ( $Self->{PermissionDebug} ) {
             my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                 Value  => $AllowedPermission || 0,
                 Format => 'Short'
@@ -393,7 +402,7 @@ sub _CheckPermission {
     if ( scalar(@Resources) > 1 && scalar(@GrantedResources) > 0 && scalar(@GrantedResources) < scalar(@Resources) ) {
         $Granted = 1;
         $Self->{AlteredRequestURI} = $ResourceBase.join(',', @GrantedResources);
-        if ( $PermissionDebug ) {
+        if ( $Self->{PermissionDebug} ) {
             my $AllowedPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
                 Value  => $AllowedPermission || 0,
                 Format => 'Short'
@@ -412,7 +421,9 @@ sub _CheckPermission {
     }
 
     $Self->{LevelIndent} = $OldLevelIndent;
-    $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+    if ( $Self->{PermissionDebug} ) {
+       $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+    }
 
     # OPTIONS requests are always possible
     $Granted = 1 if ( $Self->{RequestMethod} eq 'OPTIONS' );
@@ -423,7 +434,7 @@ sub _CheckPermission {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if !$Kernel::OM->Get('Config')->Get('API::Debug');
+    return if !$Self->{Debug};
 
     $Indent ||= '';
 
@@ -433,7 +444,7 @@ sub _Debug {
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if !$Kernel::OM->Get('Config')->Get('Permission::Debug');
+    return if !$Self->{PermissionDebug};
 
     $Indent ||= '';
 

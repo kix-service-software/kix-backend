@@ -6,6 +6,7 @@
         <Setting>
             <Array>
                 <Item>\/system\/config\/Authentication###.*?</Item>
+                <Item>\/workflows/evaluation</Item>
             </Array>
         </Setting>
     </ConfigItem>
