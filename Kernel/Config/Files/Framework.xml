@@ -9212,4 +9212,11 @@ Notes:
             </String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="external" Name="ObjectIcon::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <Description Translatable="1">Defines the maximal size (in bytes) for icon uploads. Default: 32K</Description>
+        <Setting>
+            <String Regex="^[0-9]{1,11}$">32768</String>
+        </Setting>
+    </ConfigItem>
 </kix_config>
