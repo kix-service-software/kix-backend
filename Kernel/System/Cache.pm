@@ -60,9 +60,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # 0=off; 1=set+get_cache; 2=+delete+get_request;
-    $Self->{Debug} = $Param{Debug} || 0;
-
     # Store backend in $Self for fastest access.
     $Self->{CacheObject} = $Kernel::OM->Get($Param{Backend} || 'Kernel::System::Cache::Redis');
 
@@ -155,6 +152,11 @@ sub Set {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !defined $Self->{Debug} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    }
+
     # set default TTL to 20 days
     $Param{TTL} //= 60 * 60 * 24 * 20;
 
@@ -193,15 +195,19 @@ sub Set {
 
             if ( !exists $Self->{TypeDependencies}->{$Type} || !exists $Self->{TypeDependencies}->{$Type}->{$Param{Type}} ) {
                 $Changed = 1;
-                $Self->_Debug('', "adding dependent cache type \"$Param{Type}\" to cache type \"$Type\".");
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug('', "adding dependent cache type \"$Param{Type}\" to cache type \"$Type\".");
+                }
                 $Self->{TypeDependencies}->{$Type}->{$Param{Type}} = 1;
             }
         }
 
         if ( $Changed && $Self->{CacheInBackend} && $Param{CacheInBackend} // 1 && $Self->{TypeDependencies} ) {
             # update cache dependencies in backend only if something has changed
-            use Data::Dumper;
-            $Self->_Debug('', "updating gobal cache dependency information: ".Dumper($Self->{TypeDependencies}));
+            if ( $Self->{Debug} ) {
+                use Data::Dumper;
+                $Self->_Debug('', "updating gobal cache dependency information: ".Dumper($Self->{TypeDependencies}));
+            }
             $Self->{CacheObject}->Set(
                 Type => 'Cache',
                 Key  => 'TypeDependencies',
@@ -213,7 +219,9 @@ sub Set {
 
     # Set in-memory cache.
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
-        $Self->_Debug('', "set in-memory cache key \"$Param{Key}\"");
+        if ( $Self->{Debug} ) {
+            $Self->_Debug('', "set in-memory cache key \"$Param{Key}\"");
+        }
         $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } = $Param{Value};
     }
 
@@ -531,7 +539,12 @@ sub CleanUp {
 
     $Param{Indent} = $Param{Indent} || '';
 
-    if ( $Param{KeepTypes} ) {
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !defined $Self->{Debug} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    }
+
+    if ( $Param{KeepTypes} && $Self->{Debug} ) {
         $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
     }
 
@@ -602,11 +615,13 @@ sub CleanUp {
         }
 
         # some debug output
-        if ( !$Param{KeepTypes} ) {
-            $Self->_Debug($Param{Indent}, "cleaning up everything");
-        }
-        else {
-            $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
+        if ( $Self->{Debug} ) {
+            if ( !$Param{KeepTypes} ) {
+                $Self->_Debug($Param{Indent}, "cleaning up everything");
+            }
+            else {
+                $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
+            }
         }
 
         if ( !$Param{NoStatsUpdate} && $Self->{StatsEnabled} ) {
@@ -818,15 +833,22 @@ sub _HandleDependingCacheTypes {
     );
 
     if ( $Self->{TypeDependencies} && IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-        $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
+        if ( $Self->{Debug} ) {
+            $Self->_Debug($Param{Indent}, "type \"$Param{Type}\" of deleted key affects other cache types: ".join(', ', keys %{$Self->{TypeDependencies}->{$Param{Type}}}));
+        }
 
         foreach my $DependentType ( keys %{$Self->{TypeDependencies}->{$Param{Type}}} ) {
-            $Self->_Debug($Param{Indent}, "    cleaning up depending cache type \"$DependentType\"");
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Param{Indent}, "    cleaning up depending cache type \"$DependentType\"");
+            }
+
             delete $Self->{TypeDependencies}->{$Param{Type}}->{$DependentType};
 
             # delete whole type if all keys are deleted
             if ( !IsHashRefWithData($Self->{TypeDependencies}->{$Param{Type}}) ) {
-                $Self->_Debug($Param{Indent}, "        no dependencies left for type $Param{Type}, deleting entry");
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Param{Indent}, "        no dependencies left for type $Param{Type}, deleting entry");
+                }
                 delete $Self->{TypeDependencies}->{$Param{Type}};
             }
 
@@ -916,7 +938,7 @@ sub _UpdateCacheStats {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Kernel::OM->Get('Config')->Get('Cache::Debug') );
+    return if !$Self->{Debug};
     return if !$Message;
 
     $Indent ||= '';

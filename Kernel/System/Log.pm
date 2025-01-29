@@ -149,6 +149,8 @@ sub Log {
         shift( @{ $Self->{ $Priority }->{Message} } );
     }
 
+    return 1 if ( $Param{Silent} );
+
     return 1 if $PriorityNum < $Self->{MinimumLevelNum};
 
     my $Caller = $Param{Caller} || 0;
