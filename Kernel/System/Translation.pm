@@ -14,6 +14,10 @@ use warnings;
 use Locale::PO;
 use Digest::MD5 qw(md5_hex);
 
+use base qw(
+    Kernel::System::AsynchronousExecutor
+);
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
@@ -1012,15 +1016,15 @@ Import a PO content
         Language => '...'         # required
         File     => '...',        # required if Content is not given
         Content  => '...',        # required if File is not given
-        UserID   => 123           # required
+        UserID   => 123,          # required
+        Async    => 1,            # optional, start import as a background process
     );
 
 =cut
 
 sub ImportPO {
     my ( $Self, %Param ) = @_;
-    my $CountTotal = 0;
-    my $CountOK = 0;
+    my @Result;
 
     # check needed stuff
     for (qw(Language)) {
@@ -1093,74 +1097,99 @@ sub ImportPO {
     }
 
     if ( IsHashRefWithData($Items) ) {
-        my $EncodeObject = $Kernel::OM->Get('Encode');
 
-        foreach my $MsgId ( sort keys %{$Items} ) {
-            $CountTotal++;
+        if ( $Param{Async} ) {
 
-            # the pattern is obsolete, go to the next one
-            next if $Items->{$MsgId}->obsolete;
-
-            my $MsgStr = $EncodeObject->EncodeInput($Items->{$MsgId}->msgstr);
-            $MsgId =~ s/(?<!\\)"//g;
-            $MsgId =~ s/\\"/"/g;
-            if ($MsgStr) {
-                $MsgStr =~ s/(?<!\\)"//g;
-                $MsgStr =~ s/\\"/"/g;
-            }
-
-            # the pattern is empty, go to the next one
-            next if !$MsgId;
-
-            my $PatternID = $Self->PatternExistsCheck(
-                Value => $MsgId,
+            my $TaskID = $Self->AsyncCall(
+                ObjectName     => $Kernel::OM->GetModuleFor('Translation'),
+                FunctionName   => '_ImportPO',
+                FunctionParams => {
+                    %Param,
+                    Items => $Items
+                },
+                MaximumParallelInstances => 1,
             );
-
-            if ( !$PatternID ) {
-                # create new pattern entry
-                $PatternID = $Self->PatternAdd(
-                    Value  => $MsgId,
-                    UserID => $Param{UserID},
+            if ( !$TaskID ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Could not schedule asynchronous task for PO import!",
                 );
-                if ( !$PatternID ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to add translation pattern for $MsgId!"
-                    );
-                    next;
-                }
+                return;
             }
 
-            # we don't have a translation for this language so go to the next pattern
-            next if !$MsgStr;
+            return ( scalar(keys %{$Items}), scalar(keys %{$Items}) );
+        }
 
-            # create or update language translation
-            my %Translation = $Self->TranslationLanguageGet(
-                PatternID => $PatternID,
-                Language  => $Param{Language},
+        @Result = $Self->_ImportPO(
+            %Param,
+            Items => $Items
+        );
+    }
+
+    # reset cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    return @Result;
+}
+
+sub _ImportPO {
+    my ( $Self, %Param ) = @_;
+    my $CountTotal = 0;
+    my $CountOK = 0;
+
+    my $EncodeObject = $Kernel::OM->Get('Encode');
+
+    foreach my $MsgId ( sort keys %{$Param{Items}} ) {
+        $CountTotal++;
+
+        # the pattern is obsolete, go to the next one
+        next if $Param{Items}->{$MsgId}->obsolete;
+
+        my $MsgStr = $EncodeObject->EncodeInput($Param{Items}->{$MsgId}->msgstr);
+        $MsgId =~ s/(?<!\\)"//g;
+        $MsgId =~ s/\\"/"/g;
+        if ($MsgStr) {
+            $MsgStr =~ s/(?<!\\)"//g;
+            $MsgStr =~ s/\\"/"/g;
+        }
+
+        # the pattern is empty, go to the next one
+        next if !$MsgId;
+
+        my $PatternID = $Self->PatternExistsCheck(
+            Value => $MsgId,
+        );
+
+        if ( !$PatternID ) {
+            # create new pattern entry
+            $PatternID = $Self->PatternAdd(
+                Value  => $MsgId,
+                UserID => $Param{UserID},
             );
-
-            if ( %Translation ) {
-                # update existing translation but only if it is still the default
-                if ( $Translation{IsDefault} ) {
-                    my $Result = $Self->TranslationLanguageUpdate(
-                        PatternID => $PatternID,
-                        Language  => $Param{Language},
-                        Value     => $MsgStr,
-                        IsDefault => 1,
-                        UserID    => $Param{UserID},
-                    );
-                    if ( !$Result ) {
-                        $Kernel::OM->Get('Log')->Log(
-                            Priority => 'error',
-                            Message  => "Unable to update translation language '$Param{Language}' for PatternID $PatternID!"
-                        );
-                    }
-                }
+            if ( !$PatternID ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to add translation pattern for $MsgId!"
+                );
+                next;
             }
-            else {
-                # create a new one
-                my $Result = $Self->TranslationLanguageAdd(
+        }
+
+        # we don't have a translation for this language so go to the next pattern
+        next if !$MsgStr;
+
+        # create or update language translation
+        my %Translation = $Self->TranslationLanguageGet(
+            PatternID => $PatternID,
+            Language  => $Param{Language},
+        );
+
+        if ( %Translation ) {
+            # update existing translation but only if it is still the default
+            if ( $Translation{IsDefault} ) {
+                my $Result = $Self->TranslationLanguageUpdate(
                     PatternID => $PatternID,
                     Language  => $Param{Language},
                     Value     => $MsgStr,
@@ -1170,19 +1199,30 @@ sub ImportPO {
                 if ( !$Result ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => "Unable to create translation language '$Param{Language}' for PatternID $PatternID!"
+                        Message  => "Unable to update translation language '$Param{Language}' for PatternID $PatternID!"
                     );
                 }
             }
-
-            $CountOK++;
         }
-    }
+        else {
+            # create a new one
+            my $Result = $Self->TranslationLanguageAdd(
+                PatternID => $PatternID,
+                Language  => $Param{Language},
+                Value     => $MsgStr,
+                IsDefault => 1,
+                UserID    => $Param{UserID},
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to create translation language '$Param{Language}' for PatternID $PatternID!"
+                );
+            }
+        }
 
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
+        $CountOK++;
+    }
 
     return ( $CountTotal, $CountOK );
 }

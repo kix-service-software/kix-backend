@@ -8884,8 +8884,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K18SSPDECommunity/Handbuch</Item>
-                <Item Key="en">https://docs.kixdesk.com/display/KIX18SelfServicePortalENCommunity/Manual</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8895,8 +8895,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1ACU/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18UserManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/anwender.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/anwender.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8906,8 +8906,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1AD/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18AdminManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/admin.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/admin.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -9211,6 +9211,13 @@ Notes:
     }
 }
             </String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="external" Name="ObjectIcon::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <Description Translatable="1">Defines the maximal size (in bytes) for icon uploads. Default: 32K</Description>
+        <Setting>
+            <String Regex="^[0-9]{1,11}$">32768</String>
         </Setting>
     </ConfigItem>
 </kix_config>
