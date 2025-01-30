@@ -224,6 +224,8 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
+    %Param = $Self->_PrepareEventData(%Param);
+
     my %ArticleData = $Kernel::OM->Get('Ticket')->PrepareArticle(
         %{ $Param{Config} },
         TicketID   => $Param{TicketID},
