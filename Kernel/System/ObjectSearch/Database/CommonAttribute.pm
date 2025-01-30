@@ -1422,7 +1422,7 @@ sub _FulltextColumnSQL {
     my $SQL           = q{};
     my $CaseSensitive = $Param{CaseSensitive} || 0;
 
-    $Word = lc( q{'} . $Word . q{'} );
+    $Word = q{'} . $Word . q{'};
 
     # check if database supports LIKE in large text types
     # the first condition is a little bit opaque
@@ -1439,18 +1439,18 @@ sub _FulltextColumnSQL {
     elsif ( $Kernel::OM->Get('DB')->GetDatabaseFunction('LcaseLikeInLargeText') ) {
 
         if ( $Param{IsStaticSearch} ) {
-            $SQL .= "$Column $Type $Word";
+            $SQL .= "$Column $Type LCASE($Word)";
         }
         else {
-            $SQL .= "LCASE($Column) $Type $Word";
+            $SQL .= "LCASE($Column) $Type LCASE($Word)";
         }
     }
     else {
         if ( $Param{IsStaticSearch} ) {
-            $SQL .= "$Column $Type $Word";
+            $SQL .= "$Column $Type LOWER($Word)";
         }
         else {
-            $SQL .= "LOWER($Column) $Type $Word";
+            $SQL .= "LOWER($Column) $Type LOWER($Word)";
         }
     }
 

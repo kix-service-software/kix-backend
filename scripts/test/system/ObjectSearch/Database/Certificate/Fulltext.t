@@ -131,7 +131,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(vfsp0.preferences_value LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(vfsp0.preferences_value LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
