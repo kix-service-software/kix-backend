@@ -58,6 +58,11 @@ sub Search {
     # check for needed joins
     my @SQLJoin = ();
     my $TableAliasPrefix = '';
+    my @Columns = (
+        'st.tn',
+        'st.title'
+    );
+    my @StaticColumns = ();
     if ( $IsStaticSearch ) {
         $TableAliasPrefix = 's_';
         if ( !$Param{Flags}->{JoinMap}->{StaticArticle} ) {
@@ -70,6 +75,16 @@ sub Search {
             push( @SQLJoin, $JoinString );
 
             $Param{Flags}->{JoinMap}->{StaticArticle} = 1;
+
+            # add static search columns
+            push(
+                @StaticColumns,
+                $TableAliasPrefix . 'ta.a_to',
+                $TableAliasPrefix . 'ta.a_cc',
+                $TableAliasPrefix . 'ta.a_from',
+                $TableAliasPrefix . 'ta.a_body',
+                $TableAliasPrefix . 'ta.a_subject'
+            );
         }
     }
     else {
@@ -83,6 +98,16 @@ sub Search {
             push( @SQLJoin, $JoinString );
 
             $Param{Flags}->{JoinMap}->{Article} = 1;
+
+            # add search columns
+            push(
+                @Columns,
+                $TableAliasPrefix . 'ta.a_to',
+                $TableAliasPrefix . 'ta.a_cc',
+                $TableAliasPrefix . 'ta.a_from',
+                $TableAliasPrefix . 'ta.a_body',
+                $TableAliasPrefix . 'ta.a_subject'
+            );
         }
     }
 
@@ -92,14 +117,8 @@ sub Search {
     # table article: To, Cc, From, Body and Subject
     my $Condition = $Self->_FulltextCondition(
         Value          => $Param{Search}->{Value},
-        Columns        => [
-            'st.tn', 'st.title'
-        ],
-        StaticColumns  => [
-            $TableAliasPrefix . 'ta.a_to', $TableAliasPrefix . 'ta.a_cc',
-            $TableAliasPrefix . 'ta.a_from', $TableAliasPrefix . 'ta.a_body',
-            $TableAliasPrefix . 'ta.a_subject'
-        ],
+        Columns        => \@Columns,
+        StaticColumns  => \@StaticColumns,
         Silent         => $Param{Silent},
         IsStaticSearch => $IsStaticSearch
     );
