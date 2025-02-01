@@ -122,7 +122,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? '(LOWER(a.a_from) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_to) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_cc) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_subject) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_body) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(a.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_cc) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(a.a_from) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_to) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_cc) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_subject) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(a.a_body) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(a.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR a.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

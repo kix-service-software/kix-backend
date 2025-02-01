@@ -196,7 +196,7 @@ sub ImportValuePrepare {
         return $Param{Value} if ( $QueueName );
     }
 
-    return '';
+    return;
 }
 
 1;
