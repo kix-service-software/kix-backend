@@ -1187,7 +1187,7 @@ my @GetOperationTests = (
             Operator => 'LIKE',
             Value    => 'UnitTest'
         },
-        Expected  => $CaseSensitive ? '(LOWER(test) LIKE \'%unittest%\') ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%unittest%\' ESCAPE \'' . $Escape . '\') '
+        Expected  => $CaseSensitive ? '(LOWER(test) LIKE \'%unittest%\' ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%unittest%\' ESCAPE \'' . $Escape . '\') '
     },
     {
         Name      => '_FulltextCondition: single column/ quoted simple text value',
@@ -1537,7 +1537,7 @@ my @GetOperationTests = (
             Operator => 'LIKE',
             Value    => '"Test"+###1###',
         },
-        Expected  => $CaseSensitive ? '(LOWER(test) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE LOWER(\'%###1###%\') ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE LOWER(\'%###1###%\') ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
+        Expected  => $CaseSensitive ? '(LOWER(test) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (LOWER(test) LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR LOWER(Foo) LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
     },
     {
         Name      => '_FulltextCondition: single static column/ simple text value',
@@ -1717,7 +1717,7 @@ my @GetOperationTests = (
             Value          => '"Test"+###1###',
             IsStaticSearch => 1
         },
-        Expected  => $CaseSensitive ? '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE LOWER(\'%###1###%\') ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
+        Expected  => $CaseSensitive ? '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
     },
     {
         Name      => '_FulltextCondition: multiple static StaticColumns / simple text value',
@@ -1897,7 +1897,7 @@ my @GetOperationTests = (
             Value          => '"Test"+###1###',
             IsStaticSearch => 1
         },
-        Expected  => $CaseSensitive ? '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE LOWER(\'%###1###%\') ESCAPE \'' . $Escape . '\' OR Foo LIKE LOWER(\'%###1###%\') ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
+        Expected  => $CaseSensitive ? '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') ' : '(test LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%test%\' ESCAPE \'' . $Escape . '\')  AND (test LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\' OR Foo LIKE \'%###1###%\' ESCAPE \'' . $Escape . '\') '
     }
 );
 for my $Test ( @GetOperationTests ) {
