@@ -56,24 +56,24 @@ if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
 
-# Quoting single quote character
-my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
-
-# Quoting semicolon character
-my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
-
 # check if database is casesensitive
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# set config 'Ticket::SearchIndexModule' to 'StaticDB' to check sql preparation
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'Ticket::SearchIndexModule',
+    Value => 'Kernel::System::Ticket::ArticleSearchIndex::StaticDB'
+);
 
 # check Search
 my @SearchTests = (
     {
-        Name         => 'Search: undef search',
+        Name         => 'Search/StaticDB: undef search',
         Search       => undef,
         Expected     => undef
     },
     {
-        Name         => 'Search: Value undef',
+        Name         => 'Search/StaticDB: Value undef',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'LIKE',
@@ -83,7 +83,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field undef',
+        Name         => 'Search/StaticDB: Field undef',
         Search       => {
             Field    => undef,
             Operator => 'LIKE',
@@ -92,7 +92,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Field invalid',
+        Name         => 'Search/StaticDB: Field invalid',
         Search       => {
             Field    => 'Test',
             Operator => 'LIKE',
@@ -101,7 +101,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator undef',
+        Name         => 'Search/StaticDB: Operator undef',
         Search       => {
             Field    => 'Fulltext',
             Operator => undef,
@@ -110,7 +110,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator invalid',
+        Name         => 'Search/StaticDB: Operator invalid',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'Test',
@@ -119,7 +119,7 @@ my @SearchTests = (
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
+        Name         => 'Search/StaticDB: valid search / Field Fulltext / Operator LIKE',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'LIKE',
@@ -130,7 +130,98 @@ my @SearchTests = (
                 'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
             ],
             'Where' => [
-                $CaseSensitive ? '(LOWER(st.tn) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(st.tn LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR st.title LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(st.tn) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(st.tn LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR st.title LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
+            ]
+        }
+    }
+);
+for my $Test ( @SearchTests ) {
+    my $Result = $AttributeObject->Search(
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        UserID       => 1,
+        UserType     => 'Agent',
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# set config 'Ticket::SearchIndexModule' to 'RuntimeDB' to check sql preparation
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'Ticket::SearchIndexModule',
+    Value => 'Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB'
+);
+
+# check Search
+@SearchTests = (
+    {
+        Name         => 'Search/RuntimeDB: undef search',
+        Search       => undef,
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: Value undef',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => undef
+
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: Field undef',
+        Search       => {
+            Field    => undef,
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: Field invalid',
+        Search       => {
+            Field    => 'Test',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: Operator undef',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => undef,
+            Value    => 'Test'
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: Operator invalid',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'Test',
+            Value    => 'Test'
+        },
+        Expected     => undef
+    },
+    {
+        Name         => 'Search/RuntimeDB: valid search / Field Fulltext / Operator LIKE',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'
+            ],
+            'Where' => [
+                $CaseSensitive ? '(LOWER(st.tn) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_to) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_cc) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_from) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_body) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_subject) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(st.tn LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR st.title LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
