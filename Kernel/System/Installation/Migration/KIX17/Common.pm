@@ -590,7 +590,8 @@ sub _GetTableColumnNames {
     if ( !IsHashRefWithData($Self->{ColumnNames}->{$Param{Table}}) ) {
 
         $Kernel::OM->Get('DB')->Prepare(
-            SQL => 'SELECT * FROM ' . $Param{Table},
+            SQL   => 'SELECT * FROM ' . $Param{Table},
+            Limit => 1,
         ) || die "Unable to execute SQL statement!";
 
         my @Names = $Kernel::OM->Get('DB')->GetColumnNames();
