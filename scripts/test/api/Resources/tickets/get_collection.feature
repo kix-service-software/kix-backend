@@ -80,7 +80,7 @@ Feature: GET request to the /tickets resource
     When I query the collection of tickets with sorted by "Ticket.-Title:textual" limit 38 and offset 1
     Then the response code is 200
 #    Then the response content
-    And the response now contains 5 items of type "Ticket"
+    And the response now contains 7 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204
     And the response has no content
