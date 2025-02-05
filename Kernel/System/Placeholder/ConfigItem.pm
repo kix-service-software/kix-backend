@@ -117,8 +117,8 @@ sub _Replace {
         $Version = $Kernel::OM->Get('Storable')->Clone(Data => $Version);
 
         # handle CurrentVersion placeholder
-        my $CurrentVersionTag = $Tag . 'CurrentVersion_';
-        my @Attributes = $Param{Text} =~ m/\Q$CurrentVersionTag\E(.*?)$Self->{End}/g;
+        my $CurrentVersionTag = 'CurrentVersion_';
+        my @Attributes = $Param{Text} =~ m/$Tag$CurrentVersionTag(.*?)$Self->{End}/g;
         for my $Attribute (@Attributes) {
             my $ReplaceString = '';
 
@@ -144,7 +144,7 @@ sub _Replace {
                 $ReplaceString = $Version->{ $Attribute };
             }
 
-            $Param{Text} =~ s/\Q$CurrentVersionTag$Attribute\E$Self->{End}/$ReplaceString/g;
+            $Param{Text} =~ s/$Tag$CurrentVersionTag\Q$Attribute\E$Self->{End}/$ReplaceString/g;
         }
 
         my $TopLevelAttributes = $Self->_GetTopLevelAttributes(Version => $Version) || [];

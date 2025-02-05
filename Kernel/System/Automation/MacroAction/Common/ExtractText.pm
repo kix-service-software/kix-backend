@@ -122,7 +122,11 @@ sub Run {
     }
 
     # return the captured results
-    $Self->SetResult(Name => 'ExtractedText', Value => \%Results);
+    $Self->SetResult(
+        Name   => 'ExtractedText',
+        Value  => \%Results,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

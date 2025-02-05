@@ -250,7 +250,11 @@ sub Run {
 
     $Self->_SetArticleDynamicFields(%Param, NewArticleID => $ArticleID);
 
-    $Self->SetResult(Name => 'NewArticleID', Value => $ArticleID);
+    $Self->SetResult(
+        Name   => 'NewArticleID',
+        Value  => $ArticleID,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }
