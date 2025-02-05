@@ -178,6 +178,86 @@ sub Exists {
     return $Exists;
 }
 
+=item OptionLookup()
+
+sysconfig name or id lookup
+
+    my $Name = $SysConfigObject->OptionLookup(
+        ID     => 1,
+        Silent => 1, # optional, don't generate log entry if sysconfig was not found
+    );
+
+    my $ID = $SysConfigObject->OptionLookup(
+        Name   => 'some sysconfig option name',
+        Silent => 1, # optional, don't generate log entry if sysconfig was not found
+    );
+
+=cut
+
+sub OptionLookup {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        !$Param{ID}
+        && !$Param{Name}
+     ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need ID or Name!"
+            );
+        }
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'OptionLookup::'
+        . ( $Param{ID} ? "ID::$Param{ID}" : q{} )
+        . ( $Param{Name} ? "Name::$Param{Name}" : q{} );
+
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    my $SQLSelect;
+    my $SQLWhere;
+    my @Bind;
+    if ( $Param{ID} ) {
+        $SQLSelect = 'name';
+        $SQLWhere  = 'id';
+        push( @Bind, \$Param{ID} );
+    }
+    else {
+        $SQLSelect = 'id';
+        $SQLWhere  = 'name';
+        push( @Bind, \$Param{Name} );
+    }
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT $SQLSelect FROM sysconfig WHERE $SQLWhere = ?",
+        Bind  => \@Bind,
+        Limit => 1,
+    );
+
+    # fetch the result
+    my $Result;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Result = $Row[0];
+    }
+
+    # set cache
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => $Result,
+    );
+
+    return $Result;
+}
+
 =item OptionGet()
 
 Get a SysConfig option.
@@ -1179,7 +1259,7 @@ sub _RebuildFromFile {
 
                 if ( IsHashRef($Option{$Key}) || IsArrayRef($Option{$Key}) ) {
                     my $Result = Compare(
-                        $AllOptions{ $Option{Name} }->{$Key}, 
+                        $AllOptions{ $Option{Name} }->{$Key},
                         $Option{$Key}
                     );
                     if ( !$Result ) {

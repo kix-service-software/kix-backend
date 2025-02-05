@@ -48,6 +48,10 @@
       "type": "string",
       "readOnly": true
     },
+    "ContentType": {
+      "type": "string",
+      "readOnly": true
+    },
     "CType": {
       "type": "string",
       "readOnly": true

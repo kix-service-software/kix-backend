@@ -116,8 +116,8 @@ sub CategoryAdd {
         SQL => '
             SELECT id
             FROM faq_category
-            WHERE name = ?',
-        Bind  => [ \$Param{Name} ],
+            WHERE name = ? AND parent_id = ?',
+        Bind  => [ \$Param{Name}, \$Param{ParentID} ],
         Limit => 1,
     );
 

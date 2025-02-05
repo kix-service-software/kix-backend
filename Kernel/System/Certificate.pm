@@ -134,6 +134,9 @@ sub CertificateCreate {
         $Preferences{$Key} = $Attributes->{$Key};
     }
 
+    # add content type to the preferences for serialization
+    $Preferences{ContentType} = $Param{File}->{ContentType};
+
     my $Content = $Param{File}->{Content};
 
     my $FileID = $Kernel::OM->Get('VirtualFS')->Write(
@@ -255,7 +258,6 @@ sub CertificateGet {
         return;
     }
 
-
     if (
         !$File{Preferences}->{Type}
         || !$Self->{$File{Preferences}->{Type}}
@@ -279,12 +281,6 @@ sub CertificateGet {
     $Certificate->{FileID}   = $Param{ID};
     $Certificate->{Filename} = $Filename;
 
-    # remove unnessary datas
-    for my $Key ( qw(Filesize FilesizeRaw Passphrase) ) {
-        next if ( $Key eq 'Passphrase' && $Param{Passphrase} );
-        delete $Certificate->{$Key};
-    }
-
     if (
         defined $Param{Include}
         && $Param{Include} eq 'Content'
@@ -299,6 +295,16 @@ sub CertificateGet {
             return;
         }
         $Certificate->{Content} = ${$File{Content}};
+    }
+    else {
+        # remove unnessary datas
+        for my $Key ( qw(Filesize FilesizeRaw) ) {
+            delete $Certificate->{$Key};
+        }
+    }
+
+    if ( !$Param{Passphrase} ) {
+        delete $Certificate->{Passphrase};
     }
 
     # set cache
@@ -1725,7 +1731,6 @@ sub _FetchAttributes {
         $Result .= "\n" if $Result;
         $Result .= $Output;
     }
-
 
     # filters
     my %Filters = (

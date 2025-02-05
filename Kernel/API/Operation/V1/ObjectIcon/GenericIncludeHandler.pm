@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -85,9 +85,22 @@ sub Run {
         }
     }
 
+    # For some objects it is necessary to change the object to get the right icon
+    # because they are stored on top of another object.
+    my $Object        = $Param{Object};
+    my $Config        = $Kernel::OM->Get('Config')->Get('API::Operation::GenericInclude');
+    my $ObjectPattern = $Config->{ObjectIcon}->{ObjectPattern} || {};
+
+    if (
+        IsHashRefWithData($ObjectPattern)
+        && $ObjectPattern->{$Object}
+    ) {
+        $Object = $ObjectPattern->{$Object};
+    }
+
     # perform ObjectIcon search
     my $IconIDs = $Kernel::OM->Get('ObjectIcon')->ObjectIconList(
-        Object   => $Param{Object},
+        Object   => $Object,
         ObjectID => $Param{ObjectID},
         UserID   => $Param{UserID},
     );

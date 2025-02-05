@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="sysconfig">
+        <ColumnAdd Name="id" Type="BIGINT" Required="true" AutoIncrement="true" />
+    </TableAlter>
+
+</database>
