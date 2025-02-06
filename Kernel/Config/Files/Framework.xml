@@ -8894,8 +8894,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/anwender.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/anwender.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8905,8 +8905,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/admin.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/admin.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/administration.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/administration.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
