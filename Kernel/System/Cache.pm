@@ -294,6 +294,11 @@ sub Get {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !defined $Self->{Debug} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    }
+
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
@@ -373,6 +378,11 @@ sub GetMulti {
     }
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
+
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !defined $Self->{Debug} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    }
 
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
@@ -471,6 +481,11 @@ sub Delete {
     }
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
+
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !defined $Self->{Debug} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    }
 
     $Param{Indent} = $Param{Indent} || '';
 
