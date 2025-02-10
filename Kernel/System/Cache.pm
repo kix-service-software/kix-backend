@@ -70,7 +70,8 @@ sub new {
 
     $Self->{StatsEnabled} = $Param{StatsEnabled} // 0;
 
-    $self->{Debug} = -1;        # define a value but signal that an initialization is needed
+    $Self->{Debug} = 0;
+    $Self->{DebugInitialized} = 0;
 
     return $Self;
 }
@@ -155,8 +156,9 @@ sub Set {
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( $Self->{Debug} && $Self->{Debug} < 0 ) {
+    if ( !$Self->{DebugInitialized} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
     }
 
     # set default TTL to 20 days
@@ -174,11 +176,8 @@ sub Set {
     }
 
     # debug
-    if ( $Self->{Debug} > 0 ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Set Key:$Param{Key} TTL:$Param{TTL}!",
-        );
+    if ( $Self->{Debug} ) {
+        $Self->_Debug('', "Set Key:$Param{Key} TTL:$Param{TTL}!");
     }
 
     # store TypeDependencies information
