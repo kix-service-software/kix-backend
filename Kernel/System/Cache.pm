@@ -473,6 +473,12 @@ sub Delete {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !$Self->{DebugInitialized} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
+    }
+
     $Param{Indent} = $Param{Indent} || '';
 
     # Delete and cleanup operations should also be done if the cache is disabled
@@ -539,6 +545,12 @@ sub CleanUp {
     my $NotifyClients = 0;
 
     $Param{Indent} = $Param{Indent} || '';
+
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !$Self->{DebugInitialized} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
+    }
 
     if ( $Param{KeepTypes} && $Self->{Debug} ) {
         $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
