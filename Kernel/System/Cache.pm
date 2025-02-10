@@ -156,7 +156,7 @@ sub Set {
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !$Self->{DebugInitialized} ) {
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
         $Self->{DebugInitialized} = 1;
     }
@@ -294,6 +294,12 @@ sub Get {
     }
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
+
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
+    }
 
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
@@ -474,7 +480,7 @@ sub Delete {
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !$Self->{DebugInitialized} ) {
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
         $Self->{DebugInitialized} = 1;
     }
@@ -547,7 +553,7 @@ sub CleanUp {
     $Param{Indent} = $Param{Indent} || '';
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !$Self->{DebugInitialized} ) {
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
         $Self->{DebugInitialized} = 1;
     }
