@@ -70,6 +70,8 @@ sub new {
 
     $Self->{StatsEnabled} = $Param{StatsEnabled} // 0;
 
+    $self->{Debug} = -1;        # define a value but signal that an initialization is needed
+
     return $Self;
 }
 
@@ -153,7 +155,7 @@ sub Set {
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
+    if ( $Self->{Debug} && $Self->{Debug} < 0 ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
     }
 
@@ -294,11 +296,6 @@ sub Get {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
-    # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
-        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
-    }
-
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
         if ( exists $Self->{Cache}->{ $Param{Type} }->{ $Param{Key} } ) {
@@ -378,11 +375,6 @@ sub GetMulti {
     }
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
-
-    # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
-        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
-    }
 
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
@@ -482,11 +474,6 @@ sub Delete {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
-    # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
-        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
-    }
-
     $Param{Indent} = $Param{Indent} || '';
 
     # Delete and cleanup operations should also be done if the cache is disabled
@@ -553,11 +540,6 @@ sub CleanUp {
     my $NotifyClients = 0;
 
     $Param{Indent} = $Param{Indent} || '';
-
-    # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
-        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
-    }
 
     if ( $Param{KeepTypes} && $Self->{Debug} ) {
         $Self->_Debug($Param{Indent}, "cleaning up everything except: ".join(', ', @{$Param{KeepTypes}}));
