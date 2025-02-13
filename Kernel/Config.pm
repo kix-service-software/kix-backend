@@ -142,8 +142,9 @@ sub GetSysConfig {
     if ( !$Self->{NoCache} ) {
         # check cache
         my $CacheResult = $Kernel::OM->Get('Cache')->Get(
-            Type => $SysConfigObject->{CacheType},
-            Key  => $CacheKey
+            Type        => $SysConfigObject->{CacheType},
+            Key         => $CacheKey,
+            _ConfigInit => 1,
         );
         if ( IsHashRefWithData($CacheResult) ) {
             $Self->{SysConfigLoaded} = 1;
@@ -207,10 +208,11 @@ sub GetSysConfig {
     if ( !$Self->{NoCache} ) {
         # set cache
         $Kernel::OM->Get('Cache')->Set(
-            Type  => $SysConfigObject->{CacheType},
-            TTL   => $SysConfigObject->{CacheTTL},
-            Key   => $CacheKey,
-            Value => $Result,
+            Type        => $SysConfigObject->{CacheType},
+            TTL         => $SysConfigObject->{CacheTTL},
+            Key         => $CacheKey,
+            Value       => $Result,
+            _ConfigInit => 1,
         );
     }
 

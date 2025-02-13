@@ -618,9 +618,13 @@ sub _Replace {
     # translate ticket values if needed
     if ( $Param{Language} ) {
 
-        my $LanguageObject = Kernel::Language->new(
-            UserLanguage => $Param{Language},
-        );
+        # use a cached instance or create a new one
+        if ( !$Self->{LanguageObject}->{$Param{Language}} ) {
+            $Self->{LanguageObject}->{$Param{Language}} = Kernel::Language->new(
+                UserLanguage => $Param{Language},
+            );
+        }
+        my $LanguageObject = $Self->{LanguageObject}->{$Param{Language}};
 
         # Translate the different values.
         for my $Field (qw(Type State StateType Lock Priority)) {
