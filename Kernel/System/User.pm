@@ -574,7 +574,7 @@ sub UserSearch {
         && !defined( $Param{IsOutOfOffice} )
         && !$Param{ValidID}
         && !$Param{SearchUserID}
-        && !IsArrayRefWithData{$Param{UserIDs}}
+        && !IsArrayRefWithData($Param{UserIDs})
         && !IsHashRefWithData($Param{HasPermission})
         && !IsArrayRefWithData($Param{RoleIDs})
         && !IsArrayRefWithData($Param{NotRoleIDs})
