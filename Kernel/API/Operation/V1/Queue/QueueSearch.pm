@@ -87,7 +87,11 @@ sub Run {
         Valid => 0
     );
 
-    if ( %QueueList && IsHashRefWithData($Param{Data}->{requiredPermission}) && $Param{Data}->{requiredPermission}->{Permission}) {
+    if (
+        %QueueList
+        && IsHashRefWithData($Param{Data}->{requiredPermission})
+        && $Param{Data}->{requiredPermission}->{Permission}
+    ) {
         my %BasePermissionQueueIDs;
 
         my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
@@ -97,9 +101,17 @@ sub Run {
         );
 
         if ( IsArrayRefWithData($Result) ) {
+            # get intersection of avaiable queue list and base permission list
+            my @QueueIDs     = keys( %QueueList );
+            my @CombinedList = $Kernel::OM->Get('Main')->GetCombinedList(
+                ListA => $Result,
+                ListB => \@QueueIDs,
+                Union => 0,
+            );
+            
             %BasePermissionQueueIDs = (
                 %BasePermissionQueueIDs,
-                map { $_ => 1 } @{$Result},
+                map { $_ => 1 } @CombinedList,
             );
         }
 

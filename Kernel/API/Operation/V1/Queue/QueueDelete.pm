@@ -105,6 +105,18 @@ sub Run {
             );
         }
 
+        # get all roles assigned to this queue
+        my @Permissions = $Kernel::OM->Get('Role')->PermissionList(
+            Types  => ['Base::Ticket'],
+            Target => $QueueID,
+        );
+        if ( IsArrayRefWithData(\@Permissions) ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Cannot delete queue. At least one permission is assigned to this queue.',
+            );
+        }
+
         # delete Queue
         my $Success = $Kernel::OM->Get('Queue')->QueueDelete(
             QueueID  => $QueueID,
