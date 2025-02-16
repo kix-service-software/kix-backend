@@ -603,6 +603,14 @@ sub PrintError {
     my ( $Self, $Text ) = @_;
 
     chomp $Text;
+
+    # store error message in log object
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'error',
+        Message  => $Text,
+        Silent   => 1,
+    );
+
     print STDERR $Self->_Color( 'red', "Error: $Text\n" );
     return;
 }
