@@ -29,11 +29,23 @@ open STDERR, '>>', "/dev/null";
 my $ExitCode = $CommandObject->Execute();
 
 # just check exit code; should be 0 also if no accounts are configured
-$Self->Is(
-    $ExitCode,
-    0,
-    "Maint::PostMaster::MailAccountFetch exit code",
-);
+if ( !$ExitCode ) {
+    $Self->Is(
+        $ExitCode,
+        0,
+        "Maint::PostMaster::MailAccountFetch exit code",
+    );
+}
+else {
+    my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'error',
+        What => 'Message',
+    );
+    $Self->True(
+        0,
+        "Maint::PostMaster::MailAccountFetch unexpected exit code (error: $LogMessage)"
+    );
+}
 
 $ExitCode = $CommandObject->Execute( '--mail-account-id', 99999 );
 
