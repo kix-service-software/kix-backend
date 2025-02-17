@@ -167,6 +167,12 @@ sub Request {
         );
     }
 
+    if ( IsHashRefWithData( $Param{SSLOptions} ) ) {
+        $UserAgent->ssl_opts(
+            %{ $Param{SSLOptions} }
+        );
+    }
+
     # set credentials
     if ( $Param{Credentials} ) {
         my %CredentialParams    = %{ $Param{Credentials} || {} };

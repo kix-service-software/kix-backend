@@ -826,10 +826,19 @@ sub Dump {
     # -> http://rt.cpan.org/Ticket/Display.html?id=28607
     if ( $Type eq 'binary' ) {
 
-        # Clone the data because we need to disable the utf8 flag in all
-        # reference variables and do not to want to do this in the orig.
-        # variables because they will still used in the system.
-        my $DataNew = Storable::dclone( \$Data );
+        my $DataNew;
+        {
+            # The store functions will croak if they run into such references
+            # unless you set $Storable::forgive_me to some TRUE value.
+            # In that case, the fatal message is converted to a warning
+            # and some meaningless string is stored instead.
+            local $Storable::forgive_me = 1;
+
+            # Clone the data because we need to disable the utf8 flag in all
+            # reference variables and do not to want to do this in the orig.
+            # variables because they will still used in the system.
+            $DataNew = Storable::dclone( \$Data );
+        }
 
         # Disable utf8 flag.
         $Self->_Dump($DataNew);

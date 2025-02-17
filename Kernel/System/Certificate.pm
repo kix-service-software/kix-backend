@@ -189,6 +189,7 @@ get a local certificate
         Email           => "selfsigned@example.de",
         FileID          => "4",
         Filename        => "KIX_Cert_4",
+        Filepath        => "/path/to/certificate",
         Fingerprint     => "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
         Hash            => "791510e5",
         Issuer          => "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
@@ -278,6 +279,7 @@ sub CertificateGet {
     my $Certificate = $File{Preferences};
     $Certificate->{FileID}   = $Param{ID};
     $Certificate->{Filename} = $Filename;
+    $Certificate->{Filepath} = $Self->{ $File{Preferences}->{Type} }->{Path} . '/' . $Filename;
 
     # remove unnessary datas
     for my $Key ( qw(Filesize FilesizeRaw Passphrase) ) {
