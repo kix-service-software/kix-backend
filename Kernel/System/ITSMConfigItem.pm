@@ -623,7 +623,7 @@ sub ConfigItemUpdate {
         # update current incident state
         $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_depl_state_id = ? WHERE id = ?',
-            Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
+            Bind => [ \$Param{DeplStateID}, \$Param{ConfigItemID} ],
         );
     }
 
