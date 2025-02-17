@@ -26,6 +26,25 @@ local *STDERR;
 open STDOUT, '>>', "/dev/null";
 open STDERR, '>>', "/dev/null";
 
+# begin transaction on database
+$Helper->BeginWork();
+
+# deactivate all mail accounts for this test
+my %MailAccountList = $Kernel::OM->Get('MailAccount')->MailAccountList(
+    Valid => 1,
+);
+for my $MailAccountID ( keys( %MailAccountList ) ) {
+    my %MailAccount = $Kernel::OM->Get('MailAccount')->MailAccountGet(
+        ID => $MailAccountID,
+    );
+    $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
+        %MailAccount,
+        ID      => $MailAccountID,
+        ValidID => 2,
+        UserID  => 1,
+    );
+}
+
 my $ExitCode = $CommandObject->Execute();
 
 # just check exit code; should be 0 also if no accounts are configured
@@ -55,6 +74,9 @@ $Self->Is(
     1,
     "Maint::PostMaster::MailAccountFetch exit code for nonexisting mail account",
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 
