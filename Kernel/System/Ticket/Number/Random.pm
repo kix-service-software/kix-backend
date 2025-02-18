@@ -21,31 +21,30 @@ our @ObjectDependencies = (
 sub TicketCreateNumber {
     my $Self = shift;
 
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
     # get needed config options
-    my $SystemID = $ConfigObject->Get('SystemID');
+    my $SystemID = $Kernel::OM->Get('Config')->Get('SystemID');
 
     # random counter
-    my $Count = int rand 9999999999;
-
-    $Count = sprintf "%.*u", 10, $Count;
+    my $Count = $Kernel::OM->Get('Main')->GenerateRandomString(
+        Length     => 10,
+        Dictionary => [ 0..9 ],
+    );
 
     # create new ticket number
     my $Tn = $SystemID . $Count;
 
     # Check ticket number. If exists generate new one!
-    if ( $Self->TicketCheckNumber( Tn => $Tn ) ) {
+    my $LoopProtectionCounter = 0;
+    while ( $Self->TicketCheckNumber( Tn => $Tn ) ) {
 
-        $Self->{LoopProtectionCounter}++;
+        $LoopProtectionCounter += 1;
 
-        if ( $Self->{LoopProtectionCounter} >= 16000 ) {
+        if ( $LoopProtectionCounter >= 16000 ) {
 
             # loop protection
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "CounterLoopProtection is now $Self->{LoopProtectionCounter}!"
+                Message  => "CounterLoopProtection is now $LoopProtectionCounter!"
                     . " Stopped TicketCreateNumber()!",
             );
             return;
@@ -57,7 +56,11 @@ sub TicketCreateNumber {
             Message  => "Tn ($Tn) exists! Creating a new one.",
         );
 
-        $Tn = $Self->TicketCreateNumber();
+        $Count = $Kernel::OM->Get('Main')->GenerateRandomString(
+            Length     => 10,
+            Dictionary => [ 0..9 ],
+        );
+        $Tn = $SystemID . $Count;
     }
 
     return $Tn;

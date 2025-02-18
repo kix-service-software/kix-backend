@@ -623,7 +623,7 @@ sub ConfigItemUpdate {
         # update current incident state
         $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_depl_state_id = ? WHERE id = ?',
-            Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
+            Bind => [ \$Param{DeplStateID}, \$Param{ConfigItemID} ],
         );
     }
 
@@ -1175,10 +1175,10 @@ sub ConfigItemLookup {
         $SQL = 'SELECT id FROM configitem WHERE configitem_number = ?';
     }
     if ( $Key eq 'ConfigItemName' && !$Param{Class} ) {
-        $SQL = 'SELECT id FROM configitem WHERE name = ?';
+        $SQL = 'SELECT id FROM configitem WHERE lower(name) = lower(?)';
     }
     if ( $Key eq 'ConfigItemName' && $Param{Class} ) {
-        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND ci.name = ? AND gc.name = ?';
+        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND lower(ci.name) = lower(?) AND gc.name = ?';
         push @BindArray, \$Param{Class};
     }
 
