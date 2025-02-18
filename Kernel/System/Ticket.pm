@@ -509,21 +509,25 @@ sub TicketCreate {
     }
 
     # check ticket title
-    if ( !defined $Param{Title} ) {
-        $Param{Title} = '';
-    } else {
+    if ( !$Param{Title} ) {
 
-        # TODO: replace placeholders
-        # $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        #     RichText => 0,
-        #     Text     => $Param{Title},
-        #     Data     => \%Param,
-        #     UserID   => $Param{UserID},
-        # );
+        # get default ticket title
+        my $DefaultTicketTitle = $Kernel::OM->Get('Config')->Get('Ticket::Title::Default') || '-';
+        $Param{Title} = $DefaultTicketTitle;
 
-        # substitute title if needed
-        $Param{Title} = substr( $Param{Title}, 0, 255 );
+        $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            Text            => $Param{Title},
+            RichText        => 0,
+            Translate       => 0,
+            ReplaceNotFound => 0,
+            Data            => \%Param,
+            UserID          => $Param{UserID},
+        );
+
     }
+
+    # substitute title if needed
+    $Param{Title} = substr( $Param{Title}, 0, 255 );
 
     # check given organisation id
     my $ExistingOrganisationID;
