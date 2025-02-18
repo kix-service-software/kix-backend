@@ -179,6 +179,23 @@ _TestRun(
     Tests => \@UnitTests
 );
 
+# prepare test cases after update
+@UnitTests = (
+    {
+        TestName  => 'Placeholder: <KIX_TICKET_AttachmentCount>',
+        Ticket    => {
+            AttachmentCount => 5
+        },
+        Test      => '<KIX_TICKET_AttachmentCount>',
+        Expection => '5',
+    },
+);
+
+# run tests
+_TestRun(
+    Tests => \@UnitTests
+);
+
 sub _TestRun {
     my (%Param) = @_;
 
@@ -186,7 +203,7 @@ sub _TestRun {
         my $Result = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             RichText  => 0,
             Text      => $Test->{Test},
-            Data      => {},
+            Data      => $Test->{Ticket} ? {Ticket => $Test->{Ticket}} : {},
             TicketID  => $Test->{TicketID} || undef,
             Translate => 1,
             UserID    => 1,
