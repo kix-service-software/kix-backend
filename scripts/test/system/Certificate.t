@@ -1010,7 +1010,7 @@ for my $Test ( @TestsSE ) {
     $Header{'X-Powered-By'} = 'KIX (https://www.kixdesk.com/)';
     $Header{Type}           = $Test->{Data}->{MimeType} || 'text/plain';
     $Header{Encoding}       = 'quoted-printable';
-    $Header{'Message-ID'}   = $Kernel::OM->Get('Email')->_MessageIDCreate();
+    $Header{'Message-ID'}   = $Kernel::OM->Get('Email')->GenerateMessageID();
 
     # add date header
     $Header{Date} = 'Date: ' . $Kernel::OM->Get('Time')->MailTimeStamp();
