@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2022 OTRS AG, https://otrs.com/
 # --
@@ -67,7 +67,7 @@ sub Run {
     }
     if ( !$Ticket{ContactID} ) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
+            Priority => 'info',
             Message  => "Ticket with ID $Param{Data}->{TicketID} has no contact!"
         );
         return;
@@ -88,7 +88,7 @@ sub Run {
     }
     # handle organisation on ticket is not an assigned contact organisation
     elsif (
-        !grep { $_ eq $Ticket{OrganisationID} } @{ $Contact{OrganisationIDs} } 
+        !grep { $_ eq $Ticket{OrganisationID} } @{ $Contact{OrganisationIDs} }
     ) {
         $SetOrganisation = $Contact{PrimaryOrganisationID};
     }

@@ -464,6 +464,7 @@
     <Column Name="archive_flag" Required="true" Default="0" Type="SMALLINT"/>
     <Column Name="accounted_time" Required="false" Type="INTEGER"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
+    <Column Name="attachment_count" Required="false" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>

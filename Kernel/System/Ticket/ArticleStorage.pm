@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,7 +13,7 @@ package Kernel::System::Ticket::ArticleStorage;
 use strict;
 use warnings;
 
-use CGI::Carp qw(cluck); 
+use CGI::Carp qw(cluck);
 use File::Path;
 use File::Basename;
 
@@ -270,6 +270,15 @@ sub ArticleDeleteAttachment {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    $Self->EventHandler(
+        Event => 'ArticleAttachmentDelete',
+        Data  => {
+            TicketID  => $TicketID,
+            ArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
     return 1;
 }
 
@@ -410,7 +419,7 @@ sub ArticleWriteAttachment {
             VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{ArticleID}, \$Param{Filename}, \$Param{ContentType}, \$Param{Filesize},
-            \$Param{ContentID}, \$Param{ContentAlternative}, \$Disposition, 
+            \$Param{ContentID}, \$Param{ContentAlternative}, \$Disposition,
             \$Param{UserID}, \$Param{UserID},
         ],
     );
@@ -456,6 +465,16 @@ sub ArticleWriteAttachment {
             Bind => [ \$Param{UserID}, \$Param{ArticleID} ],
         );
     }
+
+    $Self->EventHandler(
+        Event => 'ArticleAttachmentAdd',
+        Data  => {
+            TicketID  => $TicketID,
+            ArticleID => $Param{ArticleID},
+            FileName  => $Param{Filename}
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -595,7 +614,7 @@ sub ArticleAttachment {
         return;
     }
 
-    # fallback 
+    # fallback
     if ( !$Param{AttachmentID} ) {
         $Param{AttachmentID} = $Param{FileID};
         print STDERR "ArticleAttachment: obsolete parameter FileID instead of AttachmentID given!\n";
@@ -778,7 +797,7 @@ sub _ArticleStorageSwitchAsyncWorker {
             while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
                 $AttachmentCount = $Row[0];
             }
-            
+
             if ( !defined $AttachmentCount ) {
                 # do the migration
                 $Self->_ArticleStorageSwitch(
@@ -838,7 +857,7 @@ sub _ArticleStorageSwitch {
         # use only metadata files
         next FILE if $File =~ /\/plain.txt$/;
         next FILE if $File !~ /(.*?)\.(content_alternative|content_id|content_type|disposition)$/;
-        
+
         my $AttachmentFile = $1;
         my $Filename       = basename($1);
         my $MetaProperty   = $2;
@@ -881,7 +900,7 @@ sub _ArticleStorageSwitch {
             Bind => [
                 \$Param{ArticleID}, \$Filename, \$Metadata{$Filename}->{content_type}, \$Metadata{$Filename}->{content_size},
                 \$Metadata{$Filename}->{content_id}, \$Metadata{$Filename}->{content_alternative},
-                \$Metadata{$Filename}->{disposition}, \$Metadata{$Filename}->{create_time}, 
+                \$Metadata{$Filename}->{disposition}, \$Metadata{$Filename}->{create_time},
                 \$Metadata{$Filename}->{create_time},
             ],
         );
