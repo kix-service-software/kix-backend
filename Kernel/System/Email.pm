@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -26,6 +26,7 @@ our @ObjectDependencies = qw(
     Encode
     HTMLUtils
     Log
+    Main
     Time
 );
 
@@ -271,7 +272,7 @@ sub Send {
         $Header{'Message-ID'} = $Param{'Message-ID'};
     }
     else {
-        $Header{'Message-ID'} = $Self->_MessageIDCreate();
+        $Header{'Message-ID'} = $Self->GenerateMessageID();
     }
 
     # save MessageID for later use
@@ -681,7 +682,7 @@ sub Bounce {
     }
 
     # check and create message id
-    my $MessageID = $Param{'Message-ID'} || $Self->_MessageIDCreate();
+    my $MessageID = $Param{'Message-ID'} || $Self->GenerateMessageID();
 
     # split body && header
     my @EmailPlain = split( /\n/, $Param{Email} );
@@ -724,6 +725,36 @@ sub Bounce {
     return ( \$HeaderAsString, \$BodyAsString );
 }
 
+=item GenerateMessageID()
+
+generate a new message id
+
+    my $MessageID = $EmailObject->GenerateMessageID();
+
+    returns
+
+    $NewMessageID = '<1739230819.861376@example.com>';
+
+
+=cut
+
+sub GenerateMessageID {
+    my ( $Self, %Param ) = @_;
+
+    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
+    my $Random = $Kernel::OM->Get('Main')->GenerateRandomString(
+        Length     => 6,
+        Dictionary => [ 0..9 ],
+    );
+    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
+    if ( IsHashRefWithData($FQDN) ) {
+        $FQDN = $FQDN->{Backend}
+    }
+    my $NewMessageID = '<' . $Time . '.' . $Random . '@' . $FQDN . '>';
+
+    return $NewMessageID;
+}
+
 =begin Internal:
 
 =cut
@@ -745,17 +776,6 @@ sub _EncodeMIMEWords {
         # MIME::Words, see pod of MIME::Words)
         Field => $Param{Field},
     );
-}
-
-sub _MessageIDCreate {
-    my ( $Self, %Param ) = @_;
-
-    my $FQDN = $Kernel::OM->Get('Config')->Get('FQDN');
-    if (IsHashRefWithData($FQDN)) {
-        $FQDN = $FQDN->{Backend}
-    }
-
-    return '<' . time() . '.' . rand(999999) . '@' . $FQDN . '>';
 }
 
 1;
