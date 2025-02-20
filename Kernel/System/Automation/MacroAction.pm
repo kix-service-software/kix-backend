@@ -742,9 +742,10 @@ sub MacroActionExecute {
 
     # fallback if not already known
     $Self->{MacroVariables} //= {
-        RootObjectID => $Self->{RootObjectID},
-        ObjectID     => $Param{ObjectID},
-        EventData    => $Self->{EventData}
+        RootObjectID  => $Self->{RootObjectID},
+        RootMacroType => $Self->{RootMacroType},
+        ObjectID      => $Param{ObjectID},
+        EventData     => $Self->{EventData}
     };
 
     # we need the result variables and macro results for the assignments
@@ -752,8 +753,9 @@ sub MacroActionExecute {
     $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
     $BackendObject->{MacroResults}    = $Self->{MacroResults};
 
-    # add root object id
-    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
+    # add root object id and type
+    $BackendObject->{RootObjectID}  = $Self->{RootObjectID};
+    $BackendObject->{RootMacroType} = $Self->{RootMacroType};
 
     # add event data
     $BackendObject->{EventData} = $Self->{EventData};
@@ -788,15 +790,21 @@ sub MacroActionExecute {
         for my $Option ( values( %{ $Definition{Options} } ) ) {
             next OPTION if ( !IsHashRef( $Option->{Placeholder} ) );
 
+            # special handling. When root macro type is current macro type, use root object id
+            my $ObjectID = $Param{ObjectID};
+            if ( $Self->{RootMacroType} eq $Macro{Type} ) {
+                $ObjectID = $Self->{RootObjectID};
+            }
+
             $Parameters{ $Option->{Name} } = $Self->_ReplaceValuePlaceholder(
                 Value     => $Parameters{ $Option->{Name} },
                 ValueType => $Option->{Placeholder}->{ValueType} || '',
                 Richtext  => $Option->{Placeholder}->{Richtext},
                 Translate => $Option->{Placeholder}->{Translate},
                 MacroType => $Macro{Type},
-                ObjectID  => $Param{ObjectID},
+                ObjectID  => $ObjectID,
                 UserID    => $Param{UserID},
-                Data      => {},
+                Data      => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
             );
         }
 
@@ -1155,12 +1163,6 @@ sub _ReplaceValuePlaceholder {
         $Data = {
             %{ $Data },
             %{ $Param{Data} }
-        };
-    }
-    if ( IsHashRefWithData( $Param{AdditionalData} ) ) {
-        $Data = {
-            %{ $Data },
-            %{ $Param{AdditionalData} }
         };
     }
 
