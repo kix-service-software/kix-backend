@@ -1133,8 +1133,8 @@ sub GenerateRandomString {
 
     # get CSPRNG
     my $CSPRNGObject = Bytes::Random::Secure->new(
-        bits        => 256,
-        nonblocking => 1,
+        Bits        => 256,
+        NonBlocking => 1,
     );
 
     # init length for string
