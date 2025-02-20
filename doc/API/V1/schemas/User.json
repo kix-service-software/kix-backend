@@ -816,6 +816,10 @@
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -984,6 +988,7 @@
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
