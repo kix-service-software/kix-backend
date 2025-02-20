@@ -12,6 +12,10 @@ use strict;
 use warnings;
 use utf8;
 
+# include needed libs
+use HTTP::Response;
+use HTTP::Status qw(:constants status_message);
+
 use vars (qw($Self));
 
 use Kernel::System::WebUserAgent;
@@ -34,10 +38,6 @@ my %UnitTestData = (
 $Helper->HTTPRequestOverwriteSet(
     sub {
         my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
-
-        # include needed libs
-        use HTTP::Response;
-        use HTTP::Status qw(:constants status_message);
 
         # declare response
         my $Response;

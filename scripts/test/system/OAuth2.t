@@ -10,6 +10,10 @@ use strict;
 use warnings;
 use utf8;
 
+# include needed libs
+use HTTP::Response;
+use HTTP::Status qw(:constants status_message);
+
 use vars (qw($Self));
 
 # get helper object
@@ -22,15 +26,11 @@ $Helper->HTTPRequestOverwriteSet(
     sub {
         my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
 
-        # include needed libs
-        use HTTP::Response;
-        use HTTP::Status qw(:constants status_message);
-
         # declare response
         my $Response;
 
         if ( $Request->uri()->host() eq $OAuthProviderHost ) {
-            if ( $Request->method eq 'GET' ) {
+            if ( $Request->method() eq 'GET' ) {
                 my %QueryParameter = $Request->uri()->query_form();
 
                 if (
@@ -53,7 +53,7 @@ $Helper->HTTPRequestOverwriteSet(
                     $Response->header('Location' => $RedirectURI);
                 }
             }
-            elsif ( $Request->method eq 'POST' ) {
+            elsif ( $Request->method() eq 'POST' ) {
                 $Response = HTTP::Response->new(HTTP_OK, status_message(HTTP_OK));
                 $Response->header('Content-Type' => 'application/json');
                 $Response->content(
