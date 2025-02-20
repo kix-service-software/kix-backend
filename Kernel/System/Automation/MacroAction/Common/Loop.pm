@@ -122,8 +122,9 @@ sub Run {
             # keep event data if given
             EventData => $Self->{EventData} || $Param{EventData},
 
-            # keep root object id
-            RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}
+            # keep root object id and type
+            RootObjectID  => $Self->{RootObjectID} || $Param{ObjectID},
+            RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
         );
     }
 
