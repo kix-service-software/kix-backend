@@ -2960,11 +2960,11 @@ delete a plain article
         UserID    => 123,
     );
 
-=item ArticleDeleteAttachment()
+=item ArticleDeleteAttachments()
 
 delete all attachments of an article
 
-    my $Success = $TicketObject->ArticleDeleteAttachment(
+    my $Success = $TicketObject->ArticleDeleteAttachments(
         ArticleID => 123,
         UserID    => 123,
     );

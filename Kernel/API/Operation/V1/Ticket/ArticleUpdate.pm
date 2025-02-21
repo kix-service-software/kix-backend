@@ -379,7 +379,7 @@ sub _ArticleUpdate {
     # update attachment list
     if ( defined( $Article->{Attachments} ) ) {
         # delete all (old) attachments
-        my $DeleteSuccessful = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+        my $DeleteSuccessful = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachments(
             ArticleID => $Param{ArticleID},
             UserID    => $Param{UserID},
         );
