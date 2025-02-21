@@ -96,7 +96,7 @@ sub ArticleDelete {
     );
 
     # delete attachments
-    $Self->ArticleDeleteAttachment(
+    $Self->ArticleDeleteAttachments(
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
     );
@@ -203,7 +203,7 @@ sub ArticleDeletePlain {
     return 1;
 }
 
-sub ArticleDeleteAttachment {
+sub ArticleDeleteAttachments {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
@@ -257,6 +257,12 @@ sub ArticleDeleteAttachment {
         }
     }
 
+    # update article attachment counter
+    $Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE article SET attachment_count = 0 WHERE id = ?",
+        Bind => [ \$Param{ArticleID} ],
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
@@ -264,10 +270,69 @@ sub ArticleDeleteAttachment {
         ObjectID  => $TicketID.'::'.$Param{ArticleID},
     );
 
+    return 1;
+}
+
+sub ArticleDeleteAttachment {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(AttachmentID ArticleID UserID)) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    # get attachment data
+    my %Attachment = $Self->ArticleAttachment(
+        ArticleID    => $Param{ArticleID},
+        AttachmentID => $Param{AttachmentID},
+        UserID       => $Param{UserID},
+        NoContent    => 1,
+    );
+
+    # get ticket id of article
+    my $TicketID = $Self->ArticleGetTicketID(
+        ArticleID => $Param{ArticleID}
+    );
+
+    # delete attachments
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => 'DELETE FROM article_attachment WHERE id = ? AND article_id = ?',
+        Bind => [ \$Param{AttachmentID}, \$Param{ArticleID} ],
+    );
+
+    # delete from fs
+    my $ContentPath = $Self->ArticleGetContentPath(
+        TicketID  => $TicketID,
+        ArticleID => $Param{ArticleID}
+    );
+    my $Path = "$Self->{ArticleDataDir}/$ContentPath/$Param{ArticleID}";
+
+    my $Success = $Kernel::OM->Get('Main')->FileDelete(
+        Directory       => $Path,
+        Filename        => $Attachment{Filename},
+        Type            => 'Local',
+        DisableWarnings => 1,
+    );
+
     # update article attachment counter
-    $Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE article SET attachment_count = 0 WHERE id = ?",
-        Bind => [ \$Param{ArticleID} ],
+    if ( $Attachment{Disposition} eq 'attachment' ) {
+        $Kernel::OM->Get('DB')->Do(
+            SQL => "UPDATE article SET attachment_count = attachment_count - 1 WHERE id = ?",
+            Bind => [ \$Param{ArticleID} ],
+        );
+    }
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Ticket.Article.Attachment',
+        ObjectID  => $TicketID.'::'.$Param{ArticleID},
     );
 
     $Self->EventHandler(
@@ -483,6 +548,17 @@ sub ArticleWriteAttachment {
         ObjectID  => $TicketID.'::'.$Param{ArticleID}.'::'.$Param{Filename},
     );
 
+    $Self->EventHandler(
+        Event => 'ArticleAttachmentDelete',
+        Data  => {
+            TicketID  => $TicketID,
+            ArticleID => $Param{ArticleID},
+            Filename  => $Param{Filename},
+        },
+        UserID => $Param{UserID},
+    );
+
+
     return 1;
 }
 
@@ -605,11 +681,11 @@ sub ArticleAttachmentIndexRaw {
 sub ArticleAttachment {
     my ( $Self, %Param ) = @_;
 
-    # check ArticleContentPath
-    if ( !$Self->{ArticleContentPath} ) {
+    # check ArticleDataDir
+    if ( !$Self->{ArticleDataDir} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ArticleContentPath!'
+            Message  => 'Need ArticleDataDir!'
         );
         return;
     }
@@ -698,6 +774,8 @@ sub ArticleAttachment {
             Disposition        => $Disposition,
         );
     }
+
+    return %Data if ( $Param{NoContent} );
 
     # load content from FS
     my $ContentPath = $Self->ArticleGetContentPath( ArticleID => $Param{ArticleID} );
