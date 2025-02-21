@@ -10,107 +10,103 @@ use strict;
 use warnings;
 use utf8;
 
-use vars (qw($Self));
+# include needed libs
+use HTTP::Response;
+use HTTP::Status qw(:constants status_message);
 
-use Test::Fake::HTTPD;
-use URI;
+use vars (qw($Self));
 
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-# fake HTTP server
-my $HttpdOAP = Test::Fake::HTTPD->new(
-    timeout     => 5,
-    daemon_args => { }, # HTTP::Daemon args
-);
-$Self->True(
-    $HttpdOAP,
-    'Create OAuth2-Provider HTTP service'
-);
+my $OAuthProviderHost = 'oauth.unittest';
+my $LocalHost         = 'local.unittest';
 
-$HttpdOAP->run(sub {
-    my $Req = shift;
+$Helper->HTTPRequestOverwriteSet(
+    sub {
+        my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
 
-    if ( $Req->method eq 'GET' ) {
-        my $URI = URI->new( $Req->uri() );
+        # declare response
+        my $Response;
 
-        my %QueryParameter = $URI->query_form();
+        if ( $Request->uri()->host() eq $OAuthProviderHost ) {
+            if ( $Request->method() eq 'GET' ) {
+                my %QueryParameter = $Request->uri()->query_form();
 
-        if (
-            $QueryParameter{client_id}
-            && $QueryParameter{scope}
-            && $QueryParameter{redirect_uri}
-            && $QueryParameter{response_type} eq 'code'
-            && $QueryParameter{response_mode} eq 'query'
-            && $QueryParameter{state}
-        ) {
-            my $RedirectURI            = URI->new( $QueryParameter{redirect_uri} );
-            my %RedirectQueryParameter = $RedirectURI->query_form();
+                if (
+                    $QueryParameter{client_id}
+                    && $QueryParameter{scope}
+                    && $QueryParameter{redirect_uri}
+                    && $QueryParameter{response_type} eq 'code'
+                    && $QueryParameter{response_mode} eq 'query'
+                    && $QueryParameter{state}
+                ) {
+                    my $RedirectURI            = URI->new( $QueryParameter{redirect_uri} );
+                    my %RedirectQueryParameter = $RedirectURI->query_form();
 
-            $RedirectQueryParameter{state} = $QueryParameter{state};
-            $RedirectQueryParameter{code}  = '1234';
+                    $RedirectQueryParameter{state} = $QueryParameter{state};
+                    $RedirectQueryParameter{code}  = '1234';
 
-            $RedirectURI->query_form( \%RedirectQueryParameter );
+                    $RedirectURI->query_form( \%RedirectQueryParameter );
 
-            return [ 302, [ 'Location', $RedirectURI ], [ ] ];
+                    $Response = HTTP::Response->new(HTTP_FOUND, status_message(HTTP_FOUND));
+                    $Response->header('Location' => $RedirectURI);
+                }
+            }
+            elsif ( $Request->method() eq 'POST' ) {
+                $Response = HTTP::Response->new(HTTP_OK, status_message(HTTP_OK));
+                $Response->header('Content-Type' => 'application/json');
+                $Response->content(
+'{
+    "access_token": "1234",
+    "refresh_token": "5678",
+    "expires_in": "1200",
+    "id_token": "abcd"
+}'
+                );
+            }
+            else {
+                $Response = HTTP::Response->new(HTTP_BAD_REQUEST, status_message(HTTP_BAD_REQUEST));
+                $Response->header('Content-Type' => 'application/json');
+                $Response->content('');
+            }
         }
-    }
-    elsif ( $Req->method eq 'POST' ) {
-        return [ 200, [ 'Content-Type', 'application/json' ], [ '{
-            "access_token": "1234",
-            "refresh_token": "5678",
-            "expires_in": "1200",
-            "id_token": "abcd"
-        }' ] ];
-    }
+        elsif ( $Request->uri()->host() eq $LocalHost ) {
+            if ( $Request->method eq 'GET' ) {
+                my %QueryParameter = $Request->uri()->query_form();
+                
+                if (
+                    $QueryParameter{state}
+                    && $QueryParameter{code}
+                ) {
+                    my ( $ProfileID, $Token ) = $Kernel::OM->Get('OAuth2')->ProcessAuthCode(
+                        AuthCode => $QueryParameter{code},
+                        State    => $QueryParameter{state}
+                    );
 
-    return [ 400, [ 'Content-Type', 'application/json' ], [ ] ];
-});
-$Self->True(
-    $HttpdOAP->host_port,
-    'Run OAuth2-Provider HTTP service on '.$HttpdOAP->host_port
-);
-
-my $HttpdLocal = Test::Fake::HTTPD->new(
-    timeout     => 5,
-    daemon_args => { }, # HTTP::Daemon args
-);
-$Self->True(
-    $HttpdLocal,
-    'Create local HTTP service'
-);
-
-$HttpdLocal->run(sub {
-    my $Req = shift;
-
-    if ( $Req->method eq 'GET' ) {
-        my $URI = URI->new( $Req->uri() );
-
-        my %QueryParameter = $URI->query_form();
-        
-        if (
-            $QueryParameter{state}
-            && $QueryParameter{code}
-        ) {
-            my ( $ProfileID, $Token ) = $Kernel::OM->Get('OAuth2')->ProcessAuthCode(
-                AuthCode => $QueryParameter{code},
-                State    => $QueryParameter{state}
-            );
-
-            return [ 200, [ 'Content-Type', 'application/json' ], [
+                    $Response = HTTP::Response->new(HTTP_OK, status_message(HTTP_OK));
+                    $Response->header('Content-Type' => 'application/json');
+                    $Response->content(
 '{
     "profile_id": "' . $ProfileID . '",
     "token": "' . $Token . '"
 }'
-            ] ];
+                    );
+                }
+            }
+            else {
+                $Response = HTTP::Response->new(HTTP_BAD_REQUEST, status_message(HTTP_BAD_REQUEST));
+                $Response->header('Content-Type' => 'application/json');
+                $Response->content('');
+            }
         }
-    }
+        # fallback with 404
+        else {
+            $Response = HTTP::Response->new(HTTP_NOT_FOUND, status_message(HTTP_NOT_FOUND));
+        }
 
-    return [ 400, [ 'Content-Type', 'application/json' ], [ ] ];
-});
-$Self->True(
-    $HttpdLocal->host_port,
-    'Run local HTTP service on '.$HttpdLocal->host_port
+        return $Response;
+    }
 );
 
 # get oauth2 object
@@ -194,9 +190,9 @@ $Self->Is(
 my $OAuth2ProfileUpdate = $OAuth2Object->ProfileUpdate(
     ID            => $OAuth2ProfileAdd,
     Name         => 'Profile2',
-    URLAuth      => $HttpdOAP->endpoint->as_string() . '/auth',
-    URLToken     => $HttpdOAP->endpoint->as_string() . '/token',
-    URLRedirect  => $HttpdLocal->endpoint->as_string() . '/authcode',
+    URLAuth      => 'https://' . $OAuthProviderHost . '/auth',
+    URLToken     => 'https://' . $OAuthProviderHost . '/token',
+    URLRedirect  => 'https://' . $LocalHost . '/authcode',
     ClientID     => "ClientID2",
     ClientSecret => "ClientSecret2",
     Scope        => "Scope2",
@@ -223,17 +219,17 @@ $Self->Is(
 );
 $Self->Is(
     $OAuth2Profile{URLAuth},
-    $HttpdOAP->endpoint->as_string() . '/auth',
+    'https://' . $OAuthProviderHost . '/auth',
     'ProfileGet() - URLAuth',
 );
 $Self->Is(
     $OAuth2Profile{URLToken},
-    $HttpdOAP->endpoint->as_string() . '/token',
+    'https://' . $OAuthProviderHost . '/token',
     'ProfileGet() - URLToken',
 );
 $Self->Is(
     $OAuth2Profile{URLRedirect},
-    $HttpdLocal->endpoint->as_string() . '/authcode',
+    'https://' . $LocalHost . '/authcode',
     'ProfileGet() - URLRedirect',
 );
 $Self->Is(
@@ -282,17 +278,17 @@ $Self->Is(
 );
 $Self->Is(
     $OAuth2Profile{URLAuth},
-    $HttpdOAP->endpoint->as_string() . '/auth',
+    'https://' . $OAuthProviderHost . '/auth',
     'ProfileGet() with Name param - URLAuth',
 );
 $Self->Is(
     $OAuth2Profile{URLToken},
-    $HttpdOAP->endpoint->as_string() . '/token',
+    'https://' . $OAuthProviderHost . '/token',
     'ProfileGet() with Name param - URLToken',
 );
 $Self->Is(
     $OAuth2Profile{URLRedirect},
-    $HttpdLocal->endpoint->as_string() . '/authcode',
+    'https://' . $LocalHost . '/authcode',
     'ProfileGet() with Name param - URLRedirect',
 );
 $Self->Is(
@@ -327,7 +323,7 @@ $Self->Is(
 );
 
 my %List = $OAuth2Object->ProfileList(
-    Valid => 0,    # just valid/all accounts
+    Valid => 0,    # all accounts
 );
 $Self->True(
     $List{$OAuth2ProfileAdd},
@@ -369,7 +365,7 @@ $Self->IsDeeply(
     {
         ProfileID   => $ProfileID,
         TokenType   => 'access_token',
-        URLRedirect => $HttpdLocal->endpoint->as_string() . '/authcode'
+        URLRedirect => 'https://' . $LocalHost . '/authcode'
     },
     'StateGet()',
 );
@@ -385,7 +381,7 @@ $Self->True(
 $State = $OAuth2Object->StateAdd(
     ProfileID   => $ProfileID,
     TokenType   => 'access_token',
-    URLRedirect => $HttpdOAP->endpoint->as_string() . '/auth',
+    URLRedirect => 'https://' . $OAuthProviderHost . '/auth',
     StateData   => {
         ProfileID   => '0',
         TokenType   => 'UnitTest',
@@ -406,7 +402,7 @@ $Self->IsDeeply(
     {
         ProfileID   => $ProfileID,
         TokenType   => 'access_token',
-        URLRedirect => $HttpdOAP->endpoint->as_string() . '/auth',
+        URLRedirect => 'https://' . $OAuthProviderHost . '/auth',
         UnitTest    => 1
     },
     'StateGet()',
@@ -441,7 +437,7 @@ $Self->Is(
 );
 $Self->Is(
     $QueryParameter{'redirect_uri'},
-    $HttpdLocal->endpoint->as_string() . '/authcode',
+    'https://' . $LocalHost . '/authcode',
     'PrepareAuthURL() - redirect_uri',
 );
 $Self->Is(
@@ -471,7 +467,7 @@ $Self->IsDeeply(
     {
         ProfileID   => $ProfileID,
         TokenType   => 'access_token',
-        URLRedirect => $HttpdLocal->endpoint->as_string() . '/authcode'
+        URLRedirect => 'https://' . $LocalHost . '/authcode'
     },
     'StateGet() for AuthURL',
 );
@@ -526,7 +522,7 @@ $Self->Is(
 $AuthURL = $OAuth2Object->PrepareAuthURL(
     ProfileID   => $OAuth2ProfileAdd,
     TokenType   => 'id_token',
-    URLRedirect => $HttpdLocal->endpoint->as_string() . '/ProcessAuthCode',
+    URLRedirect => 'https://' . $LocalHost . '/ProcessAuthCode',
     Nonce       => 1,
     StateData   => {
         UnitTest => 1,
@@ -550,7 +546,7 @@ $Self->Is(
 );
 $Self->Is(
     $QueryParameter{'redirect_uri'},
-    $HttpdLocal->endpoint->as_string() . '/ProcessAuthCode',
+    'https://' . $LocalHost . '/ProcessAuthCode',
     'PrepareAuthURL() - redirect_uri',
 );
 $Self->Is(
@@ -580,7 +576,7 @@ $Self->IsDeeply(
     {
         ProfileID   => $ProfileID,
         TokenType   => 'id_token',
-        URLRedirect => $HttpdLocal->endpoint->as_string() . '/ProcessAuthCode',
+        URLRedirect => 'https://' . $LocalHost . '/ProcessAuthCode',
         Nonce       => $QueryParameter{'nonce'},
         UnitTest    => 1
     },
@@ -675,8 +671,6 @@ $Self->True(
 );
 
 1;
-
-
 
 =back
 
