@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kix_config version="1.0" init="Framework">
+    <ConfigItem AccessLevel="internal" Name="ObjectTag::ObjectTypes" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">.</Description>
+        <Group>ObjectTag</Group>
+        <SubGroup>Core::ObjectTag</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Queue">Queue</Item>
+                <Item Key="SystemAddress">SystemAddress</Item>
+                <Item Key="Priority">Priority</Item>
+                <Item Key="TicketState">TicketState</Item>
+                <Item Key="TicketType">TicketType</Item>
+                <Item Key="Job">Job</Item>
+                <Item Key="TextModule">TextModule</Item>
+                <Item Key="DynamicField">DynamicField</Item>
+                <Item Key="FAQCategory">FAQCategory</Item>
+                <Item Key="MailFilter">MailFilter</Item>
+                <Item Key="Notification">Notification</Item>
+                <Item Key="GeneralCatalogItem">GeneralCatalogItem</Item>
+                <Item Key="ReportDefinition">ReportDefinition</Item>
+                <Item Key="SysConfigOptionDefinition">SysConfigOptionDefinition</Item>
+                <Item Key="Role">Role</Item>
+                <Item Key="Class">ConfigItemClass<Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>
