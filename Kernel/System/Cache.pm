@@ -70,6 +70,9 @@ sub new {
 
     $Self->{StatsEnabled} = $Param{StatsEnabled} // 0;
 
+    $Self->{Debug} = 0;
+    $Self->{DebugInitialized} = 0;
+
     return $Self;
 }
 
@@ -153,8 +156,9 @@ sub Set {
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
     }
 
     # set default TTL to 20 days
@@ -172,14 +176,8 @@ sub Set {
     }
 
     # debug
-    if (
-        defined $Self->{Debug}
-        && $Self->{Debug} > 0
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Set Key:$Param{Key} TTL:$Param{TTL}!",
-        );
+    if ( $Self->{Debug} ) {
+        $Self->_Debug('', "Set Key:$Param{Key} TTL:$Param{TTL}!");
     }
 
     # store TypeDependencies information
@@ -296,6 +294,12 @@ sub Get {
     }
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
+
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
+    }
 
     # check in-memory cache
     if ( $Self->{CacheInMemory} && ( $Param{CacheInMemory} // 1 ) ) {
@@ -475,6 +479,12 @@ sub Delete {
 
     return if $Self->{IgnoreTypes}->{$Param{Type}};
 
+    # we have to initialize it here instead of the constructor, to prevent a deep recursion
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
+        $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
+    }
+
     $Param{Indent} = $Param{Indent} || '';
 
     # Delete and cleanup operations should also be done if the cache is disabled
@@ -543,8 +553,9 @@ sub CleanUp {
     $Param{Indent} = $Param{Indent} || '';
 
     # we have to initialize it here instead of the constructor, to prevent a deep recursion
-    if ( !defined $Self->{Debug} ) {
+    if ( !$Self->{DebugInitialized} && !$Param{'_ConfigInit'} ) {
         $Self->{Debug} = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+        $Self->{DebugInitialized} = 1;
     }
 
     if ( $Param{KeepTypes} && $Self->{Debug} ) {

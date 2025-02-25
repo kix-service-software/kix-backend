@@ -2120,6 +2120,116 @@ continue {
 }
 
 # ------------------------------------------------------------ #
+# test for KIX2018-12939
+# ------------------------------------------------------------ #
+
+{
+    # get id by number for checks
+    my $CheckConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+        ConfigItemNumber => $ConfigItemNumbers[8],
+    );
+
+    my @Tests = (
+        {
+            'Name'      => 'Only ConfigItemName, equal value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, lowercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'unittest - class 1 configitem 8 version 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, uppercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'UNITTEST - CLASS 1 CONFIGITEM 8 VERSION 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, mixed case value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnItTeSt - ClAsS 1 CoNfIgItEm 8 VeRsIoN 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, equal value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, lowercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'unittest - class 1 configitem 8 version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, uppercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'UNITTEST - CLASS 1 CONFIGITEM 8 VERSION 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, mixed case value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnItTeSt - ClAsS 1 CoNfIgItEm 8 VeRsIoN 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, wrong value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version X'
+            },
+            Expected    => undef,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, wrong value for ConfigItemName',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version X',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => undef,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, wrong value for Class',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[1] }
+            },
+            Expected    => undef,
+        },
+    );
+    for my $Test ( @Tests ) {
+        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            %{ $Test->{Parameter} }
+        );
+        $Self->Is(
+            $ConfigItemID,
+            $Test->{Expected},
+            "Test $TestCount: ConfigItemLookup() - " . $Test->{Name}
+        );
+    }
+
+    # increase the test counter
+    $TestCount++;
+}
+
+# ------------------------------------------------------------ #
 # testing support for attachments
 # ------------------------------------------------------------ #
 

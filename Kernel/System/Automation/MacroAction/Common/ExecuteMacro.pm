@@ -102,8 +102,9 @@ sub Run {
         # keep additional data
         AdditionalData => $Param{AdditionalData},
 
-        # keep root object id
-        RootObjectID => $Self->{RootObjectID} || $Param{ObjectID},
+        # keep root object id and type
+        RootObjectID  => $Self->{RootObjectID} || $Param{ObjectID},
+        RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
     );
 
     return 1;

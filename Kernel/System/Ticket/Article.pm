@@ -337,14 +337,8 @@ sub ArticleCreate {
         $Param{Body} =~ s/\r/\n/g;
 
         # create MessageID
-        if (!$Param{MessageID}) {
-            my $Time      = $Kernel::OM->Get('Time')->SystemTime();
-            my $Random    = rand 999999;
-            my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
-            if (IsHashRefWithData($FQDN)) {
-                $FQDN = $FQDN->{Backend}
-            }
-            $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        if ( !$Param{MessageID} ) {
+            $Param{MessageID} = $Kernel::OM->Get('Email')->GenerateMessageID();
         }
     }
 
@@ -2283,13 +2277,7 @@ sub ArticleBounce {
     }
 
     # create message id
-    my $Time         = $Kernel::OM->Get('Time')->SystemTime();
-    my $Random       = rand 999999;
-    my $FQDN         = $Kernel::OM->Get('Config')->Get('FQDN');
-    if (IsHashRefWithData($FQDN)) {
-        $FQDN = $FQDN->{Backend}
-    }
-    my $NewMessageID = "<$Time.$Random.0\@$FQDN>";
+    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
     my $Email        = $Self->ArticlePlain( ArticleID => $Param{ArticleID} );
 
     # check if plain email exists
@@ -2972,11 +2960,11 @@ delete a plain article
         UserID    => 123,
     );
 
-=item ArticleDeleteAttachment()
+=item ArticleDeleteAttachments()
 
 delete all attachments of an article
 
-    my $Success = $TicketObject->ArticleDeleteAttachment(
+    my $Success = $TicketObject->ArticleDeleteAttachments(
         ArticleID => 123,
         UserID    => 123,
     );

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -509,21 +509,25 @@ sub TicketCreate {
     }
 
     # check ticket title
-    if ( !defined $Param{Title} ) {
-        $Param{Title} = '';
-    } else {
+    if ( !$Param{Title} ) {
 
-        # TODO: replace placeholders
-        # $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        #     RichText => 0,
-        #     Text     => $Param{Title},
-        #     Data     => \%Param,
-        #     UserID   => $Param{UserID},
-        # );
+        # get default ticket title
+        my $DefaultTicketTitle = $Kernel::OM->Get('Config')->Get('Ticket::Title::Default') || '-';
+        $Param{Title} = $DefaultTicketTitle;
 
-        # substitute title if needed
-        $Param{Title} = substr( $Param{Title}, 0, 255 );
+        $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            Text            => $Param{Title},
+            RichText        => 0,
+            Translate       => 0,
+            ReplaceNotFound => 0,
+            Data            => \%Param,
+            UserID          => $Param{UserID},
+        );
+
     }
+
+    # substitute title if needed
+    $Param{Title} = substr( $Param{Title}, 0, 255 );
 
     # check given organisation id
     my $ExistingOrganisationID;
@@ -567,7 +571,7 @@ sub TicketCreate {
                 $Param{ContactID} = $ContactID;
             }
         }
-        
+
         if ( $Param{ContactID} =~ /^\d+$/ ) {
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 ID     => $Param{ContactID},
@@ -1272,7 +1276,7 @@ sub TicketGet {
                 st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
                 st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
                 st.timeout, st.type_id, st.archive_flag,
-                st.create_by, st.change_by, accounted_time
+                st.create_by, st.change_by, accounted_time, attachment_count
             FROM ticket st
             WHERE st.id = ?',
         Bind  => [ \$Param{TicketID} ],
@@ -1300,6 +1304,7 @@ sub TicketGet {
         $Ticket{CreateBy}        = $Row[18];
         $Ticket{ChangeBy}        = $Row[19];
         $Ticket{AccountedTime}   = $Row[20];
+        $Ticket{AttachmentCount} = $Row[21] || 0;
     }
 
     # check ticket
@@ -5827,36 +5832,6 @@ sub CountArticles {
     return $Result;
 }
 
-=item CountAttachments()
-
-Returns the number of attachments in all articles of a given ticket.
-
-    my $Result = $TicketObject->CountAttachments(
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-=cut
-
-sub CountAttachments {
-    my ( $Self, %Param ) = @_;
-    my $Result = 0;
-
-    my @ArticleList = $Self->ArticleContentIndex(
-        TicketID                   => $Param{TicketID},
-        StripPlainBodyAsAttachment => 1,
-        UserID                     => $Param{UserID} || 1,
-    );
-
-    for my $Article (@ArticleList) {
-        my %AtmIndex = %{ $Article->{Atms} };
-        my @AtmKeys  = keys(%AtmIndex);
-        $Result = $Result + ( scalar(@AtmKeys) || 0 );
-    }
-
-    return $Result;
-}
-
 =item CountLinkedObjects()
 
 Returns the number of objects linked with a given ticket.
@@ -5990,6 +5965,99 @@ END
     return $Result;
 }
 
+=item TicketAttachmentCountUpdate()
+
+updates the number of attachments of an ticket
+
+    my $Result = $TicketObject->TicketAttachmentCountUpdate(
+        TicketID => 123,
+        Notify   => 1 | 0      # optional - notify clients (default 0)
+    );
+
+=cut
+
+sub TicketAttachmentCountUpdate {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(TicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
+        TicketID => $Param{TicketID}
+    );
+
+    my $Success = $Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
+        Bind => [ \$AttachmentCount, \$Param{TicketID} ],
+    );
+    if (!$Success) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Couldn't update ticket attachment count for ticket ($Param{TicketID})!",
+        );
+        return;
+    }
+
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
+
+    if ($Param{Notify}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket',
+            ObjectID  => $Param{TicketID},
+        );
+    }
+
+    return 1;
+}
+
+=item TicketAttachmentCountCalculate()
+
+calculate the number of attachments of an ticket
+
+    my $Count = $TicketObject->TicketAttachmentCountCalculate(
+        TicketID => 123
+    );
+
+=cut
+
+sub TicketAttachmentCountCalculate {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(TicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $AttachmentCount = 0;
+
+    my @Articles = $Self->ArticleGet(
+        TicketID => $Param{TicketID},
+        UserID   => 1
+    );
+    if (@Articles) {
+        for my $Article (@Articles) {
+            $AttachmentCount += $Article->{AttachmentCount} || 0;
+        }
+    }
+
+    return $AttachmentCount;
+}
+
 =item ArticleMove()
 
 Moves an article to another ticket
@@ -6070,8 +6138,9 @@ sub ArticleMove {
     $Self->EventHandler(
         Event => 'ArticleMove',
         Data  => {
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
+            TicketID    => $Param{TicketID},
+            ArticleID   => $Param{ArticleID},
+            OldTicketID => $TicketID
         },
         UserID => $Param{UserID},
     );
@@ -6733,9 +6802,9 @@ sub MarkAsSeen {
     # check needed stuff
     for my $Needed (qw(TicketID UserID)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Log')->Log( 
-                Priority => 'error', 
-                Message => "Need $Needed!" 
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $Needed!"
             );
             return;
         }

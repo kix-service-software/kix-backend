@@ -1783,14 +1783,24 @@ sub _ImportXMLDataMerge {
                 next COUNTER;
             }
 
+            if ( $Param{EmptyFieldsLeaveTheOldValues} ) {
+                # do not override old value with an empty field is imported
+                next COUNTER if ( !defined( $Param{XMLData2D}->{ $Key } ) );
+            }
+
             # prepare value
             my $Value = $Kernel::OM->Get('ITSMConfigItem')->XMLImportValuePrepare(
                 ClassID      => $Param{ClassID},
                 Item         => $Item,
-                Value        => $Param{XMLData2D}->{$Key},
+                Value        => $Param{XMLData2D}->{ $Key },
                 UserID       => $Param{UserID},
                 UsageContext => $Param{UsageContext},
                 Silent       => $Param{Silent}
+            );
+
+            return if (
+                defined( $Param{XMLData2D}->{ $Key } )
+                && !defined( $Value )
             );
 
             # check if value of previous version should be restored

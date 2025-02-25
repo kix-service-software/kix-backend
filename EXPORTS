@@ -148,6 +148,7 @@ Console::Command::Maint::PostMaster::SpoolMailsReprocess                      = 
 Console::Command::Maint::SystemMonitoring::NagiosCheck                        = Kernel::System::Console::Command::Maint::SystemMonitoring::NagiosCheck
 Console::Command::Maint::SystemMonitoring::NagiosCheckTicketCount             = Kernel::System::Console::Command::Maint::SystemMonitoring::NagiosCheckTicketCount
 Console::Command::Maint::Ticket::ArchiveCleanup                               = Kernel::System::Console::Command::Maint::Ticket::ArchiveCleanup
+Console::Command::Maint::Ticket::AttachmentCountUpdate                        = Kernel::System::Console::Command::Maint::Ticket::AttachmentCountUpdate
 Console::Command::Maint::Ticket::Delete                                       = Kernel::System::Console::Command::Maint::Ticket::Delete
 Console::Command::Maint::Ticket::Dump                                         = Kernel::System::Console::Command::Maint::Ticket::Dump
 Console::Command::Maint::Ticket::FulltextIndexRebuild                         = Kernel::System::Console::Command::Maint::Ticket::FulltextIndexRebuild

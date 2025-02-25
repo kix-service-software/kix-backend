@@ -440,7 +440,11 @@ sub Run {
         return;
     }
 
-    $Self->SetResult(Name => 'NewTicketID', Value => $TicketID);
+    $Self->SetResult(
+        Name   => 'NewTicketID',
+        Value  => $TicketID,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

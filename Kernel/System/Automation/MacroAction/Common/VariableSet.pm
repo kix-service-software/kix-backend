@@ -88,7 +88,11 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     # set the variable
-    $Self->SetResult(Name => 'Variable', Value => $Param{Config}->{Value});
+    $Self->SetResult(
+        Name   => 'Variable',
+        Value  => $Param{Config}->{Value},
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

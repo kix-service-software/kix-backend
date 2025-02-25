@@ -156,7 +156,7 @@ sub DisplayValueRender {
 
     VALUEITEM:
     for my $Item (@Values) {
-        next VALUEITEM if !$Item && $Item != 0;
+        next VALUEITEM if ( !defined( $Item ) || $Item eq '' );
 
         my $ReadableValue = $Item;
         my $NotTranslatedReadableValue = $Item;

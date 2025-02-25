@@ -4378,7 +4378,56 @@ my @ImportDataTests = (
         },
     },
 
-    # 48 import a zero value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # 48 import a new value for Text1 and clear GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned off
+    # to prepare config item for next test case
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[0],
+            },
+            MappingObjectData => [
+                {
+                    Key        => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Text1::1',
+                },
+                {
+                    Key => 'GeneralCatalog1::1',
+                },
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[25],
+                ImportDataRow => [
+                    'UnitTest - Importtest 5',
+                    'Production',
+                    'Operational',
+                    'UnitTest',
+                    '',
+                ],
+                UserID        => 1,
+                UsageContext  => 'Agent',
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 5,
+            LastVersion   => {
+                Name                 => 'UnitTest - Importtest 5',
+                DeplState            => 'Production',
+                InciState            => 'Operational',
+                'Text1::1'           => 'UnitTest',
+            },
+        },
+    },
+
+    # 49 import a zero value for Text1, with EmptyFieldsLeaveTheOldValues turned on
     # zero should be used as new value for Text1
     {
         SourceImportData => {

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -13,6 +13,7 @@ package Kernel::System::Main;
 use strict;
 use warnings;
 
+use Bytes::Random::Secure;
 use Digest::MD5 qw(md5_hex);
 use Data::Dumper;
 use Hash::Flatten;
@@ -826,10 +827,19 @@ sub Dump {
     # -> http://rt.cpan.org/Ticket/Display.html?id=28607
     if ( $Type eq 'binary' ) {
 
-        # Clone the data because we need to disable the utf8 flag in all
-        # reference variables and do not to want to do this in the orig.
-        # variables because they will still used in the system.
-        my $DataNew = Storable::dclone( \$Data );
+        my $DataNew;
+        {
+            # The store functions will croak if they run into such references
+            # unless you set $Storable::forgive_me to some TRUE value.
+            # In that case, the fatal message is converted to a warning
+            # and some meaningless string is stored instead.
+            local $Storable::forgive_me = 1;
+
+            # Clone the data because we need to disable the utf8 flag in all
+            # reference variables and do not to want to do this in the orig.
+            # variables because they will still used in the system.
+            $DataNew = Storable::dclone( \$Data );
+        }
 
         # Disable utf8 flag.
         $Self->_Dump($DataNew);
@@ -1109,7 +1119,7 @@ defaults to a length of 16 and alphanumerics ( 0..9, A-Z and a-z).
     my $String = $MainObject->GenerateRandomString(
         Length     => 32,
         Dictionary => [ 0..9, 'a'..'f' ], # hexadecimal
-        );
+    );
 
     returns
 
@@ -1121,27 +1131,28 @@ defaults to a length of 16 and alphanumerics ( 0..9, A-Z and a-z).
 sub GenerateRandomString {
     my ( $Self, %Param ) = @_;
 
+    # get CSPRNG
+    my $CSPRNGObject = Bytes::Random::Secure->new(
+        Bits        => 256,
+        NonBlocking => 1,
+    );
+
+    # init length for string
     my $Length = $Param{Length} || 16;
 
-    # The standard list of characters in the dictionary. Don't use special chars here.
+    # prepare default dictionary
     my @DictionaryChars = ( 0 .. 9, 'A' .. 'Z', 'a' .. 'z' );
 
     # override dictionary with custom list if given
-    if ( $Param{Dictionary} && ref $Param{Dictionary} eq 'ARRAY' ) {
+    if ( IsArrayRefWithData( $Param{Dictionary} ) ) {
         @DictionaryChars = @{ $Param{Dictionary} };
     }
 
-    my $DictionaryLength = scalar @DictionaryChars;
+    # init dictionary string
+    my $DictionaryString = join('', @DictionaryChars);
 
     # generate the string
-    my $String;
-
-    for ( 1 .. $Length ) {
-
-        my $Key = int rand $DictionaryLength;
-
-        $String .= $DictionaryChars[$Key];
-    }
+    my $String = $CSPRNGObject->string_from($DictionaryString, $Length);
 
     return $String;
 }

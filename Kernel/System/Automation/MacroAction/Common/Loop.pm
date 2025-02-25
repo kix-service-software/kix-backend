@@ -107,7 +107,11 @@ sub Run {
 
     foreach my $Value ( @ValueList ) {
         if ( $Param{Config}->{LoopVariable} ) {
-            $Self->SetResult(Name => $Param{Config}->{LoopVariable}, Value => $Value);
+            $Self->SetResult(
+                Name   => $Param{Config}->{LoopVariable},
+                Value  => $Value,
+                UserID => $Param{UserID}
+            );
         }
 
         my $Result = $AutomationObject->MacroExecute(
@@ -118,8 +122,9 @@ sub Run {
             # keep event data if given
             EventData => $Self->{EventData} || $Param{EventData},
 
-            # keep root object id
-            RootObjectID => $Self->{RootObjectID} || $Param{ObjectID}
+            # keep root object id and type
+            RootObjectID  => $Self->{RootObjectID} || $Param{ObjectID},
+            RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
         );
     }
 

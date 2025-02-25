@@ -150,6 +150,26 @@ $Self->True(
     $OrganisationID2,
     'Created second organisation'
 );
+my $OrganisationID3 =  $Kernel::OM->Get('Organisation')->OrganisationAdd(
+    Number  => 'org1',
+    Name    => 'Organisation 1',
+    ValidID => 1,
+    UserID  => 1
+);
+$Self->True(
+    $OrganisationID3,
+    'Created third organisation'
+);
+my $OrganisationID4 =  $Kernel::OM->Get('Organisation')->OrganisationAdd(
+    Number  => 'org2',
+    Name    => 'Organisation 2',
+    ValidID => 1,
+    UserID  => 1
+);
+$Self->True(
+    $OrganisationID4,
+    'Created fourth organisation'
+);
 
 # prepare config for sync
 my $SyncConfig = {
@@ -172,16 +192,18 @@ my $SyncConfig = {
 
     ContactUserSync => {
         'DynamicField_Source' => 'ARRAYJOIN[, ]:LDAP: {objectClass}',
-        'Email'               => 'mail',
+        'Email'               => [
+            'primaryMail',
+            'mail'
+        ],
         'Firstname'           => 'givenName',
         'Lastname'            => 'sn',
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
             'ou',
-            'SET:' . $OrganisationID1,
-            'SET:-1',
+            'organisations'
         ],
-        'PrimaryOrganisationID' => 'SET:' . $OrganisationID1,
+        'PrimaryOrganisationID' => 'organisation',
         'City'                  => 'l',
         'Language'              => 'st',
         'Mobile'                => 'mobile',
@@ -193,32 +215,44 @@ my $SyncConfig = {
         'ArrayTest'             => [
             'givenName',
             'sn'
-        ]
+        ],
+        'ArrayIndex1'           => 'ARRAYINDEX[0]:organisations',
+        'ArrayIndex2'           => 'ARRAYINDEX[2]:organisations',
+        'ArrayIndex3'           => 'ARRAYINDEX[3]:organisations',
+        'ArrayIndex4'           => 'ARRAYINDEX[0]:l',
+        'ArrayIndex5'           => 'ARRAYINDEX[1]:l',
     }
 };
 
 # prepare test users
 my %TestUsers = (
     'uid=user1,ou=users,dc=example,dc=com' => [
-        objectClass => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
-        uid         => 'syncuser1',
-        ou          => 'capeIT',
-        givenName   => 'Max',
-        sn          => 'Mustermann',
-        mail        => [
+        objectClass   => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
+        uid           => 'syncuser1',
+        ou            => 'capeIT',
+        givenName     => 'Max',
+        sn            => 'Mustermann',
+        primaryMail   => 'max.mustermann@kixdesk.com',
+        mail          => [
+            'SMTP:max.mustermann@cape-it.de',
+            'smtp:info@kixdesk.com',
             'max.mustermann@kixdesk.com',
-            'max.mustermann@cape-it.de',
-            'info@kixdesk.com',
             '',
             'dummy1@kixdesk.com',
             'dummy2@kixdesk.com',
             'dummy3@kixdesk.com',
             'dummy4@kixdesk.com'
         ],
-        l           => 'Chemnitz',
-        postalCode  => '09113',
-        street      => 'Schönherrstr. 8',
-        jpegPhoto   => $TestImage,
+        organisation  => $OrganisationID1,
+        organisations => [
+            'org1',
+            'Organisation 2',
+            'unknown'
+        ],
+        l             => 'Chemnitz',
+        postalCode    => '09113',
+        street        => 'Schönherrstr. 8',
+        jpegPhoto     => $TestImage,
     ]
 );
 
@@ -279,7 +313,9 @@ ldap_mockify {
             'OrganisationIDs'     => [
                 $OrganisationID1,
                 $OrganisationID2,
-                1
+                $OrganisationID3,
+                $OrganisationID4,
+                1,
             ],
             'PrimaryOrganisationID' => $OrganisationID1,
             'City'                  => 'Chemnitz',
@@ -299,7 +335,12 @@ END
             'ArrayTest'             => [
                 'Max',
                 'Mustermann'
-            ]
+            ],
+            'ArrayIndex1'           => 'org1',
+            'ArrayIndex2'           => 'unknown',
+            'ArrayIndex3'           => '',
+            'ArrayIndex4'           => 'Chemnitz',
+            'ArrayIndex5'           => '',
         },
         'ApplyContactMappingToLDAPResult: Expected mapped data'
     );

@@ -208,9 +208,11 @@ sub Jq {
         Suffix => '.filter'
     );
 
+    binmode($DataFH, ':encoding(UTF-8)');
     print {$DataFH} $Param{Data};
     close $DataFH;
 
+    binmode($FilterFH, ':encoding(UTF-8)');
     print {$FilterFH} $Param{Filter};
     close $FilterFH;
 

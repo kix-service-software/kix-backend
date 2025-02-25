@@ -490,6 +490,9 @@ sub Rollback {
     # reset time freeze
     $Self->FixedTimeUnset();
 
+    # reset lwp useragent overwirte
+    $Self->HTTPRequestOverwriteUnset();
+
     $Kernel::OM->Get('Cache')->CleanUp();
 
     if ( $Self->{SysConfigChanged} ) {
@@ -611,6 +614,23 @@ sub FixedTimeAddSeconds {
     return;
 }
 
+my $HTTPRequestOverwrite;
+sub HTTPRequestOverwriteSet {
+    my ( $Self, $CodeRef ) = @_;
+
+    $HTTPRequestOverwrite = $CodeRef;
+
+    return;
+}
+
+sub HTTPRequestOverwriteUnset {
+    my ( $Self ) = @_;
+
+    $HTTPRequestOverwrite = undef;
+
+    return;
+}
+
 # See http://perldoc.perl.org/5.10.0/perlsub.html#Overriding-Built-in-Functions
 BEGIN {
     *CORE::GLOBAL::time = sub {
@@ -646,6 +666,29 @@ BEGIN {
             no warnings 'redefine';
             delete $INC{$FilePath};
             $Kernel::OM->Get('Main')->Require($Object);
+        }
+    }
+
+    no strict "refs";
+    no warnings 'redefine';
+
+    use HTTP::Date;
+    use LWP::Protocol::http;
+    my $HTTPRequest = \&LWP::Protocol::http::request;
+
+    *LWP::Protocol::http::request = sub {
+        if ( defined( $HTTPRequestOverwrite ) ) {
+            my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
+
+            my $Response = $HTTPRequestOverwrite->( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout );
+
+            $Response->header("Client-Date" => HTTP::Date::time2str(time));
+            $Response->request($Request);
+
+            return $Response;
+        }
+        else {
+            return $HTTPRequest->( @_ );
         }
     }
 }

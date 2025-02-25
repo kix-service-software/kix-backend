@@ -574,7 +574,7 @@ sub UserSearch {
         && !defined( $Param{IsOutOfOffice} )
         && !$Param{ValidID}
         && !$Param{SearchUserID}
-        && !IsArrayRefWithData{$Param{UserIDs}}
+        && !IsArrayRefWithData($Param{UserIDs})
         && !IsHashRefWithData($Param{HasPermission})
         && !IsArrayRefWithData($Param{RoleIDs})
         && !IsArrayRefWithData($Param{NotRoleIDs})
@@ -756,14 +756,14 @@ END
 
         # part 1 - in case ticket base permissions exist for the relevant users
         my @WherePart1 = (
-            "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+            "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.valid_id = 1 AND r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
         # safe our current bind data
         my @OrgBind = @Bind;
 
         foreach my $PermissionValue ( @PermissionValues ) {
-            push @WherePart1, "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket' AND rp1.target IN ('*', ?) AND (rp1.value & ?) = ?)";
+            push @WherePart1, "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.valid_id = 1 AND r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket' AND rp1.target IN ('*', ?) AND (rp1.value & ?) = ?)";
             push @WherePart1, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
 
             push(@Bind, ( \$Param{HasPermission}->{ObjectID}, \$PermissionValue, \$PermissionValue, \$PermissionValue, \$PermissionValue ));
@@ -773,7 +773,7 @@ END
 
         # part 2 - in case ticket base permissions do not exist for the relevant users
         my @WherePart2 = (
-            "NOT EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
+            "NOT EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.valid_id = 1 AND r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket')"
         );
 
         # add the original bind data to the second union part
