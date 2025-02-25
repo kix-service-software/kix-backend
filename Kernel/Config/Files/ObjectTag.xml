@@ -21,7 +21,7 @@
                 <Item Key="ReportDefinition">ReportDefinition</Item>
                 <Item Key="SysConfigOptionDefinition">SysConfigOptionDefinition</Item>
                 <Item Key="Role">Role</Item>
-                <Item Key="Class">ConfigItemClass<Item>
+                <Item Key="Class">ConfigItemClass</Item>
             </Hash>
         </Setting>
     </ConfigItem>
