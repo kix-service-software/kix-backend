@@ -201,9 +201,9 @@ my $SyncConfig = {
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
             'ou',
-            'organisations'
+            'companies'
         ],
-        'PrimaryOrganisationID' => 'organisation',
+        'PrimaryOrganisationID' => 'company',
         'City'                  => 'l',
         'Language'              => 'st',
         'Mobile'                => 'mobile',
@@ -216,9 +216,9 @@ my $SyncConfig = {
             'givenName',
             'sn'
         ],
-        'ArrayIndex1'           => 'ARRAYINDEX[0]:organisations',
-        'ArrayIndex2'           => 'ARRAYINDEX[2]:organisations',
-        'ArrayIndex3'           => 'ARRAYINDEX[3]:organisations',
+        'ArrayIndex1'           => 'ARRAYINDEX[0]:companies',
+        'ArrayIndex2'           => 'ARRAYINDEX[2]:companies',
+        'ArrayIndex3'           => 'ARRAYINDEX[3]:companies',
         'ArrayIndex4'           => 'ARRAYINDEX[0]:l',
         'ArrayIndex5'           => 'ARRAYINDEX[1]:l',
     }
@@ -243,8 +243,8 @@ my %TestUsers = (
             'dummy3@kixdesk.com',
             'dummy4@kixdesk.com'
         ],
-        organisation  => $OrganisationID1,
-        organisations => [
+        company       => $OrganisationID1,
+        companies     => [
             'org1',
             'Organisation 2',
             'unknown'
