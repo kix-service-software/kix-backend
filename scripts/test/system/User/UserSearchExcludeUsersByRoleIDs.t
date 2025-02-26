@@ -24,21 +24,25 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my ($RoleIDAdmin, $RoleIDTicket, $RoleIDQueue3, %LoginRoleMapping, %LoginUserIDMapping, @Tests);
+my ($RoleIDAdmin, $RoleIDAdminNoBase, $RoleIDTicket, $RoleIDTicketBaseNone, $RoleIDQueue3, %LoginRoleMapping, %LoginUserIDMapping, @Tests);
 _CreateRoles();
 
 if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue3) {
     %LoginRoleMapping = (
-        'UserSearchTestAdmin'        => [$RoleIDAdmin],
-        'UserSearchTestTicket'       => [$RoleIDTicket],
-        'UserSearchTestAdminTicket'  => [$RoleIDAdmin,$RoleIDTicket],
-        'UserSearchTestTicketQueue3' => [$RoleIDQueue3]
+        'UserSearchTestAdmin'               => [$RoleIDAdmin],
+        'UserSearchTestAdminNobase'         => [$RoleIDAdminNoBase],
+        'UserSearchTestTicket'              => [$RoleIDTicket],
+        'UserSearchTestTicketBaseNone'      => [$RoleIDTicketBaseNone],
+        'UserSearchTestAdminTicket'         => [$RoleIDAdmin,$RoleIDTicket],
+        'UserSearchTestAdminTicketBaseNone' => [$RoleIDAdmin,$RoleIDTicketBaseNone],
+        'UserSearchTestAdminNoBaseTicketBaseNone' => [$RoleIDAdminNoBase,$RoleIDTicketBaseNone],
+        'UserSearchTestTicketQueue3'        => [$RoleIDQueue3]
     );
     _CreateUsers();
 
     if (scalar(keys %LoginRoleMapping) == scalar(keys %LoginUserIDMapping)) {
 
-        # forbid admin role
+        # forbid admin roles
         my $Succes = _SetConfig();
 
         if ($Succes) {
@@ -77,22 +81,22 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue3) {
         if ($Succes) {
             @Tests = (
                 {
-                    Result => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Result => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicket", "UserSearchTestAdminTicket", 'UserSearchTestAdminTicketBaseNone'],
                     Name   => 'No roles forbidden'
                 },
                 {
-                    Result => ["UserSearchTestAdmin", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Result => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicket", "UserSearchTestAdminTicket", "UserSearchTestAdminTicketBaseNone"],
                     Name   => 'No roles forbidden + given user id exception',
                     UserID => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
                 # FIXME: currently not usable - see KIX2018-11535
                 # {
-                #     Result      => ["UserSearchTestAdmin", "UserSearchTestTicketQueue3"],
+                #     Result      => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicketQueue3", "UserSearchTestAdminTicketBaseNone"],
                 #     Name        => 'No roles forbidden + queue 3',
                 #     ObjectID    => 3
                 # },
                 {
-                    Result   => ["UserSearchTestAdmin", "UserSearchTestAdminTicket", "UserSearchTestTicket"],
+                    Result   => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicket", "UserSearchTestAdminTicket", "UserSearchTestAdminTicketBaseNone"],
                     Name     => 'No roles forbidden + queue 8',
                     ObjectID => 8
                 },
@@ -119,9 +123,10 @@ sub _CreateRoles {
     );
     $Self->True(
         $RoleIDAdmin,
-        "RoleAdd() - Admin role",
+        "RoleAdd() - Admin role ($RoleIDAdmin)",
     );
     if ($RoleIDAdmin) {
+        # all resoucre
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDAdmin,
             TypeID     => 1,
@@ -129,10 +134,65 @@ sub _CreateRoles {
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
+        # all object
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDAdmin,
+            TypeID     => 2,
+            Target     => '/*{}',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+        # all properties
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDAdmin,
+            TypeID     => 3,
+            Target     => '/*{}',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+        # all Base::Ticket
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDAdmin,
             TypeID     => 4,
             Target     => '*',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+    }
+
+
+    $RoleIDAdminNoBase = $RoleObject->RoleAdd(
+        Name         => 'TestRole_AdminNoBase',
+        UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+        ValidID      => 1,
+        UserID       => 1
+    );
+    $Self->True(
+        $RoleIDAdminNoBase,
+        "RoleAdd() - AdminNoBase role ($RoleIDAdminNoBase)",
+    );
+    if ($RoleIDAdminNoBase) {
+        # all resoucre
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDAdminNoBase,
+            TypeID     => 1,
+            Target     => '/*',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+        # all object
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDAdminNoBase,
+            TypeID     => 2,
+            Target     => '/*{}',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+        # all properties
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDAdminNoBase,
+            TypeID     => 3,
+            Target     => '/*{}',
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
@@ -146,9 +206,10 @@ sub _CreateRoles {
     );
     $Self->True(
         $RoleIDTicket,
-        "RoleAdd() - Ticket role",
+        "RoleAdd() - Ticket role ($RoleIDTicket)",
     );
     if ($RoleIDTicket) {
+        # all tickets
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDTicket,
             TypeID     => 1,
@@ -156,6 +217,7 @@ sub _CreateRoles {
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
+        # all Base::Ticket
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDTicket,
             TypeID     => 4,
@@ -163,11 +225,41 @@ sub _CreateRoles {
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
+        # but not Queue 3
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDTicket,
             TypeID     => 4,
             Target     => '3',
             Value      => Kernel::System::Role::Permission::PERMISSION->{DENY},
+            UserID     => 1
+        );
+    }
+
+    $RoleIDTicketBaseNone = $RoleObject->RoleAdd(
+        Name         => 'TestRole_TicketBaseNone',
+        UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+        ValidID      => 1,
+        UserID       => 1
+    );
+    $Self->True(
+        $RoleIDTicketBaseNone,
+        "RoleAdd() - TicketBaseNone role ($RoleIDTicketBaseNone)",
+    );
+    if ($RoleIDTicketBaseNone) {
+        # all tickets
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDTicketBaseNone,
+            TypeID     => 1,
+            Target     => '/tickets',
+            Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
+            UserID     => 1
+        );
+        # no Base::Ticket
+        $RoleObject->PermissionAdd(
+            RoleID     => $RoleIDTicketBaseNone,
+            TypeID     => 4,
+            Target     => '*',
+            Value      => Kernel::System::Role::Permission::PERMISSION->{NONE},
             UserID     => 1
         );
     }
@@ -180,9 +272,10 @@ sub _CreateRoles {
     );
     $Self->True(
         $RoleIDQueue3,
-        "RoleAdd() - Queue3 role",
+        "RoleAdd() - Queue3 role ($RoleIDQueue3)",
     );
     if ($RoleIDQueue3) {
+        # all tickets
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDQueue3,
             TypeID     => 1,
@@ -190,6 +283,7 @@ sub _CreateRoles {
             Value      => Kernel::System::Role::Permission::PERMISSION_CRUD,
             UserID     => 1
         );
+        # Base::Ticket only queue 3
         $RoleObject->PermissionAdd(
             RoleID     => $RoleIDQueue3,
             TypeID     => 4,
@@ -202,7 +296,7 @@ sub _CreateRoles {
 
 sub _SetConfig {
     my ($Value) = @_;
-    $Value //= [$RoleIDAdmin];
+    $Value //= [$RoleIDAdmin, $RoleIDAdminNoBase];
     my $Success;
 
     $Kernel::OM->Get('Config')->Set(
@@ -286,6 +380,7 @@ sub _DoTests {
 
         if ( IsHashRefWithData(\%List) && IsArrayRefWithData($Test->{Result}) ) {
             my %ReversedList = reverse(%List);
+
             for my $ResultValue ( @{$Test->{Result}} ) {
                 $Self->ContainedIn(
                     $ResultValue,
