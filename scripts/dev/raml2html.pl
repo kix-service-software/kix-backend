@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -19,6 +19,9 @@ use JSON::MaybeXS;
 use JSON::Validator;
 
 STDOUT->autoflush(1);
+
+my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
+my $CURRENT_YEAR = $year + 1900;
 
 my %Options;
 GetOptions(
@@ -41,7 +44,7 @@ foreach my $Option ( qw(SourceDirectory RamlFile OutputFile Template SchemaDirec
 # check if directory is given
 if ( $Options{Help} || %Missing ) {
     print "raml2html - Generates the HTML documentation from the RAML description.\n";
-    print "Copyright (C) 2006-2024 KIX Service Software GmbH, http//www.kixdesk.com/\n";
+    print "Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com/\n";
     print "\n";
     print "Required Options:\n";
     print "  --source-directory  - The directories where the documentation sources are located. All directories will be \"merged\" in the given order. The bundled schema files will also be created in these directories, depending on their schema sources.\n";
