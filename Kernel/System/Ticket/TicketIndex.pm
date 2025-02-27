@@ -1,8 +1,10 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# based on the original work of:
+# Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# the enclosed file LICENSE for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
 
@@ -278,7 +280,6 @@ sub TicketIndexGetQueueStats {
 
 1;
 
-
 =back
 
 =head1 TERMS AND CONDITIONS
@@ -287,7 +288,7 @@ This software is part of the KIX project
 (L<https://www.kixdesk.com/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
+LICENSE for license information (AGPL). If you did not receive this file, see
 
 <https://www.gnu.org/licenses/agpl.txt>.
 

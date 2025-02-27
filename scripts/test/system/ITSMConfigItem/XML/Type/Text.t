@@ -1,9 +1,9 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH,https://www.kixdesk.com 
 # --
-# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# This software comes with ABSOLUTELY NO WARRANTY. For details,see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
-# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# did not receive this file,see https://www.gnu.org/licenses/agpl.txt.
 # --
 
 use strict;
@@ -1338,7 +1338,6 @@ $Helper->Rollback();
 
 1;
 
-
 =back
 
 =head1 TERMS AND CONDITIONS
@@ -1346,8 +1345,8 @@ $Helper->Rollback();
 This software is part of the KIX project
 (L<https://www.kixdesk.com/>).
 
-This software comes with ABSOLUTELY NO WARRANTY. For details, see the enclosed file
-LICENSE-AGPL for license information (AGPL). If you did not receive this file, see
+This software comes with ABSOLUTELY NO WARRANTY. For details,see the enclosed file
+LICENSE-AGPL for license information (AGPL). If you did not receive this file,see
 
 <https://www.gnu.org/licenses/agpl.txt>.
 
