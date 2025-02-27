@@ -1,7 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -2993,6 +2991,7 @@ sub _PrepareLikeString {
 
 =end Internal:
 
+
 =back
 
 =head1 TERMS AND CONDITIONS
@@ -3006,6 +3005,3 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
-
-
-

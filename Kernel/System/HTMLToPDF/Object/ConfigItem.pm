@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -389,6 +389,7 @@ sub _XMLDataGet {
 }
 
 1;
+
 
 =back
 

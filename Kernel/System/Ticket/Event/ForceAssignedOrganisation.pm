@@ -1,7 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
-# based on the original work of:
-# Copyright (C) 2001-2022 OTRS AG, https://otrs.com/
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -107,6 +105,7 @@ sub Run {
 }
 
 1;
+
 
 =back
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2020 c.a.p.e. IT GmbH, https://www.cape-it.de
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -239,6 +239,7 @@ sub ExportWorker {
 }
 
 1;
+
 
 =back
 
