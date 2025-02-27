@@ -289,6 +289,7 @@ ldap_mockify {
     my $Result = $ldap->search(
         base   => $SyncConfig->{BaseDN},
         filter => $Filter,
+        attrs  => ['*','organisation','organisations','jpegPhoto'],
     );
 
     my $SyncContactRef = $Kernel::OM->Get('LDAPUtils')->ApplyContactMappingToLDAPResult(

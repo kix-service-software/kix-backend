@@ -12,10 +12,13 @@ use warnings;
 
 use File::Basename;
 
+my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
+my $CURRENT_YEAR = $year + 1900;
+
 # check if directory is given
 if ( scalar(@ARGV) < 1 ) {
     print "kix.ModifyCopyright.pl\n";
-    print "Copyright (C) 2006-2024 KIX Service Software GmbH, http//www.kixdesk.com/\n";
+    print "Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com/\n";
     print "USAGE: kix.ModifyCopyright.pl <otrs archive file> <directory>\n";
     exit -1;
 }
@@ -63,8 +66,8 @@ _ModifyCSS($FileList);
 sub _ModifyPerl {
     my ( $FileList ) = @_;
 
-    my $OTRSHEADER = '# --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $OTRSHEADER = "# --
+# Modified version of the work: Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -72,18 +75,18 @@ sub _ModifyPerl {
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-';
+";
 
-    my $CAPEHEADER = '# --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $KIXHEADER = "# --
+# Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-';
+";
 
-    my $FOOTER = '
+    my $FOOTER = "
 =back
 
 =head1 TERMS AND CONDITIONS
@@ -97,7 +100,7 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 <https://www.gnu.org/licenses/agpl.txt>.
 
 =cut
-';
+";
 
     FILE:
     foreach my $File (split(/\n/, $FileList)) {
@@ -105,7 +108,7 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 
         my $OTRSFile = _IsOTRSFile($File);
 
-        print STDOUT "(".($OTRSFile ? 'OTRS' : 'KIX').") $File\n";
+        print STDOUT "(".($OTRSFile ? "OTRS" : "KIX").") $File\n";
 
         open(FILE, "<$File") || die "File not found";
         my @Lines = <FILE>;
@@ -137,7 +140,7 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 
         # print header
         if ( !$OTRSFile ) {
-            print FILE $CAPEHEADER;
+            print FILE $KIXHEADER;
         } else {
             print FILE $OTRSHEADER;
         }
@@ -157,8 +160,8 @@ LICENSE-AGPL for license information (AGPL). If you did not receive this file, s
 sub _ModifyTemplate {
     my ( $FileList ) = @_;
 
-    my $OTRSHEADER = '# --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $OTRSHEADER = "# --
+# Modified version of the work: Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -166,16 +169,16 @@ sub _ModifyTemplate {
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-';
+";
 
-    my $CAPEHEADER = '# --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $CAPEHEADER = "# --
+# Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
 # did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 # --
-';
+";
 
     FILE:
     foreach my $File (split(/\n/, $FileList)) {
@@ -183,7 +186,7 @@ sub _ModifyTemplate {
 
         my $OTRSFile = _IsOTRSFile($File);
 
-        print STDOUT "(".($OTRSFile ? 'OTRS' : 'KIX').") $File\n";
+        print STDOUT "(".($OTRSFile ? "OTRS" : "KIX").") $File\n";
 
         open(FILE, "<$File") || die "File not found";
         my @Lines = <FILE>;
@@ -221,8 +224,8 @@ sub _ModifyTemplate {
 sub _ModifyJS {
     my ( $FileList ) = @_;
 
-    my $OTRSHEADER = '// --
-// Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $OTRSHEADER = "// --
+// Modified version of the work: Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 // based on the original work of:
 // Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 // --
@@ -230,16 +233,16 @@ sub _ModifyJS {
 // the enclosed file LICENSE-AGPL for license information (AGPL). If you
 // did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 // --
-';
+";
 
-    my $CAPEHEADER = '// --
-// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+    my $CAPEHEADER = "// --
+// Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-AGPL for license information (AGPL). If you
 // did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
 // --
-';
+";
 
     FILE:
     foreach my $File (split(/\n/, $FileList)) {
@@ -247,7 +250,7 @@ sub _ModifyJS {
 
         my $OTRSFile = _IsOTRSFile($File);
 
-        print STDOUT "(".($OTRSFile ? 'OTRS' : 'KIX').") $File\n";
+        print STDOUT "(".($OTRSFile ? "OTRS" : "KIX").") $File\n";
 
         open(FILE, "<$File") || die "File not found";
         my @Lines = <FILE>;
@@ -285,15 +288,15 @@ sub _ModifyJS {
 sub _ModifyCSS {
     my ( $FileList ) = @_;
 
-    my $OTRSHEADER = '/**
+    my $OTRSHEADER = "/**
  * This software is part of the KIX project, https://www.kixdesk.com/
- *  Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+ *  Modified version of the work: Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
  *  based on the original work of:
  *  Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
  *  --
- * @project OTRS (https://www.otrs.org) <https://www.otrs.org> - Agent Frontend
- * @copyright OTRS AG
- * @license AGPL (https://www.gnu.org/licenses/agpl.txt) <https://www.gnu.org/licenses/agpl.txt>
+ * \@project OTRS (https://www.otrs.org) <https://www.otrs.org> - Agent Frontend
+ * \@copyright OTRS AG
+ * \@license AGPL (https://www.gnu.org/licenses/agpl.txt) <https://www.gnu.org/licenses/agpl.txt>
  *  --
  *  This software comes with ABSOLUTELY NO WARRANTY. For details, see
  *  the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -301,15 +304,15 @@ sub _ModifyCSS {
  *
  */
 
-';
+";
 
-    my $CAPEHEADER = '/**
+    my $CAPEHEADER = "/**
  * This software is part of the KIX project, https://www.kixdesk.com/
- * Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+ * Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com
  * --
- * @project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
- * @copyright KIX Service Software GmbH
- * @license GPL3 (https://www.gnu.org/licenses/agpl.txt) <https://www.gnu.org/licenses/agpl.txt>
+ * \@project KIX (https://www.kixdesk.com) <https://www.kixdesk.com> - Agent Frontend
+ * \@copyright KIX Service Software GmbH
+ * \@license GPL3 (https://www.gnu.org/licenses/agpl.txt) <https://www.gnu.org/licenses/agpl.txt>
  * --
  * This software comes with ABSOLUTELY NO WARRANTY. For details, see
  * the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -317,7 +320,7 @@ sub _ModifyCSS {
  *
  */
 
-';
+";
 
     FILE:
     foreach my $File (split(/\n/, $FileList)) {
