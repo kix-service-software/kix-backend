@@ -38,7 +38,7 @@ When qr/I query the collection of automation macro type "(.*?)" actiontypes$/, s
 Then qr/the macroactiontype output is "(.*?)"/, sub {
    my $Name=$1;
    my $array=S->{ResponseContent}->{MacroActionType};
-   my @AttributeValue =( "ArticleCreate", "ArticleDelete", "AssembleObject", "Conditional", "ContactSet", "CreateReport", "DynamicFieldSet", "ExecuteMacro", "ExtractText", "FetchAssetAttributes", "LockSet", "Loop", "OrganisationSet", "OwnerSet", "PrioritySet", "ResponsibleSet", "StateSet", "TeamSet", "TicketCreate", "TicketDelete", "TitleSet", "TypeSet", "VariableSet" );
+   my @AttributeValue =( "ArticleAttachmentsDelete", "ArticleCreate", "ArticleDelete", "AssembleObject", "Conditional", "ContactSet", "CreateReport", "DynamicFieldSet", "ExecuteMacro", "ExtractText", "FetchAssetAttributes", "LockSet", "Loop", "OrganisationSet", "OwnerSet", "PrioritySet", "ResponsibleSet", "StateSet", "TeamSet", "TicketCreate", "TicketDelete", "TitleSet", "TypeSet", "VariableSet" );
 
    foreach $hash_ref (@$array) {
       if ($hash_ref->{Name} eq $Name ){

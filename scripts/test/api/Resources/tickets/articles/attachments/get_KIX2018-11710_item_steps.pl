@@ -36,7 +36,6 @@ When qr/I get the article\s*$/, sub {
 };
 
 When qr/I create a article with inline pic$/, sub {
-    print STDERR "TID:".Dumper(S->{ResponseContent}->{TicketID});
     ( S->{Response}, S->{ResponseContent} ) = _Post(
         URL     => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles',
         Token   => S->{Token},
@@ -89,7 +88,6 @@ When qr/I delete this ticket$/, sub {
 };
 
 When qr/I get the inline attachment item\s*$/, sub {
-	print STDERR "hier:".Dumper(S->{TicketID}, S->{ResponseContent}->{Article}->{ArticleID});
 	( S->{Response}, S->{ResponseContent} ) = _Get(
 		Token => S->{Token},
 		URL   => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles/'.S->{ResponseContent}->{Article}->{ArticleID}.'/attachments',

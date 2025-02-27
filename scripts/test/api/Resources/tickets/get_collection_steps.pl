@@ -135,5 +135,5 @@ When qr/I query the collection of tickets with multiplesort by "(.*?)"$/, sub {
 Then qr/the response now contains (\d+) items of type "(.*?)"$/, sub {
    is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
    my $Anzahl = @{S->{ResponseContent}->{$2}};
-   print STDERR "AnzahlTickets:".Dumper($Anzahl);
+#   print STDERR "AnzahlTickets:".Dumper($Anzahl);
 };

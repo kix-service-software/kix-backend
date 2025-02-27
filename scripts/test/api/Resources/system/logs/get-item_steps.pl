@@ -31,7 +31,7 @@ require '_StepsLib.pl';
 When qr/I get the first log\s*$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/logs/'.S->{ResponseContent}->{LogFile}->[0]->{ID},
+      URL   => S->{API_URL}.'/system/logs/'.S->{ResponseContent}->{LogFile}->[1]->{ID},
    );
 };
 
