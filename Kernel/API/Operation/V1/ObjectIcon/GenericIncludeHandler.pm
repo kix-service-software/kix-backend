@@ -89,13 +89,13 @@ sub Run {
     # because they are stored on top of another object.
     my $Object        = $Param{Object};
     my $Config        = $Kernel::OM->Get('Config')->Get('API::Operation::GenericInclude');
-    my $ObjectPattern = $Config->{ObjectIcon}->{ObjectPattern} || {};
+    my $ObjectMapping = $Config->{ObjectIcon}->{ObjectMapping} || {};
 
     if (
-        IsHashRefWithData($ObjectPattern)
-        && $ObjectPattern->{$Object}
+        IsHashRefWithData($ObjectMapping)
+        && $ObjectMapping->{$Object}
     ) {
-        $Object = $ObjectPattern->{$Object};
+        $Object = $ObjectMapping->{$Object};
     }
 
     # perform ObjectIcon search

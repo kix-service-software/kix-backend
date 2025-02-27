@@ -68,12 +68,11 @@ sub _CheckFields {
     my $HasObjectID   = 0;
     for my $Type ( keys %{$Param{Search}} ) {
         if ( ref( $Param{Search}->{ $Type } ) ne 'ARRAY' ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search! Search type has to provide an array.",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Search! Search type has to provide an array.",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
@@ -83,12 +82,11 @@ sub _CheckFields {
                 || !defined( $SearchItem->{Field} )
                 || !defined( $SearchItem->{Value} )
             ) {
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
-                    );
-                }
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
+                    Silent   => $Param{Silent}
+                );
                 return;
             }
             if ( $SearchItem->{Field} eq 'ObjectType' ) {
