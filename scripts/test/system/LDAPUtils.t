@@ -201,9 +201,9 @@ my $SyncConfig = {
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
             'ou',
-            'organisations'
+            'orgs'
         ],
-        'PrimaryOrganisationID' => 'organisation',
+        'PrimaryOrganisationID' => 'org',
         'City'                  => 'l',
         'Language'              => 'st',
         'Mobile'                => 'mobile',
@@ -216,9 +216,9 @@ my $SyncConfig = {
             'givenName',
             'sn'
         ],
-        'ArrayIndex1'           => 'ARRAYINDEX[0]:organisations',
-        'ArrayIndex2'           => 'ARRAYINDEX[2]:organisations',
-        'ArrayIndex3'           => 'ARRAYINDEX[3]:organisations',
+        'ArrayIndex1'           => 'ARRAYINDEX[0]:orgs',
+        'ArrayIndex2'           => 'ARRAYINDEX[2]:orgs',
+        'ArrayIndex3'           => 'ARRAYINDEX[3]:orgs',
         'ArrayIndex4'           => 'ARRAYINDEX[0]:l',
         'ArrayIndex5'           => 'ARRAYINDEX[1]:l',
     }
@@ -227,13 +227,13 @@ my $SyncConfig = {
 # prepare test users
 my %TestUsers = (
     'uid=user1,ou=users,dc=example,dc=com' => [
-        objectClass   => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
-        uid           => 'syncuser1',
-        ou            => 'capeIT',
-        givenName     => 'Max',
-        sn            => 'Mustermann',
-        primaryMail   => 'max.mustermann@kixdesk.com',
-        mail          => [
+        objectClass => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
+        uid         => 'syncuser1',
+        ou          => 'capeIT',
+        givenName   => 'Max',
+        sn          => 'Mustermann',
+        primaryMail => 'max.mustermann@kixdesk.com',
+        mail        => [
             'SMTP:max.mustermann@cape-it.de',
             'smtp:info@kixdesk.com',
             'max.mustermann@kixdesk.com',
@@ -243,16 +243,16 @@ my %TestUsers = (
             'dummy3@kixdesk.com',
             'dummy4@kixdesk.com'
         ],
-        organisation  => $OrganisationID1,
-        organisations => [
+        org         => $OrganisationID1,
+        orgs        => [
             'org1',
             'Organisation 2',
             'unknown'
         ],
-        l             => 'Chemnitz',
-        postalCode    => '09113',
-        street        => 'Schönherrstr. 8',
-        jpegPhoto     => $TestImage,
+        l           => 'Chemnitz',
+        postalCode  => '09113',
+        street      => 'Schönherrstr. 8',
+        jpegPhoto   => $TestImage,
     ]
 );
 
@@ -289,7 +289,7 @@ ldap_mockify {
     my $Result = $ldap->search(
         base   => $SyncConfig->{BaseDN},
         filter => $Filter,
-        attrs  => ['*','organisation','organisations','jpegPhoto'],
+        attrs  => ['*','org','orgs','jpegPhoto'],
     );
 
     my $SyncContactRef = $Kernel::OM->Get('LDAPUtils')->ApplyContactMappingToLDAPResult(
