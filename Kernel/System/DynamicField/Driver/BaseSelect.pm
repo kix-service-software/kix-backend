@@ -129,10 +129,6 @@ sub ValueSet {
 sub ValueValidate {
     my ( $Self, %Param ) = @_;
 
-    # get needed objects
-    my $DynamicFieldValueObject = $Kernel::OM->Get('DynamicFieldValue');
-    my $LogObject               = $Kernel::OM->Get('Log');
-
     # check value
     my @Values;
     if ( IsArrayRefWithData( $Param{Value} ) ) {
@@ -141,18 +137,16 @@ sub ValueValidate {
         @Values = ( $Param{Value} );
     }
 
-    if(!$Param{SearchValidation}) {
-
+    if( !$Param{SearchValidation} ) {
         my $CountMin = $Param{DynamicFieldConfig}->{Config}->{CountMin};
         if (
             $CountMin
             && scalar(@Values) < $CountMin
         ) {
-            return if $Param{Silent};
-
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message => "At least $CountMin value(s) must be selected."
+                Message  => "At least $CountMin value(s) must be selected.",
+                Silent   => $Param{Silent},
             );
             return;
         }
@@ -163,11 +157,10 @@ sub ValueValidate {
             && $CountMax > 1
             && scalar(@Values) > $CountMax
         ) {
-            return if $Param{Silent};
-
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message => "A maximum of $CountMax values can be selected."
+                Message  => "A maximum of $CountMax values can be selected.",
+                Silent   => $Param{Silent},
             );
             return;
         }
@@ -180,34 +173,112 @@ sub ValueValidate {
             )
             && scalar(@Values) > 1
         ) {
-            return if $Param{Silent};
-
-            $LogObject->Log(
+            $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message => "A maximum of 1 value can be selected. (Singleselect)"
+                Message  => "A maximum of 1 value can be selected. (Singleselect)",
+                Silent   => $Param{Silent},
             );
             return;
         }
 
-        if (IsHashRefWithData($Param{DynamicFieldConfig}->{Config}->{PossibleValues})) {
-            for my $Item (@Values) {
-                my $Known = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{$Item};
+        # make sure PossibleValues is a hashref
+        $Param{DynamicFieldConfig}->{Config}->{PossibleValues} //= {};
 
-                if (!$Known) {
-                    return if $Param{Silent};
+        # check the values
+        my $AppendValues;
+        my @RegExList;
+        my $PossibleValuesChanged = 0;
+        ITEM:
+        for my $Item (@Values) {
+            # lookup value
+            my $Known = $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ $Item };
 
-                    $LogObject->Log(
-                        Priority => 'error',
-                        Message  => "Unknown value ($Item)"
+            # skip know values
+            next ITEM if ( defined( $Known ) );
+
+            # init AppendValues config if needed
+            if ( !defined( $AppendValues ) ) {
+                $AppendValues = $Param{DynamicFieldConfig}->{Config}->{AppendValues} || 0;
+
+                # check if AppendValues is active and AppendValuesRoleIDs given
+                if (
+                    $AppendValues
+                    && IsArrayRefWithData( $Param{DynamicFieldConfig}->{Config}->{AppendValuesRoleIDs} )
+                ) {
+                    # assume the agent does not have an allowed role
+                    $AppendValues = 0;
+
+                    # get role list of user
+                    my @RoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
+                        UserID => $Param{UserID},
                     );
-                    return;
+
+                    # check for allowed role
+                    ROLE:
+                    for my $RoleID ( @{ $Param{DynamicFieldConfig}->{Config}->{AppendValuesRoleIDs} } ) {
+                        if ( grep { $_ eq $RoleID } @RoleIDs ) {
+                            $AppendValues = 1;
+
+                            last ROLE;
+                        }
+                    }
                 }
+
+                # init regex list when AppendValues is allowed
+                if ( $AppendValues ) {
+                    @RegExList = @{ $Param{DynamicFieldConfig}->{Config}->{AppendValuesRegexList} || [] };
+                }
+            }
+
+            # append new value
+            if ( $AppendValues ) {
+                # check value against regex list
+                for my $RegEx ( @RegExList ) {
+                    if ( $Item !~ $RegEx->{Value} ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "Invalid value ($Item)",
+                            Slient   => $Param{Silent},
+                        );
+                        return;
+                    }
+                }
+
+                # add new value to possible values
+                $Param{DynamicFieldConfig}->{Config}->{PossibleValues}->{ $Item } = $Item;
+
+                # remember the change
+                $PossibleValuesChanged = 1;
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unknown value ($Item)",
+                    Silent   => $Param{Silent},
+                );
+                return;
+            }
+        }
+
+        # check for change
+        if ( $PossibleValuesChanged ) {
+            # update DynamicField with new PossibleValues
+            my $Success = $Kernel::OM->Get('DynamicField')->DynamicFieldUpdate(
+                %{ $Param{DynamicFieldConfig} },
+                UserID => $Param{UserID},
+            );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Error while updateing dynamic field "' . $Param{DynamicFieldConfig}->{Name} . '"!',
+                    Silent   => $Param{Silent},
+                );
             }
         }
     }
 
     for my $Item (@Values) {
-        my $Success = $DynamicFieldValueObject->ValueValidate(
+        my $Success = $Kernel::OM->Get('DynamicFieldValue')->ValueValidate(
             Value => {
                 ValueText => $Item,
             },
