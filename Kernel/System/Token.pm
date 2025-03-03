@@ -16,6 +16,8 @@ use JSON::WebToken;
 use Kernel::Language qw(Translatable);
 use Kernel::System::VariableCheck qw(:all);
 
+use base qw(Kernel::System::EventHandler);
+
 our @ObjectDependencies = (
     'Config',
     'Log',
@@ -52,6 +54,11 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Token::EventModulePost',
+    );
 
     return $Self;
 }
@@ -275,6 +282,15 @@ sub CreateToken {
         ],
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'TokenAdd',
+        Data   => {
+            Token => $Token,
+        },
+        UserID => 1,
+    );
+
     return $Token;
 }
 
@@ -311,6 +327,15 @@ sub RemoveToken {
         Message  => "Removed token $Param{Token}."
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'TokenRemove',
+        Data   => {
+            Token => $Param{Token},
+        },
+        UserID => 1,
+    );
+
     return 1;
 
 }
@@ -321,6 +346,7 @@ returns the payload of a given token, adding LastRequestTime
 
     my $Payload = $TokenObject->ExtractToken(
         Token => '1234567890123456',
+        IgnoreLastRequestTime => 0 | 1    # optional - 0 is default
     );
 
 =cut
@@ -337,38 +363,10 @@ sub ExtractToken {
         return;
     }
 
-     # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get time of last request
-    $Kernel::OM->Get('DB')->Prepare(
-        SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
-        Bind => [ \$Param{Token} ],
-    );
-
-    my $TokenFound = 0;
-    my $LastRequestTimeUnix;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $TokenFound = $Row[0];
-
-        if ( $Row[1] ) {
-            $LastRequestTimeUnix = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                String => $Row[1],
-            );
-        }
-    }
-
-    if ( !$TokenFound ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => 'Token not found in database!'
-        );
-    }
-
     # decode token
     my $Payload = decode_jwt(
         $Param{Token},
-        $ConfigObject->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
+        $Kernel::OM->Get('Config')->Get('TokenSecret') || '###KIX_TOKEN_SECRET!!!',
     );
 
     # unable to decode
@@ -376,14 +374,33 @@ sub ExtractToken {
         return;
     }
 
-    # enrich payload
-    $Payload->{LastRequestTimeUnix} = $LastRequestTimeUnix || undef;
-    $Payload->{LastRequestTime} = undef;
-    if ( $LastRequestTimeUnix ) {
-        $Payload->{LastRequestTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $LastRequestTimeUnix,
+    # get time of last request
+    if ( !$Param{IgnoreLastRequestTime} ) {
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL => "SELECT token, last_request_time FROM token WHERE token = ?",
+            Bind => [ \$Param{Token} ],
         );
+
+        my $LastRequestTimeUnix;
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+
+            if ( $Row[1] ) {
+                $LastRequestTimeUnix = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                    String => $Row[1],
+                );
+            }
+        }
+
+        # enrich payload
+        $Payload->{LastRequestTimeUnix} = $LastRequestTimeUnix || undef;
+        $Payload->{LastRequestTime} = undef;
+        if ( $LastRequestTimeUnix ) {
+            $Payload->{LastRequestTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                SystemTime => $LastRequestTimeUnix,
+            );
+        }
     }
+
     $Payload->{CreateTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Payload->{CreateTimeUnix},
     );
