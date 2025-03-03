@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -201,9 +201,9 @@ my $SyncConfig = {
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
             'ou',
-            'organisations'
+            'department'
         ],
-        'PrimaryOrganisationID' => 'organisation',
+        'PrimaryOrganisationID' => 'company',
         'City'                  => 'l',
         'Language'              => 'st',
         'Mobile'                => 'mobile',
@@ -216,9 +216,9 @@ my $SyncConfig = {
             'givenName',
             'sn'
         ],
-        'ArrayIndex1'           => 'ARRAYINDEX[0]:organisations',
-        'ArrayIndex2'           => 'ARRAYINDEX[2]:organisations',
-        'ArrayIndex3'           => 'ARRAYINDEX[3]:organisations',
+        'ArrayIndex1'           => 'ARRAYINDEX[0]:department',
+        'ArrayIndex2'           => 'ARRAYINDEX[2]:department',
+        'ArrayIndex3'           => 'ARRAYINDEX[3]:department',
         'ArrayIndex4'           => 'ARRAYINDEX[0]:l',
         'ArrayIndex5'           => 'ARRAYINDEX[1]:l',
     }
@@ -227,13 +227,13 @@ my $SyncConfig = {
 # prepare test users
 my %TestUsers = (
     'uid=user1,ou=users,dc=example,dc=com' => [
-        objectClass   => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
-        uid           => 'syncuser1',
-        ou            => 'capeIT',
-        givenName     => 'Max',
-        sn            => 'Mustermann',
-        primaryMail   => 'max.mustermann@kixdesk.com',
-        mail          => [
+        objectClass => [ 'top', 'person', 'organizationalPerson', 'inetOrgPerson' ],
+        uid         => 'syncuser1',
+        ou          => 'capeIT',
+        givenName   => 'Max',
+        sn          => 'Mustermann',
+        primaryMail => 'max.mustermann@kixdesk.com',
+        mail        => [
             'SMTP:max.mustermann@cape-it.de',
             'smtp:info@kixdesk.com',
             'max.mustermann@kixdesk.com',
@@ -243,16 +243,16 @@ my %TestUsers = (
             'dummy3@kixdesk.com',
             'dummy4@kixdesk.com'
         ],
-        organisation  => $OrganisationID1,
-        organisations => [
+        company     => $OrganisationID1,
+        department  => [
             'org1',
             'Organisation 2',
             'unknown'
         ],
-        l             => 'Chemnitz',
-        postalCode    => '09113',
-        street        => 'Schönherrstr. 8',
-        jpegPhoto     => $TestImage,
+        l           => 'Chemnitz',
+        postalCode  => '09113',
+        street      => 'Schönherrstr. 8',
+        jpegPhoto   => $TestImage,
     ]
 );
 
@@ -280,6 +280,13 @@ ldap_mockify {
 
     for my $TestUserDN ( keys( %TestUsers ) ) {
         $ldap->add( $TestUserDN, attr => $TestUsers{ $TestUserDN } );
+
+        for my ( $Key, $Value ) ( @{ $TestUsers{ $TestUserDN } } ) {
+            $Self->True(
+                $ldap->compare( $TestUserDN, attr => $Key, value => $Value ),
+                'Test::Net::LDAP::Mock: compare data: ' . $Key
+            );
+        }
     }
     for my $TestGroupDN ( keys( %TestGroups ) ) {
         $ldap->add( $TestGroupDN, attr => $TestGroups{ $TestGroupDN } );

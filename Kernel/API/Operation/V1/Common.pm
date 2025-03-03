@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -4529,7 +4529,7 @@ sub _ValidateDynamicFieldValue {
         my $ValueTypeResult = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Value,
-            UserID             => 1,
+            UserID             => $Self->{Authorization}->{UserID},
         );
         return if (!$ValueTypeResult);
     }

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -15,6 +15,9 @@ use Getopt::Long;
 use File::Basename;
 use JSON::MaybeXS;
 use Data::Dumper;
+
+my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
+my $CURRENT_YEAR = $year + 1900;
 
 my %Options;
 GetOptions(
@@ -32,7 +35,7 @@ foreach my $Option ( qw(SourceDirectory ) ) {
 # check if directory is given
 if ( $Options{Help} || %Missing ) {
     print "allure2html - Generates a simple HTML table from pherkin Allure results.\n";
-    print "Copyright (C) 2006-2024 KIX Service Software GmbH, http//www.kixdesk.com/\n";
+    print "Copyright (C) 2006-$CURRENT_YEAR KIX Service Software GmbH, https://www.kixdesk.com/\n";
     print "\n";
     print "Required Options:\n";
     print "  --source-directory - The directory where the pherkin allure output files are located.\n";
