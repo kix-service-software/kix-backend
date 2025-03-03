@@ -4529,7 +4529,7 @@ sub _ValidateDynamicFieldValue {
         my $ValueTypeResult = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Value,
-            UserID             => 1,
+            UserID             => $Self->{Authorization}->{UserID},
         );
         return if (!$ValueTypeResult);
     }
