@@ -22,6 +22,7 @@
                 <Item Key="SysConfigOptionDefinition">SysConfigOptionDefinition</Item>
                 <Item Key="Role">Role</Item>
                 <Item Key="Class">ConfigItemClass</Item>
+                <Item Key="OBJECT_ICON">ObjectIcon</Item>
             </Hash>
         </Setting>
     </ConfigItem>
