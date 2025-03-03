@@ -201,9 +201,9 @@ my $SyncConfig = {
         'OrganisationIDs'     => [
             'SET:' . $OrganisationID1,
             'ou',
-            'orgs'
+            'department'
         ],
-        'PrimaryOrganisationID' => 'org',
+        'PrimaryOrganisationID' => 'company',
         'City'                  => 'l',
         'Language'              => 'st',
         'Mobile'                => 'mobile',
@@ -216,9 +216,9 @@ my $SyncConfig = {
             'givenName',
             'sn'
         ],
-        'ArrayIndex1'           => 'ARRAYINDEX[0]:orgs',
-        'ArrayIndex2'           => 'ARRAYINDEX[2]:orgs',
-        'ArrayIndex3'           => 'ARRAYINDEX[3]:orgs',
+        'ArrayIndex1'           => 'ARRAYINDEX[0]:department',
+        'ArrayIndex2'           => 'ARRAYINDEX[2]:department',
+        'ArrayIndex3'           => 'ARRAYINDEX[3]:department',
         'ArrayIndex4'           => 'ARRAYINDEX[0]:l',
         'ArrayIndex5'           => 'ARRAYINDEX[1]:l',
     }
@@ -243,8 +243,8 @@ my %TestUsers = (
             'dummy3@kixdesk.com',
             'dummy4@kixdesk.com'
         ],
-        org         => $OrganisationID1,
-        orgs        => [
+        company     => $OrganisationID1,
+        department  => [
             'org1',
             'Organisation 2',
             'unknown'
@@ -280,6 +280,13 @@ ldap_mockify {
 
     for my $TestUserDN ( keys( %TestUsers ) ) {
         $ldap->add( $TestUserDN, attr => $TestUsers{ $TestUserDN } );
+
+        for my ( $Key, $Value ) ( @{ $TestUsers{ $TestUserDN } } ) {
+            $Self->True(
+                $ldap->compare( $TestUserDN, attr => $Key, value => $Value ),
+                'Test::Net::LDAP::Mock: compare data: ' . $Key
+            );
+        }
     }
     for my $TestGroupDN ( keys( %TestGroups ) ) {
         $ldap->add( $TestGroupDN, attr => $TestGroups{ $TestGroupDN } );
@@ -289,7 +296,6 @@ ldap_mockify {
     my $Result = $ldap->search(
         base   => $SyncConfig->{BaseDN},
         filter => $Filter,
-        attrs  => ['*','org','orgs','jpegPhoto'],
     );
 
     my $SyncContactRef = $Kernel::OM->Get('LDAPUtils')->ApplyContactMappingToLDAPResult(
