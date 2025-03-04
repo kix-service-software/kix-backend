@@ -2389,22 +2389,25 @@ sub ArticleFlagSet {
         $UserID = 1;
     }
 
-    # set flag
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            DELETE FROM article_flag
-            WHERE article_id = ?
-                AND article_key = ?
-                AND create_by = ?',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$UserID ],
-    );
+    my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'INSERT INTO article_flag
-            (article_id, article_key, article_value, create_time, create_by)
-            VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
-    );
+    # insert flag if not exists
+    if ( !defined $Flag{$Param{Key}} ) {
+        return if !$DBObject->Do(
+            SQL => '
+                INSERT INTO article_flag
+                (article_id, article_key, article_value, create_time, create_by)
+                VALUES (?, ?, ?, current_timestamp, ?)',
+            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        );
+    }
+    else {
+        return if !$DBObject->Do(
+            SQL => 'UPDATE article_flag SET article_value = ?, create_time = current_timestamp 
+                    WHERE article_id = ? AND article_key = ? AND create_by = ?',
+            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+        );
+    }
 
     # check if we have to set the ticket Seen flag as well
     if ( $Param{Key} eq 'Seen' ) {
@@ -2412,7 +2415,7 @@ sub ArticleFlagSet {
             TicketID => $Param{TicketID},
         );
 
-        $Kernel::OM->Get('DB')->Prepare(
+        $DBObject->Prepare(
             SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
                 af.article_id = a.id AND article_key = ? AND af.create_by = ?',
             Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
@@ -2420,7 +2423,7 @@ sub ArticleFlagSet {
         );
 
         my $SeenCount;
-        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        while ( my @Row = $DBObject->FetchrowArray() ) {
             $SeenCount = $Row[0];
         }
         if ( $SeenCount == $ArticleCount ) {
@@ -2445,7 +2448,7 @@ sub ArticleFlagSet {
             TicketID => $Param{TicketID},
         );
 
-        $Kernel::OM->Get('DB')->Prepare(
+        $DBObject->Prepare(
             SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
                 af.article_id = a.id AND article_key = ? AND af.create_by = ?',
             Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
@@ -2453,7 +2456,7 @@ sub ArticleFlagSet {
         );
 
         my $SeenCount;
-        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        while ( my @Row = $DBObject->FetchrowArray() ) {
             $SeenCount = $Row[0];
         }
         if ( $SeenCount == $ArticleCount ) {
