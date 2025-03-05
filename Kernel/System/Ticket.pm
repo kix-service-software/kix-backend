@@ -5218,22 +5218,23 @@ sub TicketFlagSet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # set flag
-    return if !$DBObject->Do(
-        SQL => '
-            DELETE FROM ticket_flag
-            WHERE ticket_id = ?
-                AND ticket_key = ?
-                AND create_by = ?',
-        Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
-    );
-    return if !$DBObject->Do(
-        SQL => '
-            INSERT INTO ticket_flag
-            (ticket_id, ticket_key, ticket_value, create_time, create_by)
-            VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
-    );
+    # insert flag if not exists
+    if ( !defined $Flag{$Param{Key}} ) {
+        return if !$DBObject->Do(
+            SQL => '
+                INSERT INTO ticket_flag
+                (ticket_id, ticket_key, ticket_value, create_time, create_by)
+                VALUES (?, ?, ?, current_timestamp, ?)',
+            Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        );
+    }
+    else {
+        return if !$DBObject->Do(
+            SQL => 'UPDATE ticket_flag SET ticket_value = ?, create_time = current_timestamp 
+                    WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
+            Bind => [ \$Param{Value}, \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Cache')->Delete(
