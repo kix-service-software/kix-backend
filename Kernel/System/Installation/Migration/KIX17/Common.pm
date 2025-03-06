@@ -578,7 +578,7 @@ sub OutputProgress {
 
     my $Forecast = '';
     if ( $Progress->{AvgPerMinute} || $Progress->{TimeRemaining} ) {
-        $Forecast = sprintf "(average: %i/min, time remaining: %s)", $Progress->{AvgPerMinute}, $Progress->{TimeRemaining};
+        $Forecast = sprintf( "(average: %i/min, time remaining: %s)", ( $Progress->{AvgPerMinute} // '-' ), ( $Progress->{TimeRemaining} // '-' ) );
     }
     if ( $Progress->{Status} eq 'in progress' ) {
         printf "%s%s %i %s%s\r", $Output, $Progress->{Status}, $Progress->{Current}, $Forecast, ' ' x 60;
