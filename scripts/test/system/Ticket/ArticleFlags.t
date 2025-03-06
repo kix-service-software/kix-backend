@@ -238,6 +238,17 @@ for my $Test (@Tests) {
         $Test->{Value},
         'ArticleFlagGet() article 1',
     );
+    # test duplicate set
+    $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
+        ArticleID => $ArticleIDs[0],
+        Key       => $Test->{Key},
+        Value     => $Test->{Value},
+        UserID    => 1,
+    );
+    $Self->True(
+        $Set,
+        'ArticleFlagSet() article 1 (duplicate)',
+    );
     $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleIDs[0],
         Key       => $Test->{Key},
