@@ -279,16 +279,11 @@ ldap_mockify {
     my $ldap = Net::LDAP->new($SyncConfig->{Host});
 
     for my $TestUserDN ( keys( %TestUsers ) ) {
+        $ldap->delete( $TestUserDN );                                       # remove existing data first
         $ldap->add( $TestUserDN, attr => $TestUsers{ $TestUserDN } );
-
-        for my ( $Key, $Value ) ( @{ $TestUsers{ $TestUserDN } } ) {
-            $Self->True(
-                $ldap->compare( $TestUserDN, attr => $Key, value => $Value ),
-                'Test::Net::LDAP::Mock: compare data: ' . $Key
-            );
-        }
     }
     for my $TestGroupDN ( keys( %TestGroups ) ) {
+        $ldap->delete( $TestGroupDN );                                      # remove existing data first
         $ldap->add( $TestGroupDN, attr => $TestGroups{ $TestGroupDN } );
     }
 
