@@ -11,7 +11,7 @@
     When I get the first log
     Then the response code is 200
 ##    And the response object is LogFileResponse
-    And the attribute "LogFile.Filename" is "TicketCounter.log"
+    And the attribute "LogFile.Filename" is "Daemon_SchedulerTaskWorkerERR.log"
     
   Scenario: get an existing log content
     When I query the collection of logs
