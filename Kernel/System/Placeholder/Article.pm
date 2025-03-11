@@ -374,7 +374,7 @@ sub _GetPreparedBody {
     }
 
     # add images if needed and given
-    if ($PreparedBody =~ /<img.+?src="cid:.+?>/ && IsHashRefWithData($Param{Inline})) {
+    if ($PreparedBody =~ /<img.+?src="cid:.+?>/s && IsHashRefWithData($Param{Inline})) {
         for my $ContentID ( keys %{$Param{Inline}} ) {
             $PreparedBody =~ s/cid:$ContentID/$Param{Inline}->{$ContentID}/g;
         }
@@ -388,7 +388,7 @@ sub _CloseTags {
 
     # get all opening and closing tags but not self closing ones and ignore some specific
     # e.g. <div>, <p class...> but not <br /> or <img src... />
-    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/]+?)>|<([^!\s\/]+)\s+.+?\s*[^\/]>)/g;
+    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/]+?)>|<([^!\s\/]+)\s+.+?\s*[^\/]>)/gs;
     my @EndTags   = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /<\/(.+?)>/g;
 
     my @ReversedStartTags = reverse @StartTags;
