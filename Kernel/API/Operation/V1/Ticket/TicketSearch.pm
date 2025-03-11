@@ -77,7 +77,6 @@ sub Run {
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerTicketIDList = $Self->_GetCustomerUserVisibleObjectIds(
             ObjectType             => 'Ticket',
-            UserID                 => $Self->{Authorization}->{UserID},
             RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 

@@ -1559,6 +1559,51 @@ sub GetOrCreateID {
     return $ContactID;
 }
 
+=item GetAssignedContactsForObject()
+
+return all assigned contact IDs
+
+    my $ContactIDList = $ContactObject->GetAssignedContactsForObject(
+        ObjectType   => 'Contact',
+        Object       => $ContactHashRef,         # (optional)
+        UserID       => 1,
+        UserType     => 'Customer'               # 'Agent' | 'Customer'
+    );
+
+=cut
+
+sub GetAssignedContactsForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedContactIDs = ();
+
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
+        %Param,
+        AssignedObjectType => 'Contact'
+    );
+
+    if (IsHashRefWithData(\%SearchData)) {
+        my @ORSearch = map { { Field => $_, Operator => $_ eq 'IsCustomer' || $_ eq 'IsAgent' ? 'EQ' : 'IN', Value => $SearchData{$_} } } keys %SearchData;
+
+        @AssignedContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            Search     => {
+                OR => \@ORSearch
+            },
+            UserID   => $Param{UserID},
+            UserType => $Param{UserType},
+            Silent   => $Param{Silent}
+        );
+
+        if ( IsArrayRefWithData(\@AssignedContactIDs) ) {
+            @AssignedContactIDs = map { 0 + $_ } @AssignedContactIDs;
+        }
+    }
+
+    return \@AssignedContactIDs;
+}
+
 =begin Internal
 
 =item _ContactFullname()
