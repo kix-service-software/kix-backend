@@ -254,47 +254,48 @@ sub _Replace {
             }
 
             # get contact object by user
-            elsif (
-                $ObjectType eq 'Owner' &&
-                IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{OwnerID}
-            ) {
-                my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                    UserID        => $Param{Data}->{OwnerID} || $Param{Ticket}->{OwnerID},
-                    DynamicFields => 1,
-                    UserID        => $Param{UserID}
-                );
-                if (%Contact) {
-                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
-                        %Param,
-                        Tag        => $Tag,
-                        Object     => \%Contact,
-                        ObjectType => 'Contact'
+            elsif ( $ObjectType eq 'Owner' ) {
+                my $OwnerID =
+                    ( IsHashRefWithData($Param{Data}) && $Param{Data}->{OwnerID} ) ? $Param{Data}->{OwnerID}:
+                        ( IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{OwnerID} ) ? $Param{Ticket}->{OwnerID} : undef;
+                if ( $OwnerID ) {
+                    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                        UserID        => $OwnerID,
+                        DynamicFields => 1,
                     );
+                    if (%Contact) {
+                        $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                            %Param,
+                            Tag        => $Tag,
+                            Object     => \%Contact,
+                            ObjectType => 'Contact'
+                        );
+                    }
                 }
             }
-            elsif (
-                $ObjectType eq 'Responsible' &&
-                IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{ResponsibleID}
-            ) {
-                my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                    UserID        => $Param{Data}->{ResponsibleID} || $Param{Ticket}->{ResponsibleID},
-                    DynamicFields => 1,
-                    UserID        => $Param{UserID}
-                );
-                if (%Contact) {
-                    $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
-                        %Param,
-                        Tag        => $Tag,
-                        Object     => \%Contact,
-                        ObjectType => 'Contact'
+            elsif ( $ObjectType eq 'Responsible' ) {
+                my $ResponsibleID =
+                    ( IsHashRefWithData($Param{Data}) && $Param{Data}->{ResponsibleID} ) ? $Param{Data}->{ResponsibleID}:
+                        ( IsHashRefWithData($Param{Ticket}) && $Param{Ticket}->{ResponsibleID} ) ? $Param{Ticket}->{ResponsibleID} : undef;
+                if ( $ResponsibleID ) {
+                    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+                        UserID        => $ResponsibleID,
+                        DynamicFields => 1,
                     );
+                    if (%Contact) {
+                        $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
+                            %Param,
+                            Tag        => $Tag,
+                            Object     => \%Contact,
+                            ObjectType => 'Contact'
+                        );
+                    }
                 }
             }
             elsif ( $ObjectType eq 'Current' && $Param{UserID} ) {
                 my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
                     UserID        => $Param{UserID},
                     DynamicFields => 1,
-                    UserID        => $Param{UserID}
                 );
                 if (%Contact) {
                     $Param{Text} = $Self->_ReplaceDynamicFieldPlaceholder(
