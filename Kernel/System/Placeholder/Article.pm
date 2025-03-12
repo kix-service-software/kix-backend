@@ -388,7 +388,7 @@ sub _CloseTags {
 
     # get all opening and closing tags but not self closing ones and ignore some specific
     # e.g. <div>, <p class...> but not <br /> or <img src... />
-    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/]+?)>|<([^!\s\/]+)\s+.+?\s*[^\/]>)/gs;
+    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/>]+)(?:\s+[^\/>]+)?>)/gs;
     my @EndTags   = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /<\/(.+?)>/g;
 
     my @ReversedStartTags = reverse @StartTags;

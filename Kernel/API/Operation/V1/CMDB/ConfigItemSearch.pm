@@ -77,8 +77,6 @@ sub Run {
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
             ObjectType             => 'ConfigItem',
-            UserID                 => $Self->{Authorization}->{UserID},
-            UserType               => $Self->{Authorization}->{UserType},
             RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 

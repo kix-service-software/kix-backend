@@ -1846,6 +1846,130 @@ sub ApplyVariableFilters {
     return $Value;
 }
 
+=item GetAssignedSearchParams()
+
+prepares and transform config from AssignedObjectsMapping to a simple hash
+
+    my %SearchData = $Self->_GetAssignedSearchParams(
+        ObjectType         => 'Contact',
+        Object             => $ContactHash,         # (optional)
+        AssignedObjectType => 'Ticket'
+    );
+
+    e.g. if AssignedObjectType is 'Ticket'
+
+    %SearchData = (
+        ContactID      => 1,
+        OrganisationID => 2,
+        ...
+    );
+
+=cut
+
+sub GetAssignedSearchParams {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed ( qw(AssignedObjectType ObjectType) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
+
+    my %SearchData;
+    if ( IsStringWithData($MappingString) ) {
+
+        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
+            Data   => $MappingString,
+            Silent => $Param{Silent} || 0
+        );
+
+        if ( !IsHashRefWithData($Mapping) ) {
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
+                );
+            }
+        } elsif (
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
+            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
+        ) {
+            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
+
+            # prepare search data
+            for my $SearchAttribute ( keys %SearchAttributes ) {
+                next if (!$SearchAttribute);
+
+                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
+                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
+                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
+                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
+
+                $SearchAttribute =~ s/^\s+//g;
+                $SearchAttribute =~ s/\s+$//g;
+
+                next if (!$SearchAttribute);
+
+                $SearchData{$SearchAttribute} = [];
+
+                # get attributes search data
+                if (IsHashRefWithData( $Param{Object} )) {
+                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
+                        my $Value;
+
+                        # check if value from sub-object (e.g. User of Contact)
+                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
+                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
+                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
+                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
+                        } else {
+                            $Value = $Param{Object}->{$ObjectSearchAttribute};
+                        }
+
+                        next if ( !defined $Value );
+
+                        push (
+                            @{ $SearchData{$SearchAttribute} },
+                            IsArrayRefWithData($Value) ? @{$Value} : $Value
+                        );
+                    }
+                }
+
+                # get static search data
+                for my $SearchStatic ( @{$SearchStatics} ) {
+                    next if ( !defined $SearchStatic );
+                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
+                }
+
+                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
+                    delete $SearchData{$SearchAttribute};
+                }
+            }
+        } else {
+            if (
+                !defined $Param{Silent}
+                || !$Param{Silent}
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'info',
+                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
+                );
+            }
+        }
+    }
+
+    return %SearchData;
+}
+
 =begin Internal:
 
 =cut

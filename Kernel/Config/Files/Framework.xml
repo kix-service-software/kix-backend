@@ -7869,7 +7869,7 @@ Notes:
                     "Config": {}
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -7894,7 +7894,7 @@ Notes:
                     }
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -9048,8 +9048,6 @@ Notes:
 
     <ConfigItem AccessLevel="internal" Name="AssignedObjectsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines which dependend object (e.g. "Ticket") is assigned by which attributes to a relevant object (e.g. "Contact") - e.g. "Tickets of Contact". Structure is "{ "RelevantObject": { "DependendObject": { "DependendObjectAttribut": { "SearchAttribut OR SearchStatic": [ "RelevantObjectAttribut OR StaticValue" ] } } } }. All attributes will be OR combined."</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
             <String Regex="">
 {
@@ -9072,6 +9070,13 @@ Notes:
             "CustomerVisible": {
                 "SearchStatic": [
                     1
+                ]
+            }
+        },
+        "Contact": {
+            "OrganisationIDs": {
+                "SearchAttributes": [
+                    "RelevantOrganisationID"
                 ]
             }
         }

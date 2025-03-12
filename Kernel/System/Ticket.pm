@@ -5230,7 +5230,7 @@ sub TicketFlagSet {
     }
     else {
         return if !$DBObject->Do(
-            SQL => 'UPDATE ticket_flag SET ticket_value = ?, create_time = current_timestamp 
+            SQL => 'UPDATE ticket_flag SET ticket_value = ?, create_time = current_timestamp
                     WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
             Bind => [ \$Param{Value}, \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
         );
@@ -6743,7 +6743,8 @@ return all assigned ticket IDs
         ObjectType   => 'Contact',
         Object       => $ContactHashRef,         # (optional)
         ObjectIDList => $ObjectIDListArrayRef,   # (optional)
-        UserID       => 1
+        UserID       => 1,
+        UserType     => 'Customer'               # 'Agent' | 'Customer'
     );
 
 =cut
@@ -6753,7 +6754,7 @@ sub GetAssignedTicketsForObject {
 
     my @AssignedTicketIDs = ();
 
-    my %SearchData = $Self->_GetAssignedSearchParams(
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
         %Param,
         AssignedObjectType => 'Ticket'
     );
