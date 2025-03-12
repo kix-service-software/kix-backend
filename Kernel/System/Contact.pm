@@ -965,7 +965,18 @@ sub ContactUpdate {
             Comment ValidID AssignedUserID
         )
     ) {
-        next KEY if defined $Contact{$Key} && $Contact{$Key} eq $Param{$Key};
+        next KEY if (
+            (
+                !defined( $Contact{ $Key } )
+                && !defined( $Param{ $Key } )
+            )
+            || (
+                defined( $Contact{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Contact{ $Key } eq $Param{ $Key }
+            )
+        );
+
         $ChangeRequired = 1;
         last KEY;
     }
