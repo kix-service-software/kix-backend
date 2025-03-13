@@ -2005,7 +2005,7 @@ sub _ApplyFilter {
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
                 $Result{$Object} = scalar @FilteredResult;
-                
+
                 if ( $Self->{Debug} ) {
                     $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
                 }
@@ -2877,7 +2877,7 @@ sub _ApplyObjectPermissions {
             # replace the item list in the response
             if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                 $Param{Data}->{$Object} = \@NewItemList;
-                
+
                 if ( $Self->{PermissionDebug} ) {
                     $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
                 }
@@ -4347,6 +4347,14 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserType   => $Self->{Authorization}->{UserType}
                 );
                 return scalar(@IDs) ? \@IDs : [];
+            } elsif ($Param{ObjectType} eq 'Contact') {
+                return $Kernel::OM->Get('Contact')->GetAssignedContactsForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
+                );
             }
         }
     }
