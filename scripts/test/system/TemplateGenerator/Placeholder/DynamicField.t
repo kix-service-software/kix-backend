@@ -18,14 +18,35 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $TestUser    = $Helper->TestUserCreate(
+my $TestContactID = $Helper->TestContactCreate(
+    NoUser => 1,
+);
+
+my $TestUser = $Helper->TestUserCreate(
     Roles => [
         'Ticket Agent'
     ]
 );
-
 my %User = $Kernel::OM->Get('User')->GetUserData(
-    User  => $TestUser
+    User => $TestUser
+);
+
+my $TestOwner = $Helper->TestUserCreate(
+    Roles => [
+        'Ticket Agent'
+    ]
+);
+my %Owner = $Kernel::OM->Get('User')->GetUserData(
+    User  => $TestOwner
+);
+
+my $TestResponsible = $Helper->TestUserCreate(
+    Roles => [
+        'Ticket Agent'
+    ]
+);
+my %Responsible = $Kernel::OM->Get('User')->GetUserData(
+    User  => $TestResponsible
 );
 
 my $TestContactID = $Helper->TestContactCreate();
@@ -35,17 +56,24 @@ my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
 );
 
 my $TicketID = _CreateTicket(
-    Contact  => \%Contact,
-    User     => \%User,
-    TestName => '_CreateTicket(): ticket create'
+    Contact     => \%Contact,
+    User        => \%User,
+    Owner       => \%Owner,
+    Responsible => \%Responsible,
+    TestName    => '_CreateTicket(): ticket create'
 );
 
 my $CIID = _CreateAsset();
 
-my %DFFields = _CreateDynamicField(
+my %DFFields = _CreateTicketDynamicField(
     TicketID     => $TicketID,
     ConfigItemID => $CIID,
-    UserID       => 1
+);
+
+my %ContactDFFields = _CreateContactDynamicField(
+    User        => \%User,
+    Owner       => \%Owner,
+    Responsible => \%Responsible,
 );
 
 my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
@@ -214,6 +242,132 @@ for my $Field ( sort keys %DFFields ) {
     }
 }
 
+# test owner, responsible and current placeholder
+for my $Field ( sort keys %ContactDFFields ) {
+    for my $Placeholder ( qw(TICKETOWNER TICKET_OWNER OWNER) ) {
+        push(
+            @UnitTests,
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                UserID    => $User{UserID},
+                Expection => $Owner{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                UserID    => $User{UserID},
+                Expection => $Owner{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                UserID    => $User{UserID},
+                Expection => $Owner{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                UserID    => $User{UserID},
+                Expection => $Owner{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                UserID    => $User{UserID},
+                Expection => $Owner{UserID},
+            }
+        );
+    }
+
+    for my $Placeholder ( qw(TICKETRESPONSIBLE TICKET_RESPONSIBLE RESPONSIBLE) ) {
+        push(
+            @UnitTests,
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                UserID    => $User{UserID},
+                Expection => $Responsible{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                UserID    => $User{UserID},
+                Expection => $Responsible{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                UserID    => $User{UserID},
+                Expection => $Responsible{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                UserID    => $User{UserID},
+                Expection => $Responsible{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                UserID    => $User{UserID},
+                Expection => $Responsible{UserID},
+            }
+        );
+    }
+
+    for my $Placeholder ( qw(CURRENT) ) {
+        push(
+            @UnitTests,
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '>',
+                UserID    => $User{UserID},
+                Expection => $User{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Value>',
+                UserID    => $User{UserID},
+                Expection => $User{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Key>',
+                UserID    => $User{UserID},
+                Expection => $User{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_HTML>',
+                UserID    => $User{UserID},
+                Expection => $User{UserID},
+            },
+            {
+                TestName  => 'Placeholder: <KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                TicketID  => $TicketID,
+                Test      => '<KIX_' . $Placeholder . '_DynamicField_' . $Field . '_Short>',
+                UserID    => $User{UserID},
+                Expection => $User{UserID},
+            }
+        );
+    }
+}
+
 _TestRun(
     Tests => \@UnitTests
 );
@@ -228,7 +382,7 @@ sub _TestRun {
             Data      => {},
             TicketID  => $Test->{TicketID} || undef,
             Translate => 0,
-            UserID    => 1,
+            UserID    => $Test->{UserID} || 1,
 
         );
 
@@ -262,8 +416,9 @@ sub _CreateTicket {
         State           => 'new',
         OrganisationID  => $Contact{PrimaryOrganisationID},
         ContactID       => $Contact{UserID},
-        OwnerID         => $User{UserID},
-        UserID          => 1
+        OwnerID         => $Owner{UserID},
+        ResponsibleID   => $Responsible{UserID},
+        UserID          => $User{UserID},
     );
 
     $Self->True(
@@ -327,11 +482,9 @@ sub _CreateAsset {
     );
 
     return $ConfigItemID;
-
-
 }
 
-sub _CreateDynamicField {
+sub _CreateTicketDynamicField {
     my (%Param) = @_;
 
     my $Number     = $Helper->GetRandomNumber();
@@ -354,13 +507,12 @@ sub _CreateDynamicField {
     my %DynamicFields;
     my @DynamicFieldConfigs = (
         {
-            FieldType            => 'Text',
-            ObjectType           => 'Ticket',
-            FieldTypeDisplayName => 'Text',
-            Config               => {},
-            Value                => 'Unit Test Text',
-            Expection            => {
-                All => 'Unit Test Text',
+            FieldType  => 'Text',
+            ObjectType => 'Ticket',
+            Config     => {},
+            Value      => 'Unit Test Text',
+            Expection  => {
+                All         => 'Unit Test Text',
                 ObjectValue => {
                     undef => [
                         'Unit Test Text',
@@ -369,27 +521,26 @@ sub _CreateDynamicField {
             }
         },
         {
-            FieldType            => 'TextArea',
-            FieldTypeDisplayName => 'TextArea',
-            ObjectType           => 'Ticket',
-            Config               => {
+            FieldType  => 'TextArea',
+            ObjectType => 'Ticket',
+            Config     => {
                 CountDefault => 1,
                 CountMax     => 1,
                 CountMin     => 1,
                 DefaultValue => undef
             },
-            Value                => <<'END',
+            Value      => <<'END',
 Unit
 Test
 TextArea
 END
-            Expection            => {
-                All => <<'END',
+            Expection  => {
+                All         => <<'END',
 Unit
 Test
 TextArea
 END
-                HTML => 'Unit<br>Test<br>TextArea<br>',
+                HTML        => 'Unit<br>Test<br>TextArea<br>',
                 ObjectValue => {
                     undef => [
 <<'END',
@@ -402,16 +553,15 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'Multiselect',
-            FieldTypeDisplayName => 'Selection',
-            Config               => {
-                CountDefault => 1,
-                CountMax     => 2,
-                CountMin     => 1,
-                DefaultValue => undef,
-                PossibleNone => 1,
-                PossibleValues => {
+            FieldType  => 'Multiselect',
+            ObjectType => 'Ticket',
+            Config     => {
+                CountDefault        => 1,
+                CountMax            => 2,
+                CountMin            => 1,
+                DefaultValue        => undef,
+                PossibleNone        => 1,
+                PossibleValues      => {
                     'customer'                    => 'customer',
                     'service provider'            => 'service provider',
                     'supplier/partner (external)' => 'supplier/partner (external)',
@@ -419,11 +569,11 @@ END
                 },
                 TranslatableValues => 1
             },
-            Value                => [
+            Value      => [
                 'customer',
                 'service provider'
             ],
-            Expection            => {
+            Expection  => {
                 q{}         => 'Kunde, Service Provider',
                 Short       => 'Kunde, Service Provider',
                 Key         => 'customer, service provider',
@@ -445,22 +595,21 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'CheckList',
-            FieldTypeDisplayName => 'CheckList',
-            Config               => {},
-            Value                => '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
-            Expection            => {
+            FieldType  => 'CheckList',
+            ObjectType => 'Ticket',
+            Config     => {},
+            Value      => '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
+            Expection  => {
                 All         => <<"END",
-CheckList$Number
+TicketCheckList$Number
 - task 1: -
 - task 2: -
 - task 3: -
 
 END
                 Short       => '0/3',
-                Key         => "CheckList$Number<br />- task 1: -<br />- task 2: -<br />- task 3: -<br /><br />",
-                HTML        => "<h3>CheckList$Number</h3><table style=\"border:none; width:90%\"><thead><tr><th style=\"padding:10px 15px;\">Action</th><th style=\"padding:10px 15px;\">State</th><tr></thead><tbody><tr><td style=\"padding:10px 15px;\">task 1</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 2</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 3</td><td style=\"padding:10px 15px;\">-</td></tr></tbody></table>",
+                Key         => "TicketCheckList$Number<br />- task 1: -<br />- task 2: -<br />- task 3: -<br /><br />",
+                HTML        => "<h3>TicketCheckList$Number</h3><table style=\"border:none; width:90%\"><thead><tr><th style=\"padding:10px 15px;\">Action</th><th style=\"padding:10px 15px;\">State</th><tr></thead><tbody><tr><td style=\"padding:10px 15px;\">task 1</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 2</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 3</td><td style=\"padding:10px 15px;\">-</td></tr></tbody></table>",
                 ObjectValue => {
                     undef => [
                         '[{"id":"100","title":"task 1","description":"","input":"ChecklistState","value":"-"},{"id":"200","title":"task 2","description":"","input":"ChecklistState","value":"-"},{"id":"300","title":"task 3","description":"","input":"ChecklistState","value":"-"}]',
@@ -470,10 +619,9 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'DateTime',
-            FieldTypeDisplayName => 'Date / Time',
-            Config               => {
+            FieldType  => 'DateTime',
+            ObjectType => 'Ticket',
+            Config     => {
                 CountDefault    => 1,
                 CountMax        => 1,
                 CountMin        => 1,
@@ -483,8 +631,8 @@ END
                 YearsInFuture   => 0,
                 YearsInPast     => 0
             },
-            Value                => $CurrTime,
-            Expection            => {
+            Value      => $CurrTime,
+            Expection  => {
                 All         => $DateTime,
                 ObjectValue => {
                     undef => [
@@ -494,10 +642,9 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'Date',
-            FieldTypeDisplayName => 'Date',
-            Config               => {
+            FieldType  => 'Date',
+            ObjectType => 'Ticket',
+            Config     => {
                 CountDefault    => 1,
                 CountMax        => 1,
                 CountMin        => 1,
@@ -507,8 +654,8 @@ END
                 YearsInFuture   => 0,
                 YearsInPast     => 0
             },
-            Value                => $CurrTime,
-            Expection            => {
+            Value      => $CurrTime,
+            Expection  => {
                 All         => $Date,
                 ObjectValue => {
                     undef => [
@@ -518,10 +665,9 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'ITSMConfigItemReference',
-            FieldTypeDisplayName => 'AssetReference',
-            Config               => {
+            ObjectType => 'Ticket',
+            FieldType  => 'ITSMConfigItemReference',
+            Config     => {
                 CountDefault          =>  1,
                 CountMax              =>  15,
                 CountMin              =>  1,
@@ -532,10 +678,10 @@ END
                 ],
                 ItemSeparator         =>  q{, }
             },
-            Value                => [
+            Value      => [
                 $Param{ConfigItemID}
             ],
-            Expection            => {
+            Expection  => {
                 All         => $Kernel::OM->Get('Config')->Get('ITSMConfigItem::Hook') . $Version->{Number} . ' - ' . $Version->{Name},
                 Key         => $Param{ConfigItemID},
                 Short       => $Version->{Name},
@@ -548,10 +694,9 @@ END
             }
         },
         {
-            ObjectType           => 'Ticket',
-            FieldType            => 'Table',
-            FieldTypeDisplayName => 'Table',
-            Config               => {
+            FieldType  => 'Table',
+            ObjectType => 'Ticket',
+            Config     => {
                 Columns => [
                     'Column A',
                     'Column B',
@@ -562,8 +707,8 @@ END
                 RowsMin            => 1,
                 TranslatableColumn => 0
             },
-            Value                => '[["Value 1.0","","Value 3.0"],["Value 1.1","Value 2.1",""],["","Value 2.2",""]]',
-            Expection            => {
+            Value      => '[["Value 1.0","","Value 3.0"],["Value 1.1","Value 2.1",""],["","Value 2.2",""]]',
+            Expection  => {
                 All         => 'Function:DisplayValueRender',
                 Short       => '3 Zeilen',
                 HTML        => <<'END',
@@ -605,7 +750,7 @@ END
     );
 
     for my $Field ( @DynamicFieldConfigs ) {
-        my $Name = $Field->{FieldType}.$Number;
+        my $Name = $Field->{ObjectType}.$Field->{FieldType}.$Number;
 
         my $ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
             InternalField        => 0,
@@ -613,7 +758,6 @@ END
             Label                => $Name,
             FieldType            => $Field->{FieldType},
             ObjectType           => $Field->{ObjectType},
-            FieldTypeDisplayName => $Field->{FieldTypeDisplayName},
             Config               => $Field->{Config},
             ValidID              => 1,
             UserID               => 1,
@@ -627,7 +771,7 @@ END
 
         $Self->True(
             $ID,
-            "DynamicField ($Name) Add: FieldType - $Field->{FieldType}"
+            "DynamicField ($Name) Add: ObjectType - $Field->{ObjectType} / FieldType - $Field->{FieldType}"
         );
 
         my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -635,33 +779,105 @@ END
             UserID => 1
         );
 
-        my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
-            DynamicFieldConfig => $DynamicFieldConfig,
-            ObjectID           => $Param{TicketID},
-            Value              => $Field->{Value},
-            UserID             => 1,
+        if ( $Field->{ObjectType} eq 'Ticket' ) {
+            my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                ObjectID           => $Param{TicketID},
+                Value              => $Field->{Value},
+                UserID             => 1,
+            );
+
+            for my $Index ( keys %{$Field->{Expection}} ) {
+                if ( $Field->{Expection}->{$Index} =~ /^Function:(.*)$/sm ) {
+                    my $Function = $1;
+                    my $Result = $Kernel::OM->Get('DynamicField::Backend')->$Function(
+                        DynamicFieldConfig => $DynamicFieldConfig,
+                        ObjectID           => $Param{TicketID},
+                        Value              => $Field->{Value},
+                        UserID             => 1,
+                    );
+
+                    $Field->{Expection}->{$Index} = $Result->{Value} // q{};
+                }
+            }
+
+            $Self->True(
+                $Success,
+                "DynamicField Set Value: $Name"
+            );
+
+            $DynamicFields{$Name} = $Field->{Expection};
+        }
+    }
+
+    return %DynamicFields;
+}
+
+sub _CreateContactDynamicField {
+    my (%Param) = @_;
+
+    my $Number = $Helper->GetRandomNumber();
+
+    my %DynamicFields;
+    my @DynamicFieldConfigs = (
+        {
+            FieldType  => 'Text',
+            ObjectType => 'Contact',
+            Config     => {},
+        },
+    );
+
+    for my $Field ( @DynamicFieldConfigs ) {
+        my $Name = $Field->{ObjectType}.$Field->{FieldType}.$Number;
+
+        my $ID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+            InternalField        => 0,
+            Name                 => $Name,
+            Label                => $Name,
+            FieldType            => $Field->{FieldType},
+            ObjectType           => $Field->{ObjectType},
+            Config               => $Field->{Config},
+            ValidID              => 1,
+            UserID               => 1,
         );
 
-        for my $Index ( keys %{$Field->{Expection}} ) {
-            if ( $Field->{Expection}->{$Index} =~ /^Function:(.*)$/sm ) {
-                my $Function = $1;
-                my $Result = $Kernel::OM->Get('DynamicField::Backend')->$Function(
+        $Kernel::OM->ObjectsDiscard(
+            Objects => [
+                'DynamicField'
+            ]
+        );
+
+        $Self->True(
+            $ID,
+            "DynamicField ($Name) Add: ObjectType - $Field->{ObjectType} / FieldType - $Field->{FieldType}"
+        );
+
+        my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+            Name   => $Name,
+            UserID => 1
+        );
+
+        if ( $Field->{ObjectType} eq 'Contact' ) {
+            for my $Object ( qw( Owner Responsible User ) ) {
+                my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    UserID  => $Param{ $Object }->{UserID},
+                );
+
+                my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                     DynamicFieldConfig => $DynamicFieldConfig,
-                    ObjectID           => $Param{TicketID},
-                    Value              => $Field->{Value},
+                    ObjectID           => $ContactID,
+                    Value              => $Param{ $Object }->{UserID},
                     UserID             => 1,
                 );
 
-                $Field->{Expection}->{$Index} = $Result->{Value} // q{};
+                $Self->True(
+                    $Success,
+                    "DynamicField Set Value: $Name for $Object"
+                );
+
+                $DynamicFields{ $Name } = 1;
             }
         }
-
-        $Self->True(
-            $Success,
-            "DynamicField Set Value: $Name"
-        );
-
-        $DynamicFields{$Name} = $Field->{Expection};
     }
 
     return %DynamicFields;
