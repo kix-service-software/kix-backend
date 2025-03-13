@@ -261,6 +261,7 @@ the login name of the new customer user, the password is the same.
 
     my $TestContactID = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
+        NoUser   => 1,      # optional, create contact without user, defaults to 0
     );
 
 =cut
@@ -282,13 +283,15 @@ sub TestContactCreate {
 
         $TestContactLogin = $Self->GetRandomID();
 
-        $TestContactUserID = $Kernel::OM->Get('User')->UserAdd(
-            UserLogin    => $TestContactLogin,
-            UserPw       => $TestContactLogin,
-            ValidID      => 1,
-            ChangeUserID => 1,
-            IsCustomer   => 1,
-        );
+        if ( !$Param{NoUser} ) {
+            $TestContactUserID = $Kernel::OM->Get('User')->UserAdd(
+                UserLogin    => $TestContactLogin,
+                UserPw       => $TestContactLogin,
+                ValidID      => 1,
+                ChangeUserID => 1,
+                IsCustomer   => 1,
+            );
+        }
 
         $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
             Number  => $TestContactLogin,
@@ -316,33 +319,39 @@ sub TestContactCreate {
 
     die 'Could not create test user contact' if !$TestContactID;
     die 'Could not create test user organisation' if !$OrgID;
-    die 'Could not create test user login' if !$TestContactUserID;
+    die 'Could not create test user login' if ( !$TestContactUserID && !$Param{NoUser} );
 
     # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
     $Self->{TestContacts} ||= [];
     push( @{ $Self->{TestContacts} }, $TestContactID );
 
-    # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, UserID $TestContactUserID)");
+    if ( $Param{NoUser} ) {
+        $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, OrgID $OrgID)");
+    }
+    else {
+        $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, OrgID $OrgID, UserID $TestContactUserID)");
+    }
 
-    # Add user to roles
-    ROLE_NAME:
-    for my $RoleName ( @{ $Param{Roles} || [] } ) {
+    if ( !$Param{NoUser} ) {
+        # Add user to roles
+        ROLE_NAME:
+        for my $RoleName ( @{ $Param{Roles} || [] } ) {
 
-        # get role object
-        my $RoleObject = $Kernel::OM->Get('Role');
+            # get role object
+            my $RoleObject = $Kernel::OM->Get('Role');
 
-        my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
-        die "Cannot find role $RoleName" if ( !$RoleID );
+            my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
+            die "Cannot find role $RoleName" if ( !$RoleID );
 
-        $RoleObject->RoleUserAdd(
-            AssignUserID => $TestContactUserID,
-            RoleID       => $RoleID,
-            UserID       => 1,
-        ) || die "Could not add test contact $TestContactLogin to role $RoleName";
+            $RoleObject->RoleUserAdd(
+                AssignUserID => $TestContactUserID,
+                RoleID       => $RoleID,
+                UserID       => 1,
+            ) || die "Could not add test contact $TestContactLogin to role $RoleName";
 
-        $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
+            $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
+        }
     }
 
     # set customer user language

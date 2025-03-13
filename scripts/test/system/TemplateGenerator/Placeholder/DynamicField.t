@@ -18,6 +18,10 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+my $TestContactID = $Helper->TestContactCreate(
+    NoUser => 1,
+);
+
 my $TestUser = $Helper->TestUserCreate(
     Roles => [
         'Ticket Agent'
@@ -855,9 +859,13 @@ sub _CreateContactDynamicField {
 
         if ( $Field->{ObjectType} eq 'Contact' ) {
             for my $Object ( qw( Owner Responsible User ) ) {
+                my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    UserID  => $Param{ $Object }->{UserID},
+                );
+
                 my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                     DynamicFieldConfig => $DynamicFieldConfig,
-                    ObjectID           => $Param{ $Object }->{UserID},
+                    ObjectID           => $ContactID,
                     Value              => $Param{ $Object }->{UserID},
                     UserID             => 1,
                 );
