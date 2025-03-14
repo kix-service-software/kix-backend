@@ -23,7 +23,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::ObjectIcon::ObjectIconSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">ObjectIconCollectionResponse</Item>
-                <Item Key="CacheType">API_objecticons</Item>                
+                <Item Key="CacheType">API_objecticons</Item>
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
             </Hash>
         </Setting>
@@ -71,6 +71,11 @@
                 <Item Key="IgnoreOperationRegEx">V1::ObjectIcon::ObjectIconGet</Item>
                 <Item Key="CacheType">API_objecticons</Item>
                 <Item Key="CacheTypeDependency">ObjectIcon</Item>
+                <Item Key="ObjectMapping">
+                    <Hash>
+                        <Item Key="ConfigItemClass">GeneralCatalogItem</Item>
+                    </Hash>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
