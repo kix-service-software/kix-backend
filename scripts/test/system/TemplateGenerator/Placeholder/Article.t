@@ -281,7 +281,41 @@ END
 </div>
 END
         },
-        Name => "Create: Article | Content HTML mulitline img tag | TicketID $TicketID3"
+        Name => "Create: Article | Content HTML mulitline img tag | TicketID $TicketID4"
+    },
+    {
+        Config => {
+            TicketID        => $TicketID4,
+            Channel         => 'note',
+            CustomerVisible => 0,
+            SenderType      => 'agent',
+            From            => 'unit.test@ut.com',
+            To              => 'unit.test2@ut.com',
+            Subject         => 'UnitTest Article with not quoted scr-value in img tag' ,
+            ContentType     => 'text/html; charset=utf8',
+            UserID          => $User1{UserID},
+            HistoryType     => 'AddNote',
+            HistoryComment  => 'UnitTest HTML Article!',
+            Body            => <<'END',
+<div>
+    <img alt="image" src=cid:123456 class="test"/>
+    <img alt="image" src=cid:123456/>
+    <img alt="image" src=cid:123456>
+    <img alt="image" src="cid:123456"/>
+    <img alt="image" src="cid:123456">
+</div>
+END
+            Attachment => [
+                {
+                    Content     => 'some test text',
+                    ContentType => 'image/jpg',
+                    Filename    => 'some-test-text.jpg',
+                    Disposition => 'inline',
+                    ContentID   => '123456'
+                },
+            ]
+        },
+        Name => "Create: Article | with not quoted scr-value in img tag | TicketID $TicketID4"
     }
 );
 
@@ -995,6 +1029,54 @@ Line 3
 </div>
 ',
         Name => 'Placeholder: <KIX_ARTICLE_BodyRichtext_0> - mulitline img tag'
+    },
+    # check if not quoted scr-value in img tag gets quoting (is html usable)
+    {
+        Data => {
+            RichText  => 1,
+            Text      => '<KIX_ARTICLE_BodyRichtext_0>',
+            Data      => {
+                ArticleID => $Articles[6]{ArticleID}
+            },
+            TicketID  => $TicketID4,
+            UserID    => 1
+        },
+        Expection => '<div>
+    <img alt="image" src="data:image/jpg;base64,c29tZSB0ZXN0IHRleHQ=" class="test"/>
+    <img alt="image" src="data:image/jpg;base64,c29tZSB0ZXN0IHRleHQ="/>
+    <img alt="image" src="data:image/jpg;base64,c29tZSB0ZXN0IHRleHQ=">
+    <img alt="image" src="data:image/jpg;base64,c29tZSB0ZXN0IHRleHQ="/>
+    <img alt="image" src="data:image/jpg;base64,c29tZSB0ZXN0IHRleHQ=">
+</div>
+',
+        Name => 'Placeholder: <KIX_ARTICLE_BodyRichtext_0> - with not quoted scr-value in img tag'
+    },
+    # no inline images
+    {
+        Data => {
+            RichText  => 1,
+            Text      => '<KIX_ARTICLE_BodyRichtextNoInline_0>',
+            Data      => {
+                ArticleID => $Articles[5]{ArticleID}
+            },
+            TicketID  => $TicketID4,
+            UserID    => 1
+        },
+        Expection => "<div>\n    \n</div>\n<div>\n    \n</div>\n",
+        Name => 'Placeholder: <KIX_ARTICLE_BodyRichtextNoInline_0> - no inline imgages (also with mulitline img tag)'
+    },
+    {
+        Data => {
+            RichText  => 1,
+            Text      => '<KIX_ARTICLE_BodyRichtextNoInline_0>',
+            Data      => {
+                ArticleID => $Articles[6]{ArticleID}
+            },
+            TicketID  => $TicketID4,
+            UserID    => 1
+        },
+        Expection => "<div>\n    \n    \n    \n    \n    \n</div>\n",
+        Name => 'Placeholder: <KIX_ARTICLE_BodyRichtextNoInline_0> - no inline imgages on missing quoting'
     }
 );
 

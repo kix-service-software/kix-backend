@@ -291,7 +291,7 @@ sub _ReplaceBodyRichtext {
 
                     if (!$Param{WithInline}) {
                         # remove inline images
-                        $BodyRichtext =~ s/<img.+?src="cid:.+?>//g;
+                        $BodyRichtext =~ s/<img.+?src=["']?cid:.+?>//gs;
                     }
                 }
             } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
@@ -310,6 +310,7 @@ sub _ReplaceBodyRichtext {
     if ($BodyRichtext) {
         my %PreparedInline;
         if (scalar @InlineAttachments) {
+            $BodyRichtext =~ s/src=(?!["\'])(cid:[^\s\/\>\"\']+)/src="$1"/g;
             for my $Attachment ( @InlineAttachments ) {
                 my $Content = MIME::Base64::encode_base64( $Attachment->{Content}, '' );
 
