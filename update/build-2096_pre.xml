@@ -2,7 +2,12 @@
 <database Name="kix">
 
     <TableAlter Name="sysconfig">
-        <ColumnAdd Name="id" Type="BIGINT" Required="true" AutoIncrement="true" />
+        <PrimaryDrop />
+        <IndexDrop Name="sysconfig_name"/>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT" />
+        <UniqueCreate Name="sysconfig_name">
+            <UniqueColumn Name="name"/>
+        </UniqueCreate>
     </TableAlter>
 
     <Table Name="object_tags">

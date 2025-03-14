@@ -200,6 +200,7 @@ my @TestsCGE = (
         Index    => 0,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
@@ -225,6 +226,7 @@ my @TestsCGE = (
         Index    => 0,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
@@ -298,6 +300,7 @@ END
         Index    => 1,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
@@ -323,6 +326,7 @@ END
         Index    => 1,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
@@ -412,6 +416,7 @@ END
         Index    => 2,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/pkix-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
@@ -437,6 +442,7 @@ END
         Index    => 2,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/pkix-cert',
             'Email'       => 'example@unittest.org',
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
@@ -506,6 +512,7 @@ END
         Index    => 3,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/pkcs10',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
@@ -525,6 +532,7 @@ END
         Index    => 3,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/pkcs10',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
@@ -585,6 +593,7 @@ END
         Index    => 4,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
             'Email'       => 'example@unittest.org',
             'FileID'      => '###ID###',
@@ -611,6 +620,7 @@ END
         Index    => 4,
         Expected => {
             'CType'       => 'SMIME',
+            'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
             'Email'       => 'example@unittest.org',
             'FileID'      => '###ID###',
