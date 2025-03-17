@@ -247,14 +247,33 @@ sub NotificationSendWorker {
         }
     }
     else {
-        my $Result = $Kernel::OM->Get('Cache')->{CacheObject}->_RedisCall(
-            'publish',
-            'KIXFrontendNotify',
-            $EventList,
-        );
+        $Self->NotifyFrontendServer(EventList => $EventList);
     }
 
     return 1;
+}
+
+sub NotifyFrontendServer {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(EventList)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    my $Result = $Kernel::OM->Get('Cache')->{CacheObject}->_RedisCall(
+        'publish',
+        'KIXFrontendNotify',
+        $Param{EventList},
+    );
+
+    return $Result;
 }
 
 sub _NotificationSendToClient {
