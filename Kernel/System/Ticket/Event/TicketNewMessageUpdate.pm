@@ -42,15 +42,12 @@ sub Run {
             return;
         }
     }
-    for my $DataParameter (qw(TicketID ArticleID)) {
-        if ( !$Param{Data}->{$DataParameter} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $DataParameter in Data!",
-            );
-            return;
-        }
-    }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
+    # handle only events with given ArticleID
+    return 1 if ( !$Param{Data}->{ArticleID} );
 
     # update ticket new message flag
     if ( $Param{Event} eq 'ArticleCreate' ) {

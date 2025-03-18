@@ -71,13 +71,9 @@ sub Run {
         $TicketID = $1;
     }
     else {
-        if ( !$Param{Data}->{TicketID} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need TicketID in Data!",
-            );
-            return;
-        }
+        # handle only events with given TicketID
+        return 1 if ( !$Param{Data}->{TicketID} );
+
         $TicketID = $Param{Data}->{TicketID};
     }
 

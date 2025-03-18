@@ -234,11 +234,10 @@ sub PostValueSet {
     $TicketObject->EventHandler(
         Event => 'TicketDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName => $Param{DynamicFieldConfig}->{Name},
-            Value     => $Param{Value},
-            OldValue  => $Param{OldValue},
-            TicketID  => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            TicketID           => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );

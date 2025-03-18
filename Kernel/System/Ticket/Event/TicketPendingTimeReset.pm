@@ -42,15 +42,9 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_ in Data!"
-            );
-            return;
-        }
-    }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');

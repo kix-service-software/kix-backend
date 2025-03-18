@@ -41,15 +41,9 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Kernel::System::Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_ in Data!"
-            );
-            return;
-        }
-    }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # update ticket view index
     $Kernel::OM->Get('Kernel::System::Ticket')->TicketIndexUpdate(
