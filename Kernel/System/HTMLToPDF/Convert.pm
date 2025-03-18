@@ -14,6 +14,7 @@ use warnings;
 our $ObjectManagerDisabled = 1;
 
 use Kernel::System::VariableCheck qw(:all);
+use MIME::Base64;
 
 sub Convert {
     my ($Self, %Param) = @_;
@@ -187,6 +188,10 @@ sub Convert {
         close($FH);
     }
 
+    my $FileStat = $Kernel::OM->Get('Main')->FileStat(
+        Location => $Directory . q{/} . $TempPDFFile
+    );
+
     my @DeleteData = (
         {
             Directory => $Directory,
@@ -212,9 +217,10 @@ sub Convert {
     );
 
     return (
-        Content     => $Output,
+        Content     => MIME::Base64::encode_base64($Output),
         ContentType => $ContentType,
-        Filename    => $Filename . $FileExtension
+        Filename    => $Filename . $FileExtension,
+        Filesize    => $FileStat->size
     );
 }
 
