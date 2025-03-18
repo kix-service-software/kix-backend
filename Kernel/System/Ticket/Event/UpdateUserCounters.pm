@@ -87,6 +87,9 @@ sub Run {
         }
     }
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     if ( $Param{Event} ne 'TicketDelete' ) {
         my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID => $Param{Data}->{TicketID},

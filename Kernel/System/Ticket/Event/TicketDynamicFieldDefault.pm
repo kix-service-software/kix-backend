@@ -47,14 +47,8 @@ sub Run {
         }
     }
 
-    # listen to all kinds of events
-    if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need TicketID in Data!",
-        );
-        return;
-    }
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # get settings from sysconfig
     my $TicketObject = $Kernel::OM->Get('Ticket');

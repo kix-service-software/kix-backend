@@ -58,15 +58,10 @@ sub Run {
         }
     }
 
-    if ( $Param{Event} eq 'TicketTypeUpdate' ) {
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
-        if ( !$Param{Data}->{TicketID} ) {
-            $Self->{LogObject}->Log(
-                Priority => 'error',
-                Message  => "Need TicketID!"
-            );
-            return;
-        }
+    if ( $Param{Event} eq 'TicketTypeUpdate' ) {
 
         # get defaultticketstate...
         my $DefaultState = $Self->{ConfigObject}->Get(

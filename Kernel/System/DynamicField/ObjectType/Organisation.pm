@@ -113,11 +113,10 @@ sub PostValueSet {
     $Kernel::OM->Get('Organisation')->EventHandler(
         Event => 'OrganisationDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName      => $Param{DynamicFieldConfig}->{Name},
-            Value          => $Param{Value},
-            OldValue       => $Param{OldValue},
-            OrganisationID => $Param{ObjectID},
-            UserID         => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            OrganisationID     => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );
