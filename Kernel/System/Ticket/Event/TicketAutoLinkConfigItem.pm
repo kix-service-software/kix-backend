@@ -48,13 +48,8 @@ sub Run {
         }
     }
 
-    if ( !$Param{Data}->{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Event TicketAutoLinkConfigItem: need TicketID!"
-        );
-        return 0;
-    }
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     my $OnlyFirstArticle = $Param{'Config'}->{'FirstArticleOnly'} || q{};
     my $AppendDFName     = $Param{'Config'}->{'DynamicFieldName'} || q{};
@@ -174,48 +169,46 @@ sub Run {
 
     #---------------------------------------------------------------------------
     # GET SEARCH PATTERN for event TicketDynamicFieldUpdate
-    elsif ( $Param{Event} =~ /TicketDynamicFieldUpdate_/ ) {
-
-        # get ticket data...
-        my %TicketData = $Kernel::OM->Get('Ticket')->TicketGet(
-            TicketID      => $Param{Data}->{TicketID},
-            UserID        => 1,
-            DynamicFields => 1,
-        );
-
-        # get trigger DF...
-        my $TriggerDF = $Param{Event};
-        $TriggerDF =~ s/TicketDynamicFieldUpdate_//g;
+    elsif ( $Param{Event} =~ /^TicketDynamicFieldUpdate_/ ) {
+        if ( !IsHashRefWithData( $Param{Data}->{DynamicFieldConfig} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Need DynamicFieldConfig in Data!',
+            );
+            return;
+        }
 
         # do nothing if updated DF is empty..
-        return 0 if (!$TicketData{'DynamicField_'.$TriggerDF});
+        return 0 if ( !$Param{Data}->{Value} );
+
 
         # get CI search pattern for config for trigger DF...
+        my $KeyPattern = 'DynamicField_' . $Param{Data}->{DynamicFieldConfig}->{Name};
         CISEARCHPATTERN:
-        for my $Key ( keys( %{$CISearchPatternRef} ) ) {
-
+        for my $Key ( keys( %{ $CISearchPatternRef } ) ) {
             # next pattern if current not relevant for trigger field..
-            my $KeyPattern = "DynamicField_".$TriggerDF;
             next CISEARCHPATTERN if ( $Key !~ /$KeyPattern(_OR\d*)?/ );
 
-            $SearchPatternRegExp = $CISearchPatternRef->{$Key} || q{};
+            $SearchPatternRegExp = $CISearchPatternRef->{ $Key } || q{};
 
             # next pattern if no regex defined..
             next CISEARCHPATTERN if( !$SearchPatternRegExp );
 
             # get value(s) of trigger DF (might be an array)...
             my @ValArr = qw{};
-            if( ref($TicketData{'DynamicField_'.$TriggerDF}) eq 'ARRAY') {
-                @ValArr = @{$TicketData{'DynamicField_'.$TriggerDF}};
+            if( ref( $Param{Data}->{Value} ) eq 'ARRAY') {
+                @ValArr = @{ $Param{Data}->{Value} };
             }
             else {
-                @ValArr = ($TicketData{'DynamicField_'.$TriggerDF});
+                @ValArr = ( $Param{Data}->{Value} );
             }
 
             # extract and remember values matching CI search pattern...
             for my $CurrVal ( @ValArr ) {
-
-                if ( $CurrVal && $CurrVal =~ /$SearchPatternRegExp/ ) {
+                if (
+                    $CurrVal
+                    && $CurrVal =~ /$SearchPatternRegExp/
+                ) {
                     my $SearchString = $1;
                     $SearchString =~ s/^\s+//g;
                     $SearchString =~ s/\s+$//g;

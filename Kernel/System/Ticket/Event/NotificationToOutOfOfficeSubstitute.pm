@@ -41,8 +41,11 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     # check needed stuff
-    foreach (qw(TicketID Notification)) {
+    foreach (qw(Notification)) {
         if ( !$Param{Data}->{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

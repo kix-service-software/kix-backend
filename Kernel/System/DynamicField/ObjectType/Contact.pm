@@ -112,11 +112,10 @@ sub PostValueSet {
     $Kernel::OM->Get('Contact')->EventHandler(
         Event => 'ContactDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName => $Param{DynamicFieldConfig}->{Name},
-            Value     => $Param{Value},
-            OldValue  => $Param{OldValue},
-            ContactID => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            ContactID          => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );

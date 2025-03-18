@@ -55,13 +55,8 @@ sub Run {
         }
     }
 
-    if ( !$Param{Data}->{TicketID} ) {
-        $Self->{LogObject}->Log(
-            Priority => 'error',
-            Message  => "Need TicketID!"
-        );
-        return;
-    }
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # get ticket data...
     my %TicketData = $Self->{TicketObject}->TicketGet(

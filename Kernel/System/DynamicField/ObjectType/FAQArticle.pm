@@ -122,11 +122,10 @@ sub PostValueSet {
     $FAQObject->EventHandler(
         Event => 'FAQDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName => $Param{DynamicFieldConfig}->{Name},
-            Value     => $Param{Value},
-            OldValue  => $Param{OldValue},
-            ItemID    => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            ItemID             => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );

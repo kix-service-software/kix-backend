@@ -14,13 +14,11 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
-    Config
     Contact
-    DynamicField
     LinkObject
     Log
-    Ticket
     ObjectSearch
+    Ticket
 );
 
 =item new()
@@ -52,78 +50,62 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => "Need $_ in Data!"
-            );
-            return;
-        }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
+    # handle only TicketDynamicFieldUpdate events
+    return 1 if ( $Param{Event} !~ m/^TicketDynamicFieldUpdate_/ );
+    if ( !IsHashRefWithData( $Param{Data}->{DynamicFieldConfig} ) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need DynamicFieldConfig in Data!',
+        );
+        return;
     }
 
-    # get current ticket data
-    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
-        TicketID      => $Param{Data}->{TicketID},
-        UserID        => $Param{UserID},
-        DynamicFields => 1,
+    # check for relevant field type
+    return 1 if ( $Param{Data}->{DynamicFieldConfig}->{FieldType} ne 'Contact' );
+
+    return 1 if ( !IsArrayRefWithData( $Param{Data}->{Value} ) );
+
+    # check in customer backend for this login
+    my @ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        UserID     => $Param{UserID},
+        Search => {
+            AND => [
+                {
+                    Field    => 'Login',
+                    Operator => 'EQ',
+                    Value    => $Param{Data}->{Value}
+                }
+            ]
+        }
     );
 
-    # check event
-    if ( $Param{Event} =~ /TicketDynamicFieldUpdate_(.*)/ ) {
-
-        my $Field            = "DynamicField_" . $1;
-        my $DynamicFieldData = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-            Name => $1
+    for my $ContactID ( @ContactList ) {
+        my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+            ID => $ContactID
         );
 
-        # nothing to do if Danamic Field not of type Contact or if customer was deleted
-        return if ( $DynamicFieldData->{FieldType} ne "Contact" );
-        return if ( !$Ticket{$Field} );
-        return if ( ref( $Ticket{$Field} ) eq 'ARRAY'
-            && scalar( @{ $Ticket{$Field} } )
-            && !$Ticket{$Field}->[0] );
-
-        # check in customer backend for this login
-        my %UserListCustomer = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'Contact',
-            Result     => 'HASH',
-            UserID     => $Param{UserID},
-            Search => {
-                AND => [
-                    {
-                        Field    => 'Login',
-                        Operator => 'EQ',
-                        Value    => $Ticket{$Field}->[0]
-                    }
-                ]
-            }
+        # add links to database
+        my $Success = $Kernel::OM->Get('LinkObject')->LinkAdd(
+            SourceObject => 'Person',
+            SourceKey    => $ContactData{UserLogin},
+            TargetObject => 'Ticket',
+            TargetKey    => $Param{Data}->{TicketID},
+            Type         => 'Customer',
+            UserID       => $Param{UserID},
         );
 
-        for my $CurrUserID ( keys(%UserListCustomer) ) {
-
-            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                ID => $CurrUserID
-            );
-
-            # add links to database
-            my $Success = $Kernel::OM->Get('LinkObject')->LinkAdd(
-                SourceObject => 'Person',
-                SourceKey    => $ContactData{UserLogin},
-                TargetObject => 'Ticket',
-                TargetKey    => $Ticket{TicketID},
-                Type         => 'Customer',
-                UserID       => $Param{UserID},
-            );
-
-            $Kernel::OM->Get('Ticket')->HistoryAdd(
-                Name         => 'added involved person ' . $UserListCustomer{$CurrUserID},
-                HistoryType  => 'TicketLinkAdd',
-                TicketID     => $Ticket{TicketID},
-                CreateUserID => 1,
-            );
-        }
-
+        $Kernel::OM->Get('Ticket')->HistoryAdd(
+            Name         => 'added involved person ' . $ContactData{UserLogin},
+            HistoryType  => 'TicketLinkAdd',
+            TicketID     => $Param{Data}->{TicketID},
+            CreateUserID => 1,
+        );
     }
 
     return 1;

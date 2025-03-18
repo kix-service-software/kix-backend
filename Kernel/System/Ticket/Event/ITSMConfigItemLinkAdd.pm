@@ -37,7 +37,7 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Data Event Config)) {
+    for (qw(Data Event Config UserID)) {
         if ( !$Param{$_} ) {
             $Self->{LogObject}->Log(
                 Priority => 'error',
@@ -46,53 +46,38 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Self->{LogObject}->Log(
-                Priority => 'error',
-                Message  => "Need $_ in Data!",
-            );
-            return;
-        }
+
+    # handle only with configured link type
+    return 1 if ( !$Param{Config}->{LinkType} );
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
+    # handle only TicketDynamicFieldUpdate events
+    return 1 if ( $Param{Event} !~ m/^TicketDynamicFieldUpdate_/ );
+    if ( !IsHashRefWithData( $Param{Data}->{DynamicFieldConfig} ) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need DynamicFieldConfig in Data!',
+        );
+        return;
     }
 
-    if ( $Param{Event} =~ m/TicketDynamicFieldUpdate/ ) {
+    # check for relevant field type
+    return 1 if ( $Param{Data}->{DynamicFieldConfig}->{FieldType} ne 'ITSMConfigItemReference' );
 
-        $Param{Event} =~ s/TicketDynamicFieldUpdate_(.*?)/$1/g;
+    return 1 if ( !IsArrayRefWithData( $Param{Data}->{Value} ) );
 
-        my $DynamicField = $Self->{DynamicFieldObject}->DynamicFieldGet(
-            Name => $Param{Event},
+    for my $Value ( @{ $Param{Data}->{Value} } ) {
+        # add links to database
+        my $Success = $Self->{LinkObject}->LinkAdd(
+            SourceObject => 'Ticket',
+            SourceKey    => $Param{Data}->{TicketID},
+            TargetObject => 'ConfigItem',
+            TargetKey    => $Value,
+            Type         => $Param{Config}->{LinkType},
+            UserID       => $Param{UserID},
         );
-
-        return if ( $DynamicField->{FieldType} ne 'ITSMConfigItemReference' );
-        return if ( !$Param{Data}->{Value} );
-
-        if ( ref( $Param{Data}->{Value} ) eq 'ARRAY' ) {
-            for my $Value ( @{ $Param{Data}->{Value} } ) {
-
-                # add links to database
-                my $Success = $Self->{LinkObject}->LinkAdd(
-                    SourceObject => 'Ticket',
-                    SourceKey    => $Param{Data}->{TicketID},
-                    TargetObject => 'ConfigItem',
-                    TargetKey    => $Value,
-                    Type         => $Param{Config}->{LinkType},
-                    UserID       => $Param{UserID},
-                );
-            }
-        }
-        else {
-
-            # add links to database
-            my $Success = $Self->{LinkObject}->LinkAdd(
-                SourceObject => 'Ticket',
-                SourceKey    => $Param{Data}->{TicketID},
-                TargetObject => 'ConfigItem',
-                TargetKey    => $Param{Data}->{Value},
-                Type         => $Param{Config}->{LinkType},
-                UserID       => $Param{UserID},
-            );
-        }
     }
 
     return 1;

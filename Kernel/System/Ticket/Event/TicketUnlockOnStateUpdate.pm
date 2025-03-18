@@ -55,10 +55,10 @@ sub Run {
         return;
     }
 
-    if ( $Param{Event} eq 'TicketStateUpdate' ) {
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
-        #check required param...
-        return 1 if !$Param{Data}->{TicketID};
+    if ( $Param{Event} eq 'TicketStateUpdate' ) {
 
         # get configuration...
         my $ConfigRef = $Self->{ConfigObject}->Get('TicketUnlockOnStateUpdate');

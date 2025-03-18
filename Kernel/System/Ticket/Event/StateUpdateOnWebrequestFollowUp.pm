@@ -50,6 +50,9 @@ Run - contains the actions performed by this event handler.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     # check if manual state change is activated in CustomerTicketZoom
     my $CustomerTicketZoomConfig
         = $Self->{ConfigObject}->Get("Ticket::Frontend::CustomerTicketZoom");
@@ -68,11 +71,6 @@ sub Run {
     );
 
     return 1 if ( $ThisArticle{Channel} ne 'note' && $ThisArticle{SenderType} ne 'external');
-
-    if ( !$Param{Data}->{TicketID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need TicketID!" );
-        return;
-    }
 
     # get ticket data and check ticket state
     my %Ticket = $Self->{TicketObject}->TicketGet( TicketID => $Param{Data}->{TicketID} );
