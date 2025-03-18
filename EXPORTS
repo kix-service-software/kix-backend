@@ -133,6 +133,7 @@ Console::Command::Maint::ClientRegistration::List                             = 
 Console::Command::Maint::ClientRegistration::Remove                           = Kernel::System::Console::Command::Maint::ClientRegistration::Remove
 Console::Command::Maint::ClientRegistration::SendNotifications                = Kernel::System::Console::Command::Maint::ClientRegistration::SendNotifications
 Console::Command::Maint::Config::Rebuild                                      = Kernel::System::Console::Command::Maint::Config::Rebuild
+Console::Command::Maint::Frontend::Execute                                    = Kernel::System::Console::Command::Maint::Frontend::Execute
 Console::Command::Maint::ITSM::Configitem::UpdateCounters                     = Kernel::System::Console::Command::Maint::ITSM::Configitem::UpdateCounters
 Console::Command::Maint::Daemon::List                                         = Kernel::System::Console::Command::Maint::Daemon::List
 Console::Command::Maint::Daemon::Summary                                      = Kernel::System::Console::Command::Maint::Daemon::Summary
