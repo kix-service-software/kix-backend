@@ -165,31 +165,18 @@ sub Sort {
         }
     }
 
-    # init mapping
+    # map search attributes to table attributes
     my %AttributeMapping = (
-        CreateByID => {
-            Select  => ['otl.create_by'],
-            OrderBy => ['otl.create_by']
-        },
-        CreateBy   => {
-            Select  => ['otlcruc.lastname','otlcruc.firstname','otlcru.login'],
-            OrderBy => ['LOWER(otlcruc.lastname)','LOWER(otlcruc.firstname)','LOWER(otlcru.login)']
-        },
-        ChangeByID => {
-            Select  => ['otl.change_by'],
-            OrderBy => ['otl.change_by']
-        },
-        ChangeBy   => {
-            Select  => ['otlchuc.lastname','otlchuc.firstname','otlchu.login'],
-            OrderBy => ['LOWER(otlchuc.lastname)','LOWER(otlchuc.firstname)','LOWER(otlchu.login)']
-        }
+        CreateByID => ['otl.create_by'],
+        CreateBy   => ['LOWER(otlcruc.lastname)','LOWER(otlcruc.firstname)','LOWER(otlcru.login)'],
+        ChangeByID => ['otl.change_by'],
+        ChangeBy   => ['LOWER(otlchuc.lastname)','LOWER(otlchuc.firstname)','LOWER(otlchu.login)'],
     );
 
-    # return sort def
     return {
         Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
+        Select  => $AttributeMapping{ $Param{Attribute} },
+        OrderBy => $AttributeMapping{ $Param{Attribute} }
     };
 }
 

@@ -35,13 +35,13 @@ sub GetSupportedAttributes {
     return {
         CreateByID => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
         },
         CreateBy => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
 ## TODO: login based search instead of id
@@ -49,13 +49,13 @@ sub GetSupportedAttributes {
         },
         ChangeByID => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
         },
         ChangeBy => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
         }
@@ -98,17 +98,17 @@ sub Search {
 #    # check for needed joins
 #    my @SQLJoin = ();
 #    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{JoinOTCreateBy} ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ObjectTagCreateBy} ) {
 #            push( @SQLJoin, 'INNER JOIN users otcru ON ocru.id = ot.create_by' );
 #
-#            $Param{Flags}->{JoinMap}->{JoinOTCreateBy} = 1;
+#            $Param{Flags}->{JoinMap}->{ObjectTagCreateBy} = 1;
 #        }
 #    }
 #    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{JoinOTChangeBy} ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ObjectTagChangeBy} ) {
 #            push( @SQLJoin, 'INNER JOIN users otchu ON ochu.id = ot.change_by' );
 #
-#            $Param{Flags}->{JoinMap}->{JoinOTChangeBy} = 1;
+#            $Param{Flags}->{JoinMap}->{ObjectTagChangeBy} = 1;
 #        }
 #    }
 
@@ -129,6 +129,54 @@ sub Search {
 ## TODO: login based search instead of id
 #        Join  => \@SQLJoin,
         Where => [ $Condition ]
+    };
+}
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams( %Param ) );
+
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'CreateBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ObjectTagCreateBy} ) {
+            push( @SQLJoin, 'INNER JOIN users otcru ON otcru.id = ot.create_by' );
+
+            $Param{Flags}->{JoinMap}->{ObjectTagCreateBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{ObjectTagCreateByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact otcruc ON otcruc.user_id = otcru.id' );
+
+            $Param{Flags}->{JoinMap}->{ObjectTagCreateByContact} = 1;
+        }
+    }
+    if ( $Param{Attribute} eq 'ChangeBy' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ObjectTagChangeBy} ) {
+            push( @SQLJoin, 'INNER JOIN users otchu ON otchu.id = ot.change_by' );
+
+            $Param{Flags}->{JoinMap}->{ObjectTagChangeBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{ObjectTagChangeByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact otchuc ON otchuc.user_id = otchu.id' );
+
+            $Param{Flags}->{JoinMap}->{ObjectTagChangeByContact} = 1;
+        }
+    }
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        CreateByID => ['ot.create_by'],
+        CreateBy   => ['LOWER(otcruc.lastname)','LOWER(otcruc.firstname)','LOWER(otcru.login)'],
+        ChangeByID => ['ot.change_by'],
+        ChangeBy   => ['LOWER(otchuc.lastname)','LOWER(otchuc.firstname)','LOWER(otchu.login)'],
+    );
+
+    return {
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} },
+        OrderBy => $AttributeMapping{ $Param{Attribute} }
     };
 }
 

@@ -35,13 +35,13 @@ sub GetSupportedAttributes {
     return {
         CreateTime => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
             ValueType    => 'DATETIME'
         },
         ChangeTime => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
             ValueType    => 'DATETIME'
         }
@@ -73,6 +73,25 @@ sub Search {
     return {
         Where      => [ $Condition ],
         IsRelative => $Param{Search}->{IsRelative}
+    };
+}
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
+    # init mapping
+    my %AttributeMapping = (
+        CreateTime => 'ot.create_time',
+        ChangeTime => 'ot.change_time',
+    );
+
+    # return sort def
+    return {
+        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ]
     };
 }
 

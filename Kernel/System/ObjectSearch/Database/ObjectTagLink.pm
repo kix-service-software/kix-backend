@@ -40,79 +40,18 @@ sub Init {
     # init object tag join counter with 0
     $Param{Flags}->{ObjectTagLinkJoinCounter} = 0;
 
-    # check fields
-    return $Self->_CheckFields(
-        %Param
-    );
+    return 1;
 }
 
 sub GetBaseDef {
     my ( $Self, %Param ) = @_;
 
     return {
-        Select  => ['otl.id', 'otl.name','otl.object_id', 'otl.object_type'],
+        Select  => ['otl.id', 'LOWER(otl.name)', 'LOWER(otl.object_type)', 'otl.object_id'],
         From    => ['object_tags otl'],
-        OrderBy => ['otl.name ASC', 'otl.object_type ASC', 'otl.object_id ASC' ]
+        OrderBy => ['LOWER(otl.name) ASC', 'LOWER(otl.object_type) ASC', 'otl.object_id ASC']
     };
 }
-
-
-=begin Internal:
-
-=cut
-
-sub _CheckFields {
-    my ($Self, %Param) = @_;
-
-    my $HasObjectType = 0;
-    my $HasObjectID   = 0;
-    for my $Type ( keys %{$Param{Search}} ) {
-        if ( ref( $Param{Search}->{ $Type } ) ne 'ARRAY' ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Search! Search type has to provide an array.",
-                Silent   => $Param{Silent}
-            );
-            return;
-        }
-
-        for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
-            if (
-                ref( $SearchItem ) ne 'HASH'
-                || !defined( $SearchItem->{Field} )
-                || !defined( $SearchItem->{Value} )
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
-                    Silent   => $Param{Silent}
-                );
-                return;
-            }
-            if ( $SearchItem->{Field} eq 'ObjectType' ) {
-                $HasObjectType = 1;
-            }
-            elsif ( $SearchItem->{Field} eq 'ObjectID' ) {
-                $HasObjectID = 1;
-            }
-        }
-    }
-
-    if ( $HasObjectID && !$HasObjectType ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid search! Search of ObjectID requires an object type assignment.",
-            Silent   => $Param{Silent}
-        );
-        return;
-    }
-
-    return 1;
-}
-
-=end Internal:
-
-=cut
 
 1;
 
