@@ -37,19 +37,20 @@ sub GetSupportedAttributes {
     return {
         Name      => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ObjectType => {
+            IsSearchable => 1,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ObjectID   => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
-        },
-        ObjectType => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            ValueType    => 'NUMERIC',
+            Requires     => ['ObjectType']
         }
     };
 }
@@ -62,17 +63,17 @@ sub Search {
 
     # init mapping
     my %AttributeMapping = (
-        Name   => {
+        Name       => {
             Column          => 'ot.name',
             CaseInsensitive => 1
         },
-        ObjectType              => {
+        ObjectType => {
             Column          => 'ot.object_type',
             CaseInsensitive => 1
         },
-        ObjectID                => {
-            Column          => 'ot.object_id',
-            ValueType       => 'NUMERIC'
+        ObjectID   => {
+            Column    => 'ot.object_id',
+            ValueType => 'NUMERIC'
         }
     );
 
@@ -92,13 +93,32 @@ sub Search {
         ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
         CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
         Value           => $Values,
-        NULLValue       => 1,
         Silent          => $Param{Silent}
     );
     return if ( !$Condition );
 
     return {
-        Where => [ $Condition ]
+        Where    => [ $Condition ],
+        Requires => $Param{Search}->{Requires}
+    };
+}
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams( %Param ) );
+
+    # map search attributes to table attributes
+    my %AttributeMapping = (
+        Name       => 'LOWER(ot.name)',
+        ObjectType => 'LOWER(ot.object_type)',
+        ObjectID   => 'ot.object_id'
+    );
+
+    return {
+        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ]
     };
 }
 

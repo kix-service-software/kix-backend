@@ -131,6 +131,10 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                 && ref( $Entry->{Operators} ) eq 'ARRAY'
                 && defined( $Entry->{ValueType} )
                 && ref( $Entry->{ValueType} ) eq ''
+                && (
+                    !defined( $Entry->{Requires} )
+                    || ref( $Entry->{Requires} ) eq 'ARRAY'
+                )
             ),
             'ObjectSearch > GetSupportedAttributes: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' (expected structure)'
         );
@@ -141,43 +145,23 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                 'ObjectSearch > GetSupportedAttributes: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable and has Operators'
             );
 
-            for my $Operator ( @{ $Entry->{Operators} } ) {
-                my $SearchValue;
-                if ( $Entry->{ValueType} eq 'NUMERIC' ) {
-                    $SearchValue = 1;
-                }
-                elsif ( $Entry->{ValueType} eq 'DATE' ) {
-                    $SearchValue = '1990-01-01';
-                }
-                elsif ( $Entry->{ValueType} eq 'DATETIME' ) {
-                    $SearchValue = '1990-01-01 00:00:00';
-                }
-                else {
-                    $SearchValue = 'Test';
-                }
-
-                my $Result = $ObjectSearch->Search(
-                    ObjectType => $ObjectType,
-                    UserID     => 1,
-                    Search     => {
-                        AND => [
-                            {
-                                Field    => $Entry->{Property},
-                                Operator => $Operator,
-                                Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
-                            }
-                        ]
+            if ( !defined( $Entry->{Requires} ) ) {
+                for my $Operator ( @{ $Entry->{Operators} } ) {
+                    my $SearchValue;
+                    if ( $Entry->{ValueType} eq 'NUMERIC' ) {
+                        $SearchValue = 1;
                     }
-                );
-                $Self->Is(
-                    defined( $Result ),
-                    '1',
-                    'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator
-                );
+                    elsif ( $Entry->{ValueType} eq 'DATE' ) {
+                        $SearchValue = '1990-01-01';
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DATETIME' ) {
+                        $SearchValue = '1990-01-01 00:00:00';
+                    }
+                    else {
+                        $SearchValue = 'Test';
+                    }
 
-                if ( $Operator =~ m/^[!]?IN$/ ) {
-
-                    $Result = $ObjectSearch->Search(
+                    my $Result = $ObjectSearch->Search(
                         ObjectType => $ObjectType,
                         UserID     => 1,
                         Search     => {
@@ -185,7 +169,7 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                                 {
                                     Field    => $Entry->{Property},
                                     Operator => $Operator,
-                                    Value    => []
+                                    Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
                                 }
                             ]
                         }
@@ -193,9 +177,218 @@ for my $ObjectType ( sort( keys( %{ $RegisteredObjectTypes } ) ) ) {
                     $Self->Is(
                         defined( $Result ),
                         '1',
-                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array'
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator
                     );
+
+                    if ( $Operator =~ m/^[!]?IN$/ ) {
+
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                AND => [
+                                    {
+                                        Field    => $Entry->{Property},
+                                        Operator => $Operator,
+                                        Value    => []
+                                    }
+                                ]
+                            }
+                        );
+                        $Self->Is(
+                            defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array'
+                        );
+                    }
                 }
+            }
+            elsif ( ref( $Entry->{Requires} ) eq 'ARRAY' ) {
+                my @Requires = ();
+                for my $Require ( @{ $Entry->{Requires} } ) {
+                    REQUIREENTRY:
+                    for my $RequireEntry ( @{ $SupportedAttributes } ) {
+                        next REQUIREENTRY if ( $RequireEntry->{Property} ne $Require );
+
+                        REQUIREOPERATOR:
+                        for my $RequireOperator ( @{ $RequireEntry->{Operators} } ) {
+                            my $RequireSearchValue;
+                            if ( $RequireEntry->{ValueType} eq 'NUMERIC' ) {
+                                $RequireSearchValue = 1;
+                            }
+                            elsif ( $RequireEntry->{ValueType} eq 'DATE' ) {
+                                $RequireSearchValue = '1990-01-01';
+                            }
+                            elsif ( $RequireEntry->{ValueType} eq 'DATETIME' ) {
+                                $RequireSearchValue = '1990-01-01 00:00:00';
+                            }
+                            else {
+                                $RequireSearchValue = 'Test';
+                            }
+
+                            push(
+                                @Requires,
+                                {
+                                    Field    => $RequireEntry->{Property},
+                                    Operator => $RequireOperator,
+                                    Value    => $RequireOperator =~ m/^[!]?IN$/ ? [ $RequireSearchValue ] : $RequireSearchValue
+                                }
+                            );
+                        }
+                    }
+                }
+                for my $Operator ( @{ $Entry->{Operators} } ) {
+                    my $SearchValue;
+                    if ( $Entry->{ValueType} eq 'NUMERIC' ) {
+                        $SearchValue = 1;
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DATE' ) {
+                        $SearchValue = '1990-01-01';
+                    }
+                    elsif ( $Entry->{ValueType} eq 'DATETIME' ) {
+                        $SearchValue = '1990-01-01 00:00:00';
+                    }
+                    else {
+                        $SearchValue = 'Test';
+                    }
+
+                    my $Result = $ObjectSearch->Search(
+                        ObjectType => $ObjectType,
+                        UserID     => 1,
+                        Search     => {
+                            AND => [
+                                {
+                                    Field    => $Entry->{Property},
+                                    Operator => $Operator,
+                                    Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
+                                }
+                            ]
+                        },
+                        Silent     => 1,
+                    );
+                    $Self->Is(
+                        !defined( $Result ),
+                        '1',
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / missing Requires'
+                    );
+
+                    if ( $Operator =~ m/^[!]?IN$/ ) {
+
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                AND => [
+                                    {
+                                        Field    => $Entry->{Property},
+                                        Operator => $Operator,
+                                        Value    => []
+                                    }
+                                ]
+                            },
+                            Silent     => 1,
+                        );
+                        $Self->Is(
+                            !defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array / missing Requires'
+                        );
+                    }
+
+                    $Result = $ObjectSearch->Search(
+                        ObjectType => $ObjectType,
+                        UserID     => 1,
+                        Search     => {
+                            OR  => \@Requires,
+                            AND => {
+                                Field    => $Entry->{Property},
+                                Operator => $Operator,
+                                Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
+                            }
+                        },
+                        Silent     => 1,
+                    );
+                    $Self->Is(
+                        !defined( $Result ),
+                        '1',
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / Requires in OR'
+                    );
+
+                    if ( $Operator =~ m/^[!]?IN$/ ) {
+
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                OR  => \@Requires,
+                                AND => [
+                                    {
+                                        Field    => $Entry->{Property},
+                                        Operator => $Operator,
+                                        Value    => []
+                                    }
+                                ]
+                            },
+                            Silent     => 1,
+                        );
+                        $Self->Is(
+                            !defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array / Requires in OR'
+                        );
+                    }
+
+                    my @SearchParameter = (
+                        @Requires,
+                        {
+                            Field    => $Entry->{Property},
+                            Operator => $Operator,
+                            Value    => $Operator =~ m/^[!]?IN$/ ? [ $SearchValue ] : $SearchValue
+                        }
+                    );
+
+                    $Result = $ObjectSearch->Search(
+                        ObjectType => $ObjectType,
+                        UserID     => 1,
+                        Search     => {
+                            AND => \@SearchParameter
+                        }
+                    );
+                    $Self->Is(
+                        defined( $Result ),
+                        '1',
+                        'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / given Requires'
+                    );
+
+                    if ( $Operator =~ m/^[!]?IN$/ ) {
+                        my @INSearchParameter = (
+                            @Requires,
+                            {
+                                Field    => $Entry->{Property},
+                                Operator => $Operator,
+                                Value    => []
+                            }
+                        );
+                        $Result = $ObjectSearch->Search(
+                            ObjectType => $ObjectType,
+                            UserID     => 1,
+                            Search     => {
+                                AND => \@INSearchParameter
+                            }
+                        );
+                        $Self->Is(
+                            defined( $Result ),
+                            '1',
+                            'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' IsSearchable / Operator ' . $Operator . ' / empty value array / given Requires'
+                        );
+                    }
+                }
+            }
+            else {
+                $Self->True(
+                    ( !defined( $Entry->{Requires} ) || ref( $Entry->{Requires} ) eq 'ARRAY' ),
+                    'ObjectSearch > Search: ObjectType ' . $ObjectType . ' / Property ' . ($Entry->{Property} || '') . ' Requires has to be undefined or array ref'
+                );
             }
         }
 

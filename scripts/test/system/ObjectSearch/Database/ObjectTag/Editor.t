@@ -15,7 +15,7 @@ use vars (qw($Self));
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
-my $AttributeModule = 'Kernel::System::ObjectSearch::Database::GeneralCatalog::Editor';
+my $AttributeModule = 'Kernel::System::ObjectSearch::Database::ObjectTag::Editor';
 
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
@@ -32,7 +32,7 @@ $Self->Is(
 for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
-        'Attribute object can "' . $Method . q{"}
+        'Attribute object can "' . $Method . '"'
     );
 }
 
@@ -95,6 +95,7 @@ my @SearchTests = (
             Field    => 'CreateByID',
             Operator => 'EQ',
             Value    => 'Test'
+
         },
         Expected     => undef
     },
@@ -143,7 +144,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by = 1'
+                'ot.create_by = 1'
             ]
         }
     },
@@ -156,7 +157,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by <> 1'
+                'ot.create_by <> 1'
             ]
         }
     },
@@ -169,7 +170,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by IN (1)'
+                'ot.create_by IN (1)'
             ]
         }
     },
@@ -182,7 +183,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by NOT IN (1)'
+                'ot.create_by NOT IN (1)'
             ]
         }
     },
@@ -195,20 +196,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by < 1'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field CreateByID / Operator GT',
-        Search       => {
-            Field    => 'CreateByID',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'gc.create_by > 1'
+                'ot.create_by < 1'
             ]
         }
     },
@@ -221,7 +209,20 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by <= 1'
+                'ot.create_by <= 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field CreateByID / Operator GT',
+        Search       => {
+            Field    => 'CreateByID',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Where' => [
+                'ot.create_by > 1'
             ]
         }
     },
@@ -234,7 +235,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by >= 1'
+                'ot.create_by >= 1'
             ]
         }
     },
@@ -247,7 +248,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by = 1'
+                'ot.create_by = 1'
             ]
         }
     },
@@ -260,7 +261,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by <> 1'
+                'ot.create_by <> 1'
             ]
         }
     },
@@ -273,7 +274,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by IN (1)'
+                'ot.create_by IN (1)'
             ]
         }
     },
@@ -286,7 +287,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by NOT IN (1)'
+                'ot.create_by NOT IN (1)'
             ]
         }
     },
@@ -299,7 +300,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by < 1'
+                'ot.create_by < 1'
             ]
         }
     },
@@ -312,7 +313,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by <= 1'
+                'ot.create_by <= 1'
             ]
         }
     },
@@ -325,7 +326,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by > 1'
+                'ot.create_by > 1'
             ]
         }
     },
@@ -338,7 +339,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.create_by >= 1'
+                'ot.create_by >= 1'
             ]
         }
     },
@@ -351,7 +352,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by = 1'
+                'ot.change_by = 1'
             ]
         }
     },
@@ -364,7 +365,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by <> 1'
+                'ot.change_by <> 1'
             ]
         }
     },
@@ -377,7 +378,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by IN (1)'
+                'ot.change_by IN (1)'
             ]
         }
     },
@@ -390,7 +391,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by NOT IN (1)'
+                'ot.change_by NOT IN (1)'
             ]
         }
     },
@@ -403,20 +404,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by < 1'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / Field ChangeByID / Operator GT',
-        Search       => {
-            Field    => 'ChangeByID',
-            Operator => 'GT',
-            Value    => '1'
-        },
-        Expected     => {
-            'Where' => [
-                'gc.change_by > 1'
+                'ot.change_by < 1'
             ]
         }
     },
@@ -429,7 +417,20 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by <= 1'
+                'ot.change_by <= 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ChangeByID / Operator GT',
+        Search       => {
+            Field    => 'ChangeByID',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Where' => [
+                'ot.change_by > 1'
             ]
         }
     },
@@ -442,7 +443,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by >= 1'
+                'ot.change_by >= 1'
             ]
         }
     },
@@ -455,7 +456,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by = 1'
+                'ot.change_by = 1'
             ]
         }
     },
@@ -468,7 +469,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by <> 1'
+                'ot.change_by <> 1'
             ]
         }
     },
@@ -481,7 +482,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by IN (1)'
+                'ot.change_by IN (1)'
             ]
         }
     },
@@ -494,7 +495,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by NOT IN (1)'
+                'ot.change_by NOT IN (1)'
             ]
         }
     },
@@ -507,7 +508,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by < 1'
+                'ot.change_by < 1'
             ]
         }
     },
@@ -520,7 +521,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by <= 1'
+                'ot.change_by <= 1'
             ]
         }
     },
@@ -533,7 +534,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by > 1'
+                'ot.change_by > 1'
             ]
         }
     },
@@ -546,7 +547,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                'gc.change_by >= 1'
+                'ot.change_by >= 1'
             ]
         }
     }
@@ -582,28 +583,20 @@ my @SortTests = (
         Attribute => 'CreateByID',
         Expected  => {
             'Join'    => [],
-            'Select'  => ['gc.create_by'],
-            'OrderBy' => ['gc.create_by']
+            'Select'  => ['ot.create_by'],
+            'OrderBy' => ['ot.create_by']
         }
     },
     {
         Name      => 'Sort: Attribute "CreateBy"',
         Attribute => 'CreateBy',
         Expected  => {
-            'Join' => [
-                'INNER JOIN users gccru ON gccru.id = gc.create_by',
-                'LEFT OUTER JOIN contact gccruc ON gccruc.user_id = gccru.id'
+            'Join'    => [
+                'INNER JOIN users otcru ON otcru.id = ot.create_by',
+                'LEFT OUTER JOIN contact otcruc ON otcruc.user_id = otcru.id'
             ],
-            'OrderBy' => [
-                'LOWER(gccruc.lastname)',
-                'LOWER(gccruc.firstname)',
-                'LOWER(gccru.login)'
-            ],
-            'Select' => [
-                'gccruc.lastname',
-                'gccruc.firstname',
-                'gccru.login'
-            ]
+            'Select'  => ['LOWER(otcruc.lastname)','LOWER(otcruc.firstname)','LOWER(otcru.login)'],
+            'OrderBy' => ['LOWER(otcruc.lastname)','LOWER(otcruc.firstname)','LOWER(otcru.login)']
         }
     },
     {
@@ -611,28 +604,20 @@ my @SortTests = (
         Attribute => 'ChangeByID',
         Expected  => {
             'Join'    => [],
-            'Select'  => ['gc.change_by'],
-            'OrderBy' => ['gc.change_by']
+            'Select'  => ['ot.change_by'],
+            'OrderBy' => ['ot.change_by']
         }
     },
     {
         Name      => 'Sort: Attribute "ChangeBy"',
         Attribute => 'ChangeBy',
         Expected  => {
-            'Join' => [
-                'INNER JOIN users gcchu ON gcchu.id = gc.change_by',
-                'LEFT OUTER JOIN contact gcchuc ON gcchuc.user_id = gcchu.id'
+            'Join'    => [
+                'INNER JOIN users otchu ON otchu.id = ot.change_by',
+                'LEFT OUTER JOIN contact otchuc ON otchuc.user_id = otchu.id'
             ],
-            'OrderBy' => [
-                'LOWER(gcchuc.lastname)',
-                'LOWER(gcchuc.firstname)',
-                'LOWER(gcchu.login)'
-            ],
-            'Select' => [
-                'gcchuc.lastname',
-                'gcchuc.firstname',
-                'gcchu.login'
-            ]
+            'Select'  => ['LOWER(otchuc.lastname)','LOWER(otchuc.firstname)','LOWER(otchu.login)'],
+            'OrderBy' => ['LOWER(otchuc.lastname)','LOWER(otchuc.firstname)','LOWER(otchu.login)']
         }
     }
 );
@@ -671,7 +656,7 @@ $Helper->BeginWork();
 
 ## prepare user mapping
 my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
-    Role => 'Asset Maintainer'
+    Role => 'Customer Manager'
 );
 my $UserLogin1 = 'Test001';
 my $UserLogin2 = 'test002';
@@ -700,7 +685,7 @@ my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
     Lastname              => $ContactLastName1,
     AssignedUserID        => $UserID1,
     ValidID               => 1,
-    UserID                => $UserID1,
+    UserID                => 1,
 );
 $Self->True(
     $ContactID1,
@@ -726,7 +711,7 @@ my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
     Lastname              => $ContactLastName2,
     AssignedUserID        => $UserID2,
     ValidID               => 1,
-    UserID                => $UserID2
+    UserID                => 1,
 );
 $Self->True(
     $ContactID2,
@@ -748,103 +733,64 @@ $Self->True(
     'Third user created'
 );
 
-# discard contact,user object to process events
+# discard contact object to process events
 $Kernel::OM->ObjectsDiscard(
-    Objects => [
-        'Contact',
-        'User'
-    ],
+    Objects => ['Contact'],
 );
 
-## prepare test general catalog items ##
-# first item
-my $ItemID1 = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
-    Class   => 'Unit::Test::Type',
-    Name    => 'Foo',
-    ValidID => 1,
-    UserID  => $UserID1
-);
-$Self->True(
-    $ItemID1,
-    'Created first item'
-);
-# second item
-my $ItemID2 = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
-    Class   => 'Unit::Test::Type',
-    Name    => 'Baa',
-    ValidID => 1,
-    UserID  => $UserID2
-);
-$Self->True(
-    $ItemID2,
-    'Created second item'
-);
-# third item
-my $ItemID3 = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
-    Class   => 'Unit::Test::Type',
-    Name    => 'Test',
-    ValidID => 1,
-    UserID  => $UserID3
-);
-$Self->True(
-    $ItemID3,
-    'Created third item'
-);
-
-# discard config item object to process events
+# discard user object to process events
 $Kernel::OM->ObjectsDiscard(
-    Objects => ['GeneralCatalog'],
+    Objects => ['User'],
 );
 
-# prepare result lists
-my @ItemIDs = $ObjectSearch->Search(
-    ObjectType => 'GeneralCatalog',
-    Result     => 'ARRAY',
-    UserType   => 'Agent',
-    UserID     => 1,
-);
+## prepare test objecttag ##
+my $TestData1 = 'Test001';
+my $TestData2 = 'test002';
+my $TestData3 = 'Test003';
 
+# first objecttag
+my $ObjectTagID1 = $Kernel::OM->Get('ObjectTag')->ObjectTagAdd(
+    Name       => $TestData1,
+    ObjectType => $Helper->GetRandomID(),
+    ObjectID   => 1,
+    UserID     => $UserID1
+);
 $Self->True(
-    scalar( @ItemIDs ),
-    'ItemID: GET / All Items'
+    $ObjectTagID1,
+    'Created first objecttag'
+);
+# second objecttag
+my $ObjectTagID2 = $Kernel::OM->Get('ObjectTag')->ObjectTagAdd(
+    Name       => $TestData2,
+    ObjectType => $Helper->GetRandomID(),
+    ObjectID   => 1,
+    UserID     => $UserID2
+);
+$Self->True(
+    $ObjectTagID2,
+    'Created second objecttag'
+);
+# third objecttag
+my $ObjectTagID3 = $Kernel::OM->Get('ObjectTag')->ObjectTagAdd(
+    Name       => $TestData3,
+    ObjectType => $Helper->GetRandomID(),
+    ObjectID   => 1,
+    UserID     => $UserID3
+);
+$Self->True(
+    $ObjectTagID3,
+    'Created third objecttag'
 );
 
-# List for NE
-my @TmpList = @ItemIDs;
-splice(@TmpList, -2,1);  # remove ItemID2
-my @List1 = @TmpList;
-
-# List for !IN
-@TmpList = @ItemIDs;
-splice(@TmpList, -1,1);  # remove ItemID3
-splice(@TmpList, -2,1);  # remove ItemID1
-my @List2 = @TmpList;
-
-# List for LT
-@TmpList = @ItemIDs;
-splice(@TmpList, -2); # remove all beyond ItemID2 and include ItemID2
-my @List3 = @TmpList;
-
-# List for LTE
-@TmpList = @ItemIDs;
-splice(@TmpList, -1); # remove all beyond ItemID2 and include ItemID2
-my @List4 = @TmpList;
-
-# List for GT
-@TmpList = @ItemIDs;
-splice(@TmpList, 0,-1); # remove all before ItemID2 and include ItemID2
-my @List5 = @TmpList;
-
-# List for GTE
-@TmpList = @ItemIDs;
-splice(@TmpList, 0, -2); # remove all before ItemID2
-my @List6 = @TmpList;
-
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['ObjectTag'],
+);
 
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field CreateByID / Operator EQ / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator EQ / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -854,10 +800,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID2]
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field CreateByID / Operator NE / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator NE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -867,10 +813,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List1
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field CreateByID / Operator IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field CreateByID / Operator IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -880,10 +826,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID1, $ItemID3]
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field CreateByID / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field CreateByID / Operator !IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -893,10 +839,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List2
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field CreateByID / Operator LT / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator LT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -906,10 +852,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List3
+        Expected => [$TestData1]
     },
     {
-        Name     => "Search: Field CreateByID / Operator GT / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator GT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -919,10 +865,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List5
+        Expected => [$TestData3]
     },
     {
-        Name     => "Search: Field CreateByID / Operator LTE / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator LTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -932,10 +878,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List4
+        Expected => [$TestData1,$TestData2]
     },
     {
-        Name     => "Search: Field CreateByID / Operator GTE / Value \$UserID2",
+        Name     => 'Search: Field CreateByID / Operator GTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -945,10 +891,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List6
+        Expected => [$TestData2,$TestData3]
     },
     {
-        Name     => "Search: Field CreateBy / Operator EQ / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator EQ / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -958,10 +904,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID2]
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field CreateBy / Operator NE / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator NE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -971,10 +917,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List1
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field CreateBy / Operator IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field CreateBy / Operator IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -984,10 +930,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID1, $ItemID3]
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field CreateBy / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field CreateBy / Operator !IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -997,10 +943,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List2
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field CreateBy / Operator LT / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator LT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1010,10 +956,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List3
+        Expected => [$TestData1]
     },
     {
-        Name     => "Search: Field CreateBy / Operator GT / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator GT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1023,10 +969,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List5
+        Expected => [$TestData3]
     },
     {
-        Name     => "Search: Field CreateBy / Operator LTE / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator LTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1036,10 +982,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List4
+        Expected => [$TestData1,$TestData2]
     },
     {
-        Name     => "Search: Field CreateBy / Operator GTE / Value \$UserID2",
+        Name     => 'Search: Field CreateBy / Operator GTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1049,10 +995,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List6
+        Expected => [$TestData2,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator EQ / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator EQ / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1062,10 +1008,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID2]
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator NE / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator NE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1075,10 +1021,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List1
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field ChangeByID / Operator IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -1088,10 +1034,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID1, $ItemID3]
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field ChangeByID / Operator !IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -1101,10 +1047,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List2
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator LT / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator LT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1114,10 +1060,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List3
+        Expected => [$TestData1]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator GT / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator GT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1127,10 +1073,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List5
+        Expected => [$TestData3]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator LTE / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator LTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1140,10 +1086,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List4
+        Expected => [$TestData1,$TestData2]
     },
     {
-        Name     => "Search: Field ChangeByID / Operator GTE / Value \$UserID2",
+        Name     => 'Search: Field ChangeByID / Operator GTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1153,10 +1099,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List6
+        Expected => [$TestData2,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator EQ / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator EQ / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1166,10 +1112,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID2]
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator NE / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator NE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1179,10 +1125,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List1
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field ChangeBy / Operator IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -1192,10 +1138,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ItemID1,$ItemID3]
+        Expected => [$TestData1,$TestData3]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Name     => 'Search: Field ChangeBy / Operator !IN / Value [$UserID1,$UserID3]',
         Search   => {
             'AND' => [
                 {
@@ -1205,10 +1151,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List2
+        Expected => [$TestData2]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator LT / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator LT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1218,10 +1164,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List3
+        Expected => [$TestData1]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator GT / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator GT / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1231,10 +1177,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List5
+        Expected => [$TestData3]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator LTE / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator LTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1244,10 +1190,10 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List4
+        Expected => [$TestData1,$TestData2]
     },
     {
-        Name     => "Search: Field ChangeBy / Operator GTE / Value \$UserID2",
+        Name     => 'Search: Field ChangeBy / Operator GTE / Value $UserID2',
         Search   => {
             'AND' => [
                 {
@@ -1257,12 +1203,12 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => \@List6
+        Expected => [$TestData2,$TestData3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(
-        ObjectType => 'GeneralCatalog',
+        ObjectType => 'ObjectTag',
         Result     => 'ARRAY',
         Search     => $Test->{Search},
         UserType   => 'Agent',
@@ -1284,7 +1230,7 @@ my @IntegrationSortTests = (
                 Field => 'CreateByID'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => [$TestData1,$TestData2,$TestData3]
     },
     {
         Name     => 'Sort: Field CreateByID / Direction ascending',
@@ -1294,7 +1240,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => [$TestData1,$TestData2,$TestData3]
     },
     {
         Name     => 'Sort: Field CreateByID / Direction descending',
@@ -1304,8 +1250,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Limit    => 3,
-        Expected => [$ItemID3, $ItemID2, $ItemID1]
+        Expected => [$TestData3,$TestData2,$TestData1,]
     },
     {
         Name     => 'Sort: Field CreateBy',
@@ -1314,7 +1259,7 @@ my @IntegrationSortTests = (
                 Field => 'CreateBy'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => $OrderByNull eq 'LAST' ? [$TestData1,$TestData2,$TestData3] : [$TestData3,$TestData1,$TestData2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -1324,7 +1269,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => $OrderByNull eq 'LAST' ? [$TestData1,$TestData2,$TestData3] : [$TestData3,$TestData1,$TestData2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -1334,8 +1279,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Limit    => 3,
-        Expected => [$ItemID3, $ItemID2, $ItemID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TestData3,$TestData2,$TestData1] : [$TestData2,$TestData1,$TestData3]
     },
     {
         Name     => 'Sort: Field ChangeByID',
@@ -1344,7 +1288,7 @@ my @IntegrationSortTests = (
                 Field => 'ChangeByID'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => [$TestData1,$TestData2,$TestData3]
     },
     {
         Name     => 'Sort: Field ChangeByID / Direction ascending',
@@ -1354,7 +1298,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => [$TestData1,$TestData2,$TestData3]
     },
     {
         Name     => 'Sort: Field ChangeByID / Direction descending',
@@ -1364,8 +1308,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Limit    => 3,
-        Expected => [$ItemID3, $ItemID2, $ItemID1]
+        Expected => [$TestData3,$TestData2,$TestData1]
     },
     {
         Name     => 'Sort: Field ChangeBy',
@@ -1374,7 +1317,7 @@ my @IntegrationSortTests = (
                 Field => 'ChangeBy'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => $OrderByNull eq 'LAST' ? [$TestData1,$TestData2,$TestData3] : [$TestData3,$TestData1,$TestData2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction ascending',
@@ -1384,7 +1327,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => \@ItemIDs
+        Expected => $OrderByNull eq 'LAST' ? [$TestData1,$TestData2,$TestData3] : [$TestData3,$TestData1,$TestData2]
     },
     {
         Name     => 'Sort: Field ChangeBy / Direction descending',
@@ -1394,32 +1337,22 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Limit    => 3,
-        Expected => [$ItemID3, $ItemID2, $ItemID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TestData3,$TestData2,$TestData1] : [$TestData2,$TestData1,$TestData3]
     }
 );
-if ( $OrderByNull eq 'LAST' ) {
-    for my $Test ( @IntegrationSortTests ) {
-        my @Result = $ObjectSearch->Search(
-            ObjectType => 'GeneralCatalog',
-            Result     => 'ARRAY',
-            Sort       => $Test->{Sort},
-            Language   => $Test->{Language},
-            UserType   => 'Agent',
-            UserID     => 1,
-            Limit      => $Test->{Limit}
-        );
-        $Self->IsDeeply(
-            \@Result,
-            $Test->{Expected},
-            $Test->{Name}
-        );
-    }
-}
-else {
-    $Self->True(
-        1,
-        '## TODO ## Check Sort for OrderByNull FIRST'
+for my $Test ( @IntegrationSortTests ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'ObjectTag',
+        Result     => 'ARRAY',
+        Sort       => $Test->{Sort},
+        Language   => $Test->{Language},
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
     );
 }
 

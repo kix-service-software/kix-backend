@@ -941,6 +941,11 @@ sub _CheckSearchParams {
         }
     }
 
+    # check for required attributes
+    if ( defined( $AttributeList->{ $Param{Search}->{Field} }->{Requires} ) ) {
+        $Param{Search}->{Requires} = $AttributeList->{ $Param{Search}->{Field} }->{Requires};
+    }
+
     return 1;
 }
 

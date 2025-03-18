@@ -50,7 +50,7 @@ sub Init {
     $Param{Flags}->{OrganisationContactJoinCounter} = 0;
 
     # init user join counter with 0
-    $Param{Flags}->{IserJoinCounter} = 0;
+    $Param{Flags}->{UserJoinCounter} = 0;
 
     return 1;
 }
