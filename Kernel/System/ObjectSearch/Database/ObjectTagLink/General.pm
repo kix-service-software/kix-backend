@@ -40,16 +40,17 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
-        ObjectID   => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
-        },
         ObjectType => {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        ObjectID   => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType    => 'NUMERIC',
+            Requires     => ['ObjectType']
         }
     };
 }
@@ -62,17 +63,17 @@ sub Search {
 
     # init mapping
     my %AttributeMapping = (
-        Name   => {
+        Name       => {
             Column          => 'otl.name',
             CaseInsensitive => 1
         },
-        ObjectType              => {
+        ObjectType => {
             Column          => 'otl.object_type',
             CaseInsensitive => 1
         },
-        ObjectID                => {
-            Column          => 'otl.object_id',
-            ValueType       => 'NUMERIC'
+        ObjectID   => {
+            Column    => 'otl.object_id',
+            ValueType => 'NUMERIC'
         }
     );
 
@@ -92,13 +93,13 @@ sub Search {
         ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
         CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
         Value           => $Values,
-        NULLValue       => 1,
         Silent          => $Param{Silent}
     );
     return if ( !$Condition );
 
     return {
-        Where => [ $Condition ]
+        Where    => [ $Condition ],
+        Requires => $Param{Search}->{Requires}
     };
 }
 

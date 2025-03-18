@@ -56,33 +56,15 @@ sub GetBaseDef {
     };
 }
 
-sub GetSupportedAttributes {
+sub _GetObjectSpecifics {
     my ( $Self, %Param ) = @_;
 
-    my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeMapping}} ) {
-        my $Module    = $Self->{AttributeMapping}->{$Attribute};
-        my $Property  = $Attribute;
-
-        my $Classes = undef;
-        if ( IsArrayRefWithData($Module->{Class})) {
-            $Classes = $Module->{Class};
-        }
-        push (
-            @List,
-            {
-                ObjectType      => $Self->{ObjectType},
-                Property        => $Property,
-                ObjectSpecifics => $Classes,
-                IsSearchable    => $Module->{IsSearchable} || 0,
-                IsSortable      => $Module->{IsSortable}   || 0,
-                Operators       => $Module->{Operators}    || [],
-                ValueType       => $Module->{ValueType}    || q{}
-            }
-        );
+    my $Classes = undef;
+    if ( IsArrayRefWithData( $Param{AttributeRef}->{Class} ) ) {
+        $Classes = $Param{AttributeRef}->{Class};
     }
 
-    return \@List;
+    return $Classes;
 }
 
 1;

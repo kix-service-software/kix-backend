@@ -37,13 +37,13 @@ sub GetSupportedAttributes {
     return {
         ObjectTagID => {
             IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            IsSortable   => 1,
+            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType    => 'NUMERIC'
         },
         ID        => {
             IsSearchable => 1,
-            IsSortable   => 0,
+            IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType    => 'NUMERIC'
         }
@@ -69,6 +69,19 @@ sub Search {
 
     return {
         Where => [ $Condition ]
+    };
+}
+
+sub Sort {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSortParams(%Param) );
+
+    # return sort def
+    return {
+        Select  => ['ot.id'],
+        OrderBy => ['ot.id'],
     };
 }
 

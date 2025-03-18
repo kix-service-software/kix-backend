@@ -43,18 +43,6 @@ sub Init {
     # init translation join counter with 0
     $Param{Flags}->{TranslationJoinCounter} = 0;
 
-    # extract flags from fields
-    $Self->_CheckFields(
-        %Param,
-        Extract => {
-            PreviousVersionSearch => 1
-        },
-        Draft => {
-            AssignedOrganisation  => 1,
-            AssignedContact       => 1
-        }
-    );
-
     return 1;
 }
 
@@ -64,127 +52,41 @@ sub GetBaseDef {
     return {
         Select  => ['ci.id', 'ci.configitem_number'],
         From    => ['configitem ci'],
-        OrderBy => ['ci.id ASC']
+        OrderBy => ['ci.id ASC'],
+        Extract => {
+            PreviousVersionSearch => 0,
+            AssignedOrganisation  => 1,
+            AssignedContact       => 1
+        }
     };
 }
 
-sub GetSupportedAttributes {
+sub _GetObjectSpecifics {
     my ( $Self, %Param ) = @_;
 
-    my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeMapping}} ) {
-        my $Module    = $Self->{AttributeMapping}->{$Attribute};
-        my $Property  = $Attribute;
+    my $ClassEntries = undef;
+    if ( IsArrayRefWithData( $Param{AttributeRef}->{Class} ) ) {
+        $ClassEntries = [];
 
-        if ( IsArrayRefWithData($Module->{Class})) {
-            for my $Index ( keys @{$Module->{Class}} ) {
-                push (
-                    @List,
-                    {
-                        ObjectType      => $Self->{ObjectType},
-                        Property        => $Property,
-                        ObjectSpecifics => {
-                            ClassID => $Module->{ClassID}->[$Index],
-                            Class   => $Module->{Class}->[$Index]
-                        },
-                        IsSearchable    => $Module->{IsSearchable} || 0,
-                        IsSortable      => $Module->{IsSortable}   || 0,
-                        Operators       => $Module->{Operators}    || [],
-                        ValueType       => $Module->{ValueType}    || ''
-                    }
-                );
-            }
-        } else {
-            push (
-                @List,
+        for my $Index ( sort { $Param{AttributeRef}->{Class}->[ $a ] cmp $Param{AttributeRef}->{Class}->[ $b ] } ( keys( @{ $Param{AttributeRef}->{Class} } ) ) ) {
+            push(
+                @{ $ClassEntries },
                 {
-                    ObjectType      => $Self->{ObjectType},
-                    Property        => $Property,
-                    ObjectSpecifics => {
-                        ClassID => undef,
-                        Class   => undef
-                    },
-                    IsSearchable    => $Module->{IsSearchable} || 0,
-                    IsSortable      => $Module->{IsSortable}   || 0,
-                    Operators       => $Module->{Operators}    || [],
-                    ValueType       => $Module->{ValueType}    || ''
+                    ClassID => $Param{AttributeRef}->{ClassID}->[ $Index ],
+                    Class   => $Param{AttributeRef}->{Class}->[ $Index ]
                 }
             );
         }
     }
-
-    if ( @List ) {
-        @List = sort(
-            {
-                $a->{Property} cmp $b->{Property}
-                && ( $a->{ObjectSpecifics}->{Class} || q{} ) cmp ( $b->{ObjectSpecifics}->{Class} || q{} )
-            }
-            @List
-        );
-    }
-
-    return \@List;
-}
-
-
-=begin Internal:
-
-=cut
-
-sub _CheckFields {
-    my ($Self, %Param) = @_;
-
-    for my $Type ( keys %{$Param{Search}} ) {
-        if ( ref( $Param{Search}->{ $Type } ) ne 'ARRAY' ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search! Search type has to provide an array.",
-                );
-            }
-            return;
-        }
-
-        my @Items;
-        for my $SearchItem ( @{$Param{Search}->{$Type}} ) {
-            if (
-                ref( $SearchItem ) ne 'HASH'
-                || !defined( $SearchItem->{Field} )
-                || !defined( $SearchItem->{Value} )
-            ) {
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
-                    );
-                }
-                return;
-            }
-            if ( $Param{Draft}->{$SearchItem->{Field}} ) {
-                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
-            }
-
-            if ($Param{Extract}->{$SearchItem->{Field}}) {
-                $Param{Flags}->{$SearchItem->{Field}} = $SearchItem->{Value};
-            }
-            else {
-                push(@Items, $SearchItem);
-            }
-        }
-        if ( scalar(@Items) ) {
-            $Param{Search}->{$Type} = \@Items;
-        }
-        else {
-            delete $Param{Search}->{$Type};
+    else {
+        $ClassEntries = {
+            ClassID => undef,
+            Class   => undef
         }
     }
 
-    return 1;
+    return $ClassEntries;
 }
-
-=end Internal:
-
-=cut
 
 1;
 

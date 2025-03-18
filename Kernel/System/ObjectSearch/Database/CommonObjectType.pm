@@ -128,16 +128,18 @@ sub GetSearchDef {
     );
 
     # generate SQL from attribute modules
+    my @Requires      = ();
+    my %AttributesAND = ();
     for my $BoolOperator ( qw(AND OR) ) {
         next if ( !defined( $Param{Search}->{ $BoolOperator } ) );
 
         if ( !IsArrayRefWithData( $Param{Search}->{ $BoolOperator } ) ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid Search for $BoolOperator!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Search for $BoolOperator!",
+                Silent   => $Param{Silent}
+            );
+
             return;
         }
 
@@ -154,17 +156,22 @@ sub GetSearchDef {
                 ref( $Self->{AttributeMapping}->{ $Attribute } ) ne 'HASH'
                 || !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable}
             ) {
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to search for attribute $Attribute!",
-                    );
-                }
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to search for attribute $Attribute!",
+                    Silent   => $Param{Silent}
+                );
+
                 return;
             }
 
             # skip attribute if not searchable
             next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable} );
+
+            # remember searched attributes, when boolean is 'AND'
+            if ( $BoolOperator eq 'AND' ) {
+                $AttributesAND{ $Attribute } = 1;
+            }
 
             # get object for attribute
             my $AttributeModule = $Self->{AttributeMapping}->{ $Attribute }->{Object};
@@ -181,12 +188,12 @@ sub GetSearchDef {
             );
 
             if ( !IsHashRef($AttributeDef) ) {
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "Unable to prepare search for attribute $Attribute!",
-                    );
-                }
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to prepare search for attribute $Attribute!",
+                    Silent   => $Param{Silent}
+                );
+
                 return;
             }
             elsif ( ref( $AttributeDef->{Search} ) eq 'HASH' ) {
@@ -199,12 +206,12 @@ sub GetSearchDef {
                 );
 
                 if ( !IsHashRef($AttributeDef) ) {
-                    if ( !$Param{Silent} ) {
-                        $Kernel::OM->Get('Log')->Log(
-                            Priority => 'error',
-                            Message  => "Unable to prepare search for attribute $Attribute!",
-                        );
-                    }
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to prepare search for attribute $Attribute!",
+                        Silent   => $Param{Silent}
+                    );
+
                     return;
                 }
 
@@ -239,6 +246,11 @@ sub GetSearchDef {
                         $SQLDef{ $Key } = $AttributeDef->{ $Key };
                     }
                 }
+                elsif ( $Key eq 'Requires' ) {
+                    if ( ref( $AttributeDef->{ $Key } ) eq 'ARRAY' ) {
+                        push( @Requires, @{ $AttributeDef->{ $Key } } );
+                    }
+                }
                 else {
                     push( @{ $SQLDef{ $Key } }, @{ $AttributeDef->{ $Key } } );
                 }
@@ -261,6 +273,19 @@ sub GetSearchDef {
 
             # add to where statements
             push( @{ $SQLDef{Having} }, $StatementOR );
+        }
+    }
+
+    # check requires
+    for my $Require ( @Requires ) {
+        if ( !$AttributesAND{ $Require } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "$Require is required but not used in AND!",
+                Silent   => $Param{Silent}
+            );
+
+            return;
         }
     }
 
@@ -372,21 +397,57 @@ sub GetSupportedAttributes {
     for my $Attribute ( sort( keys( %{ $Self->{AttributeMapping} } ) ) ) {
         my $AttributeRef = $Self->{AttributeMapping}->{ $Attribute };
 
-        push (
-            @List,
-            {
-                ObjectType      => $Self->{ObjectType},
-                Property        => $Attribute,
-                ObjectSpecifics => undef,
-                IsSearchable    => $AttributeRef->{IsSearchable} || 0,
-                IsSortable      => $AttributeRef->{IsSortable}   || 0,
-                Operators       => $AttributeRef->{Operators}    || [],
-                ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL'
-            }
+        my $ObjectSpecifics = $Self->_GetObjectSpecifics(
+            AttributeRef => $AttributeRef
         );
+
+        if ( IsArrayRef( $ObjectSpecifics ) ) {
+            for my $Entry ( @{ $ObjectSpecifics } ) {
+                push (
+                    @List,
+                    {
+                        ObjectType      => $Self->{ObjectType},
+                        Property        => $Attribute,
+                        ObjectSpecifics => $Entry,
+                        IsSearchable    => $AttributeRef->{IsSearchable} || 0,
+                        IsSortable      => $AttributeRef->{IsSortable}   || 0,
+                        Operators       => $AttributeRef->{Operators}    || [],
+                        ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL',
+                        Requires        => $AttributeRef->{Requires}
+                    }
+                );
+            }
+        }
+        else {
+            push (
+                @List,
+                {
+                    ObjectType      => $Self->{ObjectType},
+                    Property        => $Attribute,
+                    ObjectSpecifics => $ObjectSpecifics,
+                    IsSearchable    => $AttributeRef->{IsSearchable} || 0,
+                    IsSortable      => $AttributeRef->{IsSortable}   || 0,
+                    Operators       => $AttributeRef->{Operators}    || [],
+                    ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL',
+                    Requires        => $AttributeRef->{Requires}
+                }
+            );
+        }
     }
 
     return \@List;
+}
+
+=item GetObjectSpecifics()
+
+### TODO ###
+
+=cut
+
+sub _GetObjectSpecifics {
+    my ( $Self, %Param ) = @_;
+
+    return;
 }
 
 1;
