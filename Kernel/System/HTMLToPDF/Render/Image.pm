@@ -11,24 +11,27 @@ package Kernel::System::HTMLToPDF::Render::Image;
 use strict;
 use warnings;
 
+our $ObjectManagerDisabled = 1;
+
 use base qw(
     Kernel::System::HTMLToPDF::Render::Common
 );
-
-our $ObjectManagerDisabled = 1;
 
 use Kernel::System::VariableCheck qw(:all);
 
 sub Run {
     my ($Self, %Param) = @_;
 
-    my $LayoutObject = $Kernel::OM->Get('Output::HTML::Layout');
-    my $IconObject   = $Kernel::OM->Get('ObjectIcon');
+    my $LayoutObject            = $Kernel::OM->Get('Output::HTML::Layout');
+    my $IconObject              = $Kernel::OM->Get('ObjectIcon');
+    my $TemplateGeneratorObject = $Kernel::OM->Get('TemplateGenerator');
 
     my $Datas = $Param{Data};
     my $Block = $Param{Block};
+    my $IDKey = $Param{IDKey};
     my $Css   = q{};
     my $Value;
+    my $Class;
 
     if ( $Block->{ID} ) {
         $LayoutObject->Block(
@@ -61,9 +64,27 @@ sub Run {
         );
     }
 
+    my %Result = $Self->ReplacePlaceholders(
+        String       => $Block->{Value},
+        UserID       => $Param{UserID},
+        Count        => $Param{Count},
+        Translate    => $Block->{Translate},
+        Object       => $Param{Object},
+        ObjectID     => $Param{ObjectID},
+        MainObject   => $Param{MainObject},
+        MainObjectID => $Param{MainObjectID},
+        Datas        => $Datas,
+        ReplaceAs    => $Block->{ReplaceAs} // q{-}
+    );
+
+    if ( !$Class ) {
+        $Class = $Result{Class};
+    }
+    $Value = $Result{Text};
+
     if ( $Block->{TypeOf} eq 'DB' ) {
         my $IconIDs = $IconObject->ObjectIconList(
-            ObjectID => $Param{Block}->{Value}
+            ObjectID => $Value
         );
         if ( !scalar(@{$IconIDs}) ) {
             $Kernel::OM->Get('Log')->Log(
@@ -80,25 +101,30 @@ sub Run {
     }
 
     if ( $Block->{TypeOf} eq 'Path' ){
-        if ( !-e $Block->{Value} ) {
+        if ( !-e $Value ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "HTMLToPDF: image could not be rendered, because file doesn't exist!"
             );
             return;
         }
-        elsif ( -z $Block->{Value} ) {
+        elsif ( -z $Value ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "HTMLToPDF: image could not be rendered because file is empty!"
             );
             return;
         }
-        $Value = $Block->{Value};
     }
 
     if ( $Block->{TypeOf} eq 'Base64' ) {
-        $Value = $Block->{Value};
+        if ( !$Value ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "HTMLToPDF: image could not be rendered because no value!"
+            );
+            return;
+        }
     }
 
     $LayoutObject->Block(
@@ -106,6 +132,7 @@ sub Run {
         Data => {
             Value     => $Value,
             Translate => $Block->{Translate},
+            Class     => $Class,
             ID        => $Block->{ID}
         }
     );
