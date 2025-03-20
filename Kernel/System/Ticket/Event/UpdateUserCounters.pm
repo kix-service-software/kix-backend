@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -87,6 +87,9 @@ sub Run {
         }
     }
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     if ( $Param{Event} ne 'TicketDelete' ) {
         my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID => $Param{Data}->{TicketID},
@@ -94,30 +97,6 @@ sub Run {
         return if !%Ticket;
 
         $Param{Ticket} = \%Ticket;
-
-        $Self->{ViewableStates} = {
-            reverse $Kernel::OM->Get('State')->StateGetStatesByType(
-                Type   => 'Viewable',
-                Result => 'HASH',
-            )
-        };
-
-        if ( !$Self->{ViewableStates}->{$Ticket{State}} ) {
-            # delete all user counters for this object for the ticket owner and leave
-            $Kernel::OM->Get('User')->DeleteUserCounterObject(
-                Category => 'Ticket',
-                ObjectID => $Param{Data}->{TicketID},
-                UserID   => $Ticket{OwnerID}
-            );
-
-            if ( $Param{Event} eq 'TicketUnsubscribe' ) {
-                # delete the watcher counter
-                $Self->HandleTicketUnsubscribe(
-                    %Param
-                );
-            }
-            return 1;
-        }
     }
 
     # handle ticket events to update ticket counters:

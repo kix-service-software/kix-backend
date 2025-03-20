@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -55,6 +55,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Asset Reference Dynamic Field'),
         Description => Kernel::Language::Translatable('The name of the dynamic field which contains the relevant asset ID.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'ForceSet',
@@ -67,6 +71,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Attribute - DynamicField Mapping'),
         Description => Kernel::Language::Translatable('The mapping which asset attribute will set which ticket dynamic field.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -98,13 +106,9 @@ sub Run {
 
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
+    return if ( !IsArrayRefWithData( $Param{Config}->{AttributeDFMapping} ) );
 
-    my $TicketObject       = $Kernel::OM->Get('Ticket');
-    my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
-    my $BackendObject      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-    my $ConfigItemObject   = $Kernel::OM->Get('Kernel::System::ITSMConfigItem');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 1,
         Silent        => 1,
@@ -112,19 +116,11 @@ sub Run {
 
     return if (!%Ticket);
 
-    my $AssetReferenceDFName = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{AssetReferenceDF}
-    );
-
-    return if (!$AssetReferenceDFName);
-    return if (!IsArrayRefWithData($Param{Config}->{AttributeDFMapping}));
-
     # check if dynamic field is set
-    my $CIID = $Ticket{ 'DynamicField_' . $AssetReferenceDFName };
+    my $CIID = $Ticket{ 'DynamicField_' . $Param{Config}->{AssetReferenceDF} };
 
     # use first entry if it is an array ref
-    if( IsArrayRefWithData($CIID) ) {
+    if( IsArrayRefWithData( $CIID ) ) {
         $CIID = $CIID->[0];
     }
 
@@ -133,7 +129,7 @@ sub Run {
     }
 
     # get version data
-    my $VersionData = $ConfigItemObject->VersionGet(
+    my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
        ConfigItemID => $CIID,
     );
     if( !$VersionData || !IsHashRefWithData($VersionData) ) {
@@ -146,7 +142,7 @@ sub Run {
     }
 
     # get xml definition
-    my $XMLDefinition = $ConfigItemObject->DefinitionGet(
+    my $XMLDefinition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
        ClassID => $VersionData->{ClassID},
     );
     if( !$XMLDefinition || !IsHashRefWithData($XMLDefinition) ) {
@@ -161,57 +157,55 @@ sub Run {
     for my $CurrMapping( @{$Param{Config}->{AttributeDFMapping}} ) {
 
         # skip if config is empty
-        next if (!IsArrayRefWithData($CurrMapping) || !$CurrMapping->[0] || !$CurrMapping->[1]);
-
-        my $SourceAttributeName = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $CurrMapping->[0]
+        next if (
+            !IsArrayRefWithData($CurrMapping)
+            || !$CurrMapping->[0]
+            || !$CurrMapping->[1]
         );
-
-        my $TargetDFName = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $CurrMapping->[1]
-        );
-
-        next if (!$SourceAttributeName || !$TargetDFName);
 
         # skip if existent value should not be overwritten
-        next if ($Ticket{ 'DynamicField_' . $TargetDFName} && !$Param{Config}->{ForceSet});
+        next if (
+            $Ticket{ 'DynamicField_' . $CurrMapping->[1] }
+            && !$Param{Config}->{ForceSet}
+        );
 
         # get dynamic field config
-        my $DynamicFieldConfig = $DynamicFieldObject->DynamicFieldGet(
-            Name => $TargetDFName,
+        my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+            Name => $CurrMapping->[1],
         );
-        next if (!IsHashRefWithData($DynamicFieldConfig));
+        next if ( !IsHashRefWithData( $DynamicFieldConfig ) );
 
         # get value from config item version
-        my $CIAttributeData = $ConfigItemObject->GetAttributeContentsByKey(
+        my $CIAttributeData = $Kernel::OM->Get('ITSMConfigItem')->GetAttributeContentsByKey(
             XMLData       => $VersionData->{XMLData}->[1]->{Version}->[1],
             XMLDefinition => $XMLDefinition->{DefinitionRef},
-            KeyName       => $SourceAttributeName,
+            KeyName       => $CurrMapping->[0],
         );
         my $NewDFValue = $CIAttributeData->[0] || undef;
 
         my $Success;
-        if (defined $NewDFValue) {
+        if ( defined( $NewDFValue ) ) {
 
             # prepare value for field type 'Date'/'DateTime'
             if(
-                ($DynamicFieldConfig->{FieldType} eq 'Date' || $DynamicFieldConfig->{FieldType} eq 'DateTime')
+                (
+                    $DynamicFieldConfig->{FieldType} eq 'Date'
+                    || $DynamicFieldConfig->{FieldType} eq 'DateTime'
+                )
                 && $NewDFValue !~ m/ 00:00:00$/
             ) {
                 $NewDFValue .= ' 00:00:00';
             }
 
             # set new value
-            $Success = $BackendObject->ValueSet(
+            $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 ObjectID           => $Param{TicketID},
                 Value              => $NewDFValue,
                 UserID             => $Param{UserID} || 1,
             );
         } else {
-            $Success = $BackendObject->ValueDelete(
+            $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueDelete(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 ObjectID           => $Param{TicketID},
                 UserID             => $Param{UserID} || 1,

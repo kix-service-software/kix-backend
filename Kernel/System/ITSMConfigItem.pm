@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -623,7 +623,7 @@ sub ConfigItemUpdate {
         # update current incident state
         $Kernel::OM->Get('DB')->Do(
             SQL  => 'UPDATE configitem SET cur_depl_state_id = ? WHERE id = ?',
-            Bind => [ \$Param{InciStateID}, \$Param{ConfigItemID} ],
+            Bind => [ \$Param{DeplStateID}, \$Param{ConfigItemID} ],
         );
     }
 
@@ -1175,10 +1175,10 @@ sub ConfigItemLookup {
         $SQL = 'SELECT id FROM configitem WHERE configitem_number = ?';
     }
     if ( $Key eq 'ConfigItemName' && !$Param{Class} ) {
-        $SQL = 'SELECT id FROM configitem WHERE name = ?';
+        $SQL = 'SELECT id FROM configitem WHERE lower(name) = lower(?)';
     }
     if ( $Key eq 'ConfigItemName' && $Param{Class} ) {
-        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND ci.name = ? AND gc.name = ?';
+        $SQL = 'SELECT ci.id FROM configitem ci, general_catalog gc WHERE gc.id = ci.class_id AND gc.general_catalog_class = \'ITSM::ConfigItem::Class\' AND lower(ci.name) = lower(?) AND gc.name = ?';
         push @BindArray, \$Param{Class};
     }
 
@@ -1419,6 +1419,7 @@ sub RecalculateCurrentIncidentState {
 
     # get the incident state lists
     if ( !IsHashRefWithData($Self->{IncidentStateList}) ) {
+        TYPE:
         foreach my $Type ( qw(operational warning incident) ) {
             my $ItemList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
                 Class       => 'ITSM::Core::IncidentState',
@@ -1426,6 +1427,16 @@ sub RecalculateCurrentIncidentState {
                     Functionality => $Type,
                 },
             );
+
+            # stop processing, when a functionality has no incident state assigned
+            if ( !IsHashRefWithData( $ItemList ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'No IncidentState with Functionality "' . $Type . '" found! IncidentStatePropagation not possible.',
+                );
+                return;
+            }
+            
             $Self->{IncidentStateList} //= {};
             %{$Self->{IncidentStateList}} = (
                 %{$Self->{IncidentStateList}},

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -14,6 +14,7 @@ use warnings;
 our $ObjectManagerDisabled = 1;
 
 use Kernel::System::VariableCheck qw(:all);
+use MIME::Base64;
 
 sub Convert {
     my ($Self, %Param) = @_;
@@ -111,12 +112,12 @@ sub Convert {
         );
 
         $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-            Text     => $Replaced{Text},
-            Object   => $Data{Object},
-            ObjectID => $Param{$IdentifierKey},
-            RichText => 1,
-            UserID   => $Param{UserID},
-            Data     => {}
+            Text       => $Replaced{Text},
+            ObjectType => $Data{Object},
+            ObjectID   => $Param{$IdentifierKey},
+            RichText   => 1,
+            UserID     => $Param{UserID},
+            Data       => {}
         );
     }
 
@@ -187,6 +188,10 @@ sub Convert {
         close($FH);
     }
 
+    my $FileStat = $Kernel::OM->Get('Main')->FileStat(
+        Location => $Directory . q{/} . $TempPDFFile
+    );
+
     my @DeleteData = (
         {
             Directory => $Directory,
@@ -212,9 +217,10 @@ sub Convert {
     );
 
     return (
-        Content     => $Output,
+        Content     => MIME::Base64::encode_base64($Output),
         ContentType => $ContentType,
-        Filename    => $Filename . $FileExtension
+        Filename    => $Filename . $FileExtension,
+        Filesize    => $FileStat->size
     );
 }
 

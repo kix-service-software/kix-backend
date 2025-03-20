@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -224,15 +224,17 @@ sub Run {
             my $Content = MIME::Base64::decode_base64($Item->{Content});
 
             # fire & forget, not result handling at the moment
-            my ($CountTotal, $CountOK) = $Kernel::OM->Get('Translation')->ImportPO(
+            my $CountTotal = $Kernel::OM->Get('Translation')->ImportPO(
                 Language => $Item->{Language},
                 Content  => $Content,
                 UserID   => $Self->{Authorization}->{UserID},
+                Async    => 1,
+                PerfLog  => $Self,
             );
             if ( defined $CountTotal ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'info',
-                    Message  => "Imported $CountOK/$CountTotal \"$Item->{Language}\" translations from client \"$ClientRegistration->{ClientID}\".",
+                    Message  => "Started background import of $CountTotal \"$Item->{Language}\" translations from client \"$ClientRegistration->{ClientID}\".",
                 );
             }
         }

@@ -1,3 +1,10 @@
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 use warnings;
 
 use Cwd;
@@ -135,3 +142,13 @@ Then qr/the response contains the following items Class (.*?) of type GeneralCat
         $Index++
     }
 };
+
+When qr/I query the collection of generalcatalog items "(.*?)"$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token  => S->{Token},
+        URL    => S->{API_URL} . '/system/generalcatalog',
+        Filter => '{  "GeneralCatalogItem":{ "AND":[  {"Field":"Class","Operator":"EQ","Type":"STRING","Value":"'.$1.'" }]}}',
+        Sort   => 'GeneralCatalogItem.Name:textual'
+    );
+};
+

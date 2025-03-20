@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -410,11 +410,11 @@ my @Tests = (
         }
     },
     {
-        Name   => 'StateSet(merged) for TicketID '.$TicketIDs{'User Counter Test 2'},
+        Name   => 'StateSet(closed) for TicketID '.$TicketIDs{'User Counter Test 2'},
         Action => sub {
             return $Kernel::OM->Get('Ticket')->TicketStateSet(
                 TicketID => $TicketIDs{'User Counter Test 2'},
-                State    => 'merged',
+                State    => 'closed',
                 UserID   => $UserID2,
             );
         },
@@ -428,10 +428,10 @@ my @Tests = (
                 WatchedAndUnseen => undef,
             },
             $UserID2 => {
-                Owned => undef,
-                OwnedAndUnseen => undef,
-                OwnedAndLocked => undef,
-                OwnedAndLockedAndUnseen => undef,
+                Owned => 1,
+                OwnedAndUnseen => 1,
+                OwnedAndLocked => 1,
+                OwnedAndLockedAndUnseen => 1,
                 Watched => undef,
                 WatchedAndUnseen => undef,
             }
@@ -570,8 +570,8 @@ my @Tests = (
                 WatchedAndUnseen => undef,
             },
             $UserID2 => {
-                Owned => 1,
-                OwnedAndUnseen => undef,
+                Owned => 2,
+                OwnedAndUnseen => 1,
                 OwnedAndLocked => 1,
                 OwnedAndLockedAndUnseen => undef,
                 Watched => 1,

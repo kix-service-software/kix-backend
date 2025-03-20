@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -21,17 +21,28 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+my $YesNoList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+    Class => 'ITSM::ConfigItem::YesNo',
+);
+my %YesNoListReverse = reverse %{$YesNoList};
 my %Data = (
     Asset_1_Name   => 'Asset One',
     Asset_1_Serial => '001-001-001',
     Asset_1_Note   => 'Note of\nAsset One',
+
     Asset_2_Name   => 'Asset Two',
     Asset_2_Serial => '002-002-002',
     Asset_2_Note   => 'Note of\nAsset Two',
 
-    Asset_1_Date   => '2023-05-01',
+    Asset_1_Date        => '2023-05-01',
     Asset_1_DateEnglish => '05/01/2023',
     Asset_1_DateGerman  => '01.05.2023',
+
+    Asset_1_YesNo        => [$YesNoListReverse{Yes}, $YesNoListReverse{No}],
+    Asset_1_YesEnglish   => 'Yes',
+    Asset_1_YesGerman    => 'Ja',
+    Asset_1_YesNoEnglish => 'Yes, No',
+    Asset_1_YesNoGerman  => 'Ja, Nein',
 );
 
 my $AssetIDs = _AddConfigItems();
@@ -123,6 +134,65 @@ if (scalar @{$AssetIDs}) {
                 Text   => 'Datum: <KIX_TICKET_DynamicField_AssetRef_Object_0_SomeDate_0>',
                 Result => "Datum: $Data{Asset_1_DateGerman}",
                 German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_SomeDate_0! - no translation',
+                Text   => 'Date: <KIX_TICKET_DynamicField_AssetRef_Object_0_SomeDate_0!>',
+                Result => "Date: $Data{Asset_1_Date}",
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_SomeDate_0! - no translation without surrounding text', # make sure it is not dependent on additional text
+                Text   => '<KIX_TICKET_DynamicField_AssetRef_Object_0_SomeDate_0!>',
+                Result => $Data{Asset_1_Date},
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0 - english',
+                Text   => 'Yes: <KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0>',
+                Result => "Yes: $Data{Asset_1_YesEnglish}",
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0 - german',
+                Text   => 'Ja: <KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0>',
+                Result => "Ja: $Data{Asset_1_YesGerman}",
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0! - no translation',
+                Text   => 'Yes: <KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0!>',
+                Result => "Yes: $Data{Asset_1_YesEnglish}",
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0! - no translation without surrounding text',
+                Text   => '<KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_0!>',
+                Result => $Data{Asset_1_YesEnglish},
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo - german',
+                Text   => 'JaNein: <KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo>',
+                Result => "JaNein: $Data{Asset_1_YesNoGerman}",
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo! - no translation', # get string
+                Text   => 'YesNo: <KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo!>',
+                Result => "YesNo: " . join(q{,},@{$Data{Asset_1_YesNo}}),
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo! - no translation without surounding text', # get "object value"
+                Text   => '<KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo!>',
+                Result => $Data{Asset_1_YesNo},
+                German => 1
+            },
+            {
+                Name   => 'KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_ObjectValue',
+                Text   => '<KIX_TICKET_DynamicField_AssetRef_Object_0_YesNo_ObjectValue>',
+                Result => $Data{Asset_1_YesNo},
+                German => 1
             }
         );
 
@@ -134,11 +204,21 @@ if (scalar @{$AssetIDs}) {
                 UserID      => 1,
                 Language    => $Test->{German} ? 'de' : 'en'
             );
-            $Self->Is(
-                $Result,
-                $Test->{Result},
-                "$Test->{Name} - _Replace()",
-            );
+
+            if ( IsStringWithData($Test->{Result}) ) {
+                $Self->Is(
+                    $Result,
+                    $Test->{Result},
+                    "$Test->{Name} - _Replace()",
+                );
+            }
+            else {
+                $Self->IsDeeply(
+                    $Result,
+                    $Test->{Result},
+                    "$Test->{Name} - _Replace()",
+                );
+            }
         }
     }
 }
@@ -205,6 +285,16 @@ sub _AddConfigItems {
             YearPeriodPast => 20
         },
         CountMax => 1
+    },
+    {
+        Key   => 'YesNo',
+        Name  => 'Yes And No',
+        Input => {
+            Type        => 'GeneralCatalog',
+            Class       => 'ITSM::ConfigItem::YesNo',
+            Translation => 1,
+        },
+        CountMax => 2
     }
 ]
 END
@@ -262,6 +352,15 @@ END
                                 undef,
                                 {
                                     Content => $Data{Asset_1_Date}
+                                }
+                            ],
+                            YesNo => [
+                                undef,
+                                {
+                                    Content => $YesNoListReverse{Yes}
+                                },
+                                {
+                                    Content => $YesNoListReverse{No}
                                 }
                             ]
                         }

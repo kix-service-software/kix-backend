@@ -1,3 +1,10 @@
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 use warnings;
 
 use Cwd;
@@ -34,3 +41,25 @@ When qr/I get the list of assigned users of RoleID (\d+)\s*$/, sub {
       URL   => S->{API_URL}.'/system/roles/'.$1.'/userids',
    );
 };
+
+#=======================no hash array=======================
+Then qr/the response contains the following rolesuserids items type of (.*?)$/, sub {
+   my $Object = $1;
+   my $Index = 0;
+
+   foreach my $Row ( sort @{C->data} ) {
+      foreach my $Attribute ( keys %{$Row} ) {
+         C->dispatch( 'Then', "the roleuseridsvalue \"$Attribute\" of the \"$Object\" item " . $Index . " is \"$Row->{$Attribute}\"" );
+      }
+
+   };
+};
+
+Then qr/the roleuseridsvalue "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+      if (ref S->{ResponseContent}->{$1} eq 'ARRAY'){
+         my @ResponseArray = @{S->{ResponseContent}->{$1}};
+         my $ARRAY =join(",",@ResponseArray);
+         is($ARRAY, $4, 'Check attribute value in response');
+      }
+};
+

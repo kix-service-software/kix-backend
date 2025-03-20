@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -50,7 +50,7 @@ for ( 1 .. 2 ) {
         $TicketID,
         "Ticket created for test - $TicketID",
     );
-    push @TicketIDs, $TicketID;
+    push( @TicketIDs, $TicketID );
 }
 
 my $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
@@ -61,7 +61,7 @@ my $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
 );
 $Self->True(
     $Subscribe || 0,
-    'WatcherAdd()',
+    'WatcherAdd() - first ticket, first user',
 );
 my $Unsubscribe = $Kernel::OM->Get('Watcher')->WatcherDelete(
     Object      => 'Ticket',
@@ -71,7 +71,7 @@ my $Unsubscribe = $Kernel::OM->Get('Watcher')->WatcherDelete(
 );
 $Self->True(
     $Unsubscribe || 0,
-    'WatcherDelete()',
+    'WatcherDelete() - first ticket, first user',
 );
 
 # add new subscription (will be deleted by TicketDelete(), also check foreign keys)
@@ -83,7 +83,7 @@ $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
 );
 $Self->True(
     $Subscribe || 0,
-    'WatcherAdd()',
+    'WatcherAdd() - first ticket, first user',
 );
 
 # subscribe first ticket with second user
@@ -95,7 +95,7 @@ $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
 );
 $Self->True(
     $Subscribe || 0,
-    'WatcherAdd()',
+    'WatcherAdd() - first ticket, second user',
 );
 
 # subscribe second ticket with second user
@@ -107,7 +107,7 @@ $Subscribe = $Kernel::OM->Get('Watcher')->WatcherAdd(
 );
 $Self->True(
     $Subscribe || 0,
-    'WatcherAdd()',
+    'WatcherAdd() - second ticket, second user',
 );
 
 my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
@@ -117,11 +117,11 @@ my @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
 my %Watchers = map { $_->{UserID} => $_ } @WatcherList;
 $Self->True(
     $Watchers{ $TestUserIDs[0] } || 0,
-    'WatcherList - first user',
+    'WatcherList() - first ticket, first user',
 );
 $Self->True(
     $Watchers{ $TestUserIDs[1] },
-    'WatcherList - second user',
+    'WatcherList() - first ticket, second user',
 );
 
 @WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
@@ -131,11 +131,113 @@ $Self->True(
 %Watchers = map { $_->{UserID} => $_ } @WatcherList;
 $Self->False(
     $Watchers{ $TestUserIDs[0] } || 0,
-    'WatcherList - first user',
+    'WatcherList() - second ticket, first user',
 );
 $Self->True(
     $Watchers{ $TestUserIDs[1] },
-    'WatcherList - second user',
+    'WatcherList() - second ticket, second user',
+);
+
+my $Transfer = $Kernel::OM->Get('Watcher')->WatcherTransfer(
+    Object         => 'Ticket',
+    SourceObjectID => $TicketIDs[0],
+    TargetObjectID => $TicketIDs[1],
+    KeepSource     => 1,
+);
+$Self->True(
+    $Transfer || 0,
+    'WatcherTransfer() - first ticket to second ticket, keep source',
+);
+
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+);
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->True(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList() - first ticket, first user',
+);
+$Self->True(
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList() - first ticket, second user',
+);
+
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[1],
+);
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->True(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList() - second ticket, first user',
+);
+$Self->True(
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList() - second ticket, second user',
+);
+
+$Unsubscribe = $Kernel::OM->Get('Watcher')->WatcherDelete(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+    UserID   => 1,
+    AllUsers => 1
+);
+$Self->True(
+    $Unsubscribe || 0,
+    'WatcherDelete() - first ticket, all users',
+);
+
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+);
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->False(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList() - first ticket, first user',
+);
+$Self->False(
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList() - first ticket, second user',
+);
+
+$Transfer = $Kernel::OM->Get('Watcher')->WatcherTransfer(
+    Object         => 'Ticket',
+    SourceObjectID => $TicketIDs[1],
+    TargetObjectID => $TicketIDs[0],
+);
+$Self->True(
+    $Transfer || 0,
+    'WatcherTransfer() - second ticket to first ticket',
+);
+
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[0],
+);
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->True(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList() - first ticket, first user',
+);
+$Self->True(
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList() - first ticket, second user',
+);
+
+@WatcherList = $Kernel::OM->Get('Watcher')->WatcherList(
+    Object   => 'Ticket',
+    ObjectID => $TicketIDs[1],
+);
+%Watchers = map { $_->{UserID} => $_ } @WatcherList;
+$Self->False(
+    $Watchers{ $TestUserIDs[0] } || 0,
+    'WatcherList() - second ticket, first user',
+);
+$Self->False(
+    $Watchers{ $TestUserIDs[1] },
+    'WatcherList() - second ticket, second user',
 );
 
 # rollback transaction on database

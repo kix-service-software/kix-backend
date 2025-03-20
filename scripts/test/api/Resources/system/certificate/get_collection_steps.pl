@@ -1,3 +1,10 @@
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 use warnings;
 
 use Cwd;
@@ -28,10 +35,10 @@ require '_StepsLib.pl';
 
 # feature specific steps 
 
-When qr/I query collection of certificate$/, sub {
+When qr/I query collection of certificates$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
-      URL   => S->{API_URL}.'/system/certificate',
+      URL   => S->{API_URL}.'/system/certificates',
    );
 };
 

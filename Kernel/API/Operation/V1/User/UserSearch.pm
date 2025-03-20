@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -87,7 +87,7 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|ValidID|Preferences\..*?|RoleIDs)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|IsOutOfOffice|ValidID|Preferences\..+|RoleIDs)$/ ) {
                     $UserSearch{$SearchType} //= [];
                     push(@{$UserSearch{$SearchType}}, $SearchItem);
                 }
@@ -130,7 +130,7 @@ sub Run {
                     my %SearchResult;
 
                     # special handling for preference search
-                    if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
+                    if ( $SearchItem->{Field} =~ /^Preferences\.(.+)$/ ) {
                         %SearchResult = $Self->_GetPreferenceSearchResult(
                             SearchItem  => $SearchItem,
                             SearchLimit => $Limit,
@@ -160,7 +160,7 @@ sub Run {
                 foreach my $SearchItem ( @{ $UserSearch{$SearchType} } ) {
 
                     # special handling for preference search
-                    if ( $SearchItem->{Field} =~ /Preferences.(.*?)$/ ) {
+                    if ( $SearchItem->{Field} =~ /^Preferences\.(.+)$/ ) {
                         my %PrefSearchResult = $Self->_GetPreferenceSearchResult(
                             SearchItem => $SearchItem,
                             NoLimit    => 1
@@ -262,7 +262,7 @@ sub _GetSearchParam {
     elsif ( $Param{SearchItem}->{Field} eq 'UserLogin' ) {
         $SearchParam{UserLogin} = $Value;
     }
-    elsif ( $Param{SearchItem}->{Field} =~ /^(IsAgent|IsCustomer)$/ ) {
+    elsif ( $Param{SearchItem}->{Field} =~ /^Is(?:Agent|Customer|OutOfOffice)$/ ) {
         $SearchParam{$Param{SearchItem}->{Field}} = $Value;
     }
     elsif ( $Param{SearchItem}->{Field} eq 'ValidID' ) {

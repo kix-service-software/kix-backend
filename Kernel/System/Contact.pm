@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -17,6 +17,7 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 use Kernel::System::VariableCheck qw( IsArrayRefWithData );
 use Data::UUID;
+use Kernel::System::EmailParser;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -964,9 +965,25 @@ sub ContactUpdate {
             Comment ValidID AssignedUserID
         )
     ) {
-        next KEY if defined $Contact{$Key} && $Contact{$Key} eq $Param{$Key};
+        next KEY if (
+            (
+                !defined( $Contact{ $Key } )
+                && !defined( $Param{ $Key } )
+            )
+            || (
+                defined( $Contact{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Contact{ $Key } eq $Param{ $Key }
+            )
+        );
+
         $ChangeRequired = 1;
         last KEY;
+    }
+
+    my $OldAssignedUserID;
+    if ($Contact{AssignedUserID} && $Contact{AssignedUserID} != $Param{AssignedUserID}) {
+        $OldAssignedUserID = $Contact{AssignedUserID};
     }
 
     my @DeleteOrgIDs;
@@ -1068,6 +1085,22 @@ sub ContactUpdate {
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
     );
+
+    # push client callback event for assigned user (contact include)
+    if ($Param{AssignedUserID}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $Param{AssignedUserID}
+        );
+    }
+    if ($OldAssignedUserID) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $OldAssignedUserID
+        );
+    }
 
     return 1;
 }
@@ -1415,6 +1448,171 @@ sub ContactList {
     );
 
     return %Contacts;
+}
+
+=item GetOrCreateID()
+
+return a contact id for a given email. If no matching contact exists, new contact is created
+
+    my $ContactID = $ContactObject->GetOrCreateID(
+        Email                 => "\"Mustermann, Max\" <max.mustermann@example.com>",    # single email to parse
+        UserID                => 1,
+        ParserObject          => $ParserObject,                                         # optional. Standalone instance of Kernel::System::EmailParser
+        PrimaryOrganisationID => 123,                                                   # optional. PrimaryOrganisationID to use when creating a new contact
+    );
+
+=cut
+sub GetOrCreateID {
+
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Email UserID)) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+
+            return;
+        }
+    }
+
+    # get parser object
+    my $ParserObject;
+    if ( defined( $Param{ParserObject} ) ) {
+        $ParserObject = $Param{ParserObject};
+    }
+    else {
+        $ParserObject = Kernel::System::EmailParser->new(
+            Mode => 'Standalone',
+        );
+    }
+
+    # parse email
+    my $ContactEmail = $ParserObject->GetEmailAddress(
+        Email => $Param{Email},
+    );
+    if ( !$ContactEmail ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not parse email from "' . $Param{Email} . '"!',
+        );
+
+        return;
+    }
+
+    # lookup existing valid contact
+    my $ContactID = $Self->ContactLookup(
+        Email  => $ContactEmail,
+        Silent => 1,
+        Valid  => 1
+    );
+    return $ContactID if ( $ContactID );
+
+    # lookup existing invalid contact
+    $ContactID = $Self->ContactLookup(
+        Email  => $ContactEmail,
+        Silent => 1
+    );
+    return $ContactID if ( $ContactID );
+
+    # set email as fallback for firstname and lastname
+    my $Firstname = $ContactEmail;
+    my $Lastname  = $ContactEmail;
+
+    # get and process realname part of given email
+    my $ContactEmailRealname = $ParserObject->GetRealname(
+        Email => $Param{Email},
+    );
+    if ( $ContactEmailRealname ) {
+        # remove quotes
+        $ContactEmailRealname =~ s/["']//g;
+
+        # remove leading/trailing whitespace
+        $ContactEmailRealname =~ s/^\s+|\s+$//g;
+
+        # realname contains comma, use part before comma as lastname, part after as firstname
+        if ( $ContactEmailRealname =~ m/^(.+)\s*,\s*(.+)$/ ) {
+            $Firstname = $2;
+            $Lastname  = $1;
+        }
+        # realname contains whitespace, use part before last whitespace as firstname, part after as lastname
+        elsif ( $ContactEmailRealname =~ m/^(.+)\s+(.+?)$/ ) {
+            $Firstname = $1;
+            $Lastname  = $2;
+        }
+        # fallback: use realname as firstname and set dash to lastname
+        else {
+            $Firstname = $ContactEmailRealname;
+            $Lastname  = '-';
+        }
+    }
+
+    # create contact
+    $ContactID = $Self->ContactAdd(
+        Firstname             => $Firstname,
+        Lastname              => $Lastname,
+        Email                 => $ContactEmail,
+        PrimaryOrganisationID => $Param{PrimaryOrganisationID},
+        ValidID               => 1,
+        UserID                => $Param{UserID},
+    );
+    if ( !$ContactID ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not create contact for "' . $Param{Email} . '"!',
+        );
+
+        return;
+    }
+
+    return $ContactID;
+}
+
+=item GetAssignedContactsForObject()
+
+return all assigned contact IDs
+
+    my $ContactIDList = $ContactObject->GetAssignedContactsForObject(
+        ObjectType   => 'Contact',
+        Object       => $ContactHashRef,         # (optional)
+        UserID       => 1,
+        UserType     => 'Customer'               # 'Agent' | 'Customer'
+    );
+
+=cut
+
+sub GetAssignedContactsForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedContactIDs = ();
+
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
+        %Param,
+        AssignedObjectType => 'Contact'
+    );
+
+    if (IsHashRefWithData(\%SearchData)) {
+        my @ORSearch = map { { Field => $_, Operator => $_ eq 'IsCustomer' || $_ eq 'IsAgent' ? 'EQ' : 'IN', Value => $SearchData{$_} } } keys %SearchData;
+
+        @AssignedContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            Search     => {
+                OR => \@ORSearch
+            },
+            UserID   => $Param{UserID},
+            UserType => $Param{UserType},
+            Silent   => $Param{Silent}
+        );
+
+        if ( IsArrayRefWithData(\@AssignedContactIDs) ) {
+            @AssignedContactIDs = map { 0 + $_ } @AssignedContactIDs;
+        }
+    }
+
+    return \@AssignedContactIDs;
 }
 
 =begin Internal

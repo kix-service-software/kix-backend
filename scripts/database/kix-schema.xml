@@ -464,6 +464,7 @@
     <Column Name="archive_flag" Required="true" Default="0" Type="SMALLINT"/>
     <Column Name="accounted_time" Required="false" Type="INTEGER"/>
     <Column Name="create_time_unix" Required="true" Type="BIGINT"/>
+    <Column Name="attachment_count" Required="false" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
@@ -1533,11 +1534,11 @@
 <Table Name="xml_storage">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
     <Column Name="xml_type" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="xml_key" Required="true" Size="250" Type="VARCHAR"/>
+    <Column Name="xml_key" Required="true" Type="BIGINT"/>
     <Column Name="xml_content_key" Required="true" Size="250" Type="VARCHAR"/>
     <Column Name="xml_content_value" Required="false" Size="1000000" Type="VARCHAR"/>
     <Index Name="xml_storage_key_type">
-        <IndexColumn Name="xml_key" Size="10"/>
+        <IndexColumn Name="xml_key"/>
         <IndexColumn Name="xml_type" Size="10"/>
     </Index>
     <Index Name="xml_storage_type_ckey_cval">
@@ -2439,7 +2440,8 @@
 </Table>
 
 <Table Name="sysconfig">
-    <Column Name="name" Required="true" Type="VARCHAR" Size="255" PrimaryKey="true" />
+    <Column Name="id" Type="BIGINT" Required="true" AutoIncrement="true" PrimaryKey="true" />
+    <Column Name="name" Required="true" Type="VARCHAR" Size="255" />
     <Column Name="context" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="context_metadata" Required="false" Type="VARCHAR" Size="255"/>
     <Column Name="description" Required="true" Type="VARCHAR" Size="10000" />
@@ -2459,6 +2461,9 @@
     <Column Name="create_by" Required="true" Type="INTEGER" />
     <Column Name="change_time" Required="true" Type="DATE" />
     <Column Name="change_by" Required="true" Type="INTEGER" />
+    <Unique Name="sysconfig_name">
+        <UniqueColumn Name="name"/>
+    </Unique>
     <ForeignKey ForeignTable="valid">
         <Reference Local="valid_id" Foreign="id"/>
         <Reference Local="default_valid_id" Foreign="id"/>
@@ -2467,9 +2472,6 @@
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
     </ForeignKey>
-    <Index Name="sysconfig_name">
-        <IndexColumn Name="name"/>
-    </Index>
     <Index Name="sysconfig_context">
         <IndexColumn Name="context"/>
     </Index>
@@ -2803,5 +2805,20 @@
         <IndexColumn Name="name"/>
     </Index>
 </Table>
+
+    <Table Name="object_tags">
+        <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="BIGINT"/>
+        <Column Name="name" Required="true" Size="255" Type="VARCHAR" />
+        <Column Name="object_id" Required="true" Type="BIGINT" />
+        <Column Name="object_type" Required="true" Size="255" Type="VARCHAR" />
+        <Column Name="create_time" Required="true" Type="DATE"/>
+        <Column Name="create_by" Required="true" Type="INTEGER"/>
+        <Column Name="change_time" Required="true" Type="DATE"/>
+        <Column Name="change_by" Required="true" Type="INTEGER"/>
+        <ForeignKey ForeignTable="users">
+            <Reference Local="create_by" Foreign="id"/>
+            <Reference Local="change_by" Foreign="id"/>
+        </ForeignKey>
+    </Table>
 
 </database>

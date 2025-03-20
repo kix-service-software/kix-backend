@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -134,6 +134,9 @@ sub CertificateCreate {
         $Preferences{$Key} = $Attributes->{$Key};
     }
 
+    # add content type to the preferences for serialization
+    $Preferences{ContentType} = $Param{File}->{ContentType};
+
     my $Content = $Param{File}->{Content};
 
     my $FileID = $Kernel::OM->Get('VirtualFS')->Write(
@@ -189,6 +192,7 @@ get a local certificate
         Email           => "selfsigned@example.de",
         FileID          => "4",
         Filename        => "KIX_Cert_4",
+        Filepath        => "/path/to/certificate",
         Fingerprint     => "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
         Hash            => "791510e5",
         Issuer          => "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
@@ -255,7 +259,6 @@ sub CertificateGet {
         return;
     }
 
-
     if (
         !$File{Preferences}->{Type}
         || !$Self->{$File{Preferences}->{Type}}
@@ -278,12 +281,7 @@ sub CertificateGet {
     my $Certificate = $File{Preferences};
     $Certificate->{FileID}   = $Param{ID};
     $Certificate->{Filename} = $Filename;
-
-    # remove unnessary datas
-    for my $Key ( qw(Filesize FilesizeRaw Passphrase) ) {
-        next if ( $Key eq 'Passphrase' && $Param{Passphrase} );
-        delete $Certificate->{$Key};
-    }
+    $Certificate->{Filepath} = $Self->{ $File{Preferences}->{Type} }->{Path} . '/' . $Filename;
 
     if (
         defined $Param{Include}
@@ -299,6 +297,16 @@ sub CertificateGet {
             return;
         }
         $Certificate->{Content} = ${$File{Content}};
+    }
+    else {
+        # remove unnessary datas
+        for my $Key ( qw(Filesize FilesizeRaw) ) {
+            delete $Certificate->{$Key};
+        }
+    }
+
+    if ( !$Param{Passphrase} ) {
+        delete $Certificate->{Passphrase};
     }
 
     # set cache
@@ -1725,7 +1733,6 @@ sub _FetchAttributes {
         $Result .= "\n" if $Result;
         $Result .= $Output;
     }
-
 
     # filters
     my %Filters = (

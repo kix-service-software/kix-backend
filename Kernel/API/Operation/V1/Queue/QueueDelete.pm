@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -102,6 +102,18 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.DependingObjectExists',
                 Message => 'Cannot delete queue. A ticket with this queue already exists.',
+            );
+        }
+
+        # get all roles assigned to this queue
+        my @Permissions = $Kernel::OM->Get('Role')->PermissionList(
+            Types  => ['Base::Ticket'],
+            Target => $QueueID,
+        );
+        if ( IsArrayRefWithData(\@Permissions) ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Cannot delete queue. At least one permission is assigned to this queue.',
             );
         }
 

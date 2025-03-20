@@ -12,9 +12,10 @@ Feature: GET request to the /system/dynamicfields/objecttypes resource
   Scenario: get a collection of existing dynamicfield objecttypes
     When I get a collection of dynamicfield objecttypes
     Then the response code is 200
-    Then the response contains 4 items of type "DynamicFieldObject"
+    Then the response contains 5 items of type "DynamicFieldObject"
     And the response contains the following items of type DynamicFieldObject
       | Name         | DisplayName  |
+      | Article      | Article      |
       | Contact      | Contact      |
       | FAQArticle   | FAQArticle   |
       | Organisation | Organisation |

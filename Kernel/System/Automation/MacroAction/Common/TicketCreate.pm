@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -60,72 +60,121 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Contact'),
         Description => Kernel::Language::Translatable('The ID or email of the contact of the new ticket.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'Lock',
         Label       => Kernel::Language::Translatable('Lock'),
         Description => Kernel::Language::Translatable('The lock state of the new ticket.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'OrganisationNumberOrID',
         Label       => Kernel::Language::Translatable('Organisation'),
         Description => Kernel::Language::Translatable('The ID or number of the organisation of the new ticket. Primary organisation of contact will be used if omitted.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'OwnerLoginOrID',
         Label       => Kernel::Language::Translatable('Owner'),
         Description => Kernel::Language::Translatable('The ID or login of the owner of the new ticket. Current user will be used if omitted.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'Priority',
         Label       => Kernel::Language::Translatable('Priority'),
         Description => Kernel::Language::Translatable('The name of the priority of the new ticket.'),
-        Required    => 1
+        Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'ResponsibleLoginOrID',
         Label       => Kernel::Language::Translatable('Responsible'),
         Description => Kernel::Language::Translatable('The ID or login of the responsible of the new ticket. Root user (ID = 1) will be used if omitted.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'State',
         Label       => Kernel::Language::Translatable('State'),
         Description => Kernel::Language::Translatable('The name of the state of the new ticket.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'PendingTimeDiff',
         Label       => Kernel::Language::Translatable('Pending Time Difference'),
         Description => Kernel::Language::Translatable('(Optional) The pending time in seconds. Will be added to the actual time when the macro action is executed. Used for pending states only.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'Title',
         Label       => Kernel::Language::Translatable('Title'),
         Description => Kernel::Language::Translatable('The title of the new ticket and subject of the first article.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 1,
+        },
     );
     $Self->AddOption(
         Name        => 'Team',
         Label       => Kernel::Language::Translatable('Team'),
         Description => Kernel::Language::Translatable('The name of the team of the new ticket. If it is as sub-team, the full path-name has to be used (separated by two colons - e.g. "NameOfParentTeam::NameOfTeamToBeSet").'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'Type',
         Label       => Kernel::Language::Translatable('Type'),
         Description => Kernel::Language::Translatable('The name of the type of the new ticket. Configured default will be used (Ticket::Type::Default) if omitted.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'DynamicFieldList',
         Label       => Kernel::Language::Translatable('Ticket Dynamic Fields'),
         Description => Kernel::Language::Translatable('The dynamic fields of the new ticket.'),
         Required    => 0,
+        Placeholder => {
+            ValueType => 'KeyValueListValues',
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     # delete Option 'Subject' from ArticleCreate since Title is used in this MA for it
@@ -186,115 +235,128 @@ sub Run {
     # collect ticket params (organisation have to be before contact)
     my %TicketParam;
     for my $Attribute (
-        qw(OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Team Type PendingTimeDiff)
+        qw(Title OrganisationNumberOrID ContactEmailOrID Lock OwnerLoginOrID Priority ResponsibleLoginOrID State Team Type PendingTimeDiff)
     ) {
-        if ( defined $Param{Config}->{$Attribute} ) {
-
-            $Param{Config}->{$Attribute} = $Self->_ReplaceValuePlaceholder(
-                %Param,
-                Value => $Param{Config}->{$Attribute}
-            );
-
-            if ( ($Attribute eq 'OwnerLoginOrID' || $Attribute eq 'ResponsibleLoginOrID') && $Param{Config}->{$Attribute} ) {
+        if ( defined( $Param{Config}->{ $Attribute } ) ) {
+            if (
+                (
+                    $Attribute eq 'OwnerLoginOrID'
+                    || $Attribute eq 'ResponsibleLoginOrID'
+                )
+                && $Param{Config}->{ $Attribute }
+            ) {
                 my $TicketAttribute = $Attribute;
                 $TicketAttribute =~ s/(.+)LoginOrID/$1/;
 
-                $TicketParam{$TicketAttribute . 'ID'} = $Kernel::OM->Get('User')->UserLookup(
-                    UserLogin => $Param{Config}->{$Attribute},
-                    Silent    => 1
+                $TicketParam{ $TicketAttribute . 'ID' } = $Kernel::OM->Get('User')->UserLookup(
+                    UserLogin => $Param{Config}->{ $Attribute },
+                    Silent    => 1,
                 );
-                if ( !$TicketParam{$TicketAttribute . 'ID'} && $Param{Config}->{$Attribute} =~ m/^\d+$/ ) {
+                if (
+                    !$TicketParam{ $TicketAttribute . 'ID' }
+                    && $Param{Config}->{ $Attribute } =~ m/^\d+$/
+                ) {
                     my $UserLogin = $Kernel::OM->Get('User')->UserLookup(
-                        UserID => $Param{Config}->{$Attribute},
+                        UserID => $Param{Config}->{ $Attribute },
                         Silent => 1
                     );
                     if ($UserLogin) {
-                        $TicketParam{$TicketAttribute . 'ID'} = $Param{Config}->{$Attribute};
+                        $TicketParam{ $TicketAttribute . 'ID' } = $Param{Config}->{ $Attribute };
                     }
                 }
-            } elsif ($Attribute eq 'OrganisationNumberOrID' && $Param{Config}->{OrganisationNumberOrID}) {
+            }
+            elsif (
+                $Attribute eq 'OrganisationNumberOrID'
+                && $Param{Config}->{OrganisationNumberOrID}
+            ) {
                 $TicketParam{OrganisationID} = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                     Number => $Param{Config}->{OrganisationNumberOrID},
-                    Silent => 1
+                    Silent => 1,
                 );
-                if ( !$TicketParam{OrganisationID} && $Param{Config}->{OrganisationNumberOrID} =~ m/^\d+$/ ) {
+                if (
+                    !$TicketParam{OrganisationID}
+                    && $Param{Config}->{OrganisationNumberOrID} =~ m/^\d+$/
+                ) {
                     my $OrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                         ID     => $Param{Config}->{OrganisationNumberOrID},
-                        Silent => 1
+                        Silent => 1,
                     );
-                    if ($OrgNumber) {
+                    if ( $OrgNumber ) {
                         $TicketParam{OrganisationID} = $Param{Config}->{OrganisationNumberOrID};
                     }
                 }
-            } elsif ($Attribute eq 'ContactEmailOrID' && $Param{Config}->{ContactEmailOrID}) {
+            }
+            elsif (
+                $Attribute eq 'ContactEmailOrID'
+                && $Param{Config}->{ContactEmailOrID}
+            ) {
                 my $ContactID;
-                if ($Param{Config}->{ContactEmailOrID} =~ m/^\d+$/) {
+                if ( $Param{Config}->{ContactEmailOrID} =~ m/^\d+$/ ) {
                     my $Mail = $Kernel::OM->Get('Contact')->ContactLookup(
-                        ID  => $Param{Config}->{ContactEmailOrID},
-                        Silent => 1
+                        ID     => $Param{Config}->{ContactEmailOrID},
+                        Silent => 1,
                     );
-                    if ($Mail) {
+                    if ( $Mail ) {
                         $ContactID = $Param{Config}->{ContactEmailOrID};
                     }
-                } else {
+                }
+                else {
                     $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                         Email  => $Param{Config}->{ContactEmailOrID},
-                        Silent => 1
+                        Silent => 1,
                     );
                 }
 
-                if (!$TicketParam{OrganisationID} && $ContactID) {
+                if (
+                    !$TicketParam{OrganisationID}
+                    && $ContactID
+                ) {
                     my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-                        ID => $ContactID
+                        ID => $ContactID,
                     );
                     $TicketParam{OrganisationID} = $Contact{PrimaryOrganisationID};
                 }
 
                 $TicketParam{ContactID} = $ContactID || $Param{Config}->{ContactEmailOrID};
-            } elsif ($Attribute eq 'Team') {
+            }
+            elsif ( $Attribute eq 'Team' ) {
                 $TicketParam{Queue} = $Param{Config}->{Team};
-            } elsif ( $Attribute eq 'PendingTimeDiff' ) {
+            }
+            elsif ( $Attribute eq 'PendingTimeDiff' ) {
                 # ignore PendingTimeDiff as ticket param
-            } else {
-                $TicketParam{$Attribute} = $Param{Config}->{$Attribute}
+            }
+            else {
+                $TicketParam{ $Attribute } = $Param{Config}->{ $Attribute };
             }
         }
     }
 
     # check ticket params (with replaced placeholders)
     return if !$Self->_CheckTicketParams(
-        %{$Param{Config}},
+        %{ $Param{Config} },
         %TicketParam,
         UserID => $Param{UserID}
     );
 
-    if (!$TicketParam{OwnerID}) {
+    if ( !$TicketParam{OwnerID} ) {
         $TicketParam{OwnerID} = $Param{UserID};
     }
 
-    if (!$TicketParam{Lock}) {
+    if ( !$TicketParam{Lock} ) {
         $TicketParam{Lock} = 'unlock';
     }
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    $TicketParam{Title} = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value     => $Param{Config}->{Title},
-        Translate => 1
-    );
-
     # create ticket
-    my $TicketID = $TicketObject->TicketCreate(
+    my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
         %TicketParam,
-        UserID => $Param{UserID}
+        UserID => $Param{UserID},
     );
 
     if ( !$TicketID ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't create new ticket!",
-            UserID   => $Param{UserID}
+            UserID   => $Param{UserID},
         );
         return;
     }
@@ -304,23 +366,31 @@ sub Run {
         Name => $TicketParam{State},
     );
 
-    if ( %StateData && $StateData{TypeName} =~ /^close/i ) {
-
+    if (
+        %StateData
+        && $StateData{TypeName} =~ /^close/i
+    ) {
         # closed tickets get unlocked
-        $TicketObject->TicketLockSet(
+        $Kernel::OM->Get('Ticket')->TicketLockSet(
             TicketID => $TicketID,
             Lock     => 'unlock',
             UserID   => $Param{UserID},
         );
-    } elsif ( %StateData && $StateData{TypeName} =~ m{\A pending}msxi && $Param{Config}->{PendingTimeDiff}) {
+    }
+    elsif (
+        %StateData
+        && $StateData{TypeName} =~ m{\A pending}msxi
+        && $Param{Config}->{PendingTimeDiff}
+    ) {
         # set pending time
-        if (IsNumber( $Param{Config}->{PendingTimeDiff} )) {
-            $TicketObject->TicketPendingTimeSet(
+        if ( IsNumber( $Param{Config}->{PendingTimeDiff} ) ) {
+            $Kernel::OM->Get('Ticket')->TicketPendingTimeSet(
                 UserID   => $Param{UserID},
                 TicketID => $TicketID,
                 Diff     => ($Param{Config}->{PendingTimeDiff} || 0) / 60, # expects minutes
             );
-        } elsif ($Param{Config}->{PendingTimeDiff}) {
+        }
+        elsif ($Param{Config}->{PendingTimeDiff}) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Could not set pending time of ticket ($TicketID) with value of diff ($Param{Config}->{PendingTimeDiff})."
@@ -328,21 +398,24 @@ sub Run {
         }
     }
 
-    $Self->_SetDynamicFields(%Param, NewTicketID => $TicketID);
+    $Self->_SetDynamicFields(
+        NewTicketID => $TicketID,
+        %Param,
+    );
 
     # remember ticket definition
     my $TicketDef = $Self->{Definition}->{Options};
 
     # use article definition
     $Self->{Definition}->{Options} = {};
-    $Self->SUPER::Describe(%Param);
+    $Self->SUPER::Describe( %Param );
 
     # collect article params based on definition
     my %ArticleParam;
-    if ( IsHashRefWithData($Self->{Definition}->{Options}) ) {
-        for my $Attribute ( %{$Self->{Definition}->{Options}} ) {
-            if ( defined $Param{Config}->{$Attribute} ) {
-                $ArticleParam{$Attribute} = $Param{Config}->{$Attribute}
+    if ( IsHashRefWithData( $Self->{Definition}->{Options} ) ) {
+        for my $Attribute ( %{ $Self->{Definition}->{Options} } ) {
+            if ( defined( $Param{Config}->{ $Attribute } ) ) {
+                $ArticleParam{ $Attribute } = $Param{Config}->{ $Attribute };
             }
         }
     }
@@ -353,7 +426,7 @@ sub Run {
         EventData => $Param{EventData},
         Config    => \%ArticleParam,
         TicketID  => $TicketID,
-        UserID    => $Param{UserID}
+        UserID    => $Param{UserID},
     );
 
     # reset definition
@@ -367,7 +440,11 @@ sub Run {
         return;
     }
 
-    $Self->SetResult(Name => 'NewTicketID', Value => $TicketID);
+    $Self->SetResult(
+        Name   => 'NewTicketID',
+        Value  => $TicketID,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }
@@ -388,12 +465,15 @@ sub ValidateConfig {
 
     return if !$Self->SUPER::ValidateConfig(%Param);
 
-    if ($Param{Config}->{State} && $Param{Config}->{State} !~ m/<KIX_/) {
+    if (
+        $Param{Config}->{State}
+        && $Param{Config}->{State} !~ m/<KIX_/
+    ) {
         my %State = $Kernel::OM->Get('State')->StateGet(
             Name => $Param{Config}->{State}
         );
 
-        if (%State) {
+        if ( %State ) {
             if (
                 $State{TypeName} =~ m{\A pending}msxi &&
                 $Param{Config}->{PendingTimeDiff} !~ m/<KIX_/ &&
@@ -416,7 +496,7 @@ sub ValidateConfig {
 sub _CheckTicketParams {
     my ( $Self, %Param ) = @_;
 
-    if ($Param{Lock}) {
+    if ( $Param{Lock} ) {
         my $LockID = $Kernel::OM->Get('Lock')->LockLookup(
             Lock => $Param{Lock},
         );
@@ -431,32 +511,16 @@ sub _CheckTicketParams {
         }
     }
 
-    # if ($Param{Organisation}) {
-    #     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
-    #         Number => $Param{Organisation},
-    #         Silent => 1
-    #     );
-
-    #     if ( !$OrganisationID ) {
-    #         $Kernel::OM->Get('Automation')->LogError(
-    #             Referrer => $Self,
-    #             Message  => "Couldn't create new ticket - can't find organisation with number \"$Param{Organisation}\"!",
-    #             UserID   => $Param{UserID}
-    #         );
-    #         return;
-    #     }
-    # }
-
     for my $UserType ( qw(Owner Responsible) ) {
-        if ($Param{$UserType}) {
+        if ( $Param{ $UserType } ) {
             my $UserID = $Kernel::OM->Get('User')->UserLookup(
-                UserLogin => $Param{$UserType},
+                UserLogin => $Param{ $UserType },
             );
 
             if ( !$UserID ) {
                 $Kernel::OM->Get('Automation')->LogError(
                     Referrer => $Self,
-                    Message  => "Couldn't create new ticket - can't find user with login \"$Param{$UserType}\"!",
+                    Message  => "Couldn't create new ticket - can't find user with login \"$Param{ $UserType }\"!",
                     UserID   => $Param{UserID}
                 );
                 return;
@@ -464,7 +528,7 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{Priority}) {
+    if ( $Param{Priority} ) {
         my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
             Priority => $Param{Priority}
         );
@@ -479,7 +543,7 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{State}) {
+    if ( $Param{State} ) {
         my %State = $Kernel::OM->Get('State')->StateGet(
             Name => $Param{State}
         );
@@ -494,8 +558,8 @@ sub _CheckTicketParams {
         }
 
         if (
-            $State{TypeName} =~ m{\A pending}msxi &&
-            !IsNumber( $Param{PendingTimeDiff} || 0 )
+            $State{TypeName} =~ m{\A pending}msxi
+            && !IsNumber( $Param{PendingTimeDiff} || 0 )
         ) {
             $Kernel::OM->Get('Automation')->LogError(
                 Referrer => $Self,
@@ -506,7 +570,7 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{Team}) {
+    if ( $Param{Team} ) {
         my $QueueID = $Kernel::OM->Get('Queue')->QueueLookup(
             Queue => $Param{Team}
         );
@@ -521,7 +585,7 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{Type}) {
+    if ( $Param{Type} ) {
         my $TypeID = $Kernel::OM->Get('Type')->TypeLookup(
             Type => $Param{Type},
         );
@@ -536,8 +600,8 @@ sub _CheckTicketParams {
         }
     }
 
-    if ($Param{ContactEmailOrID}) {
-        if ($Param{ContactEmailOrID} =~ /^\d+$/) {
+    if ( $Param{ContactEmailOrID} ) {
+        if ( $Param{ContactEmailOrID} =~ /^\d+$/ ) {
             my $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
                 ID     => $Param{ContactEmailOrID},
                 Silent => 1
@@ -550,14 +614,15 @@ sub _CheckTicketParams {
                 );
                 return;
             }
-        } else {
+        }
+        else {
             my $ParserObject = Kernel::System::EmailParser->new(
                 Mode => 'Standalone'
             );
             my $ContactEmail = $ParserObject->GetEmailAddress(
                 Email => $Param{ContactEmailOrID}
             );
-            if (!$ContactEmail) {
+            if ( !$ContactEmail ) {
                 $Kernel::OM->Get('Automation')->LogError(
                     Referrer => $Self,
                     Message  => "Couldn't create new ticket - value \"$Param{ContactEmailOrID}\" of ContactEmailOrID is no valid email address!",
@@ -566,7 +631,8 @@ sub _CheckTicketParams {
                 return;
             }
         }
-    } else {
+    }
+    else {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
             Message  => "Couldn't create new ticket - no ContactEmailOrID given!",
@@ -582,11 +648,10 @@ sub _SetDynamicFields {
     my ( $Self, %Param ) = @_;
 
     # set dynamic fields
-    if ( $Param{NewTicketID} && IsArrayRefWithData( $Param{Config}->{DynamicFieldList} ) ) {
-
-        my $TemplateGeneratorObject   = $Kernel::OM->Get('TemplateGenerator');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
+    if (
+        $Param{NewTicketID}
+        && IsArrayRefWithData( $Param{Config}->{DynamicFieldList} )
+    ) {
         # get the dynamic fields
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             Valid      => 1,
@@ -595,52 +660,50 @@ sub _SetDynamicFields {
 
         # create a Dynamic Fields lookup table (by name)
         my %DynamicFieldLookup;
-        for my $DynamicField ( @{$DynamicFieldList} ) {
-            next if !$DynamicField;
-            next if !IsHashRefWithData($DynamicField);
-            next if !$DynamicField->{Name};
+        for my $DynamicField ( @{ $DynamicFieldList } ) {
+            next if (
+                !IsHashRefWithData( $DynamicField )
+                || !$DynamicField->{Name}
+            );
+
             $DynamicFieldLookup{ $DynamicField->{Name} } = $DynamicField;
         }
 
         my %Values;
         DYNAMICFIELD:
-        foreach my $DynamicField (@{$Param{Config}->{DynamicFieldList}}) {
+        foreach my $DynamicField ( @{ $Param{Config}->{DynamicFieldList} } ) {
             next if (
-                !IsArrayRefWithData($DynamicField)
-                    || !$DynamicField->[0]
-                    || !IsHashRefWithData($DynamicFieldLookup{$DynamicField->[0]})
+                !IsArrayRefWithData( $DynamicField )
+                || !$DynamicField->[0]
+                || !$DynamicField->[1]
+                || !IsHashRefWithData( $DynamicFieldLookup{ $DynamicField->[0] } )
             );
 
-            my $ReplacedValue = $Self->_ReplaceValuePlaceholder(
-                %Param,
-                Value => $DynamicField->[1]
-            );
+            my @ExistingValuesForGivenDF = $Values{ $DynamicField->[0] } ? @{ $Values{ $DynamicField->[0] } } : ();
 
-            next if (!$ReplacedValue);
-
-            my @ExistingValuesForGivenDF = $Values{$DynamicField->[0]} ? @{$Values{$DynamicField->[0]}} : ();
-
-            if (IsArrayRefWithData($ReplacedValue)) {
-                push(@ExistingValuesForGivenDF, @{$ReplacedValue});
+            if ( IsArrayRefWithData( $DynamicField->[1] ) ) {
+                push( @ExistingValuesForGivenDF, @{ $DynamicField->[1] } );
             }
             else {
-                push(@ExistingValuesForGivenDF, ($ReplacedValue));
+                push( @ExistingValuesForGivenDF, ( $DynamicField->[1] ) );
             }
 
-            @ExistingValuesForGivenDF = $Kernel::OM->Get('Main')->GetUnique(@ExistingValuesForGivenDF);
+            @ExistingValuesForGivenDF = $Kernel::OM->Get('Main')->GetUnique( @ExistingValuesForGivenDF );
 
-            $Values{$DynamicField->[0]} = \@ExistingValuesForGivenDF;
+            $Values{ $DynamicField->[0] } = \@ExistingValuesForGivenDF;
         }
 
-        for my $v (keys %Values) {
-            $DynamicFieldBackendObject->ValueSet(
-                DynamicFieldConfig => $DynamicFieldLookup{$v},
+        for my $DynamicField ( keys( %Values ) ) {
+            $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                DynamicFieldConfig => $DynamicFieldLookup{ $DynamicField },
                 ObjectID           => $Param{NewTicketID},
-                Value              => $Values{$v},
+                Value              => $Values{$DynamicField},
                 UserID             => $Param{UserID},
             );
         }
     }
+
+    return 1;
 }
 
 

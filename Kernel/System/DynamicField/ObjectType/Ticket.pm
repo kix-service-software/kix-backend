@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -226,17 +226,18 @@ sub PostValueSet {
     );
 
     # clear ticket cache
-    $TicketObject->_TicketCacheClear( TicketID => $Param{ObjectID} );
+    $TicketObject->_TicketCacheClear(
+        TicketID => $Param{ObjectID}
+    );
 
     # Trigger event.
     $TicketObject->EventHandler(
         Event => 'TicketDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName => $Param{DynamicFieldConfig}->{Name},
-            Value     => $Param{Value},
-            OldValue  => $Param{OldValue},
-            TicketID  => $Param{ObjectID},
-            UserID    => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            TicketID           => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );

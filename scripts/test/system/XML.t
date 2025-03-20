@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -215,7 +215,7 @@ $Self->True(
 );
 
 # enter the @XMLHash into the database, retrieve and delete it
-for my $Key ( 'Some\'Key', '123' ) {
+for my $Key ( 123, 5000000000 ) {
     my $XMLHashAdd = $XMLObject->XMLHashAdd(
         Type    => 'SomeType',
         Key     => $Key,
@@ -548,7 +548,7 @@ for my $Key (@Keys) {
         OldType => 'SomeType',
         OldKey  => $Key,
         NewType => 'SomeTypeNew',
-        NewKey  => $Key . 'New',
+        NewKey  => $Key + 10000,
     );
     $Self->True(
         $XMLHashMove,

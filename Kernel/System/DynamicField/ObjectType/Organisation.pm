@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -113,11 +113,10 @@ sub PostValueSet {
     $Kernel::OM->Get('Organisation')->EventHandler(
         Event => 'OrganisationDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},
         Data  => {
-            FieldName      => $Param{DynamicFieldConfig}->{Name},
-            Value          => $Param{Value},
-            OldValue       => $Param{OldValue},
-            OrganisationID => $Param{ObjectID},
-            UserID         => $Param{UserID},
+            DynamicFieldConfig => $Param{DynamicFieldConfig},
+            Value              => $Param{Value},
+            OldValue           => $Param{OldValue},
+            OrganisationID     => $Param{ObjectID},
         },
         UserID => $Param{UserID},
     );

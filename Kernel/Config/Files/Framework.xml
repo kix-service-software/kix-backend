@@ -1100,6 +1100,7 @@
         <Setting>
             <Hash>
                 <Item Key="closed">open</Item>
+                <Item Key="new">new</Item>
                 <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
@@ -2030,7 +2031,7 @@
             <String Regex="^[1-9][\d]?$">1</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="HttpType" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="external" Name="HttpType" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the type of protocol, used by the web server, to serve the application. If https protocol will be used instead of plain http, it must be specified here. Since this has no affect on the web server's settings or behavior, it will not change the method of access to the application and, if it is wrong, it will not prevent you from logging into the application. This setting is only used as a variable, KIX_CONFIG_HttpType which is found in all forms of messaging used by the application, to build links to the tickets within your system.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
@@ -7868,7 +7869,7 @@ Notes:
                     "Config": {}
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -7893,7 +7894,7 @@ Notes:
                     }
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -8883,8 +8884,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K18SSPDECommunity/Handbuch</Item>
-                <Item Key="en">https://docs.kixdesk.com/display/KIX18SelfServicePortalENCommunity/Manual</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8894,8 +8895,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1ACU/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18UserManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8905,8 +8906,8 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/display/K1AD/Einleitung</Item>
-                <Item Key="en">https://docs.kixdesk.com/kix18AdminManualEN/kix-start/introduction</Item>
+                <Item Key="de">https://docs.kixdesk.com/pro/de/administration.html</Item>
+                <Item Key="en">https://docs.kixdesk.com/pro/de/administration.html</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -9047,8 +9048,6 @@ Notes:
 
     <ConfigItem AccessLevel="internal" Name="AssignedObjectsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines which dependend object (e.g. "Ticket") is assigned by which attributes to a relevant object (e.g. "Contact") - e.g. "Tickets of Contact". Structure is "{ "RelevantObject": { "DependendObject": { "DependendObjectAttribut": { "SearchAttribut OR SearchStatic": [ "RelevantObjectAttribut OR StaticValue" ] } } } }. All attributes will be OR combined."</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
             <String Regex="">
 {
@@ -9071,6 +9070,13 @@ Notes:
             "CustomerVisible": {
                 "SearchStatic": [
                     1
+                ]
+            }
+        },
+        "Contact": {
+            "OrganisationIDs": {
+                "SearchAttributes": [
+                    "RelevantOrganisationID"
                 ]
             }
         }
@@ -9210,6 +9216,13 @@ Notes:
     }
 }
             </String>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="external" Name="ObjectIcon::MaxAllowedSize" Required="1" Valid="1" ConfigLevel="200">
+        <Group>Framework</Group>
+        <Description Translatable="1">Defines the maximal size (in bytes) for icon uploads. Default: 32K</Description>
+        <Setting>
+            <String Regex="^[0-9]{1,11}$">32768</String>
         </Setting>
     </ConfigItem>
 </kix_config>

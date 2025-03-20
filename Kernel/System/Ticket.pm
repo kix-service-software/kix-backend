@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -27,7 +27,6 @@ use Kernel::System::Ticket::ArticleStorage;
 use Kernel::System::Ticket::TicketIndex;
 use Kernel::System::Ticket::BasePermission;
 use Kernel::System::VariableCheck qw(:all);
-use Kernel::System::EmailParser;
 
 use vars qw(@ISA);
 
@@ -510,21 +509,25 @@ sub TicketCreate {
     }
 
     # check ticket title
-    if ( !defined $Param{Title} ) {
-        $Param{Title} = '';
-    } else {
+    if ( !$Param{Title} ) {
 
-        # TODO: replace placeholders
-        # $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        #     RichText => 0,
-        #     Text     => $Param{Title},
-        #     Data     => \%Param,
-        #     UserID   => $Param{UserID},
-        # );
+        # get default ticket title
+        my $DefaultTicketTitle = $Kernel::OM->Get('Config')->Get('Ticket::Title::Default') || '-';
+        $Param{Title} = $DefaultTicketTitle;
 
-        # substitute title if needed
-        $Param{Title} = substr( $Param{Title}, 0, 255 );
+        $Param{Title} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+            Text            => $Param{Title},
+            RichText        => 0,
+            Translate       => 0,
+            ReplaceNotFound => 0,
+            Data            => \%Param,
+            UserID          => $Param{UserID},
+        );
+
     }
+
+    # substitute title if needed
+    $Param{Title} = substr( $Param{Title}, 0, 255 );
 
     # check given organisation id
     my $ExistingOrganisationID;
@@ -536,7 +539,7 @@ sub TicketCreate {
                 Silent => 1
             );
             if ($FoundOrgNumber) {
-                $ExistingOrganisationID = $Param{OrganisationID}
+                $ExistingOrganisationID = $Param{OrganisationID};
             }
         }
         if (!$ExistingOrganisationID) {
@@ -545,86 +548,39 @@ sub TicketCreate {
                 Silent => 1
             );
             if ($FoundOrgID) {
-                $ExistingOrganisationID = $FoundOrgID
+                $ExistingOrganisationID = $FoundOrgID;
             }
         }
     }
 
     # create contact if necessary
-    if ($Param{ContactID} ) {
-        if ($Param{ContactID} !~ /^\d+$/) {
-            $Self->{ParserObject} = Kernel::System::EmailParser->new(
-                Mode => 'Standalone',
+    if ( $Param{ContactID } ) {
+        if ( $Param{ContactID} !~ /^\d+$/ ) {
+            my $ContactID = $Kernel::OM->Get('Contact')->GetOrCreateID(
+                Email                 => $Param{ContactID},
+                PrimaryOrganisationID => $ExistingOrganisationID,
+                UserID                => $Param{UserID},
             );
-            my $ContactEmail = $Self->{ParserObject}->GetEmailAddress(
-                Email => $Param{ContactID},
-            );
-            my $ContactEmailRealname = $Self->{ParserObject}->GetRealname(
-                Email => $Param{ContactID},
-            );
-
-            if (!$ContactEmail && !$ContactEmailRealname) {
+            if ( !$ContactID ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message => 'No Contact ID or valid Email provided.',
+                    Message  => 'Could not get Contact for email "' . $Param{ContactID} . '"!'
                 );
-                $Param{ContactID} = undef;
-            } else {
-                my @NameChunks = $ContactEmailRealname ? split(' ', $ContactEmailRealname) : ();
-
-                # find valid contact
-                my $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                    Email  => $ContactEmail,
-                    Silent => 1,
-                    Valid  => 1
-                );
-
-                # find invalid contact as fallback
-                if (!$ExistingContactID) {
-                    $ExistingContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                        Email  => $ContactEmail,
-                        Silent => 1
-                    );
-                }
-
-                # create if none was found
-                if (!$ExistingContactID) {
-                    $Param{ContactID} = $Kernel::OM->Get('Contact')->ContactAdd(
-                        Firstname             => (@NameChunks) ? $NameChunks[0] : $ContactEmail,
-                        Lastname              => (@NameChunks) ? join(" ", splice(@NameChunks, 1)) : $ContactEmail,
-                        Email                 => $ContactEmail,
-                        PrimaryOrganisationID => $ExistingOrganisationID,
-                        ValidID               => 1,
-                        UserID                => $Param{UserID}
-                    );
-                } else {
-                    $Param{ContactID} = $ExistingContactID;
-                }
-
-                # set organisation if not given
-                # FIXME: remove this with KIX2018-6884
-                if ($Param{ContactID} && !$Param{OrganisationID}) {
-                    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                        ID => $Param{ContactID},
-                    );
-                    if (
-                        IsHashRefWithData(\%ContactData)
-                        && $ContactData{PrimaryOrganisationID}
-                    ) {
-                        $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
-                    }
-                }
             }
-        } else {
+            elsif ( $Param{ContactID} !~ /^\d+$/ ) {
+                $Param{ContactID} = $ContactID;
+            }
+        }
+
+        if ( $Param{ContactID} =~ /^\d+$/ ) {
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
                 ID     => $Param{ContactID},
                 Silent => 1,
             );
-            if (IsHashRefWithData(\%ContactData)) {
-
+            if ( IsHashRefWithData( \%ContactData ) ) {
                 # set organisation if not given at all (also no unknown)
                 # FIXME: remove this with KIX2018-6884
-                if ($ContactData{PrimaryOrganisationID} && !$Param{OrganisationID}) {
+                if ( $ContactData{PrimaryOrganisationID} && !$Param{OrganisationID} ) {
                     $ExistingOrganisationID = $ContactData{PrimaryOrganisationID};
                 }
             } else {
@@ -720,7 +676,7 @@ sub TicketCreate {
     # update ticket index
     $Self->TicketIndexAdd(TicketID => $TicketID);
 
-    # clear whole ticket cache
+    # clear general ticket cache
     $Self->_TicketCacheClear();
 
     # trigger event
@@ -803,8 +759,11 @@ sub TicketDelete {
         );
     }
 
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    # clear ticket cache and general cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID},
+        General  => 1,
+    );
 
     # delete ticket links
     $Kernel::OM->Get('LinkObject')->LinkDeleteAll(
@@ -878,6 +837,12 @@ sub TicketDelete {
         Bind => [ \$Param{TicketID} ],
     );
 
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID},
+        General  => 1,
+    );
+
     # trigger event
     $Self->EventHandler(
         Event => 'TicketDelete',
@@ -887,9 +852,6 @@ sub TicketDelete {
         },
         UserID => $Param{UserID},
     );
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -924,11 +886,12 @@ sub TicketIDLookup {
         return;
     }
 
-    my $CacheKey = 'Cache::TicketIDLookup::' . $Param{TicketNumber};
+    # prepare cache key
+    my $CacheKey = 'TicketIDLookup::' . $Param{TicketNumber};
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        Key => $CacheKey,
     );
     return $Cached if ref $Cached;
 
@@ -947,14 +910,11 @@ sub TicketIDLookup {
         $ID = $Row[0];
     }
 
+    # set cache
     if ( $ID ) {
-        # cache user result
         $Self->_TicketCacheSet(
-            TicketID => $ID,
-            Type     => $Self->{CacheType},
-            TTL      => $Self->{CacheTTL},
-            Key      => $CacheKey,
-            Value    => $ID,
+            Key   => $CacheKey,
+            Value => $ID,
         );
     }
 
@@ -984,11 +944,13 @@ sub TicketNumberLookup {
         return;
     }
 
-    my $CacheKey = 'Cache::TicketNumberLookup::' . $Param{TicketID};
+    # prepare cache key
+    my $CacheKey = 'TicketNumberLookup';
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        TicketID => $Param{TicketID},
+        Key      => $CacheKey,
     );
     return $Cached if ref $Cached;
 
@@ -1007,12 +969,10 @@ sub TicketNumberLookup {
         $Number = $Row[0];
     }
 
+    # set cache
     if ( $Number ) {
-        # cache user result
         $Self->_TicketCacheSet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
-            TTL      => $Self->{CacheTTL},
             Key      => $CacheKey,
             Value    => $Number,
         );
@@ -1289,8 +1249,8 @@ sub TicketGet {
     $Param{Extended}      //= 0;
     $Param{DynamicFields} //= 0;
 
-    my $CacheKey = 'Cache::GetTicket' . $Param{TicketID} . '::' . $Param{Extended} . '::';
-
+    # prepare cache key
+    my $CacheKey = 'TicketGet::' . $Param{Extended} . '::';
     if ( IsArrayRefWithData($Param{DynamicFields}) ) {
         $CacheKey .= join('::', @{$Param{DynamicFields}});
     }
@@ -1298,9 +1258,10 @@ sub TicketGet {
         $CacheKey .= $Param{DynamicFields};
     }
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        TicketID => $Param{TicketID},
+        Key      => $CacheKey,
     );
     return %{$Cached} if ref $Cached eq 'HASH';
 
@@ -1315,7 +1276,7 @@ sub TicketGet {
                 st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
                 st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
                 st.timeout, st.type_id, st.archive_flag,
-                st.create_by, st.change_by, accounted_time
+                st.create_by, st.change_by, accounted_time, attachment_count
             FROM ticket st
             WHERE st.id = ?',
         Bind  => [ \$Param{TicketID} ],
@@ -1343,6 +1304,7 @@ sub TicketGet {
         $Ticket{CreateBy}        = $Row[18];
         $Ticket{ChangeBy}        = $Row[19];
         $Ticket{AccountedTime}   = $Row[20];
+        $Ticket{AttachmentCount} = $Row[21] || 0;
     }
 
     # check ticket
@@ -1468,12 +1430,10 @@ sub TicketGet {
         }
     }
 
-    # cache user result
+    # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type    => $Self->{CacheType},
-        TTL     => $Self->{CacheTTL},
-        Key     => $CacheKey,
+        Key      => $CacheKey,
         Value    => \%Ticket,
     );
 
@@ -1483,108 +1443,68 @@ sub TicketGet {
 sub _TicketCacheGet {
     my ( $Self, %Param ) = @_;
 
+    # prepare cache type. Add TicketID when given
+    my $CacheType = $Self->{CacheType};
+    if ( $Param{TicketID} ) {
+        $CacheType .= $Param{TicketID}
+    }
+
     # get cache
     return $Kernel::OM->Get('Cache')->Get(
-        %Param
+        %Param,
+        Type => $CacheType,
     );
 }
 
 sub _TicketCacheSet {
     my ( $Self, %Param ) = @_;
 
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
-    if ( $Param{TicketID} ) {
-        $CacheObject->Set(
-            Type          => "TicketCache".$Param{TicketID},
-            Key           => $Param{Key},
-            Value         => $Param{Type}.'::'.$Param{Key},
-            NoStatsUpdate => 1,
-        );
-    }
-
     return if $Param{OnlyUpdateMeta};
 
+    # prepare cache type. Add TicketID when given
+    my $CacheType = $Self->{CacheType};
+    my $Depends   = undef;
+    if ( $Param{TicketID} ) {
+        $CacheType .= $Param{TicketID};
+    }
+
     # set cache
-    return $CacheObject->Set(
-        %Param
+    return $Kernel::OM->Get('Cache')->Set(
+        %Param,
+        Type    => $CacheType,
+        TTL     => $Self->{CacheTTL},
     );
 }
 
 sub _TicketCacheClear {
     my ( $Self, %Param ) = @_;
 
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
-    if ( !$Param{TicketID} ) {
-        # delete whole ticket cache, without ticket specific cache types
-        $CacheObject->CleanUp(
-            Type => $Self->{CacheType},
+    # delete specific ticket cache
+    if ( $Param{TicketID} ) {
+        my $CacheType = $Self->{CacheType} . $Param{TicketID};
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $CacheType,
         );
 
-        # cleanup search cache
-        $CacheObject->CleanUp(
-            Type => "ObjectSearch_Ticket",
-        );
-        return 1;
+        return 1 if ( $Param{OnlyTicket} );
     }
 
-    # set semaphore
-    my $Value = $Param{TicketID}.Time::HiRes::time();
-    $CacheObject->SetSemaphore(
-        ID      => "TicketCache".$Param{TicketID},
-        Value   => $Value,
-        Timeout => 1000
-    );
-
-    my @Keys = $CacheObject->GetKeysForType(
-        Type => "TicketCache".$Param{TicketID},
-    );
-    if ( @Keys ) {
-        my @Values = $CacheObject->GetMulti(
-            Type          => "TicketCache".$Param{TicketID},
-            Keys          => \@Keys,
-            UseRawKey     => 1,
-            NoStatsUpdate => 1,
-        );
-
-        for my $Value ( @Values ) {
-            next if !$Value;
-            my ( $Type, $Key ) = split(/::/, $Value, 2);
-
-            next if !$Type || !$Key;
-
-            # reset cache
-            $CacheObject->Delete(
-                Type => $Type,
-                Key  => $Key
-            );
-        }
-
-        # delete metadata
-        $CacheObject->CleanUp(
-            Type          => "TicketCache".$Param{TicketID},
-            NoStatsUpdate => 1,
-        );
-    }
-
-    # clear semaphore
-    $CacheObject->ClearSemaphore(
-        ID    => "TicketCache".$Param{TicketID},
-        Value => $Value,
+    # cleanup general ticket cache and API
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
     );
 
     # cleanup search cache
-    $CacheObject->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => "ObjectSearch_Ticket",
     );
     # cleanup search cache also for article
-    $CacheObject->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => "ObjectSearch_Article",
     );
 
     # cleanup index cache
-    $CacheObject->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => "TicketIndex",
     );
 
@@ -1865,7 +1785,9 @@ sub TicketTitleUpdate {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # truncate title
     my $Title = substr( $Param{Title}, 0, 50 );
@@ -1943,7 +1865,9 @@ sub TicketUnlockTimeoutUpdate {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -1994,11 +1918,13 @@ sub TicketQueueID {
         return;
     }
 
-    my $CacheKey = 'Cache::TicketQueueID' . $Param{TicketID};
+    # prepare cache key
+    my $CacheKey = 'TicketQueueID';
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        TicketID => $Param{TicketID},
+        Key      => $CacheKey,
     );
     return $Cached if ref $Cached;
 
@@ -2017,12 +1943,10 @@ sub TicketQueueID {
         $QueueID = $Row[0];
     }
 
+    # set cache
     if ( $QueueID ) {
-        # cache user result
         $Self->_TicketCacheSet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
-            TTL      => $Self->{CacheTTL},
             Key      => $CacheKey,
             Value    => $QueueID,
         );
@@ -2121,7 +2045,9 @@ sub TicketQueueSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # history insert
     $Self->HistoryAdd(
@@ -2377,7 +2303,9 @@ sub TicketTypeSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # get new ticket data
     my %TicketNew = $Self->TicketGet(
@@ -2512,7 +2440,9 @@ sub TicketCustomerSet {
     }
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # trigger events
     $Self->EventHandler(
@@ -2889,7 +2819,9 @@ sub TicketPendingTimeSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # trigger event
     $Self->EventHandler(
@@ -3034,7 +2966,9 @@ sub TicketLockSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     my $HistoryType = '';
@@ -3180,7 +3114,9 @@ sub TicketArchiveFlagSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # Remove seen flags from ticket and article and ticket watcher data if configured
     #   and if the ticket flag was just set.
@@ -3388,7 +3324,9 @@ sub TicketStateSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -3727,7 +3665,9 @@ sub TicketOwnerSet {
     }
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -3958,7 +3898,9 @@ sub TicketResponsibleSet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -4257,7 +4199,9 @@ sub TicketPrioritySet {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -4504,12 +4448,14 @@ sub HistoryTicketGet {
         $Param{$DateParameter} = sprintf( "%02d", $Param{$DateParameter} );
     }
 
+    # prepare cache key
     my $CacheKey = 'HistoryTicketGet::'
         . join( '::', map { ( $_ || 0 ) . "::$Param{$_}" } sort keys %Param );
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        TicketID => $Param{TicketID},
+        Key      => $CacheKey,
     );
     if ( ref $Cached eq 'HASH' && !$Param{Force} ) {
         return %{$Cached};
@@ -4692,14 +4638,12 @@ sub HistoryTicketGet {
         SystemTime => $TimeObject->SystemTime(),
     );
 
-    # if the request is for the last month or older, cache it
+    # set cache, when the request is for the last month or older
     if ( "$Year-$Month" gt "$Param{StopYear}-$Param{StopMonth}" ) {
         $Self->_TicketCacheSet(
-            TicketID  => $Param{TicketID},
-            Type      => $Self->{CacheType},
-            TTL       => $Self->{CacheTTL},
-            Key       => $CacheKey,
-            Value     => \%Ticket,
+            TicketID => $Param{TicketID},
+            Key      => $CacheKey,
+            Value    => \%Ticket,
         );
     }
 
@@ -4729,13 +4673,14 @@ sub HistoryTypeLookup {
         return;
     }
 
-    # check if we ask the same request?
+    # prepare cache key
     my $CacheKey = 'Ticket::History::HistoryTypeLookup::' . ($Param{Type} || $Param{TypeID});
+
+    # check cache
     my $Cached   = $Self->_TicketCacheGet(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-
     if ($Cached) {
         return $Cached;
     }
@@ -5198,7 +5143,9 @@ sub TicketAccountTime {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # add history
     $Self->HistoryAdd(
@@ -5271,22 +5218,23 @@ sub TicketFlagSet {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # set flag
-    return if !$DBObject->Do(
-        SQL => '
-            DELETE FROM ticket_flag
-            WHERE ticket_id = ?
-                AND ticket_key = ?
-                AND create_by = ?',
-        Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
-    );
-    return if !$DBObject->Do(
-        SQL => '
-            INSERT INTO ticket_flag
-            (ticket_id, ticket_key, ticket_value, create_time, create_by)
-            VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
-    );
+    # insert flag if not exists
+    if ( !defined $Flag{$Param{Key}} ) {
+        return if !$DBObject->Do(
+            SQL => '
+                INSERT INTO ticket_flag
+                (ticket_id, ticket_key, ticket_value, create_time, create_by)
+                VALUES (?, ?, ?, current_timestamp, ?)',
+            Bind => [ \$Param{TicketID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        );
+    }
+    else {
+        return if !$DBObject->Do(
+            SQL => 'UPDATE ticket_flag SET ticket_value = ?, create_time = current_timestamp
+                    WHERE ticket_id = ? AND ticket_key = ? AND create_by = ?',
+            Bind => [ \$Param{Value}, \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Cache')->Delete(
@@ -5527,11 +5475,8 @@ sub TicketFlagGet {
         return;
     }
 
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
     # check cache
-    my $Flags = $CacheObject->Get(
+    my $Flags = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => 'TicketFlag::' . $Param{TicketID},
     );
@@ -5557,7 +5502,7 @@ sub TicketFlagGet {
         }
 
         # set cache
-        $CacheObject->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             TTL   => $Self->{CacheTTL},
             Key   => 'TicketFlag::' . $Param{TicketID},
@@ -5616,12 +5561,9 @@ sub TicketUserFlagExists {
         }
     }
 
-    # get cache object
-    my $CacheObject = $Kernel::OM->Get('Cache');
-
     # check cache
     my $CacheKey = 'TicketFlagExists::' . $Param{TicketID} . '::' . $Param{UserID} . '::' . $Param{Flag} . '::' . ($Param{Value}||'');
-    my $Flags = $CacheObject->Get(
+    my $Flags = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -5655,7 +5597,7 @@ sub TicketUserFlagExists {
     }
 
     # set cache
-    $CacheObject->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
         Key   => $CacheKey,
@@ -5891,36 +5833,6 @@ sub CountArticles {
     return $Result;
 }
 
-=item CountAttachments()
-
-Returns the number of attachments in all articles of a given ticket.
-
-    my $Result = $TicketObject->CountAttachments(
-        TicketID => 123,
-        UserID   => 123,
-    );
-
-=cut
-
-sub CountAttachments {
-    my ( $Self, %Param ) = @_;
-    my $Result = 0;
-
-    my @ArticleList = $Self->ArticleContentIndex(
-        TicketID                   => $Param{TicketID},
-        StripPlainBodyAsAttachment => 1,
-        UserID                     => $Param{UserID} || 1,
-    );
-
-    for my $Article (@ArticleList) {
-        my %AtmIndex = %{ $Article->{Atms} };
-        my @AtmKeys  = keys(%AtmIndex);
-        $Result = $Result + ( scalar(@AtmKeys) || 0 );
-    }
-
-    return $Result;
-}
-
 =item CountLinkedObjects()
 
 Returns the number of objects linked with a given ticket.
@@ -6054,6 +5966,99 @@ END
     return $Result;
 }
 
+=item TicketAttachmentCountUpdate()
+
+updates the number of attachments of an ticket
+
+    my $Result = $TicketObject->TicketAttachmentCountUpdate(
+        TicketID => 123,
+        Notify   => 1 | 0      # optional - notify clients (default 0)
+    );
+
+=cut
+
+sub TicketAttachmentCountUpdate {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(TicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
+        TicketID => $Param{TicketID}
+    );
+
+    my $Success = $Kernel::OM->Get('DB')->Do(
+        SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
+        Bind => [ \$AttachmentCount, \$Param{TicketID} ],
+    );
+    if (!$Success) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Couldn't update ticket attachment count for ticket ($Param{TicketID})!",
+        );
+        return;
+    }
+
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
+
+    if ($Param{Notify}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'Ticket',
+            ObjectID  => $Param{TicketID},
+        );
+    }
+
+    return 1;
+}
+
+=item TicketAttachmentCountCalculate()
+
+calculate the number of attachments of an ticket
+
+    my $Count = $TicketObject->TicketAttachmentCountCalculate(
+        TicketID => 123
+    );
+
+=cut
+
+sub TicketAttachmentCountCalculate {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(TicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    my $AttachmentCount = 0;
+
+    my @Articles = $Self->ArticleGet(
+        TicketID => $Param{TicketID},
+        UserID   => 1
+    );
+    if (@Articles) {
+        for my $Article (@Articles) {
+            $AttachmentCount += $Article->{AttachmentCount} || 0;
+        }
+    }
+
+    return $AttachmentCount;
+}
+
 =item ArticleMove()
 
 Moves an article to another ticket
@@ -6122,15 +6127,21 @@ sub ArticleMove {
     );
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $TicketID );
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID   => $TicketID,
+        OnlyTicket => 1,
+    );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID},
+    );
 
     # event
     $Self->EventHandler(
         Event => 'ArticleMove',
         Data  => {
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
+            TicketID    => $Param{TicketID},
+            ArticleID   => $Param{ArticleID},
+            OldTicketID => $TicketID
         },
         UserID => $Param{UserID},
     );
@@ -6214,7 +6225,7 @@ sub ArticleCopy {
         HistoryType    => 'Misc',
         HistoryComment => "Copied article $Param{ArticleID} from "
             . "ticket $Article{TicketID} to ticket $Param{TicketID}",
-        DoNotSendEmail => 1
+        DoNotSendEmail => 1,
     );
     return 'CopyFailed' if !$CopyArticleID;
 
@@ -6247,7 +6258,9 @@ sub ArticleCopy {
     }
 
     # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     # copy plain article if exists
     if ( $Article{Channel} =~ /email/i ) {
@@ -6300,21 +6313,14 @@ sub ArticleFullDelete {
 
     # check needed stuff
     for my $Needed (qw(ArticleID UserID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "ArticleFullDelete: Need $Needed!" );
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "ArticleFullDelete: Need $Needed!"
+            );
             return;
         }
     }
-
-    # get ticket id of article
-    my $TicketID = $Self->ArticleGetTicketID(
-        ArticleID => $Param{ArticleID},
-    );
-    return if !$TicketID;
-
-    # clear ticket cache
-    $Self->_TicketCacheClear( TicketID => $TicketID );
 
     # delete article history
     return if !$Kernel::OM->Get('DB')->Do(
@@ -6326,6 +6332,17 @@ sub ArticleFullDelete {
     return if !$Self->ArticleDelete(
         ArticleID => $Param{ArticleID},
         UserID    => $Param{UserID},
+    );
+
+    # get ticket id of article
+    my $TicketID = $Self->ArticleGetTicketID(
+        ArticleID => $Param{ArticleID},
+    );
+    return if !$TicketID;
+
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $TicketID,
     );
 
     # event
@@ -6703,7 +6720,8 @@ sub TicketFulltextIndexRebuild {
             );
         }
 
-        my $Percent = int( $Count++ / ( $#TicketIDs / 100 ) );
+        my $Percent = int( $Count / ( $#TicketIDs / 100 ) );
+        $Count += 1;
 
         if ( $Percent > $PercentOld ) {
             $Kernel::OM->Get('Log')->Log(
@@ -6725,7 +6743,8 @@ return all assigned ticket IDs
         ObjectType   => 'Contact',
         Object       => $ContactHashRef,         # (optional)
         ObjectIDList => $ObjectIDListArrayRef,   # (optional)
-        UserID       => 1
+        UserID       => 1,
+        UserType     => 'Customer'               # 'Agent' | 'Customer'
     );
 
 =cut
@@ -6735,7 +6754,7 @@ sub GetAssignedTicketsForObject {
 
     my @AssignedTicketIDs = ();
 
-    my %SearchData = $Self->_GetAssignedSearchParams(
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
         %Param,
         AssignedObjectType => 'Ticket'
     );
@@ -6785,9 +6804,9 @@ sub MarkAsSeen {
     # check needed stuff
     for my $Needed (qw(TicketID UserID)) {
         if ( !defined( $Param{$Needed} ) ) {
-            $Kernel::OM->Get('Log')->Log( 
-                Priority => 'error', 
-                Message => "Need $Needed!" 
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $Needed!"
             );
             return;
         }

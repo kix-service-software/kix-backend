@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -12,6 +12,7 @@ use strict;
 use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 use base qw(
     Kernel::API::Operation::V1::CMDB::Common
@@ -76,8 +77,6 @@ sub Run {
     if ($Self->{Authorization}->{UserType} eq 'Customer') {
         my $CustomerCIIDList = $Self->_GetCustomerUserVisibleObjectIds(
             ObjectType             => 'ConfigItem',
-            UserID                 => $Self->{Authorization}->{UserID},
-            UserType               => $Self->{Authorization}->{UserType},
             RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
         );
 
@@ -97,6 +96,10 @@ sub Run {
         );
     }
 
+    $Self->_Debug($Self->{LevelIndent}, "search items...");
+
+    my $StartTime = Time::HiRes::time();
+
     my @ConfigItemList = $Kernel::OM->Get('ObjectSearch')->Search(
         Result     => 'ARRAY',
         Search     => $Self->{Search}->{ConfigItem}      || {},
@@ -106,6 +109,8 @@ sub Run {
         UserID     => $Self->{Authorization}->{UserID},
         ObjectType => 'ConfigItem'
     );
+
+    $Self->_Debug($Self->{LevelIndent}, sprintf("search items took %i ms", TimeDiff($StartTime)));
 
     # get already prepared CI data from ConfigItemGet operation
     if ( @ConfigItemList ) {

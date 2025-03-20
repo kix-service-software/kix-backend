@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -469,7 +469,25 @@ sub TableAlter {
             if ( $Tag->{NameOld} ne $Tag->{NameNew} ) {
                 push @SQL, $SQLStart . " RENAME $Tag->{NameOld} TO $Tag->{NameNew}";
             }
-            push @SQL, $SQLStart . " ALTER $Tag->{NameNew} TYPE $Tag->{Type}";
+
+            # adds USING when the type category changes (e.g. from String to Numeric)
+            my %TypeCat = (
+                'VARCHAR' => 'STRING',
+                'BIGINT'  => 'NUMERIC',
+                'INTEGER' => 'NUMERIC'
+            );
+            my $Using = q{};
+            if (
+                $Tag->{TypeOld}
+                && $Tag->{Type}
+                && $TypeCat{$Tag->{TypeOld}}
+                && $TypeCat{$Tag->{Type}}
+                && $TypeCat{$Tag->{TypeOld}} ne $TypeCat{$Tag->{Type}}
+            ) {
+                $Using = "USING $Tag->{NameNew}::$Tag->{Type}"
+            }
+
+            push @SQL, $SQLStart . " ALTER $Tag->{NameNew} TYPE $Tag->{Type} $Using";
 
             # if there is an AutoIncrement column no other changes are needed
             next TAG if $Tag->{AutoIncrement} && $Tag->{AutoIncrement} =~ /^true$/i;

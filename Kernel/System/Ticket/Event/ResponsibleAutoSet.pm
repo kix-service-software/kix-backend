@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -42,15 +42,9 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_ in Data!"
-            );
-            return;
-        }
-    }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # get config object
     my $ConfigObject = $Kernel::OM->Get('Config');

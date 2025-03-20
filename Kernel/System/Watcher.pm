@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -516,10 +516,11 @@ sub WatcherDelete {
 
 transfer all watchers from one object to the other (merge to target)
 
-    my $Success = $TicketObject->WatcherTransfer(
+    my $Success = $WatcherObject->WatcherTransfer(
         Object     => 'Ticket'
         SourceObjectID => 123,
         TargetObjectID => 123,
+        KeepSource     => 0|1,      # optional
     );
 
 =cut
@@ -538,53 +539,41 @@ sub WatcherTransfer {
         }
     }
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # transfer watchers from source to target
+    # get watchers from source
     my @SourceWatcherList = $Self->WatcherList(
-        Object => $Param{Object},
-        ObjectID   => $Param{TargetObjectID},
+        Object   => $Param{Object},
+        ObjectID => $Param{SourceObjectID},
     );
-    my %SourceWatchers = map { $_->{UserID} => $_ } @SourceWatcherList;
 
+    # get watchers from target and prepare lookup map
     my @TargetWatcherList = $Self->WatcherList(
-        Object => $Param{Object},
-        ObjectID   => $Param{TargetObjectID},
+        Object   => $Param{Object},
+        ObjectID => $Param{TargetObjectID},
     );
-    my %TargetWatchers = map { $_->{UserID} => $_ } @TargetWatcherList;
+    my %TargetWatchers = map { $_->{UserID} => 1 } @TargetWatcherList;
 
-    foreach my $UserID ( sort keys %SourceWatchers ) {
-        next if $TargetWatchers{$UserID};
+    # process source entries
+    for my $SourceEntry ( @SourceWatcherList ) {
+        # skip watcher already set on target
+        next if ( $TargetWatchers{ $SourceEntry->{UserID} } );
 
-        return if !$DBObject->Do(
-            SQL  => 'UPDATE watcher SET object_id = ? WHERE id = ?',
-            Bind => [ \$Param{TargetObjectID}, \$SourceWatchers{$UserID}->{ID} ],
+        # add watcher to target
+        $Self->WatcherAdd(
+            Object      => $Param{Object},
+            ObjectID    => $Param{TargetObjectID},
+            WatchUserID => $SourceEntry->{UserID},
+            UserID      => 1,
         );
     }
-
-    # delete all remaining watchers from source
-    return if !$DBObject->Do(
-        SQL  => 'DELETE FROM watcher WHERE object = ? AND object_id = ?',
-        Bind => [ \$Param{Object}, \$Param{SourceObjectID} ],
-    );
-
-    # delete cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType}
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Watcher',
-        ObjectID  => $Param{Object}.'::'.$Param{SourceObjectID},
-    );
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Watcher',
-        ObjectID  => $Param{Object}.'::'.$Param{TargetObjectID},
-    );
+    
+    if ( !$Param{KeepSource} ) {
+        $Self->WatcherDelete(
+            Object   => $Param{Object},
+            ObjectID => $Param{SourceObjectID},
+            UserID   => 1,
+            AllUsers => 1,
+        );
+    }
 
     return 1;
 }

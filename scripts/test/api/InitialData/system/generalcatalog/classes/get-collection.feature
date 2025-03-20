@@ -6,7 +6,7 @@
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
   Scenario: get the list of existing generalcatalog classes
-    When I query the collection of generalcatalog class
+    When I query the collection of generalcatalog classes
     Then the response code is 200
     Then the response contains 10 items type of GeneralCatalogClass
     And response contains the following items type GeneralCatalogClass

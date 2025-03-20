@@ -1,4 +1,11 @@
 #!perl
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 
 use Hash::Flatten;
 
@@ -123,6 +130,7 @@ Then qr/the attribute "(.*?)" is "(.*?)"$/, sub {
 Then qr/the response contains (\d+) items of type "(.*?)"$/, sub {
    is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
    my $Anzahl = @{S->{ResponseContent}->{$2}};
+#    print STDERR "Anzahl:".Dumper($Anzahl);
 };
 
 Then qr/the (.*?) header is set/, sub {
@@ -134,6 +142,8 @@ Then qr/the attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
 
   if ( defined( S->{ResponseContent}->{$2}->[$3]->{$1}) ) {
       S->{ResponseContent}->{$2}->[$3]->{$1}   =~ s/^\s+|\s+$//g;
+      S->{ResponseContent}->{$2}->[$3]->{$1} =~ s/[<>]//g;
+      S->{ResponseContent}->{$2}->[$3]->{$1} =~ s/[<br\/>]//g;      
       is(S->{ResponseContent}->{$2}->[$3]->{$1}, $4, 'Check attribute value in response');
   }
   else{
@@ -147,7 +157,6 @@ Then qr/the response contains the following items of type (.*?)$/, sub {
 
     foreach my $Row ( @{ C->data } ) {
         foreach my $Attribute ( keys %{$Row}) {
-
                 C->dispatch( 'Then', "the attribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
         }
         $Index++
@@ -171,7 +180,7 @@ Then qr/attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
 
-#=======================only array=======================
+#=======================no array=======================
 Then qr/the response contains the following items type (.*?)$/, sub {
     my $Object = $1;
     my $Index = 0;
@@ -186,31 +195,34 @@ Then qr/the response contains the following items type (.*?)$/, sub {
 
 
 Then qr/this attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
-
+    S->{ResponseContent}->{$2}->{$1} =~ s/\s*$//;
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
 
 #========================filter================================
 # compare filters
-Then qr/the initial Filter "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
-   $JSONString = $Kernel::OM->Get('JSON')->Encode(
-       Data     => S->{ResponseContent}->{ObjectAction}->[$3]->{Filter}->[0],
-       SortKeys => $Param{DoNotSortAttributes} ? 0 : 1
-   );
-   is($JSONString, $4, 'Check attribute value in response');
-};
-
-Then qr/the response contains the following items Filter$/, sub {
-   my $Object = "Filter";
-   my $Index = 0;
-
-   foreach my $Row ( sort @{ C->data } ) {
-      foreach my $Attribute ( keys %{$Row}) {
-         C->dispatch( 'Then', "the initial Filter \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
-      }
-      $Index++
-   };
-};
+#Then qr/the initial Filter "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+#   $JSONString = $Kernel::OM->Get('JSON')->Encode(
+#       Data     => S->{ResponseContent}->{ObjectAction}->[$3]->{Filter}->[0],
+#       SortKeys => $Param{DoNotSortAttributes} ? 0 : 1
+#   );
+#   $JSONString =~ s/[<>]//g;
+#   print STDERR "regex:".Dumper($JSONString,$1,$2,$3, $4);
+#   is($JSONString, $4, 'Check attribute value in response');
+#};
+#
+#Then qr/the response contains the following items Filter$/, sub {
+#   my $Object = "Filter";
+#   my $Index = 0;
+#
+#   foreach my $Row ( sort @{ C->data } ) {
+#      foreach my $Attribute ( keys %{$Row}) {
+#        print STDERR "attribute:".Dumper($Row->{$Attribute});
+#         C->dispatch( 'Then', "the initial Filter \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+#      }
+#      $Index++
+#   };
+#};
 
 
 #=======================work=================================

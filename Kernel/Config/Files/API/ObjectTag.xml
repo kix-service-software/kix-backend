@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kix_config version="1.0" init="Framework">
+
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectTag::ObjectTagDelete" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ObjectTagDelete</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectTag::ObjectTagDelete</Item>
+                <Item Key="APIVersion">V1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectTag::ObjectTagLinkSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ObjectTagLinkSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectTag::ObjectTagLinkSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">ObjectTagLinkCollectionResponse</Item>
+                <Item Key="CacheType">API_objecttags</Item>
+                <Item Key="CacheTypeDependency">ObjectTag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectTag::ObjectTagSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ObjectTagSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectTag::ObjectTagSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">ObjectTagCollectionResponse</Item>
+                <Item Key="CacheType">API_objecttags</Item>
+                <Item Key="CacheTypeDependency">ObjectTag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectTag::ObjectTagGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ObjectTagGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectTag::ObjectTagGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="ResponseSchema">ObjectTagResponse</Item>
+                <Item Key="CacheType">API_objecttags</Item>
+                <Item Key="CacheTypeDependency">ObjectTag</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::ObjectTag::ObjectTagCreate" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">ObjectTagCreate</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::ObjectTag::ObjectTagCreate</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="RequestSchema">ObjectTagPostRequest</Item>
+                <Item Key="ResponseSchema">ObjectTagPostResponse</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+</kix_config>

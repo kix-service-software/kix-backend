@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,9 +62,9 @@ sub new {
     $Type =~ /^.*?::(V1::.*?)$/;
     $Self->{Config} = $Kernel::OM->Get('Config')->Get('API::Operation::'.$1);
 
-    $Self->{'Cache::Debug'}      = $Kernel::OM->Get('Config')->Get('Cache::Debug');
-    $Self->{'API::Debug'}        = $Kernel::OM->Get('Config')->Get('API::Debug');
-    $Self->{'Permission::Debug'} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
+    $Self->{CacheDebug}      = $Kernel::OM->Get('Config')->Get('Cache::Debug');
+    $Self->{Debug}           = $Kernel::OM->Get('Config')->Get('API::Debug');
+    $Self->{PermissionDebug} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
 
     return $Self;
 }
@@ -167,12 +167,18 @@ sub RunOperation {
 
         # check if we have permission for this object
         if ( $Self->can('GetBasePermissionObjectIDs') ) {
-            my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
+
             my $Result =  $Self->_CheckBasePermission(
                 %Param,
                 Data => $Param{Data},
             );
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Base) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+            }
 
             if ( !$Result->{Success} ) {
                 return $Result;
@@ -183,24 +189,35 @@ sub RunOperation {
         $Self->{RelevantOrganisationID} = $Param{Data}->{RelevantOrganisationID};
 
         # check if we have permission for this object
-        my $StartTime = Time::HiRes::time();
+        my $StartTime;
+        if ( $Self->{Debug} ) {
+            $StartTime = Time::HiRes::time();
+        }
+
         my $Result =  $Self->_CheckObjectPermission(
             %Param,
             Data => $Param{Data},
         );
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+        if ( $Self->{Debug} ) {
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Object) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+        }
 
         if ( !$Result->{Success} ) {
             return $Result;
         }
 
         # check if we have permission for specific properties of this object
-        $StartTime = Time::HiRes::time();
+        if ( $Self->{Debug} ) {
+            $StartTime = Time::HiRes::time();
+        }
+
         $Result =  $Self->_CheckPropertyPermission(
             %Param,
             Data => $Param{Data},
         );
-        $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+        if ( $Self->{Debug} ) {
+            $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Property) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+        }
 
         if ( !$Result->{Success} ) {
             return $Result;
@@ -250,7 +267,9 @@ sub RunOperation {
 
         # FIXME: get specific object type for implicit paging
         if ( IsHashRefWithData($CacheResult) && !IsHashRefWithData($Self->{OperationConfig}->{ImplicitPagingFor})) {
-            $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
+            if ( $Self->{Debug} ) {
+                $Self->_Debug( $Self->{LevelIndent}, "return cached response (Key=$CacheKey)" );
+            }
             $Self->{'_CachedResponse'} = 1;
             $Result = $Self->_Success(
                 %{$CacheResult}
@@ -263,15 +282,22 @@ sub RunOperation {
 
         # exec pre run method (if possible)
         if ($Self->can('PreRun')) {
-            $Self->_Debug($Self->{LevelIndent}, "executing PreRun...");
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, "executing PreRun...");
+            }
 
-            my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
 
             my $PreRunResult = $Self->PreRun(
                 %Param,
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("PreRun took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("PreRun took %i ms", TimeDiff($StartTime)));
+            }
 
             if ( !$PreRunResult->{Success} ) {
                 return $Self->_Error(
@@ -302,7 +328,9 @@ sub RunOperation {
     # log created ID of POST requests
     if ( $Self->{RequestMethod} eq 'POST' && IsHashRefWithData($Result) && $Result->{Success} ) {
         my @Data = %{ $Result->{Data} || {} };
-        $Self->_Debug( $Self->{LevelIndent}, "created new item (" . join( '=', @Data ) . ")" );
+        if ( $Self->{Debug} ) {
+            $Self->_Debug( $Self->{LevelIndent}, "created new item (" . join( '=', @Data ) . ")" );
+        }
     }
 
     return $Result
@@ -790,7 +818,9 @@ sub SuppressSubResourceInclude {
         if ( exists $Self->{SuppressedSubResourceIncludes}->{$SubResource} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "suppress including of sub-resource \"$SubResource\"" );
+        if ( $Self->{Debug} ) {
+            $Self->_Debug( $Self->{LevelIndent}, "suppress including of sub-resource \"$SubResource\"" );
+        }
         $Self->{SuppressSubResourceIncludes}->{lc($SubResource)} = 1;
     }
 
@@ -827,7 +857,9 @@ sub IncludeSubResourceIfProperty {
         if ( exists $Self->{IncludeSubResourceIfProperty}->{$SubResource} ) {
             next;
         }
-        $Self->_Debug( $Self->{LevelIndent}, "including sub-resource \"$SubResource\" only if property \"$Param{Property}\"" );
+        if ( $Self->{Debug} ) {
+            $Self->_Debug( $Self->{LevelIndent}, "including sub-resource \"$SubResource\" only if property \"$Param{Property}\"" );
+        }
         $Self->{IncludeSubResourceIfProperty}->{lc($SubResource)} = {
             Property             => $Param{Property},
             AdditionalParameters => $Param{AdditionalParameters}
@@ -861,7 +893,10 @@ sub AutoExpandProperty {
         }
     }
 
-    $Self->_Debug( $Self->{LevelIndent}, "automatically expanding property \"$Param{Property}\"" );
+    if ( $Self->{Debug} ) {
+        $Self->_Debug( $Self->{LevelIndent}, "automatically expanding property \"$Param{Property}\"" );
+    }
+
     $Self->{AutoExpandProperty}->{$Param{Property}} = {
         AdditionalParameters => $Param{AdditionalParameters}
     };
@@ -897,7 +932,10 @@ sub PreventInclude {
     my @Includes = IsArrayRefWithData($Param{Include}) ? @{$Param{Include}} : ( $Param{Include} );
 
     foreach my $Include ( @Includes ) {
-        $Self->_Debug( $Self->{LevelIndent}, "preventing include \"$Include\"" );
+        if ( $Self->{Debug} ) {
+            $Self->_Debug( $Self->{LevelIndent}, "preventing include \"$Include\"" );
+        }
+
         delete $Self->{Include}->{$Include};
     }
 
@@ -945,7 +983,7 @@ sub AddCacheDependency {
             next;
         }
 
-        if ( $Kernel::OM->Get('Config')->Get('Cache::Debug') ) {
+        if ( $Self->{CacheDebug} ) {
             $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "adding cache type dependencies to type \"$Self->{OperationConfig}->{CacheType}\": $Type" );
         }
         $Self->{CacheDependencies}->{$Type} = 1;
@@ -986,7 +1024,9 @@ sub AddCacheKeyExtension {
 
     foreach my $Extension ( @{ $Param{Extension} } ) {
         push( @{ $Self->{CacheKeyExtensions} }, $Extension );
-        $Self->_Debug($Self->{LevelIndent}, "adding cache key extension \"$Extension\"");
+        if ( $Self->{Debug} ) {
+            $Self->_Debug($Self->{LevelIndent}, "adding cache key extension \"$Extension\"");
+        }
     }
 
     return;
@@ -1107,9 +1147,14 @@ sub ApplyPaging {
         Data => \%Param,
     );
 
-    $Self->_Debug($Self->{LevelIndent}, "applying paging...");
+    if ( $Self->{Debug} ) {
+        $Self->_Debug($Self->{LevelIndent}, "applying paging...");
+    }
 
-    my $StartTime = Time::HiRes::time();
+    my $StartTime;
+    if ( $Self->{Debug} ) {
+        $StartTime = Time::HiRes::time();
+    }
 
     if ( IsHashRefWithData( $Self->{Offset} ) ) {
         $Self->_ApplyOffset(
@@ -1125,7 +1170,9 @@ sub ApplyPaging {
         );
     }
 
-    $Self->_Debug($Self->{LevelIndent}, sprintf("applying paging took %i ms", TimeDiff($StartTime)));
+    if ( $Self->{Debug} ) {
+        $Self->_Debug($Self->{LevelIndent}, sprintf("applying paging took %i ms", TimeDiff($StartTime)));
+    }
 
     return %Param;
 }
@@ -1227,9 +1274,12 @@ sub _Success {
 
         # honor base permissions
         if ( IsHashRefWithData( \%Param ) && IsHashRefWithData( $Self->{BasePermissionFilter} ) ) {
-            my $StartTime = Time::HiRes::time();
 
-            $Self->_Debug($Self->{LevelIndent}, "applying base permission");
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+                $Self->_Debug($Self->{LevelIndent}, "applying base permission");
+            }
 
             my $FilterResult = $Self->_ApplyFilter(
                 Data               => \%Param,
@@ -1237,13 +1287,17 @@ sub _Success {
                 IsPermissionFilter => 1,
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+            }
 
             if ( $Self->{RequestMethod} eq 'GET' && IsHashRefWithData($FilterResult) ) {
                 foreach my $Object ( sort keys %{$FilterResult} ) {
                     if ( $FilterResult->{$Object} == 0 && !defined $Param{$Object} ) {
                         # we have a single object and no permission, return a forbidden
-                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                        if ( $Self->{PermissionDebug} ) {
+                            $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                        }
 
                         # return 403, because we don't have permission to execute this
                         return $Self->_Error(
@@ -1256,9 +1310,12 @@ sub _Success {
 
         # honor object permissions
         if ( IsHashRefWithData( \%Param ) && IsArrayRefWithData( $Self->{RelevantObjectPermissions} ) ) {
-            my $StartTime = Time::HiRes::time();
 
-            $Self->_Debug($Self->{LevelIndent}, "applying object permissions");
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+                $Self->_Debug($Self->{LevelIndent}, "applying object permissions");
+            }
 
             my $Result = $Self->_ApplyObjectPermissions(
                 Data => \%Param,
@@ -1267,18 +1324,25 @@ sub _Success {
                 return $Result;
             }
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission filtering took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         if ( $Self->{HandleSearchInAPI} && IsHashRefWithData( $Self->{Search} ) ) {
-            my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
 
             $Self->_ApplyFilter(
                 Data   => \%Param,
                 Filter => $Self->{Search}
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("search in API layer took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         # add header
@@ -1300,13 +1364,18 @@ sub _Success {
 
         # honor a filter, if we have one
         if ( IsHashRefWithData( $Self->{Filter} ) ) {
-            my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
 
             $Self->_ApplyFilter(
                 Data => \%Param,
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         # honor a sorter, if we have one
@@ -1314,13 +1383,18 @@ sub _Success {
             !$Self->{HandleSortInCORE}
             && IsHashRefWithData( $Self->{Sort} )
         ) {
-            my $StartTime = Time::HiRes::time();
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+                $StartTime = Time::HiRes::time();
+            }
 
             $Self->_ApplySort(
                 Data => \%Param,
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("sorting took %i ms", TimeDiff($StartTime)));
+            }
         }
 
         # apply offset and limit only for collections
@@ -1338,13 +1412,18 @@ sub _Success {
 
             # honor a limiter, if we have one
             if ( IsHashRefWithData( $Self->{Limit} ) ) {
-                my $StartTime = Time::HiRes::time();
+                my $StartTime;
+                if ( $Self->{Debug} ) {
+                    $StartTime = Time::HiRes::time();
+                }
 
                 $Self->_ApplyLimit(
                     Data => \%Param,
                 );
 
-                $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("applying limit took %i ms", TimeDiff($StartTime)));
+                }
             }
         }
 
@@ -1355,14 +1434,19 @@ sub _Success {
             # only apply the field selector, if we are not executed by another operation
             if ( $Caller1 =~ /::V1::Common$/ || $Caller2 =~ /::V1::Common$/ ) {
 
-                my $StartTime = Time::HiRes::time();
+                my $StartTime;
+                if ( $Self->{Debug} ) {
+                    $StartTime = Time::HiRes::time();
+                }
 
                 $Self->_ApplyFieldSelector(
                     Data   => \%Param,
                     Fields => $Self->{Fields},
                 );
 
-                $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("field selection took %i ms", TimeDiff($StartTime)));
+                }
             }
         }
 
@@ -1370,33 +1454,45 @@ sub _Success {
 
             # honor a generic include, if we have one
             if ( IsHashRefWithData( $Self->{Include} ) ) {
-                my $StartTime = Time::HiRes::time();
+                my $StartTime;
+                if ( $Self->{Debug} ) {
+                    $StartTime = Time::HiRes::time();
+                }
 
                 $Self->_ApplyInclude(
                     Data => \%Param,
                 );
 
-                $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", TimeDiff($StartTime)));
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("including took %i ms", TimeDiff($StartTime)));
+                }
             }
 
             # honor an expander, if we have one
             if ( IsHashRefWithData( $Self->{Expand} ) ) {
-                my $StartTime = Time::HiRes::time();
+                my $StartTime;
+                if ( $Self->{Debug} ) {
+                    $StartTime = Time::HiRes::time();
+                }
 
                 $Self->_ApplyExpand(
                     Data => \%Param,
                 );
 
-                $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", TimeDiff($StartTime)));
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("expanding took %i ms", TimeDiff($StartTime)));
+                }
             }
 
         }
 
         # honor a permission field selector, if we have one - make sure nothing gets out what should not get out
         if ( IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
-            my $StartTime = Time::HiRes::time();
-
-            $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
+            my $StartTime;
+            if ( $Self->{Debug} ) {
+               my $StartTime = Time::HiRes::time();
+               $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
+            }
 
             $Self->_ApplyFieldSelector(
                 Data                       => \%Param,
@@ -1404,7 +1500,9 @@ sub _Success {
                 IsPermissionFieldSelection => 1
             );
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", TimeDiff($StartTime)));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("permission field selection took %i ms", TimeDiff($StartTime)));
+            }
         }
     }
 
@@ -1628,7 +1726,9 @@ sub ExecOperation {
         );
     }
 
-    $Self->_Debug( $Self->{LevelIndent}, "executing operation $OperationObject->{OperationConfig}->{Name}" );
+    if ( $Self->{Debug} ) {
+        $Self->_Debug( $Self->{LevelIndent}, "executing operation $OperationObject->{OperationConfig}->{Name}" );
+    }
 
     # check and prepare additional data
     my %AdditionalData;
@@ -1678,7 +1778,7 @@ sub ExecOperation {
                 $Self->AddCacheDependency( Type => $CacheDep );
             }
         }
-        if ( $Self->{'Cache::Debug'} ) {
+        if ( $Self->{CacheDebug} ) {
             $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    cache type $Self->{OperationConfig}->{CacheType} now depends on: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
         }
     }
@@ -1883,11 +1983,15 @@ sub _ApplyFilter {
         if ( IsArrayRefWithData($ObjectData) && $Filter->{$FilterObject} ) {
             # ignore lists of scalars
             if ( !IsHashRefWithData($ObjectData->[0]) ) {
-                $Self->_Debug($Self->{LevelIndent}, "$Object is a list of scalars, not going to filter");
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, "$Object is a list of scalars, not going to filter");
+                }
                 next OBJECT;
             }
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("filtering %i objects of type %s", scalar @{$ObjectData}, $Object));
+            }
 
             # filter each contained hash
             my @FilteredResult = $Kernel::OM->Get('Main')->FilterObjectList(
@@ -1901,13 +2005,16 @@ sub _ApplyFilter {
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
                 $Result{$Object} = scalar @FilteredResult;
-                $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
+
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
+                }
             }
             else {
                 $Param{Data}->{$Object} = \@FilteredResult;
                 $Result{$Object} = scalar @FilteredResult;
             }
-            if ( ref $Param{Data}->{$Object} eq 'ARRAY' ) {
+            if ( ref $Param{Data}->{$Object} eq 'ARRAY' && $Self->{Debug} ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
             }
         }
@@ -2173,7 +2280,9 @@ sub _ApplySort {
     foreach my $Object ( keys %{ $Self->{Sort} || $Self->{DefaultSort} } ) {
         if ( ref( $Param{Data}->{$Object} ) eq 'ARRAY' ) {
 
-            $Self->_Debug($Self->{LevelIndent}, sprintf("sorting %i objects of type %s", scalar @{$Param{Data}->{$Object}}, $Object));
+            if ( $Self->{Debug} ) {
+                $Self->_Debug($Self->{LevelIndent}, sprintf("sorting %i objects of type %s", scalar @{$Param{Data}->{$Object}}, $Object));
+            }
 
             # sort array by given criteria
             my @SortCriteria;
@@ -2379,7 +2488,9 @@ sub _ApplyInclude {
                 $Self->AddCacheDependency( Type => $GenericIncludes->{$Include}->{CacheTypeDependency} );
             }
 
-            $Self->_Debug( $Self->{LevelIndent}, "GenericInclude: $Include" );
+            if ( $Self->{Debug} ) {
+                $Self->_Debug( $Self->{LevelIndent}, "GenericInclude: $Include" );
+            }
 
             # do it for every object in the response
             foreach my $Object ( keys %{ $Param{Data} } ) {
@@ -2431,7 +2542,9 @@ sub _ApplyInclude {
                 $Self->{_IncludedProperties}->{$Object . '.' . $Include} = 1;
             }
 
-            $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
+            if ( $Self->{Debug} ) {
+                $Kernel::OM->Get('Cache')->_Debug( $Self->{LevelIndent}, "    type $Self->{OperationConfig}->{CacheType} has dependencies to: " . join( ',', keys %{ $Self->{CacheDependencies} } ) );
+            }
         }
     }
 
@@ -2463,7 +2576,9 @@ sub _ApplyExpand {
                 next if $Self->{_ExpandedProperties}->{$Object . '.' . $AttributeToExpand};
                 next if !$GenericExpands->{ $Object . '.' . $AttributeToExpand } && !$GenericExpands->{$AttributeToExpand};
 
-                $Self->_Debug( $Self->{LevelIndent}, "GenericExpand: $AttributeToExpand" );
+                if ( $Self->{Debug} ) {
+                    $Self->_Debug( $Self->{LevelIndent}, "GenericExpand: $AttributeToExpand" );
+                }
 
                 my @ItemList;
                 if ( IsArrayRef( $Param{Data}->{$Object} ) ) {
@@ -2684,7 +2799,9 @@ sub _ApplyObjectPermissions {
     # get the relevant permission for the current request method
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
-    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permissions. using the following permissions: %s", Data::Dumper::Dumper($Self->{RelevantObjectPermissions})) );
+    if ( $Self->{PermissionDebug} ) {
+        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permissions. using the following permissions: %s", Data::Dumper::Dumper($Self->{RelevantObjectPermissions})) );
+    }
 
     foreach my $Object ( sort keys %{$Param{Data}} ) {
         my @ItemList = IsArrayRef($Param{Data}->{$Object}) ? @{$Param{Data}->{$Object}} : ( $Param{Data}->{$Object} );
@@ -2712,7 +2829,9 @@ sub _ApplyObjectPermissions {
                     $Object => \%{$Item}
                 );
 
-                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permission condition {%s} to object with ID %i", $Permission->{Condition}, $Item->{$ObjectID}) );
+                if ( $Self->{PermissionDebug} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("applying object permission condition {%s} to object with ID %i", $Permission->{Condition}, $Item->{$ObjectID}) );
+                }
 
                 # check the condition
                 $Self->_ApplyFilter(
@@ -2737,7 +2856,9 @@ sub _ApplyObjectPermissions {
 
                 if ( ($IsDeny || !$PermissionCheck) && !IsArrayRef($Param{Data}->{$Object}) ) {
                     # we have a single object and no permission, return a forbidden
-                    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                    if ( $Self->{PermissionDebug} ) {
+                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                    }
 
                     # return 403, because we don't have permission to execute this
                     return $Self->_Error(
@@ -2756,7 +2877,10 @@ sub _ApplyObjectPermissions {
             # replace the item list in the response
             if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                 $Param{Data}->{$Object} = \@NewItemList;
-                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
+
+                if ( $Self->{PermissionDebug} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
+                }
             }
             else {
                 $Param{Data}->{$Object} = $NewItemList[0]
@@ -2897,7 +3021,7 @@ sub _CacheRequest {
             TTL      => 60 * 60 * 24 * 7,                        # 7 days
         );
 
-        if ( $Kernel::OM->Get('Config')->Get('Cache::Debug') ) {
+        if ( $Self->{CacheDebug} ) {
             $Kernel::OM->Get('Cache')->_Debug($Self->{LevelIndent}, "caching API response using key: $CacheKey");
         }
     }
@@ -3007,7 +3131,9 @@ sub _CheckBasePermission {
     );
     if ( !%Filter ) {
         # we can't generate the filter, so this is a false
-        $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+        if ( $Self->{PermissionDebug} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+        }
         return;
     }
 
@@ -3143,7 +3269,9 @@ sub _CheckObjectPermission {
         # only match the current RequestURI
         next if $Self->{RequestURI} !~ /^$Target$/;
 
-        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+        if ( $Self->{PermissionDebug} ) {
+           $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Object) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+        }
 
         push @RelevantPermissions, $Permission;
     }
@@ -3214,16 +3342,20 @@ sub _CheckObjectPermission {
 
                 $ResultingPermission |= $Permission->{Value};
 
-                my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-                    Value  => $ResultingPermission,
-                    Format => 'Short'
-                );
+                if ( $Self->{PermissionDebug} ) {
+                    my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+                        Value  => $ResultingPermission,
+                        Format => 'Short'
+                    );
 
-                $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Object permission: $ResultingPermissionShort");
+                    $Self->_PermissionDebug($Self->{LevelIndent}, "resulting Object permission: $ResultingPermissionShort");
+                }
 
                 # check if we have a DENY already
                 if ( ($Permission->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY}) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-                    $Self->_PermissionDebug($Self->{LevelIndent}, "DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                    if ( $Self->{PermissionDebug} ) {
+                        $Self->_PermissionDebug($Self->{LevelIndent}, "DENY in permission ID $Permission->{ID} on target \"$Permission->{Target}\"" . ($Permission->{Comment} ? "(Comment: $Permission->{Comment})" : '') );
+                    }
                     last PERMISSION;
                 }
             }
@@ -3241,7 +3373,9 @@ sub _CheckObjectPermission {
 
                 # check if we have a DENY
                 if ( ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{DENY} ) == Kernel::System::Role::Permission::PERMISSION->{DENY} ) {
-                    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                    if ( $Self->{PermissionDebug} ) {
+                        $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                    }
 
                     # return 403, because we don't have permission to execute this
                     return $Self->_Error(
@@ -3251,7 +3385,9 @@ sub _CheckObjectPermission {
             }
 
             if ( $ResultingPermission != -1 && ( $ResultingPermission & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) != Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) {
-                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                if ( $Self->{PermissionDebug} ) {
+                    $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("object doesn't match the required criteria - denying request") );
+                }
 
                 # return 403, because we don't have permission to execute this
                 return $Self->_Error(
@@ -3396,7 +3532,9 @@ sub _CheckPropertyPermission {
                 @AttributeList = ( '*' );
             }
 
-            $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+            if ( $Self->{PermissionDebug} ) {
+                $Self->_PermissionDebug($Self->{LevelIndent},  sprintf( "found relevant permission (Property) on target \"%s\" with value 0x%04x", $Permission->{Target}, $Permission->{Value} ) );
+            }
 
             foreach my $Attribute (sort @AttributeList) {
                 # init
@@ -3422,12 +3560,14 @@ sub _CheckPropertyPermission {
         my %SeenAttributes;
         foreach my $Attribute ( sort keys %AttributePermissions ) {
 
-            my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
-                Value  => $AttributePermissions{$Attribute}->{Value},
-                Format => 'Short'
-            );
+            if ( $Self->{PermissionDebug} ) {
+                my $ResultingPermissionShort = $Kernel::OM->Get('Role')->GetReadablePermissionValue(
+                    Value  => $AttributePermissions{$Attribute}->{Value},
+                    Format => 'Short'
+                );
 
-            $Self->_PermissionDebug($Self->{LevelIndent}, "resulting configured Property permission for property \"$Attribute\": $ResultingPermissionShort");
+                $Self->_PermissionDebug($Self->{LevelIndent}, "resulting configured Property permission for property \"$Attribute\": $ResultingPermissionShort");
+            }
 
             if ( $Self->{RequestMethod} eq 'GET' ) {
                 # add attribute to field selector
@@ -3483,10 +3623,14 @@ sub _CheckPropertyPermission {
                     my $IsPermissionMatch = ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{$PermissionName} ) == Kernel::System::Role::Permission::PERMISSION->{$PermissionName} || 0;
                     my $IsDeny            = ( $AttributePermissions{$Attribute}->{Value} & Kernel::System::Role::Permission::PERMISSION->{DENY} )            == Kernel::System::Role::Permission::PERMISSION->{DENY} || 0;
 
-                    $Self->_PermissionDebug($Self->{LevelIndent}.'    ', "found property \"$MatchingAttribute\" (Not: $Not, $PermissionName permission: $IsPermissionMatch, DENY: $IsDeny)");
+                    if ( $Self->{PermissionDebug} ) {
+                        $Self->_PermissionDebug($Self->{LevelIndent}.'    ', "found property \"$MatchingAttribute\" (Not: $Not, $PermissionName permission: $IsPermissionMatch, DENY: $IsDeny)");
+                    }
 
                     if ( !$Not && !$IsPermissionMatch || $Not && $IsPermissionMatch || $IsDeny ) {
-                        $Self->_PermissionDebug($Self->{LevelIndent}, "request data doesn't match the required criteria - denying request" );
+                        if ( $Self->{PermissionDebug} ) {
+                            $Self->_PermissionDebug($Self->{LevelIndent}, "request data doesn't match the required criteria - denying request" );
+                        }
 
                         # return 403, because we don't have permission to execute this
                         return $Self->_Error(
@@ -3494,7 +3638,9 @@ sub _CheckPropertyPermission {
                         );
                     }
                     else {
-                        $Self->_PermissionDebug($Self->{LevelIndent}.'        ', "$PermissionName permission granted");
+                        if ( $Self->{PermissionDebug} ) {
+                            $Self->_PermissionDebug($Self->{LevelIndent}.'        ', "$PermissionName permission granted");
+                        }
                     }
 
                     # for later lookup
@@ -3597,7 +3743,9 @@ sub _CheckPermissionCondition {
         );
         if ( !%Result ) {
             # we can't generate the filter, so this is a false
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create object filter for condition part \"%s\"!", $Part) );
+            if ( $Self->{PermissionDebug} ) {
+                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create object filter for condition part \"%s\"!", $Part) );
+            }
             return;
         }
 
@@ -3623,11 +3771,13 @@ sub _CheckPermissionCondition {
             }
         }
 
-        if ( $Result ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Permission condition \"%s\" matches", $Param{Condition}) );
-        }
-        else {
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Permission condition \"%s\" does not match", $Param{Condition}) );
+        if ( $Self->{PermissionDebug} ) {
+            if ( $Result ) {
+                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Permission condition \"%s\" matches", $Param{Condition}) );
+            }
+            else {
+                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Permission condition \"%s\" does not match", $Param{Condition}) );
+            }
         }
 
         return $Result;
@@ -3849,7 +3999,9 @@ sub _RunParallel {
     my $ResultQueue : shared;
     $ResultQueue = Thread::Queue->new();
 
-    $Self->_Debug("executing with parallel algorithm ($NumWorkers workers) ");
+    if ( $Self->{Debug} ) {
+        $Self->_Debug("executing with parallel algorithm ($NumWorkers workers) ");
+    }
 
     # create parallel instances
     my %Workers;
@@ -3955,7 +4107,7 @@ sub _CanRunParallel {
 sub _Debug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Self->{'API::Debug'} );
+    return if !$Self->{Debug};
 
     $Indent ||= '';
 
@@ -3967,7 +4119,7 @@ sub _Debug {
 sub _PermissionDebug {
     my ( $Self, $Indent, $Message ) = @_;
 
-    return if ( !$Self->{'Permission::Debug'} );
+    return if !$Self->{PermissionDebug};
 
     $Indent ||= '';
 
@@ -4195,6 +4347,14 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserType   => $Self->{Authorization}->{UserType}
                 );
                 return scalar(@IDs) ? \@IDs : [];
+            } elsif ($Param{ObjectType} eq 'Contact') {
+                return $Kernel::OM->Get('Contact')->GetAssignedContactsForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
+                );
             }
         }
     }
@@ -4377,7 +4537,7 @@ sub _ValidateDynamicFieldValue {
         my $ValueTypeResult = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Value,
-            UserID             => 1,
+            UserID             => $Self->{Authorization}->{UserID},
         );
         return if (!$ValueTypeResult);
     }

@@ -8,5 +8,6 @@
   Scenario: get the list of existing objecticons  
     When I query the collection of objecticons  
     Then the response code is 200
+    And the response contains 189 items of type "ObjectIcon"
 #    And the response object is ObjectIconCollectionResponse
 

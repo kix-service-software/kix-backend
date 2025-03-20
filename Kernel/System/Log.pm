@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, http://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
@@ -148,6 +148,8 @@ sub Log {
     if ( @{ $Self->{ $Priority }->{Message} } > 100 ) {
         shift( @{ $Self->{ $Priority }->{Message} } );
     }
+
+    return 1 if ( $Param{Silent} );
 
     return 1 if $PriorityNum < $Self->{MinimumLevelNum};
 

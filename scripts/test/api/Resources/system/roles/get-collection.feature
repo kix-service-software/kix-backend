@@ -33,7 +33,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles with offset
     When I query the collection of roles with offset 2
     Then the response code is 200
-    And the response contains 18 items of type "Role"
+    And the response contains 17 items of type "Role"
 
   Scenario: get the list of existing roles with limit and offset
     When I query the collection of roles with limit 2 and offset 4
@@ -43,7 +43,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles with sorted
     When I query the collection of roles with sorted by "Role.-Name:textual"
     Then the response code is 200
-    And the response contains 20 items of type "Role"
+    And the response contains 19 items of type "Role"
     And the response contains the following items of type Role
       | Name                         |
       | Webform Ticket Creator       |
@@ -72,7 +72,7 @@ Feature: GET request to the /system/roles resource
     Then the response code is 200
     And the response contains 2 items of type "Role"
     And the response contains the following items of type Role
-      | Name           |
-      | Report User    |
-      | Report Manager |
+      | Name             |
+      | Textmodule Admin |
+      | System Admin     |
 

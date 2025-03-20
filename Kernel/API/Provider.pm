@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -395,7 +395,9 @@ sub Run {
         );
     }
 
-    $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, TimeDiff($Self->{Metric}->{StartTime}));
+    if ( $Self->{Debug} ) {
+        $Self->_Debug('', sprintf "total execution time for \"%s %s\": %i ms", $ProcessedRequest->{RequestMethod}, $ProcessedRequest->{RequestURI}, TimeDiff($Self->{Metric}->{StartTime}));
+    }
 
     return;
 }

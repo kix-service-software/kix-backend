@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -54,7 +54,7 @@ sub GetBaseDef {
 
     return {
         Select  => ['a.id', 'a.incoming_time'],
-        From    => [ 'article a'],
+        From    => ['article a'],
         OrderBy => ['a.incoming_time ASC,a.id ASC']
     };
 }
@@ -66,7 +66,10 @@ sub GetPermissionDef {
     my @PermissionDef = ();
 
     # restrict search from customers to customer visible articles
-    if ( $Param{UserType} eq 'Customer' ) {
+    if (
+        defined($Param{UserType} )
+        && $Param{UserType} eq 'Customer'
+    ) {
         push @PermissionDef, 'a.customer_visible = 1';
     }
 

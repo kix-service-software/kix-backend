@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -53,11 +53,8 @@ Run - contains the actions performed by this event handler.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{Data}->{TicketID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need ArticleID!" );
-        return;
-    }
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # get config
     my $Config = $Self->{ConfigObject}->Get('Ticket::Frontend::AgentTicketZoomTabArticle');

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -40,15 +40,9 @@ sub Run {
             return;
         }
     }
-    for (qw(TicketID)) {
-        if ( !$Param{Data}->{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_ in Data!"
-            );
-            return;
-        }
-    }
+
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
 
     # check preconditions
     return 1 if ( $Param{Event} ne 'ArticleCreate' );

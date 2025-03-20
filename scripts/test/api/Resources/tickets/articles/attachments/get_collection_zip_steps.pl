@@ -1,3 +1,10 @@
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 use warnings;
 
 use Cwd;
@@ -34,4 +41,22 @@ When qr/I query the attachments zip collection$/, sub {
       URL   => S->{API_URL}.'/tickets/'.S->{TicketID}.'/articles/'.S->{ArticleID}.'/attachments/zip',
    );
 };
+
+Then qr/the response contains the following zip Attachment$/, sub {
+   my $Object = "Attachment";
+   my $Index = 0;
+
+   foreach my $Row ( @{ C->data } ) {
+      foreach my $Attribute ( keys %{$Row}) {
+         C->dispatch( 'Then', "zipattribute \"$Attribute\" of the \"$Object\" item ". $Index ." is \"$Row->{$Attribute}\"" );
+      }
+      $Index++
+   }
+};
+
+Then qr/zipattribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+   is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
+};
+
+
 

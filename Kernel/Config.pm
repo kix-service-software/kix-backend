@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -142,8 +142,9 @@ sub GetSysConfig {
     if ( !$Self->{NoCache} ) {
         # check cache
         my $CacheResult = $Kernel::OM->Get('Cache')->Get(
-            Type => $SysConfigObject->{CacheType},
-            Key  => $CacheKey
+            Type        => $SysConfigObject->{CacheType},
+            Key         => $CacheKey,
+            _ConfigInit => 1,
         );
         if ( IsHashRefWithData($CacheResult) ) {
             $Self->{SysConfigLoaded} = 1;
@@ -207,10 +208,11 @@ sub GetSysConfig {
     if ( !$Self->{NoCache} ) {
         # set cache
         $Kernel::OM->Get('Cache')->Set(
-            Type  => $SysConfigObject->{CacheType},
-            TTL   => $SysConfigObject->{CacheTTL},
-            Key   => $CacheKey,
-            Value => $Result,
+            Type        => $SysConfigObject->{CacheType},
+            TTL         => $SysConfigObject->{CacheTTL},
+            Key         => $CacheKey,
+            Value       => $Result,
+            _ConfigInit => 1,
         );
     }
 

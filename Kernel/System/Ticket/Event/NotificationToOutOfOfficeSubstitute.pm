@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,8 +41,11 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     # check needed stuff
-    foreach (qw(TicketID Notification)) {
+    foreach (qw(Notification)) {
         if ( !$Param{Data}->{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

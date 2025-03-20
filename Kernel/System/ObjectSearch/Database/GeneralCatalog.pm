@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -56,33 +56,15 @@ sub GetBaseDef {
     };
 }
 
-sub GetSupportedAttributes {
+sub _GetObjectSpecifics {
     my ( $Self, %Param ) = @_;
 
-    my @List;
-    for my $Attribute ( sort keys %{$Self->{AttributeMapping}} ) {
-        my $Module    = $Self->{AttributeMapping}->{$Attribute};
-        my $Property  = $Attribute;
-
-        my $Classes = undef;
-        if ( IsArrayRefWithData($Module->{Class})) {
-            $Classes = $Module->{Class};
-        }
-        push (
-            @List,
-            {
-                ObjectType      => $Self->{ObjectType},
-                Property        => $Property,
-                ObjectSpecifics => $Classes,
-                IsSearchable    => $Module->{IsSearchable} || 0,
-                IsSortable      => $Module->{IsSortable}   || 0,
-                Operators       => $Module->{Operators}    || [],
-                ValueType       => $Module->{ValueType}    || q{}
-            }
-        );
+    my $Classes = undef;
+    if ( IsArrayRefWithData( $Param{AttributeRef}->{Class} ) ) {
+        $Classes = $Param{AttributeRef}->{Class};
     }
 
-    return \@List;
+    return $Classes;
 }
 
 1;

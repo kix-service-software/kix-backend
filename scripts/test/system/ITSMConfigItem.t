@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1356,25 +1356,25 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'DefinitionUpdate',
                     HistoryTypeID => 8,
-                    Comment       => 'Definition des ConfigItems aktualisiert (ID=' . $ConfigItemDefinitionIDs[0] . ')',
+                    Comment       => 'Definition des ConfigItem aktualisiert (ID=' . $ConfigItemDefinitionIDs[0] . ')',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'NameUpdate',
                     HistoryTypeID => 5,
-                    Comment       => 'UnitTest - HistoryTest%%',
+                    Comment       => 'Name geändert (neu=UnitTest - HistoryTest; alt=)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Operational} . '; alt=)',
+                    Comment       => 'Vorfallsstatus geändert (neu=Operational; alt=)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Planned} . '; alt=)',
+                    Comment       => 'Verwendungsstatus geändert (neu=Planned; alt=)',
                     CreateBy      => 1,
                 },
                 {
@@ -1391,13 +1391,13 @@ my $ConfigItemTests = [
                 {
                     HistoryType   => 'IncidentStateUpdate',
                     HistoryTypeID => 9,
-                    Comment       => 'Vorfallsstatus geändert (neu=' . $InciStateListReverse{Incident} . '; alt=' . $InciStateListReverse{Operational} . ')',
+                    Comment       => 'Vorfallsstatus geändert (neu=Incident; alt=Operational)',
                     CreateBy      => 1,
                 },
                 {
                     HistoryType   => 'DeploymentStateUpdate',
                     HistoryTypeID => 10,
-                    Comment       => 'Verwendungsstatus geändert (neu=' . $DeplStateListReverse{Maintenance} . '; alt=' . $DeplStateListReverse{Planned} . ')',
+                    Comment       => 'Verwendungsstatus geändert (neu=Maintenance; alt=Planned)',
                     CreateBy      => 1,
                 },
             ],
@@ -2114,6 +2114,116 @@ continue {
         'VersionDelete',
         "Test $TestCount: HistoryType of last version of CI $CI1",
     );
+
+    # increase the test counter
+    $TestCount++;
+}
+
+# ------------------------------------------------------------ #
+# test for KIX2018-12939
+# ------------------------------------------------------------ #
+
+{
+    # get id by number for checks
+    my $CheckConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+        ConfigItemNumber => $ConfigItemNumbers[8],
+    );
+
+    my @Tests = (
+        {
+            'Name'      => 'Only ConfigItemName, equal value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, lowercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'unittest - class 1 configitem 8 version 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, uppercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'UNITTEST - CLASS 1 CONFIGITEM 8 VERSION 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, mixed case value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnItTeSt - ClAsS 1 CoNfIgItEm 8 VeRsIoN 1'
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, equal value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, lowercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'unittest - class 1 configitem 8 version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, uppercase value',
+            'Parameter' => {
+                'ConfigItemName' => 'UNITTEST - CLASS 1 CONFIGITEM 8 VERSION 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, mixed case value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnItTeSt - ClAsS 1 CoNfIgItEm 8 VeRsIoN 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => $CheckConfigItemID,
+        },
+        {
+            'Name'      => 'Only ConfigItemName, wrong value',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version X'
+            },
+            Expected    => undef,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, wrong value for ConfigItemName',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version X',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[0] }
+            },
+            Expected    => undef,
+        },
+        {
+            'Name'      => 'ConfigItemName and Class, wrong value for Class',
+            'Parameter' => {
+                'ConfigItemName' => 'UnitTest - Class 1 ConfigItem 8 Version 1',
+                'Class'          => $ClassList->{ $ConfigItemClassIDs[1] }
+            },
+            Expected    => undef,
+        },
+    );
+    for my $Test ( @Tests ) {
+        my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
+            %{ $Test->{Parameter} }
+        );
+        $Self->Is(
+            $ConfigItemID,
+            $Test->{Expected},
+            "Test $TestCount: ConfigItemLookup() - " . $Test->{Name}
+        );
+    }
 
     # increase the test counter
     $TestCount++;

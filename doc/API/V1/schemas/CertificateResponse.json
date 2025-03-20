@@ -26,6 +26,10 @@
                "type" : "string",
                "readOnly" : true
             },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "Email" : {
                "type" : "string",
                "readOnly" : true

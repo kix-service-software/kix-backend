@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -550,19 +550,22 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
             $Kernel::OM->Get('Config')->Set(
                 Key   => 'PostmasterFollowUpState',
                 Value => 'new'
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpStateClosed',
+                Value => 'open'
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TicketStateWorkflow::PostmasterFollowUpState',
+                Value => {}
             );
             {
                 my $PostMasterObject = Kernel::System::PostMaster->new(
@@ -615,13 +618,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
@@ -653,13 +651,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                         . ": $Ticket{TicketNumber}";
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
@@ -691,13 +684,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                         . ":$Ticket{TicketNumber}";
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
@@ -724,6 +712,14 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 Key   => 'PostmasterFollowUpState',
                 Value => 'open'
             );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'PostmasterFollowUpStateClosed',
+                Value => 'new'
+            );
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'TicketStateWorkflow::PostmasterFollowUpState',
+                Value => {}
+            );
 
             # send follow up #5
             @Content = ();
@@ -734,13 +730,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                         . $Ticket{TicketNumber};
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
@@ -795,13 +786,8 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                     );
                 }
                 if ( $Line =~ /^(Message-ID:)/i ) {
-                    my $Time   = $Kernel::OM->Get('Time')->SystemTime();
-                    my $Random = rand 999999;
-                    my $FQDN   = $Kernel::OM->Get('Config')->Get('FQDN');
-                    if (IsHashRefWithData($FQDN)) {
-                        $FQDN = $FQDN->{Backend}
-                    }
-                    $Line = "$1 <$Time.$Random\@$FQDN>";
+                    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+                    $Line = $1 . ' ' . $NewMessageID;
                 }
                 push @Content, $Line;
             }
@@ -833,7 +819,7 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
             );
             $Self->Is(
                 $Ticket{State} || 0,
-                'open',
+                'new',
                 $NamePrefix . ' Run() - FollowUp/PostmasterFollowUpStateClosed check',
             );
 
