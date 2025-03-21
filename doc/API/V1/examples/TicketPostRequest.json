@@ -19,7 +19,7 @@
         "MimeType": "text/html",
         "SenderTypeID": 3,
         "Subject": "The printer does not work!",
-        "TimeUnits": 12345,
+        "TimeUnit": 12345,
         "To": "someoneelse@somecorp.com,\"another one\" <anotherone@anothercorp.com>"
       }
     ],
