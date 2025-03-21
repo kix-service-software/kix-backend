@@ -248,12 +248,14 @@ sub OptionLookup {
     }
 
     # set cache
-    $Kernel::OM->Get('Cache')->Set(
-        Type  => $Self->{CacheType},
-        TTL   => $Self->{CacheTTL},
-        Key   => $CacheKey,
-        Value => $Result,
-    );
+    if ( $Result ) {
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Result,
+        );
+    }
 
     return $Result;
 }
