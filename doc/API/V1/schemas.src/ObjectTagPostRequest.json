@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ObjectTagPostRequest.json",
+  "type": "object",
+  "description": "The objecttag request object for creation.",
+  "properties": {
+    "ObjectTag": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "ObjectID": {
+          "type": "integer"
+        },
+        "ObjectType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Name",
+        "ObjectID",
+        "ObjectType"
+      ]
+    }
+  },
+  "required": [
+    "ObjectTag"
+  ]
+}
