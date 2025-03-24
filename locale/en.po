@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-9 14:49+0000\n"
+"POT-Creation-Date: 2025-3-21 09:39+0000\n"
 "PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -220,8 +220,8 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid ""
-"Event based Execution Plan for Job \"Customer Response - reopen from pending"
-"\""
+"Event based Execution Plan for Job \"Customer Response - reopen from "
+"pending\""
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -324,6 +324,10 @@ msgid "Laptop"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Lists open tickets by statetype."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"Customer Response - reopen from pending\""
 msgstr ""
 
@@ -385,6 +389,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "New ticket created by customer."
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Number of open tickets by statetype"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1014,6 +1022,14 @@ msgstr ""
 msgid "Weekday"
 msgstr ""
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Common.pm
+msgid "Debug"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common.pm
+msgid "Output debug data."
+msgstr ""
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid "Assembles a new object to be used later in the execution."
 msgstr ""
@@ -1024,8 +1040,8 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
 msgid ""
-"The assembled object containing the two attributes \"Type\" and \"Definition"
-"\", which is a string representation of the object."
+"The assembled object containing the two attributes \"Type\" and "
+"\"Definition\", which is a string representation of the object."
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/AssembleObject.pm
@@ -1081,8 +1097,8 @@ msgstr ""
 msgid "The ID of the report definition."
 msgstr ""
 "Choose a report definition from the list, then you can fill in parameters "
-"and output format. New report definitions can be created in the \"Reporting"
-"\" module."
+"and output format. New report definitions can be created in the "
+"\"Reporting\" module."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "The parameters of the report as a HashRef."
@@ -1324,6 +1340,33 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
+msgid "Delete Rules"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
+msgid ""
+"Deletes attachments of all articles of a ticket. All pattern of a rule have "
+"to match. Any keep rule has to match to ignore file for deletion. Any delete "
+"rule has to match for a file to be deleted."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
+msgid "Keep Rules"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
+msgid ""
+"Rules for keeping a file. Pattern are in the order Filename, ContentType and "
+"Disposition."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
+msgid ""
+"Rules to delete a file. Pattern are in the order Filename, ContentType and "
+"Disposition."
+msgstr ""
+
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) A message id the new article is a reply to."
 msgstr ""
@@ -1556,8 +1599,8 @@ msgstr "The name (=internal designation) of the dynamic field to be set."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/DynamicFieldSet.pm
 msgid ""
-"The value for the dynamic field to be set. Leave empty and uncheck \"Append"
-"\" to clear relevant dynamic field value of ticket."
+"The value for the dynamic field to be set. Leave empty and uncheck "
+"\"Append\" to clear relevant dynamic field value of ticket."
 msgstr ""
 "The \"value\" for the dynamic field to be set. Leave empty and uncheck "
 "\"Append\" to clear relevant dynamic field value of ticket. Field type "
@@ -2334,8 +2377,8 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Automation.xml
 msgid ""
 "Run file based generic agent jobs (Note: module name need needs to be "
-"specified in -configuration-module param e.g. \"Kernel::System::Automation"
-"\")."
+"specified in -configuration-module param e.g. \"Kernel::System::"
+"Automation\")."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
@@ -3089,6 +3132,10 @@ msgid "Defines the maximal size (in bytes) for file uploads."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Defines the maximal size (in bytes) for icon uploads. Default: 32K"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the maximal valid time (in seconds) for a token."
 msgstr ""
 
@@ -3559,10 +3606,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "If \"file\" was selected for LogModule, create a new log file if the maximum "
-"size has been reached. You can enter bytes or add \"K\" (kilobytes) or \"M"
-"\" (megabytes) or \"G\" (gigabytes) to make it easier. Set it to 0 (default) "
-"if no maximum size exists. PLEASE NOTE: the maximum size of the file will "
-"not exactly match, due to the different length of the log messages."
+"size has been reached. You can enter bytes or add \"K\" (kilobytes) or "
+"\"M\" (megabytes) or \"G\" (gigabytes) to make it easier. Set it to 0 "
+"(default) if no maximum size exists. PLEASE NOTE: the maximum size of the "
+"file will not exactly match, due to the different length of the log messages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4502,11 +4549,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
 msgid ""
-"Configuration for configuration item number generator module \"ClassPrefixes"
-"\". Module generates incremental numbers with pattern &lt;SystemID"
-"+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, e.g. "
-"12CM0004, 12CM0005. When no class prefix and no default prefix is given, the "
-"class id is used."
+"Configuration for configuration item number generator module "
+"\"ClassPrefixes\". Module generates incremental numbers with pattern &lt;"
+"SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, "
+"e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is "
+"given, the class id is used."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
@@ -4815,6 +4862,11 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for object tags."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for objects."
 msgstr ""
 
@@ -4833,6 +4885,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Register object type for backend \"ObjectSearch::Database\""
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectTag.xml
+msgid "."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -4989,6 +5045,10 @@ msgid "Converts HTML mails into text messages."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Counts all ticket attachments (all article attachments)."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Article"
 msgstr ""
 
@@ -5083,6 +5143,12 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Defines the default ticket state."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Defines the default ticket title, e.g. if an email without subject is "
+"received."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5186,6 +5252,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Article"
 msgstr "Delete Article"
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Delete Attachments from Articles"
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
