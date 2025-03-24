@@ -444,20 +444,18 @@ sub TextModuleDelete {
     );
 
     # delete queue references
-    my $SQL = "DELETE FROM text_module_queue WHERE text_module_id = ?";
-    my $DBDelete = $Self->{DBObject}->Do(
-        SQL  => $SQL,
+    $Self->{DBObject}->Do(
+        SQL  => 'DELETE FROM text_module_queue WHERE text_module_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete ticket type references
-    my $SQL = "DELETE FROM text_module_ticket_type WHERE text_module_id = ?";
-    my $DBDelete = $Self->{DBObject}->Do(
-        SQL  => $SQL,
+    $Self->{DBObject}->Do(
+        SQL  => 'DELETE FROM text_module_ticket_type WHERE text_module_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
-    my $Result = $Self->{DBObject}->Do(
+    return if !$Self->{DBObject}->Do(
         SQL  => 'DELETE FROM text_module WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
@@ -469,7 +467,7 @@ sub TextModuleDelete {
         ObjectID  => $Param{ID},
     );
 
-    return $Result;
+    return 1;
 }
 
 =item TextModuleList()
