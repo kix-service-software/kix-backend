@@ -386,9 +386,8 @@ sub Execute {
     # Don't allow to run these scripts as root.
     if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
-            "You cannot run kix.Console.pl as root. Please run it as the apache user or with the help of su:"
+            "You cannot run this command as root. If you really want to do this and you know what you are doing, please use the option --allow-root."
         );
-        $Self->Print("  <yellow>su -c \"bin/kix.Console.pl MyCommand\" -s /bin/bash <apache user> </yellow>\n");
         return $Self->ExitCodeError();
     }
 
