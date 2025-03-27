@@ -53,18 +53,6 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $MainObject   = $Kernel::OM->Get('Main');
-
-    # load generator customer preferences module
-    my $GeneratorModule = $ConfigObject->Get('OrganisationPreferences')->{Module}
-        || 'Organisation::Preferences::DB';
-
-    if ( $MainObject->Require($GeneratorModule) ) {
-        $Self->{PreferencesObject} = $GeneratorModule->new();
-    }
-
     $Self->{OSCacheType} = 'ObjectSearch_Organisation';
     $Self->{CacheType}   = 'Organisation';
     $Self->{CacheTTL}    = 60 * 60 * 24 * 20;
@@ -618,116 +606,6 @@ sub OrganisationDelete {
     );
 
     return 1;
-}
-
-=item GetPreferences()
-
-get customer user preferences
-
-    my %Preferences = $OrganisationObject->GetPreferences(
-        UserID => 'some-login',
-    );
-
-=cut
-
-sub GetPreferences {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check if user exists
-    my %User = $Self->OrganisationGet( OrganisationNumber => $Param{UserID} );
-    if ( !%User ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such user '$Param{UserID}'!",
-        );
-        return;
-    }
-
-    # call new api (2.4.8 and higher)
-    if ( $Self->{ $User{Source} }->can('GetPreferences') ) {
-        return $Self->{ $User{Source} }->GetPreferences(%Param);
-    }
-
-    # call old api
-    return $Self->{PreferencesObject}->GetPreferences(%Param);
-}
-
-=item SetPreferences()
-
-set customer user preferences
-
-    $OrganisationObject->SetPreferences(
-        Key    => 'UserComment',
-        Value  => 'some comment',
-        UserID => 'some-login',
-    );
-
-=cut
-
-sub SetPreferences {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{UserID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID!'
-        );
-        return;
-    }
-
-    # check if user exists
-    my %User = $Self->OrganisationGet( OrganisationNumber => $Param{UserID} );
-    if ( !%User ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such user '$Param{UserID}'!",
-        );
-        return;
-    }
-
-    my $Result;
-
-    # call new api (2.4.8 and higher)
-    if ( $Self->{ $User{Source} }->can('SetPreferences') ) {
-        $Result = $Self->{ $User{Source} }->SetPreferences(%Param);
-    }
-
-    # call old api
-    else {
-        $Result = $Self->{PreferencesObject}->SetPreferences(%Param);
-    }
-
-    # trigger event handler
-    if ($Result) {
-        $Self->EventHandler(
-            Event => 'OrganisationSetPreferences',
-            Data  => {
-                %Param,
-                UserData => \%User,
-                Result   => $Result,
-            },
-            UserID => 1,
-        );
-    }
-
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Customer.Preference',
-        ObjectID  => $Param{UserID}.'::'.$Param{Key},
-    );
-
-    return $Result;
 }
 
 sub DESTROY {
