@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-3-27 10:15+0000\n"
+"POT-Creation-Date: 2025-3-27 12:09+0000\n"
 "PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -2832,19 +2832,7 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default spelling dictionary"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket type"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2902,10 +2890,6 @@ msgstr ""
 msgid ""
 "Defines all the languages that are available to the application. Specify "
 "only English names of languages here."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines all the parameters for this item in the customer preferences."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3198,14 +3182,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the parameters for the SupportData collection and sending."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the contact preferences table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the customer company preferences table."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4445,18 +4421,6 @@ msgstr ""
 msgid ""
 "You have the possibility to be ask every time which print module you want to "
 "take or to fix the using of one special print module."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket type"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
