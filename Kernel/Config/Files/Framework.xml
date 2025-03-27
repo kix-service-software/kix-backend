@@ -13,8 +13,8 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://kixdesk.com/impressum.html</Item>
-                <Item Key="en">https://kixdesk.com/impressum.html</Item>
+                <Item Key="de">https://www.kixdesk.com/impressum</Item>
+                <Item Key="en">https://www.kixdesk.com/en/legal-notice</Item>
             </Hash>
         </Setting>
     </ConfigItem>
