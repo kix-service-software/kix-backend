@@ -1276,8 +1276,8 @@ validate the current value for the dynamic field
     my $Result = $BackendObject->EditFieldValueValidate(
         DynamicFieldConfig   => $DynamicFieldConfig,      # complete config of the DynamicField
         PossibleValuesFilter => {                         # Optional. Some backends may support this.
-            'Key1' => 'Value1',                           #     This may be needed to realize ACL support for ticket masks,
-            'Key2' => 'Value2',                           #     where the possible values can be limited with and ACL.
+            'Key1' => 'Value1',
+            'Key2' => 'Value2',
         },
         ParamObject          => $Self->{ParamObject}      # To get the values directly from the web request
         Mandatory            => 1,                        # 0 or 1,
@@ -1492,8 +1492,7 @@ sub RandomValueSet {
 
 =item HistoricalValuesGet()
 
-returns the list of database values for a defined dynamic field. This function is used to calculate
-ACLs in Search Dialog
+returns the list of database values for a defined dynamic field.
 
     my $HistorialValues = $BackendObject->HistoricalValuesGet(
         DynamicFieldConfig => $DynamicFieldConfig,       # complete config of the DynamicField
