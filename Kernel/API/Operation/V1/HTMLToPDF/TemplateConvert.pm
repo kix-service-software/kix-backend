@@ -150,10 +150,6 @@ sub Run {
         );
     }
 
-    if ( !IsBase64($Result{Content}) ) {
-        $Result{Content} = MIME::Base64::encode_base64($Result{Content});
-    }
-
     # return result
     return $Self->_Success(
         HTMLToPDF => \%Result,
