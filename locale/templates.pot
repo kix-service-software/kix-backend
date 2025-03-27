@@ -3791,7 +3791,7 @@ msgid "Config item event module that updates the counters for basic configitem s
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
-msgid "Configuration for configuration item number generator module \"ClassPrefixes\". Module generates incremental numbers with pattern &lt;SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is given, the class id is used."
+msgid "Configuration for configuration item number generator module \"ClassPrefixes\". Module generates incremental numbers with pattern &lt;ClassPrefix+Separator&gt;&lt;SystemID+Separator&gt;&lt;FormattedCounter&gt;, e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is given, the class id is used."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ITSM.xml
