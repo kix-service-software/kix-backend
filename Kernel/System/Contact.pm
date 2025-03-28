@@ -1117,11 +1117,6 @@ sub ContactDelete {
         }
     }
 
-    # delete preferences (foreign key)
-    $Self->{PreferencesObject}->DeleteAllPreferencesForContact(
-        ContactID => $Param{ID}
-    );
-
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
     my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
