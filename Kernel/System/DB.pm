@@ -1133,8 +1133,12 @@ sub SQLProcessor {
                 push @Table, $Tag;
             }
 
-            # primary drop
-            elsif ( $Tag->{Tag} eq 'PrimaryDrop' ) {
+            # primary
+            elsif (
+                $Tag->{Tag} eq 'Primary'
+                || $Tag->{Tag} eq 'PrimaryCreate'
+                || $Tag->{Tag} eq 'PrimaryColumn'
+                || $Tag->{Tag} eq 'PrimaryDrop' ) {
                 push @Table, $Tag;
             }
 

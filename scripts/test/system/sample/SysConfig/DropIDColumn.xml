@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+    <TableAlter Name="sysconfig">
+        <PrimaryDrop />
+        <ColumnDrop Name="id" />
+        <ColumnChange NameOld="name" NameNew="name" Required="true" Type="VARCHAR" Size="255" />
+        <PrimaryCreate>
+            <PrimaryColumn Name="name" />
+        </PrimaryCreate>
+    </TableAlter>
+</database>
