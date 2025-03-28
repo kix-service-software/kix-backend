@@ -1,7 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
-# based on the original work of:
-# Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -12,18 +10,42 @@ use strict;
 use warnings;
 use utf8;
 
-use Kernel::System::VariableCheck qw(:all);
-
 use vars (qw($Self));
-
-# get SysConfigLanguage object
-my $SysConfigObject = $Kernel::OM->Get('SysConfig');
+use File::Basename;
 
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+my $SysConfigModule = 'Kernel::System::SysConfig';
+
+# create backend object
+my $SysConfigObject = $SysConfigModule->new( %{ $Self } );
+$Self->Is(
+    ref( $SysConfigObject ),
+    $SysConfigModule,
+    'SysConfig object has correct module ref'
+);
+
+# check supported methods
+for my $Method (
+    qw(
+        OptionTypeList Exists OptionLookup
+        OptionGet OptionGetAll OptionAdd
+        OptionUpdate OptionList OptionDelete
+        ValueGet ValueGetAll ValueSet
+        CleanUp Rebuild
+    )
+) {
+    $Self->True(
+        $SysConfigObject->can($Method),
+        'SysConfig object can "' . $Method . q{"}
+    );
+}
+
 # begin transaction on database
 $Helper->BeginWork();
+
+# ToDo: Revision necessary, as not all functions are covered and only simple
 
 ########################################################################################################################################
 # OptionType handling
@@ -299,6 +321,236 @@ $Self->True(
     $Result,
     'OptionDelete()',
 );
+
+# Special handling of the ObjectGet
+# if the database table "sysconfig" has different columns
+
+# set fixed time to have predetermined verifiable results
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2025-01-01 12:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
+
+# get xml files
+my %XMLs;
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
+
+my @XMLFiles = $Kernel::OM->Get('Main')->DirectoryRead(
+    Directory => $Home . '/scripts/test/system/sample/SysConfig',
+    Filter    => '*.xml',
+);
+
+foreach my $Filename ( @XMLFiles ) {
+    my $XMLName = basename($Filename, '.xml');
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
+        Location => $Filename,
+        Result   => 'SCALAR',
+        Mode     => 'utf8'
+    );
+    $Self->True(
+        $Content,
+        "Loaded xml content ".$XMLName
+    );
+    $XMLs{$XMLName} = ${$Content};
+}
+
+# Add new Option
+my $Option = 'Option' . $Helper->GetRandomID();
+$Result = $SysConfigObject->OptionAdd(
+    Name        => $Option,
+    Description => 'some description',
+    AccessLevel => 'internal',
+    Setting     => {
+        "RegEx" => ""
+    },
+    Type        => 'String',
+    UserID      => 1,
+);
+
+$Self->True(
+    $Result,
+    "OptionAdd | $Option | Type: String | Result true"
+);
+
+# OptionLookup for ID
+my $OptionID = $SysConfigObject->OptionLookup(
+    Name  => $Option
+);
+
+$Self->True(
+    $OptionID,
+    "OptionLookup | $Option | Pre | Result ID"
+);
+
+# Check current table configuration on ObjectGet
+my %Object = $SysConfigObject->OptionGet(
+    Name => $Option
+);
+
+$Self->IsDeeply(
+    \%Object,
+    {
+        'AccessLevel'     => 'internal',
+        'ChangeBy'        => 1,
+        'ChangeTime'      => '2025-01-01 12:00:00',
+        'Comments'        => undef,
+        'Context'         => undef,
+        'ContextMetadata' => undef,
+        'CreateBy'        => 1,
+        'CreateTime'      => '2025-01-01 12:00:00',
+        'Default'         => q{},
+        'DefaultValidID'  => 1,
+        'DefaultValue'    => undef,
+        'Description'     => 'some description',
+        'ExperienceLevel' => undef,
+        'GroupName'       => undef,
+        'ID'              => $OptionID,
+        'IsModified'      => 0,
+        'IsRequired'      => 0,
+        'Name'            => $Option,
+        'Setting'         => {
+            'RegEx' => q{}
+        },
+        'Type'            => 'String',
+        'ValidID'         => 1,
+        'Value'           => q{}
+    },
+    "OptionGet | $Option | Type: String | Result hash with ID"
+);
+
+# drop column id in the table configuration
+$Result = _ExecuteXML(
+    XML => $XMLs{DropIDColumn}
+);
+
+$Self->True(
+    $Result,
+    "DB-Table Change | Drop Column ID from sysconfig| Result true"
+);
+
+# cleanup cache
+$Kernel::OM->Get('Cache')->CleanUp(
+    Type => 'SysConfig'
+);
+
+# Check new table configuration on ObjectGet
+%Object = $SysConfigObject->OptionGet(
+    Name => $Option
+);
+
+$Self->IsDeeply(
+    \%Object,
+    {
+        'AccessLevel'     => 'internal',
+        'ChangeBy'        => 1,
+        'ChangeTime'      => '2025-01-01 12:00:00',
+        'Comments'        => undef,
+        'Context'         => undef,
+        'ContextMetadata' => undef,
+        'CreateBy'        => 1,
+        'CreateTime'      => '2025-01-01 12:00:00',
+        'Default'         => q{},
+        'DefaultValidID'  => 1,
+        'DefaultValue'    => undef,
+        'Description'     => 'some description',
+        'ExperienceLevel' => undef,
+        'GroupName'       => undef,
+        'IsModified'      => 0,
+        'IsRequired'      => 0,
+        'Name'            => $Option,
+        'Setting'         => {
+            'RegEx' => q{}
+        },
+        'Type'            => 'String',
+        'ValidID'         => 1,
+        'Value'           => q{}
+    },
+    "OptionGet | $Option | Type: String | Result hash without ID"
+);
+
+# revert pre changes of the table configuration
+$Result = _ExecuteXML(
+    XML => $XMLs{RevertDropIDColumn}
+);
+
+$Self->True(
+    $Result,
+    "DB-Table Change | Revert Drop Column ID from sysconfig| Result true"
+);
+
+# cleanup cache
+$Kernel::OM->Get('Cache')->CleanUp(
+    Type => 'SysConfig'
+);
+
+
+# Post OptionLookup for ID
+$OptionID = $SysConfigObject->OptionLookup(
+    Name  => $Option
+);
+
+$Self->True(
+    $OptionID,
+    "OptionLookup | $Option | Post | Result ID"
+);
+
+# Post check of the reverted table configuration on ObjectGet
+%Object = $SysConfigObject->OptionGet(
+    Name => $Option
+);
+
+$Self->IsDeeply(
+    \%Object,
+    {
+        'AccessLevel'     => 'internal',
+        'ChangeBy'        => 1,
+        'ChangeTime'      => '2025-01-01 12:00:00',
+        'Comments'        => undef,
+        'Context'         => undef,
+        'ContextMetadata' => undef,
+        'CreateBy'        => 1,
+        'CreateTime'      => '2025-01-01 12:00:00',
+        'Default'         => q{},
+        'DefaultValidID'  => 1,
+        'DefaultValue'    => undef,
+        'Description'     => 'some description',
+        'ExperienceLevel' => undef,
+        'GroupName'       => undef,
+        'ID'              => $OptionID,
+        'IsModified'      => 0,
+        'IsRequired'      => 0,
+        'Name'            => $Option,
+        'Setting'         => {
+            'RegEx' => q{}
+        },
+        'Type'            => 'String',
+        'ValidID'         => 1,
+        'Value'           => q{}
+    },
+    "OptionGet | $Option | Type: String | Result hash without ID"
+);
+
+sub _ExecuteXML {
+    my ( %Param ) = @_;
+
+    return 0 if !$Param{XML};
+
+    my @XMLArray = $Kernel::OM->Get('XML')->XMLParse(
+        String => $Param{XML}
+    );
+    my @SQL = $Kernel::OM->Get('DB')->SQLProcessor(
+        Database => \@XMLArray,
+    );
+
+    return 0 if !@SQL;
+
+    for my $SQL (@SQL) {
+        my $Success = $Kernel::OM->Get('DB')->Do( SQL => $SQL );
+        return 0 if !$Success;
+    }
+
+    return 1;
+}
 
 # rollback transaction on database
 $Helper->Rollback();
