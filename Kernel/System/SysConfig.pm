@@ -302,8 +302,15 @@ sub OptionGet {
     );
 
     my %Data;
-    my @Columns       = $Kernel::OM->Get('DB')->GetColumnNames();
+    my @Columns = $Kernel::OM->Get('DB')->GetColumnNames();
     for my $Column ( @Columns ) {
+        # special handling: use attribute name 'Default' for column 'default_value'
+        if ( $Column eq 'default_value' ) {
+            $Column = 'Default';
+
+            next;
+        }
+
         my @Names = split(/_/sm, $Column);
         for my $Name ( @Names) {
             $Name = ( $Name eq 'id' ) ? uc($Name) : ucfirst($Name);
