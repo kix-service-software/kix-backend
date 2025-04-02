@@ -2867,7 +2867,8 @@ Thanks for your help!
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::TicketAttachmentCountUpdate</Item>
-                <Item Key="Event">(ArticleAttachmentAdd|ArticleAttachmentDelete|ArticleMove)</Item>
+                <Item Key="Event">(ArticleAttachmentAdd|ArticleAttachmentsDelete|ArticleAttachmentDelete|ArticleMove)</Item>
+                <Item Key="Transaction">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
