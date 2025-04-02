@@ -31,7 +31,7 @@
             "SenderTypeID": 2,
             "Subject": "The printer does not work!",
             "TicketID": 49,
-            "TimeUnits": 0,
+            "TimeUnit": 0,
             "To": "agent@myorganisation.com",
             "ToRealname": "agent@myorganisation.com",
             "Unseen": 1
@@ -67,7 +67,7 @@
             "SenderTypeID": 1,
             "Subject": "RE: The printer does not work!",
             "TicketID": 49,
-            "TimeUnits": 0,
+            "TimeUnit": 0,
             "To": "\"Some one\" <someone@somecorp.com>",
             "ToRealname": "Some one",
             "Unseen": 0

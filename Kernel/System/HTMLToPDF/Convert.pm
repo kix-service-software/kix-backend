@@ -216,11 +216,32 @@ sub Convert {
         Data => \@DeleteData
     );
 
+    # raw file size
+    my $FilesizeRaw = 0 + $FileStat->size();
+
+    # human readable file size
+    my $Filesize;
+    if (
+        defined( $FilesizeRaw )
+        && $FilesizeRaw =~ m/^[0-9]+$/
+    ) {
+        if ( $FilesizeRaw > ( 1024 * 1024 ) ) {
+            $Filesize = sprintf "%.1f MBytes", ( $FilesizeRaw / ( 1024 * 1024 ) );
+        }
+        elsif ( $FilesizeRaw > 1024 ) {
+            $Filesize = sprintf "%.1f KBytes", ( ( $FilesizeRaw / 1024 ) );
+        }
+        else {
+            $Filesize = $FilesizeRaw . ' Bytes';
+        }
+    }
+
     return (
         Content     => MIME::Base64::encode_base64($Output),
         ContentType => $ContentType,
         Filename    => $Filename . $FileExtension,
-        Filesize    => $FileStat->size
+        FilesizeRaw => $FilesizeRaw,
+        Filesize    => $Filesize
     );
 }
 

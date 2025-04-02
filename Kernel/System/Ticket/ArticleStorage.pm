@@ -270,6 +270,15 @@ sub ArticleDeleteAttachments {
         ObjectID  => $TicketID.'::'.$Param{ArticleID},
     );
 
+    $Self->EventHandler(
+        Event => 'ArticleAttachmentsDelete',
+        Data  => {
+            TicketID  => $TicketID,
+            ArticleID => $Param{ArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
     return 1;
 }
 
@@ -547,17 +556,6 @@ sub ArticleWriteAttachment {
         Namespace => 'Ticket.Article.Attachment',
         ObjectID  => $TicketID.'::'.$Param{ArticleID}.'::'.$Param{Filename},
     );
-
-    $Self->EventHandler(
-        Event => 'ArticleAttachmentDelete',
-        Data  => {
-            TicketID  => $TicketID,
-            ArticleID => $Param{ArticleID},
-            Filename  => $Param{Filename},
-        },
-        UserID => $Param{UserID},
-    );
-
 
     return 1;
 }

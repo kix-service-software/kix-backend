@@ -42,7 +42,6 @@ sub _DeleteObseleteSysConfigKeys {
     my $SysConfigObject = $Kernel::OM->Get('SysConfig');
 
     my @Items = qw{
-        ContactPreferencesGroups###GoogleAuthenticatorSecretKey
         PreferencesGroups###GoogleAuthenticatorSecretKey
         UserImport::DefaultPassword
     };

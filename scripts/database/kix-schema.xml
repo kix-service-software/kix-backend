@@ -1,42 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <database Name="kix">
 
-<!-- acl - all acls from the editor -->
-<Table Name="acl">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="name" Required="true" Type="VARCHAR" Size="200"/>
-    <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="description" Required="false" Size="250" Type="VARCHAR"/>
-    <Column Name="valid_id" Required="true" Type="SMALLINT"/>
-    <Column Name="stop_after_match" Required="false" Type="SMALLINT"/>
-    <!-- configs stored as YAML like in the web service configuration -->
-    <Column Name="config_match" Required="false" Type="LONGBLOB"/>
-    <Column Name="config_change" Required="false" Type="LONGBLOB"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="create_by" Required="true" Type="INTEGER"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="acl_name">
-        <UniqueColumn Name="name"/>
-    </Unique>
-    <ForeignKey ForeignTable="valid">
-        <Reference Local="valid_id" Foreign="id"/>
-    </ForeignKey>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id"/>
-        <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- acl_sync - sync states for acls -->
-<Table Name="acl_sync">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="acl_id" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="sync_state" Required="true" Size="30" Type="VARCHAR"/>
-    <Column Name="create_time" Required="true" Type="DATE"/>
-    <Column Name="change_time" Required="true" Type="DATE"/>
-</Table>
-
 <!-- valid - all valid states -->
 <Table Name="valid">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="SMALLINT"/>
@@ -144,13 +108,14 @@
 
 <!-- role_user - relation role<->user -->
 <Table Name="role_user">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="user_id" Required="true" Type="INTEGER"/>
     <Column Name="role_id" Required="true" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="role_user_pkey">
+    <Unique Name="role_user_unique">
         <UniqueColumn Name="user_id"/>
         <UniqueColumn Name="role_id"/>
     </Unique>
@@ -1166,23 +1131,6 @@
     </ForeignKey>
 </Table>
 
-<!-- contact preferences -->
-<Table Name="contact_preferences">
-    <Column Name="contact_id" Required="true" Type="INTEGER"/>
-    <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="250" Type="VARCHAR"/>
-    <Unique Name="contact_preferences_unique">
-        <UniqueColumn Name="contact_id"/>
-        <UniqueColumn Name="preferences_key"/>
-    </Unique>
-    <Index Name="contact_preferences_contact_id">
-        <IndexColumn Name="contact_id"/>
-    </Index>
-    <ForeignKey ForeignTable="contact">
-        <Reference Local="contact_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
 <!-- organisation -->
 <Table Name="organisation">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
@@ -1208,23 +1156,6 @@
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- organisation_prefs -->
-<Table Name="organisation_prefs">
-    <Column Name="org_id" Required="true" Type="INTEGER"/>
-    <Column Name="preferences_key"   Required="true"  Type="VARCHAR" Size="100"/>
-    <Column Name="preferences_value" Required="false" Type="VARCHAR" Size="10000"/>
-    <Unique Name="organisation_prefs_unique">
-        <UniqueColumn Name="org_id"/>
-        <UniqueColumn Name="preferences_key"/>
-    </Unique>
-    <Index Name="organisation_prefs_org_id">
-        <IndexColumn Name="org_id"/>
-    </Index>
-   <ForeignKey ForeignTable="organisation">
-        <Reference Local="org_id" Foreign="id"/>
     </ForeignKey>
 </Table>
 
@@ -1337,36 +1268,6 @@
     <Column Name="negate" Required="false" Type="SMALLINT"/>
     <ForeignKey ForeignTable="mail_filter">
         <Reference Local="filter_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-
-<!-- search_profile -->
-<Table Name="search_profile">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="type" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="user_login" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="user_type" Required="true" Size="20" Type="VARCHAR"/>
-    <Column Name="subscribed_profile_id" Type="INTEGER"/>
-    <Index Name="search_profile_login">
-        <IndexColumn Name="user_login"/>
-    </Index>
-</Table>
-<Table Name="search_profile_preferences">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="search_profile_id" Required="true" Type="INTEGER"/>
-    <Column Name="preferences_type" Required="true" Size="30" Type="VARCHAR"/>
-    <Column Name="preferences_key" Required="true" Size="200" Type="VARCHAR"/>
-    <Column Name="preferences_value" Required="false" Size="200" Type="VARCHAR"/>
-    <ForeignKey ForeignTable="search_profile">
-        <Reference Local="search_profile_id" Foreign="id"/>
-    </ForeignKey>
-</Table>
-<Table Name="search_profile_category">
-    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
-    <Column Name="search_profile_id"  Required="true"  Type="INTEGER"/>
-    <Column Name="category" Required="true"  Type="VARCHAR" Size="100"/>
-    <ForeignKey ForeignTable="search_profile">
-        <Reference Local="search_profile_id" Foreign="id"/>
     </ForeignKey>
 </Table>
 
@@ -2249,6 +2150,7 @@
     </ForeignKey>
 </Table>
 <Table Name="attachment_dir_preferences">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="attachment_directory_id" Required="true" Type="INTEGER"/>
     <Column Name="preferences_key" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="preferences_value" Required="false" Size="350" Type="VARCHAR"/>
@@ -2273,23 +2175,6 @@
     <Index Name="attachment_storage_dir_id">
         <IndexColumn Name="attachment_directory_id"/>
     </Index>
-</Table>
-
-<Table Name="kix_article_flag">
-    <Column Name="article_id"  Required="true" Type="BIGINT"/>
-    <Column Name="article_key" Required="true" Type="VARCHAR" Size="50"/>
-    <Column Name="keywords"    Required="true" Type="VARCHAR" Size="200"/>
-    <Column Name="subject"     Required="true" Type="VARCHAR" Size="250"/>
-    <Column Name="note"        Required="true" Type="VARCHAR" Size="2000"/>
-    <Column Name="create_by"   Required="true" Type="INTEGER"/>
-    <Unique>
-        <UniqueColumn Name="article_id"/>
-        <UniqueColumn Name="article_key"/>
-        <UniqueColumn Name="create_by"/>
-    </Unique>
-    <ForeignKey ForeignTable="users">
-        <Reference Local="create_by" Foreign="id" />
-    </ForeignKey>
 </Table>
 
 <Table Name="text_module">
@@ -2414,6 +2299,7 @@
 
 <!-- translation_language - translations -->
 <Table Name="translation_language">
+    <Column Name="id" Required="true" Type="INTEGER" AutoIncrement="true" PrimaryKey="true" />
     <Column Name="pattern_id" Required="true" Type="INTEGER" />
     <Column Name="language" Required="true" Type="VARCHAR" Size="8" />
     <Column Name="value" Required="true" Type="VARCHAR" Size="10000" />
@@ -2629,13 +2515,14 @@
 
 <!-- job_exec_plan - relation job<->exec_plan -->
 <Table Name="job_exec_plan">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="job_id" Required="true" Type="INTEGER"/>
     <Column Name="exec_plan_id" Required="true" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="job_exec_plan_pkey">
+    <Unique Name="job_exec_plan_unique">
         <UniqueColumn Name="job_id"/>
         <UniqueColumn Name="exec_plan_id"/>
     </Unique>
@@ -2659,13 +2546,14 @@
 
 <!-- job_macro - relation job<->macro -->
 <Table Name="job_macro">
+    <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
     <Column Name="job_id" Required="true" Type="INTEGER"/>
     <Column Name="macro_id" Required="true" Type="INTEGER"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
     <Column Name="change_by" Required="true" Type="INTEGER"/>
-    <Unique Name="job_macro_pkey">
+    <Unique Name="job_macro_unique">
         <UniqueColumn Name="job_id"/>
         <UniqueColumn Name="macro_id"/>
     </Unique>

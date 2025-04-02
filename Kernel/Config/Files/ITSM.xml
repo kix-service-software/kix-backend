@@ -226,7 +226,7 @@
     </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="ITSMConfigItem::Number::ClassPrefixes" Required="0" Valid="1">
-        <Description Translatable="1">Configuration for configuration item number generator module "ClassPrefixes". Module generates incremental numbers with pattern &lt;SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is given, the class id is used.</Description>
+        <Description Translatable="1">Configuration for configuration item number generator module "ClassPrefixes". Module generates incremental numbers with pattern &lt;ClassPrefix+Separator&gt;&lt;SystemID+Separator&gt;&lt;FormattedCounter&gt;, e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is given, the class id is used.</Description>
         <Group>ITSM</Group>
         <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-3-25 07:38+0000\n"
+"POT-Creation-Date: 2025-3-31 09:11+0000\n"
 "PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -2832,19 +2832,7 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default spelling dictionary"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket type"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -2902,10 +2890,6 @@ msgstr ""
 msgid ""
 "Defines all the languages that are available to the application. Specify "
 "only English names of languages here."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines all the parameters for this item in the customer preferences."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3198,14 +3182,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the parameters for the SupportData collection and sending."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the contact preferences table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the customer company preferences table."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4448,18 +4424,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket type"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations name for use in placeholder."
 msgstr "Your organisations name for use in placeholder."
 
@@ -4551,7 +4515,7 @@ msgstr ""
 msgid ""
 "Configuration for configuration item number generator module "
 "\"ClassPrefixes\". Module generates incremental numbers with pattern &lt;"
-"SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, "
+"ClassPrefix+Separator&gt;&lt;SystemID+Separator&gt;&lt;FormattedCounter&gt;, "
 "e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is "
 "given, the class id is used."
 msgstr ""

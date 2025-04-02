@@ -306,40 +306,36 @@ sub OptionGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level,
-                  type, group_name, setting, is_required, is_modified, default_value, value, comments,
-                  default_valid_id, valid_id, create_time, create_by, change_time, change_by, id
-                  FROM sysconfig WHERE name = ?",
+        SQL   => "SELECT * FROM sysconfig WHERE name = ?",
         Bind => [ \$Param{Name} ],
     );
 
     my %Data;
+    my @Columns = $Kernel::OM->Get('DB')->GetColumnNames();
+    for my $Column ( @Columns ) {
+        # special handling: use attribute name 'Default' for column 'default_value'
+        if ( $Column eq 'default_value' ) {
+            $Column = 'Default';
+
+            next;
+        }
+
+        my @Names = split(/_/sm, $Column);
+        for my $Name ( @Names) {
+            $Name = ( $Name eq 'id' ) ? uc($Name) : ucfirst($Name);
+        }
+
+        $Column = join( q{}, @Names);
+    }
 
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        %Data = (
-            Name            => $Row[0],
-            Context         => $Row[1],
-            ContextMetadata => $Row[2],
-            Description     => $Row[3],
-            AccessLevel     => $Row[4],
-            ExperienceLevel => $Row[5],
-            Type            => $Row[6],
-            Group           => $Row[7],
-            Setting         => $Row[8],
-            IsRequired      => $Row[9],
-            IsModified      => $Row[10],
-            Default         => $Row[11],
-            Value           => $Row[12],
-            Comment         => $Row[13],
-            DefaultValidID  => $Row[14],
-            ValidID         => $Row[15],
-            CreateTime      => $Row[16],
-            CreateBy        => $Row[17],
-            ChangeTime      => $Row[18],
-            ChangeBy        => $Row[19],
-            ID              => $Row[20],
-        );
+        my $Index = 0;
+        COLUMN:
+        for my $Column ( @Columns ) {
+            $Data{ $Column } = $Row[$Index];
+            $Index++;
+        }
     }
 
     # no data found...

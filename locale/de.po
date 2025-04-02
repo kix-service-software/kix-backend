@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-3-25 07:38+0000\n"
-"PO-Revision-Date: 2024-12-09 14:51+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"POT-Creation-Date: 2025-3-31 09:11+0000\n"
+"PO-Revision-Date: 2025-03-28 10:24+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14\n"
+"X-Generator: Weblate 5.6.2\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -405,7 +405,7 @@ msgstr "Neues Ticket durch Anwender/Kunde erstellt."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Number of open tickets by statetype"
-msgstr ""
+msgstr "Anzahl offener Tickets nach Statetype"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Object"
@@ -2984,20 +2984,8 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default spelling dictionary"
 msgstr "Standard-Rechtschreibwörterbuch"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket queue"
-msgstr "Standard-Ticket-Team"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default ticket type"
-msgstr "Standard-Ticket-Typ"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Default value for NameX"
@@ -3054,10 +3042,6 @@ msgstr ""
 msgid ""
 "Defines all the languages that are available to the application. Specify "
 "only English names of languages here."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines all the parameters for this item in the customer preferences."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3356,14 +3340,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the parameters for the SupportData collection and sending."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the contact preferences table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines the parameters for the customer company preferences table."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4628,18 +4604,6 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default service"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket queue"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Your default ticket type"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Your organizations name for use in placeholder."
 msgstr "Der Name Ihres Unternehmens für die Verwendung in Platzhaltern."
 
@@ -4733,7 +4697,7 @@ msgstr ""
 msgid ""
 "Configuration for configuration item number generator module "
 "\"ClassPrefixes\". Module generates incremental numbers with pattern &lt;"
-"SystemID+Separator&gt;&lt;ClassPrefix+Separator&gt;&lt;FormattedCounter&gt;, "
+"ClassPrefix+Separator&gt;&lt;SystemID+Separator&gt;&lt;FormattedCounter&gt;, "
 "e.g. 12CM0004, 12CM0005. When no class prefix and no default prefix is "
 "given, the class id is used."
 msgstr ""
@@ -6630,6 +6594,12 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "Default ticket queue"
+#~ msgstr "Standard-Ticket-Team"
+
+#~ msgid "Default ticket type"
+#~ msgstr "Standard-Ticket-Typ"
 
 #~ msgid "note-report"
 #~ msgstr "Notiz (Bericht)"
