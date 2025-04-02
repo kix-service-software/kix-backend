@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -234,7 +234,8 @@ sub Run {
             if ( defined $CountTotal ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'info',
-                    Message  => "Started background import of $CountTotal \"$Item->{Language}\" translations from client \"$ClientRegistration->{ClientID}\".",
+                    Message  => "Started background import of $CountTotal \"$Item->{Language}\" ".($Item->{plugin} ? "($Item->{plugin}) " : "")
+                        ."translations from client \"$ClientRegistration->{ClientID}\".",
                 );
             }
         }
