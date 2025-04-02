@@ -247,6 +247,15 @@ sub OptionLookup {
         $Result = $Row[0];
     }
 
+    if ( !defined $Result ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No config found for ' . ($Param{ID} ? "ID: $Param{ID}" : "Name: $Param{Name}"),
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
     # set cache
     if ( $Result ) {
         $Kernel::OM->Get('Cache')->Set(
