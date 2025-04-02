@@ -17,11 +17,8 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $ObjectTagModule = 'Kernel::System::ObjectTag';
 
-# require module
-return if ( !$Kernel::OM->Get('Main')->Require( $ObjectTagModule ) );
-
 # create backend object
-my $ObjectTagObject = $ObjectTagModule->new( %{ $Self } );
+my $ObjectTagObject = $Kernel::OM->Get('ObjectTag');
 $Self->Is(
     ref( $ObjectTagObject ),
     $ObjectTagModule,
@@ -114,7 +111,6 @@ my @Tests = (
         ResultAs        => 'True',
         SaveResult      => 'ID_0',
         SetFixedTime    => '-86400',
-        UnsetFixedTime  => '86400'
     },
     {
         Name     => 'ObjectTagAdd | Name: test, ObjectType: UnitTest, ObjectID: 1 | Repeated | Return same ID',
@@ -333,8 +329,8 @@ for my $Test ( @Tests ) {
         );
     }
 
-    if ( $Test->{UnsetFixedTime} ) {
-        $Helper->FixedTimeAddSeconds($Test->{UnsetFixedTime});
+    if ( $Test->{SetFixedTime} ) {
+        $Helper->FixedTimeAddSeconds(-1 * $Test->{SetFixedTime});
     }
 }
 

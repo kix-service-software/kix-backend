@@ -98,18 +98,18 @@ sub Run {
     foreach my $ID ( @{$Param{Data}->{ObjectTagID}} ) {
 
         # get the ObjectTag data
-        my %ObjectTag = $Kernel::OM->Get('ObjectTag')->ObjectTagGet(
+        my $ObjectTag = $Kernel::OM->Get('ObjectTag')->ObjectTagGet(
             ID => $ID,
         );
 
-        if ( !%ObjectTag ) {
+        if ( !IsHashRefWithData($ObjectTag) ) {
             return $Self->_Error(
                 Code => 'Object.NotFound',
             );
         }
 
         # add
-        push(@ObjectTagList, \%ObjectTag);
+        push(@ObjectTagList, $ObjectTag);
     }
 
     if ( scalar(@ObjectTagList) == 1 ) {
