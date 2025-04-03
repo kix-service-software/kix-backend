@@ -53,8 +53,10 @@ sub ParameterDefinition {
     my %PermissionTypes = $Kernel::OM->Get('Role')->PermissionTypeList(
         Valid => 1
     );
-    my @PermissionTypeIDs = (keys %PermissionTypes || ());
-
+    my @PermissionTypeIDs = ();
+    if ( %PermissionTypes ) {
+        @PermissionTypeIDs = keys %PermissionTypes;
+    }
     return {
         'RoleID' => {
             DataType => 'NUMERIC',

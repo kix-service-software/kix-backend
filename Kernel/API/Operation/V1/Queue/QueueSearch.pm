@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -108,7 +108,7 @@ sub Run {
                 ListB => \@QueueIDs,
                 Union => 0,
             );
-            
+
             %BasePermissionQueueIDs = (
                 %BasePermissionQueueIDs,
                 map { $_ => 1 } @CombinedList,
@@ -132,8 +132,8 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Queue::QueueGet',
             SuppressPermissionErrors => 1,
-            Data      => {
-                QueueID => join(',', sort keys %QueueList),
+            Data                     => {
+                QueueID => join( q{,}, sort { $a <=> $b } keys %QueueList ),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
